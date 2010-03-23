@@ -25,7 +25,6 @@ integrate it into your CLI and add the tasks manually.
 First setup the class loader to load the classes for the `DoctrineExtensions`
 namespace in your project:
 
-    [php]
     $classLoader = new \Doctrine\Common\ClassLoader('DoctrineExtensions', '/path/to/extensions');
     $classLoader->register();
 
@@ -46,7 +45,6 @@ This autoloader loads classes like the following:
 
 Now we are ready to add our command line tasks to your CliController:
 
-    [php]
     $cli = new \Doctrine\Common\Cli\CliController($configuration);
 
     $cli->addNamespace('Migrations')
@@ -158,7 +156,6 @@ your first migration class with the following command:
 Have a look and you will see a new class at the above location that looks like 
 the following:
 
-    [php]
     <?php
 
     namespace DoctrineMigrations;
@@ -202,7 +199,6 @@ As you can see we have a new version present and it is ready to be executed. The
 problem is it doesn't have anything in it so nothing would be executed! Lets
 add some code to it and add a new table!
 
-    [php]
     <?php
 
     namespace DoctrineMigrations;
