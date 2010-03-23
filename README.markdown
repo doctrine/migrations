@@ -22,7 +22,7 @@ In order to use the Migrations extension you need to do a little integration to
 make sure the extensions classes can be loaded. Currently, you also need to 
 integrate it into your CLI and add the tasks manually.
 
-First setup the class loader to load the classes for the `DoctrineExtensions`
+First setup the class loader to load the classes for the DoctrineExtensions
 namespace in your project:
 
     $classLoader = new \Doctrine\Common\ClassLoader('DoctrineExtensions', '/path/to/extensions');
@@ -233,7 +233,7 @@ it produces the SQL we expect!
 
          -> CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB
 
-Everything looks good so we can remove the `--dry-run` option and actually execute
+Everything looks good so we can remove the --dry-run option and actually execute
 the migration!
 
     $ ./doctrine migrations:migrate
