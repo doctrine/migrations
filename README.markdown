@@ -274,18 +274,19 @@ By checking the status again you will see everything is updated:
 
 ## Manual SQL Migrations
 
-You can optionally write your own manual SQL statements and register them to be
-executed. You just need to use the _addSql() method. Below is an example where
-we do this.
+Sometimes you need to do some complex migration operations which force you
+to use plain SQL statements. Using the __addSql()_ this is possible within any
+migration class.
 
-First generate a new migration class:
+First you need to generate a new migration class:
 
     $ ./doctrine migrations:generate --migrations-dir=migrations/DoctrineMigrations/
     Doctrine Command Line Interface
 
     Writing new migration class to "migrations/DoctrineMigrations/Version20100323160310.php"
 
-Now open it up and we can add our own custom SQL queries:
+This newly generated migration class is the place where you can add your own
+custom SQL queries:
 
     <?php
 
@@ -307,7 +308,7 @@ Now open it up and we can add our own custom SQL queries:
         }
     }
 
-When we execute the migration it simply executes the SQL in the order you add it:
+When running the migration it simply executes the SQL in the order you add it:
 
     $ ./doctrine migrations:migrate
     Doctrine Command Line Interface
