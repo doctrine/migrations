@@ -183,7 +183,7 @@ the following:
         }
     }
 
-Now we have a new migration class present, lets run the status task to see
+Now that we have a new migration class present, lets run the status task to see
 if it is there:
 
     $ ./doctrine migrations:status
@@ -203,8 +203,8 @@ if it is there:
         >> 2010-03-23 14:03:30 (20100323140330)                not migrated
 
 As you can see we have a new version present and it is ready to be executed. The
-problem is it doesn't have anything in it so nothing would be executed! Lets
-add some code to it and add a new table!
+problem is it does not have anything in it so nothing would be executed! Let's
+add some code to it and add a new table:
 
     <?php
 
@@ -229,7 +229,7 @@ add some code to it and add a new table!
     }
 
 Now we are ready to give it a test! First lets just do a dry-run to make sure
-it produces the SQL we expect!
+it produces the SQL we expect:
 
     $ ./doctrine migrations:migrate --dry-run
     Doctrine Command Line Interface
@@ -241,7 +241,7 @@ it produces the SQL we expect!
          -> CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB
 
 Everything looks good so we can remove the --dry-run option and actually execute
-the migration!
+the migration:
 
     $ ./doctrine migrations:migrate
     Doctrine Command Line Interface
@@ -254,7 +254,7 @@ the migration!
 
       ++ migrated
 
-Now if we check the status again you will see everything is updated!
+By checking the status again you will see everything is updated:
 
     $ ./doctrine migrations:status
     Doctrine Command Line Interface
