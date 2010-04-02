@@ -1,7 +1,7 @@
 # Doctrine 2 Migrations
 
 The Doctrine migrations offer additional functionality on top of the database
-abstraction layer for versioning your database schema and easily deploying 
+abstraction layer for versioning your database schema and easily deploying
 changes to it. It is easy to use and a very powerful tool! Continue reading to
 learn a bit about migrations.
 
@@ -18,7 +18,7 @@ database or even update production database servers.
 
 ## Setup
 
-In order to use the Migrations extension you need to do a little integration to 
+In order to use the Migrations extension you need to do a little integration to
 make sure the extensions classes can be loaded.
 
 ### Class Loaders
@@ -94,12 +94,13 @@ with no arguments:
 
 ## Configuration
 
-The last thing you need to do is configure your migrations. You can do so manually
-by always passing the --migrations-dir and --version-table options but really it is
-ideal to use a XML/YAML configuration file. For this you can use the --configuration
-option to manually specify the path to a configuration file to use. If you don't
-specify any options it will look for a file named configuration.xml or configuration.yml
-at the root of your command line. So for these examples I have created a configuration.xml
+The last thing you need to do is to configure your migrations. You can do so
+manually by always passing the _--migrations-dir_ and _--version-table_
+options but really it is ideal to use a XML/YAML configuration file. For this
+you can use the _--configuration_ option to manually specify the path to a
+configuration file to use. If you don't specify any options it will look for a
+file named _configuration.xml_ or _configuration.yml_ at the root of your
+command line. So for these examples I have created a _configuration.xml_
 like the following:
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -116,8 +117,8 @@ like the following:
 
     </doctrine-migrations>
 
-You can also optionally specify each migration individually instead of reading it
-from a directory. This offers more flexibility as the naming pattern is not
+You can also optionally specify each migration individually instead of reading
+it from a directory. This offers more flexibility as the naming pattern is not
 required since you are not reading anything from the filesystem.
     
     <?xml version="1.0" encoding="UTF-8"?>
@@ -134,7 +135,7 @@ required since you are not reading anything from the filesystem.
 
     </doctrine-migrations>
 
-Of course you could do the same thing with a configuration.yml file:
+Of course you could do the same thing with a _configuration.yml_ file:
 
     table_name: doctrine_migration_versions
     directories:
@@ -158,7 +159,7 @@ your first migration class with the following command:
 
     Writing new migration class to "migrations/DoctrineMigrations/Version20100323140330.php"
 
-Have a look and you will see a new class at the above location that looks like 
+Have a look and you will see a new class at the above location that looks like
 the following:
 
     <?php
@@ -232,7 +233,7 @@ it produces the SQL we expect!
     $ ./doctrine migrations:migrate --dry-run
     Doctrine Command Line Interface
 
-     == Current version is 0 == 
+     == Current version is 0 ==
 
       ++ migrating 20100323140330
 
@@ -244,7 +245,7 @@ the migration!
     $ ./doctrine migrations:migrate
     Doctrine Command Line Interface
 
-     == Current version is 0 == 
+     == Current version is 0 ==
 
       ++ migrating 20100323140330
 
@@ -272,7 +273,7 @@ Now if we check the status again you will see everything is updated!
 
 ## Manual SQL Migrations
 
-You can optionally write your own manual SQL statements and register them to be 
+You can optionally write your own manual SQL statements and register them to be
 executed. You just need to use the _addSql() method. Below is an example where
 we do this.
 
@@ -326,7 +327,7 @@ we created. This allows us to easily revert the migrations.
     $ ./doctrine migrations:migrate --version=0
     Doctrine Command Line Interface
 
-     == Current version is 20100323160310 == 
+     == Current version is 20100323160310 ==
 
       -- reverting 20100323160310
 
@@ -340,8 +341,8 @@ we created. This allows us to easily revert the migrations.
 
       -- reverted
 
-Now our database is back to where we originally started. Give it a check with the
-status command:
+Now our database is back to where we originally started. Give it a check with
+the status command:
 
     $ ./doctrine migrations:status
     Doctrine Command Line Interface
@@ -363,13 +364,13 @@ status command:
 ## Writing Migration SQL Files
 
 You can optionally choose to not execute a migration directly on a database and
-instead output all the SQL statements to a file. This is possible with the following
-command:
+instead output all the SQL statements to a file. This is possible with the
+following command:
 
     $ ./doctrine migrations:migrate --write-sql=migration.sql
     Doctrine Command Line Interface
 
-     == Current version is 0 == 
+     == Current version is 0 ==
 
       ++ migrating 20100323140330
 
@@ -405,7 +406,7 @@ version to the database.
 
 ## Generating Migrations from ORM Mapping Information
 
-If you are using the Doctrine 2 ORM you can easily generate a migration class 
+If you are using the Doctrine 2 ORM you can easily generate a migration class
 by modifying your mapping information and running the diff task to compare it
 to your current database schema.
 
@@ -438,9 +439,9 @@ Be sure that you add the property to the Entities/User.php file:
         // ...
     }
 
-Instead of manually editing the entity class when you change your mapping information
-you can have Doctrine generate the new property and method stubs for you by running
-the generate-entities task:
+Instead of manually editing the entity class when you change your mapping
+information you can have Doctrine generate the new property and method stubs
+for you by running the generate-entities task:
 
     $ ./doctrine orm:generate-entities --from=yaml --dest=Entities
 
@@ -477,5 +478,5 @@ update your database:
 
 The SQL generated here is the exact same SQL that would be executed if you were
 using the orm:schema-tool task and the --update option. This just allows you to
-capture that SQL and maybe tweak it or add to it and trigger the deployment 
+capture that SQL and maybe tweak it or add to it and trigger the deployment
 later across multiple database servers.
