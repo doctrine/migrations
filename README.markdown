@@ -12,8 +12,8 @@ across multiple database servers. Each version is represented by a single PHP5
 class that allows you to manipulate your schema with an OO interface or by 
 manually writing SQL statements to be executed.
 
-This means you can easily commit new migration classes to your source control
-allowing other developers to pull them down and update their development
+This means you can easily commit new migration classes to your version control
+system allowing other developers to pull them down and update their development
 database or even update production database servers.
 
 ## Setup Class Loaders
