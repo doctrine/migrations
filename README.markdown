@@ -288,12 +288,12 @@ First generate a new migration class:
 Now open it up and we can add our own custom SQL queries:
 
     <?php
-    
+
     namespace DoctrineMigrations;
-    
+
     use DoctrineExtensions\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
-    
+
     class Version20100323160310 extends AbstractMigration
     {
         public function up(Schema $schema)
