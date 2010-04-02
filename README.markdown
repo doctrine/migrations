@@ -33,7 +33,7 @@ Now the above autoloader is able to load a class like the following:
 
     /path/to/extensions/DoctrineExtensions/Migrations/Migration.php
 
-Along with this we'll need to be able to autoload our actual migration classes:
+Along with this we will need to be able to autoload our actual migration classes:
 
     $classLoader = new \Doctrine\Common\ClassLoader('DoctrineMigrations', '/path/to/migrations');
     $classLoader->register();
@@ -96,12 +96,12 @@ with no arguments:
 
 The last thing you need to do is to configure your migrations. You can do so
 manually by always passing the _--migrations-dir_ and _--version-table_
-options but really it is ideal to use a XML/YAML configuration file. For this
-you can use the _--configuration_ option to manually specify the path to a
-configuration file to use. If you don't specify any options it will look for a
-file named _configuration.xml_ or _configuration.yml_ at the root of your
-command line. So for these examples I have created a _configuration.xml_
-like the following:
+options but you will save a lot of work when using a XML/YAML configuration file.
+For this you can use the _--configuration_ option to manually specify the path
+to a configuration file to use. If you don't specify any options the tasks will
+look for a file named _configuration.xml_ or _configuration.yml_ at the root of
+your command line. For the upcoming examples you can use a _configuration.xml_
+file like the following:
 
     <?xml version="1.0" encoding="UTF-8"?>
     <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
@@ -120,7 +120,7 @@ like the following:
 You can also optionally specify each migration individually instead of reading
 it from a directory. This offers more flexibility as the naming pattern is not
 required since you are not reading anything from the filesystem.
-    
+
     <?xml version="1.0" encoding="UTF-8"?>
     <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
@@ -151,8 +151,9 @@ And if you want to specify each migration manually in YAML you can:
 
 ## Migration Classes
 
-Now you are ready to start writing migration classes. You can easily generate
-your first migration class with the following command:
+As now everything is setup and configured you are ready to start writing
+migration classes. You can easily generate your first migration class with the
+following command:
 
     $ ./doctrine migrations:generate --migrations-dir=migrations/DoctrineMigrations/
     Doctrine Command Line Interface
