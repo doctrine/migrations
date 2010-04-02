@@ -383,8 +383,8 @@ _--write-sql_ option of the _migrate_ command:
 
      == Writing migration file to "migration.sql" ==
 
-Now if you have a look at migration.sql you will see the would be executed SQL
-outputted in a nice format:
+Now if you have a look at the _migration.sql_ file you will see the would be
+executed SQL outputted in a nice format:
 
     # Doctrine Migration File Generated on 2010-03-23 15:03:56
     # Migrating from 0 to 20100323140330
@@ -400,7 +400,7 @@ Take a look at the tasks available options:
 
     $ ./doctrine migrations:version --configuration=<PATH> --add=<YYYYMMDDHHMMSS> --delete=<YYYYMMDDHHMMSS>
 
-The migrations version table stores each version that has been migrated and 
+The migrations version table stores each version that has been migrated and
 exists in the current schema. Sometimes you may need to manually fix something
 in the database and manually add the migration version to the database.
 
