@@ -33,20 +33,22 @@ Now the above autoloader is able to load a class like the following:
 
     /path/to/extensions/DoctrineExtensions/Migrations/Migration.php
 
-We'll need to be able to autoload our actual migration classes:
+Along with this we'll need to be able to autoload our actual migration classes:
 
     $classLoader = new \Doctrine\Common\ClassLoader('DoctrineMigrations', '/path/to/migrations');
     $classLoader->register();
 
-This autoloader loads classes like the following:
+This autoloader is able to load classes like the following:
 
     /path/to/migrations/DoctrineMigrations/VersionYYYYMMDDHHMMSS.php
 
 ### Command Line Tasks
 
-Currently, you also need to integrate it into your CLI and add the tasks manually.
+NOTE: Currently, you also need to add the tasks manually to integrate them
+into your CLI.
 
-Now we are ready to add our command line tasks to your CliController:
+Now that we have setup the autoloaders we are ready to add our command line
+tasks to your CliController:
 
     $cli = new \Doctrine\Common\Cli\CliController($configuration);
 
@@ -60,16 +62,16 @@ Now we are ready to add our command line tasks to your CliController:
 
     $cli->run($_SERVER['argv']);
 
-Now when you execute your command line with no arguments you will see you have 
-a few new tasks to work with:
+You will see that you have a few new tasks when you execute your command line
+with no arguments:
 
     $ ./doctrine
     Doctrine Command Line Interface
 
     Available Tasks:
-    
-     ....
-    
+
+     ...
+
     Migrations:diff --from=<FROM> --configuration=<PATH> --migrations-dir=<PATH> --version-table=<PATH>
       Generate migration classes by comparing your current database to your ORM mapping information.
 
@@ -88,7 +90,7 @@ a few new tasks to work with:
     Migrations:version --configuration=<PATH> --add=<PATH> --delete=<FROM>
       Manually add and delete migration versions from the version table.
 
-     ....
+     ...
 
 ## Configuration
 
