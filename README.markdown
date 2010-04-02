@@ -325,7 +325,7 @@ When running the migration it simply executes the SQL in the order you add it:
 
 You maybe noticed in the last example that we defined a _down()_ method which
 drops the users table that we created. This method allows us to easily revert
-changes the schema has been migrated to. The _migrate_ tasks takes a _--version_
+changes the schema has been migrated to. The _migrate_ command takes a _--version_
 option which you can use to roll back your schema to a specific version of
 your migrations:
 
@@ -369,8 +369,8 @@ the status command:
 ## Writing Migration SQL Files
 
 You can optionally choose to not execute a migration directly on a database and
-instead output all the SQL statements to a file. This is possible with the
-following command:
+instead output all the SQL statements to a file. This is possible by using the
+_--write-sql_ option of the _migrate_ command:
 
     $ ./doctrine migrations:migrate --write-sql=migration.sql
     Doctrine Command Line Interface
