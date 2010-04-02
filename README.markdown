@@ -16,11 +16,12 @@ This means you can easily commit new migration classes to your version control
 system allowing other developers to pull them down and update their development
 database or even update production database servers.
 
-## Setup Class Loaders
+## Setup
+
+### Class Loaders
 
 In order to use the Migrations extension you need to do a little integration to 
-make sure the extensions classes can be loaded. Currently, you also need to 
-integrate it into your CLI and add the tasks manually.
+make sure the extensions classes can be loaded.
 
 First setup the class loader to load the classes for the DoctrineExtensions
 namespace in your project:
@@ -41,7 +42,9 @@ This autoloader loads classes like the following:
 
     /path/to/migrations/DoctrineMigrations/VersionYYYYMMDDHHMMSS.php
 
-## Command Line Tasks
+### Command Line Tasks
+
+Currently, you also need to integrate it into your CLI and add the tasks manually.
 
 Now we are ready to add our command line tasks to your CliController:
 
