@@ -18,10 +18,10 @@ database or even update production database servers.
 
 ## Setup
 
-### Class Loaders
-
 In order to use the Migrations extension you need to do a little integration to 
 make sure the extensions classes can be loaded.
+
+### Class Loaders
 
 First setup the class loader to load the classes for the DoctrineExtensions
 namespace in your project:
