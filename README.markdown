@@ -1,7 +1,7 @@
 # Doctrine 2 Migrations
 
 The Doctrine migrations offer additional functionality on top of the database
-abstraction layer for versioning your database schema and easily deploying
+abstraction layer (DBAL) for versioning your database schema and easily deploying
 changes to it. It is easy to use and a very powerful tool! Continue reading to
 learn a bit about migrations.
 
