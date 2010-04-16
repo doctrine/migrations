@@ -42,29 +42,44 @@ use Symfony\Components\Console\Command\Command,
  */
 abstract class AbstractCommand extends Command
 {
+    protected $_configuration;
+
+    protected function _outputHeader(Configuration $configuration, OutputInterface $output)
+    {
+        $name = $configuration->getName();
+        $name = $name ? $name : 'Doctrine Database Migrations';
+        $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
+        $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
+        $output->writeln('<question>' . $name . '</question>');
+        $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
+        $output->writeln('');
+    }
+
     protected function _getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
-        $outputWriter = new OutputWriter(function($message) use ($output) {
-            return $output->writeln($message);
-        });
+        if ( ! $this->_configuration) {
+            $outputWriter = new OutputWriter(function($message) use ($output) {
+                return $output->writeln($message);
+            });
 
-        $em = $this->getHelper('em')->getEntityManager();
+            $em = $this->getHelper('em')->getEntityManager();
 
-        if ($input->getOption('configuration')) {
-            $info = pathinfo($input->getOption('configuration'));
-            $class = $info['extension'] === 'xml' ? 'DoctrineExtensions\Migrations\Configuration\XmlConfiguration' : 'DoctrineExtensions\Migrations\Configuration\YamlConfiguration';
-            $configuration = new $class($em->getConnection(), $outputWriter);
-            $configuration->load($input->getOption('configuration'));
-        } else if (file_exists('migrations.xml')) {
-            $configuration = new XmlConfiguration($em->getConnection(), $outputWriter);
-            $configuration->load('migrations.xml');
-        } else if (file_exists('migrations.yml')) {
-            $configuration = new YamlConfiguration($em->getConnection(), $outputWriter);
-            $configuration->load('migrations.yml');
-        } else {
-            throw MigrationException::couldNotFindConfiguration();
+            if ($input->getOption('configuration')) {
+                $info = pathinfo($input->getOption('configuration'));
+                $class = $info['extension'] === 'xml' ? 'DoctrineExtensions\Migrations\Configuration\XmlConfiguration' : 'DoctrineExtensions\Migrations\Configuration\YamlConfiguration';
+                $configuration = new $class($em->getConnection(), $outputWriter);
+                $configuration->load($input->getOption('configuration'));
+            } else if (file_exists('migrations.xml')) {
+                $configuration = new XmlConfiguration($em->getConnection(), $outputWriter);
+                $configuration->load('migrations.xml');
+            } else if (file_exists('migrations.yml')) {
+                $configuration = new YamlConfiguration($em->getConnection(), $outputWriter);
+                $configuration->load('migrations.yml');
+            } else {
+                $configuration = new Configuration($em->getConnection(), $outputWriter);
+            }
+            $this->_configuration = $configuration;
         }
-
-        return $configuration;
+        return $this->_configuration;
     }
 }

@@ -77,16 +77,22 @@ EOT
         $configuration = $this->_getMigrationConfiguration($input, $output);
         $migration = new Migration($configuration);
 
+        $this->_outputHeader($configuration, $output);
+
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
         } else {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue?</question>', 'y');
-            if ($confirmation === true) {
-                $migration->migrate($version, $input->getOption('dry-run') ? true : false);
+            $dryRun = $input->getOption('dry-run') ? true : false;
+            if ($dryRun === true) {
+                $migration->migrate($version, true);
             } else {
-                $output->writeln('<info>Migration cancelled...</info>');
-                return 1;
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+                if ($confirmation === true) {
+                    $migration->migrate($version, $dryRun);
+                } else {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                }
             }
         }
     }

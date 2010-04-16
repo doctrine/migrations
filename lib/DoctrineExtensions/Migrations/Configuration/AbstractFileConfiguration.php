@@ -35,6 +35,9 @@ use DoctrineExtensions\Migrations\MigrationsException;
  */
 abstract class AbstractFileConfiguration extends Configuration
 {
+    /** The configuration file used to load configuration information */
+    private $_file;
+
     /** Whether or not the configuration file has been loaded yet or not */
     private $_loaded = false;
 
@@ -50,8 +53,28 @@ abstract class AbstractFileConfiguration extends Configuration
         if ($this->_loaded) {
             throw MigrationsException::configurationFileAlreadyLoaded();
         }
+        if (file_exists($path = getcwd() . '/' . $file)) {
+            $file = $path;
+        }
+        $this->_file = $file;
         $this->_load($file);
         $this->_loaded = true;
+    }
+
+    protected function _getDirectoryRelativeToFile($file, $input)
+    {
+        $path = realpath(dirname($file) . '/' . $input);
+        if ($path !== false) {
+            $directory = $path;
+        } else {
+            $directory = $input;
+        }
+        return $directory;
+    }
+
+    public function getFile()
+    {
+        return $this->_file;
     }
 
     /**

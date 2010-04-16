@@ -76,10 +76,14 @@ EOT
         $availableMigrations = $configuration->getNumberOfAvailableMigrations();
         $newMigrations = $availableMigrations - $executedMigrations;
 
-        $output->writeln("\n <info>==</info> Overview\n");
+        $output->writeln("\n <info>==</info> Configuration\n");
 
         $info = array(
-            'Table Name'            => $configuration->getMigrationTableName(),
+            'Name'                  => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
+            'Configuration Source'  => $configuration instanceof \DoctrineExtensions\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
+            'Version Table Name'    => $configuration->getMigrationsTableName(),
+            'Migrations Namespace'  => $configuration->getMigrationsNamespace(),
+            'Migrations Directory'  => $configuration->getMigrationsDirectory(),
             'Current Version'       => $currentVersionFormatted,
             'Latest Version'        => $latestVersionFormatted,
             'Executed Migrations'   => $executedMigrations,
@@ -90,12 +94,13 @@ EOT
             $output->writeln('    <comment>>></comment> ' . $name . ': ' . str_repeat(' ', 50 - strlen($name)) . $value);
         }
 
-        $output->writeln("\n <info>==</info> Status\n");
-
-        foreach ($configuration->getMigrations() as $version) {
-            $isMigrated = $version->isMigrated();
-            $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
-            $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+        if ($migrations = $configuration->getMigrations()) {
+            $output->writeln("\n <info>==</info> Migration Versions\n");
+            foreach ($migrations as $version) {
+                $isMigrated = $version->isMigrated();
+                $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+                $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+            }
         }
     }
 }

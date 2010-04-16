@@ -40,16 +40,20 @@ class YamlConfiguration extends AbstractFileConfiguration
     protected function _load($file)
     {
         $array = Yaml::load($file);
+
+        if (isset($array['name'])) {
+            $this->setName($array['name']);
+        }
         if (isset($array['table_name'])) {
-            $this->setMigrationTableName($array['table_name']);
+            $this->setMigrationsTableName($array['table_name']);
         }
-        if (isset($array['new_migrations_directory'])) {
-            $this->setNewMigrationsDirectory($array['new_migrations_directory']);
+        if (isset($array['migrations_namespace'])) {
+            $this->setMigrationsNamespace($array['migrations_namespace']);
         }
-        if (isset($array['directories']) && is_array($array['directories'])) {
-            foreach ($array['directories'] as $directory) {
-                $this->registerMigrationsFromDirectory($directory);
-            }
+        if (isset($array['migrations_directory'])) {
+            $migrationsDirectory = $this->_getDirectoryRelativeToFile($file, $array['migrations_directory']);
+            $this->setMigrationsDirectory($migrationsDirectory);
+            $this->registerMigrationsFromDirectory($migrationsDirectory);
         }
         if (isset($array['migrations']) && is_array($array['migrations'])) {
             foreach ($array['migrations'] as $migration) {

@@ -42,7 +42,7 @@ class GenerateCommand extends AbstractCommand
     private static $_template =
 '<?php
 
-namespace DoctrineMigrations;
+namespace <namespace>;
 
 use DoctrineExtensions\Migrations\AbstractMigration,
     Doctrine\DBAL\Schema\Schema;
@@ -92,17 +92,19 @@ EOT
     protected function _generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
         $placeHolders = array(
+            '<namespace>',
             '<version>',
             '<up>',
             '<down>'
         );
         $replacements = array(
+            $configuration->getMigrationsNamespace(),
             $version,
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
         );
         $code = str_replace($placeHolders, $replacements, self::$_template);
-        $dir = $configuration->getNewMigrationsDirectory();
+        $dir = $configuration->getMigrationsDirectory();
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
         $path = $dir . '/Version' . $version . '.php';

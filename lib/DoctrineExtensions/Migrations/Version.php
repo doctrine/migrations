@@ -51,6 +51,9 @@ class Version
     /** The array of collected SQL statements for this version */
     private $_sql = array();
 
+    /** The time in seconds that this migration version took to execute */
+    private $_time;
+
     public function __construct(Configuration $configuration, $version, $class)
     {
         $this->_configuration = $configuration;
@@ -98,9 +101,9 @@ class Version
         } else {
             $this->_configuration->createMigrationTable();
             if ($bool === true) {
-                $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationTableName() . " (version) VALUES (?)", array($this->_version));
+                $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->_version));
             } else {
-                $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationTableName() . " WHERE version = '$this->_version'");        
+                $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationsTableName() . " WHERE version = '$this->_version'");        
             }
         }
     }
@@ -164,6 +167,8 @@ class Version
         $this->_connection->beginTransaction();
 
         try {
+            $start = microtime(true);
+
             $fromSchema = $this->_sm->createSchema();
             $this->_migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -186,14 +191,8 @@ class Version
                         $this->_connection->executeQuery($query);
                     }
                     $this->isMigrated($direction === 'up' ? true : false);
-                    
-                    if ($direction === 'up') {
-                        $this->_outputWriter->write("\n  <info>++</info> migrated");
-                    } else {
-                        $this->_outputWriter->write("\n  <info>--</info> reverted");
-                    }
                 } else {
-                    $this->_outputWriter->write('No SQL queries to execute.', 'ERROR');
+                    $this->_outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->_version));
                 }
             } else {
                 foreach ($this->_sql as $query) {
@@ -205,6 +204,14 @@ class Version
 
             $this->_migration->{'post' . ucfirst($direction)}($toSchema);
 
+            $end = microtime(true);
+            $this->_time = round($end - $start, 2);
+            if ($direction === 'up') {
+                $this->_outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->_time));
+            } else {
+                $this->_outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->_time));
+            }
+
             return $this->_sql;
         } catch (\Exception $e) {
             $this->_outputWriter->write(sprintf('<error>Migration %s failed...</error>', $this->_version));
@@ -213,6 +220,16 @@ class Version
 
             throw $e;
         }
+    }
+
+    /**
+     * Returns the time this migration version took to execute
+     *
+     * @return integer $time The time this migration version took to execute
+     */
+    public function getTime()
+    {
+        return $this->_time;
     }
 
     public function __toString()

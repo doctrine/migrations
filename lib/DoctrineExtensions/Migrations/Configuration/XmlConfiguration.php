@@ -38,16 +38,19 @@ class XmlConfiguration extends AbstractFileConfiguration
     protected function _load($file)
     {
         $xml = simplexml_load_file($file);
+        if (isset($xml->name)) {
+            $this->setName((string) $xml->name);
+        }
         if (isset($xml->table['name'])) {
-            $this->setMigrationTableName((string) $xml->table['name']);
+            $this->setMigrationsTableName((string) $xml->table['name']);
         }
-        if (isset($xml->{'new-migrations-directory'})) {
-            $this->setNewMigrationsDirectory((string) $xml->{'new-migrations-directory'});
+        if (isset($xml->{'migrations-namespace'})) {
+            $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
         }
-        if (isset($xml->directories->directory)) {
-            foreach ($xml->directories->directory as $directory) {
-                $this->registerMigrationsFromDirectory((string) $directory['path']);
-            }
+        if (isset($xml->{'migrations-directory'})) {
+            $migrationsDirectory = $this->_getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
+            $this->setMigrationsDirectory($migrationsDirectory);
+            $this->registerMigrationsFromDirectory($migrationsDirectory);
         }
         if (isset($xml->migrations->migration)) {
             foreach ($xml->migrations->migration as $migration) {

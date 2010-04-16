@@ -32,9 +32,14 @@ namespace DoctrineExtensions\Migrations;
  */
 class MigrationException extends \Exception
 {
-    public static function couldNotFindConfiguration()
+    public static function migrationsNamespaceRequired()
     {
-        return new self('Could not find migrations configuration.');
+        return new self('Migrations namespace must be configured in order to use Doctrine migrations.');
+    }
+
+    public static function migrationsDirectoryRequired()
+    {
+        return new self('Migrations directory must be configured in order to use Doctrine migrations.');
     }
 
     public static function noMigrationsToExecute()

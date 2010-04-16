@@ -140,10 +140,17 @@ class Migration
         }
 
         $sql = array();
+        $time = 0;
         foreach ($migrations as $version) {
             $versionSql = $version->execute($direction, $dryRun);
             $sql[$version->getVersion()] = $versionSql;
+            $time += $version->getTime();
         }
+
+        $this->_outputWriter->write("\n  <comment>------------------------</comment>\n");
+        $this->_outputWriter->write(sprintf("  <info>++</info> finished in %s", $time));
+        $this->_outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrations)));
+        $this->_outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
         return $sql;
     }

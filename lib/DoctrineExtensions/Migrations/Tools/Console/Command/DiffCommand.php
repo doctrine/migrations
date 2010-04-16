@@ -94,7 +94,7 @@ EOT
     {
         $code = array();
         foreach ($sql as $query) {
-            if (strpos($query, $configuration->getMigrationTableName()) !== false) {
+            if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
             $code[] = "\$this->_addSql('" . $query . "');";
