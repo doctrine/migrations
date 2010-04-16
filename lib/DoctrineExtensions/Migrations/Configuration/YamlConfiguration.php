@@ -21,7 +21,7 @@
 
 namespace DoctrineExtensions\Migrations\Configuration;
 
-use \Symfony\Components\Yaml\Yaml;
+use Symfony\Components\Yaml\Yaml;
 
 /**
  * Load migration configuration information from a YAML configuration file.
@@ -42,6 +42,9 @@ class YamlConfiguration extends AbstractFileConfiguration
         $array = Yaml::load($file);
         if (isset($array['table_name'])) {
             $this->setMigrationTableName($array['table_name']);
+        }
+        if (isset($array['new_migrations_directory'])) {
+            $this->setNewMigrationsDirectory($array['new_migrations_directory']);
         }
         if (isset($array['directories']) && is_array($array['directories'])) {
             foreach ($array['directories'] as $directory) {

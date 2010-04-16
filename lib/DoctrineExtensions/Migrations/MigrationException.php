@@ -32,6 +32,16 @@ namespace DoctrineExtensions\Migrations;
  */
 class MigrationException extends \Exception
 {
+    public static function couldNotFindConfiguration()
+    {
+        return new self('Could not find migrations configuration.');
+    }
+
+    public static function noMigrationsToExecute()
+    {
+        return new self('Could not find any migrations to execute.');
+    }
+
     public static function unknownMigrationVersion($version)
     {
         return new self(sprintf('Could not find migration version %s', $version));

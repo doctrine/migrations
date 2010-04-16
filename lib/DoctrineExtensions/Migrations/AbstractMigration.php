@@ -26,7 +26,7 @@ use Doctrine\DBAL\Schema\Schema,
     DoctrineExtensions\Migrations\Version;
 
 /**
- * Abstract class for all users migration classes to extend from.
+ * Abstract class for individual migrations to extend from.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
@@ -36,6 +36,12 @@ use Doctrine\DBAL\Schema\Schema,
  */
 abstract class AbstractMigration
 {
+    /** The Migrations Configuration instance for this migration */
+    protected $_configuration;
+
+    /** The OutputWriter object instance used for outputting information */
+    protected $_outputWriter;
+
     /** The Doctrine\DBAL\Connection instance we are migrating */
     protected $_connection;
 
@@ -45,43 +51,38 @@ abstract class AbstractMigration
     /** Reference to the DatabasePlatform instance referenced by $_conection */
     protected $_platform;
 
-    /** CLI Printer instance used for useful output about your migration */
-    protected $_printer;
-
     /** Reference to the Version instance representing this migration */
     protected $_version;
 
     public function __construct(Version $version)
     {
-        $configuration = $version->getConfiguration();
-        $this->_connection = $configuration->getConnection();
+        $this->_configuration = $version->getConfiguration();
+        $this->_outputWriter = $this->_configuration->getOutputWriter();
+        $this->_connection = $this->_configuration->getConnection();
         $this->_sm = $this->_connection->getSchemaManager();
         $this->_platform = $this->_connection->getDatabasePlatform();
-        $this->_printer = $configuration->getPrinter();
         $this->_version = $version;
     }
 
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 
-    protected function _announce($message)
-    {
-        $this->_version->announce($message);
-    }
-
-    protected function _addSchemaChangesSql(Schema $schema)
-    {
-        return $this->_version->migrateSchema($schema);
-    }
-
     protected function _addSql($sql)
     {
         return $this->_version->addSql($sql);
     }
 
-    protected function _throwIrreversibleMigrationException($msg = null)
+    protected function _write($message)
     {
-        throw new IrreversibleMigrationException($msg);
+        $this->_outputWriter->write($message);
+    }
+
+    protected function _throwIrreversibleMigrationException($message = null)
+    {
+        if ($message === null) {
+            $message = 'This migration is irreversible and cannot be reverted.';
+        }
+        throw new IrreversibleMigrationException($message);
     }
 
     public function preUp(Schema $schema)

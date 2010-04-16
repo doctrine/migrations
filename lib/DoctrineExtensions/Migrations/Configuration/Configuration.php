@@ -22,10 +22,9 @@
 namespace DoctrineExtensions\Migrations\Configuration;
 
 use Doctrine\Dbal\Connection,
-    Doctrine\Common\Cli\Printers\AbstractPrinter,
-    Doctrine\Common\Cli\Printers\AnsiColorPrinter,
     DoctrineExtensions\Migrations\MigrationException,
     DoctrineExtensions\Migrations\Version,
+    DoctrineExtensions\Migrations\OutputWriter,
     Doctrine\Dbal\Schema\Table,
     Doctrine\Dbal\Schema\Column,
     Doctrine\DBAL\Types\Type;
@@ -43,25 +42,55 @@ use Doctrine\Dbal\Connection,
  */
 class Configuration
 {
+    /** Flag for whether or not the migration table has been created */
     private $_migrationTableCreated = false;
+
+    /** Connection instance to use for migrations */
     private $_connection;
-    private $_printer;
+
+    /** OutputWriter instance for writing output during migrations */
+    private $_outputWriter;
+
+    /** The migration table name to track versions in */
     private $_migrationTableName = 'doctrine_migration_versions';
+
+    /** The path to a directory where new migration classes will be written */
+    private $_newMigrationsDirectory;
+
+    /** Array of the registered migrations */
     private $_migrations = array();
 
     /**
-     * Base migration configuration object.
+     * Construct a migration configuration object.
      *
-     * @param Connection $connection      The connection instance we are migrating.
-     * @param AbstractPrinter $printer    CLI Printer instance used for useful output about your migration.
-     * @author Jonathan Wage
+     * @param Connection $connection      A Connection instance
+     * @param OutputWriter $outputWriter  A OutputWriter instance
      */
-    public function __construct(Connection $connection, AbstractPrinter $printer = null)
+    public function __construct(Connection $connection, OutputWriter $outputWriter = null)
     {
         $this->_connection = $connection;
-        $this->_printer = $printer ?: new AnsiColorPrinter;
+        if ($outputWriter === null) {
+            $outputWriter = new OutputWriter();
+        }
+        $this->_outputWriter = $outputWriter;
     }
 
+    /**
+     * Returns the OutputWriter instance
+     *
+     * @return OutputWriter $outputWriter  The OutputWriter instance
+     */
+    public function getOutputWriter()
+    {
+        return $this->_outputWriter;
+    }
+
+    /**
+     * Returns a timestamp version as a formatted date
+     *
+     * @param string $version 
+     * @return string $formattedVersion The formatted version
+     */
     public function formatVersion($version)
     {
         return sprintf('%s-%s-%s %s:%s:%s',
@@ -74,29 +103,54 @@ class Configuration
         );
     }
 
+    /**
+     * Returns the Connection instance
+     *
+     * @return Connection $connection  The Connection instance
+     */
     public function getConnection()
     {
         return $this->_connection;
     }
 
-    public function setPrinter(AbstractPrinter $printer)
-    {
-        $this->_printer = $printer;
-    }
-
-    public function getPrinter()
-    {
-        return $this->_printer;
-    }
-
+    /**
+     * Set the migration table name
+     *
+     * @param string $tableName The migration table name
+     */
     public function setMigrationTableName($tableName)
     {
         $this->_migrationTableName = $tableName;
     }
 
+    /**
+     * Returns the migration table name
+     *
+     * @return string $migrationTableName The migration table name
+     */
     public function getMigrationTableName()
     {
         return $this->_migrationTableName;
+    }
+
+    /**
+     * Set the new migrations directory where new migration classes are generated
+     *
+     * @param string $newMigrationsDirectory The new migrations directory 
+     */
+    public function setNewMigrationsDirectory($newMigrationsDirectory)
+    {
+        $this->_newMigrationsDirectory = $newMigrationsDirectory;
+    }
+
+    /**
+     * Returns the new migrations directory where new migration classes are generated
+     *
+     * @return string $newMigrationsDirectory The new migrations directory
+     */
+    public function getNewMigrationsDirectory()
+    {
+        return $this->_newMigrationsDirectory;
     }
 
     /**
@@ -120,7 +174,9 @@ class Configuration
         foreach ($iterator as $file) {
             $version = substr($file->getBasename('.php'), 7);
             $class = str_replace('/', '\\', substr($file->getPathname(), strlen($path . '/'), -4));
-            $versions[] = $this->registerMigration($version, $class);
+            if (strpos($class, 'DoctrineMigrations') !== false) {
+                $versions[] = $this->registerMigration($version, $class);
+            }
         }
         return $versions;
     }
@@ -152,7 +208,6 @@ class Configuration
      *
      * @param array $migrations
      * @return void
-     * @author Jonathan Wage
      */
     public function registerMigrations(array $migrations)
     {
@@ -174,7 +229,7 @@ class Configuration
     }
 
     /**
-     * Get the Version instance for a given version in the format YYYYMMDDHHMMSS.
+     * Returns the Version instance for a given version in the format YYYYMMDDHHMMSS.
      *
      * @param string $version   The version string in the format YYYYMMDDHHMMSS.
      * @return Version $version
@@ -214,7 +269,7 @@ class Configuration
     }
 
     /**
-     * Get the current migrated version from the versions table.
+     * Returns the current migrated version from the versions table.
      *
      * @return bool $currentVersion
      */
@@ -223,11 +278,11 @@ class Configuration
         $this->createMigrationTable();
 
         $result = $this->_connection->fetchColumn("SELECT version FROM " . $this->_migrationTableName . " ORDER BY version DESC LIMIT 1");
-        return $result !== false ? $result : 0;
+        return $result !== false ? (string) $result : '0';
     }
 
     /**
-     * Get the total number of executed migration versions
+     * Returns the total number of executed migration versions
      *
      * @return integer $count
      */
@@ -240,7 +295,7 @@ class Configuration
     }
 
     /**
-     * Get the total number of available migration versions
+     * Returns the total number of available migration versions
      *
      * @return integer $count
      */
@@ -250,7 +305,7 @@ class Configuration
     }
 
     /**
-     * Get the latest available migration version.
+     * Returns the latest available migration version.
      *
      * @return string $version  The version string in the format YYYYMMDDHHMMSS.
      */
@@ -258,7 +313,7 @@ class Configuration
     {
         $versions = array_keys($this->_migrations);
         $latest = end($versions);
-        return $latest !== false ? $latest : 0;
+        return $latest !== false ? (string) $latest : '0';
     }
 
     /**
@@ -289,7 +344,7 @@ class Configuration
     }
 
     /**
-     * Get the array of migrations to executed based on the given direction
+     * Returns the array of migrations to executed based on the given direction
      * and target version number.
      *
      * @param string $direction    The direction we are migrating.
@@ -322,7 +377,6 @@ class Configuration
      * @param Version $version    The Version instance to check.
      * @param string $to          The version we are migrating to.
      * @return void
-     * @author Jonathan Wage
      */
     private function _shouldExecuteMigration($direction, Version $version, $to)
     {

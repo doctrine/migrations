@@ -42,65 +42,54 @@ This autoloader is able to load classes like the following:
 
     /path/to/migrations/DoctrineMigrations/VersionYYYYMMDDHHMMSS.php
 
-### Command Line Tasks
+### Console Commands
 
-NOTE: Currently, you also need to add the tasks manually to integrate them
-into your CLI.
+Now that we have setup the autoloaders we are ready to add the migration console
+commands:
 
-Now that we have setup the autoloaders we are ready to add our command line
-tasks to your CliController:
+    $cli->addCommands(array(
+        // ...
 
-    $cli = new \Doctrine\Common\Cli\CliController($configuration);
+        // Migrations Commands
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\DiffCommand(),
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\ExecuteCommand(),
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\GenerateCommand(),
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\MigrateCommand(),
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\StatusCommand(),
+        new \DoctrineExtensions\Migrations\Tools\Console\Command\VersionCommand()
+    ));
 
-    $cli->addNamespace('Migrations')
-            ->addTask('migrate', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\MigrateTask')
-            ->addTask('version', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\VersionTask')
-            ->addTask('generate', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\GenerateTask')
-            ->addTask('diff', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\DiffTask')
-            ->addTask('status', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\StatusTask')
-            ->addTask('execute', 'DoctrineExtensions\Migrations\Tools\Cli\Tasks\ExecuteTask');
+You will see that you have a few new commands when you execute the following command:
 
-    $cli->run($_SERVER['argv']);
+    $ ./doctrine list migrations
+    Doctrine Command Line Interface version 2.0-DEV
 
-You will see that you have a few new tasks when you execute your command line
-with no arguments:
+    Usage:
+      [options] command [arguments]
 
-    $ ./doctrine
-    Doctrine Command Line Interface
+    Options:
+      --help           -h Display this help message.
+      --quiet          -q Do not output any message.
+      --verbose        -v Increase verbosity of messages.
+      --version        -V Display this program version.
+      --color          -c Force ANSI color output.
+      --no-interaction -n Do not ask any interactive question.
 
-    Available Tasks:
-
-     ...
-
-    Migrations:diff --from=<FROM> --configuration=<PATH> --migrations-dir=<PATH> --version-table=<PATH>
-      Generate migration classes by comparing your current database to your ORM mapping information.
-
-    Migrations:execute --configuration=<PATH> --migrations-dir=<PATH> --version-table=<PATH> --version=<FROM> --write-sql=<PATH> --direction=<DIRECTION> --dry-run
-      Execute a single migration version up or down
-
-    Migrations:generate --migrations-dir=<PATH>
-      Manually add and delete migration versions from the version table.
-
-    Migrations:migrate --configuration=<PATH> --migrations-dir=<PATH> --version-table=<PATH> --version=<FROM> --write-sql=<PATH> --dry-run
-      Execute a migration to a specified version or the current version.
-
-    Migrations:status --configuration=<PATH> --migrations-dir=<PATH> --version-table=<PATH>
-      View the status of some migrations.
-
-    Migrations:version --configuration=<PATH> --add=<PATH> --delete=<FROM>
-      Manually add and delete migration versions from the version table.
-
-     ...
+    Available commands for the "migrations" namespace:
+      :diff      Generate a migration by comparing your current database to your mapping information.
+      :execute   Execute a single migration version up or down manually.
+      :generate  Generate a blank migration class.
+      :migrate   Execute a migration to a specified version or the latest available version.
+      :status    View the status of a set of migrations.
+      :version   Manually add and delete migration versions from the version table.
 
 ## Configuration
 
 The last thing you need to do is to configure your migrations. You can do so
-manually by always passing the _--migrations-dir_ and _--version-table_
-options but you will save a lot of work when using a XML/YAML configuration file.
-For this you can use the _--configuration_ option to manually specify the path
-to a configuration file to use. If you don't specify any options the tasks will
-look for a file named _configuration.xml_ or _configuration.yml_ at the root of
-your command line. For the upcoming examples you can use a _configuration.xml_
+by using the _--configuration_ option to manually specify the path
+to a configuration file. If you don't specify any configuration file the tasks will
+look for a file named _migrations.xml_ or _migrations.yml_ at the root of
+your command line. For the upcoming examples you can use a _migrations.xml_
 file like the following:
 
     <?xml version="1.0" encoding="UTF-8"?>
@@ -110,6 +99,8 @@ file like the following:
                         http://doctrine-project.org/schemas/migrations/configuration.xsd">
 
         <table name="doctrine_migration_versions" />
+        
+        <new-migrations-directory>/path/to/migrations/DoctrineMigrations</new-migrations-directory>
 
         <directories>
             <directory path="/path/to/migrations" />
@@ -129,6 +120,8 @@ required since you are not reading anything from the filesystem.
 
         <table name="doctrine_migration_versions" />
 
+        <new-migrations-directory>/path/to/migrations/DoctrineMigrations</new-migrations-directory>
+
         <migrations>
             <migration version="1" class="DoctrineMigrations\NewMigration" />
         </migrations>
@@ -138,12 +131,14 @@ required since you are not reading anything from the filesystem.
 Of course you could do the same thing with a _configuration.yml_ file:
 
     table_name: doctrine_migration_versions
+    new_migrations_directory: /path/to/migrations/DoctrineMigrations
     directories:
       - /path/to/migrations
 
 And if you want to specify each migration manually in YAML you can:
 
     table_name: doctrine_migration_versions
+    new_migrations_directory: /path/to/migrations/DoctrineMigrations
     migrations:
       migration1:
         version: 1
@@ -155,10 +150,8 @@ As now everything is setup and configured you are ready to start writing
 migration classes. You can easily generate your first migration class with the
 following command:
 
-    $ ./doctrine migrations:generate --migrations-dir=migrations/DoctrineMigrations/
-    Doctrine Command Line Interface
-
-    Writing new migration class to "migrations/DoctrineMigrations/Version20100323140330.php"
+    $ ./doctrine migrations:generate
+    Generated new migration class to "/path/to/migrations/DoctrineMigrations/Version20100416130401.php"
 
 Have a look and you will see a new class at the above location that looks like
 the following:
@@ -170,7 +163,7 @@ the following:
     use DoctrineExtensions\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
-    class Version20100323140330 extends AbstractMigration
+    class Version20100416130401 extends AbstractMigration
     {
         public function up(Schema $schema)
         {
@@ -187,20 +180,19 @@ Now that we have a new migration class present, lets run the status task to see
 if it is there:
 
     $ ./doctrine migrations:status
-    Doctrine Command Line Interface
 
      == Overview
 
         >> Table Name:                                         doctrine_migration_versions
         >> Current Version:                                    0
-        >> Latest Version:                                     2010-03-23 14:03:30 (20100323140330)
+        >> Latest Version:                                     2010-04-16 13:04:52 (20100416130452)
         >> Executed Migrations:                                0
         >> Available Migrations:                               1
         >> New Migrations:                                     1
 
      == Status
 
-        >> 2010-03-23 14:03:30 (20100323140330)                not migrated
+        >> 2010-04-16 13:04:52 (20100416130401)                not migrated
 
 As you can see we have a new version present and it is ready to be executed. The
 problem is it does not have anything in it so nothing would be executed! Let's
@@ -213,7 +205,7 @@ add some code to it and add a new table:
     use DoctrineExtensions\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
-    class Version20100323140330 extends AbstractMigration
+    class Version20100416130401 extends AbstractMigration
     {
         public function up(Schema $schema)
         {
@@ -232,11 +224,11 @@ Now we are ready to give it a test! First lets just do a dry-run to make sure
 it produces the SQL we expect:
 
     $ ./doctrine migrations:migrate --dry-run
-    Doctrine Command Line Interface
+    Are you sure you wish to continue?
+    y
+    Executing dry run of migration up to 20100416130452 from 0
 
-     == Current version is 0 ==
-
-      ++ migrating 20100323140330
+      ++ migrating 20100416130452
 
          -> CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB
 
@@ -244,11 +236,11 @@ Everything looks good so we can remove the --dry-run option and actually execute
 the migration:
 
     $ ./doctrine migrations:migrate
-    Doctrine Command Line Interface
+    Are you sure you wish to continue?
+    y
+    Migrating up to 20100416130452 from 0
 
-     == Current version is 0 ==
-
-      ++ migrating 20100323140330
+      ++ migrating 20100416130452
 
          -> CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB
 
@@ -257,20 +249,19 @@ the migration:
 By checking the status again you will see everything is updated:
 
     $ ./doctrine migrations:status
-    Doctrine Command Line Interface
 
      == Overview
 
         >> Table Name:                                         doctrine_migration_versions
-        >> Current Version:                                    2010-03-23 14:03:30 (20100323140330)
-        >> Latest Version:                                     2010-03-23 14:03:30 (20100323140330)
+        >> Current Version:                                    2010-04-16 13:04:52 (20100416130452)
+        >> Latest Version:                                     2010-04-16 13:04:52 (20100416130452)
         >> Executed Migrations:                                1
         >> Available Migrations:                               1
         >> New Migrations:                                     0
 
      == Status
 
-        >> 2010-03-23 14:03:30 (20100323140330)                migrated
+        >> 2010-04-16 13:04:52 (20100416130452)                migrated
 
 ## Manual SQL Migrations
 
@@ -280,10 +271,8 @@ migration class.
 
 First you need to generate a new migration class:
 
-    $ ./doctrine migrations:generate --migrations-dir=migrations/DoctrineMigrations/
-    Doctrine Command Line Interface
-
-    Writing new migration class to "migrations/DoctrineMigrations/Version20100323160310.php"
+    $ ./doctrine migrations:generate
+    Generated new migration class to "/path/to/migrations/DoctrineMigrations/Version20100416130422.php"
 
 This newly generated migration class is the place where you can add your own
 custom SQL queries:
@@ -295,7 +284,7 @@ custom SQL queries:
     use DoctrineExtensions\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
-    class Version20100323160310 extends AbstractMigration
+    class Version20100416130422 extends AbstractMigration
     {
         public function up(Schema $schema)
         {
@@ -311,11 +300,11 @@ custom SQL queries:
 When running the migration it simply executes the SQL in the order you add it:
 
     $ ./doctrine migrations:migrate
-    Doctrine Command Line Interface
+    Are you sure you wish to continue?
+    y
+    Migrating up to 20100416130422 from 20100416130401
 
-     == Current version is 20100323140330 == 
-
-      ++ migrating 20100323160310
+      ++ migrating 20100416130422
 
          -> CREATE TABLE addresses (id INT NOT NULL, street VARCHAR(255) NOT NULL, PRIMARY KEY(id)) ENGINE = InnoDB
 
@@ -325,22 +314,22 @@ When running the migration it simply executes the SQL in the order you add it:
 
 You maybe noticed in the last example that we defined a _down()_ method which
 drops the users table that we created. This method allows us to easily revert
-changes the schema has been migrated to. The _migrate_ command takes a _--version_
-option which you can use to roll back your schema to a specific version of
+changes the schema has been migrated to. The _migrate_ command takes a _version_
+argument which you can use to roll back your schema to a specific version of
 your migrations:
 
-    $ ./doctrine migrations:migrate --version=0
-    Doctrine Command Line Interface
+    $ ./doctrine migrations:migrate 0
+    Are you sure you wish to continue?
+    y
+    Migrating down to 0 from 20100416130422
 
-     == Current version is 20100323160310 ==
-
-      -- reverting 20100323160310
+      -- reverting 20100416130422
 
          -> DROP TABLE addresses
 
       -- reverted
 
-      -- reverting 20100323140330
+      -- reverting 20100416130401
 
          -> DROP TABLE users
 
@@ -350,21 +339,20 @@ Now our database is back to where we originally started. Give it a check with
 the status command:
 
     $ ./doctrine migrations:status
-    Doctrine Command Line Interface
 
      == Overview
 
         >> Table Name:                                         doctrine_migration_versions
         >> Current Version:                                    0
-        >> Latest Version:                                     2010-03-23 16:03:10 (20100323160310)
+        >> Latest Version:                                     2010-04-16 13:04:22 (20100416130422)
         >> Executed Migrations:                                0
         >> Available Migrations:                               2
         >> New Migrations:                                     2
 
      == Status
 
-        >> 2010-03-23 14:03:30 (20100323140330)                not migrated
-        >> 2010-03-23 16:03:10 (20100323160310)                not migrated
+        >> 2010-04-16 13:04:01 (20100416130401)                not migrated
+        >> 2010-04-16 13:04:22 (20100416130422)                not migrated
 
 ## Writing Migration SQL Files
 
@@ -372,39 +360,42 @@ You can optionally choose to not execute a migration directly on a database and
 instead output all the SQL statements to a file. This is possible by using the
 _--write-sql_ option of the _migrate_ command:
 
-    $ ./doctrine migrations:migrate --write-sql=migration.sql
-    Doctrine Command Line Interface
+    $ ./doctrine migrations:migrate --write-sql
+    Executing dry run of migration up to 20100416130422 from 0
 
-     == Current version is 0 ==
-
-      ++ migrating 20100323140330
+      ++ migrating 20100416130401
 
          -> CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB
 
-     == Writing migration file to "migration.sql" ==
+      ++ migrating 20100416130422
 
-Now if you have a look at the _migration.sql_ file you will see the would be
+         -> CREATE TABLE addresses (id INT NOT NULL, street VARCHAR(255) NOT NULL, PRIMARY KEY(id)) ENGINE = InnoDB
+
+    Writing migration file to "/path/to/sandbox/doctrine_migration_20100416130405.sql"
+
+Now if you have a look at the _doctrine_migration_20100416130405.sql_ file you will see the would be
 executed SQL outputted in a nice format:
 
-    # Doctrine Migration File Generated on 2010-03-23 15:03:56
-    # Migrating from 0 to 20100323140330
+    # Doctrine Migration File Generated on 2010-04-16 13:04:05
+    # Migrating from 0 to 20100416130422
 
-    # Version 20100323140330
+    # Version 20100416130401
     CREATE TABLE users (username VARCHAR(255) NOT NULL, password VARCHAR(255) NOT NULL) ENGINE = InnoDB;
+
+    # Version 20100416130422
+    CREATE TABLE addresses (id INT NOT NULL, street VARCHAR(255) NOT NULL, PRIMARY KEY(id)) ENGINE = InnoDB;
 
 ## Managing the Version Table
 
 Sometimes you may need to manually change something in the database table which
 manages the versions for some migrations. For this you can use the version task.
-Take a look at the tasks available options:
+You can easily add a version like this:
 
-    $ ./doctrine migrations:version --configuration=<PATH> --add=<YYYYMMDDHHMMSS> --delete=<YYYYMMDDHHMMSS>
+    $ ./doctrine migrations:version YYYYMMDDHHMMSS --add
 
-The migrations version table stores each version that has been migrated and
-exists in the current schema. Sometimes you may need to manually fix something
-in the database and manually add the migration version to the database.
+Or you can delete that version:
 
-    $ ./doctrine migrations:version --configuration=migrations.xml --add=YYYYMMDDHHMMSS
+    $ ./doctrine migrations:version YYYYMMDDHHMMSS --delete
 
 The command does not execute any migrations code, it simply adds the specified
 version to the database.
@@ -444,19 +435,11 @@ Be sure that you add the property to the Entities/User.php file:
         // ...
     }
 
-Instead of manually editing the entity class when you change your mapping
-information you can have Doctrine generate the new property and method stubs
-for you by running the generate-entities task:
-
-    $ ./doctrine orm:generate-entities --from=yaml --dest=Entities
-
 Now if you run the diff task you will get a nicely generated migration with the
 changes required to update your database!
 
-    $ ./doctrine migrations:diff --from=yaml --trace --migrations-dir=migrations/DoctrineMigrations/
-    Doctrine Command Line Interface
-
-    Writing new migration class to "migrations/DoctrineMigrations/Version20100323160341.php"
+    $ ./doctrine migrations:diff
+    Generated new migration class to "/path/to/migrations/DoctrineMigrations/Version20100416130459.php" from schema differences.
 
 The migration class that is generated contains the SQL statements required to 
 update your database:
@@ -468,7 +451,7 @@ update your database:
      use DoctrineExtensions\Migrations\AbstractMigration,
          Doctrine\DBAL\Schema\Schema;
 
-     class Version20100323160341 extends AbstractMigration
+     class Version20100416130459 extends AbstractMigration
      {
          public function up(Schema $schema)
          {

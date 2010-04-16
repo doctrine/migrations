@@ -38,13 +38,18 @@ class Migration
     /** The Doctrine\DBAL\Connection instance we are migrating */
     private $_connection;
 
-    /** CLI Printer instance used for useful output about your migration */
-    private $_printer;
+    /** The OutputWriter object instance used for outputting information */
+    private $_outputWriter;
 
+    /**
+     * Construct a Migration instance
+     *
+     * @param Configuration $configuration  A migration Configuration instance
+     */
     public function __construct(Configuration $configuration)
     {
         $this->_configuration = $configuration;
-        $this->_printer = $configuration->getPrinter();
+        $this->_outputWriter = $configuration->getOutputWriter();
     }
 
     /**
@@ -89,8 +94,7 @@ class Migration
             $path = $path . '/doctrine_migration_' . date('YmdHms') . '.sql';
         }
 
-        $this->_printer->writeln('');
-        $this->_announce(sprintf('Writing migration file to "'.$this->_printer->format('%s', 'KEYWORD').'"', $path));
+        $this->_outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
 
         return file_put_contents($path, $string);
     }
@@ -101,6 +105,7 @@ class Migration
      * @param string $to      The version to migrate to.
      * @param string $dryRun  Whether or not to make this a dry run and not execute anything.
      * @return array $sql     The array of migration sql statements
+     * @throws MigrationException
      */
     public function migrate($to = null, $dryRun = false)
     {
@@ -109,20 +114,29 @@ class Migration
         }
 
         $from = $this->_configuration->getCurrentVersion();
-
-        $this->_announce(sprintf('Current version is ' . $this->_printer->format('%s', 'KEYWORD'), $from));
+        $from = (string) $from;
+        $to = (string) $to;
 
         $migrations = $this->_configuration->getMigrations();
         if ( ! isset($migrations[$to]) && $to > 0) {
-            $this->_printer->writeln(sprintf('Migration version %s does not exist', $to), 'ERROR');
-            return false;
+            throw MigrationException::unknownMigrationVersion($to);
+        }
+
+        if ($from === $to) {
+            throw MigrationException::alreadyAtVersion($to);
         }
 
         $direction = $from > $to ? 'down' : 'up';
         $migrations = $this->_configuration->getMigrationsToExecute($direction, $to);
 
+        if ($dryRun === false) {
+            $this->_outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
+        } else {
+            $this->_outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));            
+        }
+
         if (empty($migrations)) {
-            $this->_printer->writeln('No migrations to execute', 'ERROR');
+            throw MigrationException::noMigrationsToExecute();
         }
 
         $sql = array();
@@ -132,11 +146,5 @@ class Migration
         }
 
         return $sql;
-    }
-
-    protected function _announce($message)
-    {
-        $dash = $this->_printer->format(' == ', 'INFO');
-        $this->_printer->writeln($dash . $message . $dash);
     }
 }

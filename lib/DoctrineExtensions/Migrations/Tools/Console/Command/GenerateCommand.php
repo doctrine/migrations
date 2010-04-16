@@ -19,19 +19,17 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Cli\Tasks;
+namespace DoctrineExtensions\Migrations\Tools\Console\Command;
 
-use Doctrine\Common\Cli\CliException,
-    Doctrine\Common\Cli\Option,
-    Doctrine\Common\Cli\OptionGroup,
-    DoctrineExtensions\Migrations\Migration,
+use Symfony\Components\Console\Input\InputInterface,
+    Symfony\Components\Console\Output\OutputInterface,
+    Symfony\Components\Console\Input\InputArgument,
+    Symfony\Components\Console\Input\InputOption,
     DoctrineExtensions\Migrations\MigrationException,
-    DoctrineExtensions\Migrations\Configuration\Configuration,
-    DoctrineExtensions\Migrations\Configuration\YamlConfiguration,
-    DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
+    DoctrineExtensions\Migrations\Configuration\Configuration;
 
 /**
- * CLI Task for generating new blank migration classes
+ * Command for generating new blank migration classes
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
@@ -39,7 +37,7 @@ use Doctrine\Common\Cli\CliException,
  * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-class GenerateTask extends AbstractTask
+class GenerateCommand extends AbstractCommand
 {
     private static $_template =
 '<?php
@@ -61,44 +59,38 @@ class Version<version> extends AbstractMigration
 <down>
     }
 }';
-    /**
-     * @inheritdoc
-     */
-    public function buildDocumentation()
-    {
-        $options = new OptionGroup(OptionGroup::CARDINALITY_N_N, array(
-            new Option('migrations-dir', '<PATH>', 'The path to a directory containing migration classes.'),
-        ));
 
-        $doc = $this->getDocumentation();
-        $doc->setName('generate')
-            ->setDescription('Manually add and delete migration versions from the version table.')
-            ->getOptionGroup()
-                ->addOption($options);
+    protected function configure()
+    {
+        $this
+            ->setName('migrations:generate')
+            ->setDescription('Generate a blank migration class.')
+            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
+            ->addOption('editor-cmd', null, InputOption::PARAMETER_OPTIONAL, 'Open file with this command upon creation.')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command generates a blank migration class:
+
+    <info>%command.full_name%</info>
+
+You can optionally specify a <comment>--editor-cmd</comment> option to open the generated file in your favorite editor:
+
+    <info>%command.full_name% --editor-cmd=mate</info>
+EOT
+        );
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function validate()
+    public function execute(InputInterface $input, OutputInterface $output)
     {
-        return true;
-    }
+        $configuration = $this->_getMigrationConfiguration($input, $output);
 
-    /**
-     * @inheritdoc
-     */
-    public function run()
-    {
         $version = date('YmdHms');
-        $this->_generateMigration($version);
+        $path = $this->_generateMigration($configuration, $input, $version);
+        
+        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function _generateMigration($version, $up = null, $down = null)
+    protected function _generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
-        $printer = $this->getPrinter();
-        $arguments = $this->getArguments();
-
         $placeHolders = array(
             '<version>',
             '<up>',
@@ -110,15 +102,18 @@ class Version<version> extends AbstractMigration
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
         );
         $code = str_replace($placeHolders, $replacements, self::$_template);
-        $dir = isset($arguments['migrations-dir']) ? $arguments['migrations-dir'] : getcwd();
+        $dir = $configuration->getNewMigrationsDirectory();
+        $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
         $path = $dir . '/Version' . $version . '.php';
 
-        $printer->writeln(sprintf('Writing new migration class to "' . $printer->format('%s', 'INFO') . '"', $path));
-
-        $printer->writeln('');
-        $printer->writeln("     ".implode("\n     ", explode("\n", $code)));
-
         file_put_contents($path, $code);
+
+        if ($editorCmd = $input->getOption('editor-cmd'))
+        {
+          shell_exec($editorCmd . ' ' . escapeshellarg($path));
+        }
+
+        return $path;
     }
 }

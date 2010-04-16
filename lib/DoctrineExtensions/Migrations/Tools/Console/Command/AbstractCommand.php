@@ -19,19 +19,20 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Cli\Tasks;
+namespace DoctrineExtensions\Migrations\Tools\Console\Command;
 
-use Doctrine\Common\Cli\Tasks\AbstractTask as DoctrineAbstractTask,
-    Doctrine\Common\Cli\CliException,
-    Doctrine\Common\Cli\Option,
-    Doctrine\Common\Cli\OptionGroup,
+use Symfony\Components\Console\Command\Command,
+    Symfony\Components\Console\Input\InputInterface,
+    Symfony\Components\Console\Output\OutputInterface,
     DoctrineExtensions\Migrations\Migration,
+    DoctrineExtensions\Migrations\MigrationException,
+    DoctrineExtensions\Migrations\OutputWriter,
     DoctrineExtensions\Migrations\Configuration\Configuration,
     DoctrineExtensions\Migrations\Configuration\YamlConfiguration,
     DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
 
 /**
- * CLI Task for adding and deleting migration versions from the version table.
+ * CLI Command for adding and deleting migration versions from the version table.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
@@ -39,36 +40,30 @@ use Doctrine\Common\Cli\Tasks\AbstractTask as DoctrineAbstractTask,
  * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-abstract class AbstractTask extends DoctrineAbstractTask
+abstract class AbstractCommand extends Command
 {
-    protected function _getMigrationConfiguration()
+    protected function _getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
-        $arguments = $this->getArguments();
-        $em = $this->getConfiguration()->getAttribute('em');
+        $outputWriter = new OutputWriter(function($message) use ($output) {
+            return $output->writeln($message);
+        });
 
-        if (isset($arguments['configuration'])) {
-            $info = pathinfo($arguments['configuration']);
+        $em = $this->getHelper('em')->getEntityManager();
+
+        if ($input->getOption('configuration')) {
+            $info = pathinfo($input->getOption('configuration'));
             $class = $info['extension'] === 'xml' ? 'DoctrineExtensions\Migrations\Configuration\XmlConfiguration' : 'DoctrineExtensions\Migrations\Configuration\YamlConfiguration';
-            $configuration = new $class($em->getConnection());
-            $configuration->load($arguments['configuration']);
-        } else if (file_exists('configuration.xml')) {
-            $configuration = new XmlConfiguration($em->getConnection());
-            $configuration->load('configuration.xml');
-        } else if (file_exists('configuration.yml')) {
-            $configuration = new YamlConfiguration($em->getConnection());
-            $configuration->load('configuration.yml');
+            $configuration = new $class($em->getConnection(), $outputWriter);
+            $configuration->load($input->getOption('configuration'));
+        } else if (file_exists('migrations.xml')) {
+            $configuration = new XmlConfiguration($em->getConnection(), $outputWriter);
+            $configuration->load('migrations.xml');
+        } else if (file_exists('migrations.yml')) {
+            $configuration = new YamlConfiguration($em->getConnection(), $outputWriter);
+            $configuration->load('migrations.yml');
         } else {
-            $configuration = new Configuration($em->getConnection());
-            if (isset($arguments['migrations-dir'])) {
-                $configuration->registerMigrationsFromDirectory($arguments['migrations-dir']);
-            }
-
-            if (isset($arguments['version-table'])) {
-                $configuration->setMigrationTableName($arguments['version-table']);
-            }
+            throw MigrationException::couldNotFindConfiguration();
         }
-
-        $configuration->setPrinter($this->getPrinter());
 
         return $configuration;
     }

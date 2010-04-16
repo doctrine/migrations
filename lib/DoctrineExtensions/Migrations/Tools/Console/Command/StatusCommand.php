@@ -19,11 +19,12 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Cli\Tasks;
+namespace DoctrineExtensions\Migrations\Tools\Console\Command;
 
-use Doctrine\Common\Cli\CliException,
-    Doctrine\Common\Cli\Option,
-    Doctrine\Common\Cli\OptionGroup,
+use Symfony\Components\Console\Input\InputInterface,
+    Symfony\Components\Console\Output\OutputInterface,
+    Symfony\Components\Console\Input\InputArgument,
+    Symfony\Components\Console\Input\InputOption,
     DoctrineExtensions\Migrations\Migration,
     DoctrineExtensions\Migrations\MigrationException,
     DoctrineExtensions\Migrations\Configuration\Configuration,
@@ -31,7 +32,7 @@ use Doctrine\Common\Cli\CliException,
     DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
 
 /**
- * CLI Task to see the status of some Doctrine migrations
+ * Command to view the status of a set of migrations.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
@@ -39,44 +40,35 @@ use Doctrine\Common\Cli\CliException,
  * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-class StatusTask extends AbstractTask
+class StatusCommand extends AbstractCommand
 {
-    /**
-     * @inheritdoc
-     */
-    public function buildDocumentation()
+    protected function configure()
     {
-        $options = new OptionGroup(OptionGroup::CARDINALITY_N_N, array(
-            new Option('configuration', '<PATH>', 'The migrations configuration file to use.'),
-            new Option('migrations-dir', '<PATH>', 'The path to a directory containing migration classes.'),
-            new Option('version-table', '<PATH>', 'The name of the version table for these migrations.'),
-        ));
+        $this
+            ->setName('migrations:status')
+            ->setDescription('View the status of a set of migrations.')
+            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
+            ->setHelp(<<<EOT
+The <info>%command.name%</info> command outputs the status of a set of migrations:
 
-        $doc = $this->getDocumentation();
-        $doc->setName('status')
-            ->setDescription('View the status of some migrations.')
-            ->getOptionGroup()
-                ->addOption($options);
+    <info>%command.full_name%</info>
+EOT
+        );
     }
 
-    /**
-     * @inheritdoc
-     */
-    public function run()
+    public function execute(InputInterface $input, OutputInterface $output)
     {
-        $printer = $this->getPrinter();
-        $arguments = $this->getArguments();
-        $configuration = $this->_getMigrationConfiguration();
+        $configuration = $this->_getMigrationConfiguration($input, $output);
 
         $currentVersion = $configuration->getCurrentVersion();
         if ($currentVersion) {
-            $currentVersionFormatted = $configuration->formatVersion($currentVersion) . ' ('.$currentVersion.')';
+            $currentVersionFormatted = $configuration->formatVersion($currentVersion) . ' (<comment>'.$currentVersion.'</comment>)';
         } else {
             $currentVersionFormatted = 0;
         }
         $latestVersion = $configuration->getLatestVersion();
         if ($latestVersion) {
-            $latestVersionFormatted = $configuration->formatVersion($latestVersion) . ' ('.$latestVersion.')';
+            $latestVersionFormatted = $configuration->formatVersion($latestVersion) . ' (<comment>'.$latestVersion.'</comment>)';
         } else {
             $latestVersionFormatted = 0;
         }
@@ -84,8 +76,7 @@ class StatusTask extends AbstractTask
         $availableMigrations = $configuration->getNumberOfAvailableMigrations();
         $newMigrations = $availableMigrations - $executedMigrations;
 
-        $printer->writeln(' == Overview', 'INFO');
-        $printer->writeln('');
+        $output->writeln("\n <info>==</info> Overview\n");
 
         $info = array(
             'Table Name'            => $configuration->getMigrationTableName(),
@@ -93,24 +84,18 @@ class StatusTask extends AbstractTask
             'Latest Version'        => $latestVersionFormatted,
             'Executed Migrations'   => $executedMigrations,
             'Available Migrations'  => $availableMigrations,
-            'New Migrations'        => $printer->format($newMigrations, $newMigrations > 0 ? 'ERROR' : 'INFO')
+            'New Migrations'        => $newMigrations > 0 ? '<question>' . $newMigrations . '</question>' : $newMigrations
         );
         foreach ($info as $name => $value) {
-            $printer->writeln('    >> ' . $printer->format($name, 'HEADER') . ': ' . str_repeat(' ', 50 - strlen($name)) . $printer->format($value, 'INFO'));
+            $output->writeln('    <comment>>></comment> ' . $name . ': ' . str_repeat(' ', 50 - strlen($name)) . $value);
         }
 
-        $printer->writeln('');
-        $printer->writeln(' == Status', 'INFO');
-        $printer->writeln('');
+        $output->writeln("\n <info>==</info> Status\n");
 
         foreach ($configuration->getMigrations() as $version) {
             $isMigrated = $version->isMigrated();
-            $status = $printer->format(
-                $isMigrated ? 'migrated' : 'not migrated',
-                $isMigrated ? 'INFO' : 'ERROR'
-            );
-            $printer->writeln('    >> ' . $printer->format($configuration->formatVersion($version->getVersion()) . ' (' . $version->getVersion() . ')', 'HEADER') . str_repeat(' ', 30 - strlen($name)) . $status);
+            $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
         }
-        $printer->writeln('');
     }
 }

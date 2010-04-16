@@ -19,10 +19,10 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations\Configuration;
+namespace DoctrineExtensions\Migrations;
 
 /**
- * Load migration configuration information from a XML configuration file.
+ * Simple class for outputting information from migrations.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
@@ -30,29 +30,26 @@ namespace DoctrineExtensions\Migrations\Configuration;
  * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
-class XmlConfiguration extends AbstractFileConfiguration
+class OutputWriter
 {
-    /**
-     * @inheritdoc
-     */
-    protected function _load($file)
+    private $_closure;
+
+    public function __construct(\Closure $closure = null)
     {
-        $xml = simplexml_load_file($file);
-        if (isset($xml->table['name'])) {
-            $this->setMigrationTableName((string) $xml->table['name']);
+        if ($closure === null) {
+            $closure = function($message) {};
         }
-        if (isset($xml->{'new-migrations-directory'})) {
-            $this->setNewMigrationsDirectory((string) $xml->{'new-migrations-directory'});
-        }
-        if (isset($xml->directories->directory)) {
-            foreach ($xml->directories->directory as $directory) {
-                $this->registerMigrationsFromDirectory((string) $directory['path']);
-            }
-        }
-        if (isset($xml->migrations->migration)) {
-            foreach ($xml->migrations->migration as $migration) {
-                $this->registerMigration((string) $migration['version'], (string) $migration['class']);
-            }
-        }
+        $this->_closure = $closure;
+    }
+
+    /**
+     * Write output using the configured closure.
+     *
+     * @param string $message  The message to write.
+     */
+    public function write($message)
+    {
+        $closure = $this->_closure;
+        $closure($message);
     }
 }

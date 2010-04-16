@@ -36,27 +36,35 @@ use DoctrineExtensions\Migrations\Configuration\Configuration,
  */
 class Version
 {
+    /** The Migrations Configuration instance for this migration */
     private $_configuration;
+
+    /** The OutputWriter object instance used for outputting information */
+    private $_outputWriter;
+
+    /** The version in timestamp format (YYYYMMDDHHMMSS) */
     private $_version;
+
+    /** The migration class name for this version */
     private $_class;
-    private $_fromSchema;
-    private $_toSchema;
+
+    /** The array of collected SQL statements for this version */
     private $_sql = array();
 
     public function __construct(Configuration $configuration, $version, $class)
     {
         $this->_configuration = $configuration;
+        $this->_outputWriter = $configuration->getOutputWriter();
         $this->_version = $version;
         $this->_class = $class;
         $this->_connection = $configuration->getConnection();
         $this->_sm = $this->_connection->getSchemaManager();
         $this->_platform = $this->_connection->getDatabasePlatform();
-        $this->_printer = $configuration->getPrinter();
         $this->_migration = new $class($this);
     }
 
     /**
-     * Get the string version in the format YYYYMMDDHHMMSS
+     * Returns the string version in the format YYYYMMDDHHMMSS
      *
      * @return string $version
      */
@@ -66,7 +74,7 @@ class Version
     }
 
     /**
-     * Get the Migrations Configuration object instance
+     * Returns the Migrations Configuration object instance
      *
      * @return Configuration $configuration
      */
@@ -90,13 +98,9 @@ class Version
         } else {
             $this->_configuration->createMigrationTable();
             if ($bool === true) {
-                $this->_printer->writeln('');
-                $this->_printer->writeln('  ++ ' . $this->_printer->format('migrated', 'INFO'));
-                $this->_connection->execute("INSERT INTO " . $this->_configuration->getMigrationTableName() . " (version) VALUES (?)", array($this->_version));
+                $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationTableName() . " (version) VALUES (?)", array($this->_version));
             } else {
-                $this->_printer->writeln('');
-                $this->_printer->writeln('  -- ' . $this->_printer->format('reverted', 'INFO'));
-                $this->_connection->execute("DELETE FROM " . $this->_configuration->getMigrationTableName() . " WHERE version = '$this->_version'");        
+                $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationTableName() . " WHERE version = '$this->_version'");        
             }
         }
     }
@@ -140,8 +144,7 @@ class Version
             $path = $path . '/doctrine_migration_' . date('YmdHms') . '.sql';
         }
 
-        $this->_printer->writeln('');
-        $this->announce(sprintf('Writing migration file to "'.$this->_printer->format('%s', 'KEYWORD').'"', $path));
+        $this->_outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
 
         return file_put_contents($path, $string);
     }
@@ -152,6 +155,7 @@ class Version
      * @param string $direction   The direction to execute the migration.
      * @param string $dryRun      Whether to not actually execute the migration SQL and just do a dry run.
      * @return array $sql
+     * @throws Exception when migration fails
      */
     public function execute($direction, $dryRun = false)
     {
@@ -160,77 +164,55 @@ class Version
         $this->_connection->beginTransaction();
 
         try {
-            $this->_fromSchema = $this->_sm->createSchema();
-            $this->_migration->{'pre' . ucfirst($direction)}($this->_fromSchema);
+            $fromSchema = $this->_sm->createSchema();
+            $this->_migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-            $this->_printer->writeln('');
             if ($direction === 'up') {
-                $this->_printer->writeln('  ++ ' . $this->_printer->format(sprintf('migrating %s', $this->_version), 'KEYWORD'));
+                $this->_outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->_version) . "\n");
             } else {
-                $this->_printer->writeln('  -- ' . $this->_printer->format(sprintf('reverting %s', $this->_version), 'KEYWORD'));
+                $this->_outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->_version) . "\n");
             }
-            $this->_printer->writeln('');
 
-            $this->_toSchema = clone $this->_fromSchema;
-            $this->_migration->$direction($this->_toSchema);
-            $this->addSchemaChangesSql($this->_toSchema);
+            $toSchema = clone $fromSchema;
+            $this->_migration->$direction($toSchema);
+            $sql = $fromSchema->getMigrateToSql($toSchema, $this->_platform);
+            $this->addSql($sql);
 
             if ($dryRun === false) {
                 if ($this->_sql) {
                     $count = count($this->_sql);
                     foreach ($this->_sql as $query) {
-                        $this->announceQuery($query);
-                        $this->_connection->execute($query);
+                        $this->_outputWriter->write('     <comment>-></comment> ' . $query);
+                        $this->_connection->executeQuery($query);
                     }
                     $this->isMigrated($direction === 'up' ? true : false);
+                    
+                    if ($direction === 'up') {
+                        $this->_outputWriter->write("\n  <info>++</info> migrated");
+                    } else {
+                        $this->_outputWriter->write("\n  <info>--</info> reverted");
+                    }
                 } else {
-                    $this->announce('No SQL queries to execute.', 'ERROR');
+                    $this->_outputWriter->write('No SQL queries to execute.', 'ERROR');
                 }
             } else {
                 foreach ($this->_sql as $query) {
-                    $this->announceQuery($query);
+                    $this->_outputWriter->write('     <comment>-></comment> ' . $query);
                 }
             }
 
             $this->_connection->commit();
 
-            $this->_migration->{'post' . ucfirst($direction)}($this->_toSchema);
+            $this->_migration->{'post' . ucfirst($direction)}($toSchema);
 
             return $this->_sql;
         } catch (\Exception $e) {
-            $this->_printer->writeln('');
-            $this->announce('failed ... ' . $e->getMessage(), 'ERROR');
-
-            $this->_printer->writeln('');
-            $this->_printer->writeln($e->getTraceAsString());
+            $this->_outputWriter->write(sprintf('<error>Migration %s failed...</error>', $this->_version));
 
             $this->_connection->rollback();
+
+            throw $e;
         }
-    }
-
-    /**
-     * Migrate the passed schema and produce the needed SQL and add it to the migrations
-     * array of SQL statements to executes
-     *
-     * @param Schema $toSchema 
-     * @return void
-     */
-    public function addSchemaChangesSql(Schema $toSchema)
-    {
-        $sql = $this->_fromSchema->getMigrateToSql($toSchema, $this->_platform);
-        $this->_fromSchema = clone $toSchema;
-        $this->addSql($sql);
-        return $sql;
-    }
-
-    public function announce($message, $format = 'NONE')
-    {
-        $this->_printer->writeln($message, $format);
-    }
-
-    public function announceQuery($query)
-    {
-        $this->_printer->writeln($this->_printer->format('     -> ', 'INFO') . $query);
     }
 
     public function __toString()

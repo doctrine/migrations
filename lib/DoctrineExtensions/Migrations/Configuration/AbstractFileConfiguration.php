@@ -59,8 +59,7 @@ abstract class AbstractFileConfiguration extends Configuration
      * load the given configuration file whether it be xml, yaml, etc. or something
      * else.
      *
-     * @param string $file 
-     * @return void
+     * @param string $file  The path to a configuration file.
      */
     abstract protected function _load($file);
 }
