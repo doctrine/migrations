@@ -19,7 +19,7 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations;
+namespace Doctrine\DBAL\Migrations;
 
 /**
  * Exception to be thrown in the down() methods of migrations that signifies it 

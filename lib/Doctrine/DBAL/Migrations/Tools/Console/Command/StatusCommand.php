@@ -19,17 +19,17 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Console\Command;
+namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Components\Console\Input\InputInterface,
     Symfony\Components\Console\Output\OutputInterface,
     Symfony\Components\Console\Input\InputArgument,
     Symfony\Components\Console\Input\InputOption,
-    DoctrineExtensions\Migrations\Migration,
-    DoctrineExtensions\Migrations\MigrationException,
-    DoctrineExtensions\Migrations\Configuration\Configuration,
-    DoctrineExtensions\Migrations\Configuration\YamlConfiguration,
-    DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
+    Doctrine\DBAL\Migrations\Migration,
+    Doctrine\DBAL\Migrations\MigrationException,
+    Doctrine\DBAL\Migrations\Configuration\Configuration,
+    Doctrine\DBAL\Migrations\Configuration\YamlConfiguration,
+    Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 
 /**
  * Command to view the status of a set of migrations.
@@ -80,7 +80,7 @@ EOT
 
         $info = array(
             'Name'                  => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
-            'Configuration Source'  => $configuration instanceof \DoctrineExtensions\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
+            'Configuration Source'  => $configuration instanceof \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
             'Version Table Name'    => $configuration->getMigrationsTableName(),
             'Migrations Namespace'  => $configuration->getMigrationsNamespace(),
             'Migrations Directory'  => $configuration->getMigrationsDirectory(),

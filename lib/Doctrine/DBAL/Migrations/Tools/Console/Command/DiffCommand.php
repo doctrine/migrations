@@ -19,17 +19,18 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Console\Command;
+namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Components\Console\Input\InputInterface,
     Symfony\Components\Console\Output\OutputInterface,
     Symfony\Components\Console\Input\InputArgument,
     Symfony\Components\Console\Input\InputOption,
-    DoctrineExtensions\Migrations\MigrationException,
-    DoctrineExtensions\Migrations\Configuration\Configuration;
+    Doctrine\ORM\Tools\SchemaTool,
+    Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
- * Command for generating new blank migration classes
+ * Command for generate migration classes by comparing your current database schema
+ * to your mapping information.
  *
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
@@ -37,38 +38,17 @@ use Symfony\Components\Console\Input\InputInterface,
  * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
-class GenerateCommand extends AbstractCommand
+class DiffCommand extends GenerateCommand
 {
-    private static $_template =
-'<?php
-
-namespace <namespace>;
-
-use DoctrineExtensions\Migrations\AbstractMigration,
-    Doctrine\DBAL\Schema\Schema;
-
-class Version<version> extends AbstractMigration
-{
-    public function up(Schema $schema)
-    {
-<up>
-    }
-
-    public function down(Schema $schema)
-    {
-<down>
-    }
-}';
-
     protected function configure()
     {
         $this
-            ->setName('migrations:generate')
-            ->setDescription('Generate a blank migration class.')
+            ->setName('migrations:diff')
+            ->setDescription('Generate a migration by comparing your current database to your mapping information.')
             ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
             ->addOption('editor-cmd', null, InputOption::PARAMETER_OPTIONAL, 'Open file with this command upon creation.')
             ->setHelp(<<<EOT
-The <info>%command.name%</info> command generates a blank migration class:
+The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
 
     <info>%command.full_name%</info>
 
@@ -83,39 +63,42 @@ EOT
     {
         $configuration = $this->_getMigrationConfiguration($input, $output);
 
-        $version = date('YmdHms');
-        $path = $this->_generateMigration($configuration, $input, $version);
-        
-        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
-    }
+        $em = $this->getHelper('em')->getEntityManager();
+        $platform = $em->getConnection()->getDatabasePlatform();
+        $metadata = $em->getMetadataFactory()->getAllMetadata();
 
-    protected function _generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
-    {
-        $placeHolders = array(
-            '<namespace>',
-            '<version>',
-            '<up>',
-            '<down>'
-        );
-        $replacements = array(
-            $configuration->getMigrationsNamespace(),
-            $version,
-            $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null
-        );
-        $code = str_replace($placeHolders, $replacements, self::$_template);
-        $dir = $configuration->getMigrationsDirectory();
-        $dir = $dir ? $dir : getcwd();
-        $dir = rtrim($dir, '/');
-        $path = $dir . '/Version' . $version . '.php';
-
-        file_put_contents($path, $code);
-
-        if ($editorCmd = $input->getOption('editor-cmd'))
-        {
-          shell_exec($editorCmd . ' ' . escapeshellarg($path));
+        if (empty($metadata)) {
+            $output->writeln('No mapping information to process.', 'ERROR');
+            return;
         }
 
-        return $path;
+        $tool = new SchemaTool($em);
+
+        $fromSchema = $em->getConnection()->getSchemaManager()->createSchema();
+        $toSchema = $tool->getSchemaFromMetadata($metadata);
+        $up = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
+        $down = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
+
+        if ( ! $up && ! $down) {
+            $printer->writeln('No changes detected in your mapping information.', 'ERROR');
+            return;
+        }
+
+        $version = date('YmdHms');
+        $path = $this->_generateMigration($configuration, $input, $version, $up, $down);
+
+        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
+    }
+
+    private function _buildCodeFromSql(Configuration $configuration, array $sql)
+    {
+        $code = array();
+        foreach ($sql as $query) {
+            if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
+                continue;
+            }
+            $code[] = "\$this->_addSql('" . $query . "');";
+        }
+        return implode("\n", $code);
     }
 }

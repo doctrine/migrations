@@ -19,9 +19,9 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations;
+namespace Doctrine\DBAL\Migrations;
 
-use DoctrineExtensions\Migrations\Configuration\Configuration,
+use Doctrine\DBAL\Migrations\Configuration\Configuration,
     Doctrine\DBAL\Schema\Schema;
 
 /**

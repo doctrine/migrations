@@ -19,16 +19,16 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Console\Command;
+namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Components\Console\Input\InputInterface,
     Symfony\Components\Console\Output\OutputInterface,
     Symfony\Components\Console\Input\InputArgument,
     Symfony\Components\Console\Input\InputOption,
-    DoctrineExtensions\Migrations\Migration,
-    DoctrineExtensions\Migrations\Configuration\Configuration,
-    DoctrineExtensions\Migrations\Configuration\YamlConfiguration,
-    DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
+    Doctrine\DBAL\Migrations\Migration,
+    Doctrine\DBAL\Migrations\Configuration\Configuration,
+    Doctrine\DBAL\Migrations\Configuration\YamlConfiguration,
+    Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 
 /**
  * Command for executing a migration to a specified version or the latest available version.

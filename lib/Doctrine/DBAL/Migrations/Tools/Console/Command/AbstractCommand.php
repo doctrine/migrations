@@ -19,17 +19,17 @@
  * <http://www.doctrine-project.org>.
  */
  
-namespace DoctrineExtensions\Migrations\Tools\Console\Command;
+namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Components\Console\Command\Command,
     Symfony\Components\Console\Input\InputInterface,
     Symfony\Components\Console\Output\OutputInterface,
-    DoctrineExtensions\Migrations\Migration,
-    DoctrineExtensions\Migrations\MigrationException,
-    DoctrineExtensions\Migrations\OutputWriter,
-    DoctrineExtensions\Migrations\Configuration\Configuration,
-    DoctrineExtensions\Migrations\Configuration\YamlConfiguration,
-    DoctrineExtensions\Migrations\Configuration\XmlConfiguration;
+    Doctrine\DBAL\Migrations\Migration,
+    Doctrine\DBAL\Migrations\MigrationException,
+    Doctrine\DBAL\Migrations\OutputWriter,
+    Doctrine\DBAL\Migrations\Configuration\Configuration,
+    Doctrine\DBAL\Migrations\Configuration\YamlConfiguration,
+    Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 
 /**
  * CLI Command for adding and deleting migration versions from the version table.
@@ -66,7 +66,7 @@ abstract class AbstractCommand extends Command
 
             if ($input->getOption('configuration')) {
                 $info = pathinfo($input->getOption('configuration'));
-                $class = $info['extension'] === 'xml' ? 'DoctrineExtensions\Migrations\Configuration\XmlConfiguration' : 'DoctrineExtensions\Migrations\Configuration\YamlConfiguration';
+                $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
                 $configuration = new $class($em->getConnection(), $outputWriter);
                 $configuration->load($input->getOption('configuration'));
             } else if (file_exists('migrations.xml')) {

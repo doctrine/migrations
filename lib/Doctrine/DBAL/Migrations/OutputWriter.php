@@ -19,10 +19,10 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations;
+namespace Doctrine\DBAL\Migrations;
 
 /**
- * Class for Migrations specific exceptions
+ * Simple class for outputting information from migrations.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
@@ -30,40 +30,26 @@ namespace DoctrineExtensions\Migrations;
  * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
-class MigrationException extends \Exception
+class OutputWriter
 {
-    public static function migrationsNamespaceRequired()
+    private $_closure;
+
+    public function __construct(\Closure $closure = null)
     {
-        return new self('Migrations namespace must be configured in order to use Doctrine migrations.');
+        if ($closure === null) {
+            $closure = function($message) {};
+        }
+        $this->_closure = $closure;
     }
 
-    public static function migrationsDirectoryRequired()
+    /**
+     * Write output using the configured closure.
+     *
+     * @param string $message  The message to write.
+     */
+    public function write($message)
     {
-        return new self('Migrations directory must be configured in order to use Doctrine migrations.');
-    }
-
-    public static function noMigrationsToExecute()
-    {
-        return new self('Could not find any migrations to execute.');
-    }
-
-    public static function unknownMigrationVersion($version)
-    {
-        return new self(sprintf('Could not find migration version %s', $version));
-    }
-
-    public static function alreadyAtVersion($version)
-    {
-        return new self(sprintf('Database is already at version %s', $version));
-    }
-
-    public static function duplicateMigrationVersion($version, $class)
-    {
-        return new self(sprintf('Migration version %s already registered with class %s', $version, $class));
-    }
-
-    public static function configurationFileAlreadyLoaded()
-    {
-        return new self(sprintf('Migrations configuration file already loaded'));
+        $closure = $this->_closure;
+        $closure($message);
     }
 }

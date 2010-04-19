@@ -19,7 +19,7 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations\Configuration;
+namespace Doctrine\DBAL\Migrations\Configuration;
 
 /**
  * Load migration configuration information from a XML configuration file.

@@ -19,11 +19,11 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations;
+namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Schema\Schema,
-    DoctrineExtensions\Migrations\Configuration\Configuration,
-    DoctrineExtensions\Migrations\Version;
+    Doctrine\DBAL\Migrations\Configuration\Configuration,
+    Doctrine\DBAL\Migrations\Version;
 
 /**
  * Abstract class for individual migrations to extend from.

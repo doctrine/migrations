@@ -19,12 +19,12 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace DoctrineExtensions\Migrations\Configuration;
+namespace Doctrine\DBAL\Migrations\Configuration;
 
 use Doctrine\Dbal\Connection,
-    DoctrineExtensions\Migrations\MigrationException,
-    DoctrineExtensions\Migrations\Version,
-    DoctrineExtensions\Migrations\OutputWriter,
+    Doctrine\DBAL\Migrations\MigrationException,
+    Doctrine\DBAL\Migrations\Version,
+    Doctrine\DBAL\Migrations\OutputWriter,
     Doctrine\Dbal\Schema\Table,
     Doctrine\Dbal\Schema\Column,
     Doctrine\DBAL\Types\Type;

@@ -23,15 +23,15 @@ make sure the extensions classes can be loaded.
 
 ### Class Loaders
 
-First setup the class loader to load the classes for the DoctrineExtensions
+First setup the class loader to load the classes for the Doctrine\DBAL\Migrations
 namespace in your project:
 
-    $classLoader = new \Doctrine\Common\ClassLoader('DoctrineExtensions', '/path/to/extensions');
+    $classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL\Migrations', '/path/to/migrations/lib');
     $classLoader->register();
 
 Now the above autoloader is able to load a class like the following:
 
-    /path/to/extensions/DoctrineExtensions/Migrations/Migration.php
+    /path/to/migrations/lib/Doctrine/DBAL/Migrations/Migrations/Migration.php
 
 Along with this we will need to be able to autoload our actual migration classes:
 
@@ -51,12 +51,12 @@ commands:
         // ...
 
         // Migrations Commands
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\DiffCommand(),
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\ExecuteCommand(),
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\GenerateCommand(),
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\MigrateCommand(),
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\StatusCommand(),
-        new \DoctrineExtensions\Migrations\Tools\Console\Command\VersionCommand()
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
     ));
 
 You will see that you have a few new commands when you execute the following command:
@@ -98,47 +98,27 @@ file like the following:
           xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
                         http://doctrine-project.org/schemas/migrations/configuration.xsd">
 
-        <table name="doctrine_migration_versions" />
-        
-        <new-migrations-directory>/path/to/migrations/DoctrineMigrations</new-migrations-directory>
+        <name>Doctrine Sandbox Migrations</name>
 
-        <directories>
-            <directory path="/path/to/migrations" />
-        </directories>
-
-    </doctrine-migrations>
-
-You can also optionally specify each migration individually instead of reading
-it from a directory. This offers more flexibility as the naming pattern is not
-required since you are not reading anything from the filesystem.
-
-    <?xml version="1.0" encoding="UTF-8"?>
-    <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
-          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-          xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
-                        http://doctrine-project.org/schemas/migrations/configuration.xsd">
+        <migrations-namespace>DoctrineMigrations</migrations-namespace>
 
         <table name="doctrine_migration_versions" />
 
-        <new-migrations-directory>/path/to/migrations/DoctrineMigrations</new-migrations-directory>
-
-        <migrations>
-            <migration version="1" class="DoctrineMigrations\NewMigration" />
-        </migrations>
+        <migrations-directory>/path/to/DoctrineMigrations</migrations-directory>
 
     </doctrine-migrations>
 
 Of course you could do the same thing with a _configuration.yml_ file:
 
+    name: Doctrine Sandbox Migrations
+    migrations_namespace: DoctrineMigrations
     table_name: doctrine_migration_versions
-    new_migrations_directory: /path/to/migrations/DoctrineMigrations
-    directories:
-      - /path/to/migrations
+    migrations_directory: /path/to/migrations/DoctrineMigrations
 
 And if you want to specify each migration manually in YAML you can:
 
     table_name: doctrine_migration_versions
-    new_migrations_directory: /path/to/migrations/DoctrineMigrations
+    migrations_directory: /path/to/migrations/DoctrineMigrations
     migrations:
       migration1:
         version: 1
@@ -160,7 +140,7 @@ the following:
 
     namespace DoctrineMigrations;
 
-    use DoctrineExtensions\Migrations\AbstractMigration,
+    use Doctrine\DBAL\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
     class Version20100416130401 extends AbstractMigration
@@ -181,18 +161,22 @@ if it is there:
 
     $ ./doctrine migrations:status
 
-     == Overview
+     == Configuration
 
-        >> Table Name:                                         doctrine_migration_versions
-        >> Current Version:                                    0
-        >> Latest Version:                                     2010-04-16 13:04:52 (20100416130452)
+        >> Name:                                               Doctrine Sandbox Migrations
+        >> Configuration Source:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/migrations.xml
+        >> Version Table Name:                                 doctrine_migration_versions
+        >> Migrations Namespace:                               DoctrineMigrations
+        >> Migrations Directory:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/DoctrineMigrations
+        >> Current Version:                                    2010-04-16 13:04:22 (20100416130422)
+        >> Latest Version:                                     2010-04-16 13:04:22 (20100416130422)
         >> Executed Migrations:                                0
         >> Available Migrations:                               1
         >> New Migrations:                                     1
 
-     == Status
+     == Migration Versions
 
-        >> 2010-04-16 13:04:52 (20100416130401)                not migrated
+        >> 2010-04-16 13:04:01 (20100416130401)                not migrated
 
 As you can see we have a new version present and it is ready to be executed. The
 problem is it does not have anything in it so nothing would be executed! Let's
@@ -202,7 +186,7 @@ add some code to it and add a new table:
 
     namespace DoctrineMigrations;
 
-    use DoctrineExtensions\Migrations\AbstractMigration,
+    use Doctrine\DBAL\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
     class Version20100416130401 extends AbstractMigration
@@ -250,18 +234,22 @@ By checking the status again you will see everything is updated:
 
     $ ./doctrine migrations:status
 
-     == Overview
+     == Configuration
 
-        >> Table Name:                                         doctrine_migration_versions
+        >> Name:                                               Doctrine Sandbox Migrations
+        >> Configuration Source:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/migrations.xml
+        >> Version Table Name:                                 doctrine_migration_versions
+        >> Migrations Namespace:                               DoctrineMigrations
+        >> Migrations Directory:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/DoctrineMigrations
         >> Current Version:                                    2010-04-16 13:04:52 (20100416130452)
         >> Latest Version:                                     2010-04-16 13:04:52 (20100416130452)
         >> Executed Migrations:                                1
         >> Available Migrations:                               1
         >> New Migrations:                                     0
 
-     == Status
+     == Migration Versions
 
-        >> 2010-04-16 13:04:52 (20100416130452)                migrated
+        >> 2010-04-16 13:04:01 (20100416130452)                migrated
 
 ## Manual SQL Migrations
 
@@ -281,7 +269,7 @@ custom SQL queries:
 
     namespace DoctrineMigrations;
 
-    use DoctrineExtensions\Migrations\AbstractMigration,
+    use Doctrine\DBAL\Migrations\AbstractMigration,
         Doctrine\DBAL\Schema\Schema;
 
     class Version20100416130422 extends AbstractMigration
@@ -340,16 +328,20 @@ the status command:
 
     $ ./doctrine migrations:status
 
-     == Overview
+     == Configuration
 
-        >> Table Name:                                         doctrine_migration_versions
+        >> Name:                                               Doctrine Sandbox Migrations
+        >> Configuration Source:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/migrations.xml
+        >> Version Table Name:                                 doctrine_migration_versions
+        >> Migrations Namespace:                               DoctrineMigrations
+        >> Migrations Directory:                               /Users/jwage/Sites/doctrine2git/tools/sandbox/DoctrineMigrations
         >> Current Version:                                    0
         >> Latest Version:                                     2010-04-16 13:04:22 (20100416130422)
         >> Executed Migrations:                                0
         >> Available Migrations:                               2
         >> New Migrations:                                     2
 
-     == Status
+     == Migration Versions
 
         >> 2010-04-16 13:04:01 (20100416130401)                not migrated
         >> 2010-04-16 13:04:22 (20100416130422)                not migrated
@@ -448,7 +440,7 @@ update your database:
 
      namespace DoctrineMigrations;
 
-     use DoctrineExtensions\Migrations\AbstractMigration,
+     use Doctrine\DBAL\Migrations\AbstractMigration,
          Doctrine\DBAL\Schema\Schema;
 
      class Version20100416130459 extends AbstractMigration
