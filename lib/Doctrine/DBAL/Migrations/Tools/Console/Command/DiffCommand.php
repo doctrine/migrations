@@ -80,7 +80,7 @@ EOT
         $down = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
 
         if ( ! $up && ! $down) {
-            $printer->writeln('No changes detected in your mapping information.', 'ERROR');
+            $output->writeln('No changes detected in your mapping information.', 'ERROR');
             return;
         }
 
