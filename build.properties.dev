@@ -1,0 +1,11 @@
+version=2.0.0ALPHA1
+stability=alpha
+build.dir=build
+dist.dir=dist
+report.dir=reports
+log.archive.dir=logs
+test.phpunit_configuration_file=
+test.phpunit_generate_coverage=0
+test.pmd_reports=0
+test.pdepend_exec=
+test.phpmd_exec=
