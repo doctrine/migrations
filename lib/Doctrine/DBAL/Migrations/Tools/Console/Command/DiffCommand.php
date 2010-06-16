@@ -64,7 +64,8 @@ EOT
         $configuration = $this->_getMigrationConfiguration($input, $output);
 
         $em = $this->getHelper('em')->getEntityManager();
-        $platform = $em->getConnection()->getDatabasePlatform();
+        $conn = $em->getConnection();
+        $platform = $conn->getDatabasePlatform();
         $metadata = $em->getMetadataFactory()->getAllMetadata();
 
         if (empty($metadata)) {
@@ -74,7 +75,7 @@ EOT
 
         $tool = new SchemaTool($em);
 
-        $fromSchema = $em->getConnection()->getSchemaManager()->createSchema();
+        $fromSchema = $conn->getSchemaManager()->createSchema();
         $toSchema = $tool->getSchemaFromMetadata($metadata);
         $up = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
         $down = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));

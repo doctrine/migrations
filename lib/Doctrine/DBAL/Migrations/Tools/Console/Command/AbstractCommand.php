@@ -62,21 +62,21 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            $em = $this->getHelper('em')->getEntityManager();
+            $conn = $this->getHelper('db')->getConnection();
 
             if ($input->getOption('configuration')) {
                 $info = pathinfo($input->getOption('configuration'));
                 $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
-                $configuration = new $class($em->getConnection(), $outputWriter);
+                $configuration = new $class($conn, $outputWriter);
                 $configuration->load($input->getOption('configuration'));
             } else if (file_exists('migrations.xml')) {
-                $configuration = new XmlConfiguration($em->getConnection(), $outputWriter);
+                $configuration = new XmlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.xml');
             } else if (file_exists('migrations.yml')) {
-                $configuration = new YamlConfiguration($em->getConnection(), $outputWriter);
+                $configuration = new YamlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.yml');
             } else {
-                $configuration = new Configuration($em->getConnection(), $outputWriter);
+                $configuration = new Configuration($conn, $outputWriter);
             }
             $this->_configuration = $configuration;
         }
