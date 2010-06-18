@@ -21,12 +21,12 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
-use Doctrine\Dbal\Connection,
+use Doctrine\DBAL\Connection,
     Doctrine\DBAL\Migrations\MigrationException,
     Doctrine\DBAL\Migrations\Version,
     Doctrine\DBAL\Migrations\OutputWriter,
-    Doctrine\Dbal\Schema\Table,
-    Doctrine\Dbal\Schema\Column,
+    Doctrine\DBAL\Schema\Table,
+    Doctrine\DBAL\Schema\Column,
     Doctrine\DBAL\Types\Type;
 
 /**
