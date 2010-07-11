@@ -31,7 +31,9 @@ $classLoader->register();
 $classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__ . '/Doctrine');
 $classLoader->register();
 
-$helperSet = new \Symfony\Components\Console\Helper\HelperSet(array());
+$helperSet = new \Symfony\Components\Console\Helper\HelperSet(array(
+    'dialog' => new \Symfony\Components\Console\Helper\DialogHelper(),
+));
 
 $cli = new \Symfony\Components\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION);
 $cli->setCatchExceptions(true);
