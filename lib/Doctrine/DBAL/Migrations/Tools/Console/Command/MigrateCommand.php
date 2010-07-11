@@ -49,7 +49,6 @@ class MigrateCommand extends AbstractCommand
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to migrate to.', null)
             ->addOption('write-sql', null, InputOption::PARAMETER_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::PARAMETER_NONE, 'Execute the migration as a dry run.')
-            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -68,6 +67,8 @@ Or you can output the would be executed SQL statements to a file with <comment>-
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
 EOT
         );
+
+        parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
