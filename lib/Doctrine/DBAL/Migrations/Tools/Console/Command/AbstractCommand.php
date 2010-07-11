@@ -24,6 +24,7 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Symfony\Components\Console\Command\Command,
     Symfony\Components\Console\Input\InputInterface,
     Symfony\Components\Console\Output\OutputInterface,
+    Symfony\Components\Console\Input\InputOption,
     Doctrine\DBAL\Migrations\Migration,
     Doctrine\DBAL\Migrations\MigrationException,
     Doctrine\DBAL\Migrations\OutputWriter,
@@ -44,6 +45,12 @@ abstract class AbstractCommand extends Command
 {
     protected $_configuration;
 
+    protected function configure()
+    {
+        $this->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.');
+        $this->addOption('db-configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a database connection configuration file.');
+    }
+
     protected function _outputHeader(Configuration $configuration, OutputInterface $output)
     {
         $name = $configuration->getName();
@@ -62,7 +69,21 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            $conn = $this->getHelper('db')->getConnection();
+            if ($this->application->getHelperSet()->has('db')) {
+                $conn = $this->getHelper('db')->getConnection();
+            } else if($input->hasParameterOption('connection')) {
+                if (!file_exists($input->hasParameterOption('connection'))) {
+                    throw new \InvalidArgumentException("The specified connection file is a valid file.");
+                }
+
+                $params = include($input->hasParameterOption('connection'));
+                if (!is_array($params)) {
+                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                }
+                $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
+            } else {
+                throw new \InvalidArgumentException('You have to specify a --connection file or pass a Database Connection as a dependency to the Migrations.');
+            }
 
             if ($input->getOption('configuration')) {
                 $info = pathinfo($input->getOption('configuration'));

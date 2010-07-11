@@ -22,40 +22,22 @@ Phar::mapPhar();
 
 require_once 'Doctrine/Common/ClassLoader.php';
 
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine', 'phar://'.__FILE__);
+$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\Common', 'phar://'.__FILE__);
+$classLoader->register();
+
+$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL', 'phar://'.__FILE__);
 $classLoader->register();
 
 $classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__ . '/Doctrine');
 $classLoader->register();
 
-$configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
-
-$helperSet = null;
-if (file_exists($configFile)) {
-    if ( ! is_readable($configFile)) {
-        trigger_error(
-            'Configuration file [' . $configFile . '] does not have read permission.', E_ERROR
-        );
-    }
-
-    require $configFile;
-
-    foreach ($GLOBALS as $helperSetCandidate) {
-        if ($helperSetCandidate instanceof \Symfony\Components\Console\Helper\HelperSet) {
-            $helperSet = $helperSetCandidate;
-            break;
-        }
-    }
-}
-
-$helperSet = ($helperSet) ?: new \Symfony\Components\Console\Helper\HelperSet();
+$helperSet = new \Symfony\Components\Console\Helper\HelperSet(array());
 
 $cli = new \Symfony\Components\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION);
 $cli->setCatchExceptions(true);
 $cli->setHelperSet($helperSet);
 $cli->addCommands(array(
     // Migrations Commands
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),

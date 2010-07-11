@@ -45,7 +45,6 @@ class DiffCommand extends GenerateCommand
         $this
             ->setName('migrations:diff')
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
-            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
             ->addOption('editor-cmd', null, InputOption::PARAMETER_OPTIONAL, 'Open file with this command upon creation.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
@@ -57,6 +56,8 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
         );
+
+        parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

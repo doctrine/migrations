@@ -50,7 +50,6 @@ class VersionCommand extends AbstractCommand
             ->addArgument('version', InputArgument::REQUIRED, 'The version to add or delete.', null)
             ->addOption('add', null, InputOption::PARAMETER_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::PARAMETER_NONE, 'Delete the specified version.')
-            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add and delete migration versions from the version table:
 
@@ -61,6 +60,8 @@ If you want to delete a version you can use the <comment>--delete</comment> opti
     <info>%command.full_name% YYYYMMDDHHMMSS --delete</info>
 EOT
         );
+
+        parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)

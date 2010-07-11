@@ -51,7 +51,6 @@ class ExecuteCommand extends AbstractCommand
             ->addOption('dry-run', null, InputOption::PARAMETER_NONE, 'Execute the migration as a dry run.')
             ->addOption('up', null, InputOption::PARAMETER_NONE, 'Execute the migration down.')
             ->addOption('down', null, InputOption::PARAMETER_NONE, 'Execute the migration down.')
-            ->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
 
@@ -70,6 +69,8 @@ Or you can output the would be executed SQL statements to a file with <comment>-
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
 EOT
         );
+
+        parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
