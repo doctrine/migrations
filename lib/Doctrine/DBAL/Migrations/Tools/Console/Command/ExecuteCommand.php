@@ -85,7 +85,12 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
-            $version->execute($direction, $input->getOption('dry-run') ? true : false);
+            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+            if ($confirmation === true) {
+                $version->execute($direction, $input->getOption('dry-run') ? true : false);
+            } else {
+                $output->writeln('<error>Migration cancelled!</error>');
+            }
         }
     }
 }
