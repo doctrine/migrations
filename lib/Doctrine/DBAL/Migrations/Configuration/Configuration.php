@@ -230,6 +230,7 @@ class Configuration
         $files = glob($path . '/Version*.php');
         $versions = array();
         foreach ($files as $file) {
+            require_once($file);
             $info = pathinfo($file);
             $version = substr($info['filename'], 7);
             $class = $this->_migrationsNamespace . '\\' . $info['filename'];
