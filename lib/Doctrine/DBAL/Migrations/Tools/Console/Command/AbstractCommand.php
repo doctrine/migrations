@@ -62,6 +62,11 @@ abstract class AbstractCommand extends Command
         $output->writeln('');
     }
 
+    /**
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return Configuration
+     */
     protected function _getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
         if ( ! $this->_configuration) {

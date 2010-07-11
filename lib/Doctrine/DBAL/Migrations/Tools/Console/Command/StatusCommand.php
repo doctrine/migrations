@@ -81,6 +81,8 @@ EOT
 
         $info = array(
             'Name'                  => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
+            'Database Driver'       => $configuration->getConnection()->getDriver()->getName(),
+            'Database Name'         => $configuration->getConnection()->getDatabase(),
             'Configuration Source'  => $configuration instanceof \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
             'Version Table Name'    => $configuration->getMigrationsTableName(),
             'Migrations Namespace'  => $configuration->getMigrationsNamespace(),
