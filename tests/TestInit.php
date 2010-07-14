@@ -6,6 +6,9 @@ require_once __DIR__ . '/Doctrine/DBAL/Migrations/Tests/MigrationTestCase.php';
 
 use Doctrine\Common\ClassLoader;
 
+$classLoader = new ClassLoader('Doctrine\DBAL\Migrations\Tests', __DIR__ . '/');
+$classLoader->register();
+
 $classLoader = new ClassLoader('Doctrine\DBAL\Migrations', __DIR__ . '/../lib');
 $classLoader->register();
 

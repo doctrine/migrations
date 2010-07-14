@@ -7,7 +7,6 @@
 <project name="DoctrineMigrations" default="build" basedir=".">
 
     <taskdef classname="NativePhpunitTask" classpath="./tests/" name="nativephpunit" />
-    <taskdef classname="phing.tasks.ext.d51PearPkg2Task" name="d51pearpkg2" />
 
     <property file="build.properties" />
 
@@ -145,6 +144,7 @@
         Builds distributable PEAR packages.
     -->
     <target name="build-packages" depends="build-migrations">
+        <taskdef classname="phing.tasks.ext.d51PearPkg2Task" name="d51pearpkg2" />
         <d51pearpkg2 baseinstalldir="/" dir="${build.dir}/migrations">
            <name>DoctrineMigrations</name>
            <summary>Doctrine Database Migrations</summary>

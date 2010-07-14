@@ -20,7 +20,7 @@
 
 Phar::mapPhar();
 
-require_once 'Doctrine/Common/ClassLoader.php';
+require_once 'phar://'.__FILE__.'/Doctrine/Common/ClassLoader.php';
 
 $classLoader = new \Doctrine\Common\ClassLoader('Doctrine\Common', 'phar://'.__FILE__);
 $classLoader->register();
