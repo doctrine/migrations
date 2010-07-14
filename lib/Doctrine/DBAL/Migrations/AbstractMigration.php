@@ -85,6 +85,51 @@ abstract class AbstractMigration
         throw new IrreversibleMigrationException($message);
     }
 
+    /**
+     * Print a warning message if the condition evalutes to TRUE.
+     *
+     * @param bool $condition
+     * @param string $message
+     */
+    public function warnIf($condition, $message = '')
+    {
+        $message = (strlen($message)) ? $message : 'Unknown Reason';
+
+        if ($condition === true) {
+            $this->_outputWriter->write('    <warning>Warning during ' . $this->_version->getExecutionState() . ': ' . $message . '</warning>');
+        }
+    }
+
+    /**
+     * Abort the migration if the condition evalutes to TRUE.
+     *
+     * @param bool $condition
+     * @param string $message
+     */
+    public function abortIf($condition, $message = '')
+    {
+        $message = (strlen($message)) ? $message : 'Unknown Reason';
+
+        if ($condition === true) {
+            throw new AbortMigrationException($message);
+        }
+    }
+
+    /**
+     * Skip this migration (but not the next ones) if condition evalutes to TRUE.
+     *
+     * @param bool $condition
+     * @param string $message
+     */
+    public function skipIf($condition, $message = '')
+    {
+        $message = (strlen($message)) ? $message : 'Unknown Reason';
+
+        if ($condition === true) {
+            throw new SkipMigrationException($message);
+        }
+    }
+
     public function preUp(Schema $schema)
     {
     }

@@ -74,22 +74,23 @@ EOT
         }
 
         $version = $input->getArgument('version');
-        $migrated = $input->getOption('add') ? true : false;
+        $markMigrated = $input->getOption('add') ? true : false;
 
         if ( ! $configuration->hasVersion($version)) {
             throw MigrationException::unknownMigrationVersion($version);
         }
 
         $version = $configuration->getVersion($version);
-        if ($migrated && $configuration->hasVersionMigrated($version)) {
+        if ($markMigrated && $configuration->hasVersionMigrated($version)) {
             throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
         }
 
-        if ( ! $migrated && ! $configuration->hasVersionMigrated($version)) {
+        if ( ! $markMigrated && ! $configuration->hasVersionMigrated($version)) {
             throw new \InvalidArgumentException(sprintf('The version "%s" does not exists in the version table.', $version));
         }
 
-
-        $version->isMigrated($migrated);
+        if ($markMigrated) {
+            $version->markMigrated();
+        }
     }
 }

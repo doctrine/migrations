@@ -36,16 +36,57 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration,
  */
 class Version
 {
-    /** The Migrations Configuration instance for this migration */
+    const STATE_NONE = 0;
+    const STATE_PRE  = 1;
+    const STATE_EXEC = 2;
+    const STATE_POST = 3;
+
+    /**
+     * The Migrations Configuration instance for this migration
+     *
+     * @var Configuration
+     */
     private $_configuration;
 
-    /** The OutputWriter object instance used for outputting information */
+    /**
+     * The OutputWriter object instance used for outputting information
+     *
+     * @var OutputWriter
+     */
     private $_outputWriter;
 
-    /** The version in timestamp format (YYYYMMDDHHMMSS) */
+    /**
+     * The version in timestamp format (YYYYMMDDHHMMSS)
+     *
+     * @param int
+     */
     private $_version;
 
-    /** The migration class name for this version */
+    /**
+     * @var AbstractSchemaManager
+     */
+    private $_sm;
+
+    /**
+     * @var AbstractPlatform
+     */
+    private $_platform;
+
+    /**
+     * The migration instance for this version
+     *
+     * @var AbstractMigration
+     */
+    private $_migration;
+
+    /**
+     * @var Connection
+     */
+    private $_connection;
+
+    /**
+     * @var string
+     */
     private $_class;
 
     /** The array of collected SQL statements for this version */
@@ -53,6 +94,11 @@ class Version
 
     /** The time in seconds that this migration version took to execute */
     private $_time;
+
+    /**
+     * @var int
+     */
+    private $_state = self::STATE_NONE;
 
     public function __construct(Configuration $configuration, $version, $class)
     {
@@ -87,25 +133,26 @@ class Version
     }
 
     /**
-     * Check if this version has been migrated or not. If you pass a boolean value 
-     * it will mark this version as migrated or if you pass false it will unmark
-     * this version as migrated.
+     * Check if this version has been migrated or not.
      *
      * @param bool $bool
      * @return mixed
      */
-    public function isMigrated($bool = null)
+    public function isMigrated()
     {
-        if ($bool === null) {
-            return $this->_configuration->hasVersionMigrated($this);
-        } else {
-            $this->_configuration->createMigrationTable();
-            if ($bool === true) {
-                $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->_version));
-            } else {
-                $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationsTableName() . " WHERE version = '$this->_version'");        
-            }
-        }
+        return $this->_configuration->hasVersionMigrated($this);
+    }
+
+    public function markMigrated()
+    {
+        $this->_configuration->createMigrationTable();
+        $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->_version));
+    }
+
+    public function markNotMigrated()
+    {
+        $this->_configuration->createMigrationTable();
+        $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationsTableName() . " WHERE version = '$this->_version'");
     }
 
     /**
@@ -169,6 +216,7 @@ class Version
         try {
             $start = microtime(true);
 
+            $this->_state = self::STATE_PRE;
             $fromSchema = $this->_sm->createSchema();
             $this->_migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -178,10 +226,11 @@ class Version
                 $this->_outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->_version) . "\n");
             }
 
+            $this->_state = self::STATE_EXEC;
+
             $toSchema = clone $fromSchema;
             $this->_migration->$direction($toSchema);
-            $sql = $fromSchema->getMigrateToSql($toSchema, $this->_platform);
-            $this->addSql($sql);
+            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->_platform));
 
             if ($dryRun === false) {
                 if ($this->_sql) {
@@ -190,7 +239,10 @@ class Version
                         $this->_outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->_connection->executeQuery($query);
                     }
-                    $this->isMigrated($direction === 'up' ? true : false);
+
+                    if ($direction === 'up') {
+                        $this->markMigrated();
+                    }
                 } else {
                     $this->_outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->_version));
                 }
@@ -200,8 +252,7 @@ class Version
                 }
             }
 
-            $this->_connection->commit();
-
+            $this->_state = self::STATE_POST;
             $this->_migration->{'post' . ucfirst($direction)}($toSchema);
 
             $end = microtime(true);
@@ -212,13 +263,44 @@ class Version
                 $this->_outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->_time));
             }
 
+            $this->_connection->commit();
+
             return $this->_sql;
+        } catch(SkipMigrationException $e) {
+            $this->_connection->rollback();
+
+            // now mark it as migrated
+            if ($direction === 'up') {
+                $this->markMigrated();
+            }
+
+            $this->_outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
         } catch (\Exception $e) {
-            $this->_outputWriter->write(sprintf('<error>Migration %s failed...</error>', $this->_version));
+
+            $this->_outputWriter->write(sprintf(
+                '<error>Migration %s failed during %s. Error %s</error>',
+                $this->_version, $this->getExecutionState(), $e->getMessage()
+            ));
 
             $this->_connection->rollback();
 
+            $this->_state = self::STATE_NONE;
             throw $e;
+        }
+        $this->_state = self::STATE_NONE;
+    }
+
+    public function getExecutionState()
+    {
+        switch($this->_state) {
+            case self::STATE_PRE:
+                return 'Pre-Checks';
+            case self::STATE_POST:
+                return 'Post-Checks';
+            case self::STATE_EXEC:
+                return 'Exceution';
+            default:
+                return 'No State';
         }
     }
 
