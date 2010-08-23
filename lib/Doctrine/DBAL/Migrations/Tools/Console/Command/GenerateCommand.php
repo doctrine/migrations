@@ -21,10 +21,10 @@
  
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Symfony\Components\Console\Input\InputInterface,
-    Symfony\Components\Console\Output\OutputInterface,
-    Symfony\Components\Console\Input\InputArgument,
-    Symfony\Components\Console\Input\InputOption,
+use Symfony\Component\Console\Input\InputInterface,
+    Symfony\Component\Console\Output\OutputInterface,
+    Symfony\Component\Console\Input\InputArgument,
+    Symfony\Component\Console\Input\InputOption,
     Doctrine\DBAL\Migrations\MigrationException,
     Doctrine\DBAL\Migrations\Configuration\Configuration;
 

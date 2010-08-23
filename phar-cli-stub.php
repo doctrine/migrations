@@ -31,11 +31,11 @@ $classLoader->register();
 $classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__ . '/Doctrine');
 $classLoader->register();
 
-$helperSet = new \Symfony\Components\Console\Helper\HelperSet(array(
-    'dialog' => new \Symfony\Components\Console\Helper\DialogHelper(),
+$helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
+    'dialog' => new \Symfony\Component\Console\Helper\DialogHelper(),
 ));
 
-$cli = new \Symfony\Components\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION);
+$cli = new \Symfony\Component\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION);
 $cli->setCatchExceptions(true);
 $cli->setHelperSet($helperSet);
 $cli->addCommands(array(
