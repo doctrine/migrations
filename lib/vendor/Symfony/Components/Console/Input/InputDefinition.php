@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Console\Input;
+namespace Symfony\Component\Console\Input;
 
 /*
  * This file is part of the symfony framework.

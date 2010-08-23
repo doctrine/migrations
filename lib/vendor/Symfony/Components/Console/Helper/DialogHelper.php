@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Components\Console\Helper;
+namespace Symfony\Component\Console\Helper;
 
-use Symfony\Components\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /*
  * This file is part of the symfony framework.

@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Console\Output;
+namespace Symfony\Component\Console\Output;
 
 /*
  * This file is part of the symfony framework.

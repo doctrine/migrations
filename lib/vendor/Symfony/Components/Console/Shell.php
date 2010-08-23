@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\Components\Console;
+namespace Symfony\Component\Console;
 
-use Symfony\Components\Console\Application;
-use Symfony\Components\Console\Input\StringInput;
-use Symfony\Components\Console\Output\ConsoleOutput;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\StringInput;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 /*
  * This file is part of the symfony framework.

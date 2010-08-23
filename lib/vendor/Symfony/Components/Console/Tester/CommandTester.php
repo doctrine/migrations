@@ -1,10 +1,10 @@
 <?php
 
-namespace Symfony\Components\Console\Tester;
+namespace Symfony\Component\Console\Tester;
 
-use Symfony\Components\Console\Command\Command;
-use Symfony\Components\Console\Input\ArrayInput;
-use Symfony\Components\Console\Output\StreamOutput;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Output\StreamOutput;
 
 class CommandTester
 {

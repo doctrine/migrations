@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Yaml;
+namespace Symfony\Component\Yaml;
 
 /*
  * This file is part of the symfony package.

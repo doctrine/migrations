@@ -1,8 +1,8 @@
 <?php
 
-namespace Symfony\Components\Console\Helper;
+namespace Symfony\Component\Console\Helper;
 
-use Symfony\Components\Console\Command\Command;
+use Symfony\Component\Console\Command\Command;
 
 /*
  * This file is part of the symfony framework.

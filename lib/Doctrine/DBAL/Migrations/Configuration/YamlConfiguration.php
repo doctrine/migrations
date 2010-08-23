@@ -21,7 +21,7 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
-use Symfony\Components\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 
 /**
  * Load migration configuration information from a YAML configuration file.

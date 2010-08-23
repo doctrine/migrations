@@ -1,6 +1,6 @@
 <?php
 
-namespace Symfony\Components\Console\Helper;
+namespace Symfony\Component\Console\Helper;
 
 /*
  * This file is part of the symfony framework.
