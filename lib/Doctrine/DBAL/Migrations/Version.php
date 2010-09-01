@@ -242,6 +242,8 @@ class Version
 
                     if ($direction === 'up') {
                         $this->markMigrated();
+                    } else {
+                        $this->markNotMigrated();
                     }
                 } else {
                     $this->_outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->_version));
@@ -272,6 +274,8 @@ class Version
             // now mark it as migrated
             if ($direction === 'up') {
                 $this->markMigrated();
+            } else {
+                $this->markNotMigrated();
             }
 
             $this->_outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
