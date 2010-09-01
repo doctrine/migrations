@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -42,6 +42,8 @@ class DiffCommand extends GenerateCommand
 {
     protected function configure()
     {
+        parent::configure();
+
         $this
             ->setName('migrations:diff')
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
@@ -56,7 +58,6 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
 EOT
         );
 
-        parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
