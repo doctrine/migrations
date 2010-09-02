@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -91,6 +91,8 @@ EOT
 
         if ($markMigrated) {
             $version->markMigrated();
+        } else {
+            $version->markNotMigrated();
         }
     }
 }
