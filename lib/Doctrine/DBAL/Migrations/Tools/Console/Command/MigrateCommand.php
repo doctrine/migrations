@@ -65,6 +65,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 Or you can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+    
+You can also execute the migration without a warning message wich you need to interact with:
+    
+    <info>%command.full_name% --no-interaction</info>
+    
 EOT
         );
 
@@ -88,11 +93,16 @@ EOT
             if ($dryRun === true) {
                 $migration->migrate($version, true);
             } else {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
-                if ($confirmation === true) {
+                $noInteraction = $input->getOption('no-interaction') ? true : false;
+                if ($noInteraction === true) {
                     $migration->migrate($version, $dryRun);
                 } else {
-                    $output->writeln('<error>Migration cancelled!</error>');
+                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+                    if ($confirmation === true) {
+                        $migration->migrate($version, $dryRun);
+                    } else {
+                        $output->writeln('<error>Migration cancelled!</error>');
+                    }
                 }
             }
         }
