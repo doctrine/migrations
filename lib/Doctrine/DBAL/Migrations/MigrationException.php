@@ -54,7 +54,7 @@ class MigrationException extends \Exception
 
     public static function alreadyAtVersion($version)
     {
-        return new self(sprintf('Database is already at version %s', $version));
+        return new self(sprintf('Database is already at version %s', $version), 2);
     }
 
     public static function duplicateMigrationVersion($version, $class)
