@@ -18,7 +18,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -47,10 +47,15 @@ class StatusCommand extends AbstractCommand
         $this
             ->setName('migrations:status')
             ->setDescription('View the status of a set of migrations.')
+            ->addOption('show-versions', null, InputOption::PARAMETER_NONE, 'This will display a list of all available migrations and their status')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command outputs the status of a set of migrations:
 
     <info>%command.full_name%</info>
+
+You can output a list of all available migrations and their status with <comment>--show-versions</comment>:
+
+    <info>%command.full_name% --show-versions</info>
 EOT
         );
 
@@ -97,12 +102,15 @@ EOT
             $output->writeln('    <comment>>></comment> ' . $name . ': ' . str_repeat(' ', 50 - strlen($name)) . $value);
         }
 
-        if ($migrations = $configuration->getMigrations()) {
-            $output->writeln("\n <info>==</info> Migration Versions\n");
-            foreach ($migrations as $version) {
-                $isMigrated = $version->isMigrated();
-                $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
-                $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+        $showVersions = $input->getOption('show-versions') ? true : false;
+        if ($showVersions === true) {
+            if ($migrations = $configuration->getMigrations()) {
+                $output->writeln("\n <info>==</info> Migration Versions\n");
+                foreach ($migrations as $version) {
+                    $isMigrated = $version->isMigrated();
+                    $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+                }
             }
         }
     }
