@@ -302,7 +302,7 @@ class Version
             case self::STATE_POST:
                 return 'Post-Checks';
             case self::STATE_EXEC:
-                return 'Exceution';
+                return 'Execution';
             default:
                 return 'No State';
         }
