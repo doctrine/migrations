@@ -84,7 +84,7 @@ EOT
     {
         $configuration = $this->_getMigrationConfiguration($input, $output);
 
-        $version = date('YmdHms');
+        $version = date('YmdHis');
         $path = $this->_generateMigration($configuration, $input, $version);
         
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));

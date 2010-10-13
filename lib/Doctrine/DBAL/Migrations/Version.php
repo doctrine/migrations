@@ -191,7 +191,7 @@ class Version
         }
         if (is_dir($path)) {
             $path = realpath($path);
-            $path = $path . '/doctrine_migration_' . date('YmdHms') . '.sql';
+            $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
         }
 
         $this->_outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
