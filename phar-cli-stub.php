@@ -47,7 +47,8 @@ $cli->addCommands(array(
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
 ));
-$cli->run();
+
+$cli->run(isset($input) ? $input : null, isset($output) ? $output: null);
 
 __HALT_COMPILER();
 ?>
