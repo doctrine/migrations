@@ -48,7 +48,15 @@ $cli->addCommands(array(
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
 ));
 
-$cli->run(isset($input) ? $input : null, isset($output) ? $output: null);
+$input = file_exists('migrations-input.php')
+       ? include('migrations-input.php')
+       : null;
+
+$output = file_exists('migrations-output.php')
+        ? include('migrations-output.php')
+        : null;
+
+$cli->run($input, $output);
 
 __HALT_COMPILER();
 ?>
