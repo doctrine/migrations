@@ -5,6 +5,8 @@
 The latest official PHAR had path issues for me, so I made a couple of modifications and made
 packaging a bit easier, especially when creating a custom PHAR for your own apps.
 
+[Download `doctrine-migrations.phar` with custom Input/Output CLI support](http://github.com/downloads/ericclemmons/migrations/doctrine-migrations.phar)
+
 ### Modifications
 
 * Added `DiffCommand` for migrations.
