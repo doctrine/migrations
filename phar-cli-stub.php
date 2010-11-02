@@ -46,7 +46,12 @@ $cli->addCommands(array(
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
 ));
-$cli->run();
+$input = file_exists('migrations-input.php')
+       ? include('migrations-input.php')
+       : null;
 
-__HALT_COMPILER();
-?>
+$output = file_exists('migrations-output.php')
+        ? include('migrations-output.php')
+        : null;
+
+$cli->run($input, $output);
