@@ -239,15 +239,16 @@ class Version
                         $this->_outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->_connection->executeQuery($query);
                     }
-
-                    if ($direction === 'up') {
-                        $this->markMigrated();
-                    } else {
-                        $this->markNotMigrated();
-                    }
                 } else {
                     $this->_outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->_version));
                 }
+
+                if ($direction === 'up') {
+                    $this->markMigrated();
+                } else {
+                    $this->markNotMigrated();
+                }
+
             } else {
                 foreach ($this->_sql as $query) {
                     $this->_outputWriter->write('     <comment>-></comment> ' . $query);
