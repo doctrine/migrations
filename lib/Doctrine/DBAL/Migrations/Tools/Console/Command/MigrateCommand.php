@@ -62,11 +62,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
 
-You you can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
+You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
     
-Or can also execute the migration without a warning message wich you need to interact with:
+Or you can also execute the migration without a warning message wich you need to interact with:
     
     <info>%command.full_name% --no-interaction</info>
     
