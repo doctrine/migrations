@@ -64,9 +64,13 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
 
-Or you can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
+You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+
+Or you can also execute the migration without a warning message wich you need to interact with:
+
+    <info>%command.full_name% --no-interaction</info>
 EOT
         );
 
@@ -85,11 +89,16 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
-            if ($confirmation === true) {
+            $noInteraction = $input->getOption('no-interaction') ? true : false;
+            if ($noInteraction === true) {
                 $version->execute($direction, $input->getOption('dry-run') ? true : false);
             } else {
-                $output->writeln('<error>Migration cancelled!</error>');
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+                if ($confirmation === true) {
+                    $version->execute($direction, $input->getOption('dry-run') ? true : false);
+                } else {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                }
             }
         }
     }
