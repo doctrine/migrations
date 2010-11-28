@@ -47,8 +47,8 @@ abstract class AbstractCommand extends Command
 
     protected function configure()
     {
-        $this->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.');
-        $this->addOption('db-configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a database connection configuration file.');
+        $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
+        $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
     }
 
     protected function _outputHeader(Configuration $configuration, OutputInterface $output)

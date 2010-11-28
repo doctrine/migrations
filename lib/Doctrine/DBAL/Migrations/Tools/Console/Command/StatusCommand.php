@@ -47,7 +47,7 @@ class StatusCommand extends AbstractCommand
         $this
             ->setName('migrations:status')
             ->setDescription('View the status of a set of migrations.')
-            ->addOption('show-versions', null, InputOption::PARAMETER_NONE, 'This will display a list of all available migrations and their status')
+            ->addOption('show-versions', null, InputOption::VALUE_NONE, 'This will display a list of all available migrations and their status')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command outputs the status of a set of migrations:
 
