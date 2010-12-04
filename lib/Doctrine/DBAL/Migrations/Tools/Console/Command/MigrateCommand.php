@@ -47,8 +47,8 @@ class MigrateCommand extends AbstractCommand
             ->setName('migrations:migrate')
             ->setDescription('Execute a migration to a specified version or the latest available version.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to migrate to.', null)
-            ->addOption('write-sql', null, InputOption::PARAMETER_NONE, 'The path to output the migration SQL file instead of executing it.')
-            ->addOption('dry-run', null, InputOption::PARAMETER_NONE, 'Execute the migration as a dry run.')
+            ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 

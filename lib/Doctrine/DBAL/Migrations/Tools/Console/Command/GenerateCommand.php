@@ -65,7 +65,7 @@ class Version<version> extends AbstractMigration
         $this
             ->setName('migrations:generate')
             ->setDescription('Generate a blank migration class.')
-            ->addOption('editor-cmd', null, InputOption::PARAMETER_OPTIONAL, 'Open file with this command upon creation.')
+            ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
