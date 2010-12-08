@@ -64,6 +64,15 @@ abstract class AbstractMigration
         $this->_version = $version;
     }
 
+    /**
+     * Get custom migration name
+     *
+     * @return string
+     */
+    public function getName()
+    {
+    }
+
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 

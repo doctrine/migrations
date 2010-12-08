@@ -104,12 +104,12 @@ class Version
     {
         $this->_configuration = $configuration;
         $this->_outputWriter = $configuration->getOutputWriter();
-        $this->_version = $version;
         $this->_class = $class;
         $this->_connection = $configuration->getConnection();
         $this->_sm = $this->_connection->getSchemaManager();
         $this->_platform = $this->_connection->getDatabasePlatform();
         $this->_migration = new $class($this);
+        $this->_version = $this->_migration->getName() ?: $version;
     }
 
     /**
