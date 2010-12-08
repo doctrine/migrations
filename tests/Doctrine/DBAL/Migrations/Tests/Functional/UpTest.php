@@ -13,16 +13,10 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
      */
     private $config;
 
-    /**
-     * @var Connection
-     */
-    private $connection;
 
     public function setUp()
     {
-        $params = array('driver' => 'pdo_sqlite', 'memory' => true);
-        $this->connection = DriverManager::getConnection($params);
-        $this->config = new Configuration($this->connection);
+        $this->config = $this->makeConfiguration();
         $this->config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $this->config->setMigrationsDirectory('.');
     }
@@ -34,7 +28,7 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
 
-        $schema = $this->connection->getSchemaManager()->createSchema();
+        $schema = $this->getConnection()->getSchemaManager()->createSchema();
         $this->assertTrue($schema->hasTable('foo'));
         $this->assertTrue($schema->getTable('foo')->hasColumn('id'));
         $this->assertTrue($this->config->hasVersionMigrated($version));
@@ -47,13 +41,13 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
 
-        $schema = $this->connection->getSchemaManager()->createSchema();
+        $schema = $this->getConnection()->getSchemaManager()->createSchema();
         $this->assertTrue($schema->hasTable('foo'));
         $this->assertTrue($schema->getTable('foo')->hasColumn('id'));
         $this->assertTrue($this->config->hasVersionMigrated($version));
 
         $version->execute('down');
-        $schema = $this->connection->getSchemaManager()->createSchema();
+        $schema = $this->getConnection()->getSchemaManager()->createSchema();
         $this->assertFalse($schema->hasTable('foo'));
         $this->assertFalse($this->config->hasVersionMigrated($version));
 
@@ -65,8 +59,8 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
-        
-        $schema = $this->connection->getSchemaManager()->createSchema();
+
+        $schema = $this->getConnection()->getSchemaManager()->createSchema();
         $this->assertFalse($schema->hasTable('foo'));
 
         $this->assertTrue($this->config->hasVersionMigrated($version));
