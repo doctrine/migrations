@@ -110,10 +110,13 @@ EOT
         $dir = rtrim($dir, '/');
         $path = $dir . '/Version' . $version . '.php';
 
+        if (!file_exists($dir)) {
+            throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
+        }
+
         file_put_contents($path, $code);
 
-        if ($editorCmd = $input->getOption('editor-cmd'))
-        {
+        if ($editorCmd = $input->getOption('editor-cmd')) {
           shell_exec($editorCmd . ' ' . escapeshellarg($path));
         }
 
