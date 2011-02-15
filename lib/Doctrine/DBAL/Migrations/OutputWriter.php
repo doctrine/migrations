@@ -29,14 +29,14 @@ namespace Doctrine\DBAL\Migrations;
  */
 class OutputWriter
 {
-    private $_closure;
+    private $closure;
 
     public function __construct(\Closure $closure = null)
     {
         if ($closure === null) {
             $closure = function($message) {};
         }
-        $this->_closure = $closure;
+        $this->closure = $closure;
     }
 
     /**
@@ -46,7 +46,7 @@ class OutputWriter
      */
     public function write($message)
     {
-        $closure = $this->_closure;
+        $closure = $this->closure;
         $closure($message);
     }
 }

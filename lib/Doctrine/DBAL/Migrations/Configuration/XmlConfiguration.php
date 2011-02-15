@@ -25,7 +25,6 @@ namespace Doctrine\DBAL\Migrations\Configuration;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class XmlConfiguration extends AbstractFileConfiguration
