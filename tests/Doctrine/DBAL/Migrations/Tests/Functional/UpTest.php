@@ -20,8 +20,7 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function setUp()
     {
-        $params = array('driver' => 'pdo_sqlite', 'memory' => true);
-        $this->connection = DriverManager::getConnection($params);
+        $this->connection = $this->getSqliteConnection();
         $this->config = new Configuration($this->connection);
         $this->config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $this->config->setMigrationsDirectory('.');

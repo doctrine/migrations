@@ -1,8 +1,6 @@
 <?php
 
-require_once 'PHPUnit/Framework.php';
 require_once __DIR__ . '/../lib/vendor/doctrine-common/lib/Doctrine/Common/ClassLoader.php';
-require_once __DIR__ . '/Doctrine/DBAL/Migrations/Tests/MigrationTestCase.php';
 
 use Doctrine\Common\ClassLoader;
 
