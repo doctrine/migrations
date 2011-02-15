@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -35,7 +33,6 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class DiffCommand extends GenerateCommand
@@ -62,7 +59,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
 
         $em = $this->getHelper('em')->getEntityManager();
         $conn = $em->getConnection();
@@ -78,8 +75,8 @@ EOT
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
         $toSchema = $tool->getSchemaFromMetadata($metadata);
-        $up = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
-        $down = $this->_buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
+        $up = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
+        $down = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
 
         if ( ! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
@@ -87,12 +84,12 @@ EOT
         }
 
         $version = date('YmdHis');
-        $path = $this->_generateMigration($configuration, $input, $version, $up, $down);
+        $path = $this->generateMigration($configuration, $input, $version, $up, $down);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
     }
 
-    private function _buildCodeFromSql(Configuration $configuration, array $sql)
+    private function buildCodeFromSql(Configuration $configuration, array $sql)
     {
         $code = array();
         foreach ($sql as $query) {

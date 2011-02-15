@@ -1,7 +1,6 @@
 <?php
+
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -18,15 +17,15 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputOption,
-    Doctrine\DBAL\Migrations\MigrationException,
-    Doctrine\DBAL\Migrations\Configuration\Configuration;
+ Symfony\Component\Console\Output\OutputInterface,
+ Symfony\Component\Console\Input\InputArgument,
+ Symfony\Component\Console\Input\InputOption,
+ Doctrine\DBAL\Migrations\MigrationException,
+ Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
  * Command for generating new blank migration classes
@@ -34,13 +33,13 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class GenerateCommand extends AbstractCommand
 {
+
     private static $_template =
-'<?php
+            '<?php
 
 namespace <namespace>;
 
@@ -63,10 +62,10 @@ class Version<version> extends AbstractMigration
     protected function configure()
     {
         $this
-            ->setName('migrations:generate')
-            ->setDescription('Generate a blank migration class.')
-            ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
-            ->setHelp(<<<EOT
+                ->setName('migrations:generate')
+                ->setDescription('Generate a blank migration class.')
+                ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
+                ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
     <info>%command.full_name%</info>
@@ -82,15 +81,15 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
 
         $version = date('YmdHis');
-        $path = $this->_generateMigration($configuration, $input, $version);
-        
+        $path = $this->generateMigration($configuration, $input, $version);
+
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function _generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
+    protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
         $placeHolders = array(
             '<namespace>',
@@ -112,11 +111,11 @@ EOT
 
         file_put_contents($path, $code);
 
-        if ($editorCmd = $input->getOption('editor-cmd'))
-        {
-          shell_exec($editorCmd . ' ' . escapeshellarg($path));
+        if ($editorCmd = $input->getOption('editor-cmd')) {
+            shell_exec($editorCmd . ' ' . escapeshellarg($path));
         }
 
         return $path;
     }
+
 }
