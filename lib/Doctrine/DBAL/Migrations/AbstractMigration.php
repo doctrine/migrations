@@ -36,45 +36,69 @@ use Doctrine\DBAL\Schema\Schema,
  */
 abstract class AbstractMigration
 {
-    /** The Migrations Configuration instance for this migration */
-    protected $_configuration;
+    /**
+     * The Migrations Configuration instance for this migration
+     *
+     * @var Configuration
+     */
+    private $configuration;
 
-    /** The OutputWriter object instance used for outputting information */
-    protected $_outputWriter;
+    /**
+     * The OutputWriter object instance used for outputting information
+     *
+     * @var OutputWriter
+     */
+    private $outputWriter;
 
-    /** The Doctrine\DBAL\Connection instance we are migrating */
-    protected $_connection;
+    /**
+     * The Doctrine\DBAL\Connection instance we are migrating
+     *
+     * @var Connection
+     */
+    protected $connection;
 
-    /** Reference to the SchemaManager instance referened by $_connection */
-    protected $_sm;
+    /**
+     * Reference to the SchemaManager instance referened by $_connection
+     *
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
+    protected $sm;
 
-    /** Reference to the DatabasePlatform instance referenced by $_conection */
-    protected $_platform;
+    /**
+     * Reference to the DatabasePlatform instance referenced by $_conection
+     *
+     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
+     */
+    protected $platform;
 
-    /** Reference to the Version instance representing this migration */
-    protected $_version;
+    /**
+     * Reference to the Version instance representing this migration
+     *
+     * @var Version
+     */
+    protected $version;
 
     public function __construct(Version $version)
     {
-        $this->_configuration = $version->getConfiguration();
-        $this->_outputWriter = $this->_configuration->getOutputWriter();
-        $this->_connection = $this->_configuration->getConnection();
-        $this->_sm = $this->_connection->getSchemaManager();
-        $this->_platform = $this->_connection->getDatabasePlatform();
-        $this->_version = $version;
+        $this->configuration = $version->getConfiguration();
+        $this->outputWriter = $this->configuration->getOutputWriter();
+        $this->connection = $this->configuration->getConnection();
+        $this->sm = $this->connection->getSchemaManager();
+        $this->platform = $this->connection->getDatabasePlatform();
+        $this->version = $version;
     }
 
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 
-    protected function _addSql($sql)
+    protected function addSql($sql)
     {
-        return $this->_version->addSql($sql);
+        return $this->version->addSql($sql);
     }
 
-    protected function _write($message)
+    protected function write($message)
     {
-        $this->_outputWriter->write($message);
+        $this->outputWriter->write($message);
     }
 
     protected function _throwIrreversibleMigrationException($message = null)
@@ -96,7 +120,7 @@ abstract class AbstractMigration
         $message = (strlen($message)) ? $message : 'Unknown Reason';
 
         if ($condition === true) {
-            $this->_outputWriter->write('    <warning>Warning during ' . $this->_version->getExecutionState() . ': ' . $message . '</warning>');
+            $this->outputWriter->write('    <warning>Warning during ' . $this->version->getExecutionState() . ': ' . $message . '</warning>');
         }
     }
 

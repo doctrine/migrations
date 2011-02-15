@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -35,7 +33,7 @@ class XmlConfiguration extends AbstractFileConfiguration
     /**
      * @inheritdoc
      */
-    protected function _load($file)
+    protected function doLoad($file)
     {
         $xml = simplexml_load_file($file);
         if (isset($xml->name)) {
@@ -48,7 +46,7 @@ class XmlConfiguration extends AbstractFileConfiguration
             $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
         }
         if (isset($xml->{'migrations-directory'})) {
-            $migrationsDirectory = $this->_getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
+            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
             $this->setMigrationsDirectory($migrationsDirectory);
             $this->registerMigrationsFromDirectory($migrationsDirectory);
         }
