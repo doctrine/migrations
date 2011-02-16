@@ -325,7 +325,7 @@ class Configuration
     public function getVersion($version)
     {
         if ( ! isset($this->migrations[$version])) {
-            MigrationException::unknownMigrationVersion($version);
+            throw MigrationException::unknownMigrationVersion($version);
         }
         return $this->migrations[$version];
     }
@@ -351,7 +351,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = '" . $version->getVersion() . "'");
+        $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?", array($version->getVersion()));
         return $version !== false ? true : false;
     }
 
@@ -451,7 +451,7 @@ class Configuration
         }
         $versions = array();
         foreach ($allVersions as $version) {
-            if ($this->_shouldExecuteMigration($direction, $version, $to)) {
+            if ($this->shouldExecuteMigration($direction, $version, $to)) {
                 $versions[$version->getVersion()] = $version;
             }
         }
@@ -467,7 +467,7 @@ class Configuration
      * @param string $to          The version we are migrating to.
      * @return void
      */
-    private function _shouldExecuteMigration($direction, Version $version, $to)
+    private function shouldExecuteMigration($direction, Version $version, $to)
     {
         if ($direction === 'down') {
             if ( ! $this->hasVersionMigrated($version)) {

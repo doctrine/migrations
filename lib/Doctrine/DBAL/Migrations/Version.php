@@ -149,7 +149,7 @@ class Version
     public function markNotMigrated()
     {
         $this->configuration->createMigrationTable();
-        $this->connection->executeQuery("DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '$this->version'");
+        $this->connection->executeQuery("DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = ?", array($this->version));
     }
 
     /**

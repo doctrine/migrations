@@ -98,7 +98,7 @@ abstract class AbstractMigration
         $this->outputWriter->write($message);
     }
 
-    protected function _throwIrreversibleMigrationException($message = null)
+    protected function throwIrreversibleMigrationException($message = null)
     {
         if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';
