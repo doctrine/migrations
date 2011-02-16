@@ -197,6 +197,14 @@ class Version
     }
 
     /**
+     * @return AbstractMigration
+     */
+    public function getMigration()
+    {
+        return $this->migration;
+    }
+
+    /**
      * Execute this migration version up or down and and return the SQL.
      *
      * @param string $direction   The direction to execute the migration.
@@ -269,11 +277,13 @@ class Version
         } catch(SkipMigrationException $e) {
             $this->connection->rollback();
 
-            // now mark it as migrated
-            if ($direction === 'up') {
-                $this->markMigrated();
-            } else {
-                $this->markNotMigrated();
+            if ($dryRun == false) {
+                // now mark it as migrated
+                if ($direction === 'up') {
+                    $this->markMigrated();
+                } else {
+                    $this->markNotMigrated();
+                }
             }
 
             $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));

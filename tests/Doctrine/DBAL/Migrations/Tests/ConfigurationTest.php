@@ -80,6 +80,7 @@ class MigrationTest extends MigrationTestCase
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
 
         $this->assertEquals(1, count($config->getMigrations()), "One Migration registered.");
+        $this->assertTrue($config->hasVersion(1234));
 
         $version = $config->getVersion(1234);
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Version', $version);

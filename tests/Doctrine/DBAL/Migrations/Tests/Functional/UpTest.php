@@ -58,7 +58,7 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     }
 
-    public function testSKipMigrateUp()
+    public function testSkipMigrateUp()
     {
         $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
 
@@ -70,15 +70,100 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $this->assertTrue($this->config->hasVersionMigrated($version));
     }
+
+    public function testMigrateSeveralSteps()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $this->assertEquals(0, $this->config->getCurrentVersion());
+        $migrations = $this->config->getMigrationsToExecute('up', 3);
+
+        $this->assertEquals(3, count($migrations));
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp', $migrations[1]->getMigration());
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration', $migrations[2]->getMigration());
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther', $migrations[3]->getMigration());
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(3);
+
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertTrue($schema->hasTable('foo'));
+        $this->assertTrue($schema->hasTable('bar'));
+
+        $this->assertEquals(3, $this->config->getCurrentVersion());
+        $this->assertTrue($migrations[1]->isMigrated());
+        $this->assertTrue($migrations[2]->isMigrated());
+        $this->assertTrue($migrations[3]->isMigrated());
+    }
+
+    public function testMigrateToLastVersion()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate();
+
+        $this->assertEquals(3, $this->config->getCurrentVersion());
+        $migrations = $this->config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+        $this->assertTrue($migrations[2]->isMigrated());
+        $this->assertTrue($migrations[3]->isMigrated());
+    }
+
+    public function testDryRunMigration()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(3, true);
+
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertFalse($schema->hasTable('foo'));
+        $this->assertFalse($schema->hasTable('bar'));
+
+        $this->assertEquals(0, $this->config->getCurrentVersion());
+        $migrations = $this->config->getMigrations();
+        $this->assertFalse($migrations[1]->isMigrated());
+        $this->assertFalse($migrations[2]->isMigrated());
+        $this->assertFalse($migrations[3]->isMigrated());
+    }
+
+    public function testMigrateDownSeveralSteps()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(3);
+        $this->assertEquals(3, $this->config->getCurrentVersion());
+        $migration->migrate(0);
+
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertFalse($schema->hasTable('foo'));
+        $this->assertFalse($schema->hasTable('bar'));
+
+        $this->assertEquals(0, $this->config->getCurrentVersion());
+        $migrations = $this->config->getMigrations();
+        $this->assertFalse($migrations[1]->isMigrated());
+        $this->assertFalse($migrations[2]->isMigrated());
+        $this->assertFalse($migrations[3]->isMigrated());
+    }
 }
 
 class MigrationMigrateUp extends \Doctrine\DBAL\Migrations\AbstractMigration
 {
     public function down(Schema $schema)
     {
-      $schema->dropTable('foo');
+        $schema->dropTable('foo');
     }
-    
+
     public function up(Schema $schema)
     {
         $table = $schema->createTable('foo');
@@ -88,7 +173,30 @@ class MigrationMigrateUp extends \Doctrine\DBAL\Migrations\AbstractMigration
 
 class MigrationSkipMigration extends MigrationMigrateUp
 {
-    public function preUp(Schema $schema) {
+
+    public function preUp(Schema $schema)
+    {
         $this->skipIf(true);
     }
+
+    public function preDown(Schema $schema)
+    {
+        $this->skipIf(true);
+    }
+}
+
+class MigrationMigrateFurther extends \Doctrine\DBAL\Migrations\AbstractMigration
+{
+
+    public function down(Schema $schema)
+    {
+        $schema->dropTable('bar');
+    }
+
+    public function up(Schema $schema)
+    {
+        $table = $schema->createTable('bar');
+        $table->addColumn('id', 'integer');
+    }
+
 }
