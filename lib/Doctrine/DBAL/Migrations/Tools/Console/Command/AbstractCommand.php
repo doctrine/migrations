@@ -79,41 +79,46 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->application->getHelperSet()->has('db')) {
-                $conn = $this->getHelper('db')->getConnection();
-            } else if($input->getOption('db-configuration')) {
-                if (!file_exists($input->getOption('db-configuration'))) {
-                    throw new \InvalidArgumentException("The specified connection file is a valid file.");
+            if ($this->application->getHelperSet()->has('configuration')) {
+                $configuration = $this->getHelper('configuration')->getConfiguration();
+                $configuration->setOutputWriter($outputWriter);
+            } else {
+                if ($this->application->getHelperSet()->has('db')) {
+                    $conn = $this->getHelper('db')->getConnection();
+                } else if($input->getOption('db-configuration')) {
+                    if (!file_exists($input->getOption('db-configuration'))) {
+                        throw new \InvalidArgumentException("The specified connection file is a valid file.");
+                    }
+
+                    $params = include($input->getOption('db-configuration'));
+                    if (!is_array($params)) {
+                        throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                    }
+                    $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
+                } else if (file_exists('migrations-db.php')) {
+                    $params = include("migrations-db.php");
+                    if (!is_array($params)) {
+                        throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                    }
+                    $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
+                } else {
+                    throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
                 }
 
-                $params = include($input->getOption('db-configuration'));
-                if (!is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                if ($input->getOption('configuration')) {
+                    $info = pathinfo($input->getOption('configuration'));
+                    $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
+                    $configuration = new $class($conn, $outputWriter);
+                    $configuration->load($input->getOption('configuration'));
+                } else if (file_exists('migrations.xml')) {
+                    $configuration = new XmlConfiguration($conn, $outputWriter);
+                    $configuration->load('migrations.xml');
+                } else if (file_exists('migrations.yml')) {
+                    $configuration = new YamlConfiguration($conn, $outputWriter);
+                    $configuration->load('migrations.yml');
+                } else {
+                    $configuration = new Configuration($conn, $outputWriter);
                 }
-                $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-            } else if (file_exists('migrations-db.php')) {
-                $params = include("migrations-db.php");
-                if (!is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
-                }
-                $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-            } else {
-                throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
-            }
-
-            if ($input->getOption('configuration')) {
-                $info = pathinfo($input->getOption('configuration'));
-                $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
-                $configuration = new $class($conn, $outputWriter);
-                $configuration->load($input->getOption('configuration'));
-            } else if (file_exists('migrations.xml')) {
-                $configuration = new XmlConfiguration($conn, $outputWriter);
-                $configuration->load('migrations.xml');
-            } else if (file_exists('migrations.yml')) {
-                $configuration = new YamlConfiguration($conn, $outputWriter);
-                $configuration->load('migrations.yml');
-            } else {
-                $configuration = new Configuration($conn, $outputWriter);
             }
             $this->configuration = $configuration;
         }

@@ -157,6 +157,16 @@ class Configuration
     }
 
     /**
+     * Set the OutputWriter instance
+     *
+     * @param OutputWriter $outputWriter
+     */
+    public function setOuputWriter(OutputWriter $outputWriter)
+    {
+        $this->outputWriter = $outputWriter;
+    }
+
+    /**
      * Returns a timestamp version as a formatted date
      *
      * @param string $version 
