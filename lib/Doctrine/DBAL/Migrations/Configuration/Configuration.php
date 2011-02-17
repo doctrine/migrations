@@ -161,7 +161,7 @@ class Configuration
      *
      * @param OutputWriter $outputWriter
      */
-    public function setOuputWriter(OutputWriter $outputWriter)
+    public function setOutputWriter(OutputWriter $outputWriter)
     {
         $this->outputWriter = $outputWriter;
     }
