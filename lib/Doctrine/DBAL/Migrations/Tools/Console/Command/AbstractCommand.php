@@ -79,8 +79,8 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->application->getHelperSet()->has('configuration')) {
-                $configuration = $this->getHelper('configuration')->getConfiguration();
+            if ($this->application->getHelperSet()->has('mc')) {
+                $configuration = $this->getHelper('mc')->getConfiguration();
                 $configuration->setOutputWriter($outputWriter);
             } else {
                 if ($this->application->getHelperSet()->has('db')) {
