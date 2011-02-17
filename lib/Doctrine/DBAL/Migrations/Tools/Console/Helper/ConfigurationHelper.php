@@ -21,7 +21,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 
-use Symfony\Components\Console\Helper\Helper,
+use Symfony\Component\Console\Helper\Helper,
     Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
