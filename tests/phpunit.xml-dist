@@ -1,6 +1,0 @@
-<?xml version="1.0" ?>
-<phpunit bootstrap="TestInit.php">
-    <testsuite name="Doctrine\DBAL\Migrations">
-        <directory>Doctrine\DBAL\Migrations\Tests</directory>
-    </testsuite>
-</phpunit>

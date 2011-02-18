@@ -109,6 +109,10 @@ EOT
         $dir = rtrim($dir, '/');
         $path = $dir . '/Version' . $version . '.php';
 
+        if (!file_exists($dir)) {
+            throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
+        }
+
         file_put_contents($path, $code);
 
         if ($editorCmd = $input->getOption('editor-cmd')) {
@@ -117,5 +121,4 @@ EOT
 
         return $path;
     }
-
 }
