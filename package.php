@@ -39,6 +39,3 @@ foreach ($dirs as $dir => $filter) {
 $p->stopBuffering();
 
 $p->setStub(file_get_contents('phar-cli-stub.php'));
-
-@mkdir("/tmp/test");
-$p->extractTo("/tmp/test");
