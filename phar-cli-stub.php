@@ -28,7 +28,7 @@ $classLoader->register();
 $classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL', 'phar://'.__FILE__);
 $classLoader->register();
 
-$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__ . '/Doctrine');
+$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__);
 $classLoader->register();
 
 $helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
