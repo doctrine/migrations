@@ -5,7 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 
-class ConfigurationTest extends MigrationTestCase
+class MigrationTest extends MigrationTestCase
 {
     private $config;
 
@@ -24,11 +24,11 @@ class ConfigurationTest extends MigrationTestCase
         $migration->migrate('1234');
     }
 
-    public function testMigrateToCurrentVersionThrowsException()
+    public function testMigrateToCurrentVersionReturnsEmpty()
     {
         $migration = new Migration($this->config);
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Database is already at version 0');
-        $migration->migrate('0');
+        $sql = $migration->migrate('0');
+        $this->assertEquals(array(), $sql);
     }
 }

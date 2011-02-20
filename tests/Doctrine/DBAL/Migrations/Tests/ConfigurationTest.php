@@ -5,7 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Schema\Schema;
 
-class MigrationTest extends MigrationTestCase
+class ConfigurationTest extends MigrationTestCase
 {
     public function testGetConnection()
     {
