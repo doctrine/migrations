@@ -96,7 +96,7 @@ EOT
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
-            $code[] = "\$this->_addSql(\"$query\");";
+            $code[] = "\$this->addSql(\"$query\");";
         }
         return implode("\n", $code);
     }
