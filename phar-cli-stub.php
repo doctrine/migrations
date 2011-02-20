@@ -56,3 +56,5 @@ $output = file_exists('migrations-output.php')
         : null;
 
 $cli->run($input, $output);
+
+__HALT_COMPILER();
