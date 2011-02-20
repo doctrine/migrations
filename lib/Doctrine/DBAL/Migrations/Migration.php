@@ -106,11 +106,12 @@ class Migration
      * Run a migration to the current version or the given target version.
      *
      * @param string $to      The version to migrate to.
-     * @param string $dryRun  Whether or not to make this a dry run and not execute anything.
+     * @param boolean $dryRun  Whether or not to make this a dry run and not execute anything.
+     * @param boolean $silentOnNoMigrations  Whether or not to consider no migrations to migrate to an error or not
      * @return array $sql     The array of migration sql statements
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false)
+    public function migrate($to = null, $dryRun = false, $silentOnNoMigrations = false)
     {
         if ($to === null) {
             $to = $this->configuration->getLatestVersion();
@@ -125,29 +126,35 @@ class Migration
             throw MigrationException::unknownMigrationVersion($to);
         }
 
-        if ($from === $to) {
-            throw MigrationException::alreadyAtVersion($to);
-        }
-
-        $direction = $from > $to ? 'down' : 'up';
-        $migrations = $this->configuration->getMigrationsToExecute($direction, $to);
-
-        if ($dryRun === false) {
-            $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
-        } else {
-            $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
-        }
-
-        if (empty($migrations)) {
-            throw MigrationException::noMigrationsToExecute();
-        }
-
         $sql = array();
         $time = 0;
-        foreach ($migrations as $version) {
-            $versionSql = $version->execute($direction, $dryRun);
-            $sql[$version->getVersion()] = $versionSql;
-            $time += $version->getTime();
+
+        if ($from === $to) {
+            if (!$silentOnNoMigrations) {
+                throw MigrationException::alreadyAtVersion($to);
+            }
+
+            $migrations = array();
+            $this->outputWriter->write('No new migration available to migrate to');
+        } else {
+            $direction = $from > $to ? 'down' : 'up';
+            $migrations = $this->configuration->getMigrationsToExecute($direction, $to);
+
+            if ($dryRun === false) {
+                $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
+            } else {
+                $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
+            }
+
+            if (empty($migrations)) {
+                throw MigrationException::noMigrationsToExecute();
+            }
+
+            foreach ($migrations as $version) {
+                $versionSql = $version->execute($direction, $dryRun);
+                $sql[$version->getVersion()] = $versionSql;
+                $time += $version->getTime();
+            }
         }
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");

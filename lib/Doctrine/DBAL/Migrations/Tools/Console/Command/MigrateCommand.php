@@ -46,6 +46,7 @@ class MigrateCommand extends AbstractCommand
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to migrate to.', null)
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
+            ->addOption('silent-on-no-migrations', null, InputOption::VALUE_NONE, ' Whether or not to consider no migrations to migrate to an error or not.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -87,16 +88,17 @@ EOT
             $migration->writeSqlFile($path, $version);
         } else {
             $dryRun = $input->getOption('dry-run') ? true : false;
+            $silentOnNoMigrations = $input->getOption('silent-on-no-migrations') ? true : false;
             if ($dryRun === true) {
-                $migration->migrate($version, true);
+                $migration->migrate($version, true, $silentOnNoMigrations);
             } else {
                 $noInteraction = $input->getOption('no-interaction') ? true : false;
                 if ($noInteraction === true) {
-                    $migration->migrate($version, $dryRun);
+                    $migration->migrate($version, $dryRun, $silentOnNoMigrations);
                 } else {
                     $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
                     if ($confirmation === true) {
-                        $migration->migrate($version, $dryRun);
+                        $migration->migrate($version, $dryRun, $silentOnNoMigrations);
                     } else {
                         $output->writeln('<error>Migration cancelled!</error>');
                     }
