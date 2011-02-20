@@ -31,22 +31,45 @@ $classLoader->register();
 $classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__);
 $classLoader->register();
 
-$helperSet = new \Symfony\Component\Console\Helper\HelperSet(array(
-    'dialog' => new \Symfony\Component\Console\Helper\DialogHelper(),
-));
+// Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
+$configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
+
+$helperSet = null;
+if (file_exists($configFile)) {
+    if ( ! is_readable($configFile)) {
+        trigger_error(
+            'Configuration file [' . $configFile . '] does not have read permission.', E_ERROR
+        );
+    }
+
+    require $configFile;
+
+    foreach ($GLOBALS as $helperSetCandidate) {
+        if ($helperSetCandidate instanceof \Symfony\Component\Console\Helper\HelperSet) {
+            $helperSet = $helperSetCandidate;
+            break;
+        }
+    }
+}
+
+$helperSet = ($helperSet) ?: new \Symfony\Component\Console\Helper\HelperSet();
+$helperSet->set(new \Symfony\Component\Console\Helper\DialogHelper(), 'dialog');
 
 $cli = new \Symfony\Component\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION);
 $cli->setCatchExceptions(true);
 $cli->setHelperSet($helperSet);
 $cli->addCommands(array(
     // Migrations Commands
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
     new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
 ));
+if ($helperSet->has('em')) {
+    $cli->add(new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand());
+}
+
 $input = file_exists('migrations-input.php')
        ? include('migrations-input.php')
        : null;
