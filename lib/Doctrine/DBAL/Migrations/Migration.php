@@ -126,7 +126,7 @@ class Migration
         }
 
         if ($from === $to) {
-            throw MigrationException::alreadyAtVersion($to);
+            return array();
         }
 
         $direction = $from > $to ? 'down' : 'up';

@@ -11,6 +11,10 @@ $buildDir = realpath(dirname(__FILE__)) . '/build';
 
 $pharName = "$buildDir/doctrine-migrations.phar";
 
+if (!file_exists($buildDir)) {
+    mkdir($buildDir);
+}
+
 if (file_exists($pharName)) {
     unlink($pharName);
 }

@@ -89,6 +89,9 @@ class Version
     /** The array of collected SQL statements for this version */
     private $sql = array();
 
+    /** The array of collected parameters for SQL statements for this version */
+    private $params = array();
+
     /** The time in seconds that this migration version took to execute */
     private $time;
 
@@ -156,16 +159,23 @@ class Version
      * Add some SQL queries to this versions migration
      *
      * @param mixed $sql
+     * @param array $params
      * @return void
      */
-    public function addSql($sql)
+    public function addSql($sql, array $params = array())
     {
         if (is_array($sql)) {
-            foreach ($sql as $query) {
+            foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
+                if (isset($params[$key])) {
+                    $this->params[count($this->sql) - 1] = $params[$key];
+                }
             }
         } else {
             $this->sql[] = $sql;
+            if ($params) {
+                $this->params[count($this->sql) - 1] = $params;
+            }
         }
     }
 
@@ -239,10 +249,14 @@ class Version
 
             if ($dryRun === false) {
                 if ($this->sql) {
-                    $count = count($this->sql);
-                    foreach ($this->sql as $query) {
-                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
-                        $this->connection->executeQuery($query);
+                    foreach ($this->sql as $key => $query) {
+                        if ( ! isset($this->params[$key])) {
+                            $this->outputWriter->write('     <comment>-></comment> ' . $query);
+                            $this->connection->executeQuery($query);
+                        } else {
+                            $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
+                            $this->connection->executeQuery($query, $this->params[$key]);
+                        }
                     }
                 } else {
                     $this->outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->version));
