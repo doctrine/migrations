@@ -249,10 +249,9 @@ class Version
 
             if ($dryRun === false) {
                 if ($this->sql) {
-                    $count = count($this->sql);
                     foreach ($this->sql as $key => $query) {
                         if (isset($this->params[$key])) {
-                            $this->outputWriter->writeln(sprintf('    <comment>-</comment> <info>%s (%s)</info>', $query, implode(',', $this->params[$key])));
+                            $this->outputWriter->write(sprintf('    <comment>-</comment> <info>%s (parameters? %s)</info>', $query, is_array($this->params[$key]) ? 'yes' : 'no'));
                             $this->connection->executeQuery($query, $this->params[$key]);
                         } else {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
