@@ -6,7 +6,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
-class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
+class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 {
     /**
      * @var Configuration
@@ -154,6 +154,42 @@ class UpTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $this->assertFalse($migrations[1]->isMigrated());
         $this->assertFalse($migrations[2]->isMigrated());
         $this->assertFalse($migrations[3]->isMigrated());
+    }
+
+    public function testAddSql()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(1);
+
+        $migrations = $this->config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertTrue($schema->hasTable('test_add_sql_table'));
+        $check = $this->config->getConnection()->fetchAll('select * from test_add_sql_table');
+        $this->assertNotEmpty($check);
+        $this->assertEquals('test', $check[0]['test']);
+
+        $migration->migrate(0);
+        $this->assertFalse($migrations[1]->isMigrated());
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertFalse($schema->hasTable('test_add_sql_table'));
+    }
+}
+
+class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
+{
+    public function up(Schema $schema)
+    {
+        $this->addSql("CREATE TABLE test_add_sql_table (test varchar(255))");
+        $this->addSql("INSERT INTO test_add_sql_table (test) values (?)", array('test'));
+    }
+
+    public function down(Schema $schema)
+    {
+        $this->addSql("DROP TABLE test_add_sql_table");
     }
 }
 

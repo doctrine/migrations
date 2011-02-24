@@ -162,19 +162,19 @@ class Version
      * @param array $params
      * @return void
      */
-    public function addSql($sql, $params = null)
+    public function addSql($sql, array $params = array())
     {
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
-                if (isset($params[$key]) && is_array($params[$key])) {
-                    $this->params[count($this->sql)-1] = $params[$key];
+                if (isset($params[$key])) {
+                    $this->params[count($this->sql) - 1] = $params[$key];
                 }
             }
         } else {
             $this->sql[] = $sql;
-            if (is_array($params)) {
-                $this->params[count($this->sql)-1] = $params;
+            if ($params) {
+                $this->params[count($this->sql) - 1] = $params;
             }
         }
     }
@@ -250,7 +250,7 @@ class Version
             if ($dryRun === false) {
                 if ($this->sql) {
                     foreach ($this->sql as $key => $query) {
-                        if (empty($this->params[$key])) {
+                        if ( ! isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
                             $this->connection->executeQuery($query);
                         } else {

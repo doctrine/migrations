@@ -97,7 +97,7 @@ abstract class AbstractMigration
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 
-    protected function addSql($sql, $params = null)
+    protected function addSql($sql, array $params = array())
     {
         return $this->version->addSql($sql, $params);
     }
