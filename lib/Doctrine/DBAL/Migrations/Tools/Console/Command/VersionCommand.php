@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -37,7 +35,6 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class VersionCommand extends AbstractCommand
@@ -48,8 +45,8 @@ class VersionCommand extends AbstractCommand
             ->setName('migrations:version')
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to add or delete.', null)
-            ->addOption('add', null, InputOption::PARAMETER_NONE, 'Add the specified version.')
-            ->addOption('delete', null, InputOption::PARAMETER_NONE, 'Delete the specified version.')
+            ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
+            ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add and delete migration versions from the version table:
 
@@ -66,7 +63,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
         $migration = new Migration($configuration);
 
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {

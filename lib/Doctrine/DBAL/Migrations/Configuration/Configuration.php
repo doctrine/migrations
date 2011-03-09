@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -37,34 +35,65 @@ use Doctrine\DBAL\Connection,
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class Configuration
 {
-    /** Name of this set of migrations */
-    private $_name;
+    /**
+     * Name of this set of migrations
+     *
+     * @var string
+     */
+    private $name;
 
-    /** Flag for whether or not the migration table has been created */
-    private $_migrationTableCreated = false;
+    /**
+     * Flag for whether or not the migration table has been created
+     *
+     * @var bool
+     */
+    private $migrationTableCreated = false;
 
-    /** Connection instance to use for migrations */
-    private $_connection;
+    /**
+     * Connection instance to use for migrations
+     *
+     * @var Connection
+     */
+    private $connection;
 
-    /** OutputWriter instance for writing output during migrations */
-    private $_outputWriter;
+    /**
+     * OutputWriter instance for writing output during migrations
+     * 
+     * @var OutputWriter
+     */
+    private $outputWriter;
 
-    /** The migration table name to track versions in */
-    private $_migrationsTableName = 'doctrine_migration_versions';
+    /**
+     * The migration table name to track versions in
+     *
+     * @var string
+     */
+    private $migrationsTableName = 'doctrine_migration_versions';
 
-    /** The path to a directory where new migration classes will be written */
-    private $_migrationsDirectory;
+    /**
+     * The path to a directory where new migration classes will be written
+     * 
+     * @var string
+     */
+    private $migrationsDirectory;
 
-    /** Namespace the migration classes live in */
-    private $_migrationsNamespace;
+    /**
+     * Namespace the migration classes live in
+     *
+     * @var string
+     */
+    private $migrationsNamespace;
 
-    /** Array of the registered migrations */
-    private $_migrations = array();
+    /**
+     * Array of the registered migrations
+     *
+     * @var array
+     */
+    private $migrations = array();
 
     /**
      * Construct a migration configuration object.
@@ -74,11 +103,11 @@ class Configuration
      */
     public function __construct(Connection $connection, OutputWriter $outputWriter = null)
     {
-        $this->_connection = $connection;
+        $this->connection = $connection;
         if ($outputWriter === null) {
             $outputWriter = new OutputWriter();
         }
-        $this->_outputWriter = $outputWriter;
+        $this->outputWriter = $outputWriter;
     }
 
     /**
@@ -89,10 +118,10 @@ class Configuration
      */
     public function validate()
     {
-        if ( ! $this->_migrationsNamespace) {
+        if ( ! $this->migrationsNamespace) {
             throw MigrationException::migrationsNamespaceRequired();
         }
-        if ( ! $this->_migrationsDirectory) {
+        if ( ! $this->migrationsDirectory) {
             throw MigrationException::migrationsDirectoryRequired();
         }
     }
@@ -104,7 +133,7 @@ class Configuration
      */
     public function setName($name)
     {
-        $this->_name = $name;
+        $this->name = $name;
     }
 
     /**
@@ -114,7 +143,7 @@ class Configuration
      */
     public function getName()
     {
-        return $this->_name;
+        return $this->name;
     }
 
     /**
@@ -124,7 +153,7 @@ class Configuration
      */
     public function getOutputWriter()
     {
-        return $this->_outputWriter;
+        return $this->outputWriter;
     }
 
     /**
@@ -152,7 +181,7 @@ class Configuration
      */
     public function getConnection()
     {
-        return $this->_connection;
+        return $this->connection;
     }
 
     /**
@@ -162,7 +191,7 @@ class Configuration
      */
     public function setMigrationsTableName($tableName)
     {
-        $this->_migrationsTableName = $tableName;
+        $this->migrationsTableName = $tableName;
     }
 
     /**
@@ -172,7 +201,7 @@ class Configuration
      */
     public function getMigrationsTableName()
     {
-        return $this->_migrationsTableName;
+        return $this->migrationsTableName;
     }
 
     /**
@@ -182,7 +211,7 @@ class Configuration
      */
     public function setMigrationsDirectory($migrationsDirectory)
     {
-        $this->_migrationsDirectory = $migrationsDirectory;
+        $this->migrationsDirectory = $migrationsDirectory;
     }
 
     /**
@@ -192,7 +221,7 @@ class Configuration
      */
     public function getMigrationsDirectory()
     {
-        return $this->_migrationsDirectory;
+        return $this->migrationsDirectory;
     }
 
     /**
@@ -202,7 +231,7 @@ class Configuration
      */
     public function setMigrationsNamespace($migrationsNamespace)
     {
-        $this->_migrationsNamespace = $migrationsNamespace;
+        $this->migrationsNamespace = $migrationsNamespace;
     }
 
     /**
@@ -212,7 +241,7 @@ class Configuration
      */
     public function getMigrationsNamespace()
     {
-        return $this->_migrationsNamespace;
+        return $this->migrationsNamespace;
     }
 
     /**
@@ -233,7 +262,7 @@ class Configuration
             require_once($file);
             $info = pathinfo($file);
             $version = substr($info['filename'], 7);
-            $class = $this->_migrationsNamespace . '\\' . $info['filename'];
+            $class = $this->migrationsNamespace . '\\' . $info['filename'];
             $versions[] = $this->registerMigration($version, $class);
         }
         return $versions;
@@ -250,12 +279,12 @@ class Configuration
     {
         $version = (string) $version;
         $class = (string) $class;
-        if (isset($this->_migrations[$version])) {
-            throw MigrationException::duplicateMigrationVersion($version, get_class($this->_migrations[$version]));
+        if (isset($this->migrations[$version])) {
+            throw MigrationException::duplicateMigrationVersion($version, get_class($this->migrations[$version]));
         }
         $version = new Version($this, $version, $class);
-        $this->_migrations[$version->getVersion()] = $version;
-        ksort($this->_migrations);
+        $this->migrations[$version->getVersion()] = $version;
+        ksort($this->migrations);
         return $version;
     }
 
@@ -283,7 +312,7 @@ class Configuration
      */
     public function getMigrations()
     {
-        return $this->_migrations;
+        return $this->migrations;
     }
 
     /**
@@ -295,10 +324,10 @@ class Configuration
      */
     public function getVersion($version)
     {
-        if ( ! isset($this->_migrations[$version])) {
-            MigrationException::unknownMigrationVersion($version);
+        if ( ! isset($this->migrations[$version])) {
+            throw MigrationException::unknownMigrationVersion($version);
         }
-        return $this->_migrations[$version];
+        return $this->migrations[$version];
     }
 
     /**
@@ -309,7 +338,7 @@ class Configuration
      */
     public function hasVersion($version)
     {
-        return isset($this->_migrations[$version]) ? true : false;
+        return isset($this->migrations[$version]) ? true : false;
     }
 
     /**
@@ -322,7 +351,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $version = $this->_connection->fetchColumn("SELECT version FROM " . $this->_migrationsTableName . " WHERE version = '" . $version->getVersion() . "'");
+        $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?", array($version->getVersion()));
         return $version !== false ? true : false;
     }
 
@@ -335,7 +364,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->_connection->fetchColumn("SELECT version FROM " . $this->_migrationsTableName . " ORDER BY version DESC LIMIT 1");
+        $result = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " ORDER BY version DESC LIMIT 1");
         return $result !== false ? (string) $result : '0';
     }
 
@@ -348,7 +377,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->_connection->fetchColumn("SELECT COUNT(version) FROM " . $this->_migrationsTableName);
+        $result = $this->connection->fetchColumn("SELECT COUNT(version) FROM " . $this->migrationsTableName);
         return $result !== false ? $result : 0;
     }
 
@@ -359,7 +388,7 @@ class Configuration
      */
     public function getNumberOfAvailableMigrations()
     {
-        return count($this->_migrations);
+        return count($this->migrations);
     }
 
     /**
@@ -369,7 +398,7 @@ class Configuration
      */
     public function getLatestVersion()
     {
-        $versions = array_keys($this->_migrations);
+        $versions = array_keys($this->migrations);
         $latest = end($versions);
         return $latest !== false ? (string) $latest : '0';
     }
@@ -383,20 +412,20 @@ class Configuration
     {
         $this->validate();
 
-        if ($this->_migrationTableCreated) {
+        if ($this->migrationTableCreated) {
             return false;
         }
 
-        $schema = $this->_connection->getSchemaManager()->createSchema();
-        if ( ! $schema->hasTable($this->_migrationsTableName)) {
+        $schema = $this->connection->getSchemaManager()->createSchema();
+        if ( ! $schema->hasTable($this->migrationsTableName)) {
             $columns = array(
                 'version' => new Column('version', Type::getType('string'), array('length' => 14)),
             );
-            $table = new Table($this->_migrationsTableName, $columns);
+            $table = new Table($this->migrationsTableName, $columns);
             $table->setPrimaryKey(array('version'));
-            $this->_connection->getSchemaManager()->createTable($table);
+            $this->connection->getSchemaManager()->createTable($table);
 
-            $this->_migrationTableCreated = true;
+            $this->migrationTableCreated = true;
 
             return true;
         }
@@ -414,15 +443,15 @@ class Configuration
     public function getMigrationsToExecute($direction, $to)
     {
         if ($direction === 'down') {
-            $allVersions = array_reverse(array_keys($this->_migrations));
-            $classes = array_reverse(array_values($this->_migrations));
+            $allVersions = array_reverse(array_keys($this->migrations));
+            $classes = array_reverse(array_values($this->migrations));
             $allVersions = array_combine($allVersions, $classes);
         } else {
-            $allVersions = $this->_migrations;
+            $allVersions = $this->migrations;
         }
         $versions = array();
         foreach ($allVersions as $version) {
-            if ($this->_shouldExecuteMigration($direction, $version, $to)) {
+            if ($this->shouldExecuteMigration($direction, $version, $to)) {
                 $versions[$version->getVersion()] = $version;
             }
         }
@@ -438,7 +467,7 @@ class Configuration
      * @param string $to          The version we are migrating to.
      * @return void
      */
-    private function _shouldExecuteMigration($direction, Version $version, $to)
+    private function shouldExecuteMigration($direction, Version $version, $to)
     {
         if ($direction === 'down') {
             if ( ! $this->hasVersionMigrated($version)) {

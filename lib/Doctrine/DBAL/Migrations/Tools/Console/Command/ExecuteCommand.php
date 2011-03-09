@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,7 +34,6 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class ExecuteCommand extends AbstractCommand
@@ -47,10 +44,10 @@ class ExecuteCommand extends AbstractCommand
             ->setName('migrations:execute')
             ->setDescription('Execute a single migration version up or down manually.')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to execute.', null)
-            ->addOption('write-sql', null, InputOption::PARAMETER_NONE, 'The path to output the migration SQL file instead of executing it.')
-            ->addOption('dry-run', null, InputOption::PARAMETER_NONE, 'Execute the migration as a dry run.')
-            ->addOption('up', null, InputOption::PARAMETER_NONE, 'Execute the migration down.')
-            ->addOption('down', null, InputOption::PARAMETER_NONE, 'Execute the migration down.')
+            ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
+            ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration down.')
+            ->addOption('down', null, InputOption::VALUE_NONE, 'Execute the migration down.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
 
@@ -64,9 +61,13 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
 
-Or you can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
+You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+
+Or you can also execute the migration without a warning message wich you need to interact with:
+
+    <info>%command.full_name% --no-interaction</info>
 EOT
         );
 
@@ -78,18 +79,23 @@ EOT
         $version = $input->getArgument('version');
         $direction = $input->getOption('down') ? 'down' : 'up';
 
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
         $version = $configuration->getVersion($version);
 
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
-            if ($confirmation === true) {
+            $noInteraction = $input->getOption('no-interaction') ? true : false;
+            if ($noInteraction === true) {
                 $version->execute($direction, $input->getOption('dry-run') ? true : false);
             } else {
-                $output->writeln('<error>Migration cancelled!</error>');
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+                if ($confirmation === true) {
+                    $version->execute($direction, $input->getOption('dry-run') ? true : false);
+                } else {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                }
             }
         }
     }

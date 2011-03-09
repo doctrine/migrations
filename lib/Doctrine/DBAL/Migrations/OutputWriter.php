@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -27,19 +25,18 @@ namespace Doctrine\DBAL\Migrations;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class OutputWriter
 {
-    private $_closure;
+    private $closure;
 
     public function __construct(\Closure $closure = null)
     {
         if ($closure === null) {
             $closure = function($message) {};
         }
-        $this->_closure = $closure;
+        $this->closure = $closure;
     }
 
     /**
@@ -49,7 +46,7 @@ class OutputWriter
      */
     public function write($message)
     {
-        $closure = $this->_closure;
+        $closure = $this->closure;
         $closure($message);
     }
 }

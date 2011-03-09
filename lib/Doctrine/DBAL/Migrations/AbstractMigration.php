@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -31,53 +29,85 @@ use Doctrine\DBAL\Schema\Schema,
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 abstract class AbstractMigration
 {
-    /** The Migrations Configuration instance for this migration */
-    protected $_configuration;
+    /**
+     * The Migrations Configuration instance for this migration
+     *
+     * @var Configuration
+     */
+    private $configuration;
 
-    /** The OutputWriter object instance used for outputting information */
-    protected $_outputWriter;
+    /**
+     * The OutputWriter object instance used for outputting information
+     *
+     * @var OutputWriter
+     */
+    private $outputWriter;
 
-    /** The Doctrine\DBAL\Connection instance we are migrating */
-    protected $_connection;
+    /**
+     * The Doctrine\DBAL\Connection instance we are migrating
+     *
+     * @var Connection
+     */
+    protected $connection;
 
-    /** Reference to the SchemaManager instance referened by $_connection */
-    protected $_sm;
+    /**
+     * Reference to the SchemaManager instance referened by $_connection
+     *
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
+     */
+    protected $sm;
 
-    /** Reference to the DatabasePlatform instance referenced by $_conection */
-    protected $_platform;
+    /**
+     * Reference to the DatabasePlatform instance referenced by $_conection
+     *
+     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
+     */
+    protected $platform;
 
-    /** Reference to the Version instance representing this migration */
-    protected $_version;
+    /**
+     * Reference to the Version instance representing this migration
+     *
+     * @var Version
+     */
+    protected $version;
 
     public function __construct(Version $version)
     {
-        $this->_configuration = $version->getConfiguration();
-        $this->_outputWriter = $this->_configuration->getOutputWriter();
-        $this->_connection = $this->_configuration->getConnection();
-        $this->_sm = $this->_connection->getSchemaManager();
-        $this->_platform = $this->_connection->getDatabasePlatform();
-        $this->_version = $version;
+        $this->configuration = $version->getConfiguration();
+        $this->outputWriter = $this->configuration->getOutputWriter();
+        $this->connection = $this->configuration->getConnection();
+        $this->sm = $this->connection->getSchemaManager();
+        $this->platform = $this->connection->getDatabasePlatform();
+        $this->version = $version;
+    }
+
+    /**
+     * Get custom migration name
+     *
+     * @return string
+     */
+    public function getName()
+    {
     }
 
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 
-    protected function _addSql($sql)
+    protected function addSql($sql, array $params = array())
     {
-        return $this->_version->addSql($sql);
+        return $this->version->addSql($sql, $params);
     }
 
-    protected function _write($message)
+    protected function write($message)
     {
-        $this->_outputWriter->write($message);
+        $this->outputWriter->write($message);
     }
 
-    protected function _throwIrreversibleMigrationException($message = null)
+    protected function throwIrreversibleMigrationException($message = null)
     {
         if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';
@@ -96,7 +126,7 @@ abstract class AbstractMigration
         $message = (strlen($message)) ? $message : 'Unknown Reason';
 
         if ($condition === true) {
-            $this->_outputWriter->write('    <warning>Warning during ' . $this->_version->getExecutionState() . ': ' . $message . '</warning>');
+            $this->outputWriter->write('    <warning>Warning during ' . $this->version->getExecutionState() . ': ' . $message . '</warning>');
         }
     }
 

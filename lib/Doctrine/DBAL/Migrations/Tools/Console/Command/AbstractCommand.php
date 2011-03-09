@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -38,20 +36,22 @@ use Symfony\Component\Console\Command\Command,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 abstract class AbstractCommand extends Command
 {
-    protected $_configuration;
+    /**
+     * @var Configuration
+     */
+    private $configuration;
 
     protected function configure()
     {
-        $this->addOption('configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a migrations configuration file.');
-        $this->addOption('db-configuration', null, InputOption::PARAMETER_OPTIONAL, 'The path to a database connection configuration file.');
+        $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
+        $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
     }
 
-    protected function _outputHeader(Configuration $configuration, OutputInterface $output)
+    protected function outputHeader(Configuration $configuration, OutputInterface $output)
     {
         $name = $configuration->getName();
         $name = $name ? $name : 'Doctrine Database Migrations';
@@ -62,14 +62,19 @@ abstract class AbstractCommand extends Command
         $output->writeln('');
     }
 
+    public function setMigrationConfiguration(Configuration $config)
+    {
+        $this->configuration = $config;
+    }
+
     /**
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return Configuration
      */
-    protected function _getMigrationConfiguration(InputInterface $input, OutputInterface $output)
+    protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
-        if ( ! $this->_configuration) {
+        if ( ! $this->configuration) {
             $outputWriter = new OutputWriter(function($message) use ($output) {
                 return $output->writeln($message);
             });
@@ -110,8 +115,8 @@ abstract class AbstractCommand extends Command
             } else {
                 $configuration = new Configuration($conn, $outputWriter);
             }
-            $this->_configuration = $configuration;
+            $this->configuration = $configuration;
         }
-        return $this->_configuration;
+        return $this->configuration;
     }
 }

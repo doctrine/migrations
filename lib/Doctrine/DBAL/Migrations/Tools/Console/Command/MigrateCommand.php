@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -36,7 +34,6 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class MigrateCommand extends AbstractCommand
@@ -47,8 +44,8 @@ class MigrateCommand extends AbstractCommand
             ->setName('migrations:migrate')
             ->setDescription('Execute a migration to a specified version or the latest available version.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to migrate to.', null)
-            ->addOption('write-sql', null, InputOption::PARAMETER_NONE, 'The path to output the migration SQL file instead of executing it.')
-            ->addOption('dry-run', null, InputOption::PARAMETER_NONE, 'Execute the migration as a dry run.')
+            ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
+            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -62,11 +59,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
 
-Or you can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
+You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
     
-You can also execute the migration without a warning message wich you need to interact with:
+Or you can also execute the migration without a warning message wich you need to interact with:
     
     <info>%command.full_name% --no-interaction</info>
     
@@ -80,10 +77,10 @@ EOT
     {
         $version = $input->getArgument('version');
 
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
         $migration = new Migration($configuration);
 
-        $this->_outputHeader($configuration, $output);
+        $this->outputHeader($configuration, $output);
 
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;

@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -31,7 +29,6 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration,
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class Version
@@ -46,70 +43,73 @@ class Version
      *
      * @var Configuration
      */
-    private $_configuration;
+    private $configuration;
 
     /**
      * The OutputWriter object instance used for outputting information
      *
      * @var OutputWriter
      */
-    private $_outputWriter;
+    private $outputWriter;
 
     /**
      * The version in timestamp format (YYYYMMDDHHMMSS)
      *
      * @param int
      */
-    private $_version;
+    private $version;
 
     /**
      * @var AbstractSchemaManager
      */
-    private $_sm;
+    private $sm;
 
     /**
      * @var AbstractPlatform
      */
-    private $_platform;
+    private $platform;
 
     /**
      * The migration instance for this version
      *
      * @var AbstractMigration
      */
-    private $_migration;
+    private $migration;
 
     /**
      * @var Connection
      */
-    private $_connection;
+    private $connection;
 
     /**
      * @var string
      */
-    private $_class;
+    private $class;
 
     /** The array of collected SQL statements for this version */
-    private $_sql = array();
+    private $sql = array();
+
+    /** The array of collected parameters for SQL statements for this version */
+    private $params = array();
 
     /** The time in seconds that this migration version took to execute */
-    private $_time;
+    private $time;
 
     /**
      * @var int
      */
-    private $_state = self::STATE_NONE;
+    private $state = self::STATE_NONE;
 
     public function __construct(Configuration $configuration, $version, $class)
     {
-        $this->_configuration = $configuration;
-        $this->_outputWriter = $configuration->getOutputWriter();
-        $this->_version = $version;
-        $this->_class = $class;
-        $this->_connection = $configuration->getConnection();
-        $this->_sm = $this->_connection->getSchemaManager();
-        $this->_platform = $this->_connection->getDatabasePlatform();
-        $this->_migration = new $class($this);
+        $this->configuration = $configuration;
+        $this->outputWriter = $configuration->getOutputWriter();
+        $this->class = $class;
+        $this->connection = $configuration->getConnection();
+        $this->sm = $this->connection->getSchemaManager();
+        $this->platform = $this->connection->getDatabasePlatform();
+        $this->migration = new $class($this);
+        $this->version = $this->migration->getName() ?: $version;
     }
 
     /**
@@ -119,7 +119,7 @@ class Version
      */
     public function getVersion()
     {
-        return $this->_version;
+        return $this->version;
     }
 
     /**
@@ -129,7 +129,7 @@ class Version
      */
     public function getConfiguration()
     {
-        return $this->_configuration;
+        return $this->configuration;
     }
 
     /**
@@ -140,35 +140,42 @@ class Version
      */
     public function isMigrated()
     {
-        return $this->_configuration->hasVersionMigrated($this);
+        return $this->configuration->hasVersionMigrated($this);
     }
 
     public function markMigrated()
     {
-        $this->_configuration->createMigrationTable();
-        $this->_connection->executeQuery("INSERT INTO " . $this->_configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->_version));
+        $this->configuration->createMigrationTable();
+        $this->connection->executeQuery("INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->version));
     }
 
     public function markNotMigrated()
     {
-        $this->_configuration->createMigrationTable();
-        $this->_connection->executeQuery("DELETE FROM " . $this->_configuration->getMigrationsTableName() . " WHERE version = '$this->_version'");
+        $this->configuration->createMigrationTable();
+        $this->connection->executeQuery("DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = ?", array($this->version));
     }
 
     /**
      * Add some SQL queries to this versions migration
      *
      * @param mixed $sql
+     * @param array $params
      * @return void
      */
-    public function addSql($sql)
+    public function addSql($sql, array $params = array())
     {
         if (is_array($sql)) {
-            foreach ($sql as $query) {
-                $this->_sql[] = $query;
+            foreach ($sql as $key => $query) {
+                $this->sql[] = $query;
+                if (isset($params[$key])) {
+                    $this->params[count($this->sql) - 1] = $params[$key];
+                }
             }
         } else {
-            $this->_sql[] = $sql;
+            $this->sql[] = $sql;
+            if ($params) {
+                $this->params[count($this->sql) - 1] = $params;
+            }
         }
     }
 
@@ -185,7 +192,7 @@ class Version
 
         $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:m:s'));
 
-        $string .= "\n# Version " . $this->_version . "\n";
+        $string .= "\n# Version " . $this->version . "\n";
         foreach ($queries as $query) {
             $string .= $query . ";\n";
         }
@@ -194,9 +201,17 @@ class Version
             $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
         }
 
-        $this->_outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
+        $this->outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
 
         return file_put_contents($path, $string);
+    }
+
+    /**
+     * @return AbstractMigration
+     */
+    public function getMigration()
+    {
+        return $this->migration;
     }
 
     /**
@@ -209,94 +224,101 @@ class Version
      */
     public function execute($direction, $dryRun = false)
     {
-        $this->_sql = array();
+        $this->sql = array();
 
-        $this->_connection->beginTransaction();
+        $this->connection->beginTransaction();
 
         try {
             $start = microtime(true);
 
-            $this->_state = self::STATE_PRE;
-            $fromSchema = $this->_sm->createSchema();
-            $this->_migration->{'pre' . ucfirst($direction)}($fromSchema);
+            $this->state = self::STATE_PRE;
+            $fromSchema = $this->sm->createSchema();
+            $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
             if ($direction === 'up') {
-                $this->_outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->_version) . "\n");
+                $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
             } else {
-                $this->_outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->_version) . "\n");
+                $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
             }
 
-            $this->_state = self::STATE_EXEC;
+            $this->state = self::STATE_EXEC;
 
             $toSchema = clone $fromSchema;
-            $this->_migration->$direction($toSchema);
-            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->_platform));
+            $this->migration->$direction($toSchema);
+            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
 
             if ($dryRun === false) {
-                if ($this->_sql) {
-                    $count = count($this->_sql);
-                    foreach ($this->_sql as $query) {
-                        $this->_outputWriter->write('     <comment>-></comment> ' . $query);
-                        $this->_connection->executeQuery($query);
-                    }
-
-                    if ($direction === 'up') {
-                        $this->markMigrated();
-                    } else {
-                        $this->markNotMigrated();
+                if ($this->sql) {
+                    foreach ($this->sql as $key => $query) {
+                        if ( ! isset($this->params[$key])) {
+                            $this->outputWriter->write('     <comment>-></comment> ' . $query);
+                            $this->connection->executeQuery($query);
+                        } else {
+                            $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
+                            $this->connection->executeQuery($query, $this->params[$key]);
+                        }
                     }
                 } else {
-                    $this->_outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->_version));
+                    $this->outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->version));
                 }
+
+                if ($direction === 'up') {
+                    $this->markMigrated();
+                } else {
+                    $this->markNotMigrated();
+                }
+
             } else {
-                foreach ($this->_sql as $query) {
-                    $this->_outputWriter->write('     <comment>-></comment> ' . $query);
+                foreach ($this->sql as $query) {
+                    $this->outputWriter->write('     <comment>-></comment> ' . $query);
                 }
             }
 
-            $this->_state = self::STATE_POST;
-            $this->_migration->{'post' . ucfirst($direction)}($toSchema);
+            $this->state = self::STATE_POST;
+            $this->migration->{'post' . ucfirst($direction)}($toSchema);
 
             $end = microtime(true);
-            $this->_time = round($end - $start, 2);
+            $this->time = round($end - $start, 2);
             if ($direction === 'up') {
-                $this->_outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->_time));
+                $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
             } else {
-                $this->_outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->_time));
+                $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
             }
 
-            $this->_connection->commit();
+            $this->connection->commit();
 
-            return $this->_sql;
+            return $this->sql;
         } catch(SkipMigrationException $e) {
-            $this->_connection->rollback();
+            $this->connection->rollback();
 
-            // now mark it as migrated
-            if ($direction === 'up') {
-                $this->markMigrated();
-            } else {
-                $this->markNotMigrated();
+            if ($dryRun == false) {
+                // now mark it as migrated
+                if ($direction === 'up') {
+                    $this->markMigrated();
+                } else {
+                    $this->markNotMigrated();
+                }
             }
 
-            $this->_outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
+            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
         } catch (\Exception $e) {
 
-            $this->_outputWriter->write(sprintf(
+            $this->outputWriter->write(sprintf(
                 '<error>Migration %s failed during %s. Error %s</error>',
-                $this->_version, $this->getExecutionState(), $e->getMessage()
+                $this->version, $this->getExecutionState(), $e->getMessage()
             ));
 
-            $this->_connection->rollback();
+            $this->connection->rollback();
 
-            $this->_state = self::STATE_NONE;
+            $this->state = self::STATE_NONE;
             throw $e;
         }
-        $this->_state = self::STATE_NONE;
+        $this->state = self::STATE_NONE;
     }
 
     public function getExecutionState()
     {
-        switch($this->_state) {
+        switch($this->state) {
             case self::STATE_PRE:
                 return 'Pre-Checks';
             case self::STATE_POST:
@@ -315,11 +337,11 @@ class Version
      */
     public function getTime()
     {
-        return $this->_time;
+        return $this->time;
     }
 
     public function __toString()
     {
-        return $this->_version;
+        return $this->version;
     }
 }

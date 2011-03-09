@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -29,7 +27,6 @@ use Symfony\Component\Yaml\Yaml;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class YamlConfiguration extends AbstractFileConfiguration
@@ -37,7 +34,7 @@ class YamlConfiguration extends AbstractFileConfiguration
     /**
      * @inheritdoc
      */
-    protected function _load($file)
+    protected function doLoad($file)
     {
         $array = Yaml::load($file);
 
@@ -51,7 +48,7 @@ class YamlConfiguration extends AbstractFileConfiguration
             $this->setMigrationsNamespace($array['migrations_namespace']);
         }
         if (isset($array['migrations_directory'])) {
-            $migrationsDirectory = $this->_getDirectoryRelativeToFile($file, $array['migrations_directory']);
+            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, $array['migrations_directory']);
             $this->setMigrationsDirectory($migrationsDirectory);
             $this->registerMigrationsFromDirectory($migrationsDirectory);
         }

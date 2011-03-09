@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -27,7 +25,6 @@ namespace Doctrine\DBAL\Migrations\Configuration;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class XmlConfiguration extends AbstractFileConfiguration
@@ -35,7 +32,7 @@ class XmlConfiguration extends AbstractFileConfiguration
     /**
      * @inheritdoc
      */
-    protected function _load($file)
+    protected function doLoad($file)
     {
         $xml = simplexml_load_file($file);
         if (isset($xml->name)) {
@@ -48,7 +45,7 @@ class XmlConfiguration extends AbstractFileConfiguration
             $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
         }
         if (isset($xml->{'migrations-directory'})) {
-            $migrationsDirectory = $this->_getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
+            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
             $this->setMigrationsDirectory($migrationsDirectory);
             $this->registerMigrationsFromDirectory($migrationsDirectory);
         }

@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -37,7 +35,6 @@ use Symfony\Component\Console\Input\InputInterface,
  * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link    www.doctrine-project.org
  * @since   2.0
- * @version $Revision$
  * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class StatusCommand extends AbstractCommand
@@ -47,7 +44,7 @@ class StatusCommand extends AbstractCommand
         $this
             ->setName('migrations:status')
             ->setDescription('View the status of a set of migrations.')
-            ->addOption('show-versions', null, InputOption::PARAMETER_NONE, 'This will display a list of all available migrations and their status')
+            ->addOption('show-versions', null, InputOption::VALUE_NONE, 'This will display a list of all available migrations and their status')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command outputs the status of a set of migrations:
 
@@ -64,7 +61,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->_getMigrationConfiguration($input, $output);
+        $configuration = $this->getMigrationConfiguration($input, $output);
 
         $currentVersion = $configuration->getCurrentVersion();
         if ($currentVersion) {

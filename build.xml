@@ -5,9 +5,6 @@
 -->
 
 <project name="DoctrineMigrations" default="build" basedir=".">
-
-    <taskdef classname="NativePhpunitTask" classpath="./tests/" name="nativephpunit" />
-
     <property file="build.properties" />
 
     <!--
@@ -120,10 +117,7 @@
             </else>
         </if>
 
-        <nativephpunit
-            testfile="./tests/Doctrine/DBAL/Migrations/Tests/AllTests.php" junitlogfile="${build.dir}/logs/testsuites.xml"
-            testdirectory="./tests"  coverageclover="${test.phpunit_coverage_file}" configuration="${test.phpunit_configuration_file}"
-        />
+        <exec command="phpunit --configuration ${test.phpunit_configuration_option} ${test.phpunit_coverage_option} --log-junit ${project.basedir}/${build.dir}/logs/testsuites.xml Doctrine/DBAL/Migrations/Tests/" dir="./tests" passthru="true" />
         <phpunitreport infile="${build.dir}/logs/testsuites.xml" format="frames" todir="${report.dir}/tests" />
 
         <tstamp/>

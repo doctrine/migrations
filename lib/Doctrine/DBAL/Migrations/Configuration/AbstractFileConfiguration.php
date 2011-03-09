@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -30,16 +28,23 @@ use Doctrine\DBAL\Migrations\MigrationsException;
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 abstract class AbstractFileConfiguration extends Configuration
 {
-    /** The configuration file used to load configuration information */
-    private $_file;
+    /**
+     * The configuration file used to load configuration information
+     *
+     * @var string
+     */
+    private $file;
 
-    /** Whether or not the configuration file has been loaded yet or not */
-    private $_loaded = false;
+    /**
+     * Whether or not the configuration file has been loaded yet or not
+     *
+     * @var bool
+     */
+    private $loaded = false;
 
     /**
      * Load the information from the passed configuration file
@@ -50,18 +55,18 @@ abstract class AbstractFileConfiguration extends Configuration
      */
     public function load($file)
     {
-        if ($this->_loaded) {
+        if ($this->loaded) {
             throw MigrationsException::configurationFileAlreadyLoaded();
         }
         if (file_exists($path = getcwd() . '/' . $file)) {
             $file = $path;
         }
-        $this->_file = $file;
-        $this->_load($file);
-        $this->_loaded = true;
+        $this->file = $file;
+        $this->doLoad($file);
+        $this->loaded = true;
     }
 
-    protected function _getDirectoryRelativeToFile($file, $input)
+    protected function getDirectoryRelativeToFile($file, $input)
     {
         $path = realpath(dirname($file) . '/' . $input);
         if ($path !== false) {
@@ -74,7 +79,7 @@ abstract class AbstractFileConfiguration extends Configuration
 
     public function getFile()
     {
-        return $this->_file;
+        return $this->file;
     }
 
     /**
@@ -84,5 +89,5 @@ abstract class AbstractFileConfiguration extends Configuration
      *
      * @param string $file  The path to a configuration file.
      */
-    abstract protected function _load($file);
+    abstract protected function doLoad($file);
 }

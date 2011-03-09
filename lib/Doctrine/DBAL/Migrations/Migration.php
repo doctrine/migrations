@@ -1,7 +1,5 @@
 <?php
 /*
- *  $Id$
- *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
  * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
@@ -30,16 +28,21 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration,
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
  * @since       2.0
- * @version     $Revision$
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class Migration
 {
-    /** The Doctrine\DBAL\Connection instance we are migrating */
-    private $_connection;
+    /**
+     * The OutputWriter object instance used for outputting information
+     *
+     * @var OutputWriter
+     */
+    private $outputWriter;
 
-    /** The OutputWriter object instance used for outputting information */
-    private $_outputWriter;
+    /**
+     * @var Configuration
+     */
+    private $configuration;
 
     /**
      * Construct a Migration instance
@@ -48,8 +51,8 @@ class Migration
      */
     public function __construct(Configuration $configuration)
     {
-        $this->_configuration = $configuration;
-        $this->_outputWriter = $configuration->getOutputWriter();
+        $this->configuration = $configuration;
+        $this->outputWriter = $configuration->getOutputWriter();
     }
 
     /**
@@ -75,9 +78,9 @@ class Migration
     {
         $sql = $this->getSql($to);
 
-        $from = $this->_configuration->getCurrentVersion();
+        $from = $this->configuration->getCurrentVersion();
         if ($to === null) {
-            $to = $this->_configuration->getLatestVersion();
+            $to = $this->configuration->getLatestVersion();
         }
 
         $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:m:s'));
@@ -94,7 +97,7 @@ class Migration
             $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
         }
 
-        $this->_outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
+        $this->outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
 
         return file_put_contents($path, $string);
     }
@@ -110,29 +113,29 @@ class Migration
     public function migrate($to = null, $dryRun = false)
     {
         if ($to === null) {
-            $to = $this->_configuration->getLatestVersion();
+            $to = $this->configuration->getLatestVersion();
         }
 
-        $from = $this->_configuration->getCurrentVersion();
+        $from = $this->configuration->getCurrentVersion();
         $from = (string) $from;
         $to = (string) $to;
 
-        $migrations = $this->_configuration->getMigrations();
+        $migrations = $this->configuration->getMigrations();
         if ( ! isset($migrations[$to]) && $to > 0) {
             throw MigrationException::unknownMigrationVersion($to);
         }
 
         if ($from === $to) {
-            throw MigrationException::alreadyAtVersion($to);
+            return array();
         }
 
         $direction = $from > $to ? 'down' : 'up';
-        $migrations = $this->_configuration->getMigrationsToExecute($direction, $to);
+        $migrations = $this->configuration->getMigrationsToExecute($direction, $to);
 
         if ($dryRun === false) {
-            $this->_outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
+            $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         } else {
-            $this->_outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));            
+            $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         }
 
         if (empty($migrations)) {
@@ -147,10 +150,10 @@ class Migration
             $time += $version->getTime();
         }
 
-        $this->_outputWriter->write("\n  <comment>------------------------</comment>\n");
-        $this->_outputWriter->write(sprintf("  <info>++</info> finished in %s", $time));
-        $this->_outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrations)));
-        $this->_outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
+        $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
+        $this->outputWriter->write(sprintf("  <info>++</info> finished in %s", $time));
+        $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrations)));
+        $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
         return $sql;
     }
