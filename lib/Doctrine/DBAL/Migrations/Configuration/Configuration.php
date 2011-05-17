@@ -356,6 +356,24 @@ class Configuration
     }
 
     /**
+     * Returns all migrated versions from the versions table, in an array.
+     *
+     * @return array $migrated
+     */
+    public function getMigratedVersions()
+    {
+        $this->createMigrationTable();
+
+        $ret = $this->connection->fetchAll("SELECT version FROM " . $this->migrationsTableName);
+        $versions = array();
+        foreach ($ret as $version) {
+            $versions[] = current($version);
+        }
+
+        return $versions;
+    }
+
+    /**
      * Returns the current migrated version from the versions table.
      *
      * @return bool $currentVersion
@@ -450,8 +468,9 @@ class Configuration
             $allVersions = $this->migrations;
         }
         $versions = array();
+        $migrated = $this->getMigratedVersions();
         foreach ($allVersions as $version) {
-            if ($this->shouldExecuteMigration($direction, $version, $to)) {
+            if ($this->shouldExecuteMigration($direction, $version, $to, $migrated)) {
                 $versions[$version->getVersion()] = $version;
             }
         }
@@ -465,17 +484,18 @@ class Configuration
      * @param string $direction   The direction we are migrating.
      * @param Version $version    The Version instance to check.
      * @param string $to          The version we are migrating to.
+     * @param array $migrated     Migrated versions array.
      * @return void
      */
-    private function shouldExecuteMigration($direction, Version $version, $to)
+    private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
         if ($direction === 'down') {
-            if ( ! $this->hasVersionMigrated($version)) {
+            if ( ! in_array($version->getVersion(), $migrated)) {
                 return false;
             }
             return $version->getVersion() > $to ? true : false;
         } else if ($direction === 'up') {
-            if ($this->hasVersionMigrated($version)) {
+            if (in_array($version->getVersion(), $migrated)) {
                 return false;
             }
             return $version->getVersion() <= $to ? true : false;
