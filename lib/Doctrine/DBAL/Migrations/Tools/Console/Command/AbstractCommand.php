@@ -75,6 +75,10 @@ abstract class AbstractCommand extends Command
     protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
         if ( ! $this->configuration) {
+            if ($this->getApplication()->getHelperSet()->has('migration-configuration')) {
+                return $this->getHelper('migration-configuration')->getConfiguration();
+            }
+
             $outputWriter = new OutputWriter(function($message) use ($output) {
                 return $output->writeln($message);
             });
