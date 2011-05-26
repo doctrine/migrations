@@ -10,6 +10,18 @@
          syntaxCheck="false"
          bootstrap="tests/bootstrap.php"
 >
+
+     <filter>
+        <blacklist>
+            <directory suffix=".php">./lib/vendor</directory>
+        </blacklist>
+    </filter>
+
+    <logging>
+        <log type="coverage-html" target="build/coverage" title="Doctrine2 Database Migrations"
+             charset="UTF-8" />
+    </logging>
+
     <testsuites>
         <testsuite name="Doctrine2 Database Migrations Test Suite">
             <directory>./tests/Doctrine/</directory>
