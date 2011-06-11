@@ -103,8 +103,9 @@ EOT
         if ($showVersions === true) {
             if ($migrations = $configuration->getMigrations()) {
                 $output->writeln("\n <info>==</info> Migration Versions\n");
+                $migratedVersions = $configuration->getMigratedVersions();
                 foreach ($migrations as $version) {
-                    $isMigrated = $version->isMigrated();
+                    $isMigrated = in_array($version->getVersion(), $migratedVersions);
                     $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
                     $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
                 }
