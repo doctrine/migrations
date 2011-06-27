@@ -258,12 +258,14 @@ class Configuration
         $path = rtrim($path, '/');
         $files = glob($path . '/Version*.php');
         $versions = array();
-        foreach ($files as $file) {
-            require_once($file);
-            $info = pathinfo($file);
-            $version = substr($info['filename'], 7);
-            $class = $this->migrationsNamespace . '\\' . $info['filename'];
-            $versions[] = $this->registerMigration($version, $class);
+        if ($files) {
+            foreach ($files as $file) {
+                require_once($file);
+                $info = pathinfo($file);
+                $version = substr($info['filename'], 7);
+                $class = $this->migrationsNamespace . '\\' . $info['filename'];
+                $versions[] = $this->registerMigration($version, $class);
+            }
         }
         return $versions;
     }
