@@ -384,7 +384,9 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " ORDER BY version DESC LIMIT 1");
+        $sql = "SELECT version FROM " . $this->migrationsTableName . " ORDER BY version DESC";
+        $sql = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
+        $result = $this->connection->fetchColumn($sql);
         return $result !== false ? (string) $result : '0';
     }
 
