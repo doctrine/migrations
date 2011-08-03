@@ -99,8 +99,14 @@ EOT
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
-            $code[] = "\$this->addSql(\"$query\");";
+            $codeSql[] = "\$this->addSql(\"$query\");";
         }
-        return implode("\n", $code);
+
+        if (isset($codeSql)) {
+          return implode("\n", array_merge($code, $codeSql));
+        }
+        else {
+          return;
+        }
     }
 }
