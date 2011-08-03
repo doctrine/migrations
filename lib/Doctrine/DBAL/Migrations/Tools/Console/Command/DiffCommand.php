@@ -103,9 +103,8 @@ EOT
         }
 
         if (isset($codeSql)) {
-          return implode("\n", array_merge($code, $codeSql));
-        }
-        else {
+            return implode("\n", array_merge($code, $codeSql));
+        } else {
           return;
         }
     }
