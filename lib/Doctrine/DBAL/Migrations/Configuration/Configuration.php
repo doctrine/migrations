@@ -457,6 +457,28 @@ class Configuration
         }
         return $versions;
     }
+    
+    /**
+     * Returns the array of migrations that have not be run up to the
+     * specified version.
+     *
+     * @param string $to           The version to migrate to.
+     * @return array $migrations   The array of migrations we can execute.
+     */
+    public function getMissingMigrations($to)
+    {
+        $versions = array();
+        
+        foreach($this->migrations as $version)
+        {
+            if ($this->hasVersionMigrated($version) || $version->getVersion() > $to)
+                continue;
+            
+            $versions[$version->getVersion()] = $version;
+        }
+        
+        return $versions;
+    }
 
     /**
      * Check if we should execute a migration for a given direction and target
