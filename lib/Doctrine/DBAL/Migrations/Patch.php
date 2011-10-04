@@ -91,7 +91,8 @@ class Patch
         }
 
         if (empty($migrations)) {
-            throw MigrationException::noMigrationsToExecute();
+            $this->outputWriter->write('No missing migrations to patch');
+            return array();
         }
 
         $sql = array();
