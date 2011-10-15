@@ -94,7 +94,7 @@ EOT
                 if ($noInteraction === true) {
                     $migration->migrate($version, $dryRun);
                 } else {
-                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
                     if ($confirmation === true) {
                         $migration->migrate($version, $dryRun);
                     } else {
