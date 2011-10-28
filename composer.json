@@ -1,7 +1,7 @@
 {
     "name": "doctrine/migrations",
     "type": "library",
-    "description": "Databse Schema migrations using Doctrine DBAL",
+    "description": "Database Schema migrations using Doctrine DBAL",
     "keywords": ["migrations", "database"],
     "homepage": "http://www.doctrine-project.org",
     "license": "LGPL",
