@@ -35,6 +35,24 @@ Simply run `php package.php`, which will create the file: `build/doctrine-migrat
 Done! :)  This is a bit simpler than getting Phing/Ant going and running `phing build-migrations` and
 hoping the rest of the build dependencies work.
 
+### Creating archive disabled by INI setting
+
+If you receive an error that looks like:
+
+    creating archive "build/doctrine-migrations.phar" disabled by INI setting
+
+This can be fixed by setting the following in your php.ini:
+
+    ; http://php.net/phar.readonly
+    phar.readonly = Off
+
+### Installing Dependencies
+
+To install dependencies issue the following commands:
+
+    git submodule init
+    git submodule update
+
 ## Official Documentation
 
 All available documentation can be found [here](http://www.doctrine-project.org/projects/migrations/2.0/docs/en).
