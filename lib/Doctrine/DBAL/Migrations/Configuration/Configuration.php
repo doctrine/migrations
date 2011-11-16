@@ -441,7 +441,7 @@ class Configuration
         $schema = $this->connection->getSchemaManager()->createSchema();
         if ( ! $schema->hasTable($this->migrationsTableName)) {
             $columns = array(
-                'version' => new Column('version', Type::getType('string'), array('length' => 14)),
+                'version' => new Column('version', Type::getType('string'), array('length' => 255)),
             );
             $table = new Table($this->migrationsTableName, $columns);
             $table->setPrimaryKey(array('version'));
