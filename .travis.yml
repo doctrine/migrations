@@ -1,3 +1,5 @@
+before_install: "git submodule update --init"
+
 language: php
 
 php:
