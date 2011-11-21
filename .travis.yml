@@ -1,0 +1,5 @@
+before_script: "git submodule update --init"
+language: php
+php:
+  - 5.3
+  - 5.4
