@@ -465,9 +465,13 @@ class Configuration
     public function getMigrationsToExecute($direction, $to)
     {
         if ($direction === 'down') {
-            $allVersions = array_reverse(array_keys($this->migrations));
-            $classes = array_reverse(array_values($this->migrations));
-            $allVersions = array_combine($allVersions, $classes);
+            if (count($this->migrations)) {
+                $allVersions = array_reverse(array_keys($this->migrations));
+                $classes = array_reverse(array_values($this->migrations));
+                $allVersions = array_combine($allVersions, $classes);
+            } else {
+                $allVersions = array();
+            }
         } else {
             $allVersions = $this->migrations;
         }
