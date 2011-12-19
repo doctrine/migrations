@@ -14,5 +14,10 @@
         "ext-pdo": "*",
         "doctrine/common": ">=2.0",
         "doctrine/dbal": ">=2.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Doctrine\\DBAL\\Migrations": "lib"
+        }
     }
 }
