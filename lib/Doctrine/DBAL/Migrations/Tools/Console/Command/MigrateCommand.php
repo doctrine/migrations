@@ -63,7 +63,7 @@ You can output the would be executed SQL statements to a file with <comment>--wr
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
     
-Or you can also execute the migration without a warning message wich you need to interact with:
+Or you can also execute the migration without a warning message which you need to interact with:
     
     <info>%command.full_name% --no-interaction</info>
     
