@@ -406,15 +406,14 @@ class Configuration
     /**
      * Create the migration table to track migrations with.
      *
-     * @return bool $created  Whether or not the table was created.
+     * @return void
      */
     public function createMigrationTable()
     {
-        $this->validate();
+        if ($this->migrationTableCreated)
+            return;
 
-        if ($this->migrationTableCreated) {
-            return false;
-        }
+        $this->validate();
 
         $schema = $this->connection->getSchemaManager()->createSchema();
         if ( ! $schema->hasTable($this->migrationsTableName)) {
@@ -424,12 +423,9 @@ class Configuration
             $table = new Table($this->migrationsTableName, $columns);
             $table->setPrimaryKey(array('version'));
             $this->connection->getSchemaManager()->createTable($table);
-
-            $this->migrationTableCreated = true;
-
-            return true;
         }
-        return false;
+
+        $this->migrationTableCreated = true;
     }
 
     /**
