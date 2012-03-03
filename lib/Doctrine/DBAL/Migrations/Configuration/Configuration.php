@@ -113,7 +113,6 @@ class Configuration
     /**
      * Validation that this instance has all the required properties configured
      *
-     * @return void
      * @throws MigrationException
      */
     public function validate()
@@ -294,7 +293,6 @@ class Configuration
      *
      *
      * @param array $migrations
-     * @return void
      */
     public function registerMigrations(array $migrations)
     {
@@ -405,13 +403,12 @@ class Configuration
 
     /**
      * Create the migration table to track migrations with.
-     *
-     * @return void
      */
     public function createMigrationTable()
     {
-        if ($this->migrationTableCreated)
+        if ($this->migrationTableCreated) {
             return;
+        }
 
         $this->validate();
 
@@ -465,10 +462,10 @@ class Configuration
     {
         $versions = array();
         
-        foreach($this->migrations as $version)
-        {
-            if ($this->hasVersionMigrated($version) || $version->getVersion() > $to)
+        foreach($this->migrations as $version) {
+            if ($this->hasVersionMigrated($version) || $version->getVersion() > $to) {
                 continue;
+            }
             
             $versions[$version->getVersion()] = $version;
         }
@@ -483,7 +480,6 @@ class Configuration
      * @param string $direction   The direction we are migrating.
      * @param Version $version    The Version instance to check.
      * @param string $to          The version we are migrating to.
-     * @return void
      */
     private function shouldExecuteMigration($direction, Version $version, $to)
     {

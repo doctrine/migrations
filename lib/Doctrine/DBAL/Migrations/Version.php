@@ -232,7 +232,9 @@ class Version
             $start = microtime(true);
 
             $this->state = self::STATE_PRE;
+
             $fromSchema = $this->sm->createSchema();
+            
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
             if ($direction === 'up') {
