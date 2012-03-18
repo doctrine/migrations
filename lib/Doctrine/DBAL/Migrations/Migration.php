@@ -83,7 +83,7 @@ class Migration
             $to = $this->configuration->getLatestVersion();
         }
 
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:m:s'));
+        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
         $string .= sprintf("# Migrating from %s to %s\n", $from, $to);
 
         foreach ($sql as $version => $queries) {
