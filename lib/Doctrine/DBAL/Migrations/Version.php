@@ -92,6 +92,9 @@ class Version
     /** The array of collected parameters for SQL statements for this version */
     private $params = array();
 
+    /** The array of collected types for SQL statements for this version */
+    private $types = array();
+
     /** The time in seconds that this migration version took to execute */
     private $time;
 
@@ -160,21 +163,24 @@ class Version
      *
      * @param mixed $sql
      * @param array $params
+     * @param array $types
      * @return void
      */
-    public function addSql($sql, array $params = array())
+    public function addSql($sql, array $params = array(), array $types = array())
     {
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
                 if (isset($params[$key])) {
                     $this->params[count($this->sql) - 1] = $params[$key];
+                    $this->types[count($this->sql) - 1] = isset($types[$key]) ? $types[$key] : array();
                 }
             }
         } else {
             $this->sql[] = $sql;
             if ($params) {
                 $this->params[count($this->sql) - 1] = $params;
+                $this->types[count($this->sql) - 1] = $types ?: array();
             }
         }
     }
@@ -255,7 +261,7 @@ class Version
                             $this->connection->executeQuery($query);
                         } else {
                             $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
-                            $this->connection->executeQuery($query, $this->params[$key]);
+                            $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                         }
                     }
                 } else {

@@ -1,0 +1,23 @@
+{
+    "name": "doctrine/migrations",
+    "type": "library",
+    "description": "Database Schema migrations using Doctrine DBAL",
+    "keywords": ["migrations", "database"],
+    "homepage": "http://www.doctrine-project.org",
+    "license": "LGPL",
+    "authors": [
+        {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
+        {"name": "Jonathan Wage", "email": "jonwage@gmail.com"}
+    ],
+    "require": {
+        "php": ">=5.3.2",
+        "ext-pdo": "*",
+        "doctrine/common": ">=2.0",
+        "doctrine/dbal": ">=2.0"
+    },
+    "autoload": {
+        "psr-0": {
+            "Doctrine\\DBAL\\Migrations": "lib"
+        }
+    }
+}

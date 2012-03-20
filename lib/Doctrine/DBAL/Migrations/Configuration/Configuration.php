@@ -258,12 +258,14 @@ class Configuration
         $path = rtrim($path, '/');
         $files = glob($path . '/Version*.php');
         $versions = array();
-        foreach ($files as $file) {
-            require_once($file);
-            $info = pathinfo($file);
-            $version = substr($info['filename'], 7);
-            $class = $this->migrationsNamespace . '\\' . $info['filename'];
-            $versions[] = $this->registerMigration($version, $class);
+        if ($files) {
+            foreach ($files as $file) {
+                require_once($file);
+                $info = pathinfo($file);
+                $version = substr($info['filename'], 7);
+                $class = $this->migrationsNamespace . '\\' . $info['filename'];
+                $versions[] = $this->registerMigration($version, $class);
+            }
         }
         return $versions;
     }
@@ -356,6 +358,24 @@ class Configuration
     }
 
     /**
+     * Returns all migrated versions from the versions table, in an array.
+     *
+     * @return array $migrated
+     */
+    public function getMigratedVersions()
+    {
+        $this->createMigrationTable();
+
+        $ret = $this->connection->fetchAll("SELECT version FROM " . $this->migrationsTableName);
+        $versions = array();
+        foreach ($ret as $version) {
+            $versions[] = current($version);
+        }
+
+        return $versions;
+    }
+
+    /**
      * Returns the current migrated version from the versions table.
      *
      * @return bool $currentVersion
@@ -364,7 +384,9 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " ORDER BY version DESC LIMIT 1");
+        $sql = "SELECT version FROM " . $this->migrationsTableName . " ORDER BY version DESC";
+        $sql = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
+        $result = $this->connection->fetchColumn($sql);
         return $result !== false ? (string) $result : '0';
     }
 
@@ -419,7 +441,7 @@ class Configuration
         $schema = $this->connection->getSchemaManager()->createSchema();
         if ( ! $schema->hasTable($this->migrationsTableName)) {
             $columns = array(
-                'version' => new Column('version', Type::getType('string'), array('length' => 14)),
+                'version' => new Column('version', Type::getType('string'), array('length' => 255)),
             );
             $table = new Table($this->migrationsTableName, $columns);
             $table->setPrimaryKey(array('version'));
@@ -443,15 +465,20 @@ class Configuration
     public function getMigrationsToExecute($direction, $to)
     {
         if ($direction === 'down') {
-            $allVersions = array_reverse(array_keys($this->migrations));
-            $classes = array_reverse(array_values($this->migrations));
-            $allVersions = array_combine($allVersions, $classes);
+            if (count($this->migrations)) {
+                $allVersions = array_reverse(array_keys($this->migrations));
+                $classes = array_reverse(array_values($this->migrations));
+                $allVersions = array_combine($allVersions, $classes);
+            } else {
+                $allVersions = array();
+            }
         } else {
             $allVersions = $this->migrations;
         }
         $versions = array();
+        $migrated = $this->getMigratedVersions();
         foreach ($allVersions as $version) {
-            if ($this->shouldExecuteMigration($direction, $version, $to)) {
+            if ($this->shouldExecuteMigration($direction, $version, $to, $migrated)) {
                 $versions[$version->getVersion()] = $version;
             }
         }
@@ -465,17 +492,18 @@ class Configuration
      * @param string $direction   The direction we are migrating.
      * @param Version $version    The Version instance to check.
      * @param string $to          The version we are migrating to.
+     * @param array $migrated     Migrated versions array.
      * @return void
      */
-    private function shouldExecuteMigration($direction, Version $version, $to)
+    private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
         if ($direction === 'down') {
-            if ( ! $this->hasVersionMigrated($version)) {
+            if ( ! in_array($version->getVersion(), $migrated)) {
                 return false;
             }
             return $version->getVersion() > $to ? true : false;
         } else if ($direction === 'up') {
-            if ($this->hasVersionMigrated($version)) {
+            if (in_array($version->getVersion(), $migrated)) {
                 return false;
             }
             return $version->getVersion() <= $to ? true : false;

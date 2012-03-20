@@ -35,9 +35,9 @@ Define how migrations will be stored and tracked within your database:
 Define how to connect to your database:
 
     // migrations-db.php
-    
+
     ...
-    
+
     return array(
         'driver'    => 'pdo_mysql',
         'host'      => 'localhost',
@@ -64,6 +64,5 @@ For HTML to render properly, you can customize the `ConsoleOutput` within this f
 
     $output = new \Symfony\Component\Console\Output\ConsoleOutput;
     $output->setStyle('p'); // Adds default styling to the 'p' tag, as to not throw a rendering exception
-    
-    return $output;
 
+    return $output;
