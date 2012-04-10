@@ -49,6 +49,19 @@ abstract class AbstractCommand extends Command
     {
         $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
         $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
+        $this->addOption('filterAssets', null, InputOption::VALUE_NONE, 'Tables which are filtered.');
+        $this->addOption('filter', 'include', InputOption::VALUE_NONE, 'To include/exclude.');
+    }
+    
+    protected function initialize(InputInterface $input, OutputInterface $output) {       
+        $filter = $input->getOption('filter') == 'include'? true: false;
+        if ($input->getOption('filterAssets')) {
+            $filterAssets = $input->getOption('filterAssets');
+            $em = $this->getHelper('em')->getEntityManager();
+            $em->getConnection()
+                    ->getConfiguration()
+                    ->setFilterSchemaAssetsExpression($filterAssets, $filter);
+        }
     }
 
     protected function outputHeader(Configuration $configuration, OutputInterface $output)
