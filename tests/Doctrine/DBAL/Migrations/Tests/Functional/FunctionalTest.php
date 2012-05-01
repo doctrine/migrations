@@ -177,6 +177,30 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         $this->assertFalse($schema->hasTable('test_add_sql_table'));
     }
+
+    public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(10, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate();
+
+        $config = new Configuration($this->connection);
+        $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
+        $config->setMigrationsDirectory('.');
+        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($config);
+        $migration->migrate();
+
+        $migrations = $config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+        $this->assertTrue($migrations[2]->isMigrated());
+
+        $this->assertEquals(2, $config->getCurrentVersion());
+    }
 }
 
 class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
