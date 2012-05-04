@@ -114,6 +114,14 @@ class ConfigurationTest extends MigrationTestCase
         $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version');
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
     }
+
+    public function testGetAvailableVersions()
+    {
+        $config = $this->getSqliteConfiguration();
+
+        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->assertEquals(array(1234), $config->getAvailableVersions());
+    }
 }
 
 class ConfigMigration extends \Doctrine\DBAL\Migrations\AbstractMigration

@@ -376,6 +376,20 @@ class Configuration
     }
 
     /**
+     * Returns an array of available migration version numbers.
+     *
+     * @return array $availableVersions
+     */
+    public function getAvailableVersions()
+    {
+        $availableVersions = array();
+        foreach ($this->migrations as $migration) {
+            $availableVersions[] = $migration->getVersion();
+        }
+        return $availableVersions;
+    }
+
+    /**
      * Returns the current migrated version from the versions table.
      *
      * @return bool $currentVersion

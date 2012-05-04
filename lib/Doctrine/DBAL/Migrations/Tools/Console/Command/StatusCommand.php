@@ -75,25 +75,29 @@ EOT
         } else {
             $latestVersionFormatted = 0;
         }
-        $executedMigrations = $configuration->getNumberOfExecutedMigrations();
-        $availableMigrations = $configuration->getNumberOfAvailableMigrations();
-        $newMigrations = $availableMigrations - $executedMigrations;
+
+        $executedMigrations = $configuration->getMigratedVersions();
+        $availableMigrations = $configuration->getAvailableVersions();
+        $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
+        $numExecutedUnavailableMigrations = count($executedUnavailableMigrations);
+        $newMigrations = count($availableMigrations) - count($executedMigrations);
 
         $output->writeln("\n <info>==</info> Configuration\n");
 
         $info = array(
-            'Name'                  => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
-            'Database Driver'       => $configuration->getConnection()->getDriver()->getName(),
-            'Database Name'         => $configuration->getConnection()->getDatabase(),
-            'Configuration Source'  => $configuration instanceof \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
-            'Version Table Name'    => $configuration->getMigrationsTableName(),
-            'Migrations Namespace'  => $configuration->getMigrationsNamespace(),
-            'Migrations Directory'  => $configuration->getMigrationsDirectory(),
-            'Current Version'       => $currentVersionFormatted,
-            'Latest Version'        => $latestVersionFormatted,
-            'Executed Migrations'   => $executedMigrations,
-            'Available Migrations'  => $availableMigrations,
-            'New Migrations'        => $newMigrations > 0 ? '<question>' . $newMigrations . '</question>' : $newMigrations
+            'Name'                              => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
+            'Database Driver'                   => $configuration->getConnection()->getDriver()->getName(),
+            'Database Name'                     => $configuration->getConnection()->getDatabase(),
+            'Configuration Source'              => $configuration instanceof \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
+            'Version Table Name'                => $configuration->getMigrationsTableName(),
+            'Migrations Namespace'              => $configuration->getMigrationsNamespace(),
+            'Migrations Directory'              => $configuration->getMigrationsDirectory(),
+            'Current Version'                   => $currentVersionFormatted,
+            'Latest Version'                    => $latestVersionFormatted,
+            'Executed Migrations'               => count($executedMigrations),
+            'Executed Unavailable Migrations'   => $numExecutedUnavailableMigrations > 0 ? '<error>'.$numExecutedUnavailableMigrations.'</error>' : 0,
+            'Available Migrations'              => count($availableMigrations),
+            'New Migrations'                    => $newMigrations > 0 ? '<question>' . $newMigrations . '</question>' : 0
         );
         foreach ($info as $name => $value) {
             $output->writeln('    <comment>>></comment> ' . $name . ': ' . str_repeat(' ', 50 - strlen($name)) . $value);
@@ -102,12 +106,19 @@ EOT
         $showVersions = $input->getOption('show-versions') ? true : false;
         if ($showVersions === true) {
             if ($migrations = $configuration->getMigrations()) {
-                $output->writeln("\n <info>==</info> Migration Versions\n");
+                $output->writeln("\n <info>==</info> Available Migration Versions\n");
                 $migratedVersions = $configuration->getMigratedVersions();
                 foreach ($migrations as $version) {
                     $isMigrated = in_array($version->getVersion(), $migratedVersions);
                     $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
                     $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+                }
+            }
+
+            if ($executedUnavailableMigrations) {
+                $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
+                foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
                 }
             }
         }

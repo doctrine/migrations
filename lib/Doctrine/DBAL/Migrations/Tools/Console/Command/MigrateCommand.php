@@ -82,25 +82,44 @@ EOT
 
         $this->outputHeader($configuration, $output);
 
+        $noInteraction = $input->getOption('no-interaction') ? true : false;
+
+        $executedMigrations = $configuration->getMigratedVersions();
+        $availableMigrations = $configuration->getAvailableVersions();
+        $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
+
+        if ($executedUnavailableMigrations) {
+            $output->writeln(sprintf('<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>', count($executedUnavailableMigrations)));
+            foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+                $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
+            }
+
+            if ($noInteraction === false) {
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+            }
+        }
+
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
         } else {
             $dryRun = $input->getOption('dry-run') ? true : false;
             if ($dryRun === true) {
-                $migration->migrate($version, true);
+                $sql = $migration->migrate($version, true);
             } else {
-                $noInteraction = $input->getOption('no-interaction') ? true : false;
                 if ($noInteraction === true) {
                     $migration->migrate($version, $dryRun);
                 } else {
                     $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
                     if ($confirmation === true) {
-                        $migration->migrate($version, $dryRun);
+                        $sql = $migration->migrate($version, $dryRun);
                     } else {
                         $output->writeln('<error>Migration cancelled!</error>');
                     }
                 }
+            }
+            if (!$sql) {
+                $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
     }
