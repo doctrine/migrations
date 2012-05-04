@@ -384,12 +384,19 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $migratedVersions = array();
-        foreach ($this->migrations as $migration) {
-            $migratedVersions[] = $migration->getVersion();
+        $where = null;
+        if ($this->migrations) {
+            $migratedVersions = array();
+            foreach ($this->migrations as $migration) {
+                $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
+            }
+            $where = " WHERE version IN (" . implode(', ', $migratedVersions) . ")";
         }
 
-        $sql = "SELECT version FROM " . $this->migrationsTableName . " WHERE version IN (" . implode(', ', $migratedVersions) . ") ORDER BY version DESC";
+        $sql = sprintf("SELECT version FROM %s%s ORDER BY version DESC",
+            $this->migrationsTableName, $where
+        );
+
         $sql = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
         $result = $this->connection->fetchColumn($sql);
         return $result !== false ? (string) $result : '0';
