@@ -125,12 +125,12 @@ class Migration
             throw MigrationException::unknownMigrationVersion($to);
         }
 
-        if ($from === $to) {
+        $direction = $from > $to ? 'down' : 'up';
+        $migrationsToExecute = $this->configuration->getMigrationsToExecute($direction, $to);
+
+        if ($from === $to && empty($migrationsToExecute) && $migrations) {
             return array();
         }
-
-        $direction = $from > $to ? 'down' : 'up';
-        $migrations = $this->configuration->getMigrationsToExecute($direction, $to);
 
         if ($dryRun === false) {
             $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
@@ -138,13 +138,13 @@ class Migration
             $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         }
 
-        if (empty($migrations)) {
+        if (empty($migrationsToExecute)) {
             throw MigrationException::noMigrationsToExecute();
         }
 
         $sql = array();
         $time = 0;
-        foreach ($migrations as $version) {
+        foreach ($migrationsToExecute as $version) {
             $versionSql = $version->execute($direction, $dryRun);
             $sql[$version->getVersion()] = $versionSql;
             $time += $version->getTime();
@@ -152,7 +152,7 @@ class Migration
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
         $this->outputWriter->write(sprintf("  <info>++</info> finished in %s", $time));
-        $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrations)));
+        $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrationsToExecute)));
         $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
         return $sql;

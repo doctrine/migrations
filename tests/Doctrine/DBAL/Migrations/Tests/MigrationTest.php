@@ -24,11 +24,13 @@ class MigrationTest extends MigrationTestCase
         $migration->migrate('1234');
     }
 
-    public function testMigrateToCurrentVersionReturnsEmpty()
+    /**
+     * @expectedException Doctrine\DBAL\Migrations\MigrationException
+     */
+    public function testMigrateWithNoMigrationsThrowsException()
     {
         $migration = new Migration($this->config);
 
-        $sql = $migration->migrate('0');
-        $this->assertEquals(array(), $sql);
+        $sql = $migration->migrate();
     }
 }

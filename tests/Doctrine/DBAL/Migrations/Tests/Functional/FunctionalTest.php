@@ -201,6 +201,55 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $this->assertEquals(2, $config->getCurrentVersion());
     }
+
+    public function testInterweavedMigrationsAreExecuted()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate();
+
+        $migrations = $this->config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+        $this->assertTrue($migrations[3]->isMigrated());
+        $this->assertEquals(3, $this->config->getCurrentVersion());
+
+        $config = new Configuration($this->connection);
+        $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
+        $config->setMigrationsDirectory('.');
+        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $this->assertEquals(1, count($config->getMigrationsToExecute('up', 3)));
+        $migrations = $config->getMigrationsToExecute('up', 3);
+        $this->assertTrue(isset($migrations[2]));
+        $this->assertEquals(2, $migrations[2]->getVersion());
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($config);
+        $migration->migrate();
+
+        $migrations = $config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+        $this->assertTrue($migrations[2]->isMigrated());
+        $this->assertTrue($migrations[3]->isMigrated());
+
+        $this->assertEquals(3, $config->getCurrentVersion());
+    }
+
+    public function testMigrateToCurrentVersionReturnsEmpty()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate();
+
+        $sql = $migration->migrate();
+
+        $this->assertEquals(array(), $sql);;
+    }
 }
 
 class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
