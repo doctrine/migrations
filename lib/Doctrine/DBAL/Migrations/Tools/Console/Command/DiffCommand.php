@@ -53,8 +53,8 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
-        );
-
+            )
+            ->addOption('filter-expression', null, InputOption::VALUE_OPTIONAL, 'Tables which are filtered by Regular Expression.');
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
@@ -71,6 +71,11 @@ EOT
             return;
         }
 
+        if ($filterExpr = $input->getOption('filter-expression')) {
+            $conn->getConfiguration()
+                ->setFilterSchemaAssetsExpression($filterExpr);
+        }
+        
         $tool = new SchemaTool($em);
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
