@@ -477,11 +477,10 @@ class Configuration
 
             return true;
         }
-        else {
-            $this->migrationTableCreated = true;
 
-            return false;
-        }
+        $this->migrationTableCreated = true;
+
+        return false;
     }
 
     /**
