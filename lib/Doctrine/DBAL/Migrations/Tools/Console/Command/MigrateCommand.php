@@ -16,7 +16,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -62,11 +62,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
-    
+
 Or you can also execute the migration without a warning message which you need to interact with:
-    
+
     <info>%command.full_name% --no-interaction</info>
-    
+
 EOT
         );
 
@@ -96,6 +96,10 @@ EOT
 
             if ($noInteraction === false) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+                if ($confirmation !== true) {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                    return;
+                }
             }
         }
 
