@@ -21,7 +21,7 @@ namespace Doctrine\DBAL\Migrations\Generator;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Schema\Comparator;
-use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema;
 use Doctrine\DBAL\Types\Type;
 
 /**
@@ -67,12 +67,12 @@ class PhpGenerator implements GeneratorInterface
     /**
      * Generates a migration using a SchemaDiff
      *
-     * @param Schema $fromSchema
-     * @param Schema $toSchema
+     * @param \Doctrine\DBAL\Schema\Schema $fromSchema
+     * @param \Doctrine\DBAL\Schema\Schema $toSchema
      *
      * @return string Raw PHP code to be used as the body of a Migration
      */
-    public function generateMigration(Schema $fromSchema, Schema $toSchema)
+    public function generateMigration(Schema\Schema $fromSchema, Schema\Schema $toSchema)
     {
         $comparator = new Comparator();
         $schemaDiff = $comparator->compare($fromSchema, $toSchema);
@@ -206,7 +206,8 @@ class PhpGenerator implements GeneratorInterface
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\Column $column
+     * @param \Doctrine\DBAL\Schema\Column $column
+     *
      * @return string
      */
     protected function _getCreateColumnCode(Schema\Column $column)
@@ -219,7 +220,8 @@ class PhpGenerator implements GeneratorInterface
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\Index $index
+     * @param \Doctrine\DBAL\Schema\Index $index
+     *
      * @return string
      */
     protected function _getCreateIndexCode(Schema\Index $index)
@@ -239,6 +241,7 @@ class PhpGenerator implements GeneratorInterface
 
     /**
      * @param string $indexName The name of the index to drop
+     *
      * @return string
      */
     protected function _getDropIndexCode($indexName)
@@ -254,7 +257,8 @@ END;
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     *
      * @return string
      */
     protected function _getCreateForeignKeyCode(Schema\ForeignKeyConstraint $foreignKey)
@@ -270,6 +274,7 @@ END;
 
     /**
      * @param string $indexName The name of the index to drop
+     *
      * @return string
      */
     protected function _getDropForeignKeyCode(Schema\ForeignKeyConstraint $foreignKey)
@@ -287,7 +292,8 @@ END;
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
+     *
      * @return array
      */
     protected function _getForeignKeyOptions(Schema\ForeignKeyConstraint $foreignKey)
@@ -296,7 +302,8 @@ END;
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\Column $column
+     * @param \Doctrine\DBAL\Schema\Column $column
+     *
      * @return array
      */
     protected function _getColumnOptions(Schema\Column $column) {
@@ -350,7 +357,8 @@ END;
     }
 
     /**
-     * @param Doctrine\DBAL\Schema\AbstractAsset $asset
+     * @param \Doctrine\DBAL\Schema\AbstractAsset $asset
+     *
      * @return string
      */
     protected function _getQuotedIdentifier(Schema\AbstractAsset $asset)
@@ -360,6 +368,7 @@ END;
 
     /**
      * @param mixed $var
+     *
      * @return string
      */
     protected function _exportVar($var)
