@@ -152,8 +152,7 @@ class PhpGenerator implements GeneratorInterface
             foreach ($tableDiff->changedColumns as $oldName => $columnDiff) {
                 $code[] = sprintf('$column = $table->getColumn(\'%s\');', $oldName);
                 foreach ($columnDiff->changedProperties as $property) {
-                    $getter = "get{$property}";
-                    $value = call_user_func(array($columnDiff->column, $getter));
+                    $value = call_user_func(array($columnDiff->column, 'get'.$property));
 
                     if ($value instanceof Type) {
                         $code[] = sprintf('$column->setType(\Doctrine\DBAL\Types\Type::getType(\'%s\'));', $value->getName());
@@ -169,8 +168,7 @@ class PhpGenerator implements GeneratorInterface
             }
 
             foreach ($tableDiff->renamedColumns as $oldName => $column) {
-                $code[] = sprintf('$column = $table->getColumn(\'%s\');', $oldName);
-                $code[] = sprintf('$column->setName(\'%s\');', $column->getName());
+                $code[] = sprintf('$table->renameColumn(\'%s\', \'%s\'', $oldName, $column->getName());
             }
 
             foreach ($tableDiff->addedIndexes as $indexName => $index) {
@@ -247,12 +245,15 @@ class PhpGenerator implements GeneratorInterface
     protected function _getDropIndexCode($indexName)
     {
         return <<<END
-\$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
-\$indexesProperty = \$reflected->getProperty('_indexes');
-\$indexesProperty->setAccessible(true);
-\$indexes = \$indexesProperty->getValue(\$table);
-unset(\$indexes['{$indexName}']);
-\$indexesProperty->setValue(\$table, \$indexes);
+{
+    // Drop index: {$indexName}
+    \$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
+    \$indexesProperty = \$reflected->getProperty('_indexes');
+    \$indexesProperty->setAccessible(true);
+    \$indexes = \$indexesProperty->getValue(\$table);
+    unset(\$indexes['{$indexName}']);
+    \$indexesProperty->setValue(\$table, \$indexes);
+}
 END;
     }
 
@@ -282,12 +283,15 @@ END;
         $keyName = strtolower($foreignKey->getName());
 
         return <<<END
-\$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
-\$fkConstraintsProperty = \$reflected->getProperty('_fkConstraints');
-\$fkConstraintsProperty->setAccessible(true);
-\$fkConstraints = \$fkConstraintsProperty->getValue(\$table);
-unset(\$fkConstraints['{$keyName}']);
-\$fkConstraintsProperty->setValue(\$table, \$fkConstraints);
+{
+    // Remove foreign key: {$keyName}
+    \$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
+    \$fkConstraintsProperty = \$reflected->getProperty('_fkConstraints');
+    \$fkConstraintsProperty->setAccessible(true);
+    \$fkConstraints = \$fkConstraintsProperty->getValue(\$table);
+    unset(\$fkConstraints['{$keyName}']);
+    \$fkConstraintsProperty->setValue(\$table, \$fkConstraints);
+}
 END;
     }
 
