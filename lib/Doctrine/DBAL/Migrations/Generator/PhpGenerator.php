@@ -77,6 +77,7 @@ class PhpGenerator implements GeneratorInterface
         $comparator = new Comparator();
         $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
+        $codeHasReflection = false;
         $code = array('');
 
         foreach ($schemaDiff->changedSequences as $sequence) {
@@ -175,32 +176,94 @@ class PhpGenerator implements GeneratorInterface
                 $code[] = $this->_getCreateIndexCode($index);
             }
 
+            $droppedIndexes = array();
             foreach ($tableDiff->changedIndexes as $oldName => $index) {
-                $code[] = $this->_getDropIndexCode($oldName);
-                $code[] = $this->_getCreateIndexCode($index);
+                $droppedIndexes[$oldName] = $index;
             }
 
-            foreach ($tableDiff->removedIndexes as $indexName => $removed) {
-                $code[] = $this->_getDropIndexCode($indexName);
+            foreach ($tableDiff->removedIndexes as $indexName => $index) {
+                $droppedIndexes[$indexName] = $index;
+            }
+
+            if (!empty($droppedIndexes)) {
+                if (!$codeHasReflection) {
+                    $code = $this->_addReflectedProperties($code);
+                    $codeHasReflection = true;
+                }
+
+                $code[] = '$indexes = $indexesProperty->getValue($table);';
+                foreach ($droppedIndexes as $indexName => $index) {
+                    $code[] = 'unset($indexes[\'' . $indexName . '\']);';
+                }
+
+                $code[] = '$indexesProperty->setValue($table, $indexes);';
+            }
+
+            foreach ($tableDiff->changedIndexes as $oldName => $index) {
+                $code[] = $this->_getCreateIndexCode($index);
             }
 
             foreach ($tableDiff->addedForeignKeys as $foreignKey) {
                 $code[] = $this->_getCreateForeignKeyCode($foreignKey);
             }
 
+            $droppedForeignKeys = array();
             foreach ($tableDiff->changedForeignKeys as $foreignKey) {
-                $code[] = $this->_getDropForeignKeyCode($foreignKey);
-                $code[] = $this->_getCreateForeignKeyCode($foreignKey);
+                $droppedForeignKeys[] = $foreignKey;
             }
 
             foreach ($tableDiff->removedForeignKeys as $foreignKey) {
-                $code[] = $this->_getDropForeignKeyCode($foreignKey);
+                $droppedForeignKeys[] = $foreignKey;
+            }
+
+            if (!empty($droppedForeignKeys)) {
+                if (!$codeHasReflection) {
+                    $code = $this->_addReflectedProperties($code);
+                    $codeHasReflection = true;
+                }
+
+                $code[] = '$fks = $foreignKeysProperty->getValue($table);';
+                foreach ($droppedForeignKeys as $foreignKey) {
+                    $keyName = strtolower($foreignKey->getName());
+                    $code[] = 'unset($fks[\'' . $keyName . '\']);';
+                }
+
+                $code[] = '$foreignKeysProperty->setValue($table, $fks);';
+            }
+
+            foreach ($tableDiff->changedForeignKeys as $foreignKey) {
+                $code[] = $this->_getCreateForeignKeyCode($foreignKey);
             }
 
             $code[] = '';
         }
 
         return implode("\n", $code);
+    }
+
+    /**
+     * @param array $code
+     *
+     * @return array
+     */
+    protected function _addReflectedProperties(array $code)
+    {
+        $reflected = <<<END
+
+
+// These reflected properties are necessary because DBAL does not
+// expose the methods necessary to drop indexes and foreign keys
+\$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
+\$foreignKeysProperty = \$reflected->getProperty('_fkConstraints');
+\$foreignKeysProperty->setAccessible(true);
+\$indexesProperty = \$reflected->getProperty('_indexes');
+\$indexesProperty->setAccessible(true);
+
+END;
+
+        array_unshift($code, $reflected);
+
+        return $code;
     }
 
     /**
@@ -238,26 +301,6 @@ class PhpGenerator implements GeneratorInterface
     }
 
     /**
-     * @param string $indexName The name of the index to drop
-     *
-     * @return string
-     */
-    protected function _getDropIndexCode($indexName)
-    {
-        return <<<END
-{
-    // Drop index: {$indexName}
-    \$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
-    \$indexesProperty = \$reflected->getProperty('_indexes');
-    \$indexesProperty->setAccessible(true);
-    \$indexes = \$indexesProperty->getValue(\$table);
-    unset(\$indexes['{$indexName}']);
-    \$indexesProperty->setValue(\$table, \$indexes);
-}
-END;
-    }
-
-    /**
      * @param \Doctrine\DBAL\Schema\ForeignKeyConstraint $foreignKey
      *
      * @return string
@@ -271,28 +314,6 @@ END;
             $this->_exportVar($this->_getForeignKeyOptions($foreignKey)),
             $this->_getQuotedIdentifier($foreignKey)
         );
-    }
-
-    /**
-     * @param string $indexName The name of the index to drop
-     *
-     * @return string
-     */
-    protected function _getDropForeignKeyCode(Schema\ForeignKeyConstraint $foreignKey)
-    {
-        $keyName = strtolower($foreignKey->getName());
-
-        return <<<END
-{
-    // Remove foreign key: {$keyName}
-    \$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
-    \$fkConstraintsProperty = \$reflected->getProperty('_fkConstraints');
-    \$fkConstraintsProperty->setAccessible(true);
-    \$fkConstraints = \$fkConstraintsProperty->getValue(\$table);
-    unset(\$fkConstraints['{$keyName}']);
-    \$fkConstraintsProperty->setValue(\$table, \$fkConstraints);
-}
-END;
     }
 
     /**
