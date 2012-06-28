@@ -33,7 +33,7 @@ class SqlGenerator implements GeneratorInterface
     /**
      * @var Doctrine\DBAL\Migrations\Configuration\Configuration
      */
-    protected $_configuration;
+    protected $configuration;
 
     /**
      * Constructor
@@ -42,7 +42,7 @@ class SqlGenerator implements GeneratorInterface
      */
     public function __construct(Configuration $configuration)
     {
-        $this->_configuration = $configuration;
+        $this->configuration = $configuration;
     }
 
     /**
@@ -55,14 +55,14 @@ class SqlGenerator implements GeneratorInterface
      */
     public function generateMigration(Schema $fromSchema, Schema $toSchema)
     {
-        $platform = $this->_configuration->getConnection()->getDatabasePlatform();
+        $platform = $this->configuration->getConnection()->getDatabasePlatform();
         $sql = $fromSchema->getMigrateToSql($toSchema, $platform);
 
         $code = array(
             "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"" . $platform->getName() . "\");", "",
         );
         foreach ($sql as $query) {
-            if (strpos($query, $this->_configuration->getMigrationsTableName()) !== false) {
+            if (strpos($query, $this->configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
             $code[] = "\$this->addSql(\"$query\");";

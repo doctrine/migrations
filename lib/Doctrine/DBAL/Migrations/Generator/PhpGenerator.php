@@ -34,17 +34,17 @@ class PhpGenerator implements GeneratorInterface
     /**
      * @var Doctrine\DBAL\Migrations\Configuration\Configuration
      */
-    protected $_configuration;
+    protected $configuration;
 
     /**
      * @var \ReflectionProperty A Reflection on Doctrine\DBAL\Schema\AbstractAsset#$_quoted
      */
-    protected $_assetQuotedProperty;
+    protected $assetQuotedProperty;
 
     /**
      * @var \ReflectionProperty A Reflection on Doctrine\DBAL\Schema\ForeignKeyConstraint#$_options
      */
-    protected $_foreignKeyOptionsProperty;
+    protected $foreignKeyOptionsProperty;
 
     /**
      * Constructor
@@ -53,15 +53,15 @@ class PhpGenerator implements GeneratorInterface
      */
     public function __construct(Configuration $configuration)
     {
-        $this->_configuration = $configuration;
+        $this->configuration = $configuration;
 
         $reflected = new \ReflectionClass('Doctrine\DBAL\Schema\AbstractAsset');
-        $this->_assetQuotedProperty = $reflected->getProperty('_quoted');
-        $this->_assetQuotedProperty->setAccessible(true);
+        $this->assetQuotedProperty = $reflected->getProperty('_quoted');
+        $this->assetQuotedProperty->setAccessible(true);
 
         $reflected = new \ReflectionClass('Doctrine\DBAL\Schema\ForeignKeyConstraint');
-        $this->_foreignKeyOptionsProperty = $reflected->getProperty('_options');
-        $this->_foreignKeyOptionsProperty->setAccessible(true);
+        $this->foreignKeyOptionsProperty = $reflected->getProperty('_options');
+        $this->foreignKeyOptionsProperty->setAccessible(true);
     }
 
     /**
@@ -81,61 +81,61 @@ class PhpGenerator implements GeneratorInterface
         $code = array('');
 
         foreach ($schemaDiff->changedSequences as $sequence) {
-            $code[] = sprintf('$sequence = $schema->getSequence(\'%s\');', $this->_getQuotedIdentifier($sequence));
+            $code[] = sprintf('$sequence = $schema->getSequence(\'%s\');', $this->getQuotedIdentifier($sequence));
             $code[] = sprintf('$sequence->setAllocationSize(%s);', $sequence->getAllocationSize());
             $code[] = sprintf('$sequence->setInitialValue(%s);', $sequence->getInitialValue());
             $code[] = '';
         }
 
         foreach ($schemaDiff->removedSequences as $sequence) {
-            $code[] = sprintf('$schema->dropSequence(\'%s\');', $this->_getQuotedIdentifier($sequence));
+            $code[] = sprintf('$schema->dropSequence(\'%s\');', $this->getQuotedIdentifier($sequence));
             $code[] = '';
         }
 
         foreach ($schemaDiff->newSequences as $sequence) {
-            $code[] = sprintf('$schema->createSequence(\'%s\', %s, %s);', $this->_getQuotedIdentifier($sequence), $sequence->getAllocationSize(), $sequence->getInitialValue());
+            $code[] = sprintf('$schema->createSequence(\'%s\', %s, %s);', $this->getQuotedIdentifier($sequence), $sequence->getAllocationSize(), $sequence->getInitialValue());
             $code[] = '';
         }
 
         foreach ($schemaDiff->newTables as $table) {
-            if ($table->getName() == $this->_configuration->getMigrationsTableName()) {
+            if ($table->getName() == $this->configuration->getMigrationsTableName()) {
                 continue;
             }
 
             $code[] = '// Create table: ' . $table->getName();
-            $code[] = sprintf('$table = $schema->createTable(\'%s\');', $this->_getQuotedIdentifier($table));
+            $code[] = sprintf('$table = $schema->createTable(\'%s\');', $this->getQuotedIdentifier($table));
 
             foreach ($table->getOptions() as $name => $value) {
                 $code[] = sprintf('$table->addOption(\'%s\', \'%s\');');
             }
 
             foreach ($table->getColumns() as $column) {
-                $code[] = $this->_getCreateColumnCode($column);
+                $code[] = $this->getCreateColumnCode($column);
             }
 
             foreach ($table->getIndexes() as $index) {
-                $code[] = $this->_getCreateIndexCode($index);
+                $code[] = $this->getCreateIndexCode($index);
             }
 
             foreach ($table->getForeignKeys() as $foreignKey) {
-                $code[] = $this->_getCreateForeignKeyCode($foreignKey);
+                $code[] = $this->getCreateForeignKeyCode($foreignKey);
             }
 
             $code[] = '';
         }
 
         foreach ($schemaDiff->removedTables as $table) {
-            if ($table->getName() == $this->_configuration->getMigrationsTableName()) {
+            if ($table->getName() == $this->configuration->getMigrationsTableName()) {
                 continue;
             }
 
             $code[] = '// Drop table: ' . $table->getName();
-            $code[] = sprintf('$schema->dropTable(\'%s\');', $this->_getQuotedIdentifier($table));
+            $code[] = sprintf('$schema->dropTable(\'%s\');', $this->getQuotedIdentifier($table));
             $code[] = '';
         }
 
         foreach ($schemaDiff->changedTables as $tableDiff) {
-            if ($tableDiff->name == $this->_configuration->getMigrationsTableName()) {
+            if ($tableDiff->name == $this->configuration->getMigrationsTableName()) {
                 continue;
             }
 
@@ -147,7 +147,7 @@ class PhpGenerator implements GeneratorInterface
             }
 
             foreach ($tableDiff->addedColumns as $columnName => $column) {
-                $code[] = $this->_getCreateColumnCode($column);
+                $code[] = $this->getCreateColumnCode($column);
             }
 
             foreach ($tableDiff->changedColumns as $oldName => $columnDiff) {
@@ -159,7 +159,7 @@ class PhpGenerator implements GeneratorInterface
                         $code[] = sprintf('$column->setType(\Doctrine\DBAL\Types\Type::getType(\'%s\'));', $value->getName());
                     }
                     else {
-                        $code[] = sprintf('$column->set%s(%s);', ucfirst($property), $this->_exportVar($value));
+                        $code[] = sprintf('$column->set%s(%s);', ucfirst($property), $this->exportVar($value));
                     }
                 }
             }
@@ -173,7 +173,7 @@ class PhpGenerator implements GeneratorInterface
             }
 
             foreach ($tableDiff->addedIndexes as $indexName => $index) {
-                $code[] = $this->_getCreateIndexCode($index);
+                $code[] = $this->getCreateIndexCode($index);
             }
 
             $droppedIndexes = array();
@@ -187,7 +187,7 @@ class PhpGenerator implements GeneratorInterface
 
             if (!empty($droppedIndexes)) {
                 if (!$codeHasReflection) {
-                    $code = $this->_addReflectedProperties($code);
+                    $code = $this->addReflectedProperties($code);
                     $codeHasReflection = true;
                 }
 
@@ -200,11 +200,11 @@ class PhpGenerator implements GeneratorInterface
             }
 
             foreach ($tableDiff->changedIndexes as $oldName => $index) {
-                $code[] = $this->_getCreateIndexCode($index);
+                $code[] = $this->getCreateIndexCode($index);
             }
 
             foreach ($tableDiff->addedForeignKeys as $foreignKey) {
-                $code[] = $this->_getCreateForeignKeyCode($foreignKey);
+                $code[] = $this->getCreateForeignKeyCode($foreignKey);
             }
 
             $droppedForeignKeys = array();
@@ -218,7 +218,7 @@ class PhpGenerator implements GeneratorInterface
 
             if (!empty($droppedForeignKeys)) {
                 if (!$codeHasReflection) {
-                    $code = $this->_addReflectedProperties($code);
+                    $code = $this->addReflectedProperties($code);
                     $codeHasReflection = true;
                 }
 
@@ -232,7 +232,7 @@ class PhpGenerator implements GeneratorInterface
             }
 
             foreach ($tableDiff->changedForeignKeys as $foreignKey) {
-                $code[] = $this->_getCreateForeignKeyCode($foreignKey);
+                $code[] = $this->getCreateForeignKeyCode($foreignKey);
             }
 
             $code[] = '';
@@ -246,7 +246,7 @@ class PhpGenerator implements GeneratorInterface
      *
      * @return array
      */
-    protected function _addReflectedProperties(array $code)
+    protected function addReflectedProperties(array $code)
     {
         $reflected = <<<END
 
@@ -271,12 +271,12 @@ END;
      *
      * @return string
      */
-    protected function _getCreateColumnCode(Schema\Column $column)
+    protected function getCreateColumnCode(Schema\Column $column)
     {
         return sprintf('$table->addColumn(\'%s\', \'%s\', %s);',
-            $this->_getQuotedIdentifier($column),
+            $this->getQuotedIdentifier($column),
             $column->getType()->getName(),
-            $this->_exportVar($this->_getColumnOptions($column))
+            $this->exportVar($this->getColumnOptions($column))
         );
     }
 
@@ -285,7 +285,7 @@ END;
      *
      * @return string
      */
-    protected function _getCreateIndexCode(Schema\Index $index)
+    protected function getCreateIndexCode(Schema\Index $index)
     {
         if ($index->isPrimary()) {
             $str = '$table->setPrimaryKey(%s, \'%s\');';
@@ -297,7 +297,7 @@ END;
             $str = '$table->addIndex(%s, \'%s\');';
         }
 
-        return sprintf($str, $this->_exportVar($index->getColumns()), $this->_getQuotedIdentifier($index));
+        return sprintf($str, $this->exportVar($index->getColumns()), $this->getQuotedIdentifier($index));
     }
 
     /**
@@ -305,14 +305,14 @@ END;
      *
      * @return string
      */
-    protected function _getCreateForeignKeyCode(Schema\ForeignKeyConstraint $foreignKey)
+    protected function getCreateForeignKeyCode(Schema\ForeignKeyConstraint $foreignKey)
     {
         return sprintf('$table->addForeignKeyConstraint(\'%s\', %s, %s, %s, \'%s\');',
             $foreignKey->getForeignTableName(),
-            $this->_exportVar($foreignKey->getLocalColumns()),
-            $this->_exportVar($foreignKey->getForeignColumns()),
-            $this->_exportVar($this->_getForeignKeyOptions($foreignKey)),
-            $this->_getQuotedIdentifier($foreignKey)
+            $this->exportVar($foreignKey->getLocalColumns()),
+            $this->exportVar($foreignKey->getForeignColumns()),
+            $this->exportVar($this->getForeignKeyOptions($foreignKey)),
+            $this->getQuotedIdentifier($foreignKey)
         );
     }
 
@@ -321,9 +321,9 @@ END;
      *
      * @return array
      */
-    protected function _getForeignKeyOptions(Schema\ForeignKeyConstraint $foreignKey)
+    protected function getForeignKeyOptions(Schema\ForeignKeyConstraint $foreignKey)
     {
-        return $this->_foreignKeyOptionsProperty->getValue($foreignKey);
+        return $this->foreignKeyOptionsProperty->getValue($foreignKey);
     }
 
     /**
@@ -331,7 +331,7 @@ END;
      *
      * @return array
      */
-    protected function _getColumnOptions(Schema\Column $column) {
+    protected function getColumnOptions(Schema\Column $column) {
         $options = array();
 
         if ($column->getLength() !== null) {
@@ -386,9 +386,9 @@ END;
      *
      * @return string
      */
-    protected function _getQuotedIdentifier(Schema\AbstractAsset $asset)
+    protected function getQuotedIdentifier(Schema\AbstractAsset $asset)
     {
-        return $this->_assetQuotedProperty->getValue($asset) ? '"' . $asset->getName() . '"' : $asset->getName();
+        return $this->assetQuotedProperty->getValue($asset) ? '"' . $asset->getName() . '"' : $asset->getName();
     }
 
     /**
@@ -396,7 +396,7 @@ END;
      *
      * @return string
      */
-    protected function _exportVar($var)
+    protected function exportVar($var)
     {
         $export = var_export($var, true);
 
