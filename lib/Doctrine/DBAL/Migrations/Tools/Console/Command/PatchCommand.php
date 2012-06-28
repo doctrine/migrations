@@ -16,7 +16,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -49,11 +49,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
-    
+
 Or you can also execute the migration without a warning message which you need to interact with:
-    
+
     <info>%command.full_name% --no-interaction</info>
-    
+
 EOT
         );
 
@@ -70,22 +70,14 @@ EOT
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $patch->writeSqlFile($path);
+        } elseif ($input->getOption('dry-run') || $input->getOption('no-interaction')) {
+            $patch->patch(true);
         } else {
-            $dryRun = $input->getOption('dry-run') ? true : false;
-            if ($dryRun) {
-                $patch->patch(true);
+            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
+            if ($confirmation) {
+                $patch->patch(false);
             } else {
-                $noInteraction = $input->getOption('no-interaction') ? true : false;
-                if ($noInteraction) {
-                    $patch->patch($dryRun);
-                } else {
-                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', 'y');
-                    if ($confirmation) {
-                        $patch->patch($dryRun);
-                    } else {
-                        $output->writeln('<error>Patch cancelled!</error>');
-                    }
-                }
+                $output->writeln('<error>Patch cancelled!</error>');
             }
         }
     }

@@ -49,14 +49,14 @@ class Patch
     }
 
     /**
-     * Get the array of versions and SQL queries that would be executed for 
+     * Get the array of versions and SQL queries that would be executed for
      * each version but do not execute anything.
      *
      * @return array $sql  The array of SQL queries.
      */
     public function getSql()
     {
-        //TODO
+        $this->patch(true);
     }
 
     /**
