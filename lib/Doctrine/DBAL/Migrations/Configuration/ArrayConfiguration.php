@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
+use Doctrine\DBAL\Migrations\MigrationException;
+
 /**
  * Load migration configuration information from a XML configuration file.
  *
@@ -55,7 +57,7 @@ class ArrayConfiguration extends Configuration
             
             if (!is_array($options['directories'])) {
                 
-                throw new \Exception('directories config must be an array');
+                throw MigrationException::directoriesConfigInvalid();
             }
             
             foreach ($options['directories'] as $path) {
@@ -73,7 +75,7 @@ class ArrayConfiguration extends Configuration
             
             if (!is_array($options['migrations'])) {
                 
-                throw new \Exception('migrations config must be an array');
+                throw MigrationException::migrationsConfigInvalid();
             }
             
             foreach ($options['migrations'] as $migration) {
