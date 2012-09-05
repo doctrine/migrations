@@ -121,9 +121,6 @@ class Configuration
         if ( ! $this->migrationsNamespace) {
             throw MigrationException::migrationsNamespaceRequired();
         }
-        if ( ! $this->migrationsDirectory) {
-            throw MigrationException::migrationsDirectoryRequired();
-        }
     }
 
     /**
