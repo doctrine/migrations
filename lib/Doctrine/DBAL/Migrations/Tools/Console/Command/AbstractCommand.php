@@ -52,9 +52,8 @@ abstract class AbstractCommand extends Command
      */
     private $arrayConfig;
     
-    public function __construct($name = null, $config = null) {
+    public function setArrayConfig(array $config) {
         
-        parent::__construct($name);
         $this->arrayConfig = $config;
     }
     
