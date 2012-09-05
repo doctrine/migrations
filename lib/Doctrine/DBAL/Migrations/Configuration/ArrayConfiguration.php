@@ -46,6 +46,11 @@ class ArrayConfiguration extends Configuration
             $this->setMigrationsTableName($options['table_name']);
         }
         
+        if (isset($options['directory'])) {
+            
+            $this->setMigrationsDirectory($options['directory']);
+        }
+        
         if (isset($options['directories'])) {
             
             if (!is_array($options['directories'])) {
@@ -54,6 +59,11 @@ class ArrayConfiguration extends Configuration
             }
             
             foreach ($options['directories'] as $path) {
+
+                if (!$this->getMigrationsDirectory()) {
+                    
+                    $this->setMigrationsDirectory($path);
+                }
                 
                 $this->registerMigrationsFromDirectory($path);
             }
