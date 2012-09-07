@@ -80,6 +80,18 @@ EOT
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
         $toSchema = $tool->getSchemaFromMetadata($metadata);
+
+        //Not using value from options, because filters can be set from config.yml
+        if ($filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
+            $tableNames = $toSchema->getTableNames();
+            foreach ($tableNames as $tableName) {
+                $tableName = substr($tableName, strpos($tableName, '.') + 1);
+                if (!preg_match($filterExpr, $tableName)) {
+                    $toSchema->dropTable($tableName);
+                }
+            }
+        }
+
         $up = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
         $down = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
 
