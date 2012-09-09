@@ -19,6 +19,8 @@
  
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\ArrayConfiguration;
+
 use Symfony\Component\Console\Command\Command,
     Symfony\Component\Console\Input\InputInterface,
     Symfony\Component\Console\Output\OutputInterface,
@@ -45,6 +47,16 @@ abstract class AbstractCommand extends Command
      */
     private $configuration;
 
+    /**
+     * @var array
+     */
+    private $arrayConfig;
+    
+    public function setArrayConfig(array $config) {
+        
+        $this->arrayConfig = $config;
+    }
+    
     protected function configure()
     {
         $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
@@ -106,6 +118,9 @@ abstract class AbstractCommand extends Command
                 $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
                 $configuration = new $class($conn, $outputWriter);
                 $configuration->load($input->getOption('configuration'));
+            } else if ($this->arrayConfig) {
+                $configuration = new ArrayConfiguration($conn, $outputWriter);
+                $configuration->setOptions($this->arrayConfig);
             } else if (file_exists('migrations.xml')) {
                 $configuration = new XmlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.xml');

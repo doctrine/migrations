@@ -63,4 +63,14 @@ class MigrationException extends \Exception
     {
         return new self(sprintf('Migrations configuration file already loaded'), 8);
     }
+    
+    public static function directoriesConfigInvalid()
+    {
+        return new self('Migraion directories config must be an array', 9);
+    }
+    
+    public static function migrationsConfigInvalid()
+    {
+        return new self('Migraion migrations config must be an array', 9);
+    }
 }
