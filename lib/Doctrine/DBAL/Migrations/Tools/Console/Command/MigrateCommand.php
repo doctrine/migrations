@@ -103,6 +103,7 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
         } else {
+            $sql = false;
             $dryRun = $input->getOption('dry-run') ? true : false;
             if ($dryRun === true) {
                 $sql = $migration->migrate($version, true);
