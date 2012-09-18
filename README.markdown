@@ -55,4 +55,4 @@ To install dependencies issue the following commands:
 
 ## Official Documentation
 
-All available documentation can be found [here](http://www.doctrine-project.org/projects/migrations/2.0/docs/en).
+All available documentation can be found [here](http://docs.doctrine-project.org/projects/doctrine-migrations/en/latest/).
