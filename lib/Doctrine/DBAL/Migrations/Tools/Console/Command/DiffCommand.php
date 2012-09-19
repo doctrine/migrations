@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\InputInterface,
     Symfony\Component\Console\Input\InputArgument,
     Symfony\Component\Console\Input\InputOption,
     Doctrine\ORM\Tools\SchemaTool,
+    Doctrine\DBAL\Version as DbalVersion,
     Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
@@ -59,6 +60,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $isDbalOld = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
         $em = $this->getHelper('em')->getEntityManager();
@@ -72,17 +74,21 @@ EOT
         }
 
         if ($filterExpr = $input->getOption('filter-expression')) {
+            if ($isDbalOld) {
+                throw new \InvalidArgumentException('The "--filter-expression" option can only be used as of Doctrine DBAL 2.2');
+            }
+
             $conn->getConfiguration()
                 ->setFilterSchemaAssetsExpression($filterExpr);
         }
-        
+
         $tool = new SchemaTool($em);
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
         $toSchema = $tool->getSchemaFromMetadata($metadata);
 
         //Not using value from options, because filters can be set from config.yml
-        if ($filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
+        if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
             $tableNames = $toSchema->getTableNames();
             foreach ($tableNames as $tableName) {
                 $tableName = substr($tableName, strpos($tableName, '.') + 1);
