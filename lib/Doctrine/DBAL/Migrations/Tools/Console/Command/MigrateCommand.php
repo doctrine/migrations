@@ -118,7 +118,7 @@ EOT
                     }
                 }
             }
-            if (!$sql) {
+            if (isset($sql) && !$sql) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
