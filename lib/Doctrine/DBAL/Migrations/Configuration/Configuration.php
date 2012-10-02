@@ -62,7 +62,7 @@ class Configuration
 
     /**
      * OutputWriter instance for writing output during migrations
-     * 
+     *
      * @var OutputWriter
      */
     private $outputWriter;
@@ -76,7 +76,7 @@ class Configuration
 
     /**
      * The path to a directory where new migration classes will be written
-     * 
+     *
      * @var string
      */
     private $migrationsDirectory;
@@ -159,7 +159,7 @@ class Configuration
     /**
      * Returns a timestamp version as a formatted date
      *
-     * @param string $version 
+     * @param string $version
      * @return string $formattedVersion The formatted version
      */
     public function formatVersion($version)
@@ -207,7 +207,7 @@ class Configuration
     /**
      * Set the new migrations directory where new migration classes are generated
      *
-     * @param string $migrationsDirectory The new migrations directory 
+     * @param string $migrationsDirectory The new migrations directory
      */
     public function setMigrationsDirectory($migrationsDirectory)
     {
@@ -464,8 +464,7 @@ class Configuration
             return false;
         }
 
-        $schema = $this->connection->getSchemaManager()->createSchema();
-        if ( ! $schema->hasTable($this->migrationsTableName)) {
+        if ( ! $this->connection->getSchemaManager()->tablesExist(array($this->migrationsTableName))) {
             $columns = array(
                 'version' => new Column('version', Type::getType('string'), array('length' => 255)),
             );
