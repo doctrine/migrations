@@ -16,22 +16,25 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
+require_once __DIR__ . '/../vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
 
+use Doctrine\Common\ClassLoader;
 
-Phar::mapPhar();
-
-require_once 'phar://'.__FILE__.'/Doctrine/Common/ClassLoader.php';
-
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\Common', 'phar://'.__FILE__);
+$classLoader = new ClassLoader('Doctrine\DBAL\Migrations', __DIR__ . '/../lib');
 $classLoader->register();
 
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL', 'phar://'.__FILE__);
+$classLoader = new ClassLoader('Doctrine\Common', __DIR__ . '/../vendor/doctrine/common/lib');
 $classLoader->register();
 
-$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__);
+$classLoader = new ClassLoader('Doctrine\DBAL', __DIR__ . '/../vendor/doctrine/dbal/lib');
 $classLoader->register();
 
-// Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
+$classLoader = new ClassLoader('Symfony\Component\Console', __DIR__ . '/../vendor/symfony/console');
+$classLoader->register();
+
+$classLoader = new ClassLoader('Symfony\Component\Yaml', __DIR__ . '/../vendor/symfony/yaml');
+$classLoader->register();
+
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 
 $helperSet = null;
@@ -79,5 +82,3 @@ $output = file_exists('migrations-output.php')
         : null;
 
 $cli->run($input, $output);
-
-__HALT_COMPILER();
