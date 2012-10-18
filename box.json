@@ -1,0 +1,12 @@
+{
+    "alias": "doctrine-migrations.phar",
+    "main": "bin/doctrine-migrations.php",
+    "output": "build/doctrine-migrations.phar",
+    "finder": [
+        {
+            "exclude": ["Tests", "Test", "tests", "test"],
+            "in": ["lib", "vendor"]
+        }
+    ],
+    "stub": true
+}

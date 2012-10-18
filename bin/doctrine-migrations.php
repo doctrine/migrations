@@ -17,19 +17,6 @@
  * <http://www.doctrine-project.org>.
  */
 
-Phar::mapPhar();
-
-require_once 'phar://'.__FILE__.'/Doctrine/Common/ClassLoader.php';
-
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\Common', 'phar://'.__FILE__);
-$classLoader->register();
-
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL', 'phar://'.__FILE__);
-$classLoader->register();
-
-$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__);
-$classLoader->register();
-
 // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 
@@ -78,4 +65,3 @@ $output = file_exists('migrations-output.php')
 
 $cli->run($input, $output);
 
-__halt_compiler();
