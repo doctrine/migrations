@@ -17,6 +17,8 @@
  * <http://www.doctrine-project.org>.
  */
 
++include(__DIR__ . '/../vendor/autoload.php');
+
 // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 

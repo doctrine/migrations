@@ -36,10 +36,20 @@ This should give you the flexibility you need for customizing your input/output 
 
 ### Building Your Phar
 
-The PHAR is ready for [download here](http://github.com/downloads/ericclemmons/migrations/doctrine-migrations.phar), but if you still would like to build your PHAR
-run `php package.php`, which will create the file: `build/doctrine-migrations.phar` for you.
-Done! :)  This is a bit simpler than getting Phing/Ant going and running `phing build-migrations` and
-hoping the rest of the build dependencies work.
+Make sure Composer and all necessary dependencies are installed:
+
+    curl -s https://getcomposer.org/installer | php
+    php composer.phar install --dev
+
+Make sure that the Box project is installed:
+
+    curl -s http://box-project.org/installer.php | php
+
+Build the PHAR archive:
+
+    php box.phar build
+
+The `doctrine-migrations.phar` archive is built in the `build` directory.
 
 ### Creating archive disabled by INI setting
 
