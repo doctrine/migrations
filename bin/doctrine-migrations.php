@@ -16,24 +16,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
-require_once __DIR__ . '/../vendor/doctrine/common/lib/Doctrine/Common/ClassLoader.php';
-
-use Doctrine\Common\ClassLoader;
-
-$classLoader = new ClassLoader('Doctrine\DBAL\Migrations', __DIR__ . '/../lib');
-$classLoader->register();
-
-$classLoader = new ClassLoader('Doctrine\Common', __DIR__ . '/../vendor/doctrine/common/lib');
-$classLoader->register();
-
-$classLoader = new ClassLoader('Doctrine\DBAL', __DIR__ . '/../vendor/doctrine/dbal/lib');
-$classLoader->register();
-
-$classLoader = new ClassLoader('Symfony\Component\Console', __DIR__ . '/../vendor/symfony/console');
-$classLoader->register();
-
-$classLoader = new ClassLoader('Symfony\Component\Yaml', __DIR__ . '/../vendor/symfony/yaml');
-$classLoader->register();
+include(__DIR__ . '/../vendor/autoload.php');
 
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 
