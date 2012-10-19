@@ -98,7 +98,7 @@ EOT
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
                 if ( ! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
-                    return;
+                    return 1;
                 }
             }
         }
@@ -114,7 +114,7 @@ EOT
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
                 if ( ! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
-                    return;
+                    return 1;
                 }
             }
 
