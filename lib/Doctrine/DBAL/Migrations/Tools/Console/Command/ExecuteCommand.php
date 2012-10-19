@@ -46,7 +46,7 @@ class ExecuteCommand extends AbstractCommand
             ->addArgument('version', InputArgument::REQUIRED, 'The version to execute.', null)
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
-            ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration down.')
+            ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration up.')
             ->addOption('down', null, InputOption::VALUE_NONE, 'Execute the migration down.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
