@@ -16,22 +16,8 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
+include(__DIR__ . '/../vendor/autoload.php');
 
-
-Phar::mapPhar();
-
-require_once 'phar://'.__FILE__.'/Doctrine/Common/ClassLoader.php';
-
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\Common', 'phar://'.__FILE__);
-$classLoader->register();
-
-$classLoader = new \Doctrine\Common\ClassLoader('Doctrine\DBAL', 'phar://'.__FILE__);
-$classLoader->register();
-
-$classLoader = new \Doctrine\Common\ClassLoader('Symfony', 'phar://'.__FILE__);
-$classLoader->register();
-
-// Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 
 $helperSet = null;
@@ -79,5 +65,3 @@ $output = file_exists('migrations-output.php')
         : null;
 
 $cli->run($input, $output);
-
-__HALT_COMPILER();
