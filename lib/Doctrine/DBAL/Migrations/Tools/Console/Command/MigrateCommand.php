@@ -107,6 +107,7 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
         } else {
+            $sql = false;
             $dryRun = $input->getOption('dry-run') ? true : false;
 
             // warn the user if no dry run and interaction is on
