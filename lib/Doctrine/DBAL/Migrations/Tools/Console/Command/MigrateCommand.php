@@ -16,7 +16,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface,
@@ -62,11 +62,11 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
-    
+
 Or you can also execute the migration without a warning message which you need to interact with:
-    
+
     <info>%command.full_name% --no-interaction</info>
-    
+
 EOT
         );
 
@@ -94,8 +94,12 @@ EOT
                 $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
             }
 
-            if ($noInteraction === false) {
+            if ( ! $noInteraction) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+                if ( ! $confirmation) {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                    return 1;
+                }
             }
         }
 
@@ -104,21 +108,19 @@ EOT
             $migration->writeSqlFile($path, $version);
         } else {
             $dryRun = $input->getOption('dry-run') ? true : false;
-            if ($dryRun === true) {
-                $sql = $migration->migrate($version, true);
-            } else {
-                if ($noInteraction === true) {
-                    $sql = $migration->migrate($version, $dryRun);
-                } else {
-                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
-                    if ($confirmation === true) {
-                        $sql = $migration->migrate($version, $dryRun);
-                    } else {
-                        $output->writeln('<error>Migration cancelled!</error>');
-                    }
+
+            // warn the user if no dry run and interaction is on
+            if ( ! $dryRun && ! $noInteraction) {
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                if ( ! $confirmation) {
+                    $output->writeln('<error>Migration cancelled!</error>');
+                    return 1;
                 }
             }
-            if (!$sql) {
+
+            $sql = $migration->migrate($version, $dryRun);
+
+            if ( ! $sql) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
