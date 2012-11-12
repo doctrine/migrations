@@ -111,7 +111,11 @@ EOT
                 foreach ($migrations as $version) {
                     $isMigrated = in_array($version->getVersion(), $migratedVersions);
                     $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
-                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status);
+                    $migrationName = $version->getMigration()->getDescription();
+                    if ($migrationName) {
+                        $migrationName = str_repeat(' ', 10) . $migrationName;
+                    }
+                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) . ' (<comment>' . $version->getVersion() . '</comment>)' . str_repeat(' ', 30 - strlen($name)) . $status . $migrationName);
                 }
             }
 
