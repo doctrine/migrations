@@ -111,7 +111,7 @@ class Version
         $this->sm = $this->connection->getSchemaManager();
         $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
-        $this->version = $this->migration->getName() ?: $version;
+        $this->version = $version;
     }
 
     /**
