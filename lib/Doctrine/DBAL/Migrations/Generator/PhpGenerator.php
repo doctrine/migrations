@@ -39,7 +39,7 @@ class PhpGenerator implements GeneratorInterface
     /**
      * Constructor
      *
-     * @param \Doctrine\DBAL\Migrations\Configuration\Configuration A Migration configuration
+     * @param \Doctrine\DBAL\Migrations\Configuration\Configuration $configuration A Migration configuration
      */
     public function __construct(Configuration $configuration)
     {
@@ -52,6 +52,7 @@ class PhpGenerator implements GeneratorInterface
      * @param \Doctrine\DBAL\Schema\Schema $fromSchema
      * @param \Doctrine\DBAL\Schema\Schema $toSchema
      *
+     * @throws \RuntimeException if Doctrine DBAL is not version 2.3.0 or later
      * @return string Raw PHP code to be used as the body of a Migration
      */
     public function generateMigration(Schema\Schema $fromSchema, Schema\Schema $toSchema)
