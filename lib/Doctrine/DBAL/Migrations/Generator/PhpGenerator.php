@@ -32,36 +32,18 @@ use Doctrine\DBAL\Types\Type;
 class PhpGenerator implements GeneratorInterface
 {
     /**
-     * @var Doctrine\DBAL\Migrations\Configuration\Configuration
+     * @var \Doctrine\DBAL\Migrations\Configuration\Configuration
      */
     protected $configuration;
 
     /**
-     * @var \ReflectionProperty A Reflection on Doctrine\DBAL\Schema\AbstractAsset#$_quoted
-     */
-    protected $assetQuotedProperty;
-
-    /**
-     * @var \ReflectionProperty A Reflection on Doctrine\DBAL\Schema\ForeignKeyConstraint#$_options
-     */
-    protected $foreignKeyOptionsProperty;
-
-    /**
      * Constructor
      *
-     * @param Doctrine\DBAL\Migrations\Configuration\Configuration A Migration configuration
+     * @param \Doctrine\DBAL\Migrations\Configuration\Configuration A Migration configuration
      */
     public function __construct(Configuration $configuration)
     {
         $this->configuration = $configuration;
-
-        $reflected = new \ReflectionClass('Doctrine\DBAL\Schema\AbstractAsset');
-        $this->assetQuotedProperty = $reflected->getProperty('_quoted');
-        $this->assetQuotedProperty->setAccessible(true);
-
-        $reflected = new \ReflectionClass('Doctrine\DBAL\Schema\ForeignKeyConstraint');
-        $this->foreignKeyOptionsProperty = $reflected->getProperty('_options');
-        $this->foreignKeyOptionsProperty->setAccessible(true);
     }
 
     /**
@@ -74,10 +56,13 @@ class PhpGenerator implements GeneratorInterface
      */
     public function generateMigration(Schema\Schema $fromSchema, Schema\Schema $toSchema)
     {
+        if (\Doctrine\DBAL\Version::compare('2.3.0') < 0) {
+            throw new \RuntimeException('The PHP migration generator requires Doctrine DBAL 2.3.0 or later to function.');
+        }
+
         $comparator = new Comparator();
         $schemaDiff = $comparator->compare($fromSchema, $toSchema);
 
-        $codeHasReflection = false;
         $code = array('');
 
         foreach ($schemaDiff->changedSequences as $sequence) {
@@ -168,6 +153,7 @@ class PhpGenerator implements GeneratorInterface
                 $code[] = sprintf('$table->dropColumn(\'%s\');', $columnName);
             }
 
+            // TODO Should this be removed?
             foreach ($tableDiff->renamedColumns as $oldName => $column) {
                 $code[] = sprintf('$table->renameColumn(\'%s\', \'%s\'', $oldName, $column->getName());
             }
@@ -186,17 +172,9 @@ class PhpGenerator implements GeneratorInterface
             }
 
             if (!empty($droppedIndexes)) {
-                if (!$codeHasReflection) {
-                    $code = $this->addReflectedProperties($code);
-                    $codeHasReflection = true;
-                }
-
-                $code[] = '$indexes = $indexesProperty->getValue($table);';
                 foreach ($droppedIndexes as $indexName => $index) {
-                    $code[] = 'unset($indexes[\'' . $indexName . '\']);';
+                    $code[] = sprintf('$table->dropIndex(\'%s\');', $indexName);
                 }
-
-                $code[] = '$indexesProperty->setValue($table, $indexes);';
             }
 
             foreach ($tableDiff->changedIndexes as $oldName => $index) {
@@ -217,18 +195,9 @@ class PhpGenerator implements GeneratorInterface
             }
 
             if (!empty($droppedForeignKeys)) {
-                if (!$codeHasReflection) {
-                    $code = $this->addReflectedProperties($code);
-                    $codeHasReflection = true;
-                }
-
-                $code[] = '$fks = $foreignKeysProperty->getValue($table);';
                 foreach ($droppedForeignKeys as $foreignKey) {
-                    $keyName = strtolower($foreignKey->getName());
-                    $code[] = 'unset($fks[\'' . $keyName . '\']);';
+                    $code[] = sprintf('$table->removeForeignKey(\'%s\');', $foreignKey->getName());
                 }
-
-                $code[] = '$foreignKeysProperty->setValue($table, $fks);';
             }
 
             foreach ($tableDiff->changedForeignKeys as $foreignKey) {
@@ -239,31 +208,6 @@ class PhpGenerator implements GeneratorInterface
         }
 
         return implode("\n", $code);
-    }
-
-    /**
-     * @param array $code
-     *
-     * @return array
-     */
-    protected function addReflectedProperties(array $code)
-    {
-        $reflected = <<<END
-
-
-// These reflected properties are necessary because DBAL does not
-// expose the methods necessary to drop indexes and foreign keys
-\$reflected = new \ReflectionClass('Doctrine\DBAL\Schema\Table');
-\$foreignKeysProperty = \$reflected->getProperty('_fkConstraints');
-\$foreignKeysProperty->setAccessible(true);
-\$indexesProperty = \$reflected->getProperty('_indexes');
-\$indexesProperty->setAccessible(true);
-
-END;
-
-        array_unshift($code, $reflected);
-
-        return $code;
     }
 
     /**
@@ -289,11 +233,9 @@ END;
     {
         if ($index->isPrimary()) {
             $str = '$table->setPrimaryKey(%s, \'%s\');';
-        }
-        else if ($index->isUnique()) {
+        } elseif ($index->isUnique()) {
             $str = '$table->addUniqueIndex(%s, \'%s\');';
-        }
-        else {
+        } else {
             $str = '$table->addIndex(%s, \'%s\');';
         }
 
@@ -323,7 +265,7 @@ END;
      */
     protected function getForeignKeyOptions(Schema\ForeignKeyConstraint $foreignKey)
     {
-        return $this->foreignKeyOptionsProperty->getValue($foreignKey);
+        return $foreignKey->getOptions();
     }
 
     /**
@@ -388,7 +330,7 @@ END;
      */
     protected function getQuotedIdentifier(Schema\AbstractAsset $asset)
     {
-        return $this->assetQuotedProperty->getValue($asset) ? '"' . $asset->getName() . '"' : $asset->getName();
+        return $asset->isQuoted() ? '"' . $asset->getName() . '"' : $asset->getName();
     }
 
     /**
