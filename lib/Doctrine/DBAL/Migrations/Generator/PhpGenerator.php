@@ -154,9 +154,9 @@ class PhpGenerator implements GeneratorInterface
                 $code[] = sprintf('$table->dropColumn(\'%s\');', $columnName);
             }
 
-            // TODO Should this be removed?
             foreach ($tableDiff->renamedColumns as $oldName => $column) {
-                $code[] = sprintf('$table->renameColumn(\'%s\', \'%s\'', $oldName, $column->getName());
+                $code[] = sprintf('$table->dropColumn(\'%s\');', $oldName);
+                $code[] = $this->getCreateColumnCode($column);
             }
 
             foreach ($tableDiff->addedIndexes as $indexName => $index) {
