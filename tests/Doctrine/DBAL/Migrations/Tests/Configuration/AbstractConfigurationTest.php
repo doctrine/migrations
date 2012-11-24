@@ -36,6 +36,6 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
     public function testIgnoredTables()
     {
         $config = $this->loadConfiguration();
-        $this->assertArray(array('ignored_tables'), $config->getIgnoredTables());
+        $this->assertContains('ignored_tables', $config->getIgnoredTables());
     }
 }
