@@ -6,6 +6,9 @@
 
     <name>Doctrine Sandbox Migrations</name>
     <migrations-namespace>DoctrineMigrationsTest</migrations-namespace>
+    <ignored-tables>
+        <table>ignored_table</table>
+    </ignored-tables>
     <table name="doctrine_migration_versions_test" />
     <migrations-directory>/path/to/migrations/classes/DoctrineMigrations</migrations-directory>
 

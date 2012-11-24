@@ -44,8 +44,8 @@ class XmlConfiguration extends AbstractFileConfiguration
         if (isset($xml->{'migrations-namespace'})) {
             $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
         }
-        if (isset($xml->{'ignored_tables'}->{'table'})) {
-            foreach ($xml->{'ignored_tables'}->{'table'} as $table) {
+        if (isset($xml->{'ignored-tables'}->{'table'})) {
+            foreach ($xml->{'ignored-tables'}->{'table'} as $table) {
                 $this->addIgnoredTable((string) $table);
             }
         }
