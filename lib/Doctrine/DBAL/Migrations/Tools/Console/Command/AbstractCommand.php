@@ -79,7 +79,7 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->getApplication()->getHelperSet()->has('db')) {
+            if ($this->getHelper('db')) {
                 $conn = $this->getHelper('db')->getConnection();
             } else if($input->getOption('db-configuration')) {
                 if (!file_exists($input->getOption('db-configuration'))) {
