@@ -115,15 +115,21 @@ EOT
     private function buildCodeFromSql(Configuration $configuration, array $sql)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
-        $code = array(
-            "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\");", "",
-        );
+        $abortCode = "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\");";
+
+        $code = array();
         foreach ($sql as $query) {
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
             $code[] = "\$this->addSql(\"$query\");";
         }
+
+        if (empty($code)) {
+            return;
+        }
+
+        array_unshift($code, $abortCode, "");
         return implode("\n", $code);
     }
 }
