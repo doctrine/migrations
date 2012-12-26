@@ -19,7 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
-use Doctrine\DBAL\Migrations\MigrationsException;
+use Doctrine\DBAL\Migrations\MigrationException;
 
 /**
  * Abstract Migration Configuration class for loading configuration information
@@ -56,7 +56,7 @@ abstract class AbstractFileConfiguration extends Configuration
     public function load($file)
     {
         if ($this->loaded) {
-            throw MigrationsException::configurationFileAlreadyLoaded();
+            throw MigrationException::configurationFileAlreadyLoaded();
         }
         if (file_exists($path = getcwd() . '/' . $file)) {
             $file = $path;
