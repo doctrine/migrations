@@ -70,6 +70,7 @@ EOT
 
         if (empty($metadata)) {
             $output->writeln('No mapping information to process.', 'ERROR');
+
             return;
         }
 
@@ -92,7 +93,7 @@ EOT
             $tableNames = $toSchema->getTableNames();
             foreach ($tableNames as $tableName) {
                 $tableName = substr($tableName, strpos($tableName, '.') + 1);
-                if (!preg_match($filterExpr, $tableName)) {
+                if ( ! preg_match($filterExpr, $tableName)) {
                     $toSchema->dropTable($tableName);
                 }
             }
@@ -103,6 +104,7 @@ EOT
 
         if ( ! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
+
             return;
         }
 
@@ -124,6 +126,7 @@ EOT
             }
             $code[] = "\$this->addSql(\"$query\");";
         }
+
         return implode("\n", $code);
     }
 }

@@ -19,8 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\Migrations\Configuration\Configuration,
-    Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
  * Class for running migrations to the current version or a manually specified version.
@@ -47,7 +46,7 @@ class Migration
     /**
      * Construct a Migration instance
      *
-     * @param Configuration $configuration  A migration Configuration instance
+     * @param Configuration $configuration A migration Configuration instance
      */
     public function __construct(Configuration $configuration)
     {
@@ -56,10 +55,11 @@ class Migration
     }
 
     /**
-     * Get the array of versions and SQL queries that would be executed for 
+     * Get the array of versions and SQL queries that would be executed for
      * each version but do not execute anything.
      *
-     * @param string $to   The version to migrate to.
+     * @param string $to The version to migrate to.
+     *
      * @return array $sql  The array of SQL queries.
      */
     public function getSql($to = null)
@@ -70,9 +70,10 @@ class Migration
     /**
      * Write a migration SQL file to the given path
      *
-     * @param string $path   The path to write the migration SQL file.
-     * @param string $to     The version to migrate to.
-     * @return bool $written
+     * @param string $path The path to write the migration SQL file.
+     * @param string $to   The version to migrate to.
+     *
+     * @return boolean $written
      */
     public function writeSqlFile($path, $to = null)
     {
@@ -105,9 +106,11 @@ class Migration
     /**
      * Run a migration to the current version or the given target version.
      *
-     * @param string $to      The version to migrate to.
-     * @param string $dryRun  Whether or not to make this a dry run and not execute anything.
+     * @param string  $to     The version to migrate to.
+     * @param boolean $dryRun Whether or not to make this a dry run and not execute anything.
+     *
      * @return array $sql     The array of migration sql statements
+     *
      * @throws MigrationException
      */
     public function migrate($to = null, $dryRun = false)

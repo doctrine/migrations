@@ -115,7 +115,7 @@ EOT
         $dir = rtrim($dir, '/');
         $path = $dir . '/Version' . $version . '.php';
 
-        if (!file_exists($dir)) {
+        if ( ! file_exists($dir)) {
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
 

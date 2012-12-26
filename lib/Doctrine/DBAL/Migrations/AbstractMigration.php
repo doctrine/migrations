@@ -50,7 +50,7 @@ abstract class AbstractMigration
     /**
      * The Doctrine\DBAL\Connection instance we are migrating
      *
-     * @var Connection
+     * @var \Doctrine\DBAL\Connection
      */
     protected $connection;
 
@@ -99,7 +99,7 @@ abstract class AbstractMigration
 
     protected function addSql($sql, array $params = array())
     {
-        return $this->version->addSql($sql, $params);
+        $this->version->addSql($sql, $params);
     }
 
     protected function write($message)
@@ -118,8 +118,8 @@ abstract class AbstractMigration
     /**
      * Print a warning message if the condition evalutes to TRUE.
      *
-     * @param bool $condition
-     * @param string $message
+     * @param boolean $condition
+     * @param string  $message
      */
     public function warnIf($condition, $message = '')
     {
@@ -133,8 +133,10 @@ abstract class AbstractMigration
     /**
      * Abort the migration if the condition evalutes to TRUE.
      *
-     * @param bool $condition
-     * @param string $message
+     * @param boolean $condition
+     * @param string  $message
+     *
+     * @throws AbortMigrationException
      */
     public function abortIf($condition, $message = '')
     {
@@ -148,8 +150,10 @@ abstract class AbstractMigration
     /**
      * Skip this migration (but not the next ones) if condition evalutes to TRUE.
      *
-     * @param bool $condition
-     * @param string $message
+     * @param boolean $condition
+     * @param string  $message
+     *
+     * @throws SkipMigrationException
      */
     public function skipIf($condition, $message = '')
     {

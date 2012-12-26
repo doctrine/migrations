@@ -20,7 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 /**
- * Exception to be thrown in the down() methods of migrations that signifies it 
+ * Exception to be thrown in the down() methods of migrations that signifies it
  * is an irreversible migration and stops execution.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL

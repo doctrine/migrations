@@ -49,7 +49,7 @@ class Configuration
     /**
      * Flag for whether or not the migration table has been created
      *
-     * @var bool
+     * @var boolean
      */
     private $migrationTableCreated = false;
 
@@ -91,15 +91,15 @@ class Configuration
     /**
      * Array of the registered migrations
      *
-     * @var array
+     * @var Version[]
      */
     private $migrations = array();
 
     /**
      * Construct a migration configuration object.
      *
-     * @param Connection $connection      A Connection instance
-     * @param OutputWriter $outputWriter  A OutputWriter instance
+     * @param Connection   $connection   A Connection instance
+     * @param OutputWriter $outputWriter A OutputWriter instance
      */
     public function __construct(Connection $connection, OutputWriter $outputWriter = null)
     {
@@ -160,7 +160,8 @@ class Configuration
      * Returns a timestamp version as a formatted date
      *
      * @param string $version
-     * @return string $formattedVersion The formatted version
+     *
+     * @return string The formatted version
      */
     public function formatVersion($version)
     {
@@ -249,8 +250,9 @@ class Configuration
      * with the pattern VersionYYYYMMDDHHMMSS.php as the filename and registers
      * them as migrations.
      *
-     * @param string $path  The root directory to where some migration classes live.
-     * @return $migrations  The array of migrations registered.
+     * @param string $path The root directory to where some migration classes live.
+     *
+     * @return Version[] The array of migrations registered.
      */
     public function registerMigrationsFromDirectory($path)
     {
@@ -267,6 +269,7 @@ class Configuration
                 $versions[] = $this->registerMigration($version, $class);
             }
         }
+
         return $versions;
     }
 
@@ -274,8 +277,12 @@ class Configuration
      * Register a single migration version to be executed by a AbstractMigration
      * class.
      *
-     * @param string $version  The version of the migration in the format YYYYMMDDHHMMSS.
-     * @param string $class    The migration class to execute for the version.
+     * @param string $version The version of the migration in the format YYYYMMDDHHMMSS.
+     * @param string $class   The migration class to execute for the version.
+     *
+     * @return Version
+     *
+     * @throws MigrationException
      */
     public function registerMigration($version, $class)
     {
@@ -287,6 +294,7 @@ class Configuration
         $version = new Version($this, $version, $class);
         $this->migrations[$version->getVersion()] = $version;
         ksort($this->migrations);
+
         return $version;
     }
 
@@ -296,7 +304,8 @@ class Configuration
      *
      *
      * @param array $migrations
-     * @return void
+     *
+     * @return Version[]
      */
     public function registerMigrations(array $migrations)
     {
@@ -304,13 +313,14 @@ class Configuration
         foreach ($migrations as $version => $class) {
             $versions[] = $this->registerMigration($version, $class);
         }
+
         return $versions;
     }
 
     /**
      * Get the array of registered migration versions.
      *
-     * @return array $migrations
+     * @return Version[] $migrations
      */
     public function getMigrations()
     {
@@ -320,15 +330,18 @@ class Configuration
     /**
      * Returns the Version instance for a given version in the format YYYYMMDDHHMMSS.
      *
-     * @param string $version   The version string in the format YYYYMMDDHHMMSS.
-     * @return Version $version
-     * @throws MigrationException $exception Throws exception if migration version does not exist.
+     * @param string $version The version string in the format YYYYMMDDHHMMSS.
+     *
+     * @return Version
+     *
+     * @throws MigrationException Throws exception if migration version does not exist.
      */
     public function getVersion($version)
     {
         if ( ! isset($this->migrations[$version])) {
             throw MigrationException::unknownMigrationVersion($version);
         }
+
         return $this->migrations[$version];
     }
 
@@ -336,31 +349,34 @@ class Configuration
      * Check if a version exists.
      *
      * @param string $version
-     * @return bool $exists
+     *
+     * @return boolean
      */
     public function hasVersion($version)
     {
-        return isset($this->migrations[$version]) ? true : false;
+        return isset($this->migrations[$version]);
     }
 
     /**
      * Check if a version has been migrated or not yet
      *
      * @param Version $version
-     * @return bool $migrated
+     *
+     * @return boolean
      */
     public function hasVersionMigrated(Version $version)
     {
         $this->createMigrationTable();
 
         $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?", array($version->getVersion()));
-        return $version !== false ? true : false;
+
+        return $version !== false;
     }
 
     /**
      * Returns all migrated versions from the versions table, in an array.
      *
-     * @return array $migrated
+     * @return Version[]
      */
     public function getMigratedVersions()
     {
@@ -378,7 +394,7 @@ class Configuration
     /**
      * Returns an array of available migration version numbers.
      *
-     * @return array $availableVersions
+     * @return array
      */
     public function getAvailableVersions()
     {
@@ -386,13 +402,14 @@ class Configuration
         foreach ($this->migrations as $migration) {
             $availableVersions[] = $migration->getVersion();
         }
+
         return $availableVersions;
     }
 
     /**
      * Returns the current migrated version from the versions table.
      *
-     * @return bool $currentVersion
+     * @return string
      */
     public function getCurrentVersion()
     {
@@ -413,26 +430,28 @@ class Configuration
 
         $sql = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
         $result = $this->connection->fetchColumn($sql);
+
         return $result !== false ? (string) $result : '0';
     }
 
     /**
      * Returns the total number of executed migration versions
      *
-     * @return integer $count
+     * @return integer
      */
     public function getNumberOfExecutedMigrations()
     {
         $this->createMigrationTable();
 
         $result = $this->connection->fetchColumn("SELECT COUNT(version) FROM " . $this->migrationsTableName);
+
         return $result !== false ? $result : 0;
     }
 
     /**
      * Returns the total number of available migration versions
      *
-     * @return integer $count
+     * @return integer
      */
     public function getNumberOfAvailableMigrations()
     {
@@ -442,19 +461,20 @@ class Configuration
     /**
      * Returns the latest available migration version.
      *
-     * @return string $version  The version string in the format YYYYMMDDHHMMSS.
+     * @return string The version string in the format YYYYMMDDHHMMSS.
      */
     public function getLatestVersion()
     {
         $versions = array_keys($this->migrations);
         $latest = end($versions);
+
         return $latest !== false ? (string) $latest : '0';
     }
 
     /**
      * Create the migration table to track migrations with.
      *
-     * @return bool $created  Whether or not the table was created.
+     * @return boolean Whether or not the table was created.
      */
     public function createMigrationTable()
     {
@@ -476,6 +496,7 @@ class Configuration
 
             return true;
         }
+
         return false;
     }
 
@@ -483,9 +504,10 @@ class Configuration
      * Returns the array of migrations to executed based on the given direction
      * and target version number.
      *
-     * @param string $direction    The direction we are migrating.
-     * @param string $to           The version to migrate to.
-     * @return array $migrations   The array of migrations we can execute.
+     * @param string $direction The direction we are migrating.
+     * @param string $to        The version to migrate to.
+     *
+     * @return Version[] $migrations   The array of migrations we can execute.
      */
     public function getMigrationsToExecute($direction, $to)
     {
@@ -507,6 +529,7 @@ class Configuration
                 $versions[$version->getVersion()] = $version;
             }
         }
+
         return $versions;
     }
 
@@ -514,11 +537,12 @@ class Configuration
      * Check if we should execute a migration for a given direction and target
      * migration version.
      *
-     * @param string $direction   The direction we are migrating.
-     * @param Version $version    The Version instance to check.
-     * @param string $to          The version we are migrating to.
-     * @param array $migrated     Migrated versions array.
-     * @return void
+     * @param string  $direction The direction we are migrating.
+     * @param Version $version   The Version instance to check.
+     * @param string  $to        The version we are migrating to.
+     * @param array   $migrated  Migrated versions array.
+     *
+     * @return boolean
      */
     private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
@@ -526,12 +550,16 @@ class Configuration
             if ( ! in_array($version->getVersion(), $migrated)) {
                 return false;
             }
-            return $version->getVersion() > $to ? true : false;
-        } else if ($direction === 'up') {
+
+            return $version->getVersion() > $to;
+        }
+
+        if ($direction === 'up') {
             if (in_array($version->getVersion(), $migrated)) {
                 return false;
             }
-            return $version->getVersion() <= $to ? true : false;
+
+            return $version->getVersion() <= $to;
         }
     }
 }

@@ -42,16 +42,18 @@ abstract class AbstractFileConfiguration extends Configuration
     /**
      * Whether or not the configuration file has been loaded yet or not
      *
-     * @var bool
+     * @var boolean
      */
     private $loaded = false;
 
     /**
      * Load the information from the passed configuration file
      *
-     * @param string $file  The path to the configuration file
+     * @param string $file The path to the configuration file
+     *
      * @return void
-     * @throws MigrationException $exception Throws exception if configuration file was already loaded
+     *
+     * @throws MigrationException Throws exception if configuration file was already loaded
      */
     public function load($file)
     {
@@ -74,6 +76,7 @@ abstract class AbstractFileConfiguration extends Configuration
         } else {
             $directory = $input;
         }
+
         return $directory;
     }
 
@@ -87,7 +90,7 @@ abstract class AbstractFileConfiguration extends Configuration
      * load the given configuration file whether it be xml, yaml, etc. or something
      * else.
      *
-     * @param string $file  The path to a configuration file.
+     * @param string $file The path to a configuration file.
      */
     abstract protected function doLoad($file);
 }

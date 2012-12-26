@@ -16,7 +16,7 @@
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
  */
- 
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Command\Command,
@@ -68,8 +68,9 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * @param InputInterface $input
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return Configuration
      */
     protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
@@ -81,19 +82,19 @@ abstract class AbstractCommand extends Command
 
             if ($this->getApplication()->getHelperSet()->has('db')) {
                 $conn = $this->getHelper('db')->getConnection();
-            } else if($input->getOption('db-configuration')) {
-                if (!file_exists($input->getOption('db-configuration'))) {
+            } elseif ($input->getOption('db-configuration')) {
+                if ( ! file_exists($input->getOption('db-configuration'))) {
                     throw new \InvalidArgumentException("The specified connection file is not a valid file.");
                 }
 
                 $params = include($input->getOption('db-configuration'));
-                if (!is_array($params)) {
+                if ( ! is_array($params)) {
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }
                 $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-            } else if (file_exists('migrations-db.php')) {
-                $params = include("migrations-db.php");
-                if (!is_array($params)) {
+            } elseif (file_exists('migrations-db.php')) {
+                $params = include 'migrations-db.php';
+                if ( ! is_array($params)) {
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }
                 $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
@@ -106,10 +107,10 @@ abstract class AbstractCommand extends Command
                 $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
                 $configuration = new $class($conn, $outputWriter);
                 $configuration->load($input->getOption('configuration'));
-            } else if (file_exists('migrations.xml')) {
+            } elseif (file_exists('migrations.xml')) {
                 $configuration = new XmlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.xml');
-            } else if (file_exists('migrations.yml')) {
+            } elseif (file_exists('migrations.yml')) {
                 $configuration = new YamlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.yml');
             } else {
@@ -117,6 +118,7 @@ abstract class AbstractCommand extends Command
             }
             $this->configuration = $configuration;
         }
+
         return $this->configuration;
     }
 }

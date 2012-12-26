@@ -19,8 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\Migrations\Configuration\Configuration,
-    Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -60,12 +59,12 @@ class Version
     private $version;
 
     /**
-     * @var AbstractSchemaManager
+     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
     private $sm;
 
     /**
-     * @var AbstractPlatform
+     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     private $platform;
 
@@ -77,7 +76,7 @@ class Version
     private $migration;
 
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Connection
      */
     private $connection;
 
@@ -138,8 +137,7 @@ class Version
     /**
      * Check if this version has been migrated or not.
      *
-     * @param bool $bool
-     * @return mixed
+     * @return boolean
      */
     public function isMigrated()
     {
@@ -161,9 +159,10 @@ class Version
     /**
      * Add some SQL queries to this versions migration
      *
-     * @param mixed $sql
-     * @param array $params
-     * @param array $types
+     * @param array|string $sql
+     * @param array        $params
+     * @param array        $types
+     *
      * @return void
      */
     public function addSql($sql, array $params = array(), array $types = array())
@@ -188,9 +187,10 @@ class Version
     /**
      * Write a migration SQL file to the given path
      *
-     * @param string $path          The path to write the migration SQL file.
-     * @param string $direction     The direction to execute.
-     * @return bool $written
+     * @param string $path      The path to write the migration SQL file.
+     * @param string $direction The direction to execute.
+     *
+     * @return boolean $written
      */
     public function writeSqlFile($path, $direction = 'up')
     {
@@ -223,10 +223,12 @@ class Version
     /**
      * Execute this migration version up or down and and return the SQL.
      *
-     * @param string $direction   The direction to execute the migration.
-     * @param string $dryRun      Whether to not actually execute the migration SQL and just do a dry run.
+     * @param string  $direction The direction to execute the migration.
+     * @param boolean $dryRun    Whether to not actually execute the migration SQL and just do a dry run.
+     *
      * @return array $sql
-     * @throws Exception when migration fails
+     *
+     * @throws \Exception when migration fails
      */
     public function execute($direction, $dryRun = false)
     {
@@ -293,8 +295,10 @@ class Version
 
             $this->connection->commit();
 
+            $this->state = self::STATE_NONE;
+
             return $this->sql;
-        } catch(SkipMigrationException $e) {
+        } catch (SkipMigrationException $e) {
             $this->connection->rollback();
 
             if ($dryRun == false) {
@@ -307,6 +311,10 @@ class Version
             }
 
             $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
+
+            $this->state = self::STATE_NONE;
+
+            return array();
         } catch (\Exception $e) {
 
             $this->outputWriter->write(sprintf(
@@ -319,12 +327,11 @@ class Version
             $this->state = self::STATE_NONE;
             throw $e;
         }
-        $this->state = self::STATE_NONE;
     }
 
     public function getExecutionState()
     {
-        switch($this->state) {
+        switch ($this->state) {
             case self::STATE_PRE:
                 return 'Pre-Checks';
             case self::STATE_POST:

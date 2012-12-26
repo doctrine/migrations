@@ -42,7 +42,7 @@ class OutputWriter
     /**
      * Write output using the configured closure.
      *
-     * @param string $message  The message to write.
+     * @param string $message The message to write.
      */
     public function write($message)
     {
