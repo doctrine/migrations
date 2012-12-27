@@ -118,7 +118,7 @@ EOT
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
         $code = array(
-            "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\");", "",
+            "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\", \"Migration can only be executed safely on '$currentPlatform'.\");", "",
         );
         foreach ($sql as $query) {
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
