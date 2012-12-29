@@ -57,7 +57,7 @@ class PhpGenerator implements GeneratorInterface
      */
     public function generateMigration(Schema\Schema $fromSchema, Schema\Schema $toSchema)
     {
-        if (\Doctrine\DBAL\Version::compare('2.3.0') < 0) {
+        if (\Doctrine\DBAL\Version::compare('2.3.0') > 0) {
             throw new \RuntimeException('The PHP migration generator requires Doctrine DBAL 2.3.0 or later to function.');
         }
 
