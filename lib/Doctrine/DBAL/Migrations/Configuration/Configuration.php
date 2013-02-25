@@ -368,7 +368,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?", array($version->getVersion()));
+        $version = $this->connection->fetchColumn("SELECT version FROM `" . $this->migrationsTableName . "` WHERE version = ?", array($version->getVersion()));
 
         return $version !== false;
     }
@@ -382,7 +382,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $ret = $this->connection->fetchAll("SELECT version FROM " . $this->migrationsTableName);
+        $ret = $this->connection->fetchAll("SELECT version FROM `" . $this->migrationsTableName . "`");
         $versions = array();
         foreach ($ret as $version) {
             $versions[] = current($version);
@@ -424,7 +424,7 @@ class Configuration
             $where = " WHERE version IN (" . implode(', ', $migratedVersions) . ")";
         }
 
-        $sql = sprintf("SELECT version FROM %s%s ORDER BY version DESC",
+        $sql = sprintf("SELECT version FROM `%s`%s ORDER BY version DESC",
             $this->migrationsTableName, $where
         );
 
@@ -443,7 +443,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->connection->fetchColumn("SELECT COUNT(version) FROM " . $this->migrationsTableName);
+        $result = $this->connection->fetchColumn("SELECT COUNT(version) FROM `" . $this->migrationsTableName . "`");
 
         return $result !== false ? $result : 0;
     }
