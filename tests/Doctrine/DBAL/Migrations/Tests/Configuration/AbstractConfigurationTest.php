@@ -32,4 +32,10 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
         $config = $this->loadConfiguration();
         $this->assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
+
+    public function testIgnoredTables()
+    {
+        $config = $this->loadConfiguration();
+        $this->assertContains('ignored_table', $config->getIgnoredTables());
+    }
 }

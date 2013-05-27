@@ -88,6 +88,14 @@ EOT
         $fromSchema = $conn->getSchemaManager()->createSchema();
         $toSchema = $tool->getSchemaFromMetadata($metadata);
 
+        //Remove ignored tables from $fromSchema
+        foreach ($fromSchema->getTables() as $table) {
+            /** @var \Doctrine\DBAL\Schema\Table $table */
+            if (in_array($table->getName(), $configuration->getIgnoredTables())) {
+                $fromSchema->dropTable($table->getName());
+            }
+        }
+
         //Not using value from options, because filters can be set from config.yml
         if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
             $tableNames = $toSchema->getTableNames();

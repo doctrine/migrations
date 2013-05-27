@@ -96,6 +96,13 @@ class Configuration
     private $migrations = array();
 
     /**
+     * Array of tables that can be ignored when running migrations
+     *
+     * @var array
+     */
+    private $ignoredTables = array();
+
+    /**
      * Construct a migration configuration object.
      *
      * @param Connection   $connection   A Connection instance
@@ -243,6 +250,34 @@ class Configuration
     public function getMigrationsNamespace()
     {
         return $this->migrationsNamespace;
+    }
+
+    /**
+     * Set the ignored tables
+     *
+     * @param array $ignoredTables
+     */
+    public function setIgnoredTables(array $ignoredTables)
+    {
+        $this->ignoredTables = $ignoredTables;
+    }
+
+    /**
+     * @param string $table
+     */
+    public function addIgnoredTable($table)
+    {
+        $this->ignoredTables[] = $table;
+    }
+
+    /**
+     * Returns the ignored tables
+     *
+     * @return array
+     */
+    public function getIgnoredTables()
+    {
+        return $this->ignoredTables;
     }
 
     /**

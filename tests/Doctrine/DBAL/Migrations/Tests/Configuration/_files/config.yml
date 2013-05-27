@@ -1,5 +1,6 @@
 ---
 name: Doctrine Sandbox Migrations
 migrations_namespace: DoctrineMigrationsTest
+ignored_tables: [ ignored_table ]
 table_name: doctrine_migration_versions_test
 migrations_directory: /path/to/migrations/classes/DoctrineMigrations

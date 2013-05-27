@@ -47,6 +47,9 @@ class YamlConfiguration extends AbstractFileConfiguration
         if (isset($array['migrations_namespace'])) {
             $this->setMigrationsNamespace($array['migrations_namespace']);
         }
+        if (isset($array['ignored_tables'])) {
+            $this->setIgnoredTables($array['ignored_tables']);
+        }
         if (isset($array['migrations_directory'])) {
             $migrationsDirectory = $this->getDirectoryRelativeToFile($file, $array['migrations_directory']);
             $this->setMigrationsDirectory($migrationsDirectory);
