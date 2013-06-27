@@ -82,7 +82,7 @@ EOT
 
         $this->outputHeader($configuration, $output);
 
-        $noInteraction = $input->getOption('no-interaction') ? true : false;
+        $noInteraction = !$input->isInteractive();
 
         $executedMigrations = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
