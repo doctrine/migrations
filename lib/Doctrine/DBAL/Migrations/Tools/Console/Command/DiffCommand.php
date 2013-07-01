@@ -116,15 +116,40 @@ EOT
     private function buildCodeFromSql(Configuration $configuration, array $sql)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
-        $code = array(
-            "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\", \"Migration can only be executed safely on '$currentPlatform'.\");", "",
-        );
+        $code = array();
         foreach ($sql as $query) {
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
-            $code[] = "\$this->addSql(\"$query\");";
+            $replace = array(
+                ' CHANGE ' => "\n        CHANGE ",
+                ' COMMENT ' => "\n            COMMENT ",
+                ' ADD ' => "\n        ADD ",
+                ' DROP ' => "\n        DROP ",
+                ' FOREIGN KEY ' => "\n        FOREIGN KEY ",
+                ' REFERENCES ' => "\n        REFERENCES ",
+                ', ' => ",\n        ",
+            );
+
+            $query = str_replace(
+                array_keys($replace),
+                array_values($replace),
+                $query
+            );
+            $code[] = "\$this->addSql(\n    \"$query\"\n);";
         }
+
+        if (empty($code)) {
+            return;
+        }
+        array_unshift(
+            $code,
+            "\$this->abortIf(\n" .
+            "    \$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\",\n" .
+            "    \"Migration can only be executed safely on '$currentPlatform'.\"\n" .
+            ");",
+            ""
+        );
 
         return implode("\n", $code);
     }
