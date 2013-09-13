@@ -83,7 +83,7 @@ EOT
         }
 
         if ( ! $markMigrated && ! $configuration->hasVersionMigrated($version)) {
-            throw new \InvalidArgumentException(sprintf('The version "%s" does not exists in the version table.', $version));
+            throw new \InvalidArgumentException(sprintf('The version "%s" does not exist in the version table.', $version));
         }
 
         if ($markMigrated) {
