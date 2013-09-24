@@ -90,7 +90,7 @@
         <exec command="sed 's/2.0.0-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" passthru="true" />
         <exec command="mv ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php" passthru="true" />
 
-        <pharpackage destfile="${build.dir}/doctrine-migrations.phar" basedir="${build.dir}/migrations" stub="./phar-cli-stub.php">
+        <pharpackage destfile="${build.dir}/doctrine-migrations.phar" basedir="${build.dir}/migrations" stub="./phar-cli-stub.php" compression="gzip">
             <fileset dir="${build.dir}/migrations">
                 <include name="**/**" />
             </fileset>

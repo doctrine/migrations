@@ -8,3 +8,4 @@ phpunit-dest.xml
 vendor/
 composer.lock
 nbproject
+/.idea
