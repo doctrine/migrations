@@ -162,8 +162,6 @@ class Version
      * @param array|string $sql
      * @param array        $params
      * @param array        $types
-     *
-     * @return void
      */
     public function addSql($sql, array $params = array(), array $types = array())
     {

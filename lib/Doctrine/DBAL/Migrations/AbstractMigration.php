@@ -19,9 +19,9 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\Schema\Schema,
-    Doctrine\DBAL\Migrations\Configuration\Configuration,
-    Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Abstract class for individual migrations to extend from.

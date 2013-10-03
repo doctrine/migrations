@@ -51,8 +51,6 @@ abstract class AbstractFileConfiguration extends Configuration
      *
      * @param string $file The path to the configuration file
      *
-     * @return void
-     *
      * @throws MigrationException Throws exception if configuration file was already loaded
      */
     public function load($file)

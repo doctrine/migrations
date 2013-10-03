@@ -19,13 +19,12 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Symfony\Component\Console\Input\InputInterface,
-    Symfony\Component\Console\Output\OutputInterface,
-    Symfony\Component\Console\Input\InputArgument,
-    Symfony\Component\Console\Input\InputOption,
-    Doctrine\ORM\Tools\SchemaTool,
-    Doctrine\DBAL\Version as DbalVersion,
-    Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Version as DbalVersion;
+use Doctrine\ORM\Tools\SchemaTool;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Input\InputOption;
 
 /**
  * Command for generate migration classes by comparing your current database schema

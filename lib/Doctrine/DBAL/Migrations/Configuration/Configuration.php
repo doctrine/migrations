@@ -19,16 +19,16 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
-use Doctrine\DBAL\Connection,
-    Doctrine\DBAL\Migrations\MigrationException,
-    Doctrine\DBAL\Migrations\Version,
-    Doctrine\DBAL\Migrations\OutputWriter,
-    Doctrine\DBAL\Schema\Table,
-    Doctrine\DBAL\Schema\Column,
-    Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
 
 /**
- * Default Migration Configurtion object used for configuring an instance of
+ * Default Migration Configuration object used for configuring an instance of
  * the Migration class. Set the connection, version table name, register migration
  * classes/versions, etc.
  *
@@ -113,7 +113,6 @@ class Configuration
     /**
      * Validation that this instance has all the required properties configured
      *
-     * @return void
      * @throws MigrationException
      */
     public function validate()
