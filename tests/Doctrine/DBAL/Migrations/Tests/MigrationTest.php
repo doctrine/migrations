@@ -25,7 +25,7 @@ class MigrationTest extends MigrationTestCase
     }
 
     /**
-     * @expectedException Doctrine\DBAL\Migrations\MigrationException
+     * @expectedException \Doctrine\DBAL\Migrations\MigrationException
      */
     public function testMigrateWithNoMigrationsThrowsException()
     {
