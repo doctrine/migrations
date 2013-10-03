@@ -14,7 +14,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
     private $config;
 
     /**
-     * @var Connection
+     * @var \Doctrine\DBAL\Connection
      */
     private $connection;
 

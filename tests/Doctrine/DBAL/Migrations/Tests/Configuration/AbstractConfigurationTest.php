@@ -5,7 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 {
     /**
-     * @var \Doctrine\DBAL\Migrations\Configuration\Configuration
+     * @return \Doctrine\DBAL\Migrations\Configuration\Configuration
      */
     abstract public function loadConfiguration();
 
