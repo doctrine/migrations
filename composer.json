@@ -24,5 +24,10 @@
         "psr-0": {
             "Doctrine\\DBAL\\Migrations": "lib"
         }
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0.x-dev"
+        }
     }
 }
