@@ -61,7 +61,6 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration = new Migration($configuration);
 
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
