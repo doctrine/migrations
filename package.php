@@ -26,10 +26,11 @@ $p->setSignatureAlgorithm(Phar::SHA1);
 $p->startBuffering();
 
 $dirs = array(
-    './lib'                                 =>  '/Doctrine\/DBAL\/Migrations/',
-    './lib/vendor/doctrine-dbal/lib'        =>  '/Doctrine/',
-    './lib/vendor/doctrine-common/lib'      =>  '/Doctrine/',
-    './lib/vendor'                          =>  '/Symfony/'
+    './lib'                        =>  '/Doctrine\/DBAL\/Migrations/',
+    './vendor/doctrine/dbal/lib'   =>  '/Doctrine/',
+    './vendor/doctrine/common/lib' =>  '/Doctrine/',
+    './vendor/symfony/console'     =>  '/Symfony/',
+    './vendor/symfony/yaml'        =>  '/Symfony/',
 );
 
 foreach ($dirs as $dir => $filter) {
