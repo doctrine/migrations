@@ -290,10 +290,28 @@ class Configuration
         if (isset($this->migrations[$version])) {
             throw MigrationException::duplicateMigrationVersion($version, get_class($this->migrations[$version]));
         }
-        $version = new Version($this, $version, $class);
+        $version = $this->createVersion($version, $class);
         $this->migrations[$version->getVersion()] = $version;
         ksort($this->migrations);
 
+        return $version;
+    }
+
+    /**
+     * Creates a single migration version class be executed by a
+     * AbstractMigration class.
+     *
+     * @param string $version The version of the migration in the format YYYYMMDDHHMMSS.
+     * @param string $class   The migration class to execute for the version.
+     *
+     * @return Version
+     *
+     */
+    protected function createVersion($version, $class)
+    {
+        $version = (string) $version;
+        $class = (string) $class;
+        $version = new Version($this, $version, $class);
         return $version;
     }
 
