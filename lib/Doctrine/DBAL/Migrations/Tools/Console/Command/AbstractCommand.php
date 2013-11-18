@@ -100,7 +100,10 @@ abstract class AbstractCommand extends Command
                 throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
             }
 
-            if ($input->getOption('configuration')) {
+            if ($this->getApplication()->getHelperSet()->has('migration-configuration')) {
+                $configuration_helper = $this->getHelper('migration-configuration');
+                $configuration = $configuration_helper->getConfiguration($conn, $outputWriter, $input);
+            } else if ($input->getOption('configuration')) {
                 $info = pathinfo($input->getOption('configuration'));
                 $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
                 $configuration = new $class($conn, $outputWriter);
