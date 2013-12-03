@@ -55,14 +55,14 @@ abstract class AbstractMigration
     protected $connection;
 
     /**
-     * Reference to the SchemaManager instance referened by $_connection
+     * Reference to the SchemaManager instance referenced by $_connection
      *
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
     protected $sm;
 
     /**
-     * Reference to the DatabasePlatform instance referenced by $_conection
+     * Reference to the DatabasePlatform instance referenced by $_connection
      *
      * @var \Doctrine\DBAL\Platforms\AbstractPlatform
      */
@@ -116,7 +116,7 @@ abstract class AbstractMigration
     }
 
     /**
-     * Print a warning message if the condition evalutes to TRUE.
+     * Print a warning message if the condition evaluates to TRUE.
      *
      * @param boolean $condition
      * @param string  $message
@@ -131,7 +131,7 @@ abstract class AbstractMigration
     }
 
     /**
-     * Abort the migration if the condition evalutes to TRUE.
+     * Abort the migration if the condition evaluates to TRUE.
      *
      * @param boolean $condition
      * @param string  $message
@@ -148,7 +148,7 @@ abstract class AbstractMigration
     }
 
     /**
-     * Skip this migration (but not the next ones) if condition evalutes to TRUE.
+     * Skip this migration (but not the next ones) if condition evaluates to TRUE.
      *
      * @param boolean $condition
      * @param string  $message
