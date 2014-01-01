@@ -78,8 +78,8 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->getApplication()->getHelperSet()->has('db')) {
-                $conn = $this->getHelper('db')->getConnection();
+            if ($this->getApplication()->getHelperSet()->has('connection')) {
+                $conn = $this->getHelper('connection')->getConnection();
             } elseif ($input->getOption('db-configuration')) {
                 if ( ! file_exists($input->getOption('db-configuration'))) {
                     throw new \InvalidArgumentException("The specified connection file is not a valid file.");
