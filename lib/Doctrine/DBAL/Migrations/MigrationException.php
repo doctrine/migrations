@@ -39,11 +39,6 @@ class MigrationException extends \Exception
         return new self('Migrations directory must be configured in order to use Doctrine migrations.', 3);
     }
 
-    public static function noMigrationsToExecute()
-    {
-        return new self('Could not find any migrations to execute.', 4);
-    }
-
     public static function unknownMigrationVersion($version)
     {
         return new self(sprintf('Could not find migration version %s', $version), 5);

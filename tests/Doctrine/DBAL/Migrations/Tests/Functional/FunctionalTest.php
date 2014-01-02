@@ -26,6 +26,15 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $this->config->setMigrationsDirectory('.');
     }
 
+    public function testMigrateWithoutMigrationsReturnsEmpty()
+    {
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+
+        $sql = $migration->migrate();
+
+        $this->assertEquals(array(), $sql);;
+    }
+
     public function testMigrateUp()
     {
         $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
@@ -244,12 +253,14 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+
         $migration->migrate();
 
         $sql = $migration->migrate();
 
         $this->assertEquals(array(), $sql);;
     }
+
 }
 
 class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration

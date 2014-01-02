@@ -131,7 +131,7 @@ class Migration
         $direction = $from > $to ? 'down' : 'up';
         $migrationsToExecute = $this->configuration->getMigrationsToExecute($direction, $to);
 
-        if ($from === $to && empty($migrationsToExecute) && $migrations) {
+        if ($from === $to && empty($migrationsToExecute) && empty($migrations)) {
             return array();
         }
 
@@ -139,10 +139,6 @@ class Migration
             $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         } else {
             $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
-        }
-
-        if (empty($migrationsToExecute)) {
-            throw MigrationException::noMigrationsToExecute();
         }
 
         $sql = array();
