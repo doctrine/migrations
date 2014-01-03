@@ -9,6 +9,6 @@
     <table name="doctrine_migration_versions_test" />
     <migrations-directory>/path/to/migrations/classes/DoctrineMigrations</migrations-directory>
     <type-mappings>
-        <mapping from="enum" to="string" />
+        <mapping dbType="enum" doctrineType="string" />
     </type-mappings>
 </doctrine-migrations>

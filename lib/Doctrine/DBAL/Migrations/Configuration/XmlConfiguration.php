@@ -53,7 +53,7 @@ class XmlConfiguration extends AbstractFileConfiguration
         if (isset($xml->{'type-mappings'})) {
             foreach ($xml->{'type-mappings'}->children() as $child) {
                 if ($child->getName() === 'mapping') {
-                    $this->setTypeMappings(array((string) $child['from'] => (string) $child['to']));
+                    $this->setTypeMappings(array((string) $child['dbType'] => (string) $child['doctrineType']));
                 }
             }
         }
