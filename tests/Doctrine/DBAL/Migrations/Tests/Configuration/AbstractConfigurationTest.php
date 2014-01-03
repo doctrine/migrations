@@ -38,7 +38,5 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
         $config = $this->loadConfiguration();
         $typeMappings = $config->getTypeMappings();
         $this->assertEquals(array('enum' => 'string'), $typeMappings);
-        $this->assertArrayHasKey('enum', $typeMappings);
-        $this->assertEquals('string', $typeMappings['enum']);
     }
 }
