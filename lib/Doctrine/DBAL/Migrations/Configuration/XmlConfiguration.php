@@ -1,4 +1,5 @@
 <?php
+
 /*
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
  * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
@@ -15,7 +16,7 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
-*/
+ */
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
@@ -29,11 +30,11 @@ namespace Doctrine\DBAL\Migrations\Configuration;
  */
 class XmlConfiguration extends AbstractFileConfiguration
 {
+
     /**
      * @inheritdoc
      */
-    protected function doLoad($file)
-    {
+    protected function doLoad($file) {
         $xml = simplexml_load_file($file);
         if (isset($xml->name)) {
             $this->setName((string) $xml->name);
@@ -49,10 +50,18 @@ class XmlConfiguration extends AbstractFileConfiguration
             $this->setMigrationsDirectory($migrationsDirectory);
             $this->registerMigrationsFromDirectory($migrationsDirectory);
         }
+        if (isset($xml->{'type-mappings'})) {
+            foreach ($xml->{'type-mappings'}->children() as $child) {
+                if ($child->getName() === 'mapping') {
+                    $this->setTypeMappings(array((string) $child['dbType'] => (string) $child['doctrineType']));
+                }
+            }
+        }
         if (isset($xml->migrations->migration)) {
             foreach ($xml->migrations->migration as $migration) {
                 $this->registerMigration((string) $migration['version'], (string) $migration['class']);
             }
         }
     }
+
 }
