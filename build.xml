@@ -56,9 +56,9 @@
         <available file="./build.properties" property="build_properties_exist" value="true"/>
         <fail unless="build_properties_exist" message="The build.properties file is missing." />
 
-        <delete dir="${build.dir}" includeemptydirs="true" verbose="true" />
-        <delete dir="${dist.dir}" includeemptydirs="true" verbose="true" />
-        <delete dir="${report.dir}" includeemptydirs="true" verbose="true" />
+        <delete dir="${build.dir}" includeemptydirs="true" />
+        <delete dir="${dist.dir}" includeemptydirs="true" />
+        <delete dir="${report.dir}" includeemptydirs="true" />
     </target>
 
     <!--
