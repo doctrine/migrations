@@ -100,9 +100,6 @@
                     <element name="Johnathan H. Wage">
                         <element name="e-mail" value="jonwage@gmail.com" />
                     </element>
-                    <element name="Zsolt Petrik">
-                        <element name="e-mail" value="pezia@pezia.hu" />
-                    </element>
                 </element>
             </metadata>
         </pharpackage>
