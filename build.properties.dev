@@ -1,4 +1,5 @@
 version=2.0.0ALPHA1
+version.stripped=2.0.0
 stability=alpha
 build.dir=build
 dist.dir=dist
