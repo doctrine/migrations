@@ -17,7 +17,7 @@
     <!--
         Fileset for the sources of the Doctrine Common dependency.
     -->
-    <fileset id="common-sources" dir="./lib/vendor/doctrine-common/lib">
+    <fileset id="common-sources" dir="vendor/doctrine/common/lib">
         <include name="Doctrine/Common/**"/>
     </fileset>
 
@@ -31,15 +31,22 @@
     <!--
         Fileset for the sources of the Doctrine DBAL package.
     -->
-    <fileset id="dbal-sources" dir="./lib/vendor/doctrine-dbal/lib">
+    <fileset id="dbal-sources" dir="vendor/doctrine/dbal/lib">
         <include name="Doctrine/DBAL/**"/>
     </fileset>
 
     <!--
-      Fileset for source of the Symfony YAML and Console components.
+      Fileset for source of the Symfony Console components.
     -->
-    <fileset id="symfony-sources" dir="./lib/vendor">
-        <include name="Symfony/Components/**"/>
+    <fileset id="symfony-console-sources" dir="vendor/symfony/console">
+        <include name="Symfony/Component/**"/>
+    </fileset>
+
+    <!--
+      Fileset for source of the Symfony YAML components.
+    -->
+    <fileset id="symfony-yaml-sources" dir="vendor/symfony/yaml">
+        <include name="Symfony/Component/**"/>
     </fileset>
 
     <!--
@@ -49,9 +56,9 @@
         <available file="./build.properties" property="build_properties_exist" value="true"/>
         <fail unless="build_properties_exist" message="The build.properties file is missing." />
 
-        <delete dir="${build.dir}" includeemptydirs="true" />
-        <delete dir="${dist.dir}" includeemptydirs="true" />
-        <delete dir="${report.dir}" includeemptydirs="true" />
+        <delete dir="${build.dir}" includeemptydirs="true" verbose="true" />
+        <delete dir="${dist.dir}" includeemptydirs="true" verbose="true" />
+        <delete dir="${report.dir}" includeemptydirs="true" verbose="true" />
     </target>
 
     <!--
@@ -74,17 +81,14 @@
     <target name="build-migrations" depends="test">
         <copy todir="${build.dir}/migrations">
             <fileset refid="shared-artifacts"/>
-        </copy>
-        <copy todir="${build.dir}/migrations">
             <fileset refid="common-sources"/>
             <fileset refid="dbal-sources" />
             <fileset refid="migrations-sources"/>
+            <fileset refid="symfony-console-sources"/>
+            <fileset refid="symfony-yaml-sources"/>
         </copy>
-        <copy todir="${build.dir}/migrations/Doctrine">
-            <fileset refid="symfony-sources"/>
-        </copy>
-        <exec command="sed 's/${version}-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version2.php" passthru="true" />
-        <exec command="mv ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version2.php ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version.php" passthru="true" />
+        <exec command="sed 's/2.0.0-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" passthru="true" />
+        <exec command="mv ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php" passthru="true" />
 
         <pharpackage destfile="${build.dir}/doctrine-migrations.phar" basedir="${build.dir}/migrations" stub="./phar-cli-stub.php">
             <fileset dir="${build.dir}/migrations">
@@ -95,6 +99,9 @@
                 <element name="authors">
                     <element name="Johnathan H. Wage">
                         <element name="e-mail" value="jonwage@gmail.com" />
+                    </element>
+                    <element name="Zsolt Petrik">
+                        <element name="e-mail" value="pezia@pezia.hu" />
                     </element>
                 </element>
             </metadata>
@@ -117,7 +124,7 @@
             </else>
         </if>
 
-        <exec command="phpunit --configuration ${test.phpunit_configuration_option} ${test.phpunit_coverage_option} --log-junit ${project.basedir}/${build.dir}/logs/testsuites.xml Doctrine/DBAL/Migrations/Tests/" dir="./tests" passthru="true" />
+        <exec command="phpunit --configuration ${test.phpunit_configuration_option} ${test.phpunit_coverage_option} --log-junit ${project.basedir}/${build.dir}/logs/testsuites.xml ./tests/Doctrine/DBAL/Migrations/Tests/" passthru="true" />
         <phpunitreport infile="${build.dir}/logs/testsuites.xml" format="frames" todir="${report.dir}/tests" />
 
         <tstamp/>
