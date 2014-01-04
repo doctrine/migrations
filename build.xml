@@ -17,7 +17,7 @@
     <!--
         Fileset for the sources of the Doctrine Common dependency.
     -->
-    <fileset id="common-sources" dir="./lib/vendor/doctrine-common/lib">
+    <fileset id="common-sources" dir="vendor/doctrine/common/lib">
         <include name="Doctrine/Common/**"/>
     </fileset>
 
@@ -31,15 +31,22 @@
     <!--
         Fileset for the sources of the Doctrine DBAL package.
     -->
-    <fileset id="dbal-sources" dir="./lib/vendor/doctrine-dbal/lib">
+    <fileset id="dbal-sources" dir="vendor/doctrine/dbal/lib">
         <include name="Doctrine/DBAL/**"/>
     </fileset>
 
     <!--
-      Fileset for source of the Symfony YAML and Console components.
+      Fileset for source of the Symfony Console components.
     -->
-    <fileset id="symfony-sources" dir="./lib/vendor">
-        <include name="Symfony/Components/**"/>
+    <fileset id="symfony-console-sources" dir="vendor/symfony/console">
+        <include name="Symfony/Component/**"/>
+    </fileset>
+
+    <!--
+      Fileset for source of the Symfony YAML components.
+    -->
+    <fileset id="symfony-yaml-sources" dir="vendor/symfony/yaml">
+        <include name="Symfony/Component/**"/>
     </fileset>
 
     <!--
@@ -74,19 +81,17 @@
     <target name="build-migrations" depends="test">
         <copy todir="${build.dir}/migrations">
             <fileset refid="shared-artifacts"/>
-        </copy>
-        <copy todir="${build.dir}/migrations">
             <fileset refid="common-sources"/>
             <fileset refid="dbal-sources" />
             <fileset refid="migrations-sources"/>
+            <fileset refid="symfony-console-sources"/>
+            <fileset refid="symfony-yaml-sources"/>
         </copy>
-        <copy todir="${build.dir}/migrations/Doctrine">
-            <fileset refid="symfony-sources"/>
-        </copy>
-        <exec command="sed 's/${version}-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version2.php" passthru="true" />
-        <exec command="mv ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version2.php ${build.dir}/migrations/Doctrine/DBAL/Migrations/Version.php" passthru="true" />
+        
+        <exec command="sed 's/${version.stripped}-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" passthru="true" />
+        <move file="${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" tofile="${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php" overwrite="true"/>
 
-        <pharpackage destfile="${build.dir}/doctrine-migrations.phar" basedir="${build.dir}/migrations" stub="./phar-cli-stub.php">
+        <pharpackage destfile="${build.dir}/doctrine-migrations.phar" basedir="${build.dir}/migrations" stub="./phar-cli-stub.php" compression="gzip">
             <fileset dir="${build.dir}/migrations">
                 <include name="**/**" />
             </fileset>
@@ -108,7 +113,8 @@
         Runs the full test suite.
     -->
     <target name="test" depends="prepare">
-        <if><equals arg1="${test.phpunit_generate_coverage}" arg2="1" />
+        <if>
+            <equals arg1="${test.phpunit_generate_coverage}" arg2="1" />
             <then>
                 <property name="test.phpunit_coverage_file" value="${build.dir}/logs/clover.xml" />
             </then>
@@ -117,13 +123,14 @@
             </else>
         </if>
 
-        <exec command="phpunit --configuration ${test.phpunit_configuration_option} ${test.phpunit_coverage_option} --log-junit ${project.basedir}/${build.dir}/logs/testsuites.xml Doctrine/DBAL/Migrations/Tests/" dir="./tests" passthru="true" />
+        <exec command="phpunit --configuration ${test.phpunit_configuration_option} ${test.phpunit_coverage_option} --log-junit ${project.basedir}/${build.dir}/logs/testsuites.xml ./tests/Doctrine/DBAL/Migrations/Tests/" passthru="true" />
         <phpunitreport infile="${build.dir}/logs/testsuites.xml" format="frames" todir="${report.dir}/tests" />
 
         <tstamp/>
         <copy file="${build.dir}/logs/testsuites.xml" tofile="${log.archive.dir}/latest/log.xml" overwrite="true"/>
 
-        <if><equals arg1="${test.pmd_reports}" arg2="1" />
+        <if>
+            <equals arg1="${test.pmd_reports}" arg2="1" />
             <then>
                 <exec command="${test.pdepend_exec} --jdepend-xml=${build.dir}/logs/jdepend.xml ./lib/Doctrine" />
                 <exec command="${test.phpmd_exec} ./lib/Doctrine xml codesize --reportfile ${build.dir}/logs/phpmd.xml" />
@@ -140,21 +147,21 @@
     <target name="build-packages" depends="build-migrations">
         <taskdef classname="phing.tasks.ext.d51PearPkg2Task" name="d51pearpkg2" />
         <d51pearpkg2 baseinstalldir="/" dir="${build.dir}/migrations">
-           <name>DoctrineMigrations</name>
-           <summary>Doctrine Database Migrations</summary>
-           <channel>pear.doctrine-project.org</channel>
-           <description>The Doctrine migrations offer additional functionality on top of the database abstraction layer (DBAL) for versioning your database schema and easily deploying changes to it. It is easy to use and a very powerful tool!</description>
-           <lead user="jwage" name="Jonathan H. Wage" email="jonwage@gmail.com" />
-           <license>LGPL</license>
-           <version release="${version}" api="${version}" />
-           <stability release="${stability}" api="${stability}" />
-           <notes>-</notes>
-           <dependencies>
-               <php minimum_version="5.3.0" />
-               <pear minimum_version="1.6.0" recommended_version="1.6.1" />
-           </dependencies>
+            <name>DoctrineMigrations</name>
+            <summary>Doctrine Database Migrations</summary>
+            <channel>pear.doctrine-project.org</channel>
+            <description>The Doctrine migrations offer additional functionality on top of the database abstraction layer (DBAL) for versioning your database schema and easily deploying changes to it. It is easy to use and a very powerful tool!</description>
+            <lead user="jwage" name="Jonathan H. Wage" email="jonwage@gmail.com" />
+            <license>LGPL</license>
+            <version release="${version.stripped}" api="${version.stripped}" />
+            <stability release="${stability}" api="${stability}" />
+            <notes>-</notes>
+            <dependencies>
+                <php minimum_version="5.3.0" />
+                <pear minimum_version="1.6.0" recommended_version="1.6.1" />
+            </dependencies>
         </d51pearpkg2>
         <exec command="pear package" dir="${build.dir}/migrations" passthru="true" />
-        <exec command="mv DoctrineMigrations-${version}.tgz ../../dist" dir="${build.dir}/migrations" passthru="true" />
+        <move file="${build.dir}/migrations/DoctrineMigrations-${version.stripped}.tgz" todir="${dist.dir}" overwrite="true"/>
     </target>
 </project>
