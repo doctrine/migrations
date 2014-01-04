@@ -30,11 +30,11 @@ namespace Doctrine\DBAL\Migrations\Configuration;
  */
 class XmlConfiguration extends AbstractFileConfiguration
 {
-
     /**
      * @inheritdoc
      */
-    protected function doLoad($file) {
+    protected function doLoad($file)
+    {
         $xml = simplexml_load_file($file);
         if (isset($xml->name)) {
             $this->setName((string) $xml->name);
