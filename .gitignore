@@ -4,7 +4,5 @@ logs/
 reports/
 dist/
 tests/phpunit.xml
-phpunit-dest.xml
 vendor/
 composer.lock
-nbproject
