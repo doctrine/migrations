@@ -66,7 +66,7 @@ class Migrations
             throw new Exception\MetadataAlreadyInitializedException();
         }
 
-        $this->metadataStorage->initalize();
+        $this->metadataStorage->initialize();
     }
 
     /**

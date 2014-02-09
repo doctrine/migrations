@@ -22,5 +22,6 @@ namespace Doctrine\Migrations;
 interface MetadataStorage
 {
     public function isInitialized();
-    public function initalize();
+    public function initialize();
+    public function getInfo();
 }
