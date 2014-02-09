@@ -21,13 +21,48 @@ namespace Doctrine\Migrations;
 
 class Configuration
 {
+    /**
+     * @var bool
+     */
+    private $outOfOrderMigrationsAllowed = false;
+
+    /**
+     * @var bool
+     */
+    private $validateOnMigrate = false;
+
+    /**
+     * @var bool
+     */
+    private $allowInitOnMigrate = false;
+
+    public function setOutOfOrderMigrationsAllowed($flag)
+    {
+        $this->outOfOrderMigrationsAllowed = (bool)$flag;
+    }
+
+    public function setValidateOnMigrate($flag)
+    {
+        $this->validateOnMigrate = (bool)$flag;
+    }
+
+    public function setAllowInitOnMigrate($flag)
+    {
+        $this->allowInitOnMigrate = (bool)$flag;
+    }
+
     public function outOfOrderMigrationsAllowed()
     {
-        return false;
+        return $this->outOfOrderMigrationsAllowed;
     }
 
     public function validateOnMigrate()
     {
-        return false;
+        return $this->validateOnMigrate;
+    }
+
+    public function allowInitOnMigrate()
+    {
+        return $this->allowInitOnMigrate;
     }
 }

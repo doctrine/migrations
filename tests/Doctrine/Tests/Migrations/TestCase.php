@@ -39,4 +39,9 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             false
         );
     }
+
+    public function createConfiguration()
+    {
+        return new \Doctrine\Migrations\Configuration();
+    }
 }

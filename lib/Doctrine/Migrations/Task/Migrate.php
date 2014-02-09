@@ -2,8 +2,11 @@
 
 namespace Doctrine\Migrations\Task;
 
+use Doctrine\Migrations\Configuration;
 use Doctrine\Migrations\MetadataStorage;
 use Doctrine\Migrations\MigrationStatus;
+use Doctrine\Migrations\Executor\ExecutorRegistry;
+use Doctrine\Migrations\Exception;
 
 class Migrate
 {
@@ -54,8 +57,10 @@ class Migrate
         }
 
         $outstandingMigrations = $status->getOutstandingMigrations();
+        $executors = $this->executorRegistry->findFor($outstandingMigrations);
 
-        foreach ($outstandingMigrations as $migration) {
+        foreach ($executors as $executor) {
+            $migration = $executor->getMigration();
             $this->metadataStorage->start($migration);
 
             $executor = $this->executorRegistry->findFor($migration);
