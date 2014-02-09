@@ -23,5 +23,5 @@ interface MetadataStorage
 {
     public function isInitialized();
     public function initialize();
-    public function getInfo();
+    public function getExecutedMigrations();
 }

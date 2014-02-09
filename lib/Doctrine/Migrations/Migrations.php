@@ -48,11 +48,15 @@ class Migrations
     /**
      * Get information about all migrations, executed and non executed so far.
      *
-     * @return \Doctrine\Migrations\MigrationInfo
+     * @return \Doctrine\Migrations\MigrationStatus
      */
     public function getInfo()
     {
-        return $this->metadataStorage->getInfo();
+        return new MigrationStatus(
+            $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : array(),
+            array(),
+            $this->metadataStorage->isInitialized()
+        );
     }
 
     /**
