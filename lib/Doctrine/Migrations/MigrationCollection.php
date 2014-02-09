@@ -19,15 +19,20 @@
 
 namespace Doctrine\Migrations;
 
-class Configuration
+use IteratorAggregate;
+use ArrayIterator;
+
+class MigrationCollection implements IteratorAggregate
 {
-    public function outOfOrderMigrationsAllowed()
+    private $migrations;
+
+    public function add(MigrationInfo $migration)
     {
-        return false;
+        $this->migrations[] = $migration;
     }
 
-    public function validateOnMigrate()
+    public function getIterator()
     {
-        return false;
+        return new ArrayIterator($this->migrations);
     }
 }

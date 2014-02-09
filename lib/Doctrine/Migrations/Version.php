@@ -19,15 +19,17 @@
 
 namespace Doctrine\Migrations;
 
-class Configuration
+class Version
 {
-    public function outOfOrderMigrationsAllowed()
+    private $version;
+
+    public function __construct($version)
     {
-        return false;
+        $this->version = $version;
     }
 
-    public function validateOnMigrate()
+    public function __toString()
     {
-        return false;
+        return $this->version;
     }
 }

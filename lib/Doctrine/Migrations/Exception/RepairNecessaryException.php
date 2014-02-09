@@ -17,17 +17,8 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\Migrations;
+namespace Doctrine\Migrations\Exception;
 
-class Configuration
+class RepairNecessaryException extends MigrationException
 {
-    public function outOfOrderMigrationsAllowed()
-    {
-        return false;
-    }
-
-    public function validateOnMigrate()
-    {
-        return false;
-    }
 }

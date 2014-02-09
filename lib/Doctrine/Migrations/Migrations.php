@@ -34,11 +34,6 @@ class Migrations
      */
     private $metadataStorage;
 
-    /**
-     * @var \Doctrine\Migrations\ExecutorRegistry
-     */
-    private $executorRegistry;
-
     public function __construct(Configuration $configuration, MetadataStorage $metadataStorage)
     {
         $this->configuration = $configuration;
@@ -54,7 +49,7 @@ class Migrations
     {
         return new MigrationStatus(
             $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : array(),
-            array(),
+            new MigrationCollection(),
             $this->metadataStorage->isInitialized()
         );
     }
@@ -66,11 +61,8 @@ class Migrations
      */
     public function initMetadata()
     {
-        if ($this->metadataStorage->isInitialized()) {
-            throw new Exception\MetadataAlreadyInitializedException();
-        }
-
-        $this->metadataStorage->initialize();
+        $task = new Task\InitializeMetadata($this->metadataStorage);
+        $task->execute($this->getInfo());
     }
 
     /**
@@ -80,6 +72,14 @@ class Migrations
      */
     public function migrate()
     {
+        $status = $this->getInfo();
+
+        $task = new Task\Migrate(
+            $this->configuration,
+            $this->metadataStorage,
+            $this->configuration->getExecutorRegistry()
+        );
+        $task->execute($status);
     }
 
     /**
@@ -90,6 +90,10 @@ class Migrations
      */
     public function repair()
     {
+        $status = $this->getInfo();
+
+        $task = new Task\Repair($this->metadataStorage);
+        $task->execute($status);
     }
 }
 
