@@ -61,11 +61,9 @@ class Migrate
 
         foreach ($executors as $executor) {
             $migration = $executor->getMigration();
+
             $this->metadataStorage->start($migration);
-
-            $executor = $this->executorRegistry->findFor($migration);
             $executor->execute($migration);
-
             $this->metadataStorage->complete($migration);
         }
     }

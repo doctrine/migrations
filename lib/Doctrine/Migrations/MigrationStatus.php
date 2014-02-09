@@ -76,4 +76,9 @@ class MigrationStatus
     {
         return $this->executedMigrations;
     }
+
+    public function getOutstandingMigrations()
+    {
+        return new MigrationCollection();
+    }
 }

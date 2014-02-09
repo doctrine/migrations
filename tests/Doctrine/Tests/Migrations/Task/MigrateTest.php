@@ -35,4 +35,26 @@ class MigrateTest extends TestCase
         $task = new Migrate($configuration, $storage, $registry);
         $task->execute($this->createMigrationStatus(array($migration)));
     }
+
+    public function testExecuteMigrations()
+    {
+        $storage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
+        $registry = \Phake::mock('Doctrine\Migrations\Executor\ExecutorRegistry');
+        $executor = \Phake::mock('Doctrine\Migrations\Executor\Executor');
+
+        \Phake::when($registry)
+            ->findFor($this->isInstanceOf('Doctrine\Migrations\MigrationCollection'))
+            ->thenReturn(array($executor));
+
+        $configuration = $this->createConfiguration();
+        $migration = new MigrationInfo(new Version('1.0'));
+        $migration->setSuccess(true);
+
+        \Phake::when($executor)->getMigration()->thenReturn($migration);
+
+        $task = new Migrate($configuration, $storage, $registry);
+        $task->execute($this->createMigrationStatus(array($migration)));
+
+        \Phake::verify($executor)->execute($migration);
+    }
 }
