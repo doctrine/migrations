@@ -16,4 +16,14 @@ class InitializeMetadataTest extends TestCase
 
         $task->execute($this->createInitializedMigrationStatus());
     }
+
+    public function testInitialize()
+    {
+        $storage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
+        $task = new InitializeMetadata($storage);
+
+        $task->execute($this->createUninitializedMigrationStatus());
+
+        \Phake::verify($storage)->initialize();
+    }
 }

@@ -15,4 +15,13 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             true
         );
     }
+
+    public function createUninitializedMigrationStatus()
+    {
+        return new MigrationStatus(
+            new MigrationCollection(),
+            new MigrationCollection(),
+            false
+        );
+    }
 }
