@@ -14,20 +14,17 @@
         "doctrine/dbal": "~2.0"
     },
     "require-dev": {
-        "symfony/console": "2.*",
-        "symfony/yaml": "2.*"
-    },
-    "suggest": {
-        "symfony/console": "to run the migration from the console"
+        "phake/phake": "@stable",
+        "symfony/console": "~2.1"
     },
     "autoload": {
         "psr-0": {
-            "Doctrine\\DBAL\\Migrations": "lib"
+            "Doctrine\\Migrations": "lib"
         }
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "1.0.x-dev"
+            "dev-master": "2.0.x-dev"
         }
     }
 }
