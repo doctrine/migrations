@@ -24,4 +24,5 @@ interface MetadataStorage
     public function isInitialized();
     public function initialize();
     public function getExecutedMigrations();
+    public function delete(MigrationInfo $migration);
 }

@@ -61,8 +61,19 @@ class MigrationStatus
         return true;
     }
 
+    /**
+     * @return bool
+     */
     public function isInitialized()
     {
         return $this->metadataInitialized;
+    }
+
+    /**
+     * @return \Doctrine\Migrations\MigrationCollection
+     */
+    public function getExecutedMigrations()
+    {
+        return $this->executedMigrations;
     }
 }

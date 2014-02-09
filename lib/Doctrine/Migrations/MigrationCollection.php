@@ -24,7 +24,7 @@ use ArrayIterator;
 
 class MigrationCollection implements IteratorAggregate
 {
-    private $migrations;
+    private $migrations = array();
 
     public function add(MigrationInfo $migration)
     {

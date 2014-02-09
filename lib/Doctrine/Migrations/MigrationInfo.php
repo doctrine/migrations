@@ -76,16 +76,8 @@ class MigrationInfo
      */
     private $success = false;
 
-    public function __construct(Version $version, array $data = array())
+    public function __construct(Version $version)
     {
-        foreach ($data as $key => $value) {
-            if ( ! property_exists($this, $key) || $key === 'version') {
-                throw new \InvalidArgumentException('No property "%s" exists on MigrationInfo.', $key);
-            }
-
-            $this->$key = $value;
-        }
-
         $this->version = $version;
     }
 
@@ -99,11 +91,11 @@ class MigrationInfo
 
     public function wasSuccessfullyExecuted()
     {
-        return $this->success = true;
+        return $this->success;
     }
 
-    public function __set($name, $value)
+    public function setSuccess($success)
     {
-        throw new \InvalidArgumentException('No property "%s" exists on MigrationInfo.', $name);
+        $this->success = $success;
     }
 }
