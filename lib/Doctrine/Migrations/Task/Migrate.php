@@ -34,7 +34,7 @@ class Migrate
 
     public function execute(MigrationStatus $status)
     {
-        if ( ! $this->metadataStorage->isInitialized()) {
+        if ( ! $status->isInitialized()) {
             if ( ! $this->configuration->allowInitOnMigrate()) {
                 throw new Exception\MetadataIsNotInitializedException();
             }
