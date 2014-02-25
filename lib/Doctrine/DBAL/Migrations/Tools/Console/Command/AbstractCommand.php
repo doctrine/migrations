@@ -111,6 +111,9 @@ abstract class AbstractCommand extends Command
             } elseif (file_exists('migrations.yml')) {
                 $configuration = new YamlConfiguration($conn, $outputWriter);
                 $configuration->load('migrations.yml');
+            } elseif (file_exists('migrations.yaml')) {
+                $configuration = new YamlConfiguration($conn, $outputWriter);
+                $configuration->load('migrations.yaml');
             } else {
                 $configuration = new Configuration($conn, $outputWriter);
             }
