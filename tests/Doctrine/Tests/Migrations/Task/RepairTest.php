@@ -23,7 +23,7 @@ class RepairTest extends TestCase
     {
         $storage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
 
-        $migration = new MigrationInfo(new Version('1.0'));
+        $migration = $this->createMigrationInfo('1.0');
         $migration->success = false;
 
         $task = new Repair($storage);

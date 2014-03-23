@@ -80,9 +80,13 @@ class MigrationInfo
      */
     public $success = false;
 
-    public function __construct(Version $version)
+    public function __construct(Version $version, $description, $type, $script, $checksum)
     {
         $this->version = $version;
+        $this->description = $description;
+        $this->type = $type;
+        $this->script = $script;
+        $this->checksum = $checksum;
     }
 
     /**

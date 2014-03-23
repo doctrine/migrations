@@ -4,6 +4,8 @@ namespace Doctrine\Tests\Migrations;
 
 use Doctrine\Migrations\MigrationSet;
 use Doctrine\Migrations\MigrationStatus;
+use Doctrine\Migrations\Version;
+use Doctrine\Migrations\MigrationInfo;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
@@ -30,6 +32,17 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
             new MigrationSet(),
             new MigrationSet(),
             false
+        );
+    }
+
+    public function createMigrationInfo($version = null)
+    {
+        return new MigrationInfo(
+            new Version($version ?: '1.0'),
+            null,
+            null,
+            null,
+            null
         );
     }
 

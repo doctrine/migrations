@@ -48,7 +48,14 @@ class MigrationSet implements IteratorAggregate, Countable
 
     public function getIterator()
     {
-        return new ArrayIterator($this->migrations);
+        $migrations = array_values($this->migrations);
+        usort($migrations, function ($a, $b) {
+            return version_compare(
+                (string)$a->getVersion(),
+                (string)$b->getversion()
+            );
+        });
+        return new ArrayIterator($migrations);
     }
 
     /**

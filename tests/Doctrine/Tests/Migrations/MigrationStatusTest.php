@@ -14,7 +14,7 @@ class MigrationStatusTest extends TestCase
      */
     public function it_needs_repair_when_one_migration_not_executed_successfully()
     {
-        $failedMigration = new MigrationInfo(new Version(1));
+        $failedMigration = $this->createMigrationInfo('1.0');
         $failedMigration->sucess = false;
         $executedMigrations = new MigrationSet();
         $executedMigrations->add($failedMigration);

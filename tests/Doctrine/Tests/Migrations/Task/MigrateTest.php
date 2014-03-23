@@ -4,8 +4,6 @@ namespace Doctrine\Tests\Migrations\Task;
 
 use Doctrine\Tests\Migrations\TestCase;
 use Doctrine\Migrations\Task\Migrate;
-use Doctrine\Migrations\Version;
-use Doctrine\Migrations\MigrationInfo;
 
 class MigrateTest extends TestCase
 {
@@ -27,7 +25,7 @@ class MigrateTest extends TestCase
         $storage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
         $registry = \Phake::mock('Doctrine\Migrations\Executor\ExecutorRegistry');
         $configuration = $this->createConfiguration();
-        $migration = new MigrationInfo(new Version('1.0'));
+        $migration = $this->createMigrationInfo('1.0');
         $migration->success = false;
 
         $this->setExpectedException('Doctrine\Migrations\Exception\RepairNecessaryException');
@@ -43,7 +41,7 @@ class MigrateTest extends TestCase
         $executor = \Phake::mock('Doctrine\Migrations\Executor\Executor');
 
         $configuration = $this->createConfiguration();
-        $migration = new MigrationInfo(new Version('1.0'));
+        $migration = $this->createMigrationInfo('1.0');
 
         \Phake::when($registry)
             ->findFor($migration)
