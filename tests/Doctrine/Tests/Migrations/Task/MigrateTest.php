@@ -52,6 +52,6 @@ class MigrateTest extends TestCase
         $task = new Migrate($configuration, $storage, $registry);
         $task->execute($this->createMigrationStatus(array(), array($migration)));
 
-        \Phake::verify($executor)->execute();
+        \Phake::verify($executor)->execute($migration);
     }
 }

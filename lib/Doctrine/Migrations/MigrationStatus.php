@@ -77,9 +77,18 @@ class MigrationStatus
         return $this->executedMigrations;
     }
 
+    /**
+     * @return \Doctrine\Migrations\MigrationCollection
+     */
     public function getOutstandingMigrations()
     {
-        return new MigrationCollection();
+        $executedMigrations = $this->executedMigrations;
+
+        return $this->foundMigrations->filter(
+            function ($migration) use ($executedMigrations) {
+                return ! $executedMigrations->contains($migration);
+            }
+        );
     }
 
     /**

@@ -7,16 +7,12 @@ use Doctrine\Migrations\MigrationStatus;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
-    public function createMigrationStatus(array $migrations = array(), array $outstanding = arraY())
+    public function createMigrationStatus(array $migrations = array(), array $found = arraY())
     {
         $executed = new MigrationCollection($migrations);
-        $outstanding = new MigrationCollection($outstanding);
+        $found = new MigrationCollection($found);
 
-        return new MigrationStatus(
-            $executed,
-            $outstanding,
-            true
-        );
+        return new MigrationStatus($executed, $found, true);
     }
 
     public function createInitializedMigrationStatus()

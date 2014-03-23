@@ -44,7 +44,6 @@ class Migrate
             $executor = $this->executorRegistry->findFor($migration);
 
             $migration->installedRank = ++$maxInstalledRank;
-            $migration->checksum = md5_file($migration->script);
             $migration->installedOn = new \DateTime('now');
             $migration->installedBy = $installedBy;
             $migration->success = false;
@@ -53,7 +52,7 @@ class Migrate
 
             $start = microtime(true);
             try {
-                $executor->execute($migration, $this->configuration);
+                $executor->execute($migration);
 
                 $migration->success = true;
             } catch (\Exception $e) {
