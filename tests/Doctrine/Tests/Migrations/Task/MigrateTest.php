@@ -28,7 +28,7 @@ class MigrateTest extends TestCase
         $registry = \Phake::mock('Doctrine\Migrations\Executor\ExecutorRegistry');
         $configuration = $this->createConfiguration();
         $migration = new MigrationInfo(new Version('1.0'));
-        $migration->setSuccess(false);
+        $migration->success = false;
 
         $this->setExpectedException('Doctrine\Migrations\Exception\RepairNecessaryException');
 
@@ -48,7 +48,7 @@ class MigrateTest extends TestCase
 
         $configuration = $this->createConfiguration();
         $migration = new MigrationInfo(new Version('1.0'));
-        $migration->setSuccess(true);
+        $migration->success = true;
 
         \Phake::when($executor)->getMigration()->thenReturn($migration);
 

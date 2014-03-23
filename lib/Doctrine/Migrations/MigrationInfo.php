@@ -74,7 +74,7 @@ class MigrationInfo
     /**
      * @var bool
      */
-    private $success = false;
+    public $success = false;
 
     public function __construct(Version $version)
     {
@@ -92,10 +92,5 @@ class MigrationInfo
     public function wasSuccessfullyExecuted()
     {
         return $this->success;
-    }
-
-    public function setSuccess($success)
-    {
-        $this->success = $success;
     }
 }

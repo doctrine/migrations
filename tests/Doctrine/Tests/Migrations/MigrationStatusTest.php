@@ -15,7 +15,7 @@ class MigrationStatusTest extends \PHPUnit_Framework_TestCase
     public function it_needs_repair_when_one_migration_not_executed_successfully()
     {
         $failedMigration = new MigrationInfo(new Version(1));
-        $failedMigration->setSuccess(false);
+        $failedMigration->sucess = false;
         $executedMigrations = new MigrationCollection();
         $executedMigrations->add($failedMigration);
 

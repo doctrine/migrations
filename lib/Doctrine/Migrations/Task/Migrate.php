@@ -32,7 +32,7 @@ class Migrate
         $this->executorRegistry = $executorRegistry;
     }
 
-    public function execute(MigrationStatus $status)
+    public function execute(MigrationStatus $status, $installedBy = null)
     {
         if ( ! $status->isInitialized()) {
             if ( ! $this->configuration->allowInitOnMigrate()) {
@@ -61,9 +61,18 @@ class Migrate
 
         foreach ($executors as $executor) {
             $migration = $executor->getMigration();
+            $migration->installedOn = new \DateTime('now');
+            $migration->installedBy = $installedBy;
 
             $this->metadataStorage->start($migration);
-            $executor->execute($migration);
+            try {
+                $executor->execute($migration);
+
+                $migration->success = true;
+            } catch (\Exception $e) {
+                $migration->success = false;
+            }
+
             $this->metadataStorage->complete($migration);
         }
     }
