@@ -4,15 +4,15 @@ namespace Doctrine\Migrations\DBAL\Loader;
 
 use Doctrine\Migrations\Loader\AbstractFileLoader;
 
-class SqlFileLoader extends AbstractFileLoader
+class PhpFileLoader implements Loader
 {
     protected function getName()
     {
-        return 'SQL';
+        return 'PHP';
     }
 
     protected function getExtension()
     {
-        return 'sql';
+        return 'php';
     }
 }
