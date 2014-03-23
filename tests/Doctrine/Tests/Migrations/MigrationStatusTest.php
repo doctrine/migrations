@@ -2,7 +2,7 @@
 
 namespace Doctrine\Tests\Migrations;
 
-use Doctrine\Migrations\MigrationCollection;
+use Doctrine\Migrations\MigrationSet;
 use Doctrine\Migrations\MigrationStatus;
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\Version;
@@ -16,12 +16,12 @@ class MigrationStatusTest extends TestCase
     {
         $failedMigration = new MigrationInfo(new Version(1));
         $failedMigration->sucess = false;
-        $executedMigrations = new MigrationCollection();
+        $executedMigrations = new MigrationSet();
         $executedMigrations->add($failedMigration);
 
         $status = new MigrationStatus(
             $executedMigrations,
-            new MigrationCollection(),
+            new MigrationSet(),
             true
         );
 

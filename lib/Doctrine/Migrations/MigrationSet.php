@@ -23,7 +23,7 @@ use IteratorAggregate;
 use ArrayIterator;
 use Countable;
 
-class MigrationCollection implements IteratorAggregate, Countable
+class MigrationSet implements IteratorAggregate, Countable
 {
     private $migrations = array();
 
@@ -61,11 +61,11 @@ class MigrationCollection implements IteratorAggregate, Countable
 
     /**
      * @param callack $fn
-     * @return MigrationCollection
+     * @return MigrationSet
      */
     public function filter($fn)
     {
-        return new MigrationCollection(array_filter($this->migrations, $fn));
+        return new MigrationSet(array_filter($this->migrations, $fn));
     }
 
     public function contains(MigrationInfo $migration)

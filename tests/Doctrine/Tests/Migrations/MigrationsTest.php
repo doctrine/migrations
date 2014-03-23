@@ -2,7 +2,7 @@
 
 namespace Doctrine\Tests\Migrations;
 
-use Doctrine\Migrations\MigrationCollection;
+use Doctrine\Migrations\MigrationSet;
 use Doctrine\Migrations\Migrations;
 use Doctrine\Migrations\Configuration;
 
@@ -14,7 +14,7 @@ class MigrationsTest extends \PHPUnit_Framework_TestCase
         $metadataStorage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
 
         \Phake::when($metadataStorage)->isInitialized()->thenReturn(true);
-        \Phake::when($metadataStorage)->getExecutedMigrations()->thenReturn(new MigrationCollection());
+        \Phake::when($metadataStorage)->getExecutedMigrations()->thenReturn(new MigrationSet());
 
         $migrations = new Migrations($configuration, $metadataStorage);
         $status = $migrations->getInfo();

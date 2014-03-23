@@ -26,13 +26,13 @@ class MigrationStatus
     private $metadataInitialized = false;
 
     /**
-     * @param \Doctrine\Migrations\MigrationCollection $executedMigrations
-     * @param \Doctrine\Migrations\MigrationCollection $foundMigrations
+     * @param \Doctrine\Migrations\MigrationSet $executedMigrations
+     * @param \Doctrine\Migrations\MigrationSet $foundMigrations
      * @param bool $metadataInitialized
      */
     public function __construct(
-        MigrationCollection $executedMigrations,
-        MigrationCollection $foundMigrations,
+        MigrationSet $executedMigrations,
+        MigrationSet $foundMigrations,
         $metadataInitialized)
     {
         $this->executedMigrations = $executedMigrations;
@@ -70,7 +70,7 @@ class MigrationStatus
     }
 
     /**
-     * @return \Doctrine\Migrations\MigrationCollection
+     * @return \Doctrine\Migrations\MigrationSet
      */
     public function getExecutedMigrations()
     {
@@ -78,7 +78,7 @@ class MigrationStatus
     }
 
     /**
-     * @return \Doctrine\Migrations\MigrationCollection
+     * @return \Doctrine\Migrations\MigrationSet
      */
     public function getOutstandingMigrations()
     {

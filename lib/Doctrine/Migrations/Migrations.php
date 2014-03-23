@@ -49,7 +49,7 @@ class Migrations
     {
         return new MigrationStatus(
             $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : array(),
-            new MigrationCollection(),
+            new MigrationSet(),
             $this->metadataStorage->isInitialized()
         );
     }

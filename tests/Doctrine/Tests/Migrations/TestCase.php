@@ -2,15 +2,15 @@
 
 namespace Doctrine\Tests\Migrations;
 
-use Doctrine\Migrations\MigrationCollection;
+use Doctrine\Migrations\MigrationSet;
 use Doctrine\Migrations\MigrationStatus;
 
 abstract class TestCase extends \PHPUnit_Framework_TestCase
 {
     public function createMigrationStatus(array $migrations = array(), array $found = arraY())
     {
-        $executed = new MigrationCollection($migrations);
-        $found = new MigrationCollection($found);
+        $executed = new MigrationSet($migrations);
+        $found = new MigrationSet($found);
 
         return new MigrationStatus($executed, $found, true);
     }
@@ -18,8 +18,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function createInitializedMigrationStatus()
     {
         return new MigrationStatus(
-            new MigrationCollection(),
-            new MigrationCollection(),
+            new MigrationSet(),
+            new MigrationSet(),
             true
         );
     }
@@ -27,8 +27,8 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
     public function createUninitializedMigrationStatus()
     {
         return new MigrationStatus(
-            new MigrationCollection(),
-            new MigrationCollection(),
+            new MigrationSet(),
+            new MigrationSet(),
             false
         );
     }
