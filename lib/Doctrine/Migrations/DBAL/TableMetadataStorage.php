@@ -4,6 +4,8 @@ namespace Doctrine\Migrations\DBAL;
 
 use Doctrine\Migrations\MetadataStorage;
 use Doctrine\Migrations\MigrationInfo;
+use Doctrine\Migrations\MigrationSet;
+
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -47,9 +49,9 @@ class TableMetadataStorage
         $schemaChangelog->addColumn('type', 'string', array('length' => 20));
         $schemaChangelog->addColumn('script', 'string', array('length' => 1000));
         $schemaChangelog->addColumn('checksum', 'string', array('length' => 32));
-        $schemaChangelog->addColumn('installed_by', 'string', array('length' => 100));
+        $schemaChangelog->addColumn('installed_by', 'string', array('length' => 100, 'notnull' => false));
         $schemaChangelog->addColumn('installed_on', 'datetime');
-        $schemaChangelog->addColumn('execution_time', 'integer');
+        $schemaChangelog->addColumn('execution_time', 'integer', array('notnull' => false));
         $schemaChangelog->addColumn('success', 'boolean');
         $schemaChangelog->setPrimaryKey(array('version'));
 
@@ -65,6 +67,7 @@ class TableMetadataStorage
 
         foreach ($rows as $row) {
             $row = array_change_key_case($row, CASE_LOWER);
+
             $migration = new MigrationInfo(
                 new Version($row['version']),
                 $row['description'],
@@ -72,7 +75,11 @@ class TableMetadataStorage
                 $this->path . '/' . $row['script'],
                 $row['checksum']
             );
-            $migration->installedOn = Type::getType('datetime')->convertToPhpValue($row['installed_on'], $this->platform);
+
+            $migration->installedOn = \DateTime::createFromFormat(
+                $this->platform->getDateTimeFormatString(),
+                $row['installed_on']
+            );
             $migration->installedBy = $row['installed_by'];
             $migration->executionTime = $row['execution_time'];
             $migration->success = $row['success'] ? true : false;
@@ -86,13 +93,39 @@ class TableMetadataStorage
 
     public function delete(MigrationInfo $migration)
     {
+        $this->connection->delete('schema_changelog', array(
+            'version' => (string)$migration->getVersion()
+        ));
     }
 
     public function start(MigrationInfo $migration)
     {
+        $this->connection->insert('schema_changelog', array(
+            'version' => (string)$migration->getVersion(),
+            'version_rank' => 0,
+            'installed_rank' => $migration->installedRank,
+            'description' => $migration->description,
+            'type' => $migration->type,
+            'script' => str_replace($this->path . '/', '', $migration->script),
+            'checksum' => $migration->checksum,
+            'installed_on' => $migration->installedOn->format($this->platform->getDateTimeFormatString()),
+            'installed_by' => $migration->installedBy,
+            'execution_time' => null,
+            'success' => 0,
+        ));
     }
 
     public function complete(MigrationInfo $migration)
     {
+        $this->connection->update(
+            'schema_changelog',
+            array(
+                'execution_time' => $migration->executionTime,
+                'success' => 1
+            ),
+            array(
+                'version' => (string)$migration->getVersion()
+            )
+        );
     }
 }
