@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Migrations;
+namespace Doctrine\Migrations\DBAL;
 
 use Doctrine\DBAL\Connection;
 

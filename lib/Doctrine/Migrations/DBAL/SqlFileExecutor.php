@@ -4,6 +4,7 @@ namespace Doctrine\Migrations\Executor;
 
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\Executor\Executor;
+use Doctrine\Migrations\Configuration;
 use Doctrine\DBAL\Connection;
 
 class SqlFileExecutor implements Executor
