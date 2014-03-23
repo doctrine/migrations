@@ -87,6 +87,10 @@ class MigrationStatus
      */
     public function getMaxInstalledRank()
     {
+        if (count($this->executedMigrations) === 0) {
+            return 0;
+        }
+
         return max(
             $this->executedMigrations->map(
                 function ($migration) {

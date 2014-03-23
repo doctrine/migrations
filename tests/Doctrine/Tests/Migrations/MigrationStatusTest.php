@@ -7,7 +7,7 @@ use Doctrine\Migrations\MigrationStatus;
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\Version;
 
-class MigrationStatusTest extends \PHPUnit_Framework_TestCase
+class MigrationStatusTest extends TestCase
 {
     /**
      * @test

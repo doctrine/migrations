@@ -2,8 +2,9 @@
 
 namespace Doctrine\Migrations\Executor;
 
+use Doctrine\Migrations\MigrationInfo;
+
 interface Executor
 {
-    public function execute();
-    public function getMigration();
+    public function execute(MigrationInfo $migration);
 }

@@ -21,8 +21,9 @@ namespace Doctrine\Migrations;
 
 use IteratorAggregate;
 use ArrayIterator;
+use Countable;
 
-class MigrationCollection implements IteratorAggregate
+class MigrationCollection implements IteratorAggregate, Countable
 {
     private $migrations = array();
 
@@ -35,7 +36,14 @@ class MigrationCollection implements IteratorAggregate
 
     public function add(MigrationInfo $migration)
     {
-        $this->migrations[] = $migration;
+        if ($this->contains($migration)) {
+            throw new \RuntimeException(sprintf(
+                "There is already a migration with version '%s' in this set.",
+                (string)$migration->getVersion()
+            ));
+        }
+
+        $this->migrations[(string)$migration->getVersion()] = $migration;
     }
 
     public function getIterator()
@@ -49,5 +57,24 @@ class MigrationCollection implements IteratorAggregate
     public function map($fn)
     {
         return array_map($fn, $this->migrations);
+    }
+
+    /**
+     * @param callack $fn
+     * @return MigrationCollection
+     */
+    public function filter($fn)
+    {
+        return new MigrationCollection(array_filter($this->migrations, $fn));
+    }
+
+    public function contains(MigrationInfo $migration)
+    {
+        return isset($this->migrations[(string)$migration->getVersion()]);
+    }
+
+    public function count()
+    {
+        return count($this->migrations);
     }
 }

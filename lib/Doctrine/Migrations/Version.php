@@ -30,6 +30,6 @@ class Version
 
     public function __toString()
     {
-        return $this->version;
+        return (string)$this->version;
     }
 }

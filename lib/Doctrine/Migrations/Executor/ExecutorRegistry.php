@@ -2,12 +2,9 @@
 
 namespace Doctrine\Migrations\Executor;
 
-use Doctrine\Migrations\MigrationCollection;
+use Doctrine\Migrations\MigrationInfo;
 
-class ExecutorRegistry
+interface ExecutorRegistry
 {
-    public function findFor(MigrationCollection $collection)
-    {
-        return array();
-    }
+    public function findFor(MigrationInfo $migration);
 }

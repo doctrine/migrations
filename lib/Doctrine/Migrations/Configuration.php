@@ -36,6 +36,11 @@ class Configuration
      */
     private $allowInitOnMigrate = false;
 
+    /**
+     * @var string
+     */
+    private $scriptDirectory;
+
     public function setOutOfOrderMigrationsAllowed($flag)
     {
         $this->outOfOrderMigrationsAllowed = (bool)$flag;
@@ -64,5 +69,15 @@ class Configuration
     public function allowInitOnMigrate()
     {
         return $this->allowInitOnMigrate;
+    }
+
+    public function setScriptDirectory($path)
+    {
+        $this->scriptDirectory = $path;
+    }
+
+    public function getScriptDirectory()
+    {
+        return $this->scriptDirectory;
     }
 }
