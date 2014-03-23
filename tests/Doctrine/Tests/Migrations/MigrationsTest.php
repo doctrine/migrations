@@ -12,11 +12,13 @@ class MigrationsTest extends \PHPUnit_Framework_TestCase
     {
         $configuration = new Configuration();
         $metadataStorage = \Phake::mock('Doctrine\Migrations\MetadataStorage');
+        $loader = \Phake::mock('Doctrine\Migrations\Loader\Loader');
 
         \Phake::when($metadataStorage)->isInitialized()->thenReturn(true);
         \Phake::when($metadataStorage)->getExecutedMigrations()->thenReturn(new MigrationSet());
+        \Phake::when($loader)->load($configuration->getScriptDirectory())->thenReturn(new MigrationSet());
 
-        $migrations = new Migrations($configuration, $metadataStorage);
+        $migrations = new Migrations($configuration, $metadataStorage, $loader);
         $status = $migrations->getInfo();
 
         $this->assertInstanceOf('Doctrine\Migrations\MigrationStatus', $status);

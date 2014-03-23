@@ -19,6 +19,8 @@
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Migrations\Loader\Loader;
+
 /**
  * Facade for all migration operations
  */
@@ -34,10 +36,16 @@ class Migrations
      */
     private $metadataStorage;
 
-    public function __construct(Configuration $configuration, MetadataStorage $metadataStorage)
+    /**
+     * @var \Doctrine\Migrations\Loader\Loader
+     */
+    private $loader;
+
+    public function __construct(Configuration $configuration, MetadataStorage $metadataStorage, Loader $loader)
     {
         $this->configuration = $configuration;
         $this->metadataStorage = $metadataStorage;
+        $this->loader = $loader;
     }
 
     /**
@@ -49,7 +57,7 @@ class Migrations
     {
         return new MigrationStatus(
             $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : array(),
-            new MigrationSet(),
+            $this->loader->load($this->configuration->getScriptDirectory()),
             $this->metadataStorage->isInitialized()
         );
     }
