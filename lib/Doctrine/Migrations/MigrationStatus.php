@@ -81,4 +81,18 @@ class MigrationStatus
     {
         return new MigrationCollection();
     }
+
+    /**
+     * @return int
+     */
+    public function getMaxInstalledRank()
+    {
+        return max(
+            $this->executedMigrations->map(
+                function ($migration) {
+                    return $migration->installedRank;
+                }
+            )
+        );
+    }
 }

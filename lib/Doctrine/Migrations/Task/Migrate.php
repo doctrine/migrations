@@ -34,12 +34,49 @@ class Migrate
 
     public function execute(MigrationStatus $status, $installedBy = null)
     {
+        $this->assertValidToMigrate($status);
+
+        $outstandingMigrations = $status->getOutstandingMigrations();
+        $executors = $this->executorRegistry->findFor($outstandingMigrations);
+
+        $maxInstalledRank = $status->getMaxInstalledRank();
+
+        foreach ($executors as $executor) {
+            $migration = $executor->getMigration();
+            $migration->installedRank = ++$maxInstalledRank;
+            $migration->checksum = md5_file($migration->script);
+            $migration->installedOn = new \DateTime('now');
+            $migration->installedBy = $installedBy;
+            $migration->success = false;
+
+            $this->metadataStorage->start($migration);
+
+            $start = microtime(true);
+            try {
+                $executor->execute($migration);
+
+                $migration->success = true;
+            } catch (\Exception $e) {
+            }
+
+            $migration->executionTime = round(microtime(true) - $start, 3) * 1000;
+
+            $this->metadataStorage->complete($migration);
+
+            if (!$migration->success) {
+                throw new Exception\ExecutionFailedException($migration, $e);
+            }
+        }
+    }
+
+    private function assertValidToMigrate($status)
+    {
         if ( ! $status->isInitialized()) {
             if ( ! $this->configuration->allowInitOnMigrate()) {
                 throw new Exception\MetadataIsNotInitializedException();
             }
 
-            $this->initMetadata();
+            $this->initMetadata($status);
         }
 
         if ($this->configuration->validateOnMigrate() &&
@@ -55,25 +92,11 @@ class Migrate
             ! $this->configuration->outOfOrderMigrationsAllowed()) {
             throw new Exception\OutOfOrderMigrationsNotAllowedException();
         }
+    }
 
-        $outstandingMigrations = $status->getOutstandingMigrations();
-        $executors = $this->executorRegistry->findFor($outstandingMigrations);
-
-        foreach ($executors as $executor) {
-            $migration = $executor->getMigration();
-            $migration->installedOn = new \DateTime('now');
-            $migration->installedBy = $installedBy;
-
-            $this->metadataStorage->start($migration);
-            try {
-                $executor->execute($migration);
-
-                $migration->success = true;
-            } catch (\Exception $e) {
-                $migration->success = false;
-            }
-
-            $this->metadataStorage->complete($migration);
-        }
+    private function initMetadata($status)
+    {
+        $task = new InitializeMetadata($this->metadataStorage);
+        $task->execute($status);
     }
 }

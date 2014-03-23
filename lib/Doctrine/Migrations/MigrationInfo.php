@@ -47,6 +47,8 @@ class MigrationInfo
     public $type;
 
     /**
+     * Path to migration script file.
+     *
      * @var string
      */
     public $script;
@@ -67,6 +69,8 @@ class MigrationInfo
     public $installedOn;
 
     /**
+     * Miliseconds
+     *
      * @var int
      */
     public $executionTime;

@@ -26,6 +26,13 @@ class MigrationCollection implements IteratorAggregate
 {
     private $migrations = array();
 
+    public function __construct(array $migrations = array())
+    {
+        foreach ($migrations as $migration) {
+            $this->add($migration);
+        }
+    }
+
     public function add(MigrationInfo $migration)
     {
         $this->migrations[] = $migration;
@@ -34,5 +41,13 @@ class MigrationCollection implements IteratorAggregate
     public function getIterator()
     {
         return new ArrayIterator($this->migrations);
+    }
+
+    /**
+     * @return mixed
+     */
+    public function map($fn)
+    {
+        return array_map($fn, $this->migrations);
     }
 }
