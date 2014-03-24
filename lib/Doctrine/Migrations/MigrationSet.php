@@ -36,7 +36,7 @@ class MigrationSet implements IteratorAggregate, Countable
 
     public function add(MigrationInfo $migration)
     {
-        if ($this->contains($migration)) {
+        if ($this->contains($migration->getVersion())) {
             throw new \RuntimeException(sprintf(
                 "There is already a migration with version '%s' in this set.",
                 (string)$migration->getVersion()
@@ -44,6 +44,15 @@ class MigrationSet implements IteratorAggregate, Countable
         }
 
         $this->migrations[(string)$migration->getVersion()] = $migration;
+    }
+
+    public function get(Version $version)
+    {
+        if ( ! isset($this->migrations[(string)$version])) {
+            throw new \OutOfBoundsException(sprintf('No version "%s" found in set.', (string)$version));
+        }
+
+        return $this->migrations[(string)$version];
     }
 
     public function getIterator()
@@ -75,9 +84,9 @@ class MigrationSet implements IteratorAggregate, Countable
         return new MigrationSet(array_filter($this->migrations, $fn));
     }
 
-    public function contains(MigrationInfo $migration)
+    public function contains(Version $version)
     {
-        return isset($this->migrations[(string)$migration->getVersion()]);
+        return isset($this->migrations[(string)$version]);
     }
 
     public function count()

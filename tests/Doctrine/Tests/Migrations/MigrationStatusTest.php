@@ -47,9 +47,9 @@ class MigrationStatusTest extends TestCase
         );
 
         $outstanding = $status->getOutstandingMigrations();
-        $this->assertFalse($outstanding->contains($executedMigration1));
-        $this->assertFalse($outstanding->contains($executedMigration2));
-        $this->assertTrue($outstanding->contains($outstandingMigration1));
-        $this->assertTrue($outstanding->contains($outstandingMigration2));
+        $this->assertFalse($outstanding->contains($executedMigration1->getVersion()));
+        $this->assertFalse($outstanding->contains($executedMigration2->getVersion()));
+        $this->assertTrue($outstanding->contains($outstandingMigration1->getVersion()));
+        $this->assertTrue($outstanding->contains($outstandingMigration2->getVersion()));
     }
 }

@@ -86,7 +86,7 @@ class MigrationStatus
 
         return $this->foundMigrations->filter(
             function ($migration) use ($executedMigrations) {
-                return ! $executedMigrations->contains($migration);
+                return ! $executedMigrations->contains($migration->getVersion());
             }
         );
     }
