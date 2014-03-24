@@ -27,7 +27,7 @@ abstract class AbstractFileLoader implements Loader
                     new MigrationInfo(
                         new Version($matches[1]),
                         str_replace('_', ' ', $matches[3]),
-                        'sql',
+                        $this->getName(),
                         $file,
                         md5_file($file)
                     )

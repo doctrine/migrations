@@ -21,11 +21,11 @@ class SqlFileLoaderTest extends TestCase
         $this->assertEquals('Test', $first->description);
         $this->assertEquals(__DIR__ . '/_files/V1_Test.sql', $first->script);
         $this->assertEquals('2bdf1665f56c0ce5b966d9c60a7f7eac', $first->checksum);
-        $this->assertEquals('sql', $first->type);
+        $this->assertEquals('SQL', $first->type);
 
         $this->assertEquals('TestPatch', $second->description);
         $this->assertEquals(__DIR__ . '/_files/V1.1_TestPatch.sql', $second->script);
         $this->assertEquals('2bdf1665f56c0ce5b966d9c60a7f7eac', $second->checksum);
-        $this->assertEquals('sql', $second->type);
+        $this->assertEquals('SQL', $second->type);
     }
 }
