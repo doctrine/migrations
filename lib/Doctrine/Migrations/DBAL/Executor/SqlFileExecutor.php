@@ -1,6 +1,6 @@
 <?php
 
-namespace Doctrine\Migrations\Executor;
+namespace Doctrine\Migrations\DBAL\Executor;
 
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\Executor\Executor;
@@ -10,20 +10,21 @@ use Doctrine\DBAL\Connection;
 class SqlFileExecutor implements Executor
 {
     private $connection;
-    private $configuration;
 
-    public function __construct(Connection $connection, Configuration $configuration)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->configuration = $configuration;
     }
 
     public function execute(MigrationInfo $migration)
     {
-        $fileName = $this->configuration->getScriptDirectory() . "/" . $migration->script;
-
-        $sql = file_get_contents($fileName);
+        $sql = file_get_contents($migration->script);
 
         $this->connection->exec($sql);
+    }
+
+    public function getType()
+    {
+        return 'SQL';
     }
 }

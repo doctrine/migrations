@@ -20,6 +20,7 @@
 namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Loader\Loader;
+use Doctrine\Migrations\Executor\ExecutorRegistry;
 
 /**
  * Facade for all migration operations
@@ -41,11 +42,22 @@ class Migrations
      */
     private $loader;
 
-    public function __construct(Configuration $configuration, MetadataStorage $metadataStorage, Loader $loader)
+    /**
+     * @var \Doctrine\Migrations\Executor\ExecutorRegistry
+     */
+    private $executorRegistry;
+
+    public function __construct(
+        Configuration $configuration,
+        MetadataStorage $metadataStorage,
+        Loader $loader,
+        ExecutorRegistry $executorRegistry
+    )
     {
         $this->configuration = $configuration;
         $this->metadataStorage = $metadataStorage;
         $this->loader = $loader;
+        $this->executorRegistry = $executorRegistry;
     }
 
     /**
@@ -56,7 +68,7 @@ class Migrations
     public function getInfo()
     {
         return new MigrationStatus(
-            $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : array(),
+            $this->metadataStorage->isInitialized() ? $this->metadataStorage->getExecutedMigrations() : new MigrationSet(),
             $this->loader->load($this->configuration->getScriptDirectory()),
             $this->metadataStorage->isInitialized()
         );
@@ -67,7 +79,7 @@ class Migrations
      *
      * @return void
      */
-    public function initMetadata()
+    public function initializeMetadata()
     {
         $task = new Task\InitializeMetadata($this->metadataStorage);
         $task->execute($this->getInfo());
@@ -85,7 +97,7 @@ class Migrations
         $task = new Task\Migrate(
             $this->configuration,
             $this->metadataStorage,
-            $this->configuration->getExecutorRegistry()
+            $this->executorRegistry
         );
         $task->execute($status);
     }

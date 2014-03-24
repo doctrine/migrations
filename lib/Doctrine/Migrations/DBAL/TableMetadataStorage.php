@@ -5,12 +5,13 @@ namespace Doctrine\Migrations\DBAL;
 use Doctrine\Migrations\MetadataStorage;
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\MigrationSet;
+use Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
-class TableMetadataStorage
+class TableMetadataStorage implements MetadataStorage
 {
     /**
      * @var \Doctrine\DBAL\Connection
@@ -27,11 +28,17 @@ class TableMetadataStorage
      */
     private $platform;
 
-    public function __construct(Connection $connection)
+    /**
+     * @var string
+     */
+    private $path;
+
+    public function __construct(Connection $connection, $path)
     {
         $this->connection = $connection;
         $this->schemaManager = $connection->getSchemaManager();
         $this->platform = $connection->getDatabasePlatform();
+        $this->path = $path;
     }
 
     public function isInitialized()

@@ -7,4 +7,5 @@ use Doctrine\Migrations\MigrationInfo;
 interface Executor
 {
     public function execute(MigrationInfo $migration);
+    public function getType();
 }

@@ -10,7 +10,7 @@ class ExecutionFailedException extends MigrationException
     public function __construct(MigrationInfo $migration, Exception $previous)
     {
         parent::__construct(
-            'Execution of migration "' . $migration->version . ' (' . $migration->description . ') failed.',
+            sprintf('Execution of migration "%s" (%s) failed.', $migration->getVersion(), $migration->description),
             0,
             $previous
         );

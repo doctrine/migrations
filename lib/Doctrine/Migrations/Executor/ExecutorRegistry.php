@@ -11,9 +11,9 @@ class ExecutorRegistry
      */
     private $executors = array();
 
-    public function addExecutor($type, Executor $executor)
+    public function add(Executor $executor)
     {
-        $this->executors[$type] = $executor;
+        $this->executors[$executor->getType()] = $executor;
     }
 
     public function findFor(MigrationInfo $migration)

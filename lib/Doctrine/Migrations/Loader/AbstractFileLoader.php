@@ -22,7 +22,7 @@ abstract class AbstractFileLoader implements Loader
         foreach ($files as $file) {
             $fileName = str_replace($path . '/', '', $file);
 
-            if (preg_match('(^V([0-9\.]+)+(_([^\.]+))?\.' . $this->getExtension() . '$)', $fileName, $matches)) {
+            if (preg_match('(^V([0-9\.]+)+(_([^\.]+))+\.' . $this->getExtension() . '$)', $fileName, $matches)) {
                 $migrations->add(
                     new MigrationInfo(
                         new Version($matches[1]),
@@ -34,7 +34,7 @@ abstract class AbstractFileLoader implements Loader
                 );
             } else {
                 throw new \RuntimeException(sprintf(
-                    "Invalid %s migration file format '%s'. Expected V[0-9]+.%s or V[0-9]+_[^\.].%s",
+                    "Invalid %s migration file format '%s'. Expected V[0-9]+_[^\.].%s",
                     $this->getName(),
                     $fileName,
                     $this->getExtension(),

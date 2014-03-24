@@ -4,7 +4,7 @@ namespace Doctrine\Migrations\DBAL\Loader;
 
 use Doctrine\Migrations\Loader\AbstractFileLoader;
 
-class PhpFileLoader implements Loader
+class PhpFileLoader extends AbstractFileLoader
 {
     protected function getName()
     {

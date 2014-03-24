@@ -1,30 +1,27 @@
 <?php
 
-namespace Doctrine\Migrations\DBAL;
+namespace Doctrine\Migrations\DBAL\Executor;
 
 use Doctrine\Migrations\MigrationInfo;
 use Doctrine\Migrations\Executor\Executor;
 use Doctrine\Migrations\Configuration;
+use Doctrine\Migrations\DBAL\DBALMigration;
 use Doctrine\DBAL\Connection;
 
 class PhpFileExecutor implements Executor
 {
     private $connection;
-    private $configuration;
 
-    public function __construct(Connection $connection, Configuration $configuration)
+    public function __construct(Connection $connection)
     {
         $this->connection = $connection;
-        $this->configuration = $configuration;
     }
 
     public function execute(MigrationInfo $migration)
     {
-        $fileName = $this->configuration->getScriptDirectory() . "/" . $migration->script;
+        require_once $migration->script;
 
-        require_once $fileName;
-
-        $migrationClass = basename($migration->script);
+        $migrationClass = basename($migration->script, '.php');
 
         if (!class_exists($migrationClass)) {
             throw new \RuntimeException(sprintf(
@@ -36,10 +33,15 @@ class PhpFileExecutor implements Executor
 
         if (!($migration instanceof DBALMigration)) {
             throw new \RuntimeException(
-                sprintf('Class "%s" does not implement \Doctrine\Migrations\DBALMigration.', $migrationClass)
+                sprintf('Class "%s" does not implement \Doctrine\Migrations\DBAL\DBALMigration.', $migrationClass)
             );
         }
 
         $migration->migrate($this->connection);
+    }
+
+    public function getType()
+    {
+        return 'PHP';
     }
 }
