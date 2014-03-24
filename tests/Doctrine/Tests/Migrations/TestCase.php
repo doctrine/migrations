@@ -46,6 +46,20 @@ abstract class TestCase extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function createFailedMigration($version = null)
+    {
+        $migration = $this->createMigrationInfo($version);
+        $migration->success = false;
+        return $migration;
+    }
+
+    public function createSuccessMigration($version = null)
+    {
+        $migration = $this->createMigrationInfo($version);
+        $migration->success = true;
+        return $migration;
+    }
+
     public function createConfiguration()
     {
         return new \Doctrine\Migrations\Configuration();
