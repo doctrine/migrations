@@ -24,6 +24,7 @@ use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,7 +48,7 @@ abstract class AbstractCommand extends Command
     {
         $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
         $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
-        $this->addOption('password', null, InputOption::VALUE_REQUIRED, 'The database password to use (overrides configuration)');
+        $this->addOption('prompt-password', 'p', InputOption::VALUE_NONE, 'Prompt for the database password to use (overrides configuration)');
     }
 
     protected function outputHeader(Configuration $configuration, OutputInterface $output)
@@ -100,12 +101,22 @@ abstract class AbstractCommand extends Command
                     }
                 }
 
-                if ($input->getOption('password')) {
-                    $params['password'] = $input->getOption('password');
-                }
-
                 if (count($params) == 0) {
                     throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
+                }
+
+                if ($input->getOption('prompt-password')) {
+                    /** @var DialogHelper $dialog */
+                    $dialog = $this->getHelperSet()->get('dialog');
+                    $password = $dialog->askHiddenResponse(
+                        $output,
+                        'Please enter the database password: ',
+                        false
+                    );
+
+                    if ($password) {
+                        $params['password'] = $password;
+                    }
                 }
 
                 $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
