@@ -92,6 +92,7 @@ class Migration
             foreach ($queries as $query) {
                 $string .= $query . ";\n";
             }
+            $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $version ."');\n";
         }
         if (is_dir($path)) {
             $path = realpath($path);

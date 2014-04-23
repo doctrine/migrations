@@ -200,6 +200,11 @@ class Version
         foreach ($queries as $query) {
             $string .= $query . ";\n";
         }
+        if ($direction == "down") {
+            $string .= "DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '" . $this->version . "';\n";
+        } else {
+            $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $this->version . "');\n";
+        }
         if (is_dir($path)) {
             $path = realpath($path);
             $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
