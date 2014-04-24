@@ -84,6 +84,8 @@ class Migration
             $to = $this->configuration->getLatestVersion();
         }
 
+        $direction = $from > $to ? 'down' : 'up';
+
         $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
         $string .= sprintf("# Migrating from %s to %s\n", $from, $to);
 
@@ -92,7 +94,11 @@ class Migration
             foreach ($queries as $query) {
                 $string .= $query . ";\n";
             }
-            $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $version ."');\n";
+            if ($direction == "down") {
+                $string .= "DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '" . $version . "';\n";
+            } else {
+                $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $version . "');\n";
+            }
         }
         if (is_dir($path)) {
             $path = realpath($path);
