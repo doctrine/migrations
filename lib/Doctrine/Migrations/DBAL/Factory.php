@@ -16,7 +16,7 @@ class Factory
         return $this->createFromArray($data);
     }
 
-    public function createFromArray($data)
+    public static function createFromArray($data)
     {
         $configuration = new Configuration();
 
