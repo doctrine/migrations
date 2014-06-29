@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -36,56 +35,117 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class VersionCommand extends AbstractCommand
 {
+    /**
+     * The Migrations Configuration instance
+     *
+     * @var \Doctrine\DBAL\Migrations\Configuration\Configuration
+     */
+    private $configuration;
+
+    /**
+     * Whether or not the versions have to be marked as migrated or not
+     *
+     * @var boolean
+     */
+    private $markMigrated;
+
     protected function configure()
     {
         $this
             ->setName('migrations:version')
             ->setDescription('Manually add and delete migration versions from the version table.')
-            ->addArgument('version', InputArgument::REQUIRED, 'The version to add or delete.', null)
+            ->addArgument('version', InputArgument::OPTIONAL, 'The version to add or delete.', null)
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
+            ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all the versions.')
             ->setHelp(<<<EOT
-The <info>%command.name%</info> command allows you to manually add and delete migration versions from the version table:
+The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --add</info>
 
 If you want to delete a version you can use the <comment>--delete</comment> option:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --delete</info>
+
+If you want to synchronize by adding or deleting all migration versions available in the version table you can use the <comment>--all</comment> option:
+
+    <info>%command.full_name% --add --all</info>
+    <info>%command.full_name% --delete --all</info>
+
+You can also execute this command without a warning message which you need to interact with:
+
+    <info>%command.full_name% --no-interaction</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $configuration = $this->getMigrationConfiguration($input, $output);
+        $this->configuration = $this->getMigrationConfiguration($input, $output);
 
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
         }
 
-        $version = $input->getArgument('version');
-        $markMigrated = $input->getOption('add') ? true : false;
+        $this->markMigrated = $input->getOption('add') ? true : false;
 
-        if ( ! $configuration->hasVersion($version)) {
+        $noInteraction = $input->getOption('no-interaction') ? true : false;
+        if ($noInteraction === true) {
+            $this->markAllAvailableVersions($input);
+        } else {
+            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            if ($confirmation === true) {
+                $this->markAllAvailableVersions($input);
+            } else {
+                $output->writeln('<error>Migration cancelled!</error>');
+            }
+        }
+
+    }
+
+    private function markAllAvailableVersions(InputInterface $input)
+    {
+        $version = $input->getArgument('version');
+
+        if ($input->getOption('all') === true) {
+            $availableVersions = $this->configuration->getAvailableVersions();
+            foreach ($availableVersions as $version) {
+                $this->mark($version, true);
+            }
+        } else {
+            $this->mark($version);
+        }
+    }
+
+    private function mark($version, $all = false)
+    {
+        if ( ! $this->configuration->hasVersion($version)) {
             throw MigrationException::unknownMigrationVersion($version);
         }
 
-        $version = $configuration->getVersion($version);
-        if ($markMigrated && $configuration->hasVersionMigrated($version)) {
-            throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
+        $version = $this->configuration->getVersion($version);
+        if ($this->markMigrated && $this->configuration->hasVersionMigrated($version)) {
+            $marked = true;
+            if ( ! $all) {
+                throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
+            }
         }
 
-        if ( ! $markMigrated && ! $configuration->hasVersionMigrated($version)) {
-            throw new \InvalidArgumentException(sprintf('The version "%s" does not exist in the version table.', $version));
+        if ( ! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
+            $marked = false;
+            if ( ! $all) {
+                throw new \InvalidArgumentException(sprintf('The version "%s" does not exists in the version table.', $version));
+            }
         }
 
-        if ($markMigrated) {
-            $version->markMigrated();
-        } else {
-            $version->markNotMigrated();
+        if ( ! isset($marked)) {
+            if ($this->markMigrated) {
+                $version->markMigrated();
+            } else {
+                $version->markNotMigrated();
+            }
         }
     }
 }
