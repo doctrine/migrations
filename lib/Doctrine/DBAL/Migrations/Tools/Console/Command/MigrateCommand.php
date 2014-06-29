@@ -43,6 +43,7 @@ class MigrateCommand extends AbstractCommand
             ->addArgument('version', InputArgument::OPTIONAL, 'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.', 'latest')
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
+            ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -68,6 +69,9 @@ Or you can also execute the migration without a warning message which you need t
 
     <info>%command.full_name% --no-interaction</info>
 
+You can also time all the different queries if you wanna know which one is taking so long:
+
+    <info>%command.full_name% --query-time</info>
 EOT
         );
 
@@ -82,6 +86,8 @@ EOT
         $this->outputHeader($configuration, $output);
 
         $noInteraction = !$input->isInteractive();
+
+        $timeAllqueries = $input->getOption('query-time');
 
         $executedMigrations = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
@@ -136,7 +142,7 @@ EOT
                 }
             }
 
-            $sql = $migration->migrate($version, $dryRun);
+            $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
 
             if (! $sql) {
                 $output->writeln('<comment>No migrations to execute.</comment>');

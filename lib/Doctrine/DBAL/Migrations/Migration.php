@@ -113,7 +113,7 @@ class Migration
      *
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false)
+    public function migrate($to = null, $dryRun = false, $timeAllqueries=false)
     {
         if ($to === null) {
             $to = $this->configuration->getLatestVersion();
@@ -148,7 +148,7 @@ class Migration
         $sql = array();
         $time = 0;
         foreach ($migrationsToExecute as $version) {
-            $versionSql = $version->execute($direction, $dryRun);
+            $versionSql = $version->execute($direction, $dryRun, $timeAllqueries);
             $sql[$version->getVersion()] = $versionSql;
             $time += $version->getTime();
         }

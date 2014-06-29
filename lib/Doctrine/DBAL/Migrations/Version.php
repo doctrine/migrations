@@ -228,14 +228,14 @@ class Version
      *
      * @throws \Exception when migration fails
      */
-    public function execute($direction, $dryRun = false)
+    public function execute($direction, $dryRun = false, $timeAllQueries=false)
     {
         $this->sql = array();
 
         $this->connection->beginTransaction();
 
         try {
-            $start = microtime(true);
+            $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
             $fromSchema = $this->sm->createSchema();
@@ -256,12 +256,18 @@ class Version
             if (! $dryRun) {
                 if ($this->sql) {
                     foreach ($this->sql as $key => $query) {
+                        $queryStart = microtime(true);
                         if ( ! isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
                             $this->connection->executeQuery($query);
                         } else {
                             $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
                             $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                        }
+                        $queryEnd = microtime(true);
+                        $queryTime = round($queryEnd - $queryStart, 4);
+                        if ($timeAllQueries !== false) {
+                            $this->outputWriter->write(sprintf("\n  <info>%ss</info>", $queryTime));
                         }
                     }
                 } else {
@@ -283,8 +289,8 @@ class Version
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
 
-            $end = microtime(true);
-            $this->time = round($end - $start, 2);
+            $migrationEnd = microtime(true);
+            $this->time = round($migrationEnd - $migrationStart, 2);
             if ($direction === 'up') {
                 $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
             } else {

@@ -44,6 +44,7 @@ class ExecuteCommand extends AbstractCommand
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration up.')
             ->addOption('down', null, InputOption::VALUE_NONE, 'Execute the migration down.')
+            ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
 
@@ -77,6 +78,8 @@ EOT
 
         $configuration = $this->getMigrationConfiguration($input, $output);
         $version = $configuration->getVersion($version);
+
+        $timeAllqueries = $input->getOption('query-time');
 
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
