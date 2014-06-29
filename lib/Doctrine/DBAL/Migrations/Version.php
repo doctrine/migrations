@@ -267,7 +267,7 @@ class Version
                         $queryEnd = microtime(true);
                         $queryTime = round($queryEnd - $queryStart, 4);
                         if ($timeAllQueries !== false) {
-                            $this->outputWriter->write(sprintf("\n  <info>%ss</info>", $queryTime));
+                            $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
                         }
                     }
                 } else {
