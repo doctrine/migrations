@@ -87,8 +87,9 @@ abstract class AbstractMigration
 
     /**
      * Indicates the transactional mode of this migration.
-     * Should return true to run migration in a transaction.
-     * Should return false to run migration not in a transaction.
+     * If this function returns true (default) the migration will be executed in one transaction,
+     * otherwise non-transactional state will be used to execute each of the migration SQLs.
+     *
      * Extending class should override this function to alter the return value
      *
      * @return bool TRUE by default.
