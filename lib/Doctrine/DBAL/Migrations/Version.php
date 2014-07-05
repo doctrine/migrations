@@ -97,6 +97,9 @@ class Version
     /** The time in seconds that this migration version took to execute */
     private $time;
 
+    /** Whether to execute migration in a transaction or not */
+    private $transactional = true;
+
     /**
      * @var int
      */
@@ -112,6 +115,7 @@ class Version
         $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $this->migration->getName() ?: $version;
+        $this->transactional = $this->migration->isTransactional();
     }
 
     /**
@@ -232,7 +236,10 @@ class Version
     {
         $this->sql = array();
 
-        $this->connection->beginTransaction();
+        if($this->transactional){
+            //only start transaction if in transactional mode
+            $this->connection->beginTransaction();
+        }
 
         try {
             $start = microtime(true);
@@ -291,7 +298,10 @@ class Version
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
             }
 
-            $this->connection->commit();
+            if($this->transactional){
+                //commit only if running in transactional mode
+                $this->connection->commit();
+            }
 
             $this->state = self::STATE_NONE;
 

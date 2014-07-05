@@ -86,6 +86,19 @@ abstract class AbstractMigration
     }
 
     /**
+     * Indicates the transactional mode of this migration.
+     * Should return true to run migration in a transaction.
+     * Should return false to run migration not in a transaction.
+     * Extending class should override this function to alter the return value
+     *
+     * @return bool TRUE by default.
+     */
+    public function isTransactional()
+    {
+        return true;
+    }
+
+    /**
      * Get custom migration name
      *
      * @return string
