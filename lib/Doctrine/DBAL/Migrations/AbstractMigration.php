@@ -78,6 +78,20 @@ abstract class AbstractMigration
     }
 
     /**
+     * Indicates the transactional mode of this migration.
+     * If this function returns true (default) the migration will be executed in one transaction,
+     * otherwise non-transactional state will be used to execute each of the migration SQLs.
+     *
+     * Extending class should override this function to alter the return value
+     *
+     * @return bool TRUE by default.
+     */
+    public function isTransactional()
+    {
+        return true;
+    }
+
+    /**
      * Get custom migration name
      *
      * @return string
