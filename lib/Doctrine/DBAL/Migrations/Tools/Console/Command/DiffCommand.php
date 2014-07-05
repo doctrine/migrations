@@ -111,6 +111,11 @@ EOT
         $path = $this->generateMigration($configuration, $input, $version, $up, $down);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
+        $commandName = sprintf('%s:execute', $this->getApplication()->extractNamespace($this->getName()));
+        if (count($command = $this->getApplication()->find($commandName))) {
+          $output->writeln(sprintf('To run just this migration for testing purposes, you can use "<info>%s --up %s</info>"', $command->getName(), $version));
+        }
+
     }
 
     private function buildCodeFromSql(Configuration $configuration, array $sql)
