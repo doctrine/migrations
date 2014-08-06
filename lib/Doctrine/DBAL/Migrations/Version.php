@@ -307,7 +307,10 @@ class Version
 
             return $this->sql;
         } catch (SkipMigrationException $e) {
-            $this->connection->rollback();
+            if($this->transactional){
+                //only rollback transaction if in transactional mode
+                $this->connection->rollback();
+            }
 
             if ($dryRun == false) {
                 // now mark it as migrated
@@ -330,7 +333,10 @@ class Version
                 $this->version, $this->getExecutionState(), $e->getMessage()
             ));
 
-            $this->connection->rollback();
+            if($this->transactional){
+                //only rollback transaction if in transactional mode
+                $this->connection->rollback();
+            }
 
             $this->state = self::STATE_NONE;
             throw $e;
