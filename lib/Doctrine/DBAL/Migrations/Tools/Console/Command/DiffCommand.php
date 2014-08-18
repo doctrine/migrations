@@ -121,11 +121,19 @@ EOT
             if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
-            $code[] = "\$this->addSql(\"$query\");";
+            $code[] = sprintf("\$this->addSql(%s);", var_export($query, true));
         }
 
         if ($code) {
-            array_unshift($code, "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != \"$currentPlatform\", \"Migration can only be executed safely on '$currentPlatform'.\");", "");
+            array_unshift(
+                $code, 
+                sprintf(
+                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != %s, %s);", 
+                    var_export($currentPlatform, true),
+                    var_export(sprintf("Migration can only be executed safely on '%s'.", $currentPlatform), true)
+                ), 
+                ""
+            );
         }
 
         return implode("\n", $code);
