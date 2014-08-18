@@ -75,7 +75,7 @@ EOT
         $availableMigrations = $configuration->getAvailableVersions();
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
         $numExecutedUnavailableMigrations = count($executedUnavailableMigrations);
-        $newMigrations = count($availableMigrations) - count($executedMigrations);
+        $newMigrations = count(array_diff($availableMigrations, $executedMigrations));
 
         $output->writeln("\n <info>==</info> Configuration\n");
 
