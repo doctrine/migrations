@@ -40,7 +40,7 @@ class ExecuteCommand extends AbstractCommand
             ->setName('migrations:execute')
             ->setDescription('Execute a single migration version up or down manually.')
             ->addArgument('version', InputArgument::REQUIRED, 'The version to execute.', null)
-            ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
+            ->addOption('write-sql', null, InputOption::VALUE_OPTIONAL, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration up.')
             ->addOption('down', null, InputOption::VALUE_NONE, 'Execute the migration down.')
