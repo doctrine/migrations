@@ -24,6 +24,7 @@ use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -47,6 +48,7 @@ abstract class AbstractCommand extends Command
     {
         $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
         $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
+        $this->addOption('prompt-password', 'p', InputOption::VALUE_NONE, 'Prompt for the database password to use (overrides configuration)');
     }
 
     protected function outputHeader(Configuration $configuration, OutputInterface $output)
@@ -80,24 +82,44 @@ abstract class AbstractCommand extends Command
 
             if ($this->getApplication()->getHelperSet()->has('connection')) {
                 $conn = $this->getHelper('connection')->getConnection();
-            } elseif ($input->getOption('db-configuration')) {
-                if ( ! file_exists($input->getOption('db-configuration'))) {
-                    throw new \InvalidArgumentException("The specified connection file is not a valid file.");
+            } else {
+                $params = array();
+                if ($input->getOption('db-configuration')) {
+                    if ( ! file_exists($input->getOption('db-configuration'))) {
+                        throw new \InvalidArgumentException("The specified connection file is not a valid file.");
+                    }
+
+                    $params = include($input->getOption('db-configuration'));
+                    if ( ! is_array($params)) {
+                        throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                    }
+
+                } elseif (file_exists('migrations-db.php')) {
+                    $params = include 'migrations-db.php';
+                    if ( ! is_array($params)) {
+                        throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                    }
                 }
 
-                $params = include($input->getOption('db-configuration'));
-                if ( ! is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+                if (count($params) == 0) {
+                    throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
                 }
-                $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-            } elseif (file_exists('migrations-db.php')) {
-                $params = include 'migrations-db.php';
-                if ( ! is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
+
+                if ($input->getOption('prompt-password')) {
+                    /** @var DialogHelper $dialog */
+                    $dialog = $this->getHelperSet()->get('dialog');
+                    $password = $dialog->askHiddenResponse(
+                        $output,
+                        'Please enter the database password: ',
+                        false
+                    );
+
+                    if ($password) {
+                        $params['password'] = $password;
+                    }
                 }
+
                 $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
-            } else {
-                throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
             }
 
             if ($input->getOption('configuration')) {
