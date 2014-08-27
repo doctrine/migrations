@@ -198,7 +198,7 @@ class Version
     {
         $queries = $this->execute($direction, true);
 
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:m:s'));
+        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
 
         $string .= "\n# Version " . $this->version . "\n";
         foreach ($queries as $query) {
