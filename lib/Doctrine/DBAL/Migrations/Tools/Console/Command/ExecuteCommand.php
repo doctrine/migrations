@@ -84,14 +84,14 @@ EOT
         } else {
             $noInteraction = $input->getOption('no-interaction') ? true : false;
             if ($noInteraction === true) {
-                $version->execute($direction, $input->getOption('dry-run') ? true : false);
+                $confirmation = true;
             } else {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
-                if ($confirmation === true) {
-                    $version->execute($direction, $input->getOption('dry-run') ? true : false);
-                } else {
-                    $output->writeln('<error>Migration cancelled!</error>');
-                }
+            }
+            if ($confirmation === true) {
+                $version->execute($direction, $input->getOption('dry-run') ? true : false);
+            } else {
+                $output->writeln('<error>Migration cancelled!</error>');
             }
         }
     }
