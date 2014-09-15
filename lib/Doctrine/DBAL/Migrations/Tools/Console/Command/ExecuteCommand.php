@@ -42,6 +42,7 @@ class ExecuteCommand extends AbstractCommand
             ->addArgument('version', InputArgument::REQUIRED, 'The version to execute.', null)
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
+            ->addOption('ignore-errors', null, InputOption::VALUE_NONE, 'Continue running the migration even if errors are encountered.')
             ->addOption('up', null, InputOption::VALUE_NONE, 'Execute the migration up.')
             ->addOption('down', null, InputOption::VALUE_NONE, 'Execute the migration down.')
             ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
@@ -65,6 +66,10 @@ You can output the would be executed SQL statements to a file with <comment>--wr
 Or you can also execute the migration without a warning message which you need to interact with:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --no-interaction</info>
+
+If migrations fail part way through, you may want to retry running all queries anyway, even if they come after the query that caused the error:
+
+    <info>%command.full_name% YYYYMMDDHHMMSS --ignore-errors</info>
 EOT
         );
 
@@ -93,7 +98,7 @@ EOT
             }
 
             if ($execute) {
-                $version->execute($direction, (boolean) $input->getOption('dry-run'), $timeAllqueries);
+                $version->execute($direction, (boolean) $input->getOption('dry-run'), $timeAllqueries, (boolean) $input->getOption('ignore-errors'));
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }
