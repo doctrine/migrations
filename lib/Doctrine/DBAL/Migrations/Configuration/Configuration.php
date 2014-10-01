@@ -117,10 +117,10 @@ class Configuration
      */
     public function validate()
     {
-        if ( ! $this->migrationsNamespace) {
+        if (! $this->migrationsNamespace) {
             throw MigrationException::migrationsNamespaceRequired();
         }
-        if ( ! $this->migrationsDirectory) {
+        if (! $this->migrationsDirectory) {
             throw MigrationException::migrationsDirectoryRequired();
         }
     }
@@ -261,7 +261,7 @@ class Configuration
         $versions = array();
         if ($files) {
             foreach ($files as $file) {
-                require_once($file);
+                require_once $file;
                 $info = pathinfo($file);
                 $version = substr($info['filename'], 7);
                 $class = $this->migrationsNamespace . '\\' . $info['filename'];

@@ -128,9 +128,9 @@ class ConfigMigration extends \Doctrine\DBAL\Migrations\AbstractMigration
 {
     public function down(Schema $schema)
     {
-        
+
     }
-    
+
     public function up(Schema $schema)
     {
 

@@ -17,7 +17,6 @@
  * <http://www.doctrine-project.org>.
  */
 
-
 Phar::mapPhar();
 
 require_once 'phar://'.__FILE__.'/Doctrine/Common/ClassLoader.php';
@@ -72,13 +71,11 @@ if ($helperSet->has('em')) {
 }
 
 $input = file_exists('migrations-input.php')
-       ? include('migrations-input.php')
-       : null;
+       ? include 'migrations-input.php': null;
 
 $output = file_exists('migrations-output.php')
-        ? include('migrations-output.php')
-        : null;
+        ? include 'migrations-output.php': null;
 
 $cli->run($input, $output);
 
-__HALT_COMPILER();
+__halt_compiler();

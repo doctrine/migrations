@@ -91,9 +91,9 @@ EOT
                 $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
             }
 
-            if ( ! $noInteraction) {
+            if (! $noInteraction) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
-                if ( ! $confirmation) {
+                if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -108,9 +108,9 @@ EOT
             $dryRun = $input->getOption('dry-run') ? true : false;
 
             // warn the user if no dry run and interaction is on
-            if ( ! $dryRun && ! $noInteraction) {
+            if (! $dryRun && ! $noInteraction) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
-                if ( ! $confirmation) {
+                if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -119,7 +119,7 @@ EOT
 
             $sql = $migration->migrate($version, $dryRun);
 
-            if ( ! $sql) {
+            if (! $sql) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
