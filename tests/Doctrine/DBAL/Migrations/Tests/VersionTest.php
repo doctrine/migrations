@@ -1,7 +1,6 @@
 <?php
 namespace Doctrine\DBAL\Migrations\Tests;
 
-use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\Version;
@@ -40,7 +39,7 @@ class VersionTest extends MigrationTestCase
 class VersionTest_Migration extends AbstractMigration
 {
     public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
+    public function up(Schema $schema) {}
 }
 
 /**
@@ -54,5 +53,5 @@ class VersionTest_MigrationCustom extends AbstractMigration
     }
 
     public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
+    public function up(Schema $schema) {}
 }

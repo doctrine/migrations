@@ -20,7 +20,6 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Schema\Schema;
 
 /**

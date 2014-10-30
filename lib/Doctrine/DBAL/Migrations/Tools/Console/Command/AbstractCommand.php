@@ -73,8 +73,8 @@ abstract class AbstractCommand extends Command
      */
     protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
-        if ( ! $this->configuration) {
-            $outputWriter = new OutputWriter(function($message) use ($output) {
+        if (! $this->configuration) {
+            $outputWriter = new OutputWriter(function ($message) use ($output) {
                 return $output->writeln($message);
             });
 
@@ -85,7 +85,7 @@ abstract class AbstractCommand extends Command
                     throw new \InvalidArgumentException("The specified connection file is not a valid file.");
                 }
 
-                $params = include($input->getOption('db-configuration'));
+                $params = include $input->getOption('db-configuration');
                 if ( ! is_array($params)) {
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }

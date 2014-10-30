@@ -87,7 +87,7 @@
             <fileset refid="symfony-console-sources"/>
             <fileset refid="symfony-yaml-sources"/>
         </copy>
-        
+
         <exec command="sed 's/${version.stripped}-DEV/${version}/' ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php > ${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" passthru="true" />
         <move file="${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion2.php" tofile="${build.dir}/migrations/Doctrine/DBAL/Migrations/MigrationsVersion.php" overwrite="true"/>
 
