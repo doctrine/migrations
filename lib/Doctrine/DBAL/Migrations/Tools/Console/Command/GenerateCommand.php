@@ -36,7 +36,7 @@ use Symfony\Component\Console\Input\InputOption;
 class GenerateCommand extends AbstractCommand
 {
 
-    private static $_template =
+    protected static $_template =
             '<?php
 
 namespace <namespace>;
@@ -107,7 +107,7 @@ EOT
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
         );
-        $code = str_replace($placeHolders, $replacements, self::$_template);
+        $code = str_replace($placeHolders, $replacements, static::$_template);
         $dir = $configuration->getMigrationsDirectory();
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
