@@ -108,6 +108,7 @@ EOT
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
         );
         $code = str_replace($placeHolders, $replacements, self::$_template);
+        $code = preg_replace('/^ +$/m', '', $code);
         $dir = $configuration->getMigrationsDirectory();
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
