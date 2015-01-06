@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Command for executing a migration to a specified version or the latest available version.
@@ -92,7 +93,8 @@ EOT
             }
 
             if (! $noInteraction) {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+                $question = new ConfirmationQuestion('<question>Are you sure you wish to continue? (y/n)</question>');
+                $confirmation = $this->getHelper('question')->ask($input, $output, $question);
                 if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
@@ -109,7 +111,8 @@ EOT
 
             // warn the user if no dry run and interaction is on
             if (! $dryRun && ! $noInteraction) {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                $question = new ConfirmationQuestion('<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>');
+                $confirmation = $this->getHelper('question')->ask($input, $output, $question);
                 if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
