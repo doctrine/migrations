@@ -23,6 +23,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Command for executing single migrations up or down manually.
@@ -86,7 +87,8 @@ EOT
             if ($noInteraction === true) {
                 $version->execute($direction, $input->getOption('dry-run') ? true : false);
             } else {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                $question = new ConfirmationQuestion('<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>');
+                $confirmation = $this->getHelper('question')->ask($input, $output, $question);
                 if ($confirmation === true) {
                     $version->execute($direction, $input->getOption('dry-run') ? true : false);
                 } else {
