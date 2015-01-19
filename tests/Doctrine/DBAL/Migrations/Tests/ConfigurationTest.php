@@ -59,8 +59,10 @@ class ConfigurationTest extends MigrationTestCase
     public function testEmptyProjectDefaults()
     {
         $config = $this->getSqliteConfiguration();
-        $this->assertEquals(0, $config->getCurrentVersion(), "current version 0");
-        $this->assertEquals(0, $config->getLatestVersion(), "latest version 0");
+        $this->assertSame(null, $config->getPrevVersion(), "no prev version");
+        $this->assertSame(null, $config->getNextVersion(), "no next version");
+        $this->assertSame('0', $config->getCurrentVersion(), "current version 0");
+        $this->assertSame('0', $config->getLatestVersion(), "latest version 0");
         $this->assertEquals(0, $config->getNumberOfAvailableMigrations(), "number of available migrations 0");
         $this->assertEquals(0, $config->getNumberOfExecutedMigrations(), "number of executed migrations 0");
         $this->assertEquals(array(), $config->getMigrations());
@@ -115,6 +117,50 @@ class ConfigurationTest extends MigrationTestCase
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
     }
 
+    public function testPreviousCurrentNextLatestVersion()
+    {
+        $config = $this->getSqliteConfiguration();
+        $config->registerMigrations(array(
+            1234 => 'Doctrine\DBAL\Migrations\Tests\ConfigMigration',
+            1235 => 'Doctrine\DBAL\Migrations\Tests\Config2Migration',
+            1236 => 'Doctrine\DBAL\Migrations\Tests\Config3Migration',
+        ));
+
+        $this->assertSame(null, $config->getPrevVersion(), "no prev version");
+        $this->assertSame('0', $config->getCurrentVersion(), "current version 0");
+        $this->assertSame('1234', $config->getNextVersion(), "next version 1234");
+        $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+
+        $config->getVersion(1234)->markMigrated();
+
+        $this->assertSame('0', $config->getPrevVersion(), "prev version 0");
+        $this->assertSame('1234', $config->getCurrentVersion(), "current version 1234");
+        $this->assertSame('1235', $config->getNextVersion(), "next version 1235");
+        $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+
+        $config->getVersion(1235)->markMigrated();
+
+        $this->assertSame('1234', $config->getPrevVersion(), "prev version 1234");
+        $this->assertSame('1235', $config->getCurrentVersion(), "current version 1235");
+        $this->assertSame('1236', $config->getNextVersion(), "next version is 1236");
+        $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+
+        $this->assertSame('0', $config->resolveVersionAlias('first'), "first version 0");
+        $this->assertSame('1234', $config->resolveVersionAlias('prev'), "prev version 1234");
+        $this->assertSame('1235', $config->resolveVersionAlias('current'), "current version 1235");
+        $this->assertSame('1236', $config->resolveVersionAlias('next'), "next version is 1236");
+        $this->assertSame('1236', $config->resolveVersionAlias('latest'), "latest version 1236");
+        $this->assertSame('1236', $config->resolveVersionAlias('1236'), "identical version");
+        $this->assertSame(null, $config->resolveVersionAlias('123678'), "unknown version");
+
+        $config->getVersion(1236)->markMigrated();
+
+        $this->assertSame('1235', $config->getPrevVersion(), "prev version 1235");
+        $this->assertSame('1236', $config->getCurrentVersion(), "current version 1236");
+        $this->assertSame(null, $config->getNextVersion(), "no next version");
+        $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+    }
+
     public function testGetAvailableVersions()
     {
         $config = $this->getSqliteConfiguration();
@@ -138,6 +184,19 @@ class ConfigMigration extends \Doctrine\DBAL\Migrations\AbstractMigration
 }
 
 class Config2Migration extends \Doctrine\DBAL\Migrations\AbstractMigration
+{
+    public function down(Schema $schema)
+    {
+
+    }
+
+    public function up(Schema $schema)
+    {
+
+    }
+}
+
+class Config3Migration extends \Doctrine\DBAL\Migrations\AbstractMigration
 {
     public function down(Schema $schema)
     {
