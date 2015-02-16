@@ -97,9 +97,6 @@ class Version
     /** The time in seconds that this migration version took to execute */
     private $time;
 
-    /** Whether to execute migration in a transaction or not */
-    private $transactional = true;
-
     /**
      * @var int
      */
@@ -115,7 +112,6 @@ class Version
         $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $this->migration->getName() ?: $version;
-        $this->transactional = $this->migration->isTransactional();
     }
 
     /**
@@ -236,7 +232,8 @@ class Version
     {
         $this->sql = array();
 
-        if($this->transactional){
+        $transaction = $this->migration->isTransactional();
+        if($transaction){
             //only start transaction if in transactional mode
             $this->connection->beginTransaction();
         }
@@ -298,7 +295,7 @@ class Version
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
             }
 
-            if($this->transactional){
+            if($transaction){
                 //commit only if running in transactional mode
                 $this->connection->commit();
             }
@@ -307,7 +304,7 @@ class Version
 
             return $this->sql;
         } catch (SkipMigrationException $e) {
-            if($this->transactional){
+            if($transaction){
                 //only rollback transaction if in transactional mode
                 $this->connection->rollback();
             }
@@ -333,7 +330,7 @@ class Version
                 $this->version, $this->getExecutionState(), $e->getMessage()
             ));
 
-            if($this->transactional){
+            if($transaction){
                 //only rollback transaction if in transactional mode
                 $this->connection->rollback();
             }
