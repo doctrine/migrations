@@ -11,7 +11,8 @@
     ],
     "require": {
         "php": ">=5.3.2",
-        "doctrine/dbal": "~2.0"
+        "doctrine/dbal": "~2.0",
+        "doctrine/orm": "~2.4"
     },
     "require-dev": {
         "symfony/console": "2.*",
