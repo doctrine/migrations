@@ -101,7 +101,7 @@ EOT
         $up = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
         $down = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
 
-        if ( ! $up && ! $down) {
+        if (! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
 
             return;
@@ -126,12 +126,12 @@ EOT
 
         if ($code) {
             array_unshift(
-                $code, 
+                $code,
                 sprintf(
-                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != %s, %s);", 
+                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != %s, %s);",
                     var_export($currentPlatform, true),
                     var_export(sprintf("Migration can only be executed safely on '%s'.", $currentPlatform), true)
-                ), 
+                ),
                 ""
             );
         }

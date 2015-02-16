@@ -117,10 +117,10 @@ class Configuration
      */
     public function validate()
     {
-        if ( ! $this->migrationsNamespace) {
+        if (! $this->migrationsNamespace) {
             throw MigrationException::migrationsNamespaceRequired();
         }
-        if ( ! $this->migrationsDirectory) {
+        if (! $this->migrationsDirectory) {
             throw MigrationException::migrationsDirectoryRequired();
         }
     }
@@ -261,7 +261,7 @@ class Configuration
         $versions = array();
         if ($files) {
             foreach ($files as $file) {
-                require_once($file);
+                require_once $file;
                 $info = pathinfo($file);
                 $version = substr($info['filename'], 7);
                 $class = $this->migrationsNamespace . '\\' . $info['filename'];
@@ -431,6 +431,85 @@ class Configuration
         $result = $this->connection->fetchColumn($sql);
 
         return $result !== false ? (string) $result : '0';
+    }
+
+    /**
+     * Returns the version prior to the current version.
+     *
+     * @return string|null  A version string, or null if the current version is
+     *                      the first.
+     */
+    public function getPrevVersion()
+    {
+        return $this->getRelativeVersion($this->getCurrentVersion(), -1);
+    }
+
+    /**
+     * Returns the version following the current version.
+     *
+     * @return string|null  A version string, or null if the current version is
+     *                      the latest.
+     */
+    public function getNextVersion()
+    {
+        return $this->getRelativeVersion($this->getCurrentVersion(), 1);
+    }
+
+    /**
+     * Returns the version with the specified offset to the specified version.
+     *
+     * @return string|null  A version string, or null if the specified version
+     *                      is unknown or the specified delta is not within the
+     *                      list of available versions.
+     */
+    public function getRelativeVersion($version, $delta)
+    {
+        $versions = array_keys($this->migrations);
+        array_unshift($versions, 0);
+        $offset = array_search($version, $versions);
+        if ($offset === false || !isset($versions[$offset + $delta])) {
+            // Unknown version or delta out of bounds.
+            return null;
+        }
+        return (string) $versions[$offset + $delta];
+    }
+
+    /**
+     * Returns the version number from an alias.
+     *
+     * Supported aliases are:
+     * - first: The very first version before any migrations have been run.
+     * - current: The current version.
+     * - prev: The version prior to the current version.
+     * - next: The version following the current version.
+     * - latest: The latest available version.
+     *
+     * If an existing version number is specified, it is returned verbatimly.
+     *
+     * @return  string|null  A version number, or null if the specified alias
+     *                       does not map to an existing version, e.g. if "next"
+     *                       is passed but the current version is already the
+     *                       latest.
+     */
+    public function resolveVersionAlias($alias)
+    {
+        if ($this->hasVersion($alias)) {
+            return $alias;
+        }
+        switch ($alias) {
+            case 'first':
+                return '0';
+            case 'current':
+                return $this->getCurrentVersion();
+            case 'prev':
+                return $this->getPrevVersion();
+            case 'next':
+                return $this->getNextVersion();
+            case 'latest':
+                return $this->getLatestVersion();
+            default:
+                return null;
+        }
     }
 
     /**

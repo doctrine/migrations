@@ -2,7 +2,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
@@ -64,7 +63,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
-        
+
         $schema = $this->connection->getSchemaManager()->createSchema();
         $this->assertFalse($schema->hasTable('foo'));
 

@@ -4,7 +4,7 @@
     "description": "Database Schema migrations using Doctrine DBAL",
     "keywords": ["migrations", "database"],
     "homepage": "http://www.doctrine-project.org",
-    "license": "LGPL",
+    "license": "LGPL-2.1",
     "authors": [
         {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
         {"name": "Jonathan Wage", "email": "jonwage@gmail.com"}

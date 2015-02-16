@@ -40,7 +40,7 @@ class MigrateCommand extends AbstractCommand
         $this
             ->setName('migrations:migrate')
             ->setDescription('Execute a migration to a specified version or the latest available version.')
-            ->addArgument('version', InputArgument::OPTIONAL, 'The version to migrate to.', null)
+            ->addArgument('version', InputArgument::OPTIONAL, 'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.', 'latest')
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->setHelp(<<<EOT
@@ -51,6 +51,10 @@ The <info>%command.name%</info> command executes a migration to a specified vers
 You can optionally manually specify the version you wish to migrate to:
 
     <info>%command.full_name% YYYYMMDDHHMMSS</info>
+
+You can specify the version you wish to migrate to using an alias:
+
+    <info>%command.full_name% prev</info>
 
 You can also execute the migration as a <comment>--dry-run</comment>:
 
@@ -72,8 +76,6 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $version = $input->getArgument('version');
-
         $configuration = $this->getMigrationConfiguration($input, $output);
         $migration = new Migration($configuration);
 
@@ -85,15 +87,31 @@ EOT
         $availableMigrations = $configuration->getAvailableVersions();
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
 
+        $versionAlias = $input->getArgument('version');
+        $version = $configuration->resolveVersionAlias($versionAlias);
+        if ($version === null) {
+            switch ($versionAlias) {
+                case 'prev':
+                    $output->writeln('<error>Already at first version.</error>');
+                    break;
+                case 'next':
+                    $output->writeln('<error>Already at latest version.</error>');
+                    break;
+                default:
+                    $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
+            }
+            return 1;
+        }
+
         if ($executedUnavailableMigrations) {
             $output->writeln(sprintf('<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>', count($executedUnavailableMigrations)));
             foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
                 $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
             }
 
-            if ( ! $noInteraction) {
+            if (! $noInteraction) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
-                if ( ! $confirmation) {
+                if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -108,9 +126,9 @@ EOT
             $dryRun = $input->getOption('dry-run') ? true : false;
 
             // warn the user if no dry run and interaction is on
-            if ( ! $dryRun && ! $noInteraction) {
+            if (! $dryRun && ! $noInteraction) {
                 $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
-                if ( ! $confirmation) {
+                if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -119,7 +137,7 @@ EOT
 
             $sql = $migration->migrate($version, $dryRun);
 
-            if ( ! $sql) {
+            if (! $sql) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
