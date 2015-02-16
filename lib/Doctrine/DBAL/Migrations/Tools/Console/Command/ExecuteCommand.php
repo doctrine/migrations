@@ -83,12 +83,12 @@ EOT
             $version->writeSqlFile($path, $direction);
         } else {
             if ($input->getOption('no-interaction')) {
-                $confirmation = true;
+                $execute = true;
             } else {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                $execute = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
             }
 
-            if ($confirmation) {
+            if ($execute) {
                 $version->execute($direction, (boolean) $input->getOption('dry-run'));
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
