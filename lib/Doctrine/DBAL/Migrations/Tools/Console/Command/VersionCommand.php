@@ -89,7 +89,7 @@ EOT
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
         }
 
-        $this->markMigrated = $input->getOption('add') ? true : false;
+        $this->markMigrated = (boolean) $input->getOption('add');
 
         if ($input->getOption('no-interaction')) {
             $this->markAllAvailableVersions($input);
