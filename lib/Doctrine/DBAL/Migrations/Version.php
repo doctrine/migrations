@@ -253,7 +253,7 @@ class Version
             $this->migration->$direction($toSchema);
             $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
 
-            if ($dryRun === false) {
+            if (! $dryRun) {
                 if ($this->sql) {
                     foreach ($this->sql as $key => $query) {
                         if ( ! isset($this->params[$key])) {
