@@ -100,6 +100,7 @@ EOT
                 default:
                     $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
             }
+
             return 1;
         }
 

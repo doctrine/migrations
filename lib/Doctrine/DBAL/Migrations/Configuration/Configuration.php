@@ -436,8 +436,8 @@ class Configuration
     /**
      * Returns the version prior to the current version.
      *
-     * @return string|null  A version string, or null if the current version is
-     *                      the first.
+     * @return string|null A version string, or null if the current version is
+     *                     the first.
      */
     public function getPrevVersion()
     {
@@ -447,8 +447,8 @@ class Configuration
     /**
      * Returns the version following the current version.
      *
-     * @return string|null  A version string, or null if the current version is
-     *                      the latest.
+     * @return string|null A version string, or null if the current version is
+     *                     the latest.
      */
     public function getNextVersion()
     {
@@ -458,9 +458,9 @@ class Configuration
     /**
      * Returns the version with the specified offset to the specified version.
      *
-     * @return string|null  A version string, or null if the specified version
-     *                      is unknown or the specified delta is not within the
-     *                      list of available versions.
+     * @return string|null A version string, or null if the specified version
+     *                     is unknown or the specified delta is not within the
+     *                     list of available versions.
      */
     public function getRelativeVersion($version, $delta)
     {
@@ -471,6 +471,7 @@ class Configuration
             // Unknown version or delta out of bounds.
             return null;
         }
+
         return (string) $versions[$offset + $delta];
     }
 
@@ -486,10 +487,10 @@ class Configuration
      *
      * If an existing version number is specified, it is returned verbatimly.
      *
-     * @return  string|null  A version number, or null if the specified alias
-     *                       does not map to an existing version, e.g. if "next"
-     *                       is passed but the current version is already the
-     *                       latest.
+     * @return string|null A version number, or null if the specified alias
+     *                     does not map to an existing version, e.g. if "next"
+     *                     is passed but the current version is already the
+     *                     latest.
      */
     public function resolveVersionAlias($alias)
     {
