@@ -91,8 +91,7 @@ EOT
 
         $this->markMigrated = $input->getOption('add') ? true : false;
 
-        $noInteraction = $input->getOption('no-interaction') ? true : false;
-        if ($noInteraction === true) {
+        if ($input->getOption('no-interaction')) {
             $this->markAllAvailableVersions($input);
         } else {
             $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
