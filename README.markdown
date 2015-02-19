@@ -31,7 +31,8 @@ This should give you the flexibility you need for customizing your input/output 
 
 ### Building Your Phar
 
-Simply run `php package.php`, which will create the file: `build/doctrine-migrations.phar` for you.
+The PHAR is ready for [download here](http://github.com/downloads/ericclemmons/migrations/doctrine-migrations.phar), but if you still would like to build your PHAR
+run `php package.php`, which will create the file: `build/doctrine-migrations.phar` for you.
 Done! :)  This is a bit simpler than getting Phing/Ant going and running `phing build-migrations` and
 hoping the rest of the build dependencies work.
 
@@ -48,10 +49,9 @@ This can be fixed by setting the following in your php.ini:
 
 ### Installing Dependencies
 
-To install dependencies issue the following commands:
+To install dependencies run a composer update:
 
-    git submodule init
-    git submodule update
+    composer update
 
 ## Official Documentation
 
