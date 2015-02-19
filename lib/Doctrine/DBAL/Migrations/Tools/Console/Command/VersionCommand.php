@@ -24,6 +24,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * Command for manually adding and deleting migration versions from the version table.
@@ -95,7 +96,8 @@ EOT
         if ($noInteraction === true) {
             $this->markAllAvailableVersions($input);
         } else {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            $question = new ConfirmationQuestion('<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>');
+            $confirmation = $this->getHelper('question')->ask($input, $output, $question);
             if ($confirmation === true) {
                 $this->markAllAvailableVersions($input);
             } else {
