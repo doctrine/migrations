@@ -1,5 +1,9 @@
 # Doctrine Database Migrations
 
+## Status
+
+[![Build Status](https://secure.travis-ci.org/doctrine/migrations.png)](http://travis-ci.org/doctrine/migrations) [![Dependency Status](https://www.versioneye.com/php/doctrine:migrations/badge.png)](https://www.versioneye.com/php/doctrine:migrations/)
+
 ## Eric Clemmons' Modifications
 
 The latest official PHAR had path issues for me, so I made a couple of modifications and made
