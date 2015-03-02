@@ -36,7 +36,7 @@ class YamlConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        $array = Yaml::parse($file);
+        $array = Yaml::parse(file_get_contents($file));
 
         if (isset($array['name'])) {
             $this->setName($array['name']);
