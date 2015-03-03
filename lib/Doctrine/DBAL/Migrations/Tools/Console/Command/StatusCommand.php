@@ -57,19 +57,19 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $versionsFormatted = array();
+        $formattedVersion = array();
         foreach (array('prev', 'current', 'next', 'latest') as $alias) {
             $version = $configuration->resolveVersionAlias($alias);
             if ($version === null) {
                 if ($alias == 'next') {
-                    $versionsFormatted[$alias] = 'Already at latest version';
+                    $formattedVersion[$alias] = 'Already at latest version';
                 } elseif ($alias == 'prev') {
-                    $versionsFormatted[$alias] = 'Already at first version';
+                    $formattedVersion[$alias] = 'Already at first version';
                 }
             } elseif ($version === '0') {
-                $versionsFormatted[$alias] = '<comment>0</comment>';
+                $formattedVersion[$alias] = '<comment>0</comment>';
             } else {
-                $versionsFormatted[$alias] = $configuration->formatVersion($version) . ' (<comment>' . $version . '</comment>)';
+                $formattedVersion[$alias] = $configuration->formatVersion($version) . ' (<comment>' . $version . '</comment>)';
             }
         }
 
@@ -89,10 +89,10 @@ EOT
             'Version Table Name'                => $configuration->getMigrationsTableName(),
             'Migrations Namespace'              => $configuration->getMigrationsNamespace(),
             'Migrations Directory'              => $configuration->getMigrationsDirectory(),
-            'Previous Version'                  => $versionsFormatted['prev'],
-            'Current Version'                   => $versionsFormatted['current'],
-            'Next Version'                      => $versionsFormatted['next'],
-            'Latest Version'                    => $versionsFormatted['latest'],
+            'Previous Version'                  => $formattedVersion['prev'],
+            'Current Version'                   => $formattedVersion['current'],
+            'Next Version'                      => $formattedVersion['next'],
+            'Latest Version'                    => $formattedVersion['latest'],
             'Executed Migrations'               => count($executedMigrations),
             'Executed Unavailable Migrations'   => $numExecutedUnavailableMigrations > 0 ? '<error>'.$numExecutedUnavailableMigrations.'</error>' : 0,
             'Available Migrations'              => count($availableMigrations),
