@@ -121,7 +121,7 @@ EOT
         file_put_contents($path, $code);
 
         if ($editorCmd = $input->getOption('editor-cmd')) {
-            shell_exec($editorCmd . ' ' . escapeshellarg($path));
+            proc_open($editorCmd . ' ' . escapeshellarg($path), array(), $pipes);
         }
 
         return $path;
