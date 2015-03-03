@@ -78,9 +78,7 @@ abstract class AbstractCommand extends Command
                 return $output->writeln($message);
             });
 
-            if ($this->getApplication()->getHelperSet()->has('connection')) {
-                $conn = $this->getHelper('connection')->getConnection();
-            } elseif ($input->getOption('db-configuration')) {
+            if ($input->getOption('db-configuration')) {
                 if ( ! file_exists($input->getOption('db-configuration'))) {
                     throw new \InvalidArgumentException("The specified connection file is not a valid file.");
                 }
@@ -96,6 +94,8 @@ abstract class AbstractCommand extends Command
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }
                 $conn = \Doctrine\DBAL\DriverManager::getConnection($params);
+            } elseif ($this->getApplication()->getHelperSet()->has('connection')) {
+                $conn = $this->getHelper('connection')->getConnection();
             } else {
                 throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
             }
