@@ -97,8 +97,7 @@ EOT
             $output->writeln('    <comment>>></comment> ' . $name . ': ' . str_repeat(' ', 50 - strlen($name)) . $value);
         }
 
-        $showVersions = $input->getOption('show-versions') ? true : false;
-        if ($showVersions === true) {
+        if ($input->getOption('show-versions')) {
             if ($migrations = $configuration->getMigrations()) {
                 $output->writeln("\n <info>==</info> Available Migration Versions\n");
                 $migratedVersions = $configuration->getMigratedVersions();

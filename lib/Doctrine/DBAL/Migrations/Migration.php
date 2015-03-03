@@ -135,7 +135,7 @@ class Migration
             return array();
         }
 
-        if ($dryRun === false) {
+        if (! $dryRun) {
             $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         } else {
             $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));

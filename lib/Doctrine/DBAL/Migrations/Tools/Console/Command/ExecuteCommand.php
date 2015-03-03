@@ -82,16 +82,16 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
-            $noInteraction = $input->getOption('no-interaction') ? true : false;
-            if ($noInteraction === true) {
-                $version->execute($direction, $input->getOption('dry-run') ? true : false);
+            if ($input->getOption('no-interaction')) {
+                $execute = true;
             } else {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
-                if ($confirmation === true) {
-                    $version->execute($direction, $input->getOption('dry-run') ? true : false);
-                } else {
-                    $output->writeln('<error>Migration cancelled!</error>');
-                }
+                $execute = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            }
+
+            if ($execute) {
+                $version->execute($direction, (boolean) $input->getOption('dry-run'));
+            } else {
+                $output->writeln('<error>Migration cancelled!</error>');
             }
         }
     }

@@ -100,6 +100,7 @@ EOT
                 default:
                     $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
             }
+
             return 1;
         }
 
@@ -123,7 +124,7 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
         } else {
-            $dryRun = $input->getOption('dry-run') ? true : false;
+            $dryRun = (boolean) $input->getOption('dry-run');
 
             // warn the user if no dry run and interaction is on
             if (! $dryRun && ! $noInteraction) {
