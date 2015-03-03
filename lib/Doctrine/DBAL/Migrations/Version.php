@@ -147,13 +147,13 @@ class Version
     public function markMigrated()
     {
         $this->configuration->createMigrationTable();
-        $this->connection->executeQuery("INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->version));
+        $this->connection->executeQuery("INSERT INTO `" . $this->configuration->getMigrationsTableName() . "` (version) VALUES (?)", array($this->version));
     }
 
     public function markNotMigrated()
     {
         $this->configuration->createMigrationTable();
-        $this->connection->executeQuery("DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = ?", array($this->version));
+        $this->connection->executeQuery("DELETE FROM `" . $this->configuration->getMigrationsTableName() . "` WHERE version = ?", array($this->version));
     }
 
     /**
