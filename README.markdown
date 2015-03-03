@@ -2,7 +2,8 @@
 
 ## Status
 
-[![Build Status](https://secure.travis-ci.org/doctrine/migrations.png)](http://travis-ci.org/doctrine/migrations) [![Dependency Status](https://www.versioneye.com/php/doctrine:migrations/badge.png)](https://www.versioneye.com/php/doctrine:migrations/)
+[![Build Status](https://travis-ci.org/doctrine/migrations.svg)](https://travis-ci.org/doctrine/migrations)
+[![Dependency Status](https://www.versioneye.com/php/doctrine:migrations/badge.svg)](https://www.versioneye.com/php/doctrine:migrations/)
 
 ## Eric Clemmons' Modifications
 
