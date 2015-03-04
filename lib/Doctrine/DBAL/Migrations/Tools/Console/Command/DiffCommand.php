@@ -118,7 +118,7 @@ EOT
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
         $code = array();
         foreach ($sql as $query) {
-            if (strpos($query, $configuration->getMigrationsTableName()) !== false) {
+            if (stripos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
             $code[] = sprintf("\$this->addSql(%s);", var_export($query, true));
