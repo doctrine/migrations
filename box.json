@@ -8,6 +8,10 @@
             "in": ["lib", "vendor"]
         }
     ],
+    "files": [
+        "LICENSE"
+    ],
+    "chmod": "0755",
     "git-version": "git-version",
     "stub": true
 }
