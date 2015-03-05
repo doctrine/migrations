@@ -8,5 +8,6 @@
             "in": ["lib", "vendor"]
         }
     ],
+    "git-version": "git-version",
     "stub": true
 }
