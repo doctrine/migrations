@@ -237,7 +237,11 @@ class Version
     {
         $this->sql = array();
 
-        $this->connection->beginTransaction();
+        $transaction = $this->migration->isTransactional();
+        if($transaction){
+            //only start transaction if in transactional mode
+            $this->connection->beginTransaction();
+        }
 
         try {
             $start = microtime(true);
@@ -296,13 +300,19 @@ class Version
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
             }
 
-            $this->connection->commit();
+            if($transaction){
+                //commit only if running in transactional mode
+                $this->connection->commit();
+            }
 
             $this->state = self::STATE_NONE;
 
             return $this->sql;
         } catch (SkipMigrationException $e) {
-            $this->connection->rollback();
+            if($transaction){
+                //only rollback transaction if in transactional mode
+                $this->connection->rollback();
+            }
 
             if ($dryRun == false) {
                 // now mark it as migrated
@@ -325,7 +335,10 @@ class Version
                 $this->version, $this->getExecutionState(), $e->getMessage()
             ));
 
-            $this->connection->rollback();
+            if($transaction){
+                //only rollback transaction if in transactional mode
+                $this->connection->rollback();
+            }
 
             $this->state = self::STATE_NONE;
             throw $e;
