@@ -20,7 +20,7 @@ class AbstractCommandTest extends MigrationTestCase
     {
         $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand');
         $method = $class->getMethod('getMigrationConfiguration');
-        $method->setAccessible('true');
+        $method->setAccessible(true);
 
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
