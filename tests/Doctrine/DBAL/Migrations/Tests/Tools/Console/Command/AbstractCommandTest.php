@@ -25,22 +25,24 @@ class AbstractCommandTest extends MigrationTestCase
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
             'Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand',
-            ['command']
+            array('command')
         );
 
-        $command->setHelperSet(new HelperSet(['connection' => new ConnectionHelper($this->getSqliteConnection())]));
+        $command->setHelperSet(new HelperSet(array(
+            'connection' => new ConnectionHelper($this->getSqliteConnection())
+        )));
         if (null !== $configuration) {
             $command->setMigrationConfiguration($configuration);
         }
 
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\Output')
-            ->setMethods(['doWrite', 'writeln'])
+            ->setMethods(array('doWrite', 'writeln'))
             ->getMock();
 
         $output->expects($this->any())
             ->method('doWrite');
 
-        return $method->invokeArgs($command, [$input, $output]);
+        return $method->invokeArgs($command, array($input, $output));
     }
 
 
@@ -50,8 +52,8 @@ class AbstractCommandTest extends MigrationTestCase
     public function testInjectedMigrationConfigurationIsBeingReturned()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs([array()])
-            ->setMethods(['getOption'])
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
             ->getMock();
 
         $input->expects($this->any())
@@ -73,8 +75,8 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsConnectionFromHelperSet()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs([array()])
-            ->setMethods(['getOption'])
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
             ->getMock();
 
         $input->expects($this->any())
@@ -102,8 +104,8 @@ EOF;
         file_put_contents($filename, $content);
 
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs([array()])
-            ->setMethods(['getOption'])
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
             ->getMock();
 
         $input->expects($this->any())
@@ -138,8 +140,8 @@ EOF;
         file_put_contents($filename, $content);
 
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs([array()])
-            ->setMethods(['getOption'])
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
             ->getMock();
 
         $input->expects($this->any())
