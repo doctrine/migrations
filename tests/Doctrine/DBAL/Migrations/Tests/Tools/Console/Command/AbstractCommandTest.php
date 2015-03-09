@@ -95,14 +95,6 @@ class AbstractCommandTest extends MigrationTestCase
      */
     public function testMigrationConfigurationReturnsConnectionFromInputOption()
     {
-        $content = <<<EOF
-<?php
-
-return array('driver' => 'pdo_sqlite', 'memory' => true);
-EOF;
-        $filename = \tempnam(\sys_get_temp_dir(), 'migrations_test');
-        file_put_contents($filename, $content);
-
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
             ->setConstructorArgs(array(array()))
             ->setMethods(array('getOption'))
@@ -110,20 +102,14 @@ EOF;
 
         $input->expects($this->any())
             ->method('getOption')
-            ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
-            ->will($this->returnCallback(function ($name) use ($filename) {
-                if ('db-configuration' === $name) {
-                    return $filename;
-                }
-                return null;
-            }));
+            ->will($this->returnValueMap(array(
+                array('db-configuration', __DIR__ . '/_files/db-config.php')
+            )));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $actualConfiguration);
         $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
-
-        unlink($filename);
     }
 
     /**
@@ -131,14 +117,6 @@ EOF;
      */
     public function testMigrationConfigurationReturnsConfigurationFileOption()
     {
-        $content = <<<EOF
-name: "name"
-table_name: "migrations_table_name"
-migrations_namespace: "migrations_namespace"
-EOF;
-        $filename = \sys_get_temp_dir() . '/' . uniqid('migrations') . '.yml';
-        file_put_contents($filename, $content);
-
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
             ->setConstructorArgs(array(array()))
             ->setMethods(array('getOption'))
@@ -146,13 +124,9 @@ EOF;
 
         $input->expects($this->any())
             ->method('getOption')
-            ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
-            ->will($this->returnCallback(function ($name) use ($filename) {
-                if ('configuration' === $name) {
-                    return $filename;
-                }
-                return null;
-            }));
+            ->will($this->returnValueMap(array(
+                array('configuration', __DIR__ . '/_files/config.yml')
+            )));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
@@ -160,7 +134,5 @@ EOF;
         $this->assertEquals('name', $actualConfiguration->getName());
         $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
         $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
-
-        unlink($filename);
     }
 }
