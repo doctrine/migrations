@@ -21,5 +21,25 @@ namespace Doctrine\DBAL\Migrations;
 
 class MigrationsVersion
 {
-    const VERSION = '2.0.0-DEV';
+    private static $version = 'v1.0-ALPHA1';
+
+    public static function VERSION(){
+        $gitversion = '@git-version@';
+
+        if (self::isACustomPharBuild($gitversion)) {
+            return $gitversion;
+        }
+        return self::$version;
+    }
+
+    /**
+     * @param $gitVersion
+     * @return bool
+     *
+     * Check if doctrine migration is installed by composer or
+     * in a modified (not tagged) phar version.
+     */
+    private static function isACustomPharBuild($gitVersion) {
+        return $gitversion == '@' . 'git-version@';
+    }
 }
