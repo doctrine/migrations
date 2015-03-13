@@ -39,11 +39,16 @@ use Symfony\Component\Console\Input\InputOption;
 abstract class AbstractCommand extends Command
 {
     /**
+     * The configuration property only contains the configuration injected by the setter.
+     *
      * @var Configuration
      */
     private $configuration;
 
     /**
+     * The migrationConfiguration property contains the configuration
+     * created taking into account the command line options.
+     *
      * @var Configuration
      */
     private $migrationConfiguration;
@@ -81,6 +86,12 @@ abstract class AbstractCommand extends Command
     }
 
     /**
+     * When any (config) command line option is passed to the migration the migrationConfiguration
+     * property is set with the new generated configuration.
+     * If no (config) option is passed the migrationConfiguration property is set to the value
+     * of the configuration one (if any).
+     * Else a new configuration is created and assigned to the migrationConfiguration property.
+     *
      * @param InputInterface  $input
      * @param OutputInterface $output
      *
