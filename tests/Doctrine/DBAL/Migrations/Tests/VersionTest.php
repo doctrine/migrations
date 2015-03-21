@@ -20,6 +20,19 @@ class VersionTest extends MigrationTestCase
             'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration');
         $this->assertEquals($versionName, $version->getVersion());
     }
+
+    /**
+     * Create migration with description
+     */
+    public function testCreateVersionWithCustomName()
+    {
+        $versionName = '003';
+        $versionDescription = 'My super migration';
+        $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
+            'Doctrine\DBAL\Migrations\Tests\VersionTest_MigrationDescription');
+        $this->assertEquals($versionName, $version->getVersion());
+        $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
+    }
 }
 
 /**
@@ -31,3 +44,16 @@ class VersionTest_Migration extends AbstractMigration
     public function up(Schema $schema)   {}
 }
 
+/**
+ * Migration with description
+ */
+class VersionTest_MigrationDescription extends AbstractMigration
+{
+    public function getDescription()
+    {
+        return 'My super migration';
+    }
+
+    public function down(Schema $schema) {}
+    public function up(Schema $schema)   {}
+}
