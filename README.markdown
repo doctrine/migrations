@@ -5,53 +5,56 @@
 [![Build Status](https://travis-ci.org/doctrine/migrations.svg)](https://travis-ci.org/doctrine/migrations)
 [![Dependency Status](https://www.versioneye.com/php/doctrine:migrations/badge.svg)](https://www.versioneye.com/php/doctrine:migrations/)
 
-## Eric Clemmons' Modifications
 
-The latest official PHAR had path issues for me, so I made a couple of modifications and made
-packaging a bit easier, especially when creating a custom PHAR for your own apps.
+## Official Documentation
 
-[Download `doctrine-migrations.phar` with custom Input/Output CLI support](http://github.com/downloads/ericclemmons/migrations/doctrine-migrations.phar)
+All available documentation can be found [here](http://docs.doctrine-project.org/projects/doctrine-migrations/en/latest/).
 
-### Modifications
+The repository containing the documentation is [there](https://github.com/doctrine/migrations-documentation).
 
-* Added `DiffCommand` for migrations.
-* Support for custom `ArgvInput` in CLI instance
-* Support for custom `ConsoleOutput` in CLI instance
+## Working with Doctrine Migrations
+    
+### Using the integration of your framework
 
-In the same way that Doctrine will attempt to load the return values from `migrations-db.php` as your
-connection parameters, you can have `migrations-input.php` return:
+  * symfony 2 [doctrine/doctrine-migrations-bundle](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
+  * ZF2 [doctrine/doctrine-orm-module](https://packagist.org/packages/doctrine/doctrine-orm-module) 
+  * laravel [mitchellvanw/laravel-doctrine](https://packagist.org/packages/mitchellvanw/laravel-doctrine)
+  * Silex [kurl/silex-doctrine-migrations-provider](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
+  * nette [zenify/doctrine-migrations](https://packagist.org/packages/zenify/doctrine-migrations)
+  * others...
+        
+### Using composer
+            
+```composer require doctrine/migrations```
+        
+### Downloading the latest phar release
 
-    $input = new \Symfony\Component\Console\Input\ArgvInput;
-    ... make some changes ...
-    return $input;
+You can download the [doctrine migrations phar](https://github.com/doctrine/migrations/releases) directly on the release page
 
-or have `migrations-output.php` return a customized `ConsoleOutput` with support for HTML tags in
-your SQL statements:
-
-    $output = new \Symfony\Component\Console\Output\ConsoleOutput;
-    $output->setStyle('p');
-    return $output;
-
-This should give you the flexibility you need for customizing your input/output in the CLI.
-
-### Building Your Phar
+### Building Your own Phar
 
 Make sure Composer and all necessary dependencies are installed:
 
-    curl -s https://getcomposer.org/installer | php
-    php composer.phar install --dev
+```bash
+curl -s https://getcomposer.org/installer | php
+php composer.phar install --dev
+```
 
 Make sure that the Box project is installed:
 
-    curl -s http://box-project.org/installer.php | php
+```bash
+curl -s http://box-project.org/installer.php | php
+```
 
 Build the PHAR archive:
 
-    php box.phar build
+```bash
+php box.phar build
+```
 
 The `doctrine-migrations.phar` archive is built in the `build` directory.
 
-### Creating archive disabled by INI setting
+#### Creating archive disabled by INI setting
 
 If you receive an error that looks like:
 
@@ -59,15 +62,13 @@ If you receive an error that looks like:
 
 This can be fixed by setting the following in your php.ini:
 
-    ; http://php.net/phar.readonly
-    phar.readonly = Off
+```ini
+; http://php.net/phar.readonly
+phar.readonly = Off
+```
 
-### Installing Dependencies
+## Installing Dependencies
 
 To install dependencies run a composer update:
 
-    composer update
-
-## Official Documentation
-
-All available documentation can be found [here](http://docs.doctrine-project.org/projects/doctrine-migrations/en/latest/).
+```composer update```
