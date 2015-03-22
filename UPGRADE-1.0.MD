@@ -1,4 +1,4 @@
-UPGRADE FROM 1.0-alpha1 to 1.0.0-alpha2
+UPGRADE FROM 1.0-alpha1 to 1.0.0-alpha3
 =======================================
 
 ## AbstractMigration
@@ -30,9 +30,10 @@ If you want to go back to the previous behavior just make a request on the bug t
 ### Before:
     
 MigrationsVersion::VERSION used to be a property.
-The returned value was fanciful
+The returned value was fanciful.
     
 ### After:
     
 It is now a a function so that a different value can be automatically send back if it's a modified version that's used.
 The returned value is now the git tag.
+The tag is in lowercase as the other doctrine projects.

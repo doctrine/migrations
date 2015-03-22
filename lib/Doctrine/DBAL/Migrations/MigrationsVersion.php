@@ -21,7 +21,7 @@ namespace Doctrine\DBAL\Migrations;
 
 class MigrationsVersion
 {
-    private static $version = 'v1.0-ALPHA2';
+    private static $version = 'v1.0-alpha3';
 
     public static function VERSION(){
         $gitversion = '@git-version@';
