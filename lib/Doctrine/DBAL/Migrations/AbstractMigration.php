@@ -98,6 +98,7 @@ abstract class AbstractMigration
      */
     public function getDescription()
     {
+        return '';
     }
 
     /**
