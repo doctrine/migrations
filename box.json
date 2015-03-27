@@ -5,11 +5,12 @@
     "finder": [
         {
             "exclude": ["Tests", "Test", "tests", "test"],
-            "in": ["lib", "vendor"]
+            "in": ["lib", "vendor/composer/", "vendor/doctrine/", "vendor/symfony/"]
         }
     ],
     "files": [
-        "LICENSE"
+        "LICENSE",
+        "vendor/autoload.php"
     ],
     "chmod": "0755",
     "git-version": "git-version",
