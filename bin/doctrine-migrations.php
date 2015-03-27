@@ -17,7 +17,16 @@
  * <http://www.doctrine-project.org>.
  */
 
-include(__DIR__ . '/../vendor/autoload.php');
+$autoloader = __DIR__ . '/../vendor/autoload.php';
+
+if ( ! file_exists($autoloader)) {
+    if (extension_loaded('phar') && ($uri = Phar::running())) {
+        echo 'The phar has been builded without the depedencies' . PHP_EOL;
+    }
+    die('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
+}
+
+require $autoloader;
 
 // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
