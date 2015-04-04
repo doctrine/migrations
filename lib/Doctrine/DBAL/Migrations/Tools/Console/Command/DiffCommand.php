@@ -22,6 +22,8 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Version as DbalVersion;
 use Doctrine\ORM\Tools\SchemaTool;
+use Doctrine\DBAL\Migrations\Provider\SchemaProvider;
+use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -37,6 +39,17 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class DiffCommand extends GenerateCommand
 {
+    /**
+     * @var     SchemaProvider
+     */
+    protected $schemaProvider;
+
+    public function __construct(SchemaProvider $schemaProvider=null)
+    {
+        $this->schemaProvider = $schemaProvider;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         parent::configure();
@@ -62,16 +75,8 @@ EOT
         $isDbalOld = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $em = $this->getHelper('em')->getEntityManager();
-        $conn = $em->getConnection();
+        $conn = $em->getConnection($input);
         $platform = $conn->getDatabasePlatform();
-        $metadata = $em->getMetadataFactory()->getAllMetadata();
-
-        if (empty($metadata)) {
-            $output->writeln('No mapping information to process.', 'ERROR');
-
-            return;
-        }
 
         if ($filterExpr = $input->getOption('filter-expression')) {
             if ($isDbalOld) {
@@ -82,10 +87,8 @@ EOT
                 ->setFilterSchemaAssetsExpression($filterExpr);
         }
 
-        $tool = new SchemaTool($em);
-
         $fromSchema = $conn->getSchemaManager()->createSchema();
-        $toSchema = $tool->getSchemaFromMetadata($metadata);
+        $toSchema = $this->getSchemaProvider()->createSchema();
 
         //Not using value from options, because filters can be set from config.yml
         if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
@@ -137,5 +140,14 @@ EOT
         }
 
         return implode("\n", $code);
+    }
+
+    private function getSchemaProvider()
+    {
+        if (!$this->schemaProvider) {
+            $this->schemaProvider = new OrmSchemaProvider($this->getHelper('em')->getEntityManager());
+        }
+
+        return $this->schemaProvider;
     }
 }
