@@ -40,6 +40,6 @@ class MigrationsVersion
      * in a modified (not tagged) phar version.
      */
     private static function isACustomPharBuild($gitversion) {
-        return $gitversion == '@' . 'git-version@';
+        return $gitversion !== '@' . 'git-version@';
     }
 }
