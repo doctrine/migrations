@@ -115,15 +115,22 @@ EOT
     {
         $affectedVersion = $input->getArgument('version');
 
+        $allOption = $input->getOption('all');
+        $rangeOption = $input->getOption('range');
+
+        if ($allOption && $rangeOption) {
+            throw new \InvalidArgumentException('Options --all and --range both used. You should use only one of them.');
+        }
+
         switch (true) {
-            case $input->getOption('all') === true:
+            case $allOption === true:
                 $availableVersions = $this->configuration->getAvailableVersions();
                 foreach ($availableVersions as $version) {
                     $this->mark($version, true);
                 }
                 break;
 
-            case $input->getOption('range') === true:
+            case $rangeOption === true:
                 $availableVersions = $this->configuration->getAvailableVersions();
                 $versionEnd        = $input->getArgument('version_end');
                 foreach ($availableVersions as $version) {
