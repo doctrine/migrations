@@ -55,9 +55,11 @@ class VersionCommand extends AbstractCommand
             ->setName('migrations:version')
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to add or delete.', null)
+            ->addArgument('version_end', InputArgument::OPTIONAL, 'The version to add or delete.', null)
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all the versions.')
+            ->addOption('range', null, InputOption::VALUE_NONE, 'Apply to versions range.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
@@ -71,6 +73,11 @@ If you want to synchronize by adding or deleting all migration versions availabl
 
     <info>%command.full_name% --add --all</info>
     <info>%command.full_name% --delete --all</info>
+
+If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range</comment> option:
+
+    <info>%command.full_name% --add --range YYYYMMDDHHMMSS YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% --delete --range YYYYMMDDHHMMSS YYYYMMDDHHMMSS</info>
 
 You can also execute this command without a warning message which you need to interact with:
 
@@ -94,27 +101,40 @@ EOT
         if ($input->isInteractive()) {
             $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
             if ($confirmation) {
-                $this->markAllAvailableVersions($input);
+                $this->markVersions($input);
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }
         } else {
-            $this->markAllAvailableVersions($input);
+            $this->markVersions($input);
         }
 
     }
 
-    private function markAllAvailableVersions(InputInterface $input)
+    private function markVersions(InputInterface $input)
     {
-        $version = $input->getArgument('version');
+        $affectedVersion = $input->getArgument('version');
 
-        if ($input->getOption('all') === true) {
-            $availableVersions = $this->configuration->getAvailableVersions();
-            foreach ($availableVersions as $version) {
-                $this->mark($version, true);
-            }
-        } else {
-            $this->mark($version);
+        switch (true) {
+            case $input->getOption('all') === true:
+                $availableVersions = $this->configuration->getAvailableVersions();
+                foreach ($availableVersions as $version) {
+                    $this->mark($version, true);
+                }
+                break;
+
+            case $input->getOption('range') === true:
+                $availableVersions = $this->configuration->getAvailableVersions();
+                $versionEnd        = $input->getArgument('version_end');
+                foreach ($availableVersions as $version) {
+                    if ($version >= $affectedVersion && $version <= $versionEnd) {
+                        $this->mark($version, true);
+                    }
+                }
+                break;
+
+            default:
+                $this->mark($affectedVersion);
         }
     }
 
