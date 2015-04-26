@@ -34,7 +34,7 @@ class MigrationVersionTest extends MigrationTestCase
     }
 
     /**
-     * Test "--add --range" options on migrate only versions in interval.
+     * Test "--add --range-to --range-from" options on migrate only versions in interval.
      */
     public function testAddRangeOption()
     {
@@ -47,10 +47,9 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--add'       => true,
-                '--range'     => true,
-                'version'     => '1234',
-                'version_end' => '1239',
+                '--add'        => true,
+                '--range-from' => '1234',
+                '--range-to'   => '1239',
             ),
             array(
                 'interactive' => false,
@@ -65,7 +64,89 @@ class MigrationVersionTest extends MigrationTestCase
     }
 
     /**
-     * Test "--delete --range" options on migrate down only versions in interval.
+     * Test "--add --range-from" options without "--range-to".
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Options --range-to and --range-from should be used together.
+     */
+    public function testAddRangeWithoutRangeToOption()
+    {
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'        => true,
+                '--range-from' => '1233',
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+    }
+
+    /**
+     * Test "--add --range-to" options without "--range-from".
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Options --range-to and --range-from should be used together.
+     */
+    public function testAddRangeWithoutRangeFromOption()
+    {
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'      => true,
+                '--range-to' => '1233',
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+    }
+
+    /**
+     * Test "--add --all --range-to" options.
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Options --all and --range-to/--range-from both used. You should use only one of them.
+     */
+    public function testAddAllOptionsWithRangeTo()
+    {
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'      => true,
+                '--all'      => true,
+                '--range-to' => '1233',
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+    }
+
+    /**
+     * Test "--add --all --range-from" options.
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Options --all and --range-to/--range-from both used. You should use only one of them.
+     */
+    public function testAddAllOptionsWithRangeFrom()
+    {
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'      => true,
+                '--all'      => true,
+                '--range-from' => '1233',
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+    }
+
+    /**
+     * Test "--delete --range-to --range-from" options on migrate down only versions in interval.
      */
     public function testDeleteRangeOption()
     {
@@ -84,10 +165,9 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--delete'    => true,
-                '--range'     => true,
-                'version'     => '1234',
-                'version_end' => '1239',
+                '--delete'     => true,
+                '--range-from' => '1234',
+                '--range-to'   => '1239',
             ),
             array(
                 'interactive' => false,
@@ -115,8 +195,8 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--add'       => true,
-                '--all'       => true,
+                '--add' => true,
+                '--all' => true,
             ),
             array(
                 'interactive' => false,
@@ -147,8 +227,8 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--delete'    => true,
-                '--all'       => true,
+                '--delete' => true,
+                '--all'    => true,
             ),
             array(
                 'interactive' => false,
@@ -176,8 +256,8 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--add'       => true,
-                'version'     => 1234,
+                '--add'   => true,
+                'version' => 1234,
             ),
             array(
                 'interactive' => false,
@@ -203,8 +283,8 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--delete'    => true,
-                'version'     => 1234,
+                '--delete' => true,
+                'version'  => 1234,
             ),
             array(
                 'interactive' => false,
@@ -230,8 +310,8 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             array(
-                '--add'       => true,
-                'version'     => 1233,
+                '--add'   => true,
+                'version' => 1233,
             ),
             array(
                 'interactive' => false,
@@ -253,8 +333,8 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester->execute(
             array(
-                '--delete'       => true,
-                'version'     => 1233,
+                '--delete' => true,
+                'version'  => 1233,
             ),
             array(
                 'interactive' => false,
