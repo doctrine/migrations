@@ -55,7 +55,7 @@ class VersionCommand extends AbstractCommand
             ->setName('migrations:version')
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to add or delete.', null)
-            ->addArgument('version_end', InputArgument::OPTIONAL, 'The version to add or delete.', null)
+            ->addArgument('version_end', InputArgument::OPTIONAL, 'The end version to add or delete. Works only with --range option.', null)
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all the versions.')
