@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -101,7 +102,7 @@ class MigrationVersionTest extends MigrationTestCase
     }
 
     /**
-     * Test "--add --all options on migrate all versions.
+     * Test "--add --all" options on migrate all versions.
      */
     public function testAddAllOption()
     {
@@ -159,5 +160,105 @@ class MigrationVersionTest extends MigrationTestCase
         $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
         $this->assertFalse($this->configuration->getVersion('1239')->isMigrated());
         $this->assertFalse($this->configuration->getVersion('1240')->isMigrated());
+    }
+
+    /**
+     * Test "--add" option on migrate one version.
+     */
+    public function testAddOption()
+    {
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+
+        $this->configuration->getVersion('1233')->markMigrated();
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'       => true,
+                'version'     => 1234,
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+
+        $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
+        $this->assertTrue($this->configuration->getVersion('1234')->isMigrated());
+        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
+    }
+
+    /**
+     * Test "--delete" options on migrate down one version.
+     */
+    public function testDeleteOption()
+    {
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+
+        $this->configuration->getVersion('1234')->markMigrated();
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--delete'    => true,
+                'version'     => 1234,
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+
+        $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
+        $this->assertFalse($this->configuration->getVersion('1234')->isMigrated());
+        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
+    }
+
+    /**
+     * Test "--add" option on migrate already migrated version.
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The version "1233" already exists in the version table.
+     */
+    public function testAddOptionIfVersionAlreadyMigrated()
+    {
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->getVersion('1233')->markMigrated();
+
+        $commandTester = new CommandTester($this->command);
+        $commandTester->execute(
+            array(
+                '--add'       => true,
+                'version'     => 1233,
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
+    }
+
+    /**
+     * Test "--delete" option on not migrated version.
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage The version "1233" does not exists in the version table.
+     */
+    public function testDeleteOptionIfVersionNotMigrated()
+    {
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+
+        $commandTester = new CommandTester($this->command);
+
+        $commandTester->execute(
+            array(
+                '--delete'       => true,
+                'version'     => 1233,
+            ),
+            array(
+                'interactive' => false,
+            )
+        );
     }
 }
