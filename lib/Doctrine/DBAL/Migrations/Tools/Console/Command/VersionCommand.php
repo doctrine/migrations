@@ -55,11 +55,11 @@ class VersionCommand extends AbstractCommand
             ->setName('migrations:version')
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version to add or delete.', null)
-            ->addArgument('version_end', InputArgument::OPTIONAL, 'The end version to add or delete. Works only with --range option.', null)
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all the versions.')
-            ->addOption('range', null, InputOption::VALUE_NONE, 'Apply to versions range.')
+            ->addOption('range-from', null, InputOption::VALUE_OPTIONAL, 'Apply from specified version.')
+            ->addOption('range-to', null, InputOption::VALUE_OPTIONAL, 'Apply to specified version.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
@@ -74,10 +74,10 @@ If you want to synchronize by adding or deleting all migration versions availabl
     <info>%command.full_name% --add --all</info>
     <info>%command.full_name% --delete --all</info>
 
-If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range</comment> option:
+If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range-from/--range-to</comment> option:
 
-    <info>%command.full_name% --add --range YYYYMMDDHHMMSS YYYYMMDDHHMMSS</info>
-    <info>%command.full_name% --delete --range YYYYMMDDHHMMSS YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% --add --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% --delete --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
 
 You can also execute this command without a warning message which you need to interact with:
 
@@ -115,23 +115,25 @@ EOT
     {
         $affectedVersion = $input->getArgument('version');
 
-        $allOption   = $input->getOption('all');
-        $rangeOption = $input->getOption('range');
+        $allOption       = $input->getOption('all');
+        $rangeFromOption = $input->getOption('range-from');
+        $rangeToOption   = $input->getOption('range-to');
 
-        if ($allOption && $rangeOption) {
-            throw new \InvalidArgumentException('Options --all and --range both used. You should use only one of them.');
+        if ($allOption && ($rangeFromOption !== null || $rangeToOption !== null)) {
+            throw new \InvalidArgumentException('Options --all and --range-to/--range-from both used. You should use only one of them.');
+        } elseif ($rangeFromOption !== null ^ $rangeToOption !== null) {
+            throw new \InvalidArgumentException('Options --range-to and --range-from should be used together.');
         }
 
-        if ($allOption) {
+        if ($allOption === true) {
             $availableVersions = $this->configuration->getAvailableVersions();
             foreach ($availableVersions as $version) {
                 $this->mark($version, true);
             }
-        } elseif ($rangeOption) {
+        } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
             $availableVersions = $this->configuration->getAvailableVersions();
-            $versionEnd        = $input->getArgument('version_end');
             foreach ($availableVersions as $version) {
-                if ($version >= $affectedVersion && $version <= $versionEnd) {
+                if ($version >= $rangeFromOption && $version <= $rangeToOption) {
                     $this->mark($version, true);
                 }
             }
