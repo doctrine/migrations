@@ -85,10 +85,10 @@ EOT
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
-            if ($input->getOption('no-interaction')) {
-                $execute = true;
-            } else {
+            if ($input->isInteractive()) {
                 $execute = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            } else {
+                $execute = true;
             }
 
             if ($execute) {
