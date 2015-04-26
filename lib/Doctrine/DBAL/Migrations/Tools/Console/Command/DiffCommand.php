@@ -75,7 +75,7 @@ EOT
         $isDbalOld = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $conn = $em->getConnection($input);
+        $conn = $configuration->getConnection();
         $platform = $conn->getDatabasePlatform();
 
         if ($filterExpr = $input->getOption('filter-expression')) {
