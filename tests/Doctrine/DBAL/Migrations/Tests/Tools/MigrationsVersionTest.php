@@ -8,12 +8,13 @@ class MigrationsVersionTest extends \PHPUnit_Framework_TestCase {
     private $MigrationVersionClass = 'Doctrine\DBAL\Migrations\MigrationsVersion';
 
     public function testVersionNumber() {
-        $version = new MigrationsVersion();
         $class = new \ReflectionClass($this->MigrationVersionClass);
         $property = $class->getProperty('version');
         $property->setAccessible(true);
 
-        $this->assertRegExp('/^v[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}(-([a-z]){1,}[0-9]{1,}){0,1}$/', $property->getValue(new MigrationsVersion()));
+        $versionNumber = $property->getValue(new MigrationsVersion());
+        $this->assertRegExp('/^v[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}(-([a-z]){1,}[0-9]{1,}){0,1}$/', $versionNumber);
+        $this->assertEquals($versionNumber, MigrationsVersion::VERSION());
     }
 
     public function testIsACustomPharBuild(){
