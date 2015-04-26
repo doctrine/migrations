@@ -51,7 +51,7 @@ class CliTest extends MigrationTestCase
         $output = $this->executeCommand('migrations:latest');
         $this->assertContains('20150426000000', $output);
 
-        $this->executeCommand('migrations:migrate', ['--no-interaction']);
+        $this->executeCommand('migrations:migrate', array('--no-interaction'));
         $this->assertSuccessfulExit();
 
         $output = $this->executeCommand('migrations:status');
@@ -122,7 +122,7 @@ class CliTest extends MigrationTestCase
         $input = new ArrayInput(array_merge(array(
             'command'               => $commandName,
             '--configuration'       => __DIR__.'/_files/config.yml',
-        ), $args ?: array()));
+        ), $args));
         $output = new BufferedOutput();
 
         $this->lastExit = $this->application->run($input, $output);
