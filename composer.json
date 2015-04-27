@@ -14,8 +14,8 @@
         "doctrine/dbal": "~2.0"
     },
     "require-dev": {
-        "symfony/console": "2.*",
-        "symfony/yaml": "2.*"
+        "symfony/console": "~2.3|~3.0",
+        "symfony/yaml": "~2.3|~3.0"
     },
     "suggest": {
         "symfony/console": "to run the migration from the console"
@@ -25,6 +25,7 @@
             "Doctrine\\DBAL\\Migrations": "lib"
         }
     },
+    "minimum-stability": "dev",
     "extra": {
         "branch-alias": {
             "dev-master": "1.0.x-dev"
