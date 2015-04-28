@@ -16,7 +16,8 @@
     "require-dev": {
         "symfony/console": "2.*",
         "symfony/yaml": "2.*",
-        "doctrine/orm": "2.*"
+        "doctrine/orm": "2.*",
+        "phpunit/phpunit": "~4.0"
     },
     "suggest": {
         "symfony/console": "to run the migration from the console"
