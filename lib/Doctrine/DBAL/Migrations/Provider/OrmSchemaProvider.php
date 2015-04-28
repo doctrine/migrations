@@ -19,7 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Provider;
 
-use Doctrine\ORM\EntityMangerInterface;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 
 /**
@@ -49,7 +49,7 @@ final class OrmSchemaProvider implements SchemaProvider
             throw new \UnexpectedValueException('No mapping information to process');
         }
 
-        $tool = new SchemaTool($em);
+        $tool = new SchemaTool($this->entityManager);
 
         return $tool->getSchemaFromMetadata($metadata);
     }
