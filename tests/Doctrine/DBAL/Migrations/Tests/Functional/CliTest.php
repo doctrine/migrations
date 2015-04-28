@@ -23,13 +23,17 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Setup as OrmSetup;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\MigrationsVersion;
+use Doctrine\DBAL\Migrations\Provider\SchemaProvider;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
 use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 
 
 /**
@@ -37,6 +41,8 @@ use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
  */
 class CliTest extends MigrationTestCase
 {
+    private $conn;
+
     private $application;
 
     private $lastExit;
@@ -74,6 +80,7 @@ class CliTest extends MigrationTestCase
 
     public function testMigrationDiffWritesNewMigrationWithExpectedSql()
     {
+        $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         $this->assertVersionCount(0, 'should start with no versions');
         $this->executeCommand('migrations:diff');
         $this->assertSuccessfulExit();
@@ -90,6 +97,32 @@ class CliTest extends MigrationTestCase
         $this->assertContains('DROP TABLE bar', $contents);
     }
 
+    public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities()
+    {
+        $config = OrmSetup::createXMLMetadataConfiguration(array(__DIR__.'/_files/entities'), true);
+        $entityManager = EntityManager::create($this->conn, $config);
+        $this->application->getHelperSet()->set(
+            new EntityManagerHelper($entityManager),
+            'em'
+        );
+        $this->withDiffCommand();
+
+        $this->assertVersionCount(0, 'should start with no versions');
+        $this->executeCommand('migrations:diff');
+        $this->assertSuccessfulExit();
+        $this->assertVersionCount(1, 'diff command should add one version');
+
+        $output = $this->executeCommand('migrations:status');
+        $this->assertSuccessfulExit();
+        $this->assertRegExp('/available migrations:\s+2$/im', $output);
+
+        $versions = $this->globVersions();
+        $contents = file_get_contents($versions[0]);
+
+        $this->assertContains('CREATE TABLE sample_entity', $contents);
+        $this->assertContains('DROP TABLE sample_entity', $contents);
+    }
+
     protected function setUp()
     {
         if (file_exists(__DIR__.'/_files/migrations.db')) {
@@ -99,11 +132,12 @@ class CliTest extends MigrationTestCase
             @unlink($file);
         }
 
+        $this->conn = $this->getSqliteConnection();
         $this->application = new Application('Doctrine Migrations Test', MigrationsVersion::VERSION());
         $this->application->setCatchExceptions(false);
         $this->application->setAutoExit(false);
         $this->application->getHelperSet()->set(
-            new ConnectionHelper($this->getSqliteConnection()),
+            new ConnectionHelper($this->conn),
             'connection'
         );
         $this->application->addCommands(array(
@@ -113,8 +147,12 @@ class CliTest extends MigrationTestCase
             new MigrationCommands\MigrateCommand(),
             new MigrationCommands\StatusCommand(),
             new MigrationCommands\VersionCommand(),
-            new MigrationCommands\DiffCommand(new StubSchemaProvider($this->getSchema())),
         ));
+    }
+
+    protected function withDiffCommand(SchemaProvider $provider=null)
+    {
+        $this->application->add(new MigrationCommands\DiffCommand($provider));
     }
 
     protected function executeCommand($commandName, array $args = array())
@@ -175,4 +213,9 @@ class FirstMigration extends AbstractMigration
     {
         $this->addSql('DROP TABLE foo');
     }
+}
+
+class SampleEntity
+{
+    private $id;
 }
