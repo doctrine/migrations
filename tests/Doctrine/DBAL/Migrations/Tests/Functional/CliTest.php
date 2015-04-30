@@ -23,6 +23,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\BufferedOutput;
+use Doctrine\DBAL\Version as DbalVersion;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\ORM\EntityManager;
@@ -123,6 +124,60 @@ class CliTest extends MigrationTestCase
         $this->assertContains('DROP TABLE sample_entity', $contents);
     }
 
+    public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter()
+    {
+        if ($this->isDbalOld()) {
+            $this->markTestSkipped(sprintf(
+                'Schema filters were added in DBAL 2.2, version %s installed',
+                DbalVersion::VERSION
+            ));
+        }
+
+        $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^bar$/');
+
+        $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
+        $this->assertVersionCount(0, 'should start with no versions');
+        $this->executeCommand('migrations:diff');
+        $this->assertSuccessfulExit();
+        $this->assertVersionCount(1, 'diff command should add one version');
+
+        $versions = $this->globVersions();
+        $contents = file_get_contents($versions[0]);
+
+        $this->assertContains('CREATE TABLE bar', $contents);
+        $this->assertContains('DROP TABLE bar', $contents);
+        $this->assertNotContains('CREATE TABLE foo', $contents, 'should ignore the "foo" table due to schema asset filter');
+    }
+
+    public function testDiffCommandSchemaFilterAreCaseSensitive()
+    {
+        if ($this->isDbalOld()) {
+            $this->markTestSkipped(sprintf(
+                'Schema filters were added in DBAL 2.2, version %s installed',
+                DbalVersion::VERSION
+            ));
+        }
+
+        $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^FOO$/');
+
+        $schema = new Schema();
+        $t = $schema->createTable('FOO');
+        $t->addColumn('id', 'integer', array('autoincrement' => true));
+        $t->setPrimaryKey(array('id'));
+
+        $this->withDiffCommand(new StubSchemaProvider($schema));
+        $this->assertVersionCount(0, 'should start with no versions');
+        $output = $this->executeCommand('migrations:diff');
+        $this->assertSuccessfulExit();
+        $this->assertVersionCount(1, 'diff command should add one version');
+
+        $versions = $this->globVersions();
+        $contents = file_get_contents($versions[0]);
+
+        $this->assertContains('CREATE TABLE FOO', $contents);
+        $this->assertContains('DROP TABLE FOO', $contents);
+    }
+
     protected function setUp()
     {
         if (file_exists(__DIR__.'/_files/migrations.db')) {
@@ -199,6 +254,11 @@ class CliTest extends MigrationTestCase
         $t->setPrimaryKey(array('id'));
 
         return $s;
+    }
+
+    protected function isDbalOld()
+    {
+        return DbalVersion::compare('2.2.0') > 0;
     }
 }
 
