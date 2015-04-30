@@ -149,6 +149,10 @@ class CliTest extends MigrationTestCase
         $this->assertNotContains('CREATE TABLE foo', $contents, 'should ignore the "foo" table due to schema asset filter');
     }
 
+    /**
+     * @see https://github.com/doctrine/migrations/issues/179
+     * @group regression
+     */
     public function testDiffCommandSchemaFilterAreCaseSensitive()
     {
         if ($this->isDbalOld()) {
