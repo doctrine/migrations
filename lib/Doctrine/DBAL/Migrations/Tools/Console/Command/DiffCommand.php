@@ -92,10 +92,9 @@ EOT
 
         //Not using value from options, because filters can be set from config.yml
         if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
-            $tableNames = $toSchema->getTableNames();
-            foreach ($tableNames as $tableName) {
-                $tableName = substr($tableName, strpos($tableName, '.') + 1);
-                if ( ! preg_match($filterExpr, $tableName)) {
+            foreach ($toSchema->getTables() as $table) {
+                $tableName = $table->getName();
+                if ( ! preg_match($filterExpr, $this->resolveTableName($tableName))) {
                     $toSchema->dropTable($tableName);
                 }
             }
@@ -149,5 +148,21 @@ EOT
         }
 
         return $this->schemaProvider;
+    }
+
+    /**
+     * Resolve a table name from its fully qualified name. The `$name` argument
+     * comes from Doctrine\DBAL\Schema\Table#getName which can sometimes return
+     * a namespaced name with the form `{namespace}.{tableName}`. This extracts
+     * the table name from that.
+     *
+     * @param   string $name
+     * @return  string
+     */
+    private function resolveTableName($name)
+    {
+        $pos = strpos($name, '.');
+
+        return false === $pos ? $name : substr($name, $pos + 1);
     }
 }
