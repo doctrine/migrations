@@ -105,6 +105,8 @@ abstract class AbstractCommand extends Command
                 $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
                 $configuration = new $class($this->getConnection($input), $this->getOutputWriter($output));
                 $configuration->load($input->getOption('configuration'));
+            } elseif ($this->configuration) {
+                $configuration = $this->configuration;
             } elseif (file_exists('migrations.xml')) {
                 $configuration = new XmlConfiguration($this->getConnection($input), $this->getOutputWriter($output));
                 $configuration->load('migrations.xml');
@@ -114,8 +116,6 @@ abstract class AbstractCommand extends Command
             } elseif (file_exists('migrations.yaml')) {
                 $configuration = new YamlConfiguration($this->getConnection($input), $this->getOutputWriter($output));
                 $configuration->load('migrations.yaml');
-            } elseif ($this->configuration) {
-                $configuration = $this->configuration;
             } else {
                 $configuration = new Configuration($this->getConnection($input), $this->getOutputWriter($output));
             }
