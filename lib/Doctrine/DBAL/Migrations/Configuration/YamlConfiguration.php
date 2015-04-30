@@ -57,5 +57,8 @@ class YamlConfiguration extends AbstractFileConfiguration
                 $this->registerMigration($migration['version'], $migration['class']);
             }
         }
+        if (isset($array['type_mappings']) && is_array($array['type_mappings'])) {
+            $this->setTypeMappings($array['type_mappings']);
+        }
     }
 }

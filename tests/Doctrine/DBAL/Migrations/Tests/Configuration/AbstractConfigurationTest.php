@@ -32,4 +32,11 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
         $config = $this->loadConfiguration();
         $this->assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
+
+    public function testTypeMappings()
+    {
+        $config = $this->loadConfiguration();
+        $typeMappings = $config->getTypeMappings();
+        $this->assertEquals(array('enum' => 'string'), $typeMappings);
+    }
 }

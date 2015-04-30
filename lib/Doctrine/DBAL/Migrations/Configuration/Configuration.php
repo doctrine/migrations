@@ -89,6 +89,13 @@ class Configuration
     private $migrationsNamespace;
 
     /**
+     * Type mappings
+     *
+     * @var array
+     */
+    private $typeMappings = array();
+
+    /**
      * Array of the registered migrations
      *
      * @var Version[]
@@ -242,6 +249,30 @@ class Configuration
     public function getMigrationsNamespace()
     {
         return $this->migrationsNamespace;
+    }
+
+    /**
+     * Set and register type mappings
+     *
+     * @param array $typeMappings Type mappings in form of array('dbType'=>'doctrineType', ...)
+     */
+    public function setTypeMappings($typeMappings)
+    {
+        $this->typeMappings = $typeMappings;
+
+        foreach($typeMappings as $dbType => $doctrineType) {
+            $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping($dbType, $doctrineType);
+        }
+    }
+
+    /**
+     * Returns the type mappings
+     *
+     * @return array Type mappings
+     */
+    public function getTypeMappings()
+    {
+        return $this->typeMappings;
     }
 
     /**
