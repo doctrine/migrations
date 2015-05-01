@@ -58,6 +58,8 @@ class VersionCommand extends AbstractCommand
             ->addOption('add', null, InputOption::VALUE_NONE, 'Add the specified version.')
             ->addOption('delete', null, InputOption::VALUE_NONE, 'Delete the specified version.')
             ->addOption('all', null, InputOption::VALUE_NONE, 'Apply to all the versions.')
+            ->addOption('range-from', null, InputOption::VALUE_OPTIONAL, 'Apply from specified version.')
+            ->addOption('range-to', null, InputOption::VALUE_OPTIONAL, 'Apply to specified version.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
@@ -71,6 +73,11 @@ If you want to synchronize by adding or deleting all migration versions availabl
 
     <info>%command.full_name% --add --all</info>
     <info>%command.full_name% --delete --all</info>
+
+If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range-from/--range-to</comment> option:
+
+    <info>%command.full_name% --add --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% --delete --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
 
 You can also execute this command without a warning message which you need to interact with:
 
@@ -94,27 +101,44 @@ EOT
         if ($input->isInteractive()) {
             $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
             if ($confirmation) {
-                $this->markAllAvailableVersions($input);
+                $this->markVersions($input);
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }
         } else {
-            $this->markAllAvailableVersions($input);
+            $this->markVersions($input);
         }
 
     }
 
-    private function markAllAvailableVersions(InputInterface $input)
+    private function markVersions(InputInterface $input)
     {
-        $version = $input->getArgument('version');
+        $affectedVersion = $input->getArgument('version');
 
-        if ($input->getOption('all') === true) {
+        $allOption       = $input->getOption('all');
+        $rangeFromOption = $input->getOption('range-from');
+        $rangeToOption   = $input->getOption('range-to');
+
+        if ($allOption && ($rangeFromOption !== null || $rangeToOption !== null)) {
+            throw new \InvalidArgumentException('Options --all and --range-to/--range-from both used. You should use only one of them.');
+        } elseif ($rangeFromOption !== null ^ $rangeToOption !== null) {
+            throw new \InvalidArgumentException('Options --range-to and --range-from should be used together.');
+        }
+
+        if ($allOption === true) {
             $availableVersions = $this->configuration->getAvailableVersions();
             foreach ($availableVersions as $version) {
                 $this->mark($version, true);
             }
+        } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
+            $availableVersions = $this->configuration->getAvailableVersions();
+            foreach ($availableVersions as $version) {
+                if ($version >= $rangeFromOption && $version <= $rangeToOption) {
+                    $this->mark($version, true);
+                }
+            }
         } else {
-            $this->mark($version);
+            $this->mark($affectedVersion);
         }
     }
 
