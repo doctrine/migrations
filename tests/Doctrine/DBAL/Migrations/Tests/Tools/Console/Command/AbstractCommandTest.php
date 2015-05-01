@@ -8,6 +8,8 @@ use Symfony\Component\Console\Helper\HelperSet;
 
 class AbstractCommandTest extends MigrationTestCase
 {
+    private $originalCwd;
+
     /**
      * Invoke invisible migration configuration getter
      *
@@ -134,5 +136,71 @@ class AbstractCommandTest extends MigrationTestCase
         $this->assertEquals('name', $actualConfiguration->getName());
         $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
         $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+    }
+
+    public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
+            ->getMock();
+
+        $input->expects($this->any())
+            ->method('getOption')
+            ->will($this->returnValueMap(array(
+                array('configuration', __DIR__ . '/_files/config.yml')
+            )));
+
+        $configuration = $this
+            ->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
+
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\YamlConfiguration', $actualConfiguration);
+        $this->assertEquals('name', $actualConfiguration->getName());
+        $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
+        $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+    }
+
+    /**
+     * @see https://github.com/doctrine/migrations/issues/228
+     * @group regression
+     */
+    public function testInjectedConfigurationIsPreferedOverConfigFileIsCurrentWorkingDirectory()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
+            ->getMock();
+
+        $input->expects($this->any())
+            ->method('getOption')
+            ->will($this->returnValueMap(array(
+                array('configuration', null)
+            )));
+
+        $configuration = $this
+            ->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        chdir(__DIR__.'/_files');
+        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
+
+        $this->assertSame($configuration, $actualConfiguration);
+    }
+
+    protected function setUp()
+    {
+        $this->originalCwd = getcwd();
+    }
+
+    protected function tearDown()
+    {
+        if (getcwd() !== $this->originalCwd) {
+            chdir($this->originalCwd);
+        }
     }
 }
