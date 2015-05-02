@@ -23,6 +23,7 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -100,26 +101,8 @@ abstract class AbstractCommand extends Command
     protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
         if (!$this->migrationConfiguration) {
-            if ($input->getOption('configuration')) {
-                $info = pathinfo($input->getOption('configuration'));
-                $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
-                $configuration = new $class($this->getConnection($input), $this->getOutputWriter($output));
-                $configuration->load($input->getOption('configuration'));
-            } elseif ($this->configuration) {
-                $configuration = $this->configuration;
-            } elseif (file_exists('migrations.xml')) {
-                $configuration = new XmlConfiguration($this->getConnection($input), $this->getOutputWriter($output));
-                $configuration->load('migrations.xml');
-            } elseif (file_exists('migrations.yml')) {
-                $configuration = new YamlConfiguration($this->getConnection($input), $this->getOutputWriter($output));
-                $configuration->load('migrations.yml');
-            } elseif (file_exists('migrations.yaml')) {
-                $configuration = new YamlConfiguration($this->getConnection($input), $this->getOutputWriter($output));
-                $configuration->load('migrations.yaml');
-            } else {
-                $configuration = new Configuration($this->getConnection($input), $this->getOutputWriter($output));
-            }
-            $this->migrationConfiguration = $configuration;
+            $configHelper = new ConfigurationHelper($this->getConnection($input), $this->configuration);
+            $this->migrationConfiguration = $configHelper->getMigrationConfig($input, $this->getOutputWriter($output));
         }
 
         return $this->migrationConfiguration;
