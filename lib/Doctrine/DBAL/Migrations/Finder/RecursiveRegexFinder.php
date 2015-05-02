@@ -27,19 +27,7 @@ namespace Doctrine\DBAL\Migrations\Finder;
  */
 final class RecursiveRegexFinder extends AbstractFinder
 {
-    const DEFAULT_PATTERN = '/Version\d{14}\.php$/i';
-
-    /**
-     * The regex pattern to match against.
-     *
-     * @var     string
-     */
-    private $pattern;
-
-    public function __construct($pattern=null)
-    {
-        $this->pattern = $pattern ?: self::DEFAULT_PATTERN;
-    }
+    const PATTERN = '/Version\d{14}\.php$/i';
 
     /**
      * {@inheritdoc}
@@ -72,7 +60,7 @@ final class RecursiveRegexFinder extends AbstractFinder
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
-            $this->pattern
+            self::PATTERN
         );
     }
 }
