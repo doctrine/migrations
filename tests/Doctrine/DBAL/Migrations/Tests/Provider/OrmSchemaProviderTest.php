@@ -58,13 +58,13 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
     public static function notEntityManagers()
     {
-        return [
-            [new \stdclass],
-            [false],
-            [1],
-            ['oops'],
-            [1.0],
-        ];
+        return array(
+            array(new \stdclass),
+            array(false),
+            array(1),
+            array('oops'),
+            array(1.0),
+        );
     }
 
     /**
