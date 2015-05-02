@@ -56,6 +56,26 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->ormProvider->createSchema();
     }
 
+    public static function notEntityManagers()
+    {
+        return [
+            [new \stdclass],
+            [false],
+            [1],
+            ['oops'],
+            [1.0],
+        ];
+    }
+
+    /**
+     * @dataProvider notEntityManagers
+     * @expectedException InvalidArgumentException
+     */
+    public function testPassingAnInvalidEntityManagerToConstructorCausesError($em)
+    {
+        new OrmSchemaProvider($em);
+    }
+
     protected function setUp()
     {
         $this->conn = $this->getSqliteConnection();
