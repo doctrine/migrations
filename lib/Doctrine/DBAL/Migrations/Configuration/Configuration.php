@@ -23,8 +23,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Finder\GlobFinder;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinder;
+use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -646,7 +646,7 @@ class Configuration
     protected function getMigrationFinder()
     {
         if (!$this->migrationFinder) {
-            $this->migrationFinder = new GlobFinder();
+            $this->migrationFinder = new RecursiveRegexFinder();
         }
 
         return $this->migrationFinder;
