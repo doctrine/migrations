@@ -27,7 +27,7 @@ namespace Doctrine\DBAL\Migrations\Finder;
  */
 final class RecursiveRegexFinder extends AbstractFinder
 {
-    const PATTERN = '/Version\d{14}\.php$/i';
+    const PATTERN = '#^.+Version(.{1,255})\.php$#i';
 
     /**
      * {@inheritdoc}
@@ -44,9 +44,9 @@ final class RecursiveRegexFinder extends AbstractFinder
 
         $migrations = array();
         foreach ($this->createIterator($dir) as $file) {
-            static::requireOnce($file);
-            $className = $file->getBasename('.php');
-            $version = substr($className, -14);
+            list($fileName, $version) = $file;
+            static::requireOnce($fileName);
+            $className = basename($fileName, '.php');
             $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
         }
 
@@ -60,7 +60,8 @@ final class RecursiveRegexFinder extends AbstractFinder
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
-            self::PATTERN
+            self::PATTERN,
+            \RegexIterator::GET_MATCH
         );
     }
 }
