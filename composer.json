@@ -19,6 +19,9 @@
         "doctrine/orm": "2.*",
         "phpunit/phpunit": "~4.0"
     },
+    "conflict": {
+        "doctrine/orm": "<2.4"
+    },
     "suggest": {
         "symfony/console": "to run the migration from the console"
     },
