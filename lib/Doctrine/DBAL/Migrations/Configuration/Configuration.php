@@ -23,6 +23,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinder;
+use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -68,6 +70,14 @@ class Configuration
     private $outputWriter;
 
     /**
+     * The migration finder implementation -- used to load migrations from a 
+     * directory.
+     *
+     * @var MigrationFinder
+     */
+    private $migrationFinder;
+
+    /**
      * The migration table name to track versions in
      *
      * @var string
@@ -101,13 +111,14 @@ class Configuration
      * @param Connection   $connection   A Connection instance
      * @param OutputWriter $outputWriter A OutputWriter instance
      */
-    public function __construct(Connection $connection, OutputWriter $outputWriter = null)
+    public function __construct(Connection $connection, OutputWriter $outputWriter = null, MigrationFinder $finder = null)
     {
         $this->connection = $connection;
         if ($outputWriter === null) {
             $outputWriter = new OutputWriter();
         }
         $this->outputWriter = $outputWriter;
+        $this->migrationFinder = $finder;
     }
 
     /**
@@ -245,6 +256,17 @@ class Configuration
     }
 
     /**
+     * set the implementation of the migration finder.
+     *
+     * @param   $finder The new migration finder
+     * @return  void
+     */
+    public function setMigrationFinder(MigrationFinder $finder)
+    {
+        $this->migrationFinder = $finder;
+    }
+
+    /**
      * Register migrations from a given directory. Recursively finds all files
      * with the pattern VersionYYYYMMDDHHMMSS.php as the filename and registers
      * them as migrations.
@@ -255,18 +277,9 @@ class Configuration
      */
     public function registerMigrationsFromDirectory($path)
     {
-        $path = realpath($path);
-        $path = rtrim($path, '/');
-        $files = glob($path . '/Version*.php');
         $versions = array();
-        if ($files) {
-            foreach ($files as $file) {
-                require_once $file;
-                $info = pathinfo($file);
-                $version = substr($info['filename'], 7);
-                $class = $this->migrationsNamespace . '\\' . $info['filename'];
-                $versions[] = $this->registerMigration($version, $class);
-            }
+        foreach ($this->findMigrations($path) as $version => $class) {
+            $versions[] = $this->registerMigration($version, $class);
         }
 
         return $versions;
@@ -612,6 +625,31 @@ class Configuration
         }
 
         return $versions;
+    }
+
+    /**
+     * Find all the migrations in a given directory.
+     *
+     * @param   string $path the directory to search.
+     * @return  array
+     */
+    protected function findMigrations($path)
+    {
+        return $this->getMigrationFinder()->findMigrations($path, $this->getMigrationsNamespace());
+    }
+
+    /**
+     * Get the migration finder, creating one if it's not present.
+     *
+     * @return   MigrationFinder
+     */
+    protected function getMigrationFinder()
+    {
+        if (!$this->migrationFinder) {
+            $this->migrationFinder = new RecursiveRegexFinder();
+        }
+
+        return $this->migrationFinder;
     }
 
     /**
