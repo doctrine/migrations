@@ -50,6 +50,7 @@ class ConfigurationHelper {
             $outputWriter->write("Loading configuration from command option: " . $input->getOption('configuration'));
         } elseif ($this->configuration) {
             $configuration = $this->configuration;
+            $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
         } elseif ($this->configExists('migrations.xml')) {
             $configuration = $this->loadConfig('migrations.xml', $outputWriter);
             $outputWriter->write("Loading configuration from file: migrations.xml");
