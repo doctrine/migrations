@@ -25,7 +25,13 @@ use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 
-class ConfigurationHelper {
+/**
+ * Class ConfigurationHelper
+ * @package Doctrine\DBAL\Migrations\Tools\Console\Helper
+ * @internal
+ */
+final class ConfigurationHelper
+{
 
     /**
      * @var Connection
@@ -37,33 +43,50 @@ class ConfigurationHelper {
      */
     private $configuration;
 
-    public function __construct(Connection $connection=null, Configuration $configuration=null)
+    public function __construct(Connection $connection = null, Configuration $configuration = null)
     {
-        $this->connection = $connection;
+        $this->connection    = $connection;
         $this->configuration = $configuration;
     }
 
     public function getMigrationConfig(InputInterface $input, OutputWriter $outputWriter)
     {
+        /**
+         * If a configuration option is passed to the command line, use that configuration
+         * instead of any other one.
+         */
         if ($input->getOption('configuration')) {
-            $configuration = $this->loadConfig($input->getOption('configuration'), $outputWriter);
             $outputWriter->write("Loading configuration from command option: " . $input->getOption('configuration'));
-        } elseif ($this->configuration) {
-            $configuration = $this->configuration;
-            $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
-        } elseif ($this->configExists('migrations.xml')) {
-            $configuration = $this->loadConfig('migrations.xml', $outputWriter);
-            $outputWriter->write("Loading configuration from file: migrations.xml");
-        } elseif ($this->configExists('migrations.yml')) {
-            $configuration = $this->loadConfig('migrations.yml', $outputWriter);
-            $outputWriter->write("Loading configuration from file: migrations.yml");
-        } elseif ($this->configExists('migrations.yaml')) {
-            $configuration = $this->loadConfig('migrations.yaml', $outputWriter);
-            $outputWriter->write("Loading configuration from file: migrations.yaml");
-        } else {
-            $configuration = new Configuration($this->connection, $outputWriter);
+
+            return $this->loadConfig($input->getOption('configuration'), $outputWriter);
         }
-        return $configuration;
+
+        /**
+         * If a configuration has already been set using DI or a Setter use it.
+         */
+        if ($this->configuration) {
+            $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
+
+            return $this->configuration;
+        }
+
+        /**
+         * If no any other config has been found, look for default config file in the path.
+         */
+        $defaultConfig = array(
+            'migrations.xml',
+            'migrations.yml',
+            'migrations.yaml',
+        );
+        foreach ($defaultConfig as $config) {
+            if ($this->configExists($config)) {
+                $outputWriter->write("Loading configuration from file: $config");
+
+                return $this->loadConfig($config, $outputWriter);
+            }
+        }
+
+        return new Configuration($this->connection, $outputWriter);
     }
 
 
@@ -74,11 +97,12 @@ class ConfigurationHelper {
 
     private function loadConfig($config, OutputWriter $outputWriter)
     {
-        $info = pathinfo($config);
-        $class = $info['extension'] === 'xml' ? 'Doctrine\DBAL\Migrations\Configuration\XmlConfiguration' : 'Doctrine\DBAL\Migrations\Configuration\YamlConfiguration';
+        $info          = pathinfo($config);
+        $class         = 'Doctrine\DBAL\Migrations\Configuration';
+        $class        .= $info['extension'] === 'xml' ? '\XmlConfiguration' : '\YamlConfiguration';
         $configuration = new $class($this->connection, $outputWriter);
         $configuration->load($config);
+
         return $configuration;
     }
-
 }

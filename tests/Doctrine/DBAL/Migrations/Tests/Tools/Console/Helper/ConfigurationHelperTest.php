@@ -10,7 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class ConfigurationHelperTest extends MigrationTestCase {
+class ConfigurationHelperTest extends MigrationTestCase
+{
 
     /**
      * @var Connection
