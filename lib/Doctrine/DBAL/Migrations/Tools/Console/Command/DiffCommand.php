@@ -144,7 +144,7 @@ EOT
     private function getSchemaProvider()
     {
         if (!$this->schemaProvider) {
-            $this->schemaProvider = new OrmSchemaProvider($this->getHelper('em')->getEntityManager());
+            $this->schemaProvider = new OrmSchemaProvider($this->getHelper('entityManager')->getEntityManager());
         }
 
         return $this->schemaProvider;
