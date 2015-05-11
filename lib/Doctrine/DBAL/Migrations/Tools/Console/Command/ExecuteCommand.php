@@ -92,7 +92,7 @@ EOT
             }
 
             if ($execute) {
-                $version->execute($direction, (boolean) $input->getOption('dry-run'));
+                $version->execute($direction, (boolean) $input->getOption('dry-run'), $timeAllqueries);
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }
