@@ -17,7 +17,8 @@
         "symfony/console": "2.*",
         "symfony/yaml": "2.*",
         "doctrine/orm": "2.*",
-        "phpunit/phpunit": "~4.0"
+        "phpunit/phpunit": "~4.0",
+        "doctrine/coding-standard": "dev-master"
     },
     "conflict": {
         "doctrine/orm": "<2.4"
