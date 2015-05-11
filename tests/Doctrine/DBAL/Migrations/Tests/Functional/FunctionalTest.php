@@ -249,6 +249,23 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $this->assertEquals(array(), $sql);;
     }
+
+    /**
+     * @see https://github.com/doctrine/migrations/issues/61
+     * @group regresion
+     */
+    public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated()
+    {
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+
+        $this->config->registerMigration('20120228123443', 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $sql = $migration->migrate();
+        $this->assertCount(1, $sql, 'should have executed one migration');
+
+        $this->config->registerMigration('20120228114838', 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $sql = $migration->migrate();
+        $this->assertCount(1, $sql, 'should have executed one migration');
+    }
 }
 
 class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
