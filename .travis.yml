@@ -14,4 +14,12 @@ matrix:
 install:
   - composer install
 
-script: ./vendor/bin/phpunit
+script:
+  - mkdir -p build/logs
+  - ./vendor/bin/phpunit
+
+
+after_script:
+  - php vendor/bin/coveralls -v
+  - wget https://scrutinizer-ci.com/ocular.phar
+  - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
