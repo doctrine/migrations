@@ -18,10 +18,12 @@
         "symfony/yaml": "2.*",
         "doctrine/orm": "2.*",
         "phpunit/phpunit": "~4.0",
-        "satooshi/php-coveralls": "0.6.*"
+        "satooshi/php-coveralls": "0.6.*",
+        "doctrine/coding-standard": "dev-master"
     },
     "conflict": {
         "doctrine/orm": "<2.4"
+
     },
     "suggest": {
         "symfony/console": "to run the migration from the console"
