@@ -247,7 +247,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $sql = $migration->migrate();
 
-        $this->assertEquals(array(), $sql);;
+        $this->assertEquals(array(), $sql);
     }
 
     /**
