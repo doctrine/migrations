@@ -74,3 +74,9 @@ phar.readonly = Off
 To install dependencies run a composer update:
 
 ```composer update```
+
+## symfony 2.3 users
+
+Doctrine migration need the doctrine/orm 2.4, you need to [update your composer.json](https://github.com/symfony/symfony-standard/blob/v2.3.28/composer.json#L12) to the last version of it for symfony 2.3.
+
+That version is compatible with the doctrine/orm 2.4 and there are [very little upgrade needed](https://github.com/doctrine/doctrine2/blob/master/UPGRADE.md#upgrade-to-24).
