@@ -253,18 +253,31 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
     /**
      * @see https://github.com/doctrine/migrations/issues/61
      * @group regresion
+     * @dataProvider provideTestMigrationNames
      */
-    public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated()
+    public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated(array $migrations)
     {
-        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        foreach( $migrations as $key => $class){
+            $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+            $this->config->registerMigration($key, $class);
+            $sql = $migration->migrate();
+            $this->assertCount(1, $sql, 'should have executed one migration');
+        }
 
-        $this->config->registerMigration('20120228123443', 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
-        $sql = $migration->migrate();
-        $this->assertCount(1, $sql, 'should have executed one migration');
+    }
 
-        $this->config->registerMigration('20120228114838', 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $sql = $migration->migrate();
-        $this->assertCount(1, $sql, 'should have executed one migration');
+    public function provideTestMigrationNames()
+    {
+        return array(
+            array(array(
+                '20120228123443' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
+                '20120228114838' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
+            )),
+            array(array(
+                '002Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
+                '001Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
+            ))
+        );
     }
 }
 
