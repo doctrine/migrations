@@ -99,7 +99,15 @@ EOT
         $this->markMigrated = (boolean) $input->getOption('add');
 
         if ($input->isInteractive()) {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            $questionText = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)';
+
+            if ($this->getHelperSet()->has('question')) {
+                $question = new \Symfony\Component\Console\Question\ConfirmationQuestion($questionText);
+                $confirmation = $this->getHelper('question')->ask($input, $output, $question);
+            } else {
+                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>' .  $questionText . '</question>', false);
+            }
+
             if ($confirmation) {
                 $this->markVersions($input);
             } else {

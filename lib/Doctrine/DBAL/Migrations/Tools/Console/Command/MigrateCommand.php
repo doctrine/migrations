@@ -117,7 +117,14 @@ EOT
             }
 
             if (! $noInteraction) {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+                $questionText = 'Are you sure you wish to continue? (y/n)';
+                if ($this->getHelperSet()->has('question')) {
+                    $question = new \Symfony\Component\Console\Question\ConfirmationQuestion($questionText);
+                    $confirmation = $this->getHelper('question')->ask($input, $output, $question);
+                } else {
+                    $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>' .  $questionText . '</question>', false);
+                }
+
                 if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
