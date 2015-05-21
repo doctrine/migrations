@@ -10,9 +10,17 @@ php:
 matrix:
   allow_failures:
     - php: 7.0
+  include:
+    - php: 5.4
+      env: deps=low
+      
+env:
+  global:
+    - deps=no
 
 install:
-  - composer install
+  - if [ "$deps" = "no" ]; then composer install; fi;
+  - if [ "$deps" = "low" ]; then composer --prefer-lowest --prefer-stable update; fi;
 
 script:
   - mkdir -p build/logs
