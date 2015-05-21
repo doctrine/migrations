@@ -14,8 +14,8 @@
         "doctrine/dbal": "~2.0"
     },
     "require-dev": {
-        "symfony/console": "~2.1",
-        "symfony/yaml": "2.*",
+        "symfony/console": "~2.3",
+        "symfony/yaml": "~2.3",
         "doctrine/orm": "2.*",
         "phpunit/phpunit": "~4.0",
         "satooshi/php-coveralls": "0.6.*",

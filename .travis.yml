@@ -13,7 +13,7 @@ matrix:
   include:
     - php: 5.4
       env: deps=low
-      
+
 env:
   global:
     - deps=no
