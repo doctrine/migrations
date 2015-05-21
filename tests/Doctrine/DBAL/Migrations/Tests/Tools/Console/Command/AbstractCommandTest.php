@@ -248,7 +248,7 @@ class AbstractCommandTest extends MigrationTestCase
         }
     }
 
-    protected function getInputStream($input)
+    private function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
         fputs($stream, $input);
