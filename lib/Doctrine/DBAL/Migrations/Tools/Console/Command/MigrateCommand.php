@@ -117,7 +117,9 @@ EOT
             }
 
             if (! $noInteraction) {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>Are you sure you wish to continue? (y/n)</question>', false);
+                $question = 'Are you sure you wish to continue? (y/n)';
+                $confirmation = $this->askConfirmation($question, $input, $output);
+
                 if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
@@ -134,7 +136,9 @@ EOT
 
             // warn the user if no dry run and interaction is on
             if (! $dryRun && ! $noInteraction) {
-                $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
+                $confirmation = $this->askConfirmation($question, $input, $output);
+
                 if (! $confirmation) {
                     $output->writeln('<error>Migration cancelled!</error>');
 

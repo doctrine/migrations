@@ -86,7 +86,8 @@ EOT
             $version->writeSqlFile($path, $direction);
         } else {
             if ($input->isInteractive()) {
-                $execute = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)</question>', false);
+                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
+                $execute = $this->askConfirmation($question, $input, $output);
             } else {
                 $execute = true;
             }

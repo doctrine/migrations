@@ -99,7 +99,10 @@ EOT
         $this->markMigrated = (boolean) $input->getOption('add');
 
         if ($input->isInteractive()) {
-            $confirmation = $this->getHelper('dialog')->askConfirmation($output, '<question>WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)</question>', false);
+            $question = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)';
+
+            $confirmation = $this->askConfirmation($question, $input, $output);
+
             if ($confirmation) {
                 $this->markVersions($input);
             } else {

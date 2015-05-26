@@ -28,6 +28,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Question\ConfirmationQuestion;
 
 /**
  * CLI Command for adding and deleting migration versions from the version table.
@@ -109,6 +110,24 @@ abstract class AbstractCommand extends Command
     }
 
     /**
+     * This method ensure that we stay compatible with symfony console 2.3 by using the deprecated dialog helper
+     * but use the ConfirmationQuestion when available.
+     *
+     * @param $question
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return mixed
+     */
+    protected function askConfirmation($question, InputInterface $input, OutputInterface $output)
+    {
+        if ($this->getHelperSet()->has('question')) {
+            return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
+        } else {
+            return $this->getHelper('dialog')->askConfirmation($output, '<question>' .  $question . '</question>', false);
+        }
+    }
+
+    /**
      * @param \Symfony\Component\Console\Output\OutputInterface $output
      *
      * @return \Doctrine\DBAL\Migrations\OutputWriter
@@ -158,4 +177,5 @@ abstract class AbstractCommand extends Command
 
         return $this->connection;
     }
+
 }

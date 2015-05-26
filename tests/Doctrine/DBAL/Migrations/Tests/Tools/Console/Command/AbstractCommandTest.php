@@ -4,7 +4,9 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 
 class AbstractCommandTest extends MigrationTestCase
 {
@@ -190,6 +192,69 @@ class AbstractCommandTest extends MigrationTestCase
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
 
         $this->assertSame($configuration, $actualConfiguration);
+    }
+
+    public function invokeAbstractCommandConfirmation($input, $helper, $response="y", $question="There is no question?")
+    {
+        $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand');
+        $method = $class->getMethod('askConfirmation');
+        $method->setAccessible(true);
+
+        /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
+        $command = $this->getMockForAbstractClass(
+            'Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand',
+            array('command')
+        );
+
+        $helper->setInputStream($this->getInputStream($response . "\n"));
+        if ($helper instanceof QuestionHelper) {
+            $helperSet = new HelperSet(array(
+                'question' => $helper
+            ));
+        } else {
+            $helperSet = new HelperSet(array(
+                'dialog' => $helper
+            ));
+        }
+
+        $command->setHelperSet($helperSet);
+
+        $output = $this->getMockBuilder('Symfony\Component\Console\Output\Output')
+            ->setMethods(array('doWrite', 'writeln'))
+            ->getMock();
+
+        $output->expects($this->any())
+            ->method('doWrite');
+
+        return $method->invokeArgs($command, array($question, $input, $output));
+    }
+
+    public function testAskConfirmation()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs(array(array()))
+            ->setMethods(array('getOption'))
+            ->getMock();
+
+        $helper = new DialogHelper();
+
+        $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
+        $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+
+        if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
+            $helper = new QuestionHelper();
+            $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
+            $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+        }
+    }
+
+    private function getInputStream($input)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+        fputs($stream, $input);
+        rewind($stream);
+
+        return $stream;
     }
 
     protected function setUp()

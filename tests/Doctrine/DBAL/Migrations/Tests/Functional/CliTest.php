@@ -22,7 +22,6 @@ namespace Doctrine\DBAL\Migrations\Tests\Functional;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
-use Symfony\Component\Console\Output\BufferedOutput;
 use Doctrine\DBAL\Version as DbalVersion;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
@@ -35,6 +34,7 @@ use Doctrine\DBAL\Migrations\Provider\SchemaProvider;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
 use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Symfony\Component\Console\Output\StreamOutput;
 
 
 /**
@@ -220,11 +220,11 @@ class CliTest extends MigrationTestCase
             'command'               => $commandName,
             '--configuration'       => __DIR__.'/_files/config.yml',
         ), $args));
-        $output = new BufferedOutput();
+        $output = $this->getOutputStream();
 
         $this->lastExit = $this->application->run($input, $output);
 
-        return $output->fetch();
+        return $this->getOutputStreamContent($output);
     }
 
     protected function assertSuccessfulExit($msg='')
