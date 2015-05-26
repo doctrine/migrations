@@ -21,6 +21,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
 {
@@ -41,5 +42,21 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
         $config->setMigrationsNamespace('DoctrineMigrations');
 
         return $config;
+    }
+
+    public function getOutputStream()
+    {
+        $stream = fopen('php://memory', 'r+', false);
+        $streamOutput = new StreamOutput($stream);
+
+        return $streamOutput;
+    }
+
+    public function getOutputStreamContent(StreamOutput $streamOutput)
+    {
+        $stream = $streamOutput->getStream();
+        rewind($stream);
+
+        return stream_get_contents($stream);
     }
 }

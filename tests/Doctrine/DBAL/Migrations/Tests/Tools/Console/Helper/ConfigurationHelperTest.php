@@ -69,7 +69,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
-        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", $this->output->fetch());
+        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", $this->getOutputStreamContent($this->output));
     }
 
     public function testConfigurationHelperWithConfigurationFromSetterAndOverrideFromCommandLine()
@@ -84,7 +84,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
-        $this->assertStringMatchesFormat("Loading configuration from command option: %a", $this->output->fetch());
+        $this->assertStringMatchesFormat("Loading configuration from command option: %a", $this->getOutputStreamContent($this->output));
     }
 
     public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath()
@@ -99,13 +99,13 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
-        $this->assertStringMatchesFormat("", $this->output->fetch());
+        $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 
     private function getOutputWriter()
     {
         if (!$this->outputWriter) {
-            $this->output = new BufferedOutput();
+            $this->output = $this->getOutputStream();
             $output = $this->output;
             $this->outputWriter = new OutputWriter(function ($message) use ($output) {
                 return $output->writeln($message);
