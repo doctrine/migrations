@@ -172,17 +172,29 @@ class Configuration
      * @param string $version
      *
      * @return string The formatted version
+     * @deprecated
      */
     public function formatVersion($version)
     {
-        return sprintf('%s-%s-%s %s:%s:%s',
-            substr($version, 0, 4),
-            substr($version, 4, 2),
-            substr($version, 6, 2),
-            substr($version, 8, 2),
-            substr($version, 10, 2),
-            substr($version, 12, 2)
-        );
+        return $this->getDateTime($version);
+    }
+
+    /**
+     * Returns the date of a migration
+     *
+     * @param $version
+     * @return bool|string
+     */
+    public function getDateTime($version)
+    {
+        $datetime = str_replace('Version', '', $version);
+        $datetime = \DateTime::createFromFormat('YmdHms', $datetime);
+
+        if ($datetime === false){
+            return '';
+        }
+
+        return $datetime->format('Y-m-d H:m:s');
     }
 
     /**

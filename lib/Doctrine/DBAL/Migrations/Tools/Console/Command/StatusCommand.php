@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -69,7 +70,7 @@ EOT
             } elseif ($version === '0') {
                 $formattedVersions[$alias] = '<comment>0</comment>';
             } else {
-                $formattedVersions[$alias] = $configuration->formatVersion($version) . ' (<comment>' . $version . '</comment>)';
+                $formattedVersions[$alias] = $configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
             }
         }
 
@@ -104,28 +105,36 @@ EOT
 
         if ($input->getOption('show-versions')) {
             if ($migrations = $configuration->getMigrations()) {
+                $executedUnavailableMigrations = $migrations;
                 $output->writeln("\n <info>==</info> Available Migration Versions\n");
-                $migratedVersions = $configuration->getMigratedVersions();
-                foreach ($migrations as $version) {
-                    $isMigrated = in_array($version->getVersion(), $migratedVersions);
-                    $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
-                    $migrationName = $version->getMigration()->getDescription();
-                    if ($migrationName) {
-                        $migrationName = str_repeat(' ', 10) . $migrationName;
-                    }
-                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($version->getVersion()) .
-                        ' (<comment>' . $version->getVersion() . '</comment>)' .
-                        str_repeat(' ', 30 - strlen($name)) . $status . $migrationName);
-                }
+
+                $this->showVersions($migrations, $configuration, $output);
             }
 
             if ($executedUnavailableMigrations) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
-                foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
-                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) .
-                        ' (<comment>' . $executedUnavailableMigration . '</comment>)');
-                }
+                $this->showVersions($executedUnavailableMigrations, $configuration, $output);
             }
+        }
+    }
+
+    private function showVersions($migrations, Configuration $configuration, $output)
+    {
+        $migratedVersions = $configuration->getMigratedVersions();
+
+        foreach($migrations as $version) {
+            $isMigrated = in_array($version->getVersion(), $migratedVersions);
+            $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $migrationDescription = '';
+            if ($version->getMigration()->getDescription()) {
+                $migrationDescription = str_repeat(' ', 5) . $version->getMigration()->getDescription();
+            }
+            $formattedVersion = $configuration->getDateTime($version->getVersion());
+
+            $output->writeln('    <comment>>></comment> ' . $formattedVersion .
+                ' (<comment>' . $version->getVersion() . '</comment>)' .
+                str_repeat(' ', 49 - strlen($formattedVersion) - strlen($version->getVersion()))  .
+                $status  . $migrationDescription);
         }
     }
 }
