@@ -423,7 +423,7 @@ class Configuration
         $this->createMigrationTable();
 
         $where = null;
-        if ($this->migrations) {
+        if (!empty($this->migrations)) {
             $migratedVersions = array();
             foreach ($this->migrations as $migration) {
                 $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
