@@ -277,12 +277,7 @@ class Configuration
      */
     public function registerMigrationsFromDirectory($path)
     {
-        $versions = array();
-        foreach ($this->findMigrations($path) as $version => $class) {
-            $versions[] = $this->registerMigration($version, $class);
-        }
-
-        return $versions;
+        return $this->registerMigrations($this->findMigrations($path));
     }
 
     /**
