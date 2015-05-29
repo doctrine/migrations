@@ -277,12 +277,7 @@ class Configuration
      */
     public function registerMigrationsFromDirectory($path)
     {
-        $versions = array();
-        foreach ($this->findMigrations($path) as $version => $class) {
-            $versions[] = $this->registerMigration($version, $class);
-        }
-
-        return $versions;
+        return $this->registerMigrations($this->findMigrations($path));
     }
 
     /**
@@ -428,7 +423,7 @@ class Configuration
         $this->createMigrationTable();
 
         $where = null;
-        if ($this->migrations) {
+        if (!empty($this->migrations)) {
             $migratedVersions = array();
             foreach ($this->migrations as $migration) {
                 $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
