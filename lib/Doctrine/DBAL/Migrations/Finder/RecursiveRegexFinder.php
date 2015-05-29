@@ -34,13 +34,7 @@ final class RecursiveRegexFinder extends AbstractFinder
      */
     public function findMigrations($directory, $namespace=null)
     {
-        $dir = realpath($directory);
-        if (false === $dir || !is_dir($dir)) {
-            throw new \InvalidArgumentException(sprintf(
-                'Cannot load migrations from "%s" because it is not a valid directory',
-                $directory
-            ));
-        }
+        $dir = $this->getRealPath($directory);
 
         $migrations = array();
         foreach ($this->createIterator($dir) as $file) {
