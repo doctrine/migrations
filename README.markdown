@@ -27,7 +27,7 @@ The repository containing the documentation is [there](https://github.com/doctri
         
 ### Using composer
             
-```composer require doctrine/migrations```
+```composer require doctrine/migrations dev-master```
         
 ### Downloading the latest phar release
 
