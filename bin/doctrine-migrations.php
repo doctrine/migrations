@@ -50,7 +50,13 @@ if (file_exists($configFile)) {
 }
 
 $helperSet = ($helperSet) ?: new \Symfony\Component\Console\Helper\HelperSet();
-$helperSet->set(new \Symfony\Component\Console\Helper\DialogHelper(), 'dialog');
+
+if(class_exists('\Symfony\Component\Console\Helper\QuestionHelper')) {
+    $helperSet->set(new \Symfony\Component\Console\Helper\QuestionHelper(), 'question');
+} else {
+    $helperSet->set(new \Symfony\Component\Console\Helper\DialogHelper(), 'dialog');
+}
+
 
 $cli = new \Symfony\Component\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION());
 $cli->setCatchExceptions(true);
