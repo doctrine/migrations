@@ -236,10 +236,14 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(array('getOption'))
             ->getMock();
 
-        $helper = new DialogHelper();
+        try {
+            $helper = new DialogHelper();
 
-        $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
-        $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+            $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
+            $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+        } catch (\PHPUnit_Framework_Error_Deprecated $error) {
+
+        }
 
         if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
             $helper = new QuestionHelper();
