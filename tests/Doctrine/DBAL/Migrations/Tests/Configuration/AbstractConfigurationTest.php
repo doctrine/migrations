@@ -5,7 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 {
     /**
-     * @return \Doctrine\DBAL\Migrations\Configuration\Configuration
+     * @return \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration
      */
     abstract public function loadConfiguration();
 
@@ -32,4 +32,13 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
         $config = $this->loadConfiguration();
         $this->assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
+
+    public function testThrowExceptionIfAlreadyLoaded()
+    {
+        /** @var $config \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration */
+        $config = $this->loadConfiguration();
+        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException');
+        $config->load($config->getFile());
+    }
+
 }
