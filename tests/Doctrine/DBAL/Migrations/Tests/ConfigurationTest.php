@@ -168,6 +168,37 @@ class ConfigurationTest extends MigrationTestCase
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
         $this->assertEquals(array(1234), $config->getAvailableVersions());
     }
+
+    /**
+     * @dataProvider versionProvider
+     */
+    public function testFormatVersion($version, $return)
+    {
+        $config = $this->getSqliteConfiguration();
+
+        $this->assertEquals($return, $config->formatVersion($version));
+    }
+
+    /**
+     * @dataProvider versionProvider
+     */
+    public function testGetDatetime($version, $return)
+    {
+        $config = $this->getSqliteConfiguration();
+
+        $this->assertEquals($return, $config->formatVersion($version));
+    }
+
+    public function versionProvider()
+    {
+        return [
+            ['20150101123545Version', '2015-01-01 12:35:45'],
+            ['tralalaVersion', ''],
+            ['0000254Version', ''],
+            ['0000254BaldlfqjdVersion', ''],
+            ['20130101123545Version', '2013-01-01 12:35:45'],
+        ];
+    }
 }
 
 class ConfigMigration extends \Doctrine\DBAL\Migrations\AbstractMigration

@@ -46,7 +46,7 @@ class MigrationStatusTest extends MigrationTestCase
 
         $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
             ->setConstructorArgs(array($this->getSqliteConnection()))
-            ->setMethods(array('resolveVersionAlias', 'formatVersion'))
+            ->setMethods(array('resolveVersionAlias', 'getDateTime'))
             ->getMock();
 
         $configuration
@@ -58,7 +58,7 @@ class MigrationStatusTest extends MigrationTestCase
 
         $configuration
             ->expects($this->any())
-            ->method('formatVersion')
+            ->method('getDateTime')
             ->will($this->returnValue('FORMATTED'));
 
         $configuration->setMigrationsNamespace('DoctrineMigrations');

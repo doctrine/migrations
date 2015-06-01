@@ -180,7 +180,7 @@ class Configuration
     }
 
     /**
-     * Returns the date of a migration
+     * Returns the datetime of a migration
      *
      * @param $version
      * @return bool|string
@@ -188,13 +188,13 @@ class Configuration
     public function getDateTime($version)
     {
         $datetime = str_replace('Version', '', $version);
-        $datetime = \DateTime::createFromFormat('YmdHms', $datetime);
+        $datetime = \DateTime::createFromFormat('Ymdhis', $datetime);
 
         if ($datetime === false){
             return '';
         }
 
-        return $datetime->format('Y-m-d H:m:s');
+        return $datetime->format('Y-m-d h:i:s');
     }
 
     /**
