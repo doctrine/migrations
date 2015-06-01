@@ -320,7 +320,7 @@ class Version
                 $this->connection->rollback();
             }
 
-            if ($dryRun == false) {
+            if ($dryRun === false) {
                 // now mark it as migrated
                 if ($direction === 'up') {
                     $this->markMigrated();
