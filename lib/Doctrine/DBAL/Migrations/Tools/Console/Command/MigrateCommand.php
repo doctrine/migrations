@@ -108,7 +108,7 @@ EOT
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
-            if (! $this->getConfirmationToExecute($question, $input, $output)) {
+            if (! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return 1;
@@ -124,7 +124,7 @@ EOT
             // warn the user if no dry run and interaction is on
             if (! $dryRun) {
                 $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
-                if (! $this->getConfirmationToExecute($question, $input, $output))
+                if (! $this->canExecute($question, $input, $output))
                 {
                     $output->writeln('<error>Migration cancelled!</error>');
 
@@ -146,7 +146,7 @@ EOT
      * @param OutputInterface $output
      * @return bool
      */
-    private function getConfirmationToExecute($question, InputInterface $input, OutputInterface $output)
+    private function canExecute($question, InputInterface $input, OutputInterface $output)
     {
         if ($input->isInteractive()) {
             $question = 'Are you sure you wish to continue? (y/n)';
