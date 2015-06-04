@@ -50,6 +50,12 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testCanExecute()
     {
+        if (!class_exists('Symfony\Component\Console\Helper\QuestionHelper')) {
+            $this->markTestSkipped(
+                'The QuestionHelper must be available.'
+            );
+        }
+
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
             ->setConstructorArgs(array(array()))
             ->setMethods(array('isInteractive'))
