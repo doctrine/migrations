@@ -236,13 +236,19 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(array('getOption'))
             ->getMock();
 
-        try {
-            $helper = new DialogHelper();
+        /**
+         * This test is testing a deprecated method.
+         * PHPunit convert those deprecations errors into tests failures.
+         * You can either use \PHPUnit_Framework_Error_Deprecated::$enabled = false;
+         * or use the @ operator to suppress the error.
+         * The advantage of the later is that it also remove the error message from the phpunit output.
+         */
+        if (class_exists("Symfony\\Component\\Console\\Helper\\DialogHelper"))
+        {
+            @$helper = new DialogHelper();
 
-            $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
-            $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
-        } catch (\PHPUnit_Framework_Error_Deprecated $error) {
-
+            @$this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
+            @$this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
         }
 
         if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
