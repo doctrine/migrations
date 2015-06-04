@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -94,19 +95,9 @@ EOT
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
 
         $versionAlias = $input->getArgument('version');
-        $version = $configuration->resolveVersionAlias($versionAlias);
-        if ($version === null) {
-            switch ($versionAlias) {
-                case 'prev':
-                    $output->writeln('<error>Already at first version.</error>');
-                    break;
-                case 'next':
-                    $output->writeln('<error>Already at latest version.</error>');
-                    break;
-                default:
-                    $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
-            }
 
+        $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
+        if ($version === false) {
             return 1;
         }
 
@@ -116,15 +107,11 @@ EOT
                 $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
             }
 
-            if (! $noInteraction) {
-                $question = 'Are you sure you wish to continue? (y/n)';
-                $confirmation = $this->askConfirmation($question, $input, $output);
+            $question = 'Are you sure you wish to continue? (y/n)';
+            if (! $this->getConfirmationToExecute($question, $input, $output)) {
+                $output->writeln('<error>Migration cancelled!</error>');
 
-                if (! $confirmation) {
-                    $output->writeln('<error>Migration cancelled!</error>');
-
-                    return 1;
-                }
+                return 1;
             }
         }
 
@@ -135,11 +122,10 @@ EOT
             $dryRun = (boolean) $input->getOption('dry-run');
 
             // warn the user if no dry run and interaction is on
-            if (! $dryRun && ! $noInteraction) {
+            if (! $dryRun) {
                 $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
-                $confirmation = $this->askConfirmation($question, $input, $output);
-
-                if (! $confirmation) {
+                if (! $this->getConfirmationToExecute($question, $input, $output))
+                {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -152,5 +138,52 @@ EOT
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
+    }
+
+    /**
+     * @param $question
+     * @param InputInterface $input
+     * @param OutputInterface $output
+     * @return bool
+     */
+    private function getConfirmationToExecute($question, InputInterface $input, OutputInterface $output)
+    {
+        if ($input->isInteractive()) {
+            $question = 'Are you sure you wish to continue? (y/n)';
+            if (! $this->askConfirmation($question, $input, $output)) {
+
+                return false;
+            }
+
+            return true;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param $versionAlias
+     * @param OutputInterface $output
+     * @param Configuration $configuration
+     * @return bool|string
+     */
+    private function getVersionNameFromAlias($versionAlias, OutputInterface $output, Configuration $configuration)
+    {
+        $version = $configuration->resolveVersionAlias($versionAlias);
+        if ($version === null) {
+            if ($versionAlias == 'prev') {
+                $output->writeln('<error>Already at first version.</error>');
+                return false;
+            }
+            if ($versionAlias == 'next') {
+                $output->writeln('<error>Already at latest version.</error>');
+                return false;
+            }
+
+            $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
+            return false;
+        }
+
+        return $version;
     }
 }

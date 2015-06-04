@@ -258,15 +258,6 @@ class AbstractCommandTest extends MigrationTestCase
         }
     }
 
-    private function getInputStream($input)
-    {
-        $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
-        rewind($stream);
-
-        return $stream;
-    }
-
     protected function setUp()
     {
         $this->originalCwd = getcwd();
