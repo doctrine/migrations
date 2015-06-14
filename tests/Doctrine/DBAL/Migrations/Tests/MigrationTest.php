@@ -26,6 +26,7 @@ class MigrationTest extends MigrationTestCase
 
     /**
      * @expectedException \Doctrine\DBAL\Migrations\MigrationException
+     * @expectedExceptionMessage Could not find any migrations to execute.
      */
     public function testMigrateWithNoMigrationsThrowsException()
     {
