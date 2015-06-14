@@ -17,6 +17,7 @@ matrix:
 env:
   global:
     - deps=no
+    - secure: "Cu/OUIXjfAW0mOe0zSX1qgvOkYx9HpiD/NsqE2Zs5iexipknL+6vgrML1AkDJnAwde/pUTpcmt1o2EXhVNfYDpKUsTWn+VnRi0fmBZYH/QsS5yosk/t/f1rO4xNDrxd2EhLYr8VrL0gnXlOaVxZ+ENd2ZPZ/Ufq/O9b2qjYc5pI="
 
 install:
   - if [ "$deps" = "no" ]; then composer install; fi;
@@ -26,6 +27,9 @@ script:
   - mkdir -p build/logs
   - ./vendor/bin/phpunit
 
+before_script:
+  #Set the github Oauth token
+  - composer config github-oauth.github.com $GITHUB_TOKEN
 
 after_script:
   - if [[ $TRAVIS_PHP_VERSION = '5.6' ]]; then php vendor/bin/coveralls -v ; fi
