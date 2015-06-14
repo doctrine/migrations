@@ -21,7 +21,6 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Version as DbalVersion;
-use Doctrine\ORM\Tools\SchemaTool;
 use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
 use Symfony\Component\Console\Input\InputInterface;
