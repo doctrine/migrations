@@ -97,7 +97,7 @@ EOT
             return 1;
         }
 
-        if ($executedUnavailableMigrations) {
+        if (!empty($executedUnavailableMigrations)) {
             $output->writeln(sprintf('<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>', count($executedUnavailableMigrations)));
             foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
                 $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
@@ -130,7 +130,7 @@ EOT
 
             $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
 
-            if (! $sql) {
+            if (empty($sql)) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
