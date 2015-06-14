@@ -86,15 +86,11 @@ EOT
 
         $this->outputHeader($configuration, $output);
 
-        $noInteraction = !$input->isInteractive();
-
         $timeAllqueries = $input->getOption('query-time');
 
         $executedMigrations = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
-
-        $versionAlias = $input->getArgument('version');
 
         $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
         if ($version === false) {
