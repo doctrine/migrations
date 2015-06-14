@@ -27,7 +27,7 @@ use Doctrine\ORM\Tools\SchemaTool;
  *
  * @since   1.0.0-alpha3
  */
-final class OrmSchemaProvider implements SchemaProvider
+final class OrmSchemaProvider implements SchemaProviderInterface
 {
     /**
      * @var     EntityManagerInterface

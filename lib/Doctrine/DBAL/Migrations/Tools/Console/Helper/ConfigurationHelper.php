@@ -22,7 +22,6 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**

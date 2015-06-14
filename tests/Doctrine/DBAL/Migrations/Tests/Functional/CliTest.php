@@ -30,7 +30,7 @@ use Doctrine\ORM\Tools\Setup as OrmSetup;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\MigrationsVersion;
-use Doctrine\DBAL\Migrations\Provider\SchemaProvider;
+use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
 use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
@@ -209,7 +209,7 @@ class CliTest extends MigrationTestCase
         ));
     }
 
-    protected function withDiffCommand(SchemaProvider $provider=null)
+    protected function withDiffCommand(SchemaProviderInterface $provider=null)
     {
         $this->application->add(new MigrationCommands\DiffCommand($provider));
     }

@@ -26,7 +26,7 @@ use Doctrine\DBAL\Schema\Schema;
  *
  * @since   1.0.0-alpha3
  */
-final class StubSchemaProvider implements SchemaProvider
+final class StubSchemaProvider implements SchemaProviderInterface
 {
     /**
      * @var     Schema
