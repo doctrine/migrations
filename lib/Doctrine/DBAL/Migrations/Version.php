@@ -175,7 +175,7 @@ class Version
             }
         } else {
             $this->sql[] = $sql;
-            if ($params) {
+            if (!empty($params)) {
                 $this->params[count($this->sql) - 1] = $params;
                 $this->types[count($this->sql) - 1] = $types ?: array();
             }
@@ -263,7 +263,7 @@ class Version
             $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
 
             if (! $dryRun) {
-                if ($this->sql) {
+                if (!empty($this->sql)) {
                     foreach ($this->sql as $key => $query) {
                         $queryStart = microtime(true);
                         if ( ! isset($this->params[$key])) {

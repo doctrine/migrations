@@ -111,7 +111,7 @@ EOT
                 $this->showVersions($migrations, $configuration, $output);
             }
 
-            if ($executedUnavailableMigrations) {
+            if (!empty($executedUnavailableMigrations)) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
                 $this->showVersions($executedUnavailableMigrations, $configuration, $output);
             }

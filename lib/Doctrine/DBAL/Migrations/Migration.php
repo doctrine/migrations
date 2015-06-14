@@ -122,6 +122,9 @@ class Migration
      */
     public function migrate($to = null, $dryRun = false, $timeAllqueries=false)
     {
+        /**
+         * If no version to migrate to is given we default to the last available one.
+         */
         if ($to === null) {
             $to = $this->configuration->getLatestVersion();
         }
@@ -130,6 +133,10 @@ class Migration
         $from = (string) $from;
         $to = (string) $to;
 
+        /**
+         * Throw an error if we can't find the migration to migrate to in the registered
+         * migrations.
+         */
         $migrations = $this->configuration->getMigrations();
         if ( ! isset($migrations[$to]) && $to > 0) {
             throw MigrationException::unknownMigrationVersion($to);
@@ -138,7 +145,15 @@ class Migration
         $direction = $from > $to ? 'down' : 'up';
         $migrationsToExecute = $this->configuration->getMigrationsToExecute($direction, $to);
 
-        if ($from === $to && empty($migrationsToExecute) && $migrations) {
+        /**
+         * If
+         *  there are no migrations to execute
+         *  and there are migrations,
+         *  and the migration from and to are the same
+         * means we are already at the destination return an empty array()
+         * to signify that there is nothing left to do.
+         */
+        if ($from === $to && empty($migrationsToExecute) && !empty($migrations)) {
             return array();
         }
 
@@ -148,6 +163,9 @@ class Migration
             $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
         }
 
+        /**
+         * If there are no migrations to execute throw an exception.
+         */
         if (empty($migrationsToExecute)) {
             throw MigrationException::noMigrationsToExecute();
         }
