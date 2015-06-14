@@ -145,7 +145,6 @@ EOT
     private function canExecute($question, InputInterface $input, OutputInterface $output)
     {
         if ($input->isInteractive()) {
-            $question = 'Are you sure you wish to continue? (y/n)';
             if (! $this->askConfirmation($question, $input, $output)) {
 
                 return false;
