@@ -20,16 +20,18 @@ env:
     - secure: "Cu/OUIXjfAW0mOe0zSX1qgvOkYx9HpiD/NsqE2Zs5iexipknL+6vgrML1AkDJnAwde/pUTpcmt1o2EXhVNfYDpKUsTWn+VnRi0fmBZYH/QsS5yosk/t/f1rO4xNDrxd2EhLYr8VrL0gnXlOaVxZ+ENd2ZPZ/Ufq/O9b2qjYc5pI="
 
 install:
-  - if [ "$deps" = "no" ]; then composer install; fi;
-  - if [ "$deps" = "low" ]; then composer --prefer-lowest --prefer-stable update; fi;
+  - if [ "$deps" = "no" ]; then composer $flag install; fi;
+  - if [ "$deps" = "low" ]; then composer $flag --prefer-lowest --prefer-stable update; fi;
 
 script:
   - mkdir -p build/logs
   - ./vendor/bin/phpunit
 
-before_script:
+before_install:
   #Set the github Oauth token
   - composer config github-oauth.github.com $GITHUB_TOKEN
+  - if [[ ! $GITHUB_TOKEN ]]; then echo "no github token"; fi
+  - if [[ ! $GITHUB_TOKEN ]]; then flag=--prefer-source; fi
 
 after_script:
   - if [[ $TRAVIS_PHP_VERSION = '5.6' ]]; then php vendor/bin/coveralls -v ; fi
