@@ -59,4 +59,13 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
 
         return stream_get_contents($stream);
     }
+
+    public function getInputStream($input)
+    {
+        $stream = fopen('php://memory', 'r+', false);
+        fputs($stream, $input);
+        rewind($stream);
+
+        return $stream;
+    }
 }
