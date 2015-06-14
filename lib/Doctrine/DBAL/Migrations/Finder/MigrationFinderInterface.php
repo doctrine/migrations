@@ -15,22 +15,26 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
-*/
+ */
 
-namespace Doctrine\DBAL\Migrations\Provider;
+namespace Doctrine\DBAL\Migrations\Finder;
 
 /**
- * Generates `Schema` objects for the diff command. A schema provider should
- * return the schema to which the database should be migrated.
+ * MigrationFinderInterface implementations locate migrations (classes that extend
+ * `Doctrine\DBAL\Migrations\AbstractMigration`) in a directory.
  *
  * @since   1.0.0-alpha3
  */
-interface SchemaProvider
+interface MigrationFinderInterface
 {
     /**
-     * Create the schema to which the database should be migrated.
+     * Find all the migrations in a directory for the given path and namespace.
      *
-     * @return  \Doctrine\DBAL\Schema\Schema
+     * @param   string $directory The directory in which to look for migrations
+     * @param   string|null $namespace The namespace of the classes to load
+     * @throws  InvalidArgumentException if the directory does not exist
+     * @return  string[] An array of class names that were found with the version
+     *          as keys.
      */
-    public function createSchema();
+    public function findMigrations($directory, $namespace=null);
 }

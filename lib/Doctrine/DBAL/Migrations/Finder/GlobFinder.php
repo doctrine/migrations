@@ -20,7 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Finder;
 
 /**
- * A MigrationFinder implementation that uses `glob` and some special file and
+ * A MigrationFinderInterface implementation that uses `glob` and some special file and
  * class names to load migrations from a directory.
  *
  * The migrations are expected to reside in files with the filename

@@ -23,7 +23,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Finder\MigrationFinder;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
@@ -73,7 +73,7 @@ class Configuration
      * The migration finder implementation -- used to load migrations from a 
      * directory.
      *
-     * @var MigrationFinder
+     * @var MigrationFinderInterface
      */
     private $migrationFinder;
 
@@ -111,7 +111,7 @@ class Configuration
      * @param Connection   $connection   A Connection instance
      * @param OutputWriter $outputWriter A OutputWriter instance
      */
-    public function __construct(Connection $connection, OutputWriter $outputWriter = null, MigrationFinder $finder = null)
+    public function __construct(Connection $connection, OutputWriter $outputWriter = null, MigrationFinderInterface $finder = null)
     {
         $this->connection = $connection;
         if ($outputWriter === null) {
@@ -273,7 +273,7 @@ class Configuration
      * @param   $finder The new migration finder
      * @return  void
      */
-    public function setMigrationFinder(MigrationFinder $finder)
+    public function setMigrationFinder(MigrationFinderInterface $finder)
     {
         $this->migrationFinder = $finder;
     }
@@ -648,7 +648,7 @@ class Configuration
     /**
      * Get the migration finder, creating one if it's not present.
      *
-     * @return   MigrationFinder
+     * @return   MigrationFinderInterface
      */
     protected function getMigrationFinder()
     {

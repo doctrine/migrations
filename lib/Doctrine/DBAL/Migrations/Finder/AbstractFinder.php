@@ -24,7 +24,7 @@ namespace Doctrine\DBAL\Migrations\Finder;
  *
  * @since   1.0.0-alpha3
  */
-abstract class AbstractFinder implements MigrationFinder
+abstract class AbstractFinder implements MigrationFinderInterface
 {
     protected static function requireOnce($path)
     {

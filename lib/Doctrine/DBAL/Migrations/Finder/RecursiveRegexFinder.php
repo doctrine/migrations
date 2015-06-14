@@ -20,7 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Finder;
 
 /**
- * A MigrationFinder implementation that uses a RegexIterator along with a
+ * A MigrationFinderInterface implementation that uses a RegexIterator along with a
  * RecursiveDirectoryIterator.
  *
  * @since   1.0.0-alpha3
