@@ -226,14 +226,15 @@ class Version
     /**
      * Execute this migration version up or down and and return the SQL.
      *
-     * @param string  $direction The direction to execute the migration.
-     * @param boolean $dryRun    Whether to not actually execute the migration SQL and just do a dry run.
+     * @param string  $direction      The direction to execute the migration.
+     * @param boolean $dryRun         Whether to not actually execute the migration SQL and just do a dry run.
+     * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
      *
      * @return array $sql
      *
      * @throws \Exception when migration fails
      */
-    public function execute($direction, $dryRun = false, $timeAllQueries=false)
+    public function execute($direction, $dryRun = false, $timeAllQueries = false)
     {
         $this->sql = array();
 
@@ -265,7 +266,10 @@ class Version
             if (! $dryRun) {
                 if (!empty($this->sql)) {
                     foreach ($this->sql as $key => $query) {
-                        $queryStart = microtime(true);
+                        if ($timeAllQueries !== false) {
+                            $queryStart = microtime(true);
+                        }
+
                         if ( ! isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
                             $this->connection->executeQuery($query);
@@ -273,9 +277,11 @@ class Version
                             $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
                             $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                         }
-                        $queryEnd = microtime(true);
-                        $queryTime = round($queryEnd - $queryStart, 4);
+
                         if ($timeAllQueries !== false) {
+                            $queryEnd = microtime(true);
+                            $queryTime = round($queryEnd - $queryStart, 4);
+
                             $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
                         }
                     }

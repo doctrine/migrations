@@ -113,14 +113,15 @@ class Migration
     /**
      * Run a migration to the current version or the given target version.
      *
-     * @param string  $to     The version to migrate to.
-     * @param boolean $dryRun Whether or not to make this a dry run and not execute anything.
+     * @param string  $to             The version to migrate to.
+     * @param boolean $dryRun         Whether or not to make this a dry run and not execute anything.
+     * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
      *
      * @return array $sql     The array of migration sql statements
      *
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false, $timeAllqueries=false)
+    public function migrate($to = null, $dryRun = false, $timeAllQueries = false)
     {
         /**
          * If no version to migrate to is given we default to the last available one.
@@ -129,9 +130,8 @@ class Migration
             $to = $this->configuration->getLatestVersion();
         }
 
-        $from = $this->configuration->getCurrentVersion();
-        $from = (string) $from;
-        $to = (string) $to;
+        $from = (string) $this->configuration->getCurrentVersion();
+        $to   = (string) $to;
 
         /**
          * Throw an error if we can't find the migration to migrate to in the registered
@@ -157,11 +157,9 @@ class Migration
             return array();
         }
 
-        if (! $dryRun) {
-            $this->outputWriter->write(sprintf('Migrating <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
-        } else {
-            $this->outputWriter->write(sprintf('Executing dry run of migration <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>', $direction, $to, $from));
-        }
+        $output = $dryRun ? 'Executing dry run of migration' : 'Migrating';
+        $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
+        $this->outputWriter->write(sprintf($output, $direction, $to, $from));
 
         /**
          * If there are no migrations to execute throw an exception.
@@ -173,7 +171,7 @@ class Migration
         $sql = array();
         $time = 0;
         foreach ($migrationsToExecute as $version) {
-            $versionSql = $version->execute($direction, $dryRun, $timeAllqueries);
+            $versionSql = $version->execute($direction, $dryRun, $timeAllQueries);
             $sql[$version->getVersion()] = $versionSql;
             $time += $version->getTime();
         }
