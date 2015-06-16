@@ -188,7 +188,7 @@ class Configuration
     public function getDateTime($version)
     {
         $datetime = str_replace('Version', '', $version);
-        $datetime = \DateTime::createFromFormat('Ymdhis', $datetime);
+        $datetime = \DateTime::createFromFormat('YmdHis', $datetime);
 
         if ($datetime === false){
             return '';

@@ -197,6 +197,7 @@ class ConfigurationTest extends MigrationTestCase
             ['0000254Version', ''],
             ['0000254BaldlfqjdVersion', ''],
             ['20130101123545Version', '2013-01-01 12:35:45'],
+            ['20150202162811', '2015-02-02 04:28:11']
         ];
     }
 }
