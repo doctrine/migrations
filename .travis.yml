@@ -28,7 +28,7 @@ script:
   - ./vendor/bin/phpunit
 
 before_install:
-  #Set the github Oauth token
+  - composer self-update
   - composer config github-oauth.github.com $GITHUB_TOKEN
   - if [[ ! $GITHUB_TOKEN ]]; then echo "no github token"; fi
   - if [[ ! $GITHUB_TOKEN ]]; then flag=--prefer-source; fi
