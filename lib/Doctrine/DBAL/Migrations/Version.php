@@ -266,9 +266,7 @@ class Version
             if (! $dryRun) {
                 if (!empty($this->sql)) {
                     foreach ($this->sql as $key => $query) {
-                        if ($timeAllQueries !== false) {
-                            $queryStart = microtime(true);
-                        }
+                        $queryStart = microtime(true);
 
                         if ( ! isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
@@ -278,12 +276,7 @@ class Version
                             $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                         }
 
-                        if ($timeAllQueries !== false) {
-                            $queryEnd = microtime(true);
-                            $queryTime = round($queryEnd - $queryStart, 4);
-
-                            $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
-                        }
+                        $this->outputQueryTime($queryStart, $timeAllQueries);
                     }
                 } else {
                     $this->outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->version));
@@ -368,6 +361,16 @@ class Version
                 return 'Execution';
             default:
                 return 'No State';
+        }
+    }
+
+    private function outputQueryTime($queryStart, $timeAllQueries = false)
+    {
+        if ($timeAllQueries !== false) {
+            $queryEnd = microtime(true);
+            $queryTime = round($queryEnd - $queryStart, 4);
+
+            $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
         }
     }
 
