@@ -29,7 +29,7 @@ script:
 
 before_install:
   - composer self-update
-  - composer config github-oauth.github.com $GITHUB_TOKEN
+  - composer config --quiet github-oauth.github.com $GITHUB_TOKEN
   - if [[ ! $GITHUB_TOKEN ]]; then echo "no github token"; fi
   - if [[ ! $GITHUB_TOKEN ]]; then flag=--prefer-source; fi
 
