@@ -168,6 +168,8 @@ abstract class AbstractCommand extends Command
                 $this->connection = \Doctrine\DBAL\DriverManager::getConnection($params);
             } elseif ($this->getHelperSet()->has('connection')) {
                 $this->connection = $this->getHelper('connection')->getConnection();
+            } elseif ($this->configuration) {
+                $this->connection = $this->configuration->getConnection();
             } else {
                 throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
             }

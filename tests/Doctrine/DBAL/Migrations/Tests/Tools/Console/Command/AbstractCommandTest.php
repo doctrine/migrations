@@ -2,6 +2,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
@@ -20,7 +21,7 @@ class AbstractCommandTest extends MigrationTestCase
      *
      * @return \Doctrine\DBAL\Migrations\Configuration\Configuration
      */
-    public function invokeMigrationConfigurationGetter($input, $configuration = null)
+    public function invokeMigrationConfigurationGetter($input, $configuration = null, $noConnection=false)
     {
         $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand');
         $method = $class->getMethod('getMigrationConfiguration');
@@ -32,9 +33,13 @@ class AbstractCommandTest extends MigrationTestCase
             array('command')
         );
 
-        $command->setHelperSet(new HelperSet(array(
-            'connection' => new ConnectionHelper($this->getSqliteConnection())
-        )));
+        if (!$noConnection) {
+            $command->setHelperSet(new HelperSet(array(
+                'connection' => new ConnectionHelper($this->getSqliteConnection())
+            )));
+        } else {
+            $command->setHelperSet(new HelperSet());
+        }
         if (null !== $configuration) {
             $command->setMigrationConfiguration($configuration);
         }
@@ -138,6 +143,43 @@ class AbstractCommandTest extends MigrationTestCase
         $this->assertEquals('name', $actualConfiguration->getName());
         $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
         $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+    }
+
+    /**
+     * Test if the migration configuration use the connection in a configuration passed to it.
+     */
+    public function testMigrationConfigurationReturnsConnectionFromConfigurationIfNothingElseIsProvided()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs(array(array()))
+            ->getMock();
+
+        $configuration = new \Doctrine\DBAL\Migrations\Configuration\Configuration($this->getSqliteConnection());
+        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration, true);
+
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $actualConfiguration);
+        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
+        $this->assertEquals(null, $actualConfiguration->getMigrationsNamespace());
+    }
+
+    /**
+     * Test if trhow an error if no connection is passed.
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.
+     */
+    public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs(array(array()))
+            ->getMock();
+
+        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, true);
+
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $actualConfiguration);
+        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
+        $this->assertEquals(null, $actualConfiguration->getMigrationsNamespace());
     }
 
     public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration()
