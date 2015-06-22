@@ -46,12 +46,14 @@ class RecursiveRegexFinderTest extends MigrationTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__.'/_files', 'TestMigrations');
 
-        $this->assertCount(4, $migrations);
+        $this->assertCount(6, $migrations);
 
         $tests = array(
             '20150502000000' => 'TestMigrations\\Version20150502000000',
             '20150502000001' => 'TestMigrations\\Version20150502000001',
             '20150502000003' => 'TestMigrations\\Version20150502000003',
+            '20150502000004' => 'TestMigrations\\Version20150502000004',
+            '20150502000005' => 'TestMigrations\\Version20150502000005',
             '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
         );
         foreach($tests as $version => $namespace) {
@@ -61,6 +63,9 @@ class RecursiveRegexFinderTest extends MigrationTestCase
         $this->assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
         $this->assertArrayNotHasKey('Version20150502000002', $migrations);
         $this->assertArrayNotHasKey('20150502000002', $migrations);
+        $this->assertArrayNotHasKey('ADeeperRandomClass', $migrations);
+        $this->assertArrayNotHasKey('AnotherRandomClassNotStartingWithVersion', $migrations);
+        $this->assertArrayNotHasKey('ARandomClass', $migrations);
     }
 
     protected function setUp()
