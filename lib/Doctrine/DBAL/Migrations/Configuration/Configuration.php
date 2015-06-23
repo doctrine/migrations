@@ -183,7 +183,7 @@ class Configuration
      * Returns the datetime of a migration
      *
      * @param $version
-     * @return bool|string
+     * @return string
      */
     public function getDateTime($version)
     {
@@ -194,7 +194,7 @@ class Configuration
             return '';
         }
 
-        return $datetime->format('Y-m-d h:i:s');
+        return $datetime->format('Y-m-d H:i:s');
     }
 
     /**
