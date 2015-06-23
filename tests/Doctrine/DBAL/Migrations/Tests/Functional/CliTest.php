@@ -52,8 +52,8 @@ class CliTest extends MigrationTestCase
     {
         $output = $this->executeCommand('migrations:status');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+1$/im', $output);
-        $this->assertRegExp('/new migrations:\s+1$/im', $output);
+        $this->assertRegExp('/available migrations:\s+1/im', $output);
+        $this->assertRegExp('/new migrations:\s+1/im', $output);
 
         $output = $this->executeCommand('migrations:latest');
         $this->assertContains('20150426000000', $output);
@@ -63,8 +63,8 @@ class CliTest extends MigrationTestCase
 
         $output = $this->executeCommand('migrations:status');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/^.*available migrations:\s+1$/im', $output);
-        $this->assertRegExp('/^.*new migrations:\s+0$/im', $output);
+        $this->assertRegExp('/^.*available migrations:\s+1/im', $output);
+        $this->assertRegExp('/^.*new migrations:\s+0/im', $output);
     }
 
     public function testGenerateCommandAddsNewVersion()
@@ -76,7 +76,7 @@ class CliTest extends MigrationTestCase
 
         $output = $this->executeCommand('migrations:status');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2$/im', $output);
+        $this->assertRegExp('/available migrations:\s+2/im', $output);
     }
 
     public function testMigrationDiffWritesNewMigrationWithExpectedSql()
@@ -89,7 +89,7 @@ class CliTest extends MigrationTestCase
 
         $output = $this->executeCommand('migrations:status');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2$/im', $output);
+        $this->assertRegExp('/available migrations:\s+2/im', $output);
 
         $versions = $this->globVersions();
         $contents = file_get_contents($versions[0]);
@@ -115,7 +115,7 @@ class CliTest extends MigrationTestCase
 
         $output = $this->executeCommand('migrations:status');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2$/im', $output);
+        $this->assertRegExp('/available migrations:\s+2/im', $output);
 
         $versions = $this->globVersions();
         $contents = file_get_contents($versions[0]);
