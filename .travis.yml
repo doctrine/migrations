@@ -34,6 +34,5 @@ before_install:
   - if [[ ! $GITHUB_TOKEN ]]; then flag=--prefer-source; fi
 
 after_script:
-  - if [[ $TRAVIS_PHP_VERSION = '5.6' ]]; then php vendor/bin/coveralls -v ; fi
   - wget https://scrutinizer-ci.com/ocular.phar
   - php ocular.phar code-coverage:upload --format=php-clover build/logs/clover.xml
