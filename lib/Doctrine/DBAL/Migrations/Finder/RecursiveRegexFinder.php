@@ -27,7 +27,6 @@ namespace Doctrine\DBAL\Migrations\Finder;
  */
 final class RecursiveRegexFinder extends AbstractFinder
 {
-    const PATTERN = '#^.+Version(.{1,255})\.php$#i';
 
     /**
      * {@inheritdoc}
@@ -36,17 +35,14 @@ final class RecursiveRegexFinder extends AbstractFinder
     {
         $dir = $this->getRealPath($directory);
 
-        $migrations = array();
-        foreach ($this->createIterator($dir) as $file) {
-            list($fileName, $version) = $file;
-            static::requireOnce($fileName);
-            $className = basename($fileName, '.php');
-            $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
-        }
-
-        return $migrations;
+        return $this->loadMigrations($this->getMatches($this->createIterator($dir)), $namespace);
     }
 
+    /**
+     * Create a recursive iterator to find all the migrations in the subdirectories.
+     * @param $dir
+     * @return \RegexIterator
+     */
     private function createIterator($dir)
     {
         return new \RegexIterator(
@@ -54,8 +50,28 @@ final class RecursiveRegexFinder extends AbstractFinder
                 new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
-            self::PATTERN,
+            $this->getPattern(),
             \RegexIterator::GET_MATCH
         );
+    }
+
+    private function getPattern()
+    {
+        return sprintf('#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+    }
+
+    /**
+     * Transform the recursiveIterator result array of array into the expected array of migration file
+     * @param $iteratorFilesMatch
+     * @return array
+     */
+    private function getMatches($iteratorFilesMatch)
+    {
+        $files = [];
+        foreach($iteratorFilesMatch as $file) {
+            $files[] = $file[0];
+        }
+
+        return $files;
     }
 }

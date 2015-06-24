@@ -12,7 +12,7 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
     public function testMigrationDirectory()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals(__DIR__.'/_files', $config->getMigrationsDirectory());
+        $this->assertEquals(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
     }
 
     public function testMigrationNamespace()

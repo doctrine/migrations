@@ -40,14 +40,6 @@ final class GlobFinder extends AbstractFinder
 
         $files = glob(rtrim($dir, '/').'/Version*.php');
 
-        $migrations = [];
-        foreach ($files as $file) {
-            static::requireOnce($file);
-            $className = basename($file, '.php');
-            $version = substr($className, 7);
-            $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
-        }
-
-        return $migrations;
+        return $this->loadMigrations($files, $namespace);
     }
 }

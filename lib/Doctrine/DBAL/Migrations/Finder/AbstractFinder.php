@@ -43,4 +43,23 @@ abstract class AbstractFinder implements MigrationFinderInterface
 
         return $dir;
     }
+
+    /**
+     * Load the migrations and return an array of thoses loaded migrations
+     * @param $files array of migration filename found
+     * @param $namespace namespace of thoses migrations
+     * @return array constructed with the migration name as key and the value is the fully qualified name of the migration
+     */
+    protected function loadMigrations($files, $namespace)
+    {
+        $migrations = [];
+        foreach ($files as $file) {
+            static::requireOnce($file);
+            $className = basename($file, '.php');
+            $version = substr($className, 7);
+            $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
+        }
+
+        return $migrations;
+    }
 }
