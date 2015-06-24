@@ -57,7 +57,7 @@ final class RecursiveRegexFinder extends AbstractFinder
 
     private function getPattern()
     {
-        return sprintf('#^.+\\%sVersion[^\\/\\\\]{1,255}\\.php$#i', DIRECTORY_SEPARATOR);
+        return sprintf('#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
     }
 
     /**
