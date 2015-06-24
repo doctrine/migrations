@@ -268,7 +268,7 @@ class Version
                         $queryStart = microtime(true);
                         if ( ! isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
-                            $this->connection->executeQuery($query);
+                            $this->connection->exec($query);
                         } else {
                             $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
                             $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
