@@ -19,7 +19,8 @@
         "doctrine/orm": "2.*",
         "phpunit/phpunit": "~4.0",
         "satooshi/php-coveralls": "0.6.*",
-        "doctrine/coding-standard": "dev-master"
+        "doctrine/coding-standard": "dev-master",
+        "mockery/mockery": "^0.9.4"
     },
     "conflict": {
         "doctrine/orm": "<2.4"
