@@ -23,10 +23,6 @@
         "mockery/mockery": "^0.9.4",
         "johnkary/phpunit-speedtrap": "~1.0@dev"
     },
-    "conflict": {
-        "doctrine/orm": "<2.4"
-
-    },
     "suggest": {
         "symfony/console": "to run the migration from the console"
     },
