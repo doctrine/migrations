@@ -22,9 +22,7 @@ class MigrationVersionTest extends MigrationTestCase
             ->setMethods(array('getMigrationConfiguration'))
             ->getMock();
 
-        $this->configuration = new Configuration($this->getSqliteConnection());
-        $this->configuration->setMigrationsNamespace('DoctrineMigrations');
-        $this->configuration->setMigrationsDirectory(sys_get_temp_dir());
+        $this->configuration = $this->getSqliteConfiguration();
 
         $this->command
             ->expects($this->once())
