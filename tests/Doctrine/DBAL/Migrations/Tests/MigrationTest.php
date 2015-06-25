@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
+use \Mockery as m;
 
 class MigrationTest extends MigrationTestCase
 {
@@ -34,4 +35,28 @@ class MigrationTest extends MigrationTestCase
 
         $sql = $migration->migrate();
     }
+
+    /**
+     * @param $to
+     *
+     * @dataProvider getSqlProvider
+     */
+    public function testGetSql($to)
+    {
+        $migrationMock = m::mock('Doctrine\DBAL\Migrations\Migration')->makePartial();
+        $migrationMock->makePartial();
+        $expected = 'something';
+        $migrationMock->shouldReceive('migrate')->with($to, true)->andReturn($expected);
+        $result = $migrationMock->getSql($to);
+        $this->assertEquals($expected, $result);
+    }
+
+    public function getSqlProvider()
+    {
+        return [
+            [null],
+            ['test'],
+        ];
+    }
+
 }
