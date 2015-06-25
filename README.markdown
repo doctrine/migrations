@@ -80,3 +80,29 @@ To install dependencies run a composer update:
 Doctrine migration need the doctrine/orm 2.4, you need to [update your composer.json](https://github.com/symfony/symfony-standard/blob/v2.3.28/composer.json#L12) to the last version of it for symfony 2.3.
 
 That version is compatible with the doctrine/orm 2.4 and there are [very little upgrade needed](https://github.com/doctrine/doctrine2/blob/master/UPGRADE.md#upgrade-to-24).
+
+## Running the unit tests
+
+To run the tests, you need the sqlite extension for php.
+On Unix-like systems, install:
+- php5-sqlite
+
+On Windows, enable the extension by uncommenting the following lines in php.ini
+```
+extension = php_pdo_sqlite.dll
+extension = php_sqlite3.dll
+extension_dir = ext
+```
+
+Running the tests from the project root:
+```
+./vendor/bin/phpunit
+```
+
+On Windows run phpunit from the full path
+```
+php vendor/phpunit/phpunit/phpunit
+```
+This appears to be some bug.
+
+Happy testing :-)
