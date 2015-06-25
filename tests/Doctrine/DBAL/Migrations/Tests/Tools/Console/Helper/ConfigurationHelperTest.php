@@ -69,7 +69,8 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
-        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", $this->getOutputStreamContent($this->output));
+
+        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
     }
 
     public function testConfigurationHelperWithConfigurationFromSetterAndOverrideFromCommandLine()
