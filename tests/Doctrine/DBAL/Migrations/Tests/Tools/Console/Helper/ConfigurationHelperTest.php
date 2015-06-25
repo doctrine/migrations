@@ -57,6 +57,51 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper', $configurationHelper);
     }
 
+    //used in other tests to see if xml or yaml or yml config files are loaded.
+    protected function getConfigurationHelperLoadsASpecificFormat($baseFile, $configFile) {
+        try {
+            $file = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
+            copy($file,$configFile);
+
+            $this->input->expects($this->any())
+                ->method('getOption')
+                ->with('configuration')
+                ->will($this->returnValue(null));
+
+            $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+            $configfileLoaded = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+
+            unlink($configFile);
+
+            return trim($this->getOutputStreamContent($this->output));
+        }
+        catch(\Exception $e) {
+            unlink($configFile);//i want to be really sure to cleanup this file
+        }
+        return false;
+    }
+
+    public function testConfigurationHelperLoadsXmlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.xml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.xml', 'migrations.xml')
+        );
+    }
+
+    public function testConfigurationHelperLoadsYamlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.yaml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yaml')
+        );
+    }
+
+    public function testConfigurationHelperLoadsYmlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.yml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yml')
+        );
+    }
+
     public function testConfigurationHelperWithConfigurationFromSetter()
     {
         $this->input->expects($this->any())

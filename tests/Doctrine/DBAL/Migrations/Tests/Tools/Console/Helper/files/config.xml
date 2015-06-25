@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
+                    http://doctrine-project.org/schemas/migrations/configuration.xsd">
+
+    <name>Doctrine Sandbox Migrations</name>
+    <migrations-namespace>DoctrineMigrationsTest</migrations-namespace>
+    <table name="doctrine_migration_versions_test" />
+    <migrations-directory>tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Helper/files</migrations-directory>
+
+</doctrine-migrations>
