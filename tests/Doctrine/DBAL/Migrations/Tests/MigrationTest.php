@@ -1,4 +1,21 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the LGPL. For more information, see
+ * <http://www.doctrine-project.org>.
+*/
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
@@ -6,6 +23,10 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use \Mockery as m;
 
+/**
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
+ */
 class MigrationTest extends MigrationTestCase
 {
     /** @var Configuration */
@@ -73,6 +94,10 @@ class MigrationTest extends MigrationTestCase
      */
     public function testWriteSqlFile($path, $from, $to, $getSqlReturn)
     {
+        $expectedReturn = 123;
+        $sqlWriter = m::instanceMock('overload:Doctrine\DBAL\Migrations\SqlFileWriter');
+        $sqlWriter->shouldReceive('write')->with(m::type('array'), m::anyOf('up', 'down'))->andReturn($expectedReturn);
+
         $outputWriter = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
         $outputWriter->shouldReceive('write');
 
@@ -88,26 +113,14 @@ class MigrationTest extends MigrationTestCase
         $migration->shouldReceive('getSql')->with($to)->andReturn($getSqlReturn);
 
         $result = $migration->writeSqlFile($path, $to);
-        $this->assertNotFalse($result);
-        if (!is_dir($path)) {
-            $this->assertNotEmpty(file_get_contents($path));
-        }
-
-        // cleanup if necessary
-        if (is_dir($path)) {
-            $createdFiles = glob(realpath($path) . '/*.sql');
-            foreach($createdFiles as $file) {
-                unlink($file);
-            }
-        } elseif(is_file($path)) {
-            unlink($path);
-        }
+        $this->assertEquals($expectedReturn, $result);
     }
 
     public function writeSqlFileProvider()
     {
         return [
             [__DIR__, 0, 1, ['1' => ['SHOW DATABASES;']]], // up
+            [__DIR__, 0, null, ['1' => ['SHOW DATABASES;']]], // up
             [__DIR__, 1, 1, ['1' => ['SHOW DATABASES;']]], // up (same)
             [__DIR__, 1, 0, ['1' => ['SHOW DATABASES;']]], // down
             [__DIR__ . '/tmpfile.sql', 0, 1, ['1' => ['SHOW DATABASES']]], // tests something actually got written
