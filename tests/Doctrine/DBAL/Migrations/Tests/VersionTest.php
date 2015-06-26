@@ -36,8 +36,13 @@ class VersionTest extends MigrationTestCase
      */
     public function testCreateVersion()
     {
-        $version = new Version(new Configuration($this->getSqliteConnection()), $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration');
+        $versionName = '003';
+        $version = new Version(
+            new Configuration($this->getSqliteConnection()),
+            $versionName,
+            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+        );
+
         $this->assertEquals($versionName, $version->getVersion());
     }
 
@@ -48,8 +53,12 @@ class VersionTest extends MigrationTestCase
     {
         $versionName = '003';
         $versionDescription = 'My super migration';
-        $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_MigrationDescription');
+        $version = new Version(
+            new Configuration($this->getSqliteConnection()),
+            $versionName,
+            'Doctrine\DBAL\Migrations\Tests\VersionTest_MigrationDescription'
+        );
+
         $this->assertEquals($versionName, $version->getVersion());
         $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
     }

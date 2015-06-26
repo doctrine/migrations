@@ -70,7 +70,7 @@ class Configuration
     private $outputWriter;
 
     /**
-     * The migration finder implementation -- used to load migrations from a 
+     * The migration finder implementation -- used to load migrations from a
      * directory.
      *
      * @var MigrationFinderInterface
@@ -108,8 +108,9 @@ class Configuration
     /**
      * Construct a migration configuration object.
      *
-     * @param Connection   $connection   A Connection instance
-     * @param OutputWriter $outputWriter A OutputWriter instance
+     * @param Connection               $connection   A Connection instance
+     * @param OutputWriter             $outputWriter A OutputWriter instance
+     * @param MigrationFinderInterface $finder       Migration files finder
      */
     public function __construct(Connection $connection, OutputWriter $outputWriter = null, MigrationFinderInterface $finder = null)
     {
@@ -387,7 +388,10 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $version = $this->connection->fetchColumn("SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?", array($version->getVersion()));
+        $version = $this->connection->fetchColumn(
+            "SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?",
+            array($version->getVersion())
+        );
 
         return $version !== false;
     }
