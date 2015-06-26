@@ -19,7 +19,10 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        $this->setExpectedException("Doctrine\DBAL\Migrations\MigrationException", "Migrations namespace must be configured in order to use Doctrine migrations.");
+        $this->setExpectedException(
+            "Doctrine\DBAL\Migrations\MigrationException",
+            "Migrations namespace must be configured in order to use Doctrine migrations."
+        );
         $config->validate();
     }
 
@@ -28,7 +31,10 @@ class ConfigurationTest extends MigrationTestCase
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsNamespace("DoctrineMigrations\\");
 
-        $this->setExpectedException("Doctrine\DBAL\Migrations\MigrationException", "Migrations directory must be configured in order to use Doctrine migrations.");
+        $this->setExpectedException(
+            "Doctrine\DBAL\Migrations\MigrationException",
+            "Migrations directory must be configured in order to use Doctrine migrations."
+        );
         $config->validate();
     }
 
@@ -72,7 +78,10 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Could not find migration version 1234');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Could not find migration version 1234'
+        );
         $config->getVersion(1234);
     }
 
@@ -113,7 +122,10 @@ class ConfigurationTest extends MigrationTestCase
 
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version'
+        );
         $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
     }
 
