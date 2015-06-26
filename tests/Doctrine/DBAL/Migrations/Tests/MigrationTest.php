@@ -1,5 +1,4 @@
 <?php
-
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -22,7 +21,10 @@ class MigrationTest extends MigrationTestCase
     {
         $migration = new Migration($this->config);
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Could not find migration version 1234');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Could not find migration version 1234'
+        );
         $migration->migrate('1234');
     }
 
@@ -34,7 +36,7 @@ class MigrationTest extends MigrationTestCase
     {
         $migration = new Migration($this->config);
 
-        $sql = $migration->migrate();
+        $migration->migrate();
     }
 
     /**

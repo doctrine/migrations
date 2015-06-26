@@ -98,9 +98,18 @@ EOT
         }
 
         if (!empty($executedUnavailableMigrations)) {
-            $output->writeln(sprintf('<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>', count($executedUnavailableMigrations)));
+            $output->writeln(sprintf(
+                '<error>WARNING! You have %s previously executed migrations'
+                . ' in the database that are not registered migrations.</error>',
+                count($executedUnavailableMigrations)
+            ));
+
             foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
-                $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) . ' (<comment>' . $executedUnavailableMigration . '</comment>)');
+                $output->writeln(sprintf(
+                    '    <comment>>></comment> %s (<comment>%s</comment>)',
+                    $configuration->getDateTime($executedUnavailableMigration),
+                    $executedUnavailableMigration
+                ));
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
@@ -119,9 +128,10 @@ EOT
 
             // warn the user if no dry run and interaction is on
             if (! $dryRun) {
-                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
-                if (! $this->canExecute($question, $input, $output))
-                {
+                $question = 'WARNING! You are about to execute a database migration'
+                    . ' that could result in schema changes and data lost.'
+                    . ' Are you sure you wish to continue? (y/n)';
+                if (! $this->canExecute($question, $input, $output)) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -137,27 +147,22 @@ EOT
     }
 
     /**
-     * @param $question
+     * @param string $question
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return bool
      */
     private function canExecute($question, InputInterface $input, OutputInterface $output)
     {
-        if ($input->isInteractive()) {
-            if (! $this->askConfirmation($question, $input, $output)) {
-
-                return false;
-            }
-
-            return true;
+        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
+            return false;
         }
 
         return true;
     }
 
     /**
-     * @param $versionAlias
+     * @param string $versionAlias
      * @param OutputInterface $output
      * @param Configuration $configuration
      * @return bool|string
@@ -175,7 +180,10 @@ EOT
                 return false;
             }
 
-            $output->writeln('<error>Unknown version: ' . $output->getFormatter()->escape($versionAlias) . '</error>');
+            $output->writeln(sprintf(
+                '<error>Unknown version: %s</error>',
+                $output->getFormatter()->escape($versionAlias)
+            ));
             return false;
         }
 
