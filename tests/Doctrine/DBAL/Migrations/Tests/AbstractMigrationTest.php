@@ -16,13 +16,14 @@ class AbstractMigrationTest extends MigrationTestCase
 {
     private $config;
     private $version;
+    /** @var  AbstractMigrationStub */
     private $migration;
-    private $outputWriter;
+    protected $outputWriter;
+    protected $output;
 
     public function setUp()
     {
-        $this->outputWriter = $this->getMockBuilder('Doctrine\DBAL\Migrations\OutputWriter')
-            ->getMock();
+        $this->outputWriter = $this->getOutputWriter();
 
         $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
@@ -37,23 +38,32 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->assertSame('', $this->migration->getDescription());
     }
 
-    public function testWarnIfInvokesOutputWriter()
+    public function testWarnIfOutputMessage()
     {
-        $this->outputWriter
-            ->expects($this->once())
-            ->method('write');
-
         $this->migration->warnIf(true, 'Warning was thrown');
+        $this->assertContains('<warning>Warning during No State: Warning was thrown</warning>'
+            , $this->getOutputStreamContent($this->output));
+    }
+
+    public function testWarnIfAddDefaultMessage()
+    {
+        $this->migration->warnIf(true);
+        $this->assertContains('<warning>Warning during No State: Unknown Reason</warning>'
+            , $this->getOutputStreamContent($this->output));
+    }
+
+    public function testWarnIfDontOutputMessageIfFalse()
+    {
+        $this->migration->warnIf(false, 'trallala');
+        $this->assertEquals('', $this->getOutputStreamContent($this->output));
     }
 
     public function testWriteInvokesOutputWriter()
     {
-        $this->outputWriter
-            ->expects($this->once())
-            ->method('write')
-            ->with('Message');
-
         $this->migration->exposed_Write('Message');
+        $this->assertContains('Message'
+            , $this->getOutputStreamContent($this->output));
+
     }
 
     public function testAbortIfThrowsException()
@@ -62,10 +72,26 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->abortIf(true, 'Something failed');
     }
 
+    public function testAbortIfDontThrowsException()
+    {
+        $this->migration->abortIf(false, 'Something failed');
+    }
+
+    public function testAbortIfThrowsExceptionEvenWithoutMessage()
+    {
+        $this->setExpectedException('Doctrine\DBAL\Migrations\AbortMigrationException', 'Unknown Reason');
+        $this->migration->abortIf(true);
+    }
+
     public function testSkipIfThrowsException()
     {
         $this->setExpectedException('Doctrine\DBAL\Migrations\SkipMigrationException', 'Something skipped');
         $this->migration->skipIf(true, 'Something skipped');
+    }
+
+    public function testSkipIfDontThrowsException()
+    {
+        $this->migration->skipIf(false, 'Something skipped');
     }
 
     public function testThrowIrreversibleMigrationException()
@@ -73,4 +99,21 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'Irreversible migration');
         $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
     }
+
+    public function testThrowIrreversibleMigrationExceptionWithoutMessage()
+    {
+        $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'This migration is irreversible and cannot be reverted.');
+        $this->migration->exposed_ThrowIrreversibleMigrationException();
+    }
+
+    public function testIstransactional()
+    {
+        $this->assertTrue($this->migration->isTransactional());
+    }
+
+    public function testAddSql()
+    {
+        $this->migration->exposed_AddSql('tralala');
+    }
+
 }

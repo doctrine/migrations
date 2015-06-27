@@ -26,12 +26,12 @@ class ConfigurationHelperTest extends MigrationTestCase
     /**
      * @var OutputWriter
      */
-    private $outputWriter;
+    protected $outputWriter;
 
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * @var InputInterface
@@ -148,15 +148,4 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 
-    private function getOutputWriter()
-    {
-        if (!$this->outputWriter) {
-            $this->output = $this->getOutputStream();
-            $output = $this->output;
-            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
-                return $output->writeln($message);
-            });
-        }
-        return $this->outputWriter;
-    }
 }

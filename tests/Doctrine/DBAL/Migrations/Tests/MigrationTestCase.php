@@ -21,6 +21,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\OutputWriter;
 use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
@@ -67,5 +68,17 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
         rewind($stream);
 
         return $stream;
+    }
+
+    protected function getOutputWriter()
+    {
+        if (!$this->outputWriter) {
+            $this->output = $this->getOutputStream();
+            $output = $this->output;
+            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
+                return $output->writeln($message);
+            });
+        }
+        return $this->outputWriter;
     }
 }
