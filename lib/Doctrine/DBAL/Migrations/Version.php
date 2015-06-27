@@ -194,25 +194,16 @@ class Version
     {
         $queries = $this->execute($direction, true);
 
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
+        $this->outputWriter->write("\n# Version " . $this->version . "\n");
 
-        $string .= "\n# Version " . $this->version . "\n";
-        foreach ($queries as $query) {
-            $string .= $query . ";\n";
-        }
-        if ($direction == "down") {
-            $string .= "DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '" . $this->version . "';\n";
-        } else {
-            $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $this->version . "');\n";
-        }
-        if (is_dir($path)) {
-            $path = realpath($path);
-            $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
-        }
+        $sqlQueries = [$this->version => $queries];
+        $sqlWriter = new SqlFileWriter(
+            $this->configuration->getMigrationsTableName(),
+            $path,
+            $this->outputWriter
+        );
 
-        $this->outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
-
-        return file_put_contents($path, $string);
+        return $sqlWriter->write($sqlQueries, $direction);
     }
 
     /**

@@ -1,13 +1,33 @@
 <?php
+/*
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
+ * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
+ * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
+ * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
+ * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
+ * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
+ * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
+ * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
+ * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+ * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+ * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ *
+ * This software consists of voluntary contributions made by many individuals
+ * and is licensed under the LGPL. For more information, see
+ * <http://www.doctrine-project.org>.
+*/
+
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use \Mockery as m;
 
 /**
- * Version Test
+ * @runTestsInSeparateProcesses
+ * @preserveGlobalState disabled
  */
 class VersionTest extends MigrationTestCase
 {
@@ -123,6 +143,51 @@ class VersionTest extends MigrationTestCase
         $this->assertNull($version->addSql(array('SELECT * FROM foo')));
         $this->assertNull($version->addSql(array('SELECT * FROM foo WHERE id = ?'), array(1)));
         $this->assertNull($version->addSql(array('SELECT * FROM foo WHERE id = ?'), array(1), array(\PDO::PARAM_INT)));
+    }
+
+    /**
+     * @param $path
+     * @param $to
+     * @param $getSqlReturn
+     *
+     * @dataProvider writeSqlFileProvider
+     */
+    public function testWriteSqlFile($path, $direction, $getSqlReturn)
+    {
+        $version = 1;
+
+        $outputWriter = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
+        $outputWriter->shouldReceive('write');
+
+        $connection = m::mock('Doctrine\DBAL\Connection');
+        $connection->shouldReceive([
+            'getSchemaManager' => 'something',
+            'getDatabasePlatform' => 'something else',
+        ]);
+
+        $config = m::mock('Doctrine\DBAL\Migrations\Configuration\Configuration')
+            ->makePartial();
+        $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);
+        $config->shouldReceive('getConnection')->andReturn($connection);
+
+        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', [$config, $version, 'stdClass'])->makePartial();
+        $migration->shouldReceive('execute')->with($direction, true)->andReturn($getSqlReturn);
+
+        $expectedReturn = 123;
+        $sqlWriter = m::instanceMock('overload:Doctrine\DBAL\Migrations\SqlFileWriter');
+        $sqlWriter->shouldReceive('write')->with(m::type('array'), m::anyOf('up', 'down'))->andReturn($expectedReturn);
+
+        $result = $migration->writeSqlFile($path, $direction);
+        $this->assertEquals($expectedReturn, $result);
+    }
+
+    public function writeSqlFileProvider()
+    {
+        return [
+            [__DIR__, 'up', ['1' => ['SHOW DATABASES;']]], // up
+            [__DIR__, 'down', ['1' => ['SHOW DATABASES;']]], // up
+            [__DIR__ . '/tmpfile.sql', 'up', ['1' => ['SHOW DATABASES']]], // tests something actually got written
+        ];
     }
 }
 
