@@ -196,27 +196,47 @@ class VersionTest extends MigrationTestCase
             [__DIR__ . '/tmpfile.sql', 'up', ['1' => ['SHOW DATABASES']]], // tests something actually got written
         ];
     }
-}
 
-/**
- * Simple migration
- */
-class VersionTest_Migration extends AbstractMigration
-{
-    public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
-}
-
-/**
- * Migration with description
- */
-class VersionTest_MigrationDescription extends AbstractMigration
-{
-    public function getDescription()
+    public function testWarningWhenNoSqlStatementIsOutputed()
     {
-        return 'My super migration';
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '003',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+        );
+
+        $version->execute('up');
+        $this->assertContains(
+            'Migration 003 was executed but did not result in any SQL statements.',
+            $this->getOutputStreamContent($this->output));
     }
 
-    public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
+    public function testCatchExceptionDuringMigration()
+    {
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '004',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException'
+        );
+
+        try {
+            $version->execute('up');
+        } catch (\Exception $e) {
+            $this->assertContains(
+                'Migration 004 failed during Execution. Error Super Exception',
+                $this->getOutputStreamContent($this->output));
+        }
+    }
 }
