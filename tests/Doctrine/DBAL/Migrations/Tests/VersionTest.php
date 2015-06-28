@@ -31,13 +31,20 @@ use \Mockery as m;
  */
 class VersionTest extends MigrationTestCase
 {
+
+    private $config;
+
+    protected $outputWriter;
+
+    protected $output;
+
     /**
      * Create simple migration
      */
     public function testCreateVersion()
     {
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration');
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy');
         $this->assertEquals($versionName, $version->getVersion());
     }
 
@@ -49,7 +56,7 @@ class VersionTest extends MigrationTestCase
         $versionName = '003';
         $versionDescription = 'My super migration';
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_MigrationDescription');
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription');
         $this->assertEquals($versionName, $version->getVersion());
         $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
     }
@@ -69,7 +76,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($method->invoke($version, 0, true));
     }
@@ -89,7 +96,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($method->invoke($version, 0, false));
     }
@@ -104,7 +111,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $reflectionVersion = new \ReflectionClass('Doctrine\DBAL\Migrations\Version');
         $stateProperty = $reflectionVersion->getProperty('state');
@@ -137,7 +144,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($version->addSql('SELECT * FROM foo'));
         $this->assertNull($version->addSql(array('SELECT * FROM foo')));
@@ -189,27 +196,47 @@ class VersionTest extends MigrationTestCase
             [__DIR__ . '/tmpfile.sql', 'up', ['1' => ['SHOW DATABASES']]], // tests something actually got written
         ];
     }
-}
 
-/**
- * Simple migration
- */
-class VersionTest_Migration extends AbstractMigration
-{
-    public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
-}
-
-/**
- * Migration with description
- */
-class VersionTest_MigrationDescription extends AbstractMigration
-{
-    public function getDescription()
+    public function testWarningWhenNoSqlStatementIsOutputed()
     {
-        return 'My super migration';
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '003',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+        );
+
+        $version->execute('up');
+        $this->assertContains(
+            'Migration 003 was executed but did not result in any SQL statements.',
+            $this->getOutputStreamContent($this->output));
     }
 
-    public function down(Schema $schema) {}
-    public function up(Schema $schema)   {}
+    public function testCatchExceptionDuringMigration()
+    {
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '004',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException'
+        );
+
+        try {
+            $version->execute('up');
+        } catch (\Exception $e) {
+            $this->assertContains(
+                'Migration 004 failed during Execution. Error Super Exception',
+                $this->getOutputStreamContent($this->output));
+        }
+    }
 }
