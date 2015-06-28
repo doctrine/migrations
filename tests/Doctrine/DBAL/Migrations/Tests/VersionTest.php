@@ -31,13 +31,20 @@ use \Mockery as m;
  */
 class VersionTest extends MigrationTestCase
 {
+
+    private $config;
+
+    protected $outputWriter;
+
+    protected $output;
+
     /**
      * Create simple migration
      */
     public function testCreateVersion()
     {
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration');
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy');
         $this->assertEquals($versionName, $version->getVersion());
     }
 
@@ -49,7 +56,7 @@ class VersionTest extends MigrationTestCase
         $versionName = '003';
         $versionDescription = 'My super migration';
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_MigrationDescription');
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription');
         $this->assertEquals($versionName, $version->getVersion());
         $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
     }
@@ -69,7 +76,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($method->invoke($version, 0, true));
     }
@@ -89,7 +96,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($method->invoke($version, 0, false));
     }
@@ -104,7 +111,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $reflectionVersion = new \ReflectionClass('Doctrine\DBAL\Migrations\Version');
         $stateProperty = $reflectionVersion->getProperty('state');
@@ -137,7 +144,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\VersionTest_Migration'
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
         );
         $this->assertNull($version->addSql('SELECT * FROM foo'));
         $this->assertNull($version->addSql(array('SELECT * FROM foo')));
