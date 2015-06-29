@@ -68,7 +68,7 @@ class SqlFileWriter
         return file_put_contents($path, $string);
     }
 
-    protected function buildMigrationFile(array $queriesByVersion, $direction)
+    private function buildMigrationFile(array $queriesByVersion, $direction)
     {
         $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
 
@@ -85,7 +85,7 @@ class SqlFileWriter
         return $string;
     }
 
-    protected function getVersionUpdateQuery($version, $direction)
+    private function getVersionUpdateQuery($version, $direction)
     {
         if ($direction == 'down') {
             $query = "DELETE FROM %s WHERE version = '%s';\n";
@@ -96,7 +96,7 @@ class SqlFileWriter
         return sprintf($query, $this->migrationsTableName, $version);
     }
 
-    protected function buildMigrationFilePath()
+    private function buildMigrationFilePath()
     {
         $path = $this->destPath;
         if (is_dir($path)) {
