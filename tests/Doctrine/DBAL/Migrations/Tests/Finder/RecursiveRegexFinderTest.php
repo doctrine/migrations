@@ -48,14 +48,14 @@ class RecursiveRegexFinderTest extends MigrationTestCase
 
         $this->assertCount(6, $migrations);
 
-        $tests = array(
+        $tests = [
             '20150502000000' => 'TestMigrations\\Version20150502000000',
             '20150502000001' => 'TestMigrations\\Version20150502000001',
             '20150502000003' => 'TestMigrations\\Version20150502000003',
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
             '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
-        );
+        ];
         foreach($tests as $version => $namespace) {
             $this->assertArrayHasKey($version, $migrations);
             $this->assertEquals($namespace, $migrations[$version]);

@@ -247,7 +247,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
         $sql = $migration->migrate();
 
-        $this->assertEquals(array(), $sql);
+        $this->assertEquals([], $sql);
     }
 
     /**
@@ -257,7 +257,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
      */
     public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated(array $migrations)
     {
-        foreach( $migrations as $key => $class){
+        foreach ($migrations as $key => $class) {
             $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
             $this->config->registerMigration($key, $class);
             $sql = $migration->migrate();
@@ -268,16 +268,16 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function provideTestMigrationNames()
     {
-        return array(
-            array(array(
+        return [
+            [[
                 '20120228123443' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
                 '20120228114838' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
-            )),
-            array(array(
+            ]],
+            [[
                 '002Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
                 '001Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
-            ))
-        );
+            ]]
+        ];
     }
 }
 
@@ -286,7 +286,7 @@ class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
     public function up(Schema $schema)
     {
         $this->addSql("CREATE TABLE test_add_sql_table (test varchar(255))");
-        $this->addSql("INSERT INTO test_add_sql_table (test) values (?)", array('test'));
+        $this->addSql("INSERT INTO test_add_sql_table (test) values (?)", ['test']);
     }
 
     public function down(Schema $schema)

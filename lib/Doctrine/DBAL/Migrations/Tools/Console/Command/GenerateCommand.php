@@ -101,18 +101,18 @@ EOT
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
-        $placeHolders = array(
+        $placeHolders = [
             '<namespace>',
             '<version>',
             '<up>',
-            '<down>'
-        );
-        $replacements = array(
+            '<down>',
+        ];
+        $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
-        );
+        ];
         $code = str_replace($placeHolders, $replacements, self::$_template);
         $code = preg_replace('/^ +$/m', '', $code);
         $dir = $configuration->getMigrationsDirectory();
@@ -127,7 +127,7 @@ EOT
         file_put_contents($path, $code);
 
         if ($editorCmd = $input->getOption('editor-cmd')) {
-            proc_open($editorCmd . ' ' . escapeshellarg($path), array(), $pipes);
+            proc_open($editorCmd . ' ' . escapeshellarg($path), [], $pipes);
         }
 
         return $path;

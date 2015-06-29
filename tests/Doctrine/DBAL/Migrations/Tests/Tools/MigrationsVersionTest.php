@@ -24,7 +24,7 @@ class MigrationsVersionTest extends \PHPUnit_Framework_TestCase {
         $method = $class->getMethod('isACustomPharBuild');
         $method->setAccessible(true);
 
-        $this->assertFalse($method->invokeArgs(new MigrationsVersion(), array('@git-version@')), 'This is not a custom phar build.');
-        $this->assertTrue($method->invokeArgs(new MigrationsVersion(), array('v1.0.0-alpha3-125435')), 'This has been replaced by box and is thus a phar build.');
+        $this->assertFalse($method->invokeArgs(new MigrationsVersion(), ['@git-version@']), 'This is not a custom phar build.');
+        $this->assertTrue($method->invokeArgs(new MigrationsVersion(), ['v1.0.0-alpha3-125435']), 'This has been replaced by box and is thus a phar build.');
     }
 }

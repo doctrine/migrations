@@ -28,7 +28,7 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
 {
     public function getSqliteConnection()
     {
-        $params = array('driver' => 'pdo_sqlite', 'memory' => true);
+        $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
         return DriverManager::getConnection($params);
     }

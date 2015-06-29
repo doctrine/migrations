@@ -36,17 +36,17 @@ class MigrationStatusTest extends MigrationTestCase
     {
         $command = $this
             ->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand')
-            ->setConstructorArgs(array('migrations:status'))
+            ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                array(
+                [
                     'getMigrationConfiguration',
-                )
+                ]
             )
             ->getMock();
 
         $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
-            ->setConstructorArgs(array($this->getSqliteConnection()))
-            ->setMethods(array('resolveVersionAlias', 'getDateTime'))
+            ->setConstructorArgs([$this->getSqliteConnection()])
+            ->setMethods(['resolveVersionAlias', 'getDateTime'])
             ->getMock();
 
         $configuration
@@ -71,8 +71,8 @@ class MigrationStatusTest extends MigrationTestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(
-            array(),
-            array()
+            [],
+            []
         );
 
         $textOutput = $commandTester->getDisplay();
@@ -89,28 +89,28 @@ class MigrationStatusTest extends MigrationTestCase
     {
         $command = $this
             ->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand')
-            ->setConstructorArgs(array('migrations:status'))
+            ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                array(
+                [
                     'getMigrationConfiguration',
-                )
+                ]
             )
             ->getMock();
 
         $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
-            ->setConstructorArgs(array($this->getSqliteConnection()))
-            ->setMethods(array('getMigratedVersions', 'getAvailableVersions', 'getCurrentVersion'))
+            ->setConstructorArgs([$this->getSqliteConnection()])
+            ->setMethods(['getMigratedVersions', 'getAvailableVersions', 'getCurrentVersion'])
             ->getMock();
 
         $configuration
             ->expects($this->once())
             ->method('getMigratedVersions')
-            ->will($this->returnValue(array(1234,1235,1237,1238,1239)));
+            ->will($this->returnValue([1234,1235,1237,1238,1239]));
 
         $configuration
             ->expects($this->once())
             ->method('getAvailableVersions')
-            ->will($this->returnValue(array(1234,1235,1239,1240)));
+            ->will($this->returnValue([1234,1235,1239,1240]));
 
         $configuration
             ->expects($this->any())
@@ -127,8 +127,8 @@ class MigrationStatusTest extends MigrationTestCase
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(
-            array(),
-            array()
+            [],
+            []
         );
 
         $textOutput = $commandTester->getDisplay();

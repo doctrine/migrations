@@ -51,7 +51,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
      */
     public function testEntityManagerWithoutMetadataCausesError()
     {
-        $this->config->setMetadataDriverImpl(new XmlDriver(array()));
+        $this->config->setMetadataDriverImpl(new XmlDriver([]));
 
         $this->ormProvider->createSchema();
     }
@@ -59,7 +59,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
     protected function setUp()
     {
         $this->conn = $this->getSqliteConnection();
-        $this->config = Setup::createXMLMetadataConfiguration(array(__DIR__.'/_files'), true);
+        $this->config = Setup::createXMLMetadataConfiguration([__DIR__.'/_files'], true);
         $this->entityManager = EntityManager::create($this->conn, $this->config);
         $this->ormProvider = new OrmSchemaProvider($this->entityManager);
     }
