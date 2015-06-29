@@ -19,7 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
-use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\Exception\MigrationException;
 
 /**
  * Abstract Migration Configuration class for loading configuration information

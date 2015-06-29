@@ -20,7 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Configuration;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\Exception\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;

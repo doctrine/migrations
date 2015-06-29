@@ -19,6 +19,9 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Migrations\Exception\AbortMigrationException;
+use Doctrine\DBAL\Migrations\Exception\IrreversibleMigrationException;
+use Doctrine\DBAL\Migrations\Exception\SkipMigrationException;
 use Doctrine\DBAL\Schema\Schema;
 
 /**

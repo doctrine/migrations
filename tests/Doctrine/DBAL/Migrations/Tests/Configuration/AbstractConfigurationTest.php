@@ -37,7 +37,7 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
     {
         /** @var $config \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration */
         $config = $this->loadConfiguration();
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException');
+        $this->setExpectedException('Doctrine\DBAL\Migrations\Exception\MigrationException');
         $config->load($config->getFile());
     }
 

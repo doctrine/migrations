@@ -68,7 +68,10 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\AbortMigrationException', 'Something failed');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\Exception\AbortMigrationException',
+            'Something failed'
+        );
         $this->migration->abortIf(true, 'Something failed');
     }
 
@@ -79,13 +82,19 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsExceptionEvenWithoutMessage()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\AbortMigrationException', 'Unknown Reason');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\Exception\AbortMigrationException',
+            'Unknown Reason'
+        );
         $this->migration->abortIf(true);
     }
 
     public function testSkipIfThrowsException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\SkipMigrationException', 'Something skipped');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\Exception\SkipMigrationException',
+            'Something skipped'
+        );
         $this->migration->skipIf(true, 'Something skipped');
     }
 
@@ -96,13 +105,19 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testThrowIrreversibleMigrationException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'Irreversible migration');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\Exception\IrreversibleMigrationException',
+            'Irreversible migration'
+        );
         $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
     }
 
     public function testThrowIrreversibleMigrationExceptionWithoutMessage()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'This migration is irreversible and cannot be reverted.');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\Exception\IrreversibleMigrationException',
+            'This migration is irreversible and cannot be reverted.'
+        );
         $this->migration->exposed_ThrowIrreversibleMigrationException();
     }
 

@@ -44,14 +44,14 @@ class MigrationTest extends MigrationTestCase
         $migration = new Migration($this->config);
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationException',
+            'Doctrine\DBAL\Migrations\Exception\MigrationException',
             'Could not find migration version 1234'
         );
         $migration->migrate('1234');
     }
 
     /**
-     * @expectedException \Doctrine\DBAL\Migrations\MigrationException
+     * @expectedException \Doctrine\DBAL\Migrations\Exception\MigrationException
      * @expectedExceptionMessage Could not find any migrations to execute.
      */
     public function testMigrateWithNoMigrationsThrowsException()
