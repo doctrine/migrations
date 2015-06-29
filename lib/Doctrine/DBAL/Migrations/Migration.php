@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Exception\MigrationException;
 
 /**
  * Class for running migrations to the current version or a manually specified version.

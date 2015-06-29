@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Exception\SkipMigrationException;
 
 /**
  * Class which wraps a migration version and allows execution of the

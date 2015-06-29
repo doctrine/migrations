@@ -17,7 +17,7 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace Doctrine\DBAL\Migrations;
+namespace Doctrine\DBAL\Migrations\Exception;
 
 /**
  * Class for Migrations specific exceptions
