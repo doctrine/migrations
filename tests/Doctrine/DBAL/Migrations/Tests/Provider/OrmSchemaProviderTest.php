@@ -56,7 +56,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->ormProvider->createSchema();
     }
 
-    public static function notEntityManagers()
+    public function notEntityManagers()
     {
         return array(
             array(new \stdclass),

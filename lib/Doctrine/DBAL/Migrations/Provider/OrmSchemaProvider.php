@@ -74,7 +74,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
      * @param   mixed $manager Hopefully an entity manager, but it may be anything
      * @return  boolean
      */
-    private static function isEntityManager($manager)
+    private function isEntityManager($manager)
     {
         return $manager instanceof EntityManagerInterface || $manager instanceof EntityManager;
     }
