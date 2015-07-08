@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
 use InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -36,11 +37,11 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
@@ -148,11 +149,11 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteRangeOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $this->configuration->getVersion('1233')->markMigrated();
         $this->configuration->getVersion('1234')->markMigrated();
@@ -184,11 +185,11 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddAllOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
@@ -213,11 +214,11 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteAllOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1239, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1240, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $this->configuration->getVersion('1233')->markMigrated();
         $this->configuration->getVersion('1234')->markMigrated();
@@ -245,9 +246,9 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $this->configuration->getVersion('1233')->markMigrated();
 
@@ -272,9 +273,9 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOption()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
-        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $this->configuration->registerMigration(1235, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $this->configuration->getVersion('1234')->markMigrated();
 
@@ -302,7 +303,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOptionIfVersionAlreadyMigrated()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
         $this->configuration->getVersion('1233')->markMigrated();
 
         $commandTester = new CommandTester($this->command);
@@ -325,7 +326,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOptionIfVersionNotMigrated()
     {
-        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->configuration->registerMigration(1233, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $commandTester = new CommandTester($this->command);
 

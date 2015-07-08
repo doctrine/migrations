@@ -147,13 +147,19 @@ class Version
     public function markMigrated()
     {
         $this->configuration->createMigrationTable();
-        $this->connection->executeQuery("INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES (?)", array($this->version));
+        $this->connection->insert(
+            $this->configuration->getMigrationsTableName(),
+            array('version' => $this->version)
+        );
     }
 
     public function markNotMigrated()
     {
         $this->configuration->createMigrationTable();
-        $this->connection->executeQuery("DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = ?", array($this->version));
+        $this->connection->delete(
+            $this->configuration->getMigrationsTableName(),
+            array('version' => $this->version)
+        );
     }
 
     /**
@@ -176,8 +182,9 @@ class Version
         } else {
             $this->sql[] = $sql;
             if (!empty($params)) {
-                $this->params[count($this->sql) - 1] = $params;
-                $this->types[count($this->sql) - 1] = $types ?: array();
+                $index = count($this->sql) - 1;
+                $this->params[$index] = $params;
+                $this->types[$index]  = $types;
             }
         }
     }
@@ -194,25 +201,16 @@ class Version
     {
         $queries = $this->execute($direction, true);
 
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
+        $this->outputWriter->write("\n# Version " . $this->version . "\n");
 
-        $string .= "\n# Version " . $this->version . "\n";
-        foreach ($queries as $query) {
-            $string .= $query . ";\n";
-        }
-        if ($direction == "down") {
-            $string .= "DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '" . $this->version . "';\n";
-        } else {
-            $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $this->version . "');\n";
-        }
-        if (is_dir($path)) {
-            $path = realpath($path);
-            $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
-        }
+        $sqlQueries = [$this->version => $queries];
+        $sqlWriter = new SqlFileWriter(
+            $this->configuration->getMigrationsTableName(),
+            $path,
+            $this->outputWriter
+        );
 
-        $this->outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
-
-        return file_put_contents($path, $string);
+        return $sqlWriter->write($sqlQueries, $direction);
     }
 
     /**
@@ -239,7 +237,7 @@ class Version
         $this->sql = array();
 
         $transaction = $this->migration->isTransactional();
-        if($transaction){
+        if ($transaction) {
             //only start transaction if in transactional mode
             $this->connection->beginTransaction();
         }
@@ -279,7 +277,10 @@ class Version
                         $this->outputQueryTime($queryStart, $timeAllQueries);
                     }
                 } else {
-                    $this->outputWriter->write(sprintf('<error>Migration %s was executed but did not result in any SQL statements.</error>', $this->version));
+                    $this->outputWriter->write(sprintf(
+                        '<error>Migration %s was executed but did not result in any SQL statements.</error>',
+                        $this->version
+                    ));
                 }
 
                 if ($direction === 'up') {
@@ -305,7 +306,7 @@ class Version
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
             }
 
-            if($transaction){
+            if ($transaction) {
                 //commit only if running in transactional mode
                 $this->connection->commit();
             }
@@ -314,7 +315,7 @@ class Version
 
             return $this->sql;
         } catch (SkipMigrationException $e) {
-            if($transaction){
+            if ($transaction) {
                 //only rollback transaction if in transactional mode
                 $this->connection->rollback();
             }
@@ -340,7 +341,7 @@ class Version
                 $this->version, $this->getExecutionState(), $e->getMessage()
             ));
 
-            if($transaction){
+            if ($transaction) {
                 //only rollback transaction if in transactional mode
                 $this->connection->rollback();
             }

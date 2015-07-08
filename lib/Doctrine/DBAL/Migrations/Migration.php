@@ -86,28 +86,15 @@ class Migration
 
         $direction = $from > $to ? 'down' : 'up';
 
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
-        $string .= sprintf("# Migrating from %s to %s\n", $from, $to);
+        $this->outputWriter->write(sprintf("# Migrating from %s to %s\n", $from, $to));
 
-        foreach ($sql as $version => $queries) {
-            $string .= "\n# Version " . $version . "\n";
-            foreach ($queries as $query) {
-                $string .= $query . ";\n";
-            }
-            if ($direction == "down") {
-                $string .= "DELETE FROM " . $this->configuration->getMigrationsTableName() . " WHERE version = '" . $version . "';\n";
-            } else {
-                $string .= "INSERT INTO " . $this->configuration->getMigrationsTableName() . " (version) VALUES ('" . $version . "');\n";
-            }
-        }
-        if (is_dir($path)) {
-            $path = realpath($path);
-            $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
-        }
+        $sqlWriter = new SqlFileWriter(
+            $this->configuration->getMigrationsTableName(),
+            $path,
+            $this->outputWriter
+        );
 
-        $this->outputWriter->write("\n".sprintf('Writing migration file to "<info>%s</info>"', $path));
-
-        return file_put_contents($path, $string);
+        return $sqlWriter->write($sql, $direction);
     }
 
     /**

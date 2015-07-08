@@ -1,3 +1,6 @@
+#Trying to go to the faster container infrastructure of github
+sudo: false
+
 language: php
 
 php:

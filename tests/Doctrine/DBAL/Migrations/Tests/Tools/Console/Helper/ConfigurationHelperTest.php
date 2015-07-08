@@ -26,12 +26,12 @@ class ConfigurationHelperTest extends MigrationTestCase
     /**
      * @var OutputWriter
      */
-    private $outputWriter;
+    protected $outputWriter;
 
     /**
      * @var OutputInterface
      */
-    private $output;
+    protected $output;
 
     /**
      * @var InputInterface
@@ -57,6 +57,51 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper', $configurationHelper);
     }
 
+    //used in other tests to see if xml or yaml or yml config files are loaded.
+    protected function getConfigurationHelperLoadsASpecificFormat($baseFile, $configFile) {
+        try {
+            $file = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
+            copy($file,$configFile);
+
+            $this->input->expects($this->any())
+                ->method('getOption')
+                ->with('configuration')
+                ->will($this->returnValue(null));
+
+            $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+            $configfileLoaded = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+
+            unlink($configFile);
+
+            return trim($this->getOutputStreamContent($this->output));
+        }
+        catch(\Exception $e) {
+            unlink($configFile);//i want to be really sure to cleanup this file
+        }
+        return false;
+    }
+
+    public function testConfigurationHelperLoadsXmlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.xml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.xml', 'migrations.xml')
+        );
+    }
+
+    public function testConfigurationHelperLoadsYamlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.yaml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yaml')
+        );
+    }
+
+    public function testConfigurationHelperLoadsYmlFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.yml',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yml')
+        );
+    }
+
     public function testConfigurationHelperWithConfigurationFromSetter()
     {
         $this->input->expects($this->any())
@@ -69,7 +114,8 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
-        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", $this->getOutputStreamContent($this->output));
+
+        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
     }
 
     public function testConfigurationHelperWithConfigurationFromSetterAndOverrideFromCommandLine()
@@ -102,15 +148,4 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 
-    private function getOutputWriter()
-    {
-        if (!$this->outputWriter) {
-            $this->output = $this->getOutputStream();
-            $output = $this->output;
-            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
-                return $output->writeln($message);
-            });
-        }
-        return $this->outputWriter;
-    }
 }

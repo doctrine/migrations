@@ -19,7 +19,10 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        $this->setExpectedException("Doctrine\DBAL\Migrations\MigrationException", "Migrations namespace must be configured in order to use Doctrine migrations.");
+        $this->setExpectedException(
+            "Doctrine\DBAL\Migrations\MigrationException",
+            "Migrations namespace must be configured in order to use Doctrine migrations."
+        );
         $config->validate();
     }
 
@@ -28,7 +31,10 @@ class ConfigurationTest extends MigrationTestCase
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsNamespace("DoctrineMigrations\\");
 
-        $this->setExpectedException("Doctrine\DBAL\Migrations\MigrationException", "Migrations directory must be configured in order to use Doctrine migrations.");
+        $this->setExpectedException(
+            "Doctrine\DBAL\Migrations\MigrationException",
+            "Migrations directory must be configured in order to use Doctrine migrations."
+        );
         $config->validate();
     }
 
@@ -72,14 +78,17 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Could not find migration version 1234');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Could not find migration version 1234'
+        );
         $config->getVersion(1234);
     }
 
     public function testRegisterMigration()
     {
         $config = $this->getSqliteConfiguration();
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
         $this->assertEquals(1, count($config->getMigrations()), "One Migration registered.");
         $this->assertTrue($config->hasVersion(1234));
@@ -94,8 +103,8 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations(array(
-            1234 => 'Doctrine\DBAL\Migrations\Tests\ConfigMigration',
-            1235 => 'Doctrine\DBAL\Migrations\Tests\Config2Migration',
+            1234 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test',
+            1235 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version2Test',
         ));
 
         $this->assertEquals(2, count($config->getMigrations()), "Two Migration registered.");
@@ -111,19 +120,22 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
 
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException', 'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version');
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version'
+        );
+        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
     }
 
     public function testPreviousCurrentNextLatestVersion()
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations(array(
-            1234 => 'Doctrine\DBAL\Migrations\Tests\ConfigMigration',
-            1235 => 'Doctrine\DBAL\Migrations\Tests\Config2Migration',
-            1236 => 'Doctrine\DBAL\Migrations\Tests\Config3Migration',
+            1234 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test',
+            1235 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version2Test',
+            1236 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version3Test',
         ));
 
         $this->assertSame(null, $config->getPrevVersion(), "no prev version");
@@ -165,7 +177,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\ConfigMigration');
+        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
         $this->assertEquals(array(1234), $config->getAvailableVersions());
     }
 
