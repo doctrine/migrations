@@ -47,6 +47,19 @@ class YamlConfiguration extends AbstractFileConfiguration
         if (isset($array['migrations_namespace'])) {
             $this->setMigrationsNamespace($array['migrations_namespace']);
         }
+        if (isset($array['organize_versions'])) {
+            $versions_organization = $array['organize_versions'];
+            if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
+                $this->setVersionsAreOrganizedByYear();
+            } else if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+                $this->setVersionsAreOrganizedByYearAndMonth();
+            } else {
+                trigger_error(
+                    'Unknown ' . var_export($versions_organization, true) . ' for configuration "organize_versions".',
+                    E_USER_NOTICE
+                );
+            }
+        }
         if (isset($array['migrations_directory'])) {
             $migrationsDirectory = $this->getDirectoryRelativeToFile($file, $array['migrations_directory']);
             $this->setMigrationsDirectory($migrationsDirectory);

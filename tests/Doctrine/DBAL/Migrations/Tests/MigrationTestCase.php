@@ -26,6 +26,10 @@ use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @return \Doctrine\DBAL\Connection
+     * @throws \Doctrine\DBAL\DBALException
+     */
     public function getSqliteConnection()
     {
         $params = array('driver' => 'pdo_sqlite', 'memory' => true);

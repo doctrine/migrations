@@ -42,6 +42,18 @@ use Doctrine\DBAL\Types\Type;
 class Configuration
 {
     /**
+     * Configure versions to be organized by year.
+     */
+    const VERSIONS_ORGANIZATION_BY_YEAR = 'year';
+
+    /**
+     * Configure versions to be organized by year and month.
+     *
+     * @var string
+     */
+    const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
+
+    /**
      * Name of this set of migrations
      *
      * @var string
@@ -106,6 +118,20 @@ class Configuration
     private $migrations = array();
 
     /**
+     * Versions are organized by year.
+     *
+     * @var boolean
+     */
+    private $versionsOrganizedByYear = false;
+
+    /**
+     * Versions are organized by year and month.
+     *
+     * @var boolean
+     */
+    private $versionsOrganizedByYearAndMonth = false;
+
+    /**
      * Construct a migration configuration object.
      *
      * @param Connection               $connection   A Connection instance
@@ -120,6 +146,22 @@ class Configuration
         }
         $this->outputWriter = $outputWriter;
         $this->migrationFinder = $finder;
+    }
+
+    /**
+     * @return bool
+     */
+    public function versionsAreOrganizedByYear()
+    {
+        return $this->versionsOrganizedByYear;
+    }
+
+    /**
+     * @return bool
+     */
+    public function versionsAreOrganizedByYearAndMonth()
+    {
+        return $this->versionsOrganizedByYearAndMonth;
     }
 
     /**
@@ -271,7 +313,7 @@ class Configuration
     /**
      * set the implementation of the migration finder.
      *
-     * @param   $finder The new migration finder
+     * @param MigrationFinderInterface $finder The new migration finder
      * @return  void
      */
     public function setMigrationFinder(MigrationFinderInterface $finder)
@@ -661,6 +703,22 @@ class Configuration
         }
 
         return $this->migrationFinder;
+    }
+
+    /**
+     * @param bool $versionsOrganizedByYear
+     */
+    protected function setVersionsAreOrganizedByYear($versionsOrganizedByYear = true)
+    {
+        $this->versionsOrganizedByYear = $versionsOrganizedByYear;
+    }
+
+    /**
+     * @param bool $versionsOrganizedByYearAndMonth
+     */
+    protected function setVersionsAreOrganizedByYearAndMonth($versionsOrganizedByYearAndMonth = true)
+    {
+        $this->versionsOrganizedByYearAndMonth = $versionsOrganizedByYearAndMonth;
     }
 
     /**

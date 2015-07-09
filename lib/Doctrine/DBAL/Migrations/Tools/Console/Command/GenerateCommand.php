@@ -37,7 +37,7 @@ class GenerateCommand extends AbstractCommand
 {
 
     private static $_template =
-            '<?php
+        '<?php
 
 namespace <namespace>;
 
@@ -72,10 +72,10 @@ class Version<version> extends AbstractMigration
     protected function configure()
     {
         $this
-                ->setName('migrations:generate')
-                ->setDescription('Generate a blank migration class.')
-                ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
-                ->setHelp(<<<EOT
+            ->setName('migrations:generate')
+            ->setDescription('Generate a blank migration class.')
+            ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
+            ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
     <info>%command.full_name%</info>
@@ -84,7 +84,7 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -99,8 +99,13 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
-    {
+    protected function generateMigration(
+        Configuration $configuration,
+        InputInterface $input,
+        $version,
+        $up = null,
+        $down = null
+    ) {
         $placeHolders = array(
             '<namespace>',
             '<version>',
@@ -117,12 +122,30 @@ EOT
         $code = preg_replace('/^ +$/m', '', $code);
         $dir = $configuration->getMigrationsDirectory();
         $dir = $dir ? $dir : getcwd();
-        $dir = rtrim($dir, '/');
-        $path = $dir . '/Version' . $version . '.php';
-
-        if ( ! file_exists($dir)) {
+        $dir = rtrim($dir, DIRECTORY_SEPARATOR);
+        if (!file_exists($dir)) {
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
+
+        if ($configuration->versionsAreOrganizedByYear() ||
+            $configuration->versionsAreOrganizedByYearAndMonth()
+        ) {
+            $versionYear = substr($version, 0, 4);
+            $dir = $dir . DIRECTORY_SEPARATOR . $versionYear;
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755);
+            }
+
+            if ($configuration->versionsAreOrganizedByYearAndMonth()) {
+                $versionMonth = substr($version, 4, 2);
+                $versionMonthShortName = strtolower(date('M', mktime(0, 0, 0, $versionMonth, 1, $versionYear)));
+                $dir .= DIRECTORY_SEPARATOR . $versionMonth . $versionMonthShortName;
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0755);
+                }
+            }
+        }
+        $path = $dir . DIRECTORY_SEPARATOR . 'Version' . $version . '.php';
 
         file_put_contents($path, $code);
 

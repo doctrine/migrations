@@ -44,6 +44,19 @@ class XmlConfiguration extends AbstractFileConfiguration
         if (isset($xml->{'migrations-namespace'})) {
             $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
         }
+        if (isset($xml->{'organize-versions'})) {
+            $versions_organization = $xml->{'organize-versions'};
+            if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
+                $this->setVersionsAreOrganizedByYear();
+            } else if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+                $this->setVersionsAreOrganizedByYearAndMonth();
+            } else {
+                trigger_error(
+                    'Unknown ' . var_export($versions_organization, true) . ' for configuration "organize_versions".',
+                    E_USER_NOTICE
+                );
+            }
+        }
         if (isset($xml->{'migrations-directory'})) {
             $migrationsDirectory = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
             $this->setMigrationsDirectory($migrationsDirectory);
