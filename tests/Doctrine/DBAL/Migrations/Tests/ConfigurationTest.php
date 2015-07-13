@@ -203,15 +203,15 @@ class ConfigurationTest extends MigrationTestCase
 
     public function versionProvider()
     {
-        return [
-            ['20150101123545Version', '2015-01-01 12:35:45'],
-            ['tralalaVersion', ''],
-            ['0000254Version', ''],
-            ['0000254BaldlfqjdVersion', ''],
-            ['20130101123545Version', '2013-01-01 12:35:45'],
-            ['20150202042811', '2015-02-02 04:28:11'],
-            ['20150202162811', '2015-02-02 16:28:11']
-        ];
+        return array(
+            array('20150101123545Version', '2015-01-01 12:35:45'),
+            array('tralalaVersion', ''),
+            array('0000254Version', ''),
+            array('0000254BaldlfqjdVersion', ''),
+            array('20130101123545Version', '2013-01-01 12:35:45'),
+            array('20150202042811', '2015-02-02 04:28:11'),
+            array('20150202162811', '2015-02-02 16:28:11')
+        );
     }
 }
 

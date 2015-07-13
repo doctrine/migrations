@@ -82,10 +82,10 @@ class MigrationTest extends MigrationTestCase
      */
     public function getSqlProvider()
     {
-        return [
-            [null],
-            ['test'],
-        ];
+        return array(
+            array(null),
+            array('test'),
+        );
     }
 
     /**
@@ -112,7 +112,7 @@ class MigrationTest extends MigrationTestCase
             $config->shouldReceive('getLatestVersion')->andReturn($from + 1);
         }
 
-        $migration = m::mock('Doctrine\DBAL\Migrations\Migration[getSql]', [$config])->makePartial();
+        $migration = m::mock('Doctrine\DBAL\Migrations\Migration[getSql]', array($config))->makePartial();
         $migration->shouldReceive('getSql')->with($to)->andReturn($getSqlReturn);
 
         $result = $migration->writeSqlFile($path, $to);
@@ -121,13 +121,13 @@ class MigrationTest extends MigrationTestCase
 
     public function writeSqlFileProvider()
     {
-        return [
-            [__DIR__, 0, 1, ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, 0, null, ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, 1, 1, ['1' => ['SHOW DATABASES;']]], // up (same)
-            [__DIR__, 1, 0, ['1' => ['SHOW DATABASES;']]], // down
-            [__DIR__ . '/tmpfile.sql', 0, 1, ['1' => ['SHOW DATABASES']]], // tests something actually got written
-        ];
+        return array(
+            array(__DIR__, 0, 1, array('1' => array('SHOW DATABASES;'))), // up
+            array(__DIR__, 0, null, array('1' => array('SHOW DATABASES;'))), // up
+            array(__DIR__, 1, 1, array('1' => array('SHOW DATABASES;'))), // up (same)
+            array(__DIR__, 1, 0, array('1' => array('SHOW DATABASES;'))), // down
+            array(__DIR__ . '/tmpfile.sql', 0, 1, array('1' => array('SHOW DATABASES'))), // tests something actually got written
+        );
     }
 
 }
