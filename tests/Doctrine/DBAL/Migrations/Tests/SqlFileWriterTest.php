@@ -78,11 +78,11 @@ class SqlFileWriterTest extends MigrationTestCase
         $instance->write($queries, $direction);
 
         // file content tests & cleanup
-        $files = [];
+        $files = array();
         if (is_dir($path)) {
             $files = glob(realpath($path) . '/*.sql');
         } elseif(is_file($path)) {
-            $files = [$path];
+            $files = array($path);
         }
         foreach ($files as $file) {
             $contents = file_get_contents($file);
@@ -93,12 +93,12 @@ class SqlFileWriterTest extends MigrationTestCase
 
     public function writeProvider()
     {
-        return [
-            [__DIR__, 'up', [1 => ['SHOW DATABASES']], true],
-            [__DIR__, 'up', [1 => ['SHOW DATABASES']], false],
-            [__DIR__, 'down', [1 => ['SHOW DATABASES']], true],
-            [__DIR__, 'down', [1 => ['SHOW DATABASES']], false],
-        ];
+        return array(
+            array(__DIR__, 'up', array(1 => array('SHOW DATABASES')), true),
+            array(__DIR__, 'up', array(1 => array('SHOW DATABASES')), false),
+            array(__DIR__, 'down', array(1 => array('SHOW DATABASES')), true),
+            array(__DIR__, 'down', array(1 => array('SHOW DATABASES')), false),
+        );
     }
 
 }

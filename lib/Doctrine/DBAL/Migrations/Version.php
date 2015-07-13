@@ -203,7 +203,7 @@ class Version
 
         $this->outputWriter->write("\n# Version " . $this->version . "\n");
 
-        $sqlQueries = [$this->version => $queries];
+        $sqlQueries = array($this->version => $queries);
         $sqlWriter = new SqlFileWriter(
             $this->configuration->getMigrationsTableName(),
             $path,

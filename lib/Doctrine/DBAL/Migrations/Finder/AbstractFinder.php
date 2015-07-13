@@ -52,7 +52,7 @@ abstract class AbstractFinder implements MigrationFinderInterface
      */
     protected function loadMigrations($files, $namespace)
     {
-        $migrations = [];
+        $migrations = array();
         foreach ($files as $file) {
             static::requireOnce($file);
             $className = basename($file, '.php');

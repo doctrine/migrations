@@ -67,7 +67,7 @@ final class RecursiveRegexFinder extends AbstractFinder
      */
     private function getMatches($iteratorFilesMatch)
     {
-        $files = [];
+        $files = array();
         foreach($iteratorFilesMatch as $file) {
             $files[] = $file[0];
         }
