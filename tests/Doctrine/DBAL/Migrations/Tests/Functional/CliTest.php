@@ -81,16 +81,16 @@ class CliTest extends MigrationTestCase
         $this->assertRegExp('/available migrations:\s+2/im', $output);
     }
 
-    public function testGenerateCommandAddsNewVersionOrganizedByYearAndMonth()
+    public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth()
     {
         $this->assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate', 'config_organize_by_year_and_month.xml');
         $this->assertSuccessfulExit();
         $this->assertVersionCount(1, 'generate command should add one version');
 
-        $output = $this->executeCommand('migrations:status');
+        $output = $this->executeCommand('migrations:status', 'config_organize_by_year_and_month.xml');
         $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2/im', $output);
+        $this->assertRegExp('/available migrations:\s+1/im', $output);
     }
 
     public function testMigrationDiffWritesNewMigrationWithExpectedSql()
