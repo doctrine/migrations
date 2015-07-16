@@ -118,11 +118,30 @@ EOT
         $dir = $configuration->getMigrationsDirectory();
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
-        $path = $dir . '/Version' . $version . '.php';
 
         if ( ! file_exists($dir)) {
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
+
+        if ($configuration->areMigrationsOrganizedByYear() ||
+            $configuration->areMigrationsOrganizedByYearAndMonth()
+        ) {
+            $versionYear = substr($version, 0, 4);
+            $dir = $dir . DIRECTORY_SEPARATOR . $versionYear;
+            if (!file_exists($dir)) {
+                mkdir($dir, 0755);
+            }
+
+            if ($configuration->areMigrationsOrganizedByYearAndMonth()) {
+                $versionMonth = substr($version, 4, 2);
+                $versionMonthShortName = strtolower(date('M', mktime(0, 0, 0, $versionMonth, 1, $versionYear)));
+                $dir .= DIRECTORY_SEPARATOR . $versionMonth . $versionMonthShortName;
+                if (!file_exists($dir)) {
+                    mkdir($dir, 0755);
+                }
+            }
+        }
+        $path = $dir . '/Version' . $version . '.php';
 
         file_put_contents($path, $code);
 

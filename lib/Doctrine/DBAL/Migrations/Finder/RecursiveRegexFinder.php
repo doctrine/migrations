@@ -25,7 +25,7 @@ namespace Doctrine\DBAL\Migrations\Finder;
  *
  * @since   1.0.0-alpha3
  */
-final class RecursiveRegexFinder extends AbstractFinder
+final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeepFinderInterface
 {
 
     /**

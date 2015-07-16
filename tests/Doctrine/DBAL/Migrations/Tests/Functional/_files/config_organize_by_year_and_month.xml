@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
+                    http://doctrine-project.org/schemas/migrations/configuration.xsd">
+
+    <name>some-name</name>
+    <migrations-namespace>TestMigrationsVersionsOrganized</migrations-namespace>
+    <table name="migrations_table_name" />
+    <migrations-directory>migrations</migrations-directory>
+    <organize-migrations>year_and_month</organize-migrations>
+
+</doctrine-migrations>

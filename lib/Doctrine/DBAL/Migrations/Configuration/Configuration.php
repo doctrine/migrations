@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Configuration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
@@ -41,6 +42,18 @@ use Doctrine\DBAL\Types\Type;
  */
 class Configuration
 {
+    /**
+     * Configure versions to be organized by year.
+     */
+    const VERSIONS_ORGANIZATION_BY_YEAR = 'year';
+
+    /**
+     * Configure versions to be organized by year and month.
+     *
+     * @var string
+     */
+    const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
+
     /**
      * Name of this set of migrations
      *
@@ -106,6 +119,20 @@ class Configuration
     private $migrations = array();
 
     /**
+     * Versions are organized by year.
+     *
+     * @var boolean
+     */
+    private $migrationsAreOrganizedByYear = false;
+
+    /**
+     * Versions are organized by year and month.
+     *
+     * @var boolean
+     */
+    private $migrationsAreOrganizedByYearAndMonth = false;
+
+    /**
      * Construct a migration configuration object.
      *
      * @param Connection               $connection   A Connection instance
@@ -119,7 +146,26 @@ class Configuration
             $outputWriter = new OutputWriter();
         }
         $this->outputWriter = $outputWriter;
+        if ($finder === null) {
+            $finder = new RecursiveRegexFinder();
+        }
         $this->migrationFinder = $finder;
+    }
+
+    /**
+     * @return bool
+     */
+    public function areMigrationsOrganizedByYear()
+    {
+        return $this->migrationsAreOrganizedByYear;
+    }
+
+    /**
+     * @return bool
+     */
+    public function areMigrationsOrganizedByYearAndMonth()
+    {
+        return $this->migrationsAreOrganizedByYearAndMonth;
     }
 
     /**
@@ -271,11 +317,20 @@ class Configuration
     /**
      * set the implementation of the migration finder.
      *
-     * @param   $finder The new migration finder
-     * @return  void
+     * @param MigrationFinderInterface $finder The new migration finder
+     * @throws MigrationException
      */
-    public function setMigrationFinder(MigrationFinderInterface $finder)
+    public function setMigrationsFinder(MigrationFinderInterface $finder)
     {
+        if (($this->migrationsAreOrganizedByYear || $this->migrationsAreOrganizedByYearAndMonth) &&
+            !($finder instanceof MigrationDeepFinderInterface)) {
+
+            throw MigrationException::configurationIncompatibleWithFinder(
+                'organize-migrations',
+                $finder
+            );
+        }
+
         $this->migrationFinder = $finder;
     }
 
@@ -646,21 +701,42 @@ class Configuration
      */
     protected function findMigrations($path)
     {
-        return $this->getMigrationFinder()->findMigrations($path, $this->getMigrationsNamespace());
+        return $this->migrationFinder->findMigrations($path, $this->getMigrationsNamespace());
     }
 
     /**
-     * Get the migration finder, creating one if it's not present.
-     *
-     * @return   MigrationFinderInterface
+     * @param bool $migrationsAreOrganizedByYear
+     * @throws MigrationException
      */
-    protected function getMigrationFinder()
+    protected function setMigrationsAreOrganizedByYear($migrationsAreOrganizedByYear = true)
     {
-        if (!$this->migrationFinder) {
-            $this->migrationFinder = new RecursiveRegexFinder();
-        }
+        $this->ensureOrganizeMigrationsIsCompatibleWithFinder();
 
-        return $this->migrationFinder;
+        $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
+    }
+
+    /**
+     * @param bool $migrationsAreOrganizedByYearAndMonth
+     * @throws MigrationException
+     */
+    protected function setMigrationsAreOrganizedByYearAndMonth($migrationsAreOrganizedByYearAndMonth = true)
+    {
+        $this->ensureOrganizeMigrationsIsCompatibleWithFinder();
+
+        $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
+    }
+
+    /**
+     * @throws MigrationException
+     */
+    private function ensureOrganizeMigrationsIsCompatibleWithFinder()
+    {
+        if (!($this->migrationFinder instanceof MigrationDeepFinderInterface)) {
+            throw MigrationException::configurationIncompatibleWithFinder(
+                'organize-migrations',
+                $this->migrationFinder
+            );
+        }
     }
 
     /**
