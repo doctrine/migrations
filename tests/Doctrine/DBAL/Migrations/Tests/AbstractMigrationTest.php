@@ -37,7 +37,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->assertSame('', $this->migration->getDescription());
     }
 
-    public function testWarnIfInvokesOutputWriterWitMessage()
+    public function testWarnIfInvokesOutputWriterWithMessage()
     {
         $this->outputWriter
             ->expects($this->once())
