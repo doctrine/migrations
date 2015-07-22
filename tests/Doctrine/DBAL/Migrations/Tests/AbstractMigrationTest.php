@@ -37,13 +37,24 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->assertSame('', $this->migration->getDescription());
     }
 
-    public function testWarnIfInvokesOutputWriter()
+    public function testWarnIfInvokesOutputWriterWitMessage()
     {
         $this->outputWriter
             ->expects($this->once())
-            ->method('write');
+            ->method('write')
+            ->with($this->stringContains('Warning was thrown'));
 
         $this->migration->warnIf(true, 'Warning was thrown');
+    }
+
+    public function testWarnIfWithEmptyMessageWritesUnknownReason()
+    {
+        $this->outputWriter
+            ->expects($this->once())
+            ->method('write')
+            ->with($this->stringContains('Unknown Reason'));
+
+        $this->migration->warnIf(true);
     }
 
     public function testWriteInvokesOutputWriter()
@@ -68,9 +79,18 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->skipIf(true, 'Something skipped');
     }
 
-    public function testThrowIrreversibleMigrationException()
+    public function testThrowIrreversibleMigrationExceptionWithMessage()
     {
         $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'Irreversible migration');
         $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
+    }
+
+    public function testThrowIrreversibleMigrationExceptionWithEmptyMessage()
+    {
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\IrreversibleMigrationException',
+            'This migration is irreversible and cannot be reverted.'
+        );
+        $this->migration->exposed_ThrowIrreversibleMigrationException();
     }
 }
