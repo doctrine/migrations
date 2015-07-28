@@ -17,13 +17,13 @@
  * <http://www.doctrine-project.org>.
  */
 
-$autoloader = __DIR__ . '/../vendor/autoload.php';
+$autoloadFiles = array(__DIR__ . '/../vendor/autoload.php',
+    __DIR__ . '/../../../autoload.php');
 
-if ( ! file_exists($autoloader)) {
-    if (extension_loaded('phar') && ($uri = Phar::running())) {
-        echo 'The phar has been builded without the depedencies' . PHP_EOL;
+foreach ($autoloadFiles as $autoloadFile) {
+    if (file_exists($autoloadFile)) {
+        require_once $autoloadFile;
     }
-    die('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
 }
 
 require $autoloader;
