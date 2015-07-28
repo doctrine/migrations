@@ -26,8 +26,6 @@ foreach ($autoloadFiles as $autoloadFile) {
     }
 }
 
-require $autoloader;
-
 // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
 $configFile = getcwd() . DIRECTORY_SEPARATOR . 'cli-config.php';
 
