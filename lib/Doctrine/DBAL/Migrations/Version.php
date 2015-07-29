@@ -414,7 +414,7 @@ class Version
                         }
                     }  catch (DBALException $e) {
                         if ($continueAfterErrors) {
-                            $this->outputWriter->write(sprintf('         <error>- failed</error>', $query));
+                            $this->outputWriter->write(sprintf('         <error>- %s</error>', $e->getMessage()));
                         } else {
                             // Reraise exception
                             throw $e;
