@@ -18,23 +18,23 @@ class MigrateCommandTest extends MigrationTestCase
         $method->setAccessible(true);
 
         $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
-            ->setConstructorArgs(array($this->getSqliteConnection()))
-            ->setMethods(array('resolveVersionAlias'))
+            ->setConstructorArgs([$this->getSqliteConnection()])
+            ->setMethods(['resolveVersionAlias'])
             ->getMock();
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), array('prev', $output, $configuration)));
+        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['prev', $output, $configuration]));
         $this->assertContains('Already at first version.', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), array('next', $output, $configuration)));
+        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['next', $output, $configuration]));
         $this->assertContains('Already at latest version.', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), array('giberich', $output, $configuration)));
+        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['giberich', $output, $configuration]));
         $this->assertContains('Unknown version: giberich', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
@@ -44,7 +44,7 @@ class MigrateCommandTest extends MigrationTestCase
             ->method('resolveVersionAlias')
             ->will($this->returnValue('1234'));
 
-        $this->assertEquals('1234', $method->invokeArgs(new MigrateCommand(), array('test', $output, $configuration)));
+        $this->assertEquals('1234', $method->invokeArgs(new MigrateCommand(), ['test', $output, $configuration]));
         $this->assertEquals('', $this->getOutputStreamContent($output));
     }
 
@@ -57,8 +57,8 @@ class MigrateCommandTest extends MigrationTestCase
         }
 
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('isInteractive'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['isInteractive'])
             ->getMock();
 
         $input->expects($this->any())
@@ -74,15 +74,15 @@ class MigrateCommandTest extends MigrationTestCase
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMock(
             'Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand',
-            array('getHelperSet')
+            ['getHelperSet']
         );
 
         $helper = new QuestionHelper();
         $helper->setInputStream($this->getInputStream("y\n"));
         if ($helper instanceof QuestionHelper) {
-            $helperSet = new HelperSet(array(
+            $helperSet = new HelperSet([
                 'question' => $helper
-            ));
+            ]);
         }
         $command->setHelperSet($helperSet);
         $command->expects($this->any())
@@ -90,20 +90,20 @@ class MigrateCommandTest extends MigrationTestCase
             ->will($this->returnValue($helperSet));
 
         //should return true if user confirm
-        $this->assertEquals(true, $method->invokeArgs($command, array('test', $input, $output)));
+        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
 
         //shoudl return false if user cancel
         $helper->setInputStream($this->getInputStream("n\n"));
-        $this->assertEquals(false, $method->invokeArgs($command, array('test', $input, $output)));
+        $this->assertEquals(false, $method->invokeArgs($command, ['test', $input, $output]));
 
         //should return true if non interactive
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('isInteractive'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['isInteractive'])
             ->getMock();
         $input->expects($this->any())
             ->method('isInteractive')
             ->will($this->returnValue(false));
-        $this->assertEquals(true, $method->invokeArgs($command, array('test', $input, $output)));
+        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
     }
 }

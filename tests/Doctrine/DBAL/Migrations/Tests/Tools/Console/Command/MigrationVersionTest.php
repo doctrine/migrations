@@ -19,8 +19,8 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $this->command = $this
             ->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand')
-            ->setConstructorArgs(array('migrations:version'))
-            ->setMethods(array('getMigrationConfiguration'))
+            ->setConstructorArgs(['migrations:version'])
+            ->setMethods(['getMigrationConfiguration'])
             ->getMock();
 
         $this->configuration = new Configuration($this->getSqliteConnection());
@@ -47,14 +47,14 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'        => true,
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -74,13 +74,13 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'        => true,
                 '--range-from' => '1233',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 
@@ -94,13 +94,13 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'      => true,
                 '--range-to' => '1233',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 
@@ -114,14 +114,14 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'      => true,
                 '--all'      => true,
                 '--range-to' => '1233',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 
@@ -135,14 +135,14 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'      => true,
                 '--all'      => true,
                 '--range-from' => '1233',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 
@@ -165,14 +165,14 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--delete'     => true,
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -195,13 +195,13 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add' => true,
                 '--all' => true,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -227,13 +227,13 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--delete' => true,
                 '--all'    => true,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -256,13 +256,13 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'   => true,
                 'version' => 1234,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -283,13 +283,13 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--delete' => true,
                 'version'  => 1234,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
 
         $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -310,13 +310,13 @@ class MigrationVersionTest extends MigrationTestCase
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
-            array(
+            [
                 '--add'   => true,
                 'version' => 1233,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 
@@ -333,13 +333,13 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
 
         $commandTester->execute(
-            array(
+            [
                 '--delete' => true,
                 'version'  => 1233,
-            ),
-            array(
+            ],
+            [
                 'interactive' => false,
-            )
+            ]
         );
     }
 }

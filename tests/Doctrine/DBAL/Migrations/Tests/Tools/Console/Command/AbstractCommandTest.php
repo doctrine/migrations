@@ -30,13 +30,13 @@ class AbstractCommandTest extends MigrationTestCase
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
             'Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand',
-            array('command')
+            ['command']
         );
 
         if (!$noConnection) {
-            $command->setHelperSet(new HelperSet(array(
+            $command->setHelperSet(new HelperSet([
                 'connection' => new ConnectionHelper($this->getSqliteConnection())
-            )));
+            ]));
         } else {
             $command->setHelperSet(new HelperSet());
         }
@@ -45,13 +45,13 @@ class AbstractCommandTest extends MigrationTestCase
         }
 
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\Output')
-            ->setMethods(array('doWrite', 'writeln'))
+            ->setMethods(['doWrite', 'writeln'])
             ->getMock();
 
         $output->expects($this->any())
             ->method('doWrite');
 
-        return $method->invokeArgs($command, array($input, $output));
+        return $method->invokeArgs($command, [$input, $output]);
     }
 
 
@@ -61,8 +61,8 @@ class AbstractCommandTest extends MigrationTestCase
     public function testInjectedMigrationConfigurationIsBeingReturned()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
@@ -84,8 +84,8 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsConnectionFromHelperSet()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
@@ -105,15 +105,15 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsConnectionFromInputOption()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
             ->method('getOption')
-            ->will($this->returnValueMap(array(
-                array('db-configuration', __DIR__ . '/_files/db-config.php')
-            )));
+            ->will($this->returnValueMap([
+                ['db-configuration', __DIR__ . '/_files/db-config.php']
+            ]));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
@@ -127,15 +127,15 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsConfigurationFileOption()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
             ->method('getOption')
-            ->will($this->returnValueMap(array(
-                array('configuration', __DIR__ . '/_files/config.yml')
-            )));
+            ->will($this->returnValueMap([
+                ['configuration', __DIR__ . '/_files/config.yml']
+            ]));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
@@ -151,7 +151,7 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsConnectionFromConfigurationIfNothingElseIsProvided()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
+            ->setConstructorArgs([[]])
             ->getMock();
 
         $configuration = new \Doctrine\DBAL\Migrations\Configuration\Configuration($this->getSqliteConnection());
@@ -171,7 +171,7 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
+            ->setConstructorArgs([[]])
             ->getMock();
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, true);
@@ -185,15 +185,15 @@ class AbstractCommandTest extends MigrationTestCase
     public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
             ->method('getOption')
-            ->will($this->returnValueMap(array(
-                array('configuration', __DIR__ . '/_files/config.yml')
-            )));
+            ->will($this->returnValueMap([
+                ['configuration', __DIR__ . '/_files/config.yml']
+            ]));
 
         $configuration = $this
             ->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
@@ -215,15 +215,15 @@ class AbstractCommandTest extends MigrationTestCase
     public function testInjectedConfigurationIsPreferedOverConfigFileIsCurrentWorkingDirectory()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         $input->expects($this->any())
             ->method('getOption')
-            ->will($this->returnValueMap(array(
-                array('configuration', null)
-            )));
+            ->will($this->returnValueMap([
+                ['configuration', null]
+            ]));
 
         $configuration = $this
             ->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
@@ -245,37 +245,37 @@ class AbstractCommandTest extends MigrationTestCase
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
             'Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand',
-            array('command')
+            ['command']
         );
 
         $helper->setInputStream($this->getInputStream($response . "\n"));
         if ($helper instanceof QuestionHelper) {
-            $helperSet = new HelperSet(array(
+            $helperSet = new HelperSet([
                 'question' => $helper
-            ));
+            ]);
         } else {
-            $helperSet = new HelperSet(array(
+            $helperSet = new HelperSet([
                 'dialog' => $helper
-            ));
+            ]);
         }
 
         $command->setHelperSet($helperSet);
 
         $output = $this->getMockBuilder('Symfony\Component\Console\Output\Output')
-            ->setMethods(array('doWrite', 'writeln'))
+            ->setMethods(['doWrite', 'writeln'])
             ->getMock();
 
         $output->expects($this->any())
             ->method('doWrite');
 
-        return $method->invokeArgs($command, array($question, $input, $output));
+        return $method->invokeArgs($command, [$question, $input, $output]);
     }
 
     public function testAskConfirmation()
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs(array(array()))
-            ->setMethods(array('getOption'))
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
             ->getMock();
 
         /**

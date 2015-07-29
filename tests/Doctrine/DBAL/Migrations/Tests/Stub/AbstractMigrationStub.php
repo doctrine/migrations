@@ -34,7 +34,7 @@ class AbstractMigrationStub extends AbstractMigration
         $this->throwIrreversibleMigrationException($message);
     }
 
-    public function exposed_AddSql($sql, $params = array(),  $types = array())
+    public function exposed_AddSql($sql, $params = [],  $types = [])
     {
         $this->addSql($sql, $params, $types);
     }
