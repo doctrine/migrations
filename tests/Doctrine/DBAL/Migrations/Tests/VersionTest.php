@@ -167,17 +167,19 @@ class VersionTest extends MigrationTestCase
         $outputWriter->shouldReceive('write');
 
         $connection = m::mock('Doctrine\DBAL\Connection');
-        $connection->shouldReceive([
+        $connection->shouldReceive(
+            array(
             'getSchemaManager' => 'something',
             'getDatabasePlatform' => 'something else',
-        ]);
+            )
+        );
 
         $config = m::mock('Doctrine\DBAL\Migrations\Configuration\Configuration')
             ->makePartial();
         $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);
         $config->shouldReceive('getConnection')->andReturn($connection);
 
-        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', [$config, $version, 'stdClass'])->makePartial();
+        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', array($config, $version, 'stdClass'))->makePartial();
         $migration->shouldReceive('execute')->with($direction, true)->andReturn($getSqlReturn);
 
         $expectedReturn = 123;
@@ -190,11 +192,11 @@ class VersionTest extends MigrationTestCase
 
     public function writeSqlFileProvider()
     {
-        return [
-            [__DIR__, 'up', ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, 'down', ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__ . '/tmpfile.sql', 'up', ['1' => ['SHOW DATABASES']]], // tests something actually got written
-        ];
+        return array(
+            array(__DIR__, 'up', array('1' => array('SHOW DATABASES;'))), // up
+            array(__DIR__, 'down', array('1' => array('SHOW DATABASES;'))), // up
+            array(__DIR__ . '/tmpfile.sql', 'up', array('1' => array('SHOW DATABASES'))), // tests something actually got written
+        );
     }
 
     public function testWarningWhenNoSqlStatementIsOutputed()
