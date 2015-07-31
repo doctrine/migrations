@@ -111,6 +111,6 @@ class ConfigurationHelper extends Helper
      */
     public function getName()
     {
-        return 'connection';
+        return 'configuration';
     }
 }
