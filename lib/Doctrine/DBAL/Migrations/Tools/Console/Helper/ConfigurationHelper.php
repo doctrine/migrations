@@ -23,13 +23,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Helper\Helper;
 
 /**
  * Class ConfigurationHelper
  * @package Doctrine\DBAL\Migrations\Tools\Console\Helper
  * @internal
  */
-final class ConfigurationHelper
+class ConfigurationHelper extends Helper
 {
 
     /**
@@ -103,5 +104,13 @@ final class ConfigurationHelper
         $configuration->load($config);
 
         return $configuration;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getName()
+    {
+        return 'connection';
     }
 }
