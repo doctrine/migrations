@@ -269,7 +269,7 @@ class Configuration
     }
 
     /**
-     * set the implementation of the migration finder.
+     * Set the implementation of the migration finder.
      *
      * @param   $finder The new migration finder
      * @return  void
