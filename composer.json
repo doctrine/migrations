@@ -27,8 +27,8 @@
         "symfony/console": "to run the migration from the console"
     },
     "autoload": {
-        "psr-0": {
-            "Doctrine\\DBAL\\Migrations": "lib"
+        "psr-4": {
+            "Doctrine\\DBAL\\Migrations\\": "lib/Doctrine/DBAL/Migrations"
         }
     },
     "extra": {
