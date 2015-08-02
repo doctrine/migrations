@@ -5,6 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -18,10 +19,12 @@ class AbstractCommandTest extends MigrationTestCase
      *
      * @param mixed $input
      * @param mixed $configuration
+     * @param bool $noConnection
+     * @param mixed $helperSet
      *
      * @return \Doctrine\DBAL\Migrations\Configuration\Configuration
      */
-    public function invokeMigrationConfigurationGetter($input, $configuration = null, $noConnection=false)
+    public function invokeMigrationConfigurationGetter($input, $configuration = null, $noConnection = false, $helperSet = null)
     {
         $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand');
         $method = $class->getMethod('getMigrationConfiguration');
@@ -33,13 +36,18 @@ class AbstractCommandTest extends MigrationTestCase
             ['command']
         );
 
-        if (!$noConnection) {
-            $command->setHelperSet(new HelperSet([
-                'connection' => new ConnectionHelper($this->getSqliteConnection())
-            ]));
+        if ($helperSet != null && $helperSet instanceof HelperSet) {
+            $command->setHelperSet($helperSet);
         } else {
             $command->setHelperSet(new HelperSet());
         }
+
+        if (!$noConnection) {
+            $command->getHelperSet()->set(
+                new ConnectionHelper($this->getSqliteConnection()), 'connection'
+            );
+        }
+
         if (null !== $configuration) {
             $command->setMigrationConfiguration($configuration);
         }
@@ -232,6 +240,29 @@ class AbstractCommandTest extends MigrationTestCase
 
         chdir(__DIR__.'/_files');
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
+
+        $this->assertSame($configuration, $actualConfiguration);
+    }
+
+    /**
+     * Test if the migration configuration can be set via ConfigurationHelper in HelperSet
+     */
+    public function testMigrationsConfigurationFromConfighelperInHelperset()
+    {
+        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+            ->setConstructorArgs([[]])
+            ->getMock();
+
+        $configuration = $this
+            ->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helperSet = new HelperSet();
+        $configHelper = new ConfigurationHelper($this->getSqliteConnection(), $configuration);
+        $helperSet->set($configHelper, 'configuration');
+
+        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, false, $helperSet);
 
         $this->assertSame($configuration, $actualConfiguration);
     }
