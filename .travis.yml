@@ -17,14 +17,18 @@ matrix:
     - php: 5.4
       env: deps=low
 
+cache:
+  directories:
+    - $HOME/.composer/cache
+
 env:
   global:
     - deps=no
     - secure: "TaQTGgMHcaejJfKyuHeT7YAc6ysT+xT6j6SEvSKfjIPkroJE/ZXDRdMevTIlkmPz7InLWmWksZ8mfb3ZlFtOYF9H5N88XTuSMCf3Ce+FY8yQNAxLimtpN5qXQ3jLuDLhsG2eI8r/9bIK6Amx9g4GRVeDOvCwJ3lfiaipMRPNKZY="
 
 install:
-  - if [ "$deps" = "no" ]; then composer $flag install; fi;
-  - if [ "$deps" = "low" ]; then composer $flag --prefer-lowest --prefer-stable update; fi;
+  - if [ "$deps" = "no" ]; then composer install; fi;
+  - if [ "$deps" = "low" ]; then composer --prefer-lowest --prefer-stable update; fi;
 
 script:
   - mkdir -p build/logs
@@ -34,7 +38,6 @@ before_install:
   - composer self-update
   - composer config --quiet github-oauth.github.com $GITHUB_TOKEN
   - if [[ ! $GITHUB_TOKEN ]]; then echo "no github token"; fi
-  - if [[ ! $GITHUB_TOKEN ]]; then flag=--prefer-source; fi
 
 after_script:
   - if [[ $TRAVIS_PHP_VERSION = '5.6' ]]; then php vendor/bin/coveralls -v ; fi
