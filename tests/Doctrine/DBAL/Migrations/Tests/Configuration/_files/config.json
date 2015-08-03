@@ -1,7 +1,8 @@
 {
-  "name":                 "Doctrine Sandbox Migrations",
+  "name"                : "Doctrine Sandbox Migrations",
   "migrations_namespace": "DoctrineMigrationsTest",
-  "table_name":           "doctrine_migration_versions_test",
-  "migrations_directory": "."
+  "table_name"          : "doctrine_migration_versions_test",
+  "migrations_directory": ".",
+  "migrations"          : []
 }
 
