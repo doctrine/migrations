@@ -13,4 +13,16 @@ class JsonConfigurationTest extends AbstractConfigurationTest
 
         return $config;
     }
+
+    /**
+     * Test that config file not exists exception
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Given config file does not exist
+     */
+    public function testThrowExceptionIfFileNotExist()
+    {
+        $config = new JsonConfiguration($this->getSqliteConnection());
+        $config->load(__DIR__ . "/_files/none.json");
+    }
 }

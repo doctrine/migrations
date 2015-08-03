@@ -13,4 +13,17 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
 
         return $config;
     }
+
+    /**
+     * Test that config file not exists exception
+     *
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Given config file does not exist
+     */
+    public function testThrowExceptionIfFileNotExist()
+    {
+        $config = new ArrayConfiguration($this->getSqliteConnection());
+        $config->load(__DIR__ . "/_files/none.php");
+    }
+
 }
