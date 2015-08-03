@@ -9,6 +9,7 @@ use Doctrine\ORM\Configuration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\BufferedOutput;
 use Symfony\Component\Console\Output\OutputInterface;
+use InvalidArgumentException;
 
 class ConfigurationHelperTest extends MigrationTestCase
 {
@@ -100,6 +101,56 @@ class ConfigurationHelperTest extends MigrationTestCase
             'Loading configuration from file: migrations.yml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yml')
         );
+    }
+
+    public function testConfigurationHelperLoadsJsonFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.json',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.json', 'migrations.json')
+        );
+    }
+
+    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() {
+        $this->input->expects($this->any())
+            ->method('getOption')
+            ->with('configuration')
+            ->will($this->returnValue( __DIR__ . '/files/config.php'));
+
+        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+        $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\ArrayConfiguration', $migrationConfig);
+        $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
+    }
+
+    public function testConfigurationHelperLoadsJsonFormatFromCommandLine() {
+        $this->input->expects($this->any())
+            ->method('getOption')
+            ->with('configuration')
+            ->will($this->returnValue( __DIR__ . '/files/config.json'));
+
+        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+        $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\JsonConfiguration', $migrationConfig);
+        $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
+    }
+
+    /**
+     * Test that unsupported file type throws exception
+     *
+     * @expectedException InvalidArgumentException
+     * @expectedExceptionMessage Given config file type is not supported
+     */
+    public function testConfigurationHelperFailsToLoadOtherFormat() {
+
+        $this->input->expects($this->any())
+            ->method('getOption')
+            ->with('configuration')
+            ->will($this->returnValue('testconfig.wrong'));
+
+        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+        $configfileLoaded = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
     }
 
     public function testConfigurationHelperWithConfigurationFromSetter()
