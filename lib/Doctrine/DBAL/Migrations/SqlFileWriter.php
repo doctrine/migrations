@@ -70,7 +70,7 @@ class SqlFileWriter
 
     private function buildMigrationFile(array $queriesByVersion, $direction)
     {
-        $string  = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
+        $string = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
             $string .= "\n# Version " . $version . "\n";
