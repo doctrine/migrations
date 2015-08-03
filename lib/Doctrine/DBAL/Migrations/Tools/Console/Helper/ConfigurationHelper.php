@@ -77,6 +77,7 @@ class ConfigurationHelper extends Helper
             'migrations.xml',
             'migrations.yml',
             'migrations.yaml',
+            'migrations.json'
         ];
         foreach ($defaultConfig as $config) {
             if ($this->configExists($config)) {
@@ -97,9 +98,22 @@ class ConfigurationHelper extends Helper
 
     private function loadConfig($config, OutputWriter $outputWriter)
     {
-        $info          = pathinfo($config);
+        $map = array(
+            'xml'   => '\XmlConfiguration',
+            'yaml'  => '\YamlConfiguration',
+            'yml'   => '\YamlConfiguration',
+            'php'   => '\ArrayConfiguration',
+            'json'  => '\JsonConfiguration'
+        );
+
+        $info = pathinfo($config);
+        // check we can support this file type
+        if (empty($map[$info['extension']])) {
+            throw new \InvalidArgumentException('Given config file type is not supported');
+        }
+
         $class         = 'Doctrine\DBAL\Migrations\Configuration';
-        $class        .= $info['extension'] === 'xml' ? '\XmlConfiguration' : '\YamlConfiguration';
+        $class        .= $map[$info['extension']];
         $configuration = new $class($this->connection, $outputWriter);
         $configuration->load($config);
 
