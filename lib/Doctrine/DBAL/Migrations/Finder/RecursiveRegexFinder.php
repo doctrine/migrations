@@ -31,7 +31,7 @@ final class RecursiveRegexFinder extends AbstractFinder
     /**
      * {@inheritdoc}
      */
-    public function findMigrations($directory, $namespace=null)
+    public function findMigrations($directory, $namespace = null)
     {
         $dir = $this->getRealPath($directory);
 
@@ -68,7 +68,7 @@ final class RecursiveRegexFinder extends AbstractFinder
     private function getMatches($iteratorFilesMatch)
     {
         $files = [];
-        foreach($iteratorFilesMatch as $file) {
+        foreach ($iteratorFilesMatch as $file) {
             $files[] = $file[0];
         }
 

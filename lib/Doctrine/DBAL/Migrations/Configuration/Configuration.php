@@ -129,10 +129,10 @@ class Configuration
      */
     public function validate()
     {
-        if (! $this->migrationsNamespace) {
+        if (!$this->migrationsNamespace) {
             throw MigrationException::migrationsNamespaceRequired();
         }
-        if (! $this->migrationsDirectory) {
+        if (!$this->migrationsDirectory) {
             throw MigrationException::migrationsDirectoryRequired();
         }
     }
@@ -191,7 +191,7 @@ class Configuration
         $datetime = str_replace('Version', '', $version);
         $datetime = \DateTime::createFromFormat('YmdHis', $datetime);
 
-        if ($datetime === false){
+        if ($datetime === false) {
             return '';
         }
 
@@ -358,7 +358,7 @@ class Configuration
      */
     public function getVersion($version)
     {
-        if ( ! isset($this->migrations[$version])) {
+        if (!isset($this->migrations[$version])) {
             throw MigrationException::unknownMigrationVersion($version);
         }
 
@@ -587,7 +587,7 @@ class Configuration
             return false;
         }
 
-        if ( ! $this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
+        if (!$this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $columns = [
                 'version' => new Column('version', Type::getType('string'), ['length' => 255]),
             ];
@@ -677,7 +677,7 @@ class Configuration
     private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
         if ($direction === 'down') {
-            if ( ! in_array($version->getVersion(), $migrated)) {
+            if (!in_array($version->getVersion(), $migrated)) {
                 return false;
             }
 

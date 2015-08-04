@@ -110,7 +110,7 @@ abstract class AbstractMigration
     public function warnIf($condition, $message = '')
     {
         if ($condition) {
-            $message = $message?: 'Unknown Reason';
+            $message = $message ?: 'Unknown Reason';
             $this->outputWriter->write(sprintf(
                 '    <warning>Warning during %s: %s</warning>',
                 $this->version->getExecutionState(),

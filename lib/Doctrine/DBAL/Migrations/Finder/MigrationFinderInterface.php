@@ -36,5 +36,5 @@ interface MigrationFinderInterface
      * @return  string[] An array of class names that were found with the version
      *          as keys.
      */
-    public function findMigrations($directory, $namespace=null);
+    public function findMigrations($directory, $namespace = null);
 }

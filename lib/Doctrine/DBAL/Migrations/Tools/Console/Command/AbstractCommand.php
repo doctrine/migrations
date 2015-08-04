@@ -126,7 +126,7 @@ abstract class AbstractCommand extends Command
         if ($this->getHelperSet()->has('question')) {
             return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
         } else {
-            return $this->getHelper('dialog')->askConfirmation($output, '<question>' .  $question . '</question>', false);
+            return $this->getHelper('dialog')->askConfirmation($output, '<question>' . $question . '</question>', false);
         }
     }
 
@@ -138,7 +138,7 @@ abstract class AbstractCommand extends Command
     private function getOutputWriter(OutputInterface $output)
     {
         if (!$this->outputWriter) {
-            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
+            $this->outputWriter = new OutputWriter(function($message) use ($output) {
                 return $output->writeln($message);
             });
         }

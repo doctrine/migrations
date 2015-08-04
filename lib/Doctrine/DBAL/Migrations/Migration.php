@@ -125,7 +125,7 @@ class Migration
          * migrations.
          */
         $migrations = $this->configuration->getMigrations();
-        if ( ! isset($migrations[$to]) && $to > 0) {
+        if (!isset($migrations[$to]) && $to > 0) {
             throw MigrationException::unknownMigrationVersion($to);
         }
 
