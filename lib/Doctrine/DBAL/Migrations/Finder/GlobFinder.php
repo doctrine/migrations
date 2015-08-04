@@ -34,11 +34,11 @@ final class GlobFinder extends AbstractFinder
     /**
      * {@inheritdoc}
      */
-    public function findMigrations($directory, $namespace=null)
+    public function findMigrations($directory, $namespace = null)
     {
         $dir = $this->getRealPath($directory);
 
-        $files = glob(rtrim($dir, '/').'/Version*.php');
+        $files = glob(rtrim($dir, '/') . '/Version*.php');
 
         return $this->loadMigrations($files, $namespace);
     }
