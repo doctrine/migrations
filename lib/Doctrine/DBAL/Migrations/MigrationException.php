@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use \Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+
 /**
  * Class for Migrations specific exceptions
  *
@@ -62,5 +64,19 @@ class MigrationException extends \Exception
     public static function configurationFileAlreadyLoaded()
     {
         return new self(sprintf('Migrations configuration file already loaded'), 8);
+    }
+
+    public static function configurationIncompatibleWithFinder(
+        $configurationParameterName,
+        MigrationFinderInterface $finder
+    ) {
+        return new self(
+            sprintf(
+                'Configuration-parameter "%s" cannot be used with finder of type "%s"',
+                $configurationParameterName,
+                get_class($finder)
+            ),
+            9
+        );
     }
 }

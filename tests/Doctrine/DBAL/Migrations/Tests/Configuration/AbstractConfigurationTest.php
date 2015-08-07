@@ -2,12 +2,24 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
-abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
+use Doctrine\DBAL\Migrations\Finder\GlobFinder;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+
+abstract class AbstractConfigurationTest extends MigrationTestCase
 {
     /**
+     * @param string                   $configFileSuffix Specify config to load.
+     * @param OutputWriter             $outputWriter
+     * @param MigrationFinderInterface $migrationFinder
      * @return \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration
      */
-    abstract public function loadConfiguration();
+    abstract public function loadConfiguration(
+        $configFileSuffix = '',
+        OutputWriter $outputWriter = null,
+        MigrationFinderInterface $migrationFinder = null
+    );
 
     public function testMigrationDirectory()
     {
@@ -33,12 +45,73 @@ abstract class AbstractConfigurationTest extends \Doctrine\DBAL\Migrations\Tests
         $this->assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
 
+    /**
+     * @expectedException Doctrine\DBAL\Migrations\MigrationException
+     */
+    public function testFinderIsIncompatibleWithConfiguration()
+    {
+        $this->loadConfiguration('organize_by_year', null, new GlobFinder());
+    }
+
+    public function testSetMigrationFinder()
+    {
+        $migrationFinderProphecy = $this->prophesize('Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface');
+        /** @var $migrationFinder MigrationFinderInterface */
+        $migrationFinder = $migrationFinderProphecy->reveal();
+
+        $config = $this->loadConfiguration();
+        $config->setMigrationsFinder($migrationFinder);
+
+        $migrationFinderPropertyReflected = new \ReflectionProperty(
+            'Doctrine\DBAL\Migrations\Configuration\Configuration',
+            'migrationFinder'
+        );
+        $migrationFinderPropertyReflected->setAccessible(true);
+        $this->assertSame($migrationFinder, $migrationFinderPropertyReflected->getValue($config));
+    }
+
     public function testThrowExceptionIfAlreadyLoaded()
     {
-        /** @var $config \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration */
         $config = $this->loadConfiguration();
         $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException');
         $config->load($config->getFile());
     }
 
+    public function testVersionsOrganizationNoConfig()
+    {
+        $config = $this->loadConfiguration();
+        $this->assertFalse($config->areMigrationsOrganizedByYear());
+        $this->assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    public function testVersionsOrganizationByYear()
+    {
+        $config = $this->loadConfiguration('organize_by_year');
+        $this->assertTrue($config->areMigrationsOrganizedByYear());
+        $this->assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    public function testVersionsOrganizationByYearAndMonth()
+    {
+        $config = $this->loadConfiguration('organize_by_year_and_month');
+        $this->assertFalse($config->areMigrationsOrganizedByYear());
+        $this->assertTrue($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    /**
+     * @expectedException \PHPUnit_Framework_Error_Notice
+     */
+    public function testVersionsOrganizationInvalid()
+    {
+        $this->loadConfiguration('organize_invalid');
+    }
+
+    /**
+     * @expectedException Doctrine\DBAL\Migrations\MigrationException
+     */
+    public function testVersionsOrganizationIncompatibleFinder()
+    {
+        $config = $this->loadConfiguration('organize_by_year_and_month');
+        $config->setMigrationsFinder(new GlobFinder());
+    }
 }
