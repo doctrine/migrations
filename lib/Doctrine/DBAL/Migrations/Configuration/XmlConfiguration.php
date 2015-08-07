@@ -34,38 +34,31 @@ class XmlConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
+        if (!file_exists($file)) {
+            throw new \InvalidArgumentException('Given config file does not exist');
+        }
+
+        $config = [];
         $xml = simplexml_load_file($file);
         if (isset($xml->name)) {
-            $this->setName((string) $xml->name);
+            $config['name'] = (string) $xml->name;
         }
         if (isset($xml->table['name'])) {
-            $this->setMigrationsTableName((string) $xml->table['name']);
+            $config['table_name'] = (string) $xml->table['name'];
         }
         if (isset($xml->{'migrations-namespace'})) {
-            $this->setMigrationsNamespace((string) $xml->{'migrations-namespace'});
+            $config['migrations_namespace'] = (string) $xml->{'migrations-namespace'};
         }
         if (isset($xml->{'organize-migrations'})) {
-            $versions_organization = $xml->{'organize-migrations'};
-            if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
-                $this->setMigrationsAreOrganizedByYear();
-            } else if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
-                $this->setMigrationsAreOrganizedByYearAndMonth();
-            } else {
-                trigger_error(
-                    'Unknown ' . var_export($versions_organization, true) . ' for configuration "organize-migrations".',
-                    E_USER_NOTICE
-                );
-            }
+            $config['organize_migrations'] = $xml->{'organize-migrations'};
         }
         if (isset($xml->{'migrations-directory'})) {
-            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
-            $this->setMigrationsDirectory($migrationsDirectory);
-            $this->registerMigrationsFromDirectory($migrationsDirectory);
+            $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
         }
         if (isset($xml->migrations->migration)) {
-            foreach ($xml->migrations->migration as $migration) {
-                $this->registerMigration((string) $migration['version'], (string) $migration['class']);
-            }
+            $config['migrations'] = $xml->migrations->migration;
         }
+
+        $this->setConfiguration($config);
     }
 }

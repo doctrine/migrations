@@ -79,4 +79,9 @@ class MigrationException extends \Exception
             9
         );
     }
+
+    public static function configurationKeyDoesNotExists($key)
+    {
+        return new self(sprintf('Migrations configuration key "%s" does not exists.', $key), 10);
+    }
 }

@@ -47,6 +47,57 @@ abstract class AbstractFileConfiguration extends Configuration
     private $loaded = false;
 
     /**
+     * @var array of possible configuration properties in migrations configuration.
+     */
+    private $configurationProperties = [
+        'name' => 'setName',
+        'table_name' => 'setMigrationsTableName',
+        'migrations_namespace' => 'setMigrationsNamespace',
+        'organize_migrations' => 'setMigrationOrganisation',
+        'migrations_directory' => 'loadMigrationsFromDirectory',
+        'migrations' => 'loadMigrations',
+    ];
+
+    protected function setConfiguration(Array $config)
+    {
+        foreach($config as $configurationKey => $configurationValue) {
+            if (!isset($this->configurationProperties[$configurationKey])) {
+                throw MigrationException::configurationKeyDoesNotExists($configurationKey);
+            }
+            $this->{$this->configurationProperties[$configurationKey]}($configurationValue);
+        }
+    }
+
+    private function loadMigrationsFromDirectory($migrationsDirectory)
+    {
+        $this->setMigrationsDirectory($migrationsDirectory);
+        $this->registerMigrationsFromDirectory($migrationsDirectory);
+    }
+
+    private function loadMigrations($migrations)
+    {
+        if (is_array($migrations)) {
+            foreach ($migrations as $migration) {
+                $this->registerMigration($migration['version'], $migration['class']);
+            }
+        }
+    }
+
+    private function setMigrationOrganisation($migrationOrganisation)
+    {
+        if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
+            $this->setMigrationsAreOrganizedByYear();
+        } else if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+            $this->setMigrationsAreOrganizedByYearAndMonth();
+        } else {
+            trigger_error(
+                'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".',
+                E_USER_NOTICE
+            );
+        }
+    }
+
+    /**
      * Load the information from the passed configuration file
      *
      * @param string $file The path to the configuration file

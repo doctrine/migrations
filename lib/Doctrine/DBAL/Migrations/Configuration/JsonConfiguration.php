@@ -39,39 +39,13 @@ class JsonConfiguration extends AbstractFileConfiguration
             throw new \InvalidArgumentException('Given config file does not exist');
         }
 
-        $array = json_decode(file_get_contents($file), true);
+        $config = json_decode(file_get_contents($file), true);
 
-        if (isset($array['name'])) {
-            $this->setName($array['name']);
+        if (isset($config['migrations_directory'])) {
+            $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, $config['migrations_directory']);
         }
-        if (isset($array['table_name'])) {
-            $this->setMigrationsTableName($array['table_name']);
-        }
-        if (isset($array['migrations_namespace'])) {
-            $this->setMigrationsNamespace($array['migrations_namespace']);
-        }
-        if (isset($array['organize_migrations'])) {
-            $versions_organization = $array['organize_migrations'];
-            if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
-                $this->setMigrationsAreOrganizedByYear();
-            } else if (strcasecmp($versions_organization, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
-                $this->setMigrationsAreOrganizedByYearAndMonth();
-            } else {
-                trigger_error(
-                    'Unknown ' . var_export($versions_organization, true) . ' for configuration "organize_migrations".',
-                    E_USER_NOTICE
-                );
-            }
-        }
-        if (isset($array['migrations_directory'])) {
-            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, $array['migrations_directory']);
-            $this->setMigrationsDirectory($migrationsDirectory);
-            $this->registerMigrationsFromDirectory($migrationsDirectory);
-        }
-        if (isset($array['migrations']) && is_array($array['migrations'])) {
-            foreach ($array['migrations'] as $migration) {
-                $this->registerMigration($migration['version'], $migration['class']);
-            }
-        }
+
+        $this->setConfiguration($config);
+
     }
 }
