@@ -42,6 +42,10 @@ class YamlConfiguration extends AbstractFileConfiguration
 
         $config = Yaml::parse(file_get_contents($file));
 
+        if (!is_array($config)) {
+            throw new \InvalidArgumentException('Not valid configuration.');
+        }
+
         if (isset($config['migrations_directory'])) {
             $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, $config['migrations_directory']);
         }
