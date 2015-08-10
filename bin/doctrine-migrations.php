@@ -32,7 +32,7 @@ foreach ($autoloadFiles as $autoloadFile) {
 
 if (!$autoloader) {
     if (extension_loaded('phar') && ($uri = Phar::running())) {
-        echo 'The phar has been builded without the depedencies' . PHP_EOL;
+        echo 'The phar has been built without dependencies' . PHP_EOL;
     }
     die('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
 }
