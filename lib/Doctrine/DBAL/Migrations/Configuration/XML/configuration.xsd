@@ -25,7 +25,7 @@
                     <xs:complexType>
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="migration">
-                                <xs:complexType>
+                                <xs:complexType mixed="true">
                                     <xs:attribute name="version" type="xs:string"/>
                                     <xs:attribute name="class" type="xs:string"/>
                                 </xs:complexType>

@@ -1,0 +1,13 @@
+---
+name: Doctrine Sandbox Migrations
+table_name: doctrine_migration_versions_test
+migrations:
+  migration1:
+    version: Version1Test
+    class: Doctrine\DBAL\Migrations\Tests\Stub\Version1Test
+  migration2:
+    version: Version2Test
+    class: Doctrine\DBAL\Migrations\Tests\Stub\Version2Test
+  migration3:
+    version: Version3Test
+    class: Doctrine\DBAL\Migrations\Tests\Stub\Version3Test

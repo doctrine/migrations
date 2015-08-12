@@ -135,5 +135,6 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testLoadMigrationsList()
     {
         $this->loadConfiguration('migrations_list');
+        $this->loadConfiguration('migrations_list2');
     }
 }
