@@ -20,10 +20,10 @@
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>
-                <xs:element name="migrations">
+                <xs:element type="xs:string" name="migrations-directory" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="migrations" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
-                        <xs:choice>
-                            <xs:element type="xs:string" name="migrations-directory"/>
+                        <xs:choice minOccurs="1">
                             <xs:element name="migration">
                                 <xs:complexType>
                                     <xs:all>
