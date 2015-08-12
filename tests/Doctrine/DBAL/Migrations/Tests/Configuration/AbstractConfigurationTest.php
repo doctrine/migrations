@@ -114,4 +114,21 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $config = $this->loadConfiguration('organize_by_year_and_month');
         $config->setMigrationsFinder(new GlobFinder());
     }
+
+    /**
+     * @expectedException Doctrine\DBAL\Migrations\MigrationException
+     * @expectedExceptionCode 10
+     */
+    public function testConfigurationWithInvalidOption()
+    {
+        $this->loadConfiguration('invalid');
+    }
+
+    /**
+     * @expectedException InvalidArgumentException
+     */
+    public function testConfigurationFileNotExists()
+    {
+        $this->loadConfiguration('file_not_exists');
+    }
 }
