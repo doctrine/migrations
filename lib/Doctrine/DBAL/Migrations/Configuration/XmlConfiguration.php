@@ -36,10 +36,6 @@ class XmlConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        if (!file_exists($file)) {
-            throw new \InvalidArgumentException('Given config file does not exist');
-        }
-
         libxml_use_internal_errors(true);
         $xml = new \DOMDocument();
         $xml->load($file);

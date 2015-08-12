@@ -35,10 +35,6 @@ class ArrayConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        if (!file_exists($file)) {
-            throw new \InvalidArgumentException('Given config file does not exist');
-        }
-
         $config = require $file;
 
         if (isset($config['migrations_directory'])) {

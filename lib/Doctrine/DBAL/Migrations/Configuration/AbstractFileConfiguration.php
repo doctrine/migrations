@@ -112,6 +112,11 @@ abstract class AbstractFileConfiguration extends Configuration
             $file = $path;
         }
         $this->file = $file;
+
+        if (!file_exists($file)) {
+            throw new \InvalidArgumentException('Given config file does not exist');
+        }
+
         $this->doLoad($file);
         $this->loaded = true;
     }

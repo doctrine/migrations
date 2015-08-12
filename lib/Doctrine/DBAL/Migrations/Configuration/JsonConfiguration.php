@@ -35,10 +35,6 @@ class JsonConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        if (!file_exists($file)) {
-            throw new \InvalidArgumentException('Given config file does not exist');
-        }
-
         $config = json_decode(file_get_contents($file), true);
 
         if (isset($config['migrations_directory'])) {

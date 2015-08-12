@@ -36,10 +36,6 @@ class YamlConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        if (!file_exists($file)) {
-            throw new \InvalidArgumentException('Given config file does not exist');
-        }
-
         $config = Yaml::parse(file_get_contents($file));
 
         if (!is_array($config)) {
