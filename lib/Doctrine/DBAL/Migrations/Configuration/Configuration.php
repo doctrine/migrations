@@ -708,7 +708,7 @@ class Configuration
      * @param bool $migrationsAreOrganizedByYear
      * @throws MigrationException
      */
-    protected function setMigrationsAreOrganizedByYear($migrationsAreOrganizedByYear = true)
+    public function setMigrationsAreOrganizedByYear($migrationsAreOrganizedByYear = true)
     {
         $this->ensureOrganizeMigrationsIsCompatibleWithFinder();
 
@@ -719,7 +719,7 @@ class Configuration
      * @param bool $migrationsAreOrganizedByYearAndMonth
      * @throws MigrationException
      */
-    protected function setMigrationsAreOrganizedByYearAndMonth($migrationsAreOrganizedByYearAndMonth = true)
+    public function setMigrationsAreOrganizedByYearAndMonth($migrationsAreOrganizedByYearAndMonth = true)
     {
         $this->ensureOrganizeMigrationsIsCompatibleWithFinder();
 
