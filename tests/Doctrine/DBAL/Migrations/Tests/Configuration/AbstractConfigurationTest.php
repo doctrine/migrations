@@ -131,4 +131,9 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     {
         $this->loadConfiguration('file_not_exists');
     }
+
+    public function testLoadMigrationsList()
+    {
+        $this->loadConfiguration('migrations_list');
+    }
 }

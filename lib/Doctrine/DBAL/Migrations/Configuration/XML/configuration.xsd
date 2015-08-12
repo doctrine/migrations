@@ -23,16 +23,14 @@
                 <xs:element type="xs:string" name="migrations-directory" minOccurs="0" maxOccurs="1"/>
                 <xs:element name="migrations" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
-                        <xs:choice minOccurs="1">
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
                             <xs:element name="migration">
                                 <xs:complexType>
-                                    <xs:all>
-                                        <xs:element name="version" type="xs:string"/>
-                                        <xs:element name="class" type="xs:string"/>
-                                    </xs:all>
+                                    <xs:attribute name="version" type="xs:string"/>
+                                    <xs:attribute name="class" type="xs:string"/>
                                 </xs:complexType>
                             </xs:element>
-                        </xs:choice>
+                        </xs:sequence>
                     </xs:complexType>
                 </xs:element>
             </xs:all>
