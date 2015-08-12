@@ -99,7 +99,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @expectedException \PHPUnit_Framework_Error_Notice
+     * @expectedException Doctrine\DBAL\Migrations\MigrationException
      */
     public function testVersionsOrganizationInvalid()
     {

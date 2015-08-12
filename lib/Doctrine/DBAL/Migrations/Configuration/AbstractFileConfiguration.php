@@ -62,7 +62,8 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         foreach($config as $configurationKey => $configurationValue) {
             if (!isset($this->configurationProperties[$configurationKey])) {
-                throw MigrationException::configurationKeyDoesNotExists($configurationKey);
+                $msg = sprintf('Migrations configuration key "%s" does not exists.', $configurationKey);
+                throw MigrationException::configurationNotValid($msg);
             }
             $this->{$this->configurationProperties[$configurationKey]}($configurationValue);
         }
@@ -90,10 +91,8 @@ abstract class AbstractFileConfiguration extends Configuration
         } else if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
             $this->setMigrationsAreOrganizedByYearAndMonth();
         } else {
-            trigger_error(
-                'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".',
-                E_USER_NOTICE
-            );
+            $msg = 'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".';
+            throw MigrationException::configurationNotValid($msg);
         }
     }
 

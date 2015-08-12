@@ -80,8 +80,8 @@ class MigrationException extends \Exception
         );
     }
 
-    public static function configurationKeyDoesNotExists($key)
+    public static function configurationNotValid($msg)
     {
-        return new self(sprintf('Migrations configuration key "%s" does not exists.', $key), 10);
+        return new self($msg, 10);
     }
 }
