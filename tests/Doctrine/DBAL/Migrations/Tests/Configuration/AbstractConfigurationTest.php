@@ -94,7 +94,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testVersionsOrganizationByYearAndMonth()
     {
         $config = $this->loadConfiguration('organize_by_year_and_month');
-        $this->assertFalse($config->areMigrationsOrganizedByYear());
+        $this->assertTrue($config->areMigrationsOrganizedByYear());
         $this->assertTrue($config->areMigrationsOrganizedByYearAndMonth());
     }
 
