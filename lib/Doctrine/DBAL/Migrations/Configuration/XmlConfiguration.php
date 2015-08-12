@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
+use Doctrine\DBAL\Migrations\MigrationException;
+
 /**
  * Load migration configuration information from a XML configuration file.
  *
@@ -38,8 +40,17 @@ class XmlConfiguration extends AbstractFileConfiguration
             throw new \InvalidArgumentException('Given config file does not exist');
         }
 
+        libxml_use_internal_errors(true);
+        $xml = new \DOMDocument();
+        $xml->load($file);
+        if (!$xml->schemaValidate(__DIR__ . DIRECTORY_SEPARATOR . "XML" . DIRECTORY_SEPARATOR . "configuration.xsd")) {
+            libxml_clear_errors();
+            throw MigrationException::configurationNotValid('XML configuration did not pass the validation test.');
+        }
+
+        $xml = simplexml_load_file($file, "SimpleXMLElement", LIBXML_NOCDATA);
         $config = [];
-        $xml = simplexml_load_file($file);
+
         if (isset($xml->name)) {
             $config['name'] = (string) $xml->name;
         }
