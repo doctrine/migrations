@@ -723,6 +723,7 @@ class Configuration
     {
         $this->ensureOrganizeMigrationsIsCompatibleWithFinder();
 
+        $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYearAndMonth;
         $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
     }
 

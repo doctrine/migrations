@@ -53,25 +53,28 @@ class MigrationDirectoryHelper extends Helper
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
 
-        if ($this->configuration->areMigrationsOrganizedByYear() ||
-            $this->configuration->areMigrationsOrganizedByYearAndMonth()
-        ) {
-            $versionYear = date('Y');
-            $dir = $dir . DIRECTORY_SEPARATOR . $versionYear;
-            if (!file_exists($dir)) {
-                mkdir($dir, 0755);
-            }
-
-            if ($this->configuration->areMigrationsOrganizedByYearAndMonth()) {
-                $versionMonth = date('m');
-                $dir .= DIRECTORY_SEPARATOR . $versionMonth ;
-                if (!file_exists($dir)) {
-                    mkdir($dir, 0755);
-                }
-            }
+        if ($this->configuration->areMigrationsOrganizedByYear()) {
+            $dir .= $this->appendDir(date('Y'));
         }
 
+        if ($this->configuration->areMigrationsOrganizedByYearAndMonth()) {
+            $dir .= $this->appendDir(date('m'));
+        }
+        $this->createDirIfNotExists($dir);
+
         return $dir;
+    }
+
+    private function appendDir($dir)
+    {
+        return DIRECTORY_SEPARATOR . $dir;
+    }
+
+    private function createDirIfNotExists($dir)
+    {
+        if (!file_exists($dir)) {
+            mkdir($dir, 0755, true);
+        }
     }
 
     /**
