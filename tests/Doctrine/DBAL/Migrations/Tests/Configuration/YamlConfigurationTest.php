@@ -2,15 +2,28 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
+use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 
 class YamlConfigurationTest extends AbstractConfigurationTest
 {
-    public function loadConfiguration()
-    {
-        $config = new YamlConfiguration($this->getSqliteConnection());
-        $config->load(__DIR__ . "/_files/config.yml");
+    /**
+     * @inheritdoc
+     */
+    public function loadConfiguration(
+        $configFileSuffix = '',
+        OutputWriter $outputWriter = null,
+        MigrationFinderInterface $migrationFinder = null
+    ) {
+        $configFile = 'config.yml';
+        if ('' !== $configFileSuffix) {
+            $configFile = 'config_' . $configFileSuffix . '.yml';
+        }
 
-        return $config;
+        $configFileSuffix = new YamlConfiguration($this->getSqliteConnection(), $outputWriter, $migrationFinder);
+        $configFileSuffix->load(__DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile);
+
+        return $configFileSuffix;
     }
 }

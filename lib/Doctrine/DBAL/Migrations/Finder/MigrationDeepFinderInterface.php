@@ -15,37 +15,15 @@
  * This software consists of voluntary contributions made by many individuals
  * and is licensed under the LGPL. For more information, see
  * <http://www.doctrine-project.org>.
-*/
+ */
 
-namespace Doctrine\DBAL\Migrations\Configuration;
-
-use Symfony\Component\Yaml\Yaml;
+namespace Doctrine\DBAL\Migrations\Finder;
 
 /**
- * Load migration configuration information from a YAML configuration file.
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
+ * A MigrationDeepFinderInterface is a MigrationFinderInterface, which locates
+ * migrations not only in a directory itself, but in subdirectories of this directory,
+ * too.
  */
-class YamlConfiguration extends AbstractFileConfiguration
+interface MigrationDeepFinderInterface extends MigrationFinderInterface
 {
-    /**
-     * @inheritdoc
-     */
-    protected function doLoad($file)
-    {
-        $config = Yaml::parse(file_get_contents($file));
-
-        if (!is_array($config)) {
-            throw new \InvalidArgumentException('Not valid configuration.');
-        }
-
-        if (isset($config['migrations_directory'])) {
-            $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, $config['migrations_directory']);
-        }
-
-        $this->setConfiguration($config);
-    }
 }

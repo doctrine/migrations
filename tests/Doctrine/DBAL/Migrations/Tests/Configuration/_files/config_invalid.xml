@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
+      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+      xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
+                    http://doctrine-project.org/schemas/migrations/configuration.xsd">
+
+    <OptionThatDoesNotExists>Doctrine Sandbox Migrations</OptionThatDoesNotExists>
+
+</doctrine-migrations>

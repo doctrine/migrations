@@ -35,30 +35,13 @@ class JsonConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
-        if (!file_exists($file)) {
-            throw new \InvalidArgumentException('Given config file does not exist');
+        $config = json_decode(file_get_contents($file), true);
+
+        if (isset($config['migrations_directory'])) {
+            $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, $config['migrations_directory']);
         }
 
-        $array = json_decode(file_get_contents($file), true);
+        $this->setConfiguration($config);
 
-        if (isset($array['name'])) {
-            $this->setName($array['name']);
-        }
-        if (isset($array['table_name'])) {
-            $this->setMigrationsTableName($array['table_name']);
-        }
-        if (isset($array['migrations_namespace'])) {
-            $this->setMigrationsNamespace($array['migrations_namespace']);
-        }
-        if (isset($array['migrations_directory'])) {
-            $migrationsDirectory = $this->getDirectoryRelativeToFile($file, $array['migrations_directory']);
-            $this->setMigrationsDirectory($migrationsDirectory);
-            $this->registerMigrationsFromDirectory($migrationsDirectory);
-        }
-        if (isset($array['migrations']) && is_array($array['migrations'])) {
-            foreach ($array['migrations'] as $migration) {
-                $this->registerMigration($migration['version'], $migration['class']);
-            }
-        }
     }
 }

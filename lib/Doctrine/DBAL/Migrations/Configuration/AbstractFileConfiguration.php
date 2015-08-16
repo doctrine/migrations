@@ -47,6 +47,56 @@ abstract class AbstractFileConfiguration extends Configuration
     private $loaded = false;
 
     /**
+     * @var array of possible configuration properties in migrations configuration.
+     */
+    private $configurationProperties = [
+        'name' => 'setName',
+        'table_name' => 'setMigrationsTableName',
+        'migrations_namespace' => 'setMigrationsNamespace',
+        'organize_migrations' => 'setMigrationOrganisation',
+        'migrations_directory' => 'loadMigrationsFromDirectory',
+        'migrations' => 'loadMigrations',
+    ];
+
+    protected function setConfiguration(Array $config)
+    {
+        foreach($config as $configurationKey => $configurationValue) {
+            if (!isset($this->configurationProperties[$configurationKey])) {
+                $msg = sprintf('Migrations configuration key "%s" does not exists.', $configurationKey);
+                throw MigrationException::configurationNotValid($msg);
+            }
+            $this->{$this->configurationProperties[$configurationKey]}($configurationValue);
+        }
+    }
+
+    private function loadMigrationsFromDirectory($migrationsDirectory)
+    {
+        $this->setMigrationsDirectory($migrationsDirectory);
+        $this->registerMigrationsFromDirectory($migrationsDirectory);
+    }
+
+    private function loadMigrations($migrations)
+    {
+        if (is_array($migrations)) {
+            foreach ($migrations as $migration) {
+                $this->registerMigration($migration['version'], $migration['class']);
+            }
+        }
+    }
+
+    private function setMigrationOrganisation($migrationOrganisation)
+    {
+        if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
+            $this->setMigrationsAreOrganizedByYear();
+        } else if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+            $this->setMigrationsAreOrganizedByYearAndMonth();
+        } else {
+            $msg = 'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".';
+            throw MigrationException::configurationNotValid($msg);
+        }
+    }
+
+    /**
      * Load the information from the passed configuration file
      *
      * @param string $file The path to the configuration file
@@ -62,6 +112,11 @@ abstract class AbstractFileConfiguration extends Configuration
             $file = $path;
         }
         $this->file = $file;
+
+        if (!file_exists($file)) {
+            throw new \InvalidArgumentException('Given config file does not exist');
+        }
+
         $this->doLoad($file);
         $this->loaded = true;
     }
