@@ -204,6 +204,16 @@ class Configuration
     }
 
     /**
+     * Sets the output writer.
+     *
+     * @param OutputWriter $outputWriter
+     */
+    public function setOutputWriter(OutputWriter $outputWriter)
+    {
+        $this->outputWriter = $outputWriter;
+    }
+
+    /**
      * Returns the OutputWriter instance
      *
      * @return OutputWriter $outputWriter  The OutputWriter instance

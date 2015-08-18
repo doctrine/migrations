@@ -27,6 +27,16 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\OutputWriter', $configuration->getOutputWriter());
     }
 
+    public function testOutputWriterCanBeSet()
+    {
+        $outputWriter = $this->getOutputWriterMock();
+
+        $configuration = new Configuration($this->getConnectionMock());
+        $configuration->setOutputWriter($outputWriter);
+
+        $this->assertSame($outputWriter, $configuration->getOutputWriter());
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Connection
      */
