@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
@@ -123,11 +124,11 @@ abstract class AbstractCommand extends Command
      */
     protected function askConfirmation($question, InputInterface $input, OutputInterface $output)
     {
-        if ($this->getHelperSet()->has('question')) {
-            return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
-        } else {
+        if (!$this->getHelperSet()->has('question')) {
             return $this->getHelper('dialog')->askConfirmation($output, '<question>' . $question . '</question>', false);
         }
+
+        return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
     }
 
     /**
@@ -164,13 +165,13 @@ abstract class AbstractCommand extends Command
                 if (!is_array($params)) {
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }
-                $this->connection = \Doctrine\DBAL\DriverManager::getConnection($params);
+                $this->connection = DriverManager::getConnection($params);
             } elseif (file_exists('migrations-db.php')) {
                 $params = include 'migrations-db.php';
                 if (!is_array($params)) {
                     throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
                 }
-                $this->connection = \Doctrine\DBAL\DriverManager::getConnection($params);
+                $this->connection = DriverManager::getConnection($params);
             } elseif ($this->getHelperSet()->has('connection')) {
                 $this->connection = $this->getHelper('connection')->getConnection();
             } elseif ($this->configuration) {

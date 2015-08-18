@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -86,7 +87,7 @@ EOT
             'Name'                              => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
             'Database Driver'                   => $configuration->getConnection()->getDriver()->getName(),
             'Database Name'                     => $configuration->getConnection()->getDatabase(),
-            'Configuration Source'              => $configuration instanceof \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
+            'Configuration Source'              => $configuration instanceof AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
             'Version Table Name'                => $configuration->getMigrationsTableName(),
             'Migrations Namespace'              => $configuration->getMigrationsNamespace(),
             'Migrations Directory'              => $configuration->getMigrationsDirectory(),
@@ -118,7 +119,7 @@ EOT
         }
     }
 
-    private function showVersions($migrations, Configuration $configuration, $output)
+    private function showVersions($migrations, Configuration $configuration, OutputInterface $output)
     {
         $migratedVersions = $configuration->getMigratedVersions();
 
