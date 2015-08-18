@@ -123,11 +123,11 @@ abstract class AbstractCommand extends Command
      */
     protected function askConfirmation($question, InputInterface $input, OutputInterface $output)
     {
-        if ($this->getHelperSet()->has('question')) {
-            return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
-        } else {
+        if (!$this->getHelperSet()->has('question')) {
             return $this->getHelper('dialog')->askConfirmation($output, '<question>' . $question . '</question>', false);
         }
+
+        return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
     }
 
     /**
