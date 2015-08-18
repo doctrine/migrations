@@ -37,6 +37,9 @@ class Version
     const STATE_EXEC = 2;
     const STATE_POST = 3;
 
+    const DIRECTION_UP = 'up';
+    const DIRECTION_DOWN = 'down';
+
     /**
      * The Migrations Configuration instance for this migration
      *
