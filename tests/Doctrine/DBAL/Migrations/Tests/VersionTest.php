@@ -38,6 +38,12 @@ class VersionTest extends MigrationTestCase
 
     protected $output;
 
+    public function testConstants()
+    {
+        $this->assertSame('up', Version::DIRECTION_UP);
+        $this->assertSame('down', Version::DIRECTION_DOWN);
+    }
+
     /**
      * Create simple migration
      */
