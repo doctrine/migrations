@@ -96,7 +96,7 @@ EOT
             'Next Version'                      => $formattedVersions['next'],
             'Latest Version'                    => $formattedVersions['latest'],
             'Executed Migrations'               => count($executedMigrations),
-            'Executed Unavailable Migrations'   => $numExecutedUnavailableMigrations > 0 ? '<error>'.$numExecutedUnavailableMigrations.'</error>' : 0,
+            'Executed Unavailable Migrations'   => $numExecutedUnavailableMigrations > 0 ? '<error>' . $numExecutedUnavailableMigrations . '</error>' : 0,
             'Available Migrations'              => count($availableMigrations),
             'New Migrations'                    => $newMigrations > 0 ? '<question>' . $newMigrations . '</question>' : 0
         ];
@@ -123,7 +123,7 @@ EOT
     {
         $migratedVersions = $configuration->getMigratedVersions();
 
-        foreach($migrations as $version) {
+        foreach ($migrations as $version) {
             $isMigrated = in_array($version->getVersion(), $migratedVersions);
             $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
             $migrationDescription = '';
@@ -134,8 +134,8 @@ EOT
 
             $output->writeln('    <comment>>></comment> ' . $formattedVersion .
                 ' (<comment>' . $version->getVersion() . '</comment>)' .
-                str_repeat(' ', 49 - strlen($formattedVersion) - strlen($version->getVersion()))  .
-                $status  . $migrationDescription);
+                str_repeat(' ', 49 - strlen($formattedVersion) - strlen($version->getVersion())) .
+                $status . $migrationDescription);
         }
     }
 }

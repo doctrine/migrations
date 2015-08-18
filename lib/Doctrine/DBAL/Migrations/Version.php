@@ -261,12 +261,12 @@ class Version
             $this->migration->$direction($toSchema);
             $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
 
-            if (! $dryRun) {
+            if (!$dryRun) {
                 if (!empty($this->sql)) {
                     foreach ($this->sql as $key => $query) {
                         $queryStart = microtime(true);
 
-                        if ( ! isset($this->params[$key])) {
+                        if (!isset($this->params[$key])) {
                             $this->outputWriter->write('     <comment>-></comment> ' . $query);
                             $this->connection->exec($query);
                         } else {
@@ -329,7 +329,7 @@ class Version
                 }
             }
 
-            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
+            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)", $e->getMessage()));
 
             $this->state = self::STATE_NONE;
 

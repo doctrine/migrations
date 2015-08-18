@@ -43,7 +43,7 @@ class DiffCommand extends GenerateCommand
      */
     protected $schemaProvider;
 
-    public function __construct(SchemaProviderInterface $schemaProvider=null)
+    public function __construct(SchemaProviderInterface $schemaProvider = null)
     {
         $this->schemaProvider = $schemaProvider;
         parent::__construct();
@@ -90,10 +90,10 @@ EOT
         $toSchema = $this->getSchemaProvider()->createSchema();
 
         //Not using value from options, because filters can be set from config.yml
-        if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
+        if (!$isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
-                if ( ! preg_match($filterExpr, $this->resolveTableName($tableName))) {
+                if (!preg_match($filterExpr, $this->resolveTableName($tableName))) {
                     $toSchema->dropTable($tableName);
                 }
             }
@@ -102,7 +102,7 @@ EOT
         $up = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
         $down = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
 
-        if (! $up && ! $down) {
+        if (!$up && !$down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
 
             return;
