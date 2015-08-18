@@ -32,7 +32,7 @@ interface MigrationFinderInterface
      *
      * @param   string $directory The directory in which to look for migrations
      * @param   string|null $namespace The namespace of the classes to load
-     * @throws  InvalidArgumentException if the directory does not exist
+     * @throws  \InvalidArgumentException if the directory does not exist
      * @return  string[] An array of class names that were found with the version
      *          as keys.
      */
