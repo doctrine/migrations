@@ -84,7 +84,7 @@ class Migration
             $to = $this->configuration->getLatestVersion();
         }
 
-        $direction = $from > $to ? 'down' : 'up';
+        $direction = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
 
         $this->outputWriter->write(sprintf("# Migrating from %s to %s\n", $from, $to));
 
@@ -129,7 +129,7 @@ class Migration
             throw MigrationException::unknownMigrationVersion($to);
         }
 
-        $direction = $from > $to ? 'down' : 'up';
+        $direction = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
         $migrationsToExecute = $this->configuration->getMigrationsToExecute($direction, $to);
 
         /**
