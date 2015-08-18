@@ -2,10 +2,11 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
+use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
-class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
+class FunctionalTest extends MigrationTestCase
 {
     /**
      * @var Configuration
@@ -27,7 +28,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateUp()
     {
-        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
 
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -40,7 +41,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateDown()
     {
-        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
 
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -59,7 +60,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testSkipMigrateUp()
     {
-        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
+        $version = new \Doctrine\DBAL\Migrations\Version($this->config, 1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration');
 
         $this->assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -72,17 +73,17 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateSeveralSteps()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
-        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
-        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $this->assertEquals(0, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrationsToExecute('up', 3);
 
         $this->assertEquals(3, count($migrations));
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp', $migrations[1]->getMigration());
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration', $migrations[2]->getMigration());
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther', $migrations[3]->getMigration());
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp', $migrations[1]->getMigration());
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration', $migrations[2]->getMigration());
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther', $migrations[3]->getMigration());
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate(3);
@@ -99,9 +100,9 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateToLastVersion()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
-        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
-        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate();
@@ -115,9 +116,9 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testDryRunMigration()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
-        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
-        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate(3, true);
@@ -135,9 +136,9 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateDownSeveralSteps()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
-        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationSkipMigration');
-        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate(3);
@@ -157,7 +158,7 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testAddSql()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate(1);
@@ -179,8 +180,8 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $this->config->registerMigration(10, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(10, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate();
@@ -188,8 +189,8 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $config = new Configuration($this->connection);
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $config->setMigrationsDirectory('.');
-        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
+        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
+        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($config);
         $migration->migrate();
@@ -203,8 +204,8 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testInterweavedMigrationsAreExecuted()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate();
@@ -217,9 +218,9 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
         $config = new Configuration($this->connection);
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $config->setMigrationsDirectory('.');
-        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateUp');
-        $config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
+        $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $this->assertEquals(1, count($config->getMigrationsToExecute('up', 3)));
         $migrations = $config->getMigrationsToExecute('up', 3);
@@ -239,8 +240,8 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
 
     public function testMigrateToCurrentVersionReturnsEmpty()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest');
-        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther');
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
+        $this->config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate();
@@ -270,71 +271,13 @@ class FunctionalTest extends \Doctrine\DBAL\Migrations\Tests\MigrationTestCase
     {
         return [
             [[
-                '20120228123443' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
-                '20120228114838' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
+                '20120228123443' => 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest',
+                '20120228114838' => 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther',
             ]],
             [[
-                '002Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrateAddSqlTest',
-                '001Test' => 'Doctrine\DBAL\Migrations\Tests\Functional\MigrationMigrateFurther',
+                '002Test' => 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest',
+                '001Test' => 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther',
             ]]
         ];
     }
-}
-
-class MigrateAddSqlTest extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-    public function up(Schema $schema)
-    {
-        $this->addSql("CREATE TABLE test_add_sql_table (test varchar(255))");
-        $this->addSql("INSERT INTO test_add_sql_table (test) values (?)", ['test']);
-    }
-
-    public function down(Schema $schema)
-    {
-        $this->addSql("DROP TABLE test_add_sql_table");
-    }
-}
-
-class MigrationMigrateUp extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-    public function down(Schema $schema)
-    {
-        $schema->dropTable('foo');
-    }
-
-    public function up(Schema $schema)
-    {
-        $table = $schema->createTable('foo');
-        $table->addColumn('id', 'integer');
-    }
-}
-
-class MigrationSkipMigration extends MigrationMigrateUp
-{
-
-    public function preUp(Schema $schema)
-    {
-        $this->skipIf(true);
-    }
-
-    public function preDown(Schema $schema)
-    {
-        $this->skipIf(true);
-    }
-}
-
-class MigrationMigrateFurther extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-
-    public function down(Schema $schema)
-    {
-        $schema->dropTable('bar');
-    }
-
-    public function up(Schema $schema)
-    {
-        $table = $schema->createTable('bar');
-        $table->addColumn('id', 'integer');
-    }
-
 }
