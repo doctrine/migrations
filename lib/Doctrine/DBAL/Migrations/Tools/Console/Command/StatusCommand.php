@@ -118,7 +118,7 @@ EOT
         }
     }
 
-    private function showVersions($migrations, Configuration $configuration, $output)
+    private function showVersions($migrations, Configuration $configuration, OutputInterface $output)
     {
         $migratedVersions = $configuration->getMigratedVersions();
 
