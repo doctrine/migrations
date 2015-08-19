@@ -87,7 +87,7 @@ class SqlFileWriter
 
     private function getVersionUpdateQuery($version, $direction)
     {
-        if ($direction == 'down') {
+        if ($direction == Version::DIRECTION_DOWN) {
             $query = "DELETE FROM %s WHERE version = '%s';\n";
         } else {
             $query = "INSERT INTO %s (version) VALUES ('%s');\n";

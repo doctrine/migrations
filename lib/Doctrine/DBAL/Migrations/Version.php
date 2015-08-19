@@ -37,6 +37,9 @@ class Version
     const STATE_EXEC = 2;
     const STATE_POST = 3;
 
+    const DIRECTION_UP = 'up';
+    const DIRECTION_DOWN = 'down';
+
     /**
      * The Migrations Configuration instance for this migration
      *
@@ -197,7 +200,7 @@ class Version
      *
      * @return boolean $written
      */
-    public function writeSqlFile($path, $direction = 'up')
+    public function writeSqlFile($path, $direction = self::DIRECTION_UP)
     {
         $queries = $this->execute($direction, true);
 
@@ -249,7 +252,7 @@ class Version
             $fromSchema = $this->sm->createSchema();
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-            if ($direction === 'up') {
+            if ($direction === self::DIRECTION_UP) {
                 $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
             } else {
                 $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
@@ -283,7 +286,7 @@ class Version
                     ));
                 }
 
-                if ($direction === 'up') {
+                if ($direction === self::DIRECTION_UP) {
                     $this->markMigrated();
                 } else {
                     $this->markNotMigrated();
@@ -300,7 +303,7 @@ class Version
 
             $migrationEnd = microtime(true);
             $this->time = round($migrationEnd - $migrationStart, 2);
-            if ($direction === 'up') {
+            if ($direction === self::DIRECTION_UP) {
                 $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
             } else {
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
@@ -322,7 +325,7 @@ class Version
 
             if ($dryRun === false) {
                 // now mark it as migrated
-                if ($direction === 'up') {
+                if ($direction === self::DIRECTION_UP) {
                     $this->markMigrated();
                 } else {
                     $this->markNotMigrated();

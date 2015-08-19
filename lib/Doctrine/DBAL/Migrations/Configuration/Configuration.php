@@ -681,7 +681,7 @@ class Configuration
      */
     public function getMigrationsToExecute($direction, $to)
     {
-        if ($direction === 'down') {
+        if ($direction === Version::DIRECTION_DOWN) {
             if (count($this->migrations)) {
                 $allVersions = array_reverse(array_keys($this->migrations));
                 $classes = array_reverse(array_values($this->migrations));
@@ -763,7 +763,7 @@ class Configuration
      */
     private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
-        if ($direction === 'down') {
+        if ($direction === Version::DIRECTION_DOWN) {
             if (!in_array($version->getVersion(), $migrated)) {
                 return false;
             }
@@ -771,7 +771,7 @@ class Configuration
             return $version->getVersion() > $to;
         }
 
-        if ($direction === 'up') {
+        if ($direction === Version::DIRECTION_UP) {
             if (in_array($version->getVersion(), $migrated)) {
                 return false;
             }
