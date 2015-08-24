@@ -24,6 +24,9 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 class RecursiveRegexFinderTest extends MigrationTestCase
 {
+    /**
+     * @var RecursiveRegexFinder
+     */
     private $finder;
 
     /**
