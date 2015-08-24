@@ -173,6 +173,38 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
     }
 
+    public function testPreviousCurrentNextLatestVersionWithVersionWithNoNumber()
+    {
+        $config = $this->getSqliteConfiguration();
+        $config->registerMigrations([
+            '001InitialSchema' => 'Doctrine\DBAL\Migrations\Tests\Stub\VersionsWithAlphaNames\Version001InitialSchema',
+            '001InitialSchemaDev' => 'Doctrine\DBAL\Migrations\Tests\Stub\VersionsWithAlphaNames\Version001InitialSchemaDev',
+            '002ReleasedFeature' => 'Doctrine\DBAL\Migrations\Tests\Stub\VersionsWithAlphaNames\Version002ReleasedFeature',
+            'NewFeatureDev' => 'Doctrine\DBAL\Migrations\Tests\Stub\VersionsWithAlphaNames\VersionNewFeatureDev',
+        ]);
+
+        $this->assertSame(null, $config->getPrevVersion(), "no prev version");
+        $this->assertSame('0', $config->getCurrentVersion(), "current version 0");
+        $this->assertSame('001InitialSchema', $config->getNextVersion(), "next version 001InitialSchema");
+        $this->assertSame('NewFeatureDev', $config->getLatestVersion(), "latest version NewFeatureDev");
+
+        $config->getVersion('001InitialSchema')->markMigrated();
+
+        $this->assertSame('0', $config->getPrevVersion(), "prev version 0");
+        $this->assertSame('001InitialSchema', $config->getCurrentVersion(), "current version 001InitialSchema");
+        $this->assertSame('001InitialSchemaDev', $config->getNextVersion(), "next version 001InitialSchemaDev");
+        $this->assertSame('NewFeatureDev', $config->getLatestVersion(), "latest version NewFeatureDev");
+
+        $config->getVersion('001InitialSchemaDev')->markMigrated();
+        $config->getVersion('002ReleasedFeature')->markMigrated();
+        $config->getVersion('NewFeatureDev')->markMigrated();
+
+        $this->assertSame('002ReleasedFeature', $config->getPrevVersion(), "prev version 002ReleasedFeature");
+        $this->assertSame('NewFeatureDev', $config->getCurrentVersion(), "current version NewFeatureDev");
+        $this->assertSame(null, $config->getNextVersion(), "no next version");
+        $this->assertSame('NewFeatureDev', $config->getLatestVersion(), "latest version NewFeatureDev");
+    }
+
     public function testGetAvailableVersions()
     {
         $config = $this->getSqliteConfiguration();
