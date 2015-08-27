@@ -45,6 +45,7 @@ class MigrateCommand extends AbstractCommand
             ->addOption('write-sql', null, InputOption::VALUE_NONE, 'The path to output the migration SQL file instead of executing it.')
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
+            ->addOption('allow-no-migration', null, InputOption::VALUE_NONE, 'Don\'t throw an exception if no migration is available (CI).')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -138,6 +139,7 @@ EOT
                 }
             }
 
+            $migration->setNoMigrationException($input->getOption('allow-no-migration'));
             $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
 
             if (empty($sql)) {
