@@ -91,6 +91,51 @@ class MigrateCommandTest extends MigrationTestCase
         $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
     }
 
+
+    public function testExecute()
+    {
+        $input = $this->getInputMock(false);
+        $output = $this->getOutputStream();
+
+        $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand');
+        $method = $class->getMethod('execute');
+        $method->setAccessible(true);
+
+        /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand $command */
+        $command = $this->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configuration = $this->getConfigurationMock();
+        $configuration
+            ->expects($this->any())
+            ->method('getMigratedVersions')
+            ->willReturn(array());
+        $configuration
+            ->expects($this->any())
+            ->method('getAvailableVersions')
+            ->willReturn(array());
+
+
+        $command->setHelperSet(new HelperSet());
+        
+
+        $command->expects($this->any())
+            ->method('getHelperSet')
+            ->willReturn($this->returnValue(new HelperSet(['question' => new QuestionHelper()])));
+
+        $command->expects($this->any())
+            ->method('getMigrationConfiguration')
+            ->willReturn($this->returnValue($configuration));
+
+        $command->expects($this->any())
+            ->method('getVersionNameFromAlias')
+            ->willReturn($this->returnValue(false));
+
+        $this->assertEquals(0,  $method->invokeArgs($command, [$input, $output]));
+
+    }
+
     private function getInputMock($returnValue)
     {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
