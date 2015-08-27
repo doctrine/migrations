@@ -17,10 +17,7 @@ class MigrateCommandTest extends MigrationTestCase
         $method = $class->getMethod('getVersionNameFromAlias');
         $method->setAccessible(true);
 
-        $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
-            ->setConstructorArgs([$this->getSqliteConnection()])
-            ->setMethods(['resolveVersionAlias'])
-            ->getMock();
+        $configuration = $this->getConfigurationMock();
 
         $output = $this->getOutputStream();
 
@@ -56,14 +53,7 @@ class MigrateCommandTest extends MigrationTestCase
             );
         }
 
-        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
-            ->setConstructorArgs([[]])
-            ->setMethods(['isInteractive'])
-            ->getMock();
-
-        $input->expects($this->any())
-            ->method('isInteractive')
-            ->will($this->returnValue(true));
+        $input = $this->getInputMock(true);
 
         $output = $this->getOutputStream();
 
@@ -97,13 +87,31 @@ class MigrateCommandTest extends MigrationTestCase
         $this->assertEquals(false, $method->invokeArgs($command, ['test', $input, $output]));
 
         //should return true if non interactive
+        $input = $this->getInputMock(false);
+        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
+    }
+
+    private function getInputMock($returnValue)
+    {
         $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
             ->setConstructorArgs([[]])
             ->setMethods(['isInteractive'])
             ->getMock();
+
         $input->expects($this->any())
             ->method('isInteractive')
-            ->will($this->returnValue(false));
-        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
+            ->will($this->returnValue($returnValue));
+
+        return $input;
+    }
+
+    private function getConfigurationMock()
+    {
+        $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+            ->setConstructorArgs([$this->getSqliteConnection()])
+            ->setMethods(['resolveVersionAlias'])
+            ->getMock();
+
+        return $configuration;
     }
 }
