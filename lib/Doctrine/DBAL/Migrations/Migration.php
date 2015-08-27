@@ -44,6 +44,11 @@ class Migration
     private $configuration;
 
     /**
+     * @var boolean
+     */
+    private $noMigrationException;
+
+    /**
      * Construct a Migration instance
      *
      * @param Configuration $configuration A migration Configuration instance
@@ -52,6 +57,7 @@ class Migration
     {
         $this->configuration = $configuration;
         $this->outputWriter = $configuration->getOutputWriter();
+        $this->noMigrationException = false;
     }
 
     /**
@@ -95,6 +101,14 @@ class Migration
         );
 
         return $sqlWriter->write($sql, $direction);
+    }
+
+    /**
+     * @param boolean $noMigrationException Throw an exception or not if no migration is found. Mostly for Continuous Integration.
+     */
+    public function setNoMigrationException($noMigrationException = false)
+    {
+        $this->noMigrationException = $noMigrationException;
     }
 
     /**
@@ -151,7 +165,7 @@ class Migration
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (empty($migrationsToExecute)) {
+        if (empty($migrationsToExecute) && !$this->noMigrationException) {
             throw MigrationException::noMigrationsToExecute();
         }
 

@@ -61,6 +61,14 @@ class MigrationTest extends MigrationTestCase
         $migration->migrate();
     }
 
+    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption()
+    {
+        $migration = new Migration($this->config);
+
+        $migration->setNoMigrationException(true);
+        $migration->migrate();
+    }
+
     /**
      * @param $to
      *
