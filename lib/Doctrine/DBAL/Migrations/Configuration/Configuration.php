@@ -439,7 +439,7 @@ class Configuration
      */
     public function hasVersion($version)
     {
-        return isset($this->migrations[$version]);
+        return isset($this->migrations[$version]) || $version === '0';
     }
 
     /**

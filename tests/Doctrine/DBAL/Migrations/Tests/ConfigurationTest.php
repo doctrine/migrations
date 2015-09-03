@@ -99,6 +99,12 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertFalse($version->isMigrated());
     }
 
+    public function testHasVersionAllowsZero()
+    {
+        $config = $this->getSqliteConfiguration();
+        $this->assertTrue($config->hasVersion('0'));
+    }
+
     public function testRegisterMigrations()
     {
         $config = $this->getSqliteConfiguration();
