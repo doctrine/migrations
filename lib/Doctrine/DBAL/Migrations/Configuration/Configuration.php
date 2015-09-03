@@ -703,6 +703,13 @@ class Configuration
         return $versions;
     }
 
+
+    public function setMappingTypes($mapping_types) {
+        foreach($mapping_types as $field=>$type) {
+            $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping($field, $type);
+        }
+    }    
+
     /**
      * Find all the migrations in a given directory.
      *

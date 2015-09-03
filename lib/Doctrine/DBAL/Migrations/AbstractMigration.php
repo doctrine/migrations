@@ -173,6 +173,11 @@ abstract class AbstractMigration
         $this->version->addSql($sql, $params, $types);
     }
 
+    protected function checkResultExists($sql, array $params = array(), array $types = array())
+    {
+      return $this->version->checkResultExists($sql, $params, $types);
+    }        
+
     protected function write($message)
     {
         $this->outputWriter->write($message);

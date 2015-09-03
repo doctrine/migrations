@@ -192,6 +192,12 @@ class Version
         }
     }
 
+
+   public function checkResultExists($sql, array $params = array(), array $types = array())
+   {
+     $result = $this->connection->executeQuery($sql,$params,$types);
+     return $result->rowCount() > 0;
+   }
     /**
      * Write a migration SQL file to the given path
      *
