@@ -39,13 +39,13 @@ Make sure Composer and all necessary dependencies are installed:
 
 ```bash
 curl -s https://getcomposer.org/installer | php
-php composer.phar install --dev
+php composer.phar install
 ```
 
 Make sure that the Box project is installed:
 
 ```bash
-curl -s http://box-project.org/installer.php | php
+curl -LSs http://box-project.github.io/box2/installer.php | php
 ```
 
 Build the PHAR archive:
