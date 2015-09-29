@@ -92,7 +92,7 @@ EOT
     {
         $this->configuration = $this->getMigrationConfiguration($input, $output);
 
-        if ( ! $input->getOption('add') && ! $input->getOption('delete')) {
+        if (!$input->getOption('add') && !$input->getOption('delete')) {
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
         }
 
@@ -147,26 +147,26 @@ EOT
 
     private function mark($version, $all = false)
     {
-        if ( ! $this->configuration->hasVersion($version)) {
+        if (!$this->configuration->hasVersion($version)) {
             throw MigrationException::unknownMigrationVersion($version);
         }
 
         $version = $this->configuration->getVersion($version);
         if ($this->markMigrated && $this->configuration->hasVersionMigrated($version)) {
             $marked = true;
-            if (! $all) {
+            if (!$all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
             }
         }
 
-        if ( ! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
+        if (!$this->markMigrated && !$this->configuration->hasVersionMigrated($version)) {
             $marked = false;
-            if (! $all) {
+            if (!$all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" does not exists in the version table.', $version));
             }
         }
 
-        if ( ! isset($marked)) {
+        if (!isset($marked)) {
             if ($this->markMigrated) {
                 $version->markMigrated();
             } else {
