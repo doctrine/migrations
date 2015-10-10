@@ -7,7 +7,8 @@
     "license": "LGPL-2.1",
     "authors": [
         {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
-        {"name": "Jonathan Wage", "email": "jonwage@gmail.com"}
+        {"name": "Jonathan Wage", "email": "jonwage@gmail.com"},
+        {"name": "Michael Simonson", "email": "contact@mikesimonson.com" }
     ],
     "require": {
         "php": ">=5.4.0",
