@@ -106,15 +106,17 @@ EOT
 
         if ($input->getOption('show-versions')) {
             if ($migrations = $configuration->getMigrations()) {
-                $executedUnavailableMigrations = $migrations;
                 $output->writeln("\n <info>==</info> Available Migration Versions\n");
 
                 $this->showVersions($migrations, $configuration, $output);
             }
 
-            if (!empty($executedUnavailableMigrations)) {
+            if ($numExecutedUnavailableMigrations) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
-                $this->showVersions($executedUnavailableMigrations, $configuration, $output);
+                foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) .
+                        ' (<comment>' . $executedUnavailableMigration . '</comment>)');
+                }
             }
         }
     }
