@@ -264,42 +264,19 @@ class Version
             $this->migration->$direction($toSchema);
             $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
 
+            $this->executeRegisteredSql();
+
+            $this->state = self::STATE_POST;
+            $this->migration->{'post' . ucfirst($direction)}($toSchema);
+            $this->executeRegisteredSql();
+
             if (! $dryRun) {
-                if (!empty($this->sql)) {
-                    foreach ($this->sql as $key => $query) {
-                        $queryStart = microtime(true);
-
-                        if ( ! isset($this->params[$key])) {
-                            $this->outputWriter->write('     <comment>-></comment> ' . $query);
-                            $this->connection->exec($query);
-                        } else {
-                            $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
-                            $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
-                        }
-
-                        $this->outputQueryTime($queryStart, $timeAllQueries);
-                    }
-                } else {
-                    $this->outputWriter->write(sprintf(
-                        '<error>Migration %s was executed but did not result in any SQL statements.</error>',
-                        $this->version
-                    ));
-                }
-
                 if ($direction === self::DIRECTION_UP) {
                     $this->markMigrated();
                 } else {
                     $this->markNotMigrated();
                 }
-
-            } else {
-                foreach ($this->sql as $query) {
-                    $this->outputWriter->write('     <comment>-></comment> ' . $query);
-                }
             }
-
-            $this->state = self::STATE_POST;
-            $this->migration->{'post' . ucfirst($direction)}($toSchema);
 
             $migrationEnd = microtime(true);
             $this->time = round($migrationEnd - $migrationStart, 2);
@@ -391,5 +368,43 @@ class Version
     public function __toString()
     {
         return $this->version;
+    }
+
+    private function executeRegisteredSql($dryRun = false, $timeAllQueries = false)
+    {
+        if (! $dryRun) {
+            if (!empty($this->sql)) {
+                foreach ($this->sql as $key => $query) {
+                    $queryStart = microtime(true);
+
+                    if ( ! isset($this->params[$key])) {
+                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
+                        $this->connection->exec($query);
+                    } else {
+                        $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
+                        $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                    }
+
+                    $this->outputQueryTime($queryStart, $timeAllQueries);
+                }
+            } else {
+                $this->outputWriter->write(sprintf(
+                    '<error>Migration %s was executed but did not result in any SQL statements.</error>',
+                    $this->version
+                ));
+            }
+        } else {
+            foreach ($this->sql as $query) {
+                $this->outputWriter->write('     <comment>-></comment> ' . $query);
+            }
+        }
+        $this->resetRegisteredSql();
+    }
+
+    private function resetRegisteredSql()
+    {
+        $this->sql = [];
+        $this->params = [];
+        $this->types = [];
     }
 }
