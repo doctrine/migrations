@@ -178,6 +178,29 @@ class FunctionalTest extends MigrationTestCase
         $this->assertFalse($schema->hasTable('test_add_sql_table'));
     }
 
+    public function testAddSqlInPostUp()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostUpTest');
+        $tableName = \Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostUpTest::TABLE_NAME;
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(1);
+
+        $migrations = $this->config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertTrue($schema->hasTable($tableName));
+        $check = $this->config->getConnection()->fetchAll("select * from $tableName");
+        $this->assertNotEmpty($check);
+        $this->assertEquals('test', $check[0]['test']);
+
+        $migration->migrate(0);
+        $this->assertFalse($migrations[1]->isMigrated());
+        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $this->assertFalse($schema->hasTable($tableName));
+    }
+
     public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
     {
         $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
