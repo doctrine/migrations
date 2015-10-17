@@ -1,10 +1,14 @@
 {
     "alias": "doctrine-migrations.phar",
+    "compactors": [
+        "Herrera\\Box\\Compactor\\Composer",
+        "Herrera\\Box\\Compactor\\Json"
+    ],
     "main": "bin/doctrine-migrations.php",
     "output": "build/doctrine-migrations.phar",
     "finder": [
         {
-            "exclude": ["Tests", "Test", "tests", "test"],
+            "exclude": ["Tests", "Test", "tests", "test", "box.phar"],
             "in": ["lib", "vendor/composer/", "vendor/doctrine/", "vendor/symfony/"]
         }
     ],
