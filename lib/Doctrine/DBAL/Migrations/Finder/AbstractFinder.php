@@ -56,7 +56,14 @@ abstract class AbstractFinder implements MigrationFinderInterface
         foreach ($files as $file) {
             static::requireOnce($file);
             $className = basename($file, '.php');
-            $version = substr($className, 7);
+            $version = (string) substr($className, 7);
+            if ($version === '0') {
+                throw new \InvalidArgumentException(sprintf(
+                    'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migraitons' . PHP_EOL .
+                    'It\'s used to revert all migrations including the first one.',
+                    $version
+                ));
+            }
             $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
         }
 
