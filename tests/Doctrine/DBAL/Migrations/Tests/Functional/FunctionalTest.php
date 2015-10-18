@@ -178,6 +178,34 @@ class FunctionalTest extends MigrationTestCase
         $this->assertFalse($schema->hasTable('test_add_sql_table'));
     }
 
+    public function testAddSqlInPostUp()
+    {
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest');
+        $tableName = \Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest::TABLE_NAME;
+
+        $this->config->getConnection()->executeQuery(sprintf("CREATE TABLE IF NOT EXISTS %s (test INT)", $tableName));
+
+        $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
+        $migration->migrate(1);
+
+        $migrations = $this->config->getMigrations();
+        $this->assertTrue($migrations[1]->isMigrated());
+
+        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+
+        $this->assertNotEmpty($check);
+        $this->assertEquals(6, $check);
+
+        $migration->migrate(0);
+        $this->assertFalse($migrations[1]->isMigrated());
+        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $this->assertNotEmpty($check);
+        $this->assertEquals(21, $check);
+
+
+        $this->config->getConnection()->executeQuery(sprintf("DROP TABLE %s ", $tableName));
+    }
+
     public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
     {
         $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
