@@ -180,8 +180,10 @@ class FunctionalTest extends MigrationTestCase
 
     public function testAddSqlInPostUp()
     {
-        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostUpTest');
-        $tableName = \Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostUpTest::TABLE_NAME;
+        $this->config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest');
+        $tableName = \Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest::TABLE_NAME;
+
+        $this->config->getConnection()->executeQuery(sprintf("CREATE TABLE IF NOT EXISTS %s (test INT)", $tableName));
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($this->config);
         $migration->migrate(1);
@@ -189,16 +191,19 @@ class FunctionalTest extends MigrationTestCase
         $migrations = $this->config->getMigrations();
         $this->assertTrue($migrations[1]->isMigrated());
 
-        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
-        $this->assertTrue($schema->hasTable($tableName));
-        $check = $this->config->getConnection()->fetchAll("select * from $tableName");
+        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+
         $this->assertNotEmpty($check);
-        $this->assertEquals('test', $check[0]['test']);
+        $this->assertEquals(6, $check);
 
         $migration->migrate(0);
         $this->assertFalse($migrations[1]->isMigrated());
-        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
-        $this->assertFalse($schema->hasTable($tableName));
+        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $this->assertNotEmpty($check);
+        $this->assertEquals(21, $check);
+
+
+        $this->config->getConnection()->executeQuery(sprintf("DROP TABLE %s ", $tableName));
     }
 
     public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
