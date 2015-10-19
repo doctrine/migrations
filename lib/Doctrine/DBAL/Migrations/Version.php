@@ -240,35 +240,40 @@ class Version
         $this->sql = [];
 
         $transaction = $this->migration->isTransactional();
-        if ($transaction) {
-            //only start transaction if in transactional mode
-            $this->connection->beginTransaction();
-        }
+
 
         try {
             $migrationStart = microtime(true);
 
-            $this->state = self::STATE_PRE;
-            $fromSchema = $this->sm->createSchema();
-            $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
+            $steps = [
+                'STATE_PRE' =>  'pre' . ucfirst($direction),
+                'STATE_EXEC' => $direction,
+                'STATE_POST' => 'post' . ucfirst($direction),
+            ];
 
-            if ($direction === self::DIRECTION_UP) {
-                $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
-            } else {
-                $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
+            foreach($steps as $step => $method) {
+                if ($transaction) {
+                    //only start transaction if in transactional mode
+                    $this->connection->beginTransaction();
+                }
+
+                $this->state = constant('self::' . $step);
+
+                $fromSchema = $this->sm->createSchema();
+                $toSchema = clone $fromSchema;
+
+                $this->migration->{$method}($fromSchema);
+                $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+
+                $this->showMessage($direction);
+
+                $this->executeRegisteredSql($dryRun, $timeAllQueries);
+
+                if ($transaction) {
+                    $this->connection->commit();
+                }
             }
 
-            $this->state = self::STATE_EXEC;
-
-            $toSchema = clone $fromSchema;
-            $this->migration->$direction($toSchema);
-            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
-
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
-
-            $this->state = self::STATE_POST;
-            $this->migration->{'post' . ucfirst($direction)}($toSchema);
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             if (! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {
@@ -284,11 +289,6 @@ class Version
                 $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
             } else {
                 $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
-            }
-
-            if ($transaction) {
-                //commit only if running in transactional mode
-                $this->connection->commit();
             }
 
             $this->state = self::STATE_NONE;
@@ -328,6 +328,16 @@ class Version
 
             $this->state = self::STATE_NONE;
             throw $e;
+        }
+    }
+
+    private function showMessage($direction) {
+        if ($this->state == self::STATE_PRE) {
+            if ($direction === self::DIRECTION_UP) {
+                $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
+            } else {
+                $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
+            }
         }
     }
 
