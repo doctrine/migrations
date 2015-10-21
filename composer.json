@@ -24,12 +24,14 @@
         "mockery/mockery": "^0.9.4",
         "johnkary/phpunit-speedtrap": "~1.0@dev"
     },
-    "suggest": {
-        "symfony/console": "to run the migration from the console"
-    },
     "autoload": {
         "psr-4": {
             "Doctrine\\DBAL\\Migrations\\": "lib/Doctrine/DBAL/Migrations"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Doctrine\\DBAL\\Migrations\\Tests\\": "tests/Doctrine/DBAL/Migrations/Tests"
         }
     },
     "extra": {
