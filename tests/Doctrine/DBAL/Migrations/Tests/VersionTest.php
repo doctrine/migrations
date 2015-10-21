@@ -223,6 +223,51 @@ class VersionTest extends MigrationTestCase
             $this->getOutputStreamContent($this->output));
     }
 
+    public function testExecuteReturnsAllExecutedQueries()
+    {
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '004',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionWithPostUpAndEmptyPostDown'
+        );
+
+        $upQueries = $version->execute('up');
+        $this->assertEquals(
+            ['CREATE TABLE test (test INT)', 'INSERT INTO test VALUES (1)'],
+            $upQueries
+        );
+
+        $downQueries = $version->execute('down');
+        $this->assertEquals(['DROP TABLE test'], $downQueries);
+    }
+
+    public function testNoWarningWhenNoSqlStatementInPostUpAndDownIsOutputed()
+    {
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '004',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionEmptyPostUpAndPostDown'
+        );
+
+        $version->execute('up');
+        $version->execute('down');
+        $this->assertNotContains(
+            'Migration 004 was executed but did not result in any SQL statements.',
+            $this->getOutputStreamContent($this->output));
+    }
+
     public function testCatchExceptionDuringMigration()
     {
         $this->outputWriter = $this->getOutputWriter();
