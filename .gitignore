@@ -7,3 +7,4 @@ tests/phpunit.xml
 vendor/
 composer.lock
 box.phar
+phpunit.xml

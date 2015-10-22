@@ -3,7 +3,6 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Schema\Schema;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -32,7 +31,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->setMigrationsNamespace("DoctrineMigrations\\");
 
         $this->setExpectedException(
-            "Doctrine\DBAL\Migrations\MigrationException",
+            "Doctrine\\DBAL\\Migrations\\MigrationException",
             "Migrations directory must be configured in order to use Doctrine migrations."
         );
         $config->validate();
@@ -212,44 +211,5 @@ class ConfigurationTest extends MigrationTestCase
             ['20150202042811', '2015-02-02 04:28:11'],
             ['20150202162811', '2015-02-02 16:28:11']
         ];
-    }
-}
-
-class ConfigMigration extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-    public function down(Schema $schema)
-    {
-
-    }
-
-    public function up(Schema $schema)
-    {
-
-    }
-}
-
-class Config2Migration extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-    public function down(Schema $schema)
-    {
-
-    }
-
-    public function up(Schema $schema)
-    {
-
-    }
-}
-
-class Config3Migration extends \Doctrine\DBAL\Migrations\AbstractMigration
-{
-    public function down(Schema $schema)
-    {
-
-    }
-
-    public function up(Schema $schema)
-    {
-
     }
 }
