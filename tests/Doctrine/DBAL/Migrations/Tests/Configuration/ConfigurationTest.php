@@ -37,6 +37,20 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
+    public function testRegisterMigrationsClassExistCheck()
+    {
+        $migrationsDir = __DIR__ . '/ConfigurationTestSource/Migrations';
+
+        $configuration = new Configuration($this->getConnectionMock());
+        $configuration->setMigrationsNamespace('Migrations');
+        $configuration->setMigrationsDirectory($migrationsDir);
+
+        $this->setExpectedException(
+            'Doctrine\DBAL\Migrations\MigrationClassNotFoundException',
+            'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?');
+        $configuration->registerMigrationsFromDirectory($migrationsDir);
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Connection
      */

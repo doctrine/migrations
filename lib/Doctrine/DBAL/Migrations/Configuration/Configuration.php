@@ -22,6 +22,7 @@ namespace Doctrine\DBAL\Migrations\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
 use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\MigrationClassNotFoundException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
@@ -371,6 +372,8 @@ class Configuration
      */
     public function registerMigration($version, $class)
     {
+        $this->ensureMigrationClassExists($class);
+
         $version = (string) $version;
         $class = (string) $class;
         if (isset($this->migrations[$version])) {
@@ -777,6 +780,22 @@ class Configuration
             }
 
             return $version->getVersion() <= $to;
+        }
+    }
+
+    /**
+     * @param string $class
+     */
+    private function ensureMigrationClassExists($class)
+    {
+        if ( ! class_exists($class)) {
+            throw new MigrationClassNotFoundException(
+                sprintf(
+                    'Migration class "%s" was not found. Is it placed in "%s" namespace?',
+                    $class,
+                    $this->getMigrationsNamespace()
+                )
+            );
         }
     }
 }
