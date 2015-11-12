@@ -371,6 +371,8 @@ class Configuration
      */
     public function registerMigration($version, $class)
     {
+        $this->ensureMigrationClassExists($class);
+
         $version = (string) $version;
         $class = (string) $class;
         if (isset($this->migrations[$version])) {
@@ -777,6 +779,16 @@ class Configuration
             }
 
             return $version->getVersion() <= $to;
+        }
+    }
+
+    /**
+     * @param string $class
+     */
+    private function ensureMigrationClassExists($class)
+    {
+        if ( ! class_exists($class)) {
+            throw MigrationException::migrationClassNotFound($class, $this->getMigrationsNamespace());
         }
     }
 }

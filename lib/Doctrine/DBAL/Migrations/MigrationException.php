@@ -84,4 +84,20 @@ class MigrationException extends \Exception
     {
         return new self($msg, 10);
     }
+
+    /**
+     * @param string $migrationClass
+     * @param string $migrationNamespace
+     * @return MigrationException
+     */
+    public static function migrationClassNotFound($migrationClass, $migrationNamespace)
+    {
+        return new self(
+            sprintf(
+                'Migration class "%s" was not found. Is it placed in "%s" namespace?',
+                $migrationClass,
+                $migrationNamespace
+            )
+        );
+    }
 }
