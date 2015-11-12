@@ -22,7 +22,6 @@ namespace Doctrine\DBAL\Migrations\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
 use Doctrine\DBAL\Migrations\MigrationException;
-use Doctrine\DBAL\Migrations\MigrationClassNotFoundException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
@@ -789,13 +788,7 @@ class Configuration
     private function ensureMigrationClassExists($class)
     {
         if ( ! class_exists($class)) {
-            throw new MigrationClassNotFoundException(
-                sprintf(
-                    'Migration class "%s" was not found. Is it placed in "%s" namespace?',
-                    $class,
-                    $this->getMigrationsNamespace()
-                )
-            );
+            throw MigrationException::migrationClassNotFound($class, $this->getMigrationsNamespace());
         }
     }
 }

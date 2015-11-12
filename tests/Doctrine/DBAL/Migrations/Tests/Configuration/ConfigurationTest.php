@@ -46,8 +46,9 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $configuration->setMigrationsDirectory($migrationsDir);
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationClassNotFoundException',
-            'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?');
+            'Doctrine\DBAL\Migrations\MigrationException',
+            'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?'
+        );
         $configuration->registerMigrationsFromDirectory($migrationsDir);
     }
 
