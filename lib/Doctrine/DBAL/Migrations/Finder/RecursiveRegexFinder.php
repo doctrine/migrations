@@ -72,8 +72,6 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
             $files[] = $file[0];
         }
         
-        sort($files);
-
         return $files;
     }
 }

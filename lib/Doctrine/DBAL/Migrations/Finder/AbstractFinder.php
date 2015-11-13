@@ -53,6 +53,9 @@ abstract class AbstractFinder implements MigrationFinderInterface
     protected function loadMigrations($files, $namespace)
     {
         $migrations = [];
+
+        uasort($files, $this->getFileSortCallback());
+
         foreach ($files as $file) {
             static::requireOnce($file);
             $className = basename($file, '.php');
@@ -68,5 +71,16 @@ abstract class AbstractFinder implements MigrationFinderInterface
         }
 
         return $migrations;
+    }
+
+    /**
+     * Return callable for files basename uasort
+     *
+     * @return callable
+     */
+    protected function getFileSortCallback(){
+        return function ($a, $b) {
+            return (basename($a) < basename($b)) ? -1 : 1;
+        };
     }
 }
