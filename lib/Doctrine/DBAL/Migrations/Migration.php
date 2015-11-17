@@ -178,7 +178,7 @@ class Migration
         }
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
-        $this->outputWriter->write(sprintf("  <info>++</info> finished in %s", $time));
+        $this->outputWriter->write(sprintf("  <info>++</info> finished in %ss", $time));
         $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrationsToExecute)));
         $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
