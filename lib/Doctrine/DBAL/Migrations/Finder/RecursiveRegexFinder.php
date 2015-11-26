@@ -71,7 +71,7 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
         foreach ($iteratorFilesMatch as $file) {
             $files[] = $file[0];
         }
-
+        
         return $files;
     }
 }
