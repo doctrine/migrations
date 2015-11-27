@@ -268,7 +268,7 @@ class Version
 
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
+            $this->executeRegisteredSql($dryRun, $timeAllQueries, true);
 
             if (! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {
@@ -370,7 +370,15 @@ class Version
         return $this->version;
     }
 
-    private function executeRegisteredSql($dryRun = false, $timeAllQueries = false)
+
+    /**
+     * @param boolean|false $dryRun
+     * @param boolean|false $timeAllQueries
+     * @param boolean|false $allowEmpty
+     *
+     * @throws \Doctrine\DBAL\DBALException
+     */
+    private function executeRegisteredSql($dryRun = false, $timeAllQueries = false, $allowEmpty = false)
     {
         if (! $dryRun) {
             if (!empty($this->sql)) {
@@ -387,7 +395,7 @@ class Version
 
                     $this->outputQueryTime($queryStart, $timeAllQueries);
                 }
-            } else {
+            } elseif (false === $allowEmpty) {
                 $this->outputWriter->write(sprintf(
                     '<error>Migration %s was executed but did not result in any SQL statements.</error>',
                     $this->version
