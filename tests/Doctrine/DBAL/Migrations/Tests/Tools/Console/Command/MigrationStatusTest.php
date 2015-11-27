@@ -72,7 +72,7 @@ class MigrationStatusTest extends MigrationTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             [],
-            []
+            'WIN' === strtoupper(substr(PHP_OS, 0, 3)) ? ['decorated' => false] : []
         );
 
         $textOutput = $commandTester->getDisplay();
@@ -128,7 +128,7 @@ class MigrationStatusTest extends MigrationTestCase
         $commandTester = new CommandTester($command);
         $commandTester->execute(
             [],
-            []
+            'WIN' === strtoupper(substr(PHP_OS, 0, 3)) ? ['decorated' => false] : []
         );
 
         $textOutput = $commandTester->getDisplay();

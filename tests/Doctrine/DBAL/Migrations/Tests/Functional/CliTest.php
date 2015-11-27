@@ -234,7 +234,8 @@ class CliTest extends MigrationTestCase
                 'command'         => $commandName,
                 '--configuration' => __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile,
             ],
-            $args
+            $args,
+            'WIN' === strtoupper(substr(PHP_OS, 0, 3)) ? ['--no-ansi'] : []
         ));
         $output = $this->getOutputStream();
 
