@@ -538,7 +538,7 @@ class Configuration
             foreach ($this->migrations as $migration) {
                 $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
             }
-            $where = " WHERE version IN (" . implode(', ', $migratedVersions) . ")";
+            $where = " WHERE " . $this->migrationsColumnName . " IN (" . implode(', ', $migratedVersions) . ")";
         }
 
         $sql = sprintf("SELECT %s FROM %s%s ORDER BY %s DESC",
