@@ -89,6 +89,7 @@ EOT
             'Database Name'                     => $configuration->getConnection()->getDatabase(),
             'Configuration Source'              => $configuration instanceof AbstractFileConfiguration ? $configuration->getFile() : 'manually configured',
             'Version Table Name'                => $configuration->getMigrationsTableName(),
+            'Version Column Name'                => $configuration->getMigrationsColumnName(),
             'Migrations Namespace'              => $configuration->getMigrationsNamespace(),
             'Migrations Directory'              => $configuration->getMigrationsDirectory(),
             'Previous Version'                  => $formattedVersions['prev'],
