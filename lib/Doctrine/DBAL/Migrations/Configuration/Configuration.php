@@ -483,7 +483,7 @@ class Configuration
         $this->createMigrationTable();
 
         $version = $this->connection->fetchColumn(
-            "SELECT version FROM " . $this->migrationsTableName . " WHERE version = ?",
+            "SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName . " WHERE " . $this->migrationsColumnName . " = ?",
             [$version->getVersion()]
         );
 
@@ -499,7 +499,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $ret = $this->connection->fetchAll("SELECT version FROM " . $this->migrationsTableName);
+        $ret = $this->connection->fetchAll("SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName);
         $versions = [];
         foreach ($ret as $version) {
             $versions[] = current($version);
@@ -541,8 +541,8 @@ class Configuration
             $where = " WHERE version IN (" . implode(', ', $migratedVersions) . ")";
         }
 
-        $sql = sprintf("SELECT version FROM %s%s ORDER BY version DESC",
-            $this->migrationsTableName, $where
+        $sql = sprintf("SELECT %s FROM %s%s ORDER BY %s DESC",
+            $this->migrationsColumnName, $this->migrationsTableName, $where, $this->migrationsColumnName
         );
 
         $sql = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
@@ -640,7 +640,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        $result = $this->connection->fetchColumn("SELECT COUNT(version) FROM " . $this->migrationsTableName);
+        $result = $this->connection->fetchColumn("SELECT COUNT(" . $this->migrationsColumnName . ") FROM " . $this->migrationsTableName);
 
         return $result !== false ? $result : 0;
     }
@@ -683,10 +683,10 @@ class Configuration
 
         if (!$this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $columns = [
-                'version' => new Column('version', Type::getType('string'), ['length' => 255]),
+                $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
             ];
             $table = new Table($this->migrationsTableName, $columns);
-            $table->setPrimaryKey(['version']);
+            $table->setPrimaryKey([$this->migrationsColumnName]);
             $this->connection->getSchemaManager()->createTable($table);
 
             $this->migrationTableCreated = true;
