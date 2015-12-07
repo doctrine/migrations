@@ -98,6 +98,13 @@ class Configuration
     private $migrationsTableName = 'doctrine_migration_versions';
 
     /**
+     * The migration column name to track versions in
+     *
+     * @var string
+     */
+    private $migrationsColumnName = 'version';
+
+    /**
      * The path to a directory where new migration classes will be written
      *
      * @var string
@@ -282,6 +289,26 @@ class Configuration
     public function getMigrationsTableName()
     {
         return $this->migrationsTableName;
+    }
+
+    /**
+     * Set the migration column name
+     *
+     * @param string $columnName The migration column name
+     */
+    public function setMigrationsColumnName($columnName)
+    {
+        $this->migrationsColumnName = $columnName;
+    }
+
+    /**
+     * Returns the migration column name
+     *
+     * @return string $migrationsColumnName The migration column name
+     */
+    public function getMigrationsColumnName()
+    {
+        return $this->migrationsColumnName;
     }
 
     /**
