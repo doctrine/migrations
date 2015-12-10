@@ -24,6 +24,9 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 class RecursiveRegexFinderTest extends MigrationTestCase
 {
+    /**
+     * @var RecursiveRegexFinder
+     */
     private $finder;
 
     /**
@@ -54,7 +57,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__.'/_files', 'TestMigrations');
 
-        $this->assertCount(6, $migrations);
+        $this->assertCount(7, $migrations);
 
         $tests = [
             '20150502000000' => 'TestMigrations\\Version20150502000000',
@@ -63,6 +66,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
             '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
+            'NewFeatureMigration' => 'TestMigrations\\VersionNewFeatureMigration'
         ];
         foreach($tests as $version => $namespace) {
             $this->assertArrayHasKey($version, $migrations);

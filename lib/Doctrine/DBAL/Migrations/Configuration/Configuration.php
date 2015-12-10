@@ -555,9 +555,11 @@ class Configuration
      */
     public function getRelativeVersion($version, $delta)
     {
-        $versions = array_keys($this->migrations);
-        array_unshift($versions, 0);
-        $offset = array_search($version, $versions);
+        $versions = ['0'];
+        foreach (array_keys($this->migrations) as $migrationVersion) {
+            $versions[] = (string)$migrationVersion;
+        }
+        $offset = array_search($version, $versions, true);
         if ($offset === false || !isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.
             return null;
