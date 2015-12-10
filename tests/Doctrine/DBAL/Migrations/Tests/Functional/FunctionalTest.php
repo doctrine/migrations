@@ -24,6 +24,8 @@ class FunctionalTest extends MigrationTestCase
         $this->config = new Configuration($this->connection);
         $this->config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $this->config->setMigrationsDirectory('.');
+        $this->config->setMigrationsTableName('test_migrations_table');
+        $this->config->setMigrationsColumnName('current_version');
     }
 
     public function testMigrateUp()
@@ -219,6 +221,8 @@ class FunctionalTest extends MigrationTestCase
         $config->setMigrationsDirectory('.');
         $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
         $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
+        $config->setMigrationsTableName('test_migrations_table');
+        $config->setMigrationsColumnName('current_version');
 
         $migration = new \Doctrine\DBAL\Migrations\Migration($config);
         $migration->migrate();
@@ -249,6 +253,8 @@ class FunctionalTest extends MigrationTestCase
         $config->registerMigration(1, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest');
         $config->registerMigration(2, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp');
         $config->registerMigration(3, 'Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther');
+        $config->setMigrationsTableName('test_migrations_table');
+        $config->setMigrationsColumnName('current_version');
 
         $this->assertEquals(1, count($config->getMigrationsToExecute('up', 3)));
         $migrations = $config->getMigrationsToExecute('up', 3);

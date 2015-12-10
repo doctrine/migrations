@@ -72,4 +72,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
             ->getMock()
         ;
     }
+
+    public function testGetSetMigrationsColumnName()
+    {
+        $configuration = new Configuration($this->getConnectionMock());
+
+        $this->assertSame('version', $configuration->getMigrationsColumnName());
+
+        $configuration->setMigrationsColumnName('foobar');
+        $this->assertSame('foobar', $configuration->getMigrationsColumnName());
+    }
 }
