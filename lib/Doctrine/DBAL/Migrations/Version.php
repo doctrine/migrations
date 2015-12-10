@@ -152,7 +152,7 @@ class Version
         $this->configuration->createMigrationTable();
         $this->connection->insert(
             $this->configuration->getMigrationsTableName(),
-            ['version' => $this->version]
+            [$this->configuration->getMigrationsColumnName() => $this->version]
         );
     }
 
@@ -161,7 +161,7 @@ class Version
         $this->configuration->createMigrationTable();
         $this->connection->delete(
             $this->configuration->getMigrationsTableName(),
-            ['version' => $this->version]
+            [$this->configuration->getMigrationsColumnName() => $this->version]
         );
     }
 
