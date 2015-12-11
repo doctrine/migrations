@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -245,11 +246,17 @@ class Version
             $this->connection->beginTransaction();
         }
 
+        $isSqlMigration = $this->migration instanceof SqlMigration;
+
         try {
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->sm->createSchema();
+            if ($isSqlMigration) {
+                $fromSchema = new Schema();
+            } else {
+                $fromSchema = $this->sm->createSchema();
+            }
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
             if ($direction === self::DIRECTION_UP) {
@@ -262,7 +269,17 @@ class Version
 
             $toSchema = clone $fromSchema;
             $this->migration->$direction($toSchema);
-            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+
+            if ($isSqlMigration) {
+                $tables = $toSchema->getTables();
+                $sequences = $toSchema->getSequences();
+
+                if (! empty($tables) || ! empty($sequences)) {
+                    throw new \LogicException('Migrations implementing SqlMigration are not allowed to perform changes on the Schema object but should add SQL queries directly.');
+                }
+            } else {
+                $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+            }
 
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
