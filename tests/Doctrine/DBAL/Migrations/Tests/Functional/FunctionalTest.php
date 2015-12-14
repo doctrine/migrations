@@ -196,13 +196,13 @@ class FunctionalTest extends MigrationTestCase
         $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
 
         $this->assertNotEmpty($check);
-        $this->assertEquals(6, $check);
+        $this->assertEquals(3, $check);
 
         $migration->migrate(0);
         $this->assertFalse($migrations[1]->isMigrated());
         $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
         $this->assertNotEmpty($check);
-        $this->assertEquals(21, $check);
+        $this->assertEquals(12, $check);
 
 
         $this->config->getConnection()->executeQuery(sprintf("DROP TABLE %s ", $tableName));
