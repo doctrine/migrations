@@ -263,12 +263,10 @@ class Version
             $toSchema = clone $fromSchema;
             $this->migration->$direction($toSchema);
             $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
-
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             if (! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {
