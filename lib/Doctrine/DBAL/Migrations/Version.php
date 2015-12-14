@@ -226,6 +226,10 @@ class Version
 
     /**
      * Execute this migration version up or down and and return the SQL.
+     * We are only allowing the addSql call and the schema modification to take effect in the up and down call.
+     * This is necessary to ensure that the migration is revertable.
+     * The schema is passed to the pre and post method only to be able to test the presence of some table, And the
+     * connection that can get used trough it allow for the test of the presence of records.
      *
      * @param string  $direction      The direction to execute the migration.
      * @param boolean $dryRun         Whether to not actually execute the migration SQL and just do a dry run.
