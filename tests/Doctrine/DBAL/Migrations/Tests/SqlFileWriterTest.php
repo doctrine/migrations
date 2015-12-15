@@ -35,7 +35,17 @@ class SqlFileWriterTest extends MigrationTestCase
 
     public function testGoodConstructor()
     {
-        $instance = new SqlFileWriter('test', '/tmp', $this->ow);
+        $instance = new SqlFileWriter('version', 'test', '/tmp', $this->ow);
+        $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
+    }
+
+    public function testConstructorEmptyColumnName()
+    {
+        $expectedException = class_exists('Doctrine\DBAL\Exception\InvalidArgumentException') ?
+            'Doctrine\DBAL\Exception\InvalidArgumentException' :
+            'Doctrine\DBAL\DBALException';
+        $this->setExpectedException($expectedException);
+        $instance = new SqlFileWriter('', 'test', '/tmp', $this->ow);
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
     }
 
@@ -45,7 +55,7 @@ class SqlFileWriterTest extends MigrationTestCase
             'Doctrine\DBAL\Exception\InvalidArgumentException' :
             'Doctrine\DBAL\DBALException';
         $this->setExpectedException($expectedException);
-        $instance = new SqlFileWriter('', '/tmp', $this->ow);
+        $instance = new SqlFileWriter('version', '', '/tmp', $this->ow);
         $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
     }
 
@@ -70,10 +80,10 @@ class SqlFileWriterTest extends MigrationTestCase
     public function testWrite($path, $direction, array $queries, $withOw)
     {
         if ($withOw) {
-            $instance = new SqlFileWriter('test', $path, $this->ow);
+            $instance = new SqlFileWriter('version', 'test', $path, $this->ow);
             $this->ow->shouldReceive('write')->with(m::type('string'))->once();
         } else {
-            $instance = new SqlFileWriter('test', $path);
+            $instance = new SqlFileWriter('version', 'test', $path);
         }
         $instance->write($queries, $direction);
 

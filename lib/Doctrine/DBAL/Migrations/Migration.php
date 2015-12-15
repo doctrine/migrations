@@ -95,6 +95,7 @@ class Migration
         $this->outputWriter->write(sprintf("# Migrating from %s to %s\n", $from, $to));
 
         $sqlWriter = new SqlFileWriter(
+            $this->configuration->getMigrationsColumnName(),
             $this->configuration->getMigrationsTableName(),
             $path,
             $this->outputWriter

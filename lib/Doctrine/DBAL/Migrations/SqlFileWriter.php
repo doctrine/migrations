@@ -24,6 +24,8 @@ use Doctrine\DBAL\Exception\InvalidArgumentException;
 
 class SqlFileWriter
 {
+    private $migrationsColumnName;
+
     private $migrationsTableName;
 
     private $destPath;
@@ -32,12 +34,17 @@ class SqlFileWriter
     private $outputWriter;
 
     /**
+     * @param string $migrationsColumnName
      * @param string $migrationsTableName
      * @param string $destPath
      * @param \Doctrine\DBAL\Migrations\OutputWriter $outputWriter
      */
-    public function __construct($migrationsTableName, $destPath, OutputWriter $outputWriter = null)
+    public function __construct($migrationsColumnName, $migrationsTableName, $destPath, OutputWriter $outputWriter = null)
     {
+        if (empty($migrationsColumnName)) {
+            $this->throwInvalidArgumentException('Migrations column name cannot be empty.');
+        }
+        $this->migrationsColumnName = $migrationsColumnName;
         if (empty($migrationsTableName)) {
             $this->throwInvalidArgumentException('Migrations table name cannot be empty.');
         }
@@ -88,12 +95,12 @@ class SqlFileWriter
     private function getVersionUpdateQuery($version, $direction)
     {
         if ($direction == Version::DIRECTION_DOWN) {
-            $query = "DELETE FROM %s WHERE version = '%s';\n";
+            $query = "DELETE FROM %s WHERE %s = '%s';\n";
         } else {
-            $query = "INSERT INTO %s (version) VALUES ('%s');\n";
+            $query = "INSERT INTO %s (%s) VALUES ('%s');\n";
         }
 
-        return sprintf($query, $this->migrationsTableName, $version);
+        return sprintf($query, $this->migrationsColumnName, $this->migrationsTableName, $version);
     }
 
     private function buildMigrationFilePath()
