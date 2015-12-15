@@ -100,7 +100,7 @@ class SqlFileWriter
             $query = "INSERT INTO %s (%s) VALUES ('%s');\n";
         }
 
-        return sprintf($query, $this->migrationsColumnName, $this->migrationsTableName, $version);
+        return sprintf($query, $this->migrationsTableName, $this->migrationsColumnName, $version);
     }
 
     private function buildMigrationFilePath()

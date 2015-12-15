@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\SqlFileWriter;
+use Doctrine\DBAL\Migrations\Version;
 use \Mockery as m;
 
 class SqlFileWriterTest extends MigrationTestCase
@@ -97,6 +98,11 @@ class SqlFileWriterTest extends MigrationTestCase
         foreach ($files as $file) {
             $contents = file_get_contents($file);
             $this->assertNotEmpty($contents);
+            if ($direction == 'up') {
+                $this->assertContains('INSERT INTO test (version) VALUES (\'1\');', $contents);
+            } else {
+                $this->assertContains('DELETE FROM test WHERE version = \'1\';', $contents);
+            }
             unlink($file);
         }
     }
@@ -104,10 +110,10 @@ class SqlFileWriterTest extends MigrationTestCase
     public function writeProvider()
     {
         return [
-            [__DIR__, 'up', [1 => ['SHOW DATABASES']], true],
-            [__DIR__, 'up', [1 => ['SHOW DATABASES']], false],
-            [__DIR__, 'down', [1 => ['SHOW DATABASES']], true],
-            [__DIR__, 'down', [1 => ['SHOW DATABASES']], false],
+            [__DIR__, Version::DIRECTION_UP, [1 => ['SHOW DATABASES']], true],
+            [__DIR__, Version::DIRECTION_UP, [1 => ['SHOW DATABASES']], false],
+            [__DIR__, Version::DIRECTION_DOWN, [1 => ['SHOW DATABASES']], true],
+            [__DIR__, Version::DIRECTION_DOWN, [1 => ['SHOW DATABASES']], false],
         ];
     }
 
