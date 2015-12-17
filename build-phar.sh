@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+git pull origin master --tags
+
 composer install --no-dev --optimize-autoloader
 
 mkdir build
