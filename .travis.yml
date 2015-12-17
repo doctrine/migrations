@@ -33,7 +33,7 @@ script:
   - ./vendor/bin/phpunit
 
 before_install:
-  - composer self-update
+  - travis_retry composer self-update
   - composer config --quiet github-oauth.github.com $GITHUB_TOKEN
   - if [[ ! $GITHUB_TOKEN ]]; then echo "no github token"; fi
 
