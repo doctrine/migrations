@@ -245,4 +245,22 @@ class VersionTest extends MigrationTestCase
                 $this->getOutputStreamContent($this->output));
         }
     }
+
+    public function testReturnTheSql()
+    {
+        $this->outputWriter = $this->getOutputWriter();
+
+        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
+        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+
+        $version = new Version(
+            $this->config,
+            $versionName = '004',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql'
+        );
+
+        $this->assertContains('Select 1', $version->execute('up'));
+        $this->assertContains('Select 1', $version->execute('down'));
+    }
 }
