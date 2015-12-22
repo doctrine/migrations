@@ -401,13 +401,5 @@ class Version
                 $this->outputWriter->write('     <comment>-></comment> ' . $query);
             }
         }
-        $this->resetRegisteredSql();
-    }
-
-    private function resetRegisteredSql()
-    {
-        $this->sql = [];
-        $this->params = [];
-        $this->types = [];
     }
 }
