@@ -256,7 +256,7 @@ class VersionTest extends MigrationTestCase
 
         $version = new Version(
             $this->config,
-            $versionName = '004',
+            $versionName = '005',
             'Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql'
         );
 
