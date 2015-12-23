@@ -2,6 +2,10 @@
 
 git pull origin master --tags
 
+if [ -f composer.lock ]; then
+  rm composer.lock
+fi
+
 composer install --no-dev --optimize-autoloader
 
 mkdir -p build
