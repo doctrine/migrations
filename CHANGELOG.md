@@ -4,12 +4,16 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ### Fixed
+  - [Fix the write-sql option](https://github.com/doctrine/migrations/pull/400)
 ### Changed
   - [Dropped the support for php 5.4](https://github.com/doctrine/migrations/pull/393)
   - [Again make the phar more than 3 times smaller](https://github.com/doctrine/migrations/pull/396)
 ### Added
   - [Give the possibility to override the Migration template](https://github.com/doctrine/migrations/pull/391)
 
+## [1.2.1] - 2015-12-23
+### Fixed
+  - [Fix the write-sql option](https://github.com/doctrine/migrations/pull/400)
 
 ## [1.2.0] - 2015-12-15
 ### Fixed
