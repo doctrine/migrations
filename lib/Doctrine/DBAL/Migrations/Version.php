@@ -257,7 +257,7 @@ class Version
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->sm->createSchema();
+            $fromSchema = $this->schemaManipulator->createSchema();
 
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -269,9 +269,11 @@ class Version
 
             $this->state = self::STATE_EXEC;
 
-            $toSchema = clone $fromSchema;
+            $toSchema = $this->schemaManipulator->createToSchema($fromSchema);
             $this->migration->$direction($toSchema);
-            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+
+            $this->schemaManipulator->addSqlToSchema($fromSchema, $toSchema);
+
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             $this->state = self::STATE_POST;
