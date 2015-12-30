@@ -19,23 +19,32 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Schema\Schema;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
+use ProxyManager\Proxy\LazyLoadingInterface;
+
 class LazySchemaManipulator
 {
+    /** @var  LazyLoadingGhostFactory */
     private $proxyFactory;
 
+    /** @var SchemaManipulator */
     private $originalSchemaManipulator;
 
-    public function __construct($proxyFactory, $originalSchemaManipulator)
+    public function __construct(LazyLoadingGhostFactory $proxyFactory, SchemaManipulator $originalSchemaManipulator)
     {
         $this->proxyFactory = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
+    /**
+     * @return Schema
+     */
     public function createFromSchema()
     {
         return $this->proxyFactory->createProxy(
             Schema::class,
-            function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) {
+            function (& $wrappedObject, $method, array $parameters, & $initializer) {
                 $initializer   = null;
                 $wrappedObject = $this->originalSchemaManipulator->createFromSchema();
 
@@ -44,7 +53,11 @@ class LazySchemaManipulator
         );
     }
 
-    public function createToSchema($fromSchema)
+    /**
+     * @param Schema $fromSchema
+     * @return Schema
+     */
+    public function createToSchema(Schema $fromSchema)
     {
         if ($fromSchema instanceof LazyLoadingInterface && ! $fromSchema->isProxyInitialized()) {
             return $this->createFromSchema();
@@ -53,7 +66,13 @@ class LazySchemaManipulator
         return $this->originalSchemaManipulator->createToSchema($fromSchema);
     }
 
-    public function addSqlToSchema($fromSchema, $toSchema)
+    /**
+     * @param $fromSchema
+     * @param $toSchema
+     *
+     * @return array|string
+     */
+    public function getSqlDiffToMigrate($fromSchema, $toSchema)
     {
         if (
             $fromSchema instanceof LazyLoadingInterface
@@ -61,9 +80,9 @@ class LazySchemaManipulator
             && ! $fromSchema->isProxyInitialized()
             && ! $toSchema->isProxyInitialized()
         ) {
-            return;
+            return [];
         }
 
-        return $this->originalSchemaManipulator->addSqlToSchema($fromSchema, $toSchema);
+        return $this->originalSchemaManipulator->getSqlDiffToMigrate($fromSchema, $toSchema);
     }
 }

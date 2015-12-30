@@ -20,6 +20,8 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\ORM\Proxy\ProxyFactory;
+use ProxyManager\Factory\LazyLoadingGhostFactory;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -115,6 +117,8 @@ class Version
         $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $version;
+        $schemaManipulator = new SchemaManipulator($this->sm, $this->platform);
+        $this->schemaManipulator = new LazySchemaManipulator(new LazyLoadingGhostFactory(), $schemaManipulator);
     }
 
     /**
@@ -257,7 +261,7 @@ class Version
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->schemaManipulator->createSchema();
+            $fromSchema = $this->schemaManipulator->createFromSchema();
 
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -272,7 +276,7 @@ class Version
             $toSchema = $this->schemaManipulator->createToSchema($fromSchema);
             $this->migration->$direction($toSchema);
 
-            $this->schemaManipulator->addSqlToSchema($fromSchema, $toSchema);
+            $this->addSql($this->schemaManipulator->getSqlDiffToMigrate($fromSchema, $toSchema));
 
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 

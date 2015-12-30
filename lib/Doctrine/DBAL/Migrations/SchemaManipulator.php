@@ -19,20 +19,47 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Schema;
+
 class SchemaManipulator
 {
-    public function createFromSchema()
+    private $platform;
+
+    /** @var  AbstractSchemaManager */
+    private $schemaManager;
+
+    public function _construct(AbstractSchemaManager $schemaManager, $platform)
     {
-        return $this->sm->createSchema();
+        $this->schemaManager = $schemaManager;
+        $this->platform = $platform;
     }
 
-    public function createToSchema($fromSchema)
+    /**
+     * @return Schema
+     */
+    public function createFromSchema()
+    {
+        //var_dump($this->schemaManager);
+        return $this->schemaManager->createSchema();
+    }
+
+    /**
+     * @param Schema $fromSchema
+     * @return Schema
+     */
+    public function createToSchema(Schema $fromSchema)
     {
         return clone $fromSchema;
     }
 
-    public function addSqlToSchema($fromSchema, $toSchema)
+    /**
+     * @param $fromSchema Schema
+     * @param $toSchema Schema
+     * @return array|string
+     */
+    public function getSqlDiffToMigrate($fromSchema, $toSchema)
     {
-        $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+        return $fromSchema->getMigrateToSql($toSchema, $this->platform);
     }
 }
