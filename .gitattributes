@@ -8,5 +8,3 @@ tests/*                 export-ignore
 box.json                export-ignore
 build.properties.dev    export-ignore
 build.xml               export-ignore
-composer.json           export-ignore
-composer.lock           export-ignore
