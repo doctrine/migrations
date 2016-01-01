@@ -75,9 +75,7 @@ class LazySchemaManipulator
     public function getSqlDiffToMigrate(Schema $fromSchema,Schema $toSchema)
     {
         if (
-            $fromSchema instanceof LazyLoadingInterface
-            && $toSchema instanceof LazyLoadingInterface
-            && ! $fromSchema->isProxyInitialized()
+            $toSchema instanceof LazyLoadingInterface
             && ! $toSchema->isProxyInitialized()
         ) {
             return [];
