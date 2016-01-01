@@ -29,7 +29,7 @@ class SchemaManipulator
     /** @var  AbstractSchemaManager */
     private $schemaManager;
 
-    public function _construct(AbstractSchemaManager $schemaManager, $platform)
+    public function __construct(AbstractSchemaManager $schemaManager, $platform)
     {
         $this->schemaManager = $schemaManager;
         $this->platform = $platform;
