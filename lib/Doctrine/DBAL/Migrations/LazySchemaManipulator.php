@@ -60,7 +60,15 @@ class LazySchemaManipulator
     public function createToSchema(Schema $fromSchema)
     {
         if ($fromSchema instanceof LazyLoadingInterface && ! $fromSchema->isProxyInitialized()) {
-            return $this->createFromSchema();
+            return $this->proxyFactory->createProxy(
+                Schema::class,
+                function (& $wrappedObject, $method, array $parameters, & $initializer) use ($fromSchema) {
+                    $initializer   = null;
+                    $wrappedObject = $this->originalSchemaManipulator->createToSchema($fromSchema);
+
+                    return true;
+                }
+            );
         }
 
         return $this->originalSchemaManipulator->createToSchema($fromSchema);
