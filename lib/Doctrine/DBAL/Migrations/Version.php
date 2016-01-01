@@ -107,6 +107,9 @@ class Version
      */
     private $state = self::STATE_NONE;
 
+    /** @var  */
+    private $schemaManipulator;
+
     public function __construct(Configuration $configuration, $version, $class)
     {
         $this->configuration = $configuration;
