@@ -40,7 +40,6 @@ class SchemaManipulator
      */
     public function createFromSchema()
     {
-        //var_dump($this->schemaManager);
         return $this->schemaManager->createSchema();
     }
 
