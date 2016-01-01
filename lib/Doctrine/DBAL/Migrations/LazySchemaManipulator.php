@@ -67,12 +67,12 @@ class LazySchemaManipulator
     }
 
     /**
-     * @param $fromSchema
-     * @param $toSchema
+     * @param Schema $fromSchema
+     * @param Schema $toSchema
      *
-     * @return array|string
+     * @return array
      */
-    public function getSqlDiffToMigrate($fromSchema, $toSchema)
+    public function getSqlDiffToMigrate(Schema $fromSchema,Schema $toSchema)
     {
         if (
             $fromSchema instanceof LazyLoadingInterface

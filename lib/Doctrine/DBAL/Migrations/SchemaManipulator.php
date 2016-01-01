@@ -54,11 +54,11 @@ class SchemaManipulator
     }
 
     /**
-     * @param $fromSchema Schema
-     * @param $toSchema Schema
-     * @return array|string
+     * @param Schema $fromSchema
+     * @param Schema $toSchema
+     * @return array
      */
-    public function getSqlDiffToMigrate($fromSchema, $toSchema)
+    public function getSqlDiffToMigrate(Schema $fromSchema,Schema $toSchema)
     {
         return $fromSchema->getMigrateToSql($toSchema, $this->platform);
     }
