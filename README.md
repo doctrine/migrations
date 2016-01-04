@@ -18,11 +18,12 @@ The repository containing the documentation is [there](https://github.com/doctri
     
 ### Using the integration of your framework
 
-  * symfony 2 [doctrine/doctrine-migrations-bundle](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
-  * ZF2 [doctrine/doctrine-orm-module](https://packagist.org/packages/doctrine/doctrine-orm-module) 
-  * laravel [mitchellvanw/laravel-doctrine](https://packagist.org/packages/mitchellvanw/laravel-doctrine)
-  * Silex [kurl/silex-doctrine-migrations-provider](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
-  * nette [zenify/doctrine-migrations](https://packagist.org/packages/zenify/doctrine-migrations)
+  * [symfony 2](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
+  * [ZF2](https://packagist.org/packages/doctrine/doctrine-orm-module) 
+  * [laravel](https://packagist.org/packages/laravel-doctrine/migrations)
+  * [Silex](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
+  * [Silex](https://packagist.org/packages/dbtlr/silex-doctrine-migrations)
+  * [nette](https://packagist.org/packages/zenify/doctrine-migrations)
   * others...
         
 ### Using composer
