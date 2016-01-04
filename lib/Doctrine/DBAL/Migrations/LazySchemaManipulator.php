@@ -21,17 +21,18 @@ namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
 class LazySchemaManipulator
 {
-    /** @var  LazyLoadingGhostFactory */
+    /** @var  LazyLoadingValueHolderFactory */
     private $proxyFactory;
 
     /** @var SchemaManipulator */
     private $originalSchemaManipulator;
 
-    public function __construct(LazyLoadingGhostFactory $proxyFactory, SchemaManipulator $originalSchemaManipulator)
+    public function __construct(LazyLoadingValueHolderFactory $proxyFactory, SchemaManipulator $originalSchemaManipulator)
     {
         $this->proxyFactory = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
@@ -46,7 +47,7 @@ class LazySchemaManipulator
 
         return $this->proxyFactory->createProxy(
             Schema::class,
-            function (& $wrappedObject, $method, array $parameters, & $initializer) use ($originalSchemaManipulator) {
+            function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) use ($originalSchemaManipulator) {
                 $initializer   = null;
                 $wrappedObject = $originalSchemaManipulator->createFromSchema();
 
@@ -66,7 +67,7 @@ class LazySchemaManipulator
         if ($fromSchema instanceof LazyLoadingInterface && ! $fromSchema->isProxyInitialized()) {
             return $this->proxyFactory->createProxy(
                 Schema::class,
-                function (& $wrappedObject, $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
+                function (& $wrappedObject, $proxy,  $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
                     $initializer   = null;
                     $wrappedObject = $originalSchemaManipulator->createToSchema($fromSchema);
 

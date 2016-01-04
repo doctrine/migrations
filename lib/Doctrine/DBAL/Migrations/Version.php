@@ -20,8 +20,8 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\ORM\Proxy\ProxyFactory;
 use ProxyManager\Factory\LazyLoadingGhostFactory;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -121,7 +121,7 @@ class Version
         $this->migration = new $class($this);
         $this->version = $version;
         $schemaManipulator = new SchemaManipulator($this->sm, $this->platform);
-        $this->schemaManipulator = new LazySchemaManipulator(new LazyLoadingGhostFactory(), $schemaManipulator);
+        $this->schemaManipulator = new LazySchemaManipulator(new LazyLoadingValueHolderFactory(), $schemaManipulator);
     }
 
     /**
