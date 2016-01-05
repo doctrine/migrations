@@ -19,10 +19,11 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 
-class SchemaManipulator
+class SchemaDiffProvider implements SchemaDiffProviderInterface
 {
     private $platform;
 

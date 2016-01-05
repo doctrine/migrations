@@ -19,20 +19,20 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Schema\Schema;
-use ProxyManager\Factory\LazyLoadingGhostFactory;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
-class LazySchemaManipulator
+class LazySchemaDiffProvider implements SchemaDiffProviderInterface
 {
     /** @var  LazyLoadingValueHolderFactory */
     private $proxyFactory;
 
-    /** @var SchemaManipulator */
+    /** @var SchemaDiffProviderInterface */
     private $originalSchemaManipulator;
 
-    public function __construct(LazyLoadingValueHolderFactory $proxyFactory, SchemaManipulator $originalSchemaManipulator)
+    public function __construct(LazyLoadingValueHolderFactory $proxyFactory, SchemaDiffProviderInterface $originalSchemaManipulator)
     {
         $this->proxyFactory = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
