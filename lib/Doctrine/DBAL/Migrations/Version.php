@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
@@ -106,7 +107,7 @@ class Version
      */
     private $state = self::STATE_NONE;
 
-    /** @var  */
+    /** @var SchemaDiffProviderInterface */
     private $schemaManipulator;
 
     public function __construct(Configuration $configuration, $version, $class)
