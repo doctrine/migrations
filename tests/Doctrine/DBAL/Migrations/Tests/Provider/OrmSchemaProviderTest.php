@@ -19,7 +19,11 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Provider;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\Tools\Setup;
 use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
@@ -32,15 +36,22 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
  */
 class OrmSchemaProviderTest extends MigrationTestCase
 {
+    /** @var  Connection */
     private $conn;
+
+    /** @var  Configuration */
     private $config;
+
+    /** @var  EntityManagerInterface */
     private $entityManager;
+
+    /** @var  OrmSchemaProvider */
     private $ormProvider;
 
     public function testCreateSchemaFetchesMetadataFromEntityManager()
     {
         $schema = $this->ormProvider->createSchema();
-        $this->assertInstanceOf('Doctrine\\DBAL\\Schema\\Schema', $schema);
+        $this->assertInstanceOf(Schema::class, $schema);
         $this->assertTrue($schema->hasTable('sample_entity'));
         $table = $schema->getTable('sample_entity');
         $this->assertTrue($table->hasColumn('id'));
@@ -83,9 +94,4 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->entityManager = EntityManager::create($this->conn, $this->config);
         $this->ormProvider = new OrmSchemaProvider($this->entityManager);
     }
-}
-
-class SampleEntity
-{
-    private $id;
 }
