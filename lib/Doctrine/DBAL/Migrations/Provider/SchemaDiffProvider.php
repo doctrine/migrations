@@ -17,20 +17,22 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Migrations;
+namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 
 class SchemaDiffProvider implements SchemaDiffProviderInterface
 {
+    /** @var  AbstractPlatform */
     private $platform;
 
     /** @var  AbstractSchemaManager */
     private $schemaManager;
 
-    public function __construct(AbstractSchemaManager $schemaManager, $platform)
+    public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
     {
         $this->schemaManager = $schemaManager;
         $this->platform = $platform;

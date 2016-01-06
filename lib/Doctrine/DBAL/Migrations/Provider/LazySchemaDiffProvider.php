@@ -17,7 +17,7 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Migrations;
+namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Schema\Schema;
