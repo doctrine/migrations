@@ -66,16 +66,6 @@ class Version
     private $version;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    private $sm;
-
-    /**
-     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
-     */
-    private $platform;
-
-    /**
      * The migration instance for this version
      *
      * @var AbstractMigration
@@ -118,8 +108,6 @@ class Version
         $this->outputWriter = $configuration->getOutputWriter();
         $this->class = $class;
         $this->connection = $configuration->getConnection();
-        $this->sm = $this->connection->getSchemaManager();
-        $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $version;
 
