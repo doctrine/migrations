@@ -100,4 +100,20 @@ class MigrationException extends \Exception
             )
         );
     }
+
+    /**
+     * @param string $migrationClass
+     * @return MigrationException
+     */
+    public static function migrationNotConvertibleToSql($migrationClass)
+    {
+        return new self(
+            sprintf(
+                'Migration class "%s" contains a prepared statement.
+                Unfortunately there is no cross platform way of outputing it as an sql string.
+                Do you want to write a PR for it ?',
+                $migrationClass
+            )
+        );
+    }
 }

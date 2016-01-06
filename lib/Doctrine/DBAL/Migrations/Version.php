@@ -204,6 +204,10 @@ class Version
     {
         $queries = $this->execute($direction, true);
 
+        if ( ! empty($this->params)) {
+            throw MigrationException::migrationNotConvertibleToSql($this->class);
+        }
+
         $this->outputWriter->write("\n# Version " . $this->version . "\n");
 
         $sqlQueries = [$this->version => $queries];
