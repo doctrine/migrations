@@ -20,6 +20,8 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
@@ -108,7 +110,7 @@ class Version
     private $state = self::STATE_NONE;
 
     /** @var SchemaDiffProviderInterface */
-    private $schemaManipulator;
+    private $schemaProvider;
 
     public function __construct(Configuration $configuration, $version, $class)
     {
@@ -120,8 +122,10 @@ class Version
         $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $version;
-        $schemaManipulator = new SchemaDiffProvider($this->sm, $this->platform);
-        $this->schemaManipulator = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaManipulator);
+
+        $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
+            $this->connection->getDatabasePlatform());
+        $this->schemaProvider = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaProvider);
     }
 
     /**
@@ -264,7 +268,7 @@ class Version
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->schemaManipulator->createFromSchema();
+            $fromSchema = $this->schemaProvider->createFromSchema();
 
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -276,10 +280,10 @@ class Version
 
             $this->state = self::STATE_EXEC;
 
-            $toSchema = $this->schemaManipulator->createToSchema($fromSchema);
+            $toSchema = $this->schemaProvider->createToSchema($fromSchema);
             $this->migration->$direction($toSchema);
 
-            $this->addSql($this->schemaManipulator->getSqlDiffToMigrate($fromSchema, $toSchema));
+            $this->addSql($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema));
 
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
