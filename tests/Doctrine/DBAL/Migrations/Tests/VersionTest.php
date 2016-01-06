@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\AbstractMigration;
@@ -279,7 +280,7 @@ class VersionTest extends MigrationTestCase
             VersionOutputSqlWithParam::class
         );
 
-        $this->assertContains('Select 1 WHERE 2 = 3', $version->execute('up'));
-        $this->assertContains('Select 1 WHERE 2 = 3', $version->execute('down'));
+        $this->setExpectedException(MigrationException::class, 'contains a prepared statement.');
+        $version->writeSqlFile('tralala');
     }
 }
