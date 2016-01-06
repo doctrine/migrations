@@ -10,6 +10,7 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
@@ -306,6 +307,31 @@ class FunctionalTest extends MigrationTestCase
             $this->assertCount(1, $sql, 'should have executed one migration');
         }
 
+    }
+
+    public function testSchemaChangeAreNotTakenIntoAccountInPreAndPostMethod()
+    {
+        $version = new Version($this->config, 1, MigrationModifySchemaInPreAndPost::class);
+
+        $this->assertFalse($this->config->hasVersionMigrated($version));
+        $queries = $version->execute('up');
+
+        $schema = $this->connection->getSchemaManager()->createSchema();
+        $this->assertTrue($schema->hasTable('foo'), 'The table foo is not present');
+        $this->assertFalse($schema->hasTable('bar'), 'The table bar is present');
+        $this->assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
+
+        foreach($queries as $query) {
+            $this->assertNotContains('bar', $query);
+            $this->assertNotContains('bar2', $query);
+        };
+
+        $queries = $version->execute('down');
+
+        $schema = $this->connection->getSchemaManager()->createSchema();
+        $this->assertFalse($schema->hasTable('foo'), 'The table foo is present');
+        $this->assertFalse($schema->hasTable('bar'), 'The table bar is present');
+        $this->assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
     }
 
     public function provideTestMigrationNames()
