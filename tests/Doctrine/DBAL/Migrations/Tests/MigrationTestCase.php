@@ -22,6 +22,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 
 abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
@@ -30,6 +31,9 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
      * @var OutputWriter
      */
     private $outputWriter;
+
+    /** @var  Output */
+    protected $output;
 
     public function getSqliteConnection()
     {
