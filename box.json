@@ -9,7 +9,7 @@
     "finder": [
         {
             "exclude": ["Tests", "Test", "tests", "test", "box.phar"],
-            "in": ["lib", "vendor/composer/", "vendor/doctrine/", "vendor/symfony/"]
+            "in": ["lib", "vendor/composer", "vendor/doctrine", "vendor/symfony"]
         }
     ],
     "files": [
@@ -17,6 +17,7 @@
         "vendor/autoload.php"
     ],
     "chmod": "0755",
+    "compression":"GZ",
     "git-version": "git-version",
     "stub": true
 }
