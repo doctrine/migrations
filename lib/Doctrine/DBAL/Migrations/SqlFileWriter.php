@@ -69,7 +69,7 @@ class SqlFileWriter
         $string = $this->buildMigrationFile($queriesByVersion, $direction);
 
         if ($this->outputWriter) {
-            $this->outputWriter->write("\n" . sprintf('Writing migration file to "<info>%s</info>"', $path));
+            $this->outputWriter->write(PHP_EOL . sprintf('Writing migration file to "<info>%s</info>"', $path));
         }
 
         return file_put_contents($path, $string);
@@ -77,12 +77,12 @@ class SqlFileWriter
 
     private function buildMigrationFile(array $queriesByVersion, $direction)
     {
-        $string = sprintf("# Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
+        $string = sprintf("# Doctrine Migration File Generated on %s" . PHP_EOL, date('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
-            $string .= "\n# Version " . $version . "\n";
+            $string .= PHP_EOL . "# Version " . $version . PHP_EOL;
             foreach ($queries as $query) {
-                $string .= $query . ";\n";
+                $string .= $query . ";" . PHP_EOL;
             }
 
 
@@ -95,9 +95,9 @@ class SqlFileWriter
     private function getVersionUpdateQuery($version, $direction)
     {
         if ($direction == Version::DIRECTION_DOWN) {
-            $query = "DELETE FROM %s WHERE %s = '%s';\n";
+            $query = "DELETE FROM %s WHERE %s = '%s';" . PHP_EOL;
         } else {
-            $query = "INSERT INTO %s (%s) VALUES ('%s');\n";
+            $query = "INSERT INTO %s (%s) VALUES ('%s');" . PHP_EOL;
         }
 
         return sprintf($query, $this->migrationsTableName, $this->migrationsColumnName, $version);

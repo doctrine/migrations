@@ -81,7 +81,7 @@ EOT
         $numExecutedUnavailableMigrations = count($executedUnavailableMigrations);
         $newMigrations = count(array_diff($availableMigrations, $executedMigrations));
 
-        $output->writeln("\n <info>==</info> Configuration\n");
+        $output->writeln(PHP_EOL . " <info>==</info> Configuration" . PHP_EOL);
 
         $info = [
             'Name'                              => $configuration->getName() ? $configuration->getName() : 'Doctrine Database Migrations',
@@ -107,13 +107,13 @@ EOT
 
         if ($input->getOption('show-versions')) {
             if ($migrations = $configuration->getMigrations()) {
-                $output->writeln("\n <info>==</info> Available Migration Versions\n");
+                $output->writeln(PHP_EOL . " <info>==</info> Available Migration Versions" . PHP_EOL);
 
                 $this->showVersions($migrations, $configuration, $output);
             }
 
             if ($numExecutedUnavailableMigrations) {
-                $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
+                $output->writeln(PHP_EOL . " <info>==</info> Previously Executed Unavailable Migration Versions" . PHP_EOL);
                 foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
                     $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) .
                         ' (<comment>' . $executedUnavailableMigration . '</comment>)');

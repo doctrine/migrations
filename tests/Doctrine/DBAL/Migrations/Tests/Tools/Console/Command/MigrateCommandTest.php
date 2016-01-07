@@ -78,7 +78,7 @@ class MigrateCommandTest extends MigrationTestCase
         );
 
         $helper = new QuestionHelper();
-        $helper->setInputStream($this->getInputStream("y\n"));
+        $helper->setInputStream($this->getInputStream("y" . PHP_EOL));
         if ($helper instanceof QuestionHelper) {
             $helperSet = new HelperSet([
                 'question' => $helper
@@ -93,7 +93,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
 
         //shoudl return false if user cancel
-        $helper->setInputStream($this->getInputStream("n\n"));
+        $helper->setInputStream($this->getInputStream("n" . PHP_EOL));
         $this->assertEquals(false, $method->invokeArgs($command, ['test', $input, $output]));
 
         //should return true if non interactive
