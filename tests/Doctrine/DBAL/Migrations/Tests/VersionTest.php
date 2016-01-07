@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\Version;
@@ -262,5 +264,52 @@ class VersionTest extends MigrationTestCase
 
         $this->assertContains('Select 1', $version->execute('up'));
         $this->assertContains('Select 1', $version->execute('down'));
+    }
+
+    /**
+     * @param $direction
+     * @param $columnName
+     * @param $tableName
+     *
+     * @dataProvider sqlWriteProvider
+     */
+    public function testWriteSqlWriteToTheCorrectColumnName($direction, $columnName, $tableName)
+    {
+        $connection = $this->getSqliteConnection();
+        $configuration = new Configuration($connection, $this->outputWriter);
+        $configuration->setMigrationsColumnName($columnName);
+        $configuration->setMigrationsTableName($tableName);
+
+        $version = new Version(
+            $configuration,
+            $versionName = '005',
+            'Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql'
+        );
+        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
+
+        $version->writeSqlFile($path, $direction);
+
+        $files = $this->getSqlFilesList($path);
+
+        foreach ($files as $file) {
+            $contents = file_get_contents($file);
+            $this->assertNotEmpty($contents);
+            if ($direction == Version::DIRECTION_UP) {
+                $this->assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
+            } else {
+                $this->assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
+            }
+            unlink($file);
+        }
+    }
+
+    public function sqlWriteProvider()
+    {
+        return [
+            [Version::DIRECTION_UP, 'balalala', 'fkqsdmfjl'],
+            [Version::DIRECTION_UP, 'fkqsdmfjl', 'balalala'],
+            [Version::DIRECTION_DOWN, 'balalala', 'fkqsdmfjl'],
+            [Version::DIRECTION_DOWN, 'fkqsdmfjl', 'balalala'],
+        ];
     }
 }

@@ -86,4 +86,20 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
         }
         return $this->outputWriter;
     }
+
+    protected function createTempDirForMigrations($path)
+    {
+        if (!mkdir($path)) {
+            throw new \Exception('fail to create a temporary folder for the tests at ' . $path);
+        }
+    }
+
+    protected function getSqlFilesList($path)
+    {
+        if (is_dir($path)) {
+            return glob(realpath($path) . '/*.sql');
+        } elseif(is_file($path)) {
+            return [$path];
+        }
+    }
 }

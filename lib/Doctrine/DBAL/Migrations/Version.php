@@ -208,6 +208,7 @@ class Version
 
         $sqlQueries = [$this->version => $queries];
         $sqlWriter = new SqlFileWriter(
+            $this->configuration->getMigrationsColumnName(),
             $this->configuration->getMigrationsTableName(),
             $path,
             $this->outputWriter
