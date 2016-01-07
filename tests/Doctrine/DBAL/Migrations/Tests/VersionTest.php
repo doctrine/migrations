@@ -174,11 +174,7 @@ class VersionTest extends MigrationTestCase
         $outputWriter = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
         $outputWriter->shouldReceive('write');
 
-        $connection = m::mock('Doctrine\DBAL\Connection');
-        $connection->shouldReceive([
-            'getSchemaManager' => 'something',
-            'getDatabasePlatform' => 'something else',
-        ]);
+        $connection = $this->getSqliteConnection();
 
         $config = m::mock('Doctrine\DBAL\Migrations\Configuration\Configuration')
             ->makePartial();

@@ -20,6 +20,10 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
+use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -62,16 +66,6 @@ class Version
     private $version;
 
     /**
-     * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
-     */
-    private $sm;
-
-    /**
-     * @var \Doctrine\DBAL\Platforms\AbstractPlatform
-     */
-    private $platform;
-
-    /**
      * The migration instance for this version
      *
      * @var AbstractMigration
@@ -105,16 +99,21 @@ class Version
      */
     private $state = self::STATE_NONE;
 
+    /** @var SchemaDiffProviderInterface */
+    private $schemaProvider;
+
     public function __construct(Configuration $configuration, $version, $class)
     {
         $this->configuration = $configuration;
         $this->outputWriter = $configuration->getOutputWriter();
         $this->class = $class;
         $this->connection = $configuration->getConnection();
-        $this->sm = $this->connection->getSchemaManager();
-        $this->platform = $this->connection->getDatabasePlatform();
         $this->migration = new $class($this);
         $this->version = $version;
+
+        $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
+            $this->connection->getDatabasePlatform());
+        $this->schemaProvider = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaProvider);
     }
 
     /**
@@ -257,7 +256,7 @@ class Version
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->sm->createSchema();
+            $fromSchema = $this->schemaProvider->createFromSchema();
 
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -269,9 +268,11 @@ class Version
 
             $this->state = self::STATE_EXEC;
 
-            $toSchema = clone $fromSchema;
+            $toSchema = $this->schemaProvider->createToSchema($fromSchema);
             $this->migration->$direction($toSchema);
-            $this->addSql($fromSchema->getMigrateToSql($toSchema, $this->platform));
+
+            $this->addSql($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema));
+
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             $this->state = self::STATE_POST;
