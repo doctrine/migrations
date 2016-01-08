@@ -60,7 +60,7 @@ class SchemaDiffProvider implements SchemaDiffProviderInterface
      * @param Schema $toSchema
      * @return string[]
      */
-    public function getSqlDiffToMigrate(Schema $fromSchema,Schema $toSchema)
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema)
     {
         return $fromSchema->getMigrateToSql($toSchema, $this->platform);
     }

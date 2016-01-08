@@ -52,5 +52,5 @@ interface SchemaDiffProviderInterface
      *
      * @return string[]
      */
-    public function getSqlDiffToMigrate(Schema $fromSchema,Schema $toSchema);
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema);
 }
