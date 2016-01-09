@@ -3,9 +3,11 @@
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
 use Doctrine\DBAL\Migrations\Migration;
+use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
@@ -346,5 +348,27 @@ class FunctionalTest extends MigrationTestCase
                 '001Test' => MigrationMigrateFurther::class,
             ]]
         ];
+    }
+
+    public function testMigrationWorksWhenNoCallsAreMadeToTheSchema()
+    {
+
+        $schema = $this->getMock(Schema::class);
+        $schemaDiffProvider = $this->getMock(SchemaDiffProviderInterface::class);
+
+        $schemaDiffProvider->expects(self::any())->method('createFromSchema')->willReturn($schema);
+        $schemaDiffProvider->expects(self::any())->method('getSqlDiffToMigrate')->willReturn([]);
+        $schemaDiffProvider
+            ->expects(self::any())
+            ->method('createToSchema')
+            ->willReturnCallback(function () use ($schema) { return $schema; });
+
+        $version = new Version($this->config, 1, MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
+        $version->execute('up');
+
+        $methods = get_class_methods(Schema::class);
+        foreach($methods as $method) {
+            $schema->expects($this->never())->method($method);
+        }
     }
 }
