@@ -115,7 +115,7 @@ EOT
             if ($numExecutedUnavailableMigrations) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
                 foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
-                    $output->writeln('    <comment>>></comment> ' . $configuration->formatVersion($executedUnavailableMigration) .
+                    $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
                         ' (<comment>' . $executedUnavailableMigration . '</comment>)');
                 }
             }
