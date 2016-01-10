@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\SqlFileWriter;
 use Doctrine\DBAL\Migrations\Version;
 use \Mockery as m;
@@ -80,28 +82,26 @@ class SqlFileWriterTest extends MigrationTestCase
      */
     public function testWrite($path, $direction, array $queries, $withOw)
     {
+        $columnName = 'columnName';
+        $tableName = 'tableName';
         if ($withOw) {
-            $instance = new SqlFileWriter('version', 'test', $path, $this->ow);
+            $instance = new SqlFileWriter($columnName, $tableName, $path, $this->ow);
             $this->ow->shouldReceive('write')->with(m::type('string'))->once();
         } else {
-            $instance = new SqlFileWriter('version', 'test', $path);
+            $instance = new SqlFileWriter($columnName, $tableName, $path);
         }
         $instance->write($queries, $direction);
 
         // file content tests & cleanup
-        $files = [];
-        if (is_dir($path)) {
-            $files = glob(realpath($path) . '/*.sql');
-        } elseif(is_file($path)) {
-            $files = [$path];
-        }
+        $files = $this->getSqlFilesList($path);
+
         foreach ($files as $file) {
             $contents = file_get_contents($file);
             $this->assertNotEmpty($contents);
-            if ($direction == 'up') {
-                $this->assertContains('INSERT INTO test (version) VALUES (\'1\');', $contents);
+            if ($direction == Version::DIRECTION_UP) {
+                $this->assertContains("INSERT INTO $tableName ($columnName) VALUES ('1');", $contents);
             } else {
-                $this->assertContains('DELETE FROM test WHERE version = \'1\';', $contents);
+                $this->assertContains("DELETE FROM $tableName WHERE $columnName = '1'", $contents);
             }
             unlink($file);
         }
