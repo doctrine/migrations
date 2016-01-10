@@ -334,6 +334,11 @@ class FunctionalTest extends MigrationTestCase
         $this->assertFalse($schema->hasTable('foo'), 'The table foo is present');
         $this->assertFalse($schema->hasTable('bar'), 'The table bar is present');
         $this->assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
+
+        foreach($queries as $query) {
+            $this->assertNotContains('bar', $query);
+            $this->assertNotContains('bar2', $query);
+        };
     }
 
     public function provideTestMigrationNames()
