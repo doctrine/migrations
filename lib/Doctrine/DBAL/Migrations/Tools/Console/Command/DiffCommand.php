@@ -137,7 +137,7 @@ EOT
             );
         }
 
-        return implode("\n", $code);
+        return implode(PHP_EOL, $code);
     }
 
     private function getSchemaProvider()

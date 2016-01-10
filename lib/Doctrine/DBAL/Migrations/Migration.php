@@ -92,7 +92,7 @@ class Migration
 
         $direction = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
 
-        $this->outputWriter->write(sprintf("# Migrating from %s to %s\n", $from, $to));
+        $this->outputWriter->write(sprintf("# Migrating from %s to %s" . PHP_EOL, $from, $to));
 
         $sqlWriter = new SqlFileWriter(
             $this->configuration->getMigrationsColumnName(),
@@ -178,7 +178,7 @@ class Migration
             $time += $version->getTime();
         }
 
-        $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
+        $this->outputWriter->write(PHP_EOL . "  <comment>------------------------</comment>" . PHP_EOL);
         $this->outputWriter->write(sprintf("  <info>++</info> finished in %ss", $time));
         $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrationsToExecute)));
         $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));

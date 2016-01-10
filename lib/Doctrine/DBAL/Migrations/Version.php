@@ -207,7 +207,7 @@ class Version
             throw MigrationException::migrationNotConvertibleToSql($this->class);
         }
 
-        $this->outputWriter->write("\n# Version " . $this->version . "\n");
+        $this->outputWriter->write(PHP_EOL . "# Version " . $this->version . PHP_EOL);
 
         $sqlQueries = [$this->version => $queries];
         $sqlWriter = new SqlFileWriter(
@@ -262,9 +262,9 @@ class Version
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
             if ($direction === self::DIRECTION_UP) {
-                $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
+                $this->outputWriter->write(PHP_EOL . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . PHP_EOL);
             } else {
-                $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
+                $this->outputWriter->write(PHP_EOL . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . PHP_EOL);
             }
 
             $this->state = self::STATE_EXEC;
@@ -290,9 +290,9 @@ class Version
             $migrationEnd = microtime(true);
             $this->time = round($migrationEnd - $migrationStart, 2);
             if ($direction === self::DIRECTION_UP) {
-                $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
+                $this->outputWriter->write(sprintf(PHP_EOL . "  <info>++</info> migrated (%ss)", $this->time));
             } else {
-                $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
+                $this->outputWriter->write(sprintf(PHP_EOL . "  <info>--</info> reverted (%ss)", $this->time));
             }
 
             if ($transaction) {
@@ -318,7 +318,7 @@ class Version
                 }
             }
 
-            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
+            $this->outputWriter->write(sprintf(PHP_EOL . "  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
 
             $this->state = self::STATE_NONE;
 

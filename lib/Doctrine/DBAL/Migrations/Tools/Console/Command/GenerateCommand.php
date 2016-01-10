@@ -116,8 +116,8 @@ EOT
         $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
-            $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null
+            $up ? "        " . implode(PHP_EOL . "        ", explode(PHP_EOL, $up)) : null,
+            $down ? "        " . implode(PHP_EOL . "        ", explode(PHP_EOL, $down)) : null
         ];
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
         $code = preg_replace('/^ +$/m', '', $code);

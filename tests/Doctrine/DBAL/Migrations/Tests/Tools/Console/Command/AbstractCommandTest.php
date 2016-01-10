@@ -279,7 +279,7 @@ class AbstractCommandTest extends MigrationTestCase
             ['command']
         );
 
-        $helper->setInputStream($this->getInputStream($response . "\n"));
+        $helper->setInputStream($this->getInputStream($response . PHP_EOL));
         if ($helper instanceof QuestionHelper) {
             $helperSet = new HelperSet([
                 'question' => $helper
