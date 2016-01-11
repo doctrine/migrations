@@ -111,10 +111,10 @@ class Version
         $this->migration = new $class($this);
         $this->version = $version;
 
-        if (!is_null($schemaProvider)) {
+        if ($schemaProvider !== null) {
             $this->schemaProvider = $schemaProvider;
         }
-        if(is_null($schemaProvider)) {
+        if($schemaProvider === null) {
             $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
                 $this->connection->getDatabasePlatform());
             $this->schemaProvider = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaProvider);
