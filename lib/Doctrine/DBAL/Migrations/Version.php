@@ -148,8 +148,18 @@ class Version
 
     public function markMigrated()
     {
+        $this->markVersion('up');
+    }
+
+    private function markVersion($direction)
+    {
+        if ($direction == 'up') {
+            $action = 'insert';
+        } else {
+            $action = 'delete';
+        }
         $this->configuration->createMigrationTable();
-        $this->connection->insert(
+        $this->connection->$action(
             $this->configuration->getMigrationsTableName(),
             [$this->configuration->getMigrationsColumnName() => $this->version]
         );
@@ -157,11 +167,7 @@ class Version
 
     public function markNotMigrated()
     {
-        $this->configuration->createMigrationTable();
-        $this->connection->delete(
-            $this->configuration->getMigrationsTableName(),
-            [$this->configuration->getMigrationsColumnName() => $this->version]
-        );
+        $this->markVersion('down');
     }
 
     /**
