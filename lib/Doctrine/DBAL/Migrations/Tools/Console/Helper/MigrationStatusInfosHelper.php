@@ -31,22 +31,6 @@ class MigrationStatusInfosHelper
 
     public function getMigrationsInfos()
     {
-        $formattedVersions = [];
-        foreach (['prev', 'current', 'next', 'latest'] as $alias) {
-            $version = $this->configuration->resolveVersionAlias($alias);
-            if ($version === null) {
-                if ($alias == 'next') {
-                    $formattedVersions[$alias] = 'Already at latest version';
-                } elseif ($alias == 'prev') {
-                    $formattedVersions[$alias] = 'Already at first version';
-                }
-            } elseif ($version === '0') {
-                $formattedVersions[$alias] = '<comment>0</comment>';
-            } else {
-                $formattedVersions[$alias] = $this->configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
-            }
-        }
-
         $numExecutedUnavailableMigrations = count($this->executedUnavailableMigrations);
         $numNewMigrations = count(array_diff($this->availableMigrations, $this->executedMigrations));
 
@@ -59,10 +43,10 @@ class MigrationStatusInfosHelper
             'Version Column Name'               => $this->configuration->getMigrationsColumnName(),
             'Migrations Namespace'              => $this->configuration->getMigrationsNamespace(),
             'Migrations Directory'              => $this->configuration->getMigrationsDirectory(),
-            'Previous Version'                  => $formattedVersions['prev'],
-            'Current Version'                   => $formattedVersions['current'],
-            'Next Version'                      => $formattedVersions['next'],
-            'Latest Version'                    => $formattedVersions['latest'],
+            'Previous Version'                  => $this->getFormattedVersionAlias('prev'),
+            'Current Version'                   => $this->getFormattedVersionAlias('current'),
+            'Next Version'                      => $this->getFormattedVersionAlias('next'),
+            'Latest Version'                    => $this->getFormattedVersionAlias('latest'),
             'Executed Migrations'               => count($this->executedMigrations),
             'Executed Unavailable Migrations'   => $numExecutedUnavailableMigrations,
             'Available Migrations'              => count($this->availableMigrations),
@@ -70,6 +54,30 @@ class MigrationStatusInfosHelper
         ];
 
         return $infos;
+    }
+
+    private function getFormattedVersionAlias($alias)
+    {
+        $version = $this->configuration->resolveVersionAlias($alias);
+        //No version found
+        if ($version === null) {
+            if ($alias == 'next') {
+
+                return 'Already at latest version';
+            } elseif ($alias == 'prev') {
+
+                return 'Already at first version';
+            }
+        }
+        //Before first version "virtual" version number
+        if ($version === '0') {
+
+            return '<comment>0</comment>';
+        }
+
+        //Show normal version number
+        return $this->configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
+
     }
 
     /** @var Version[] */
