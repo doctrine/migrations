@@ -102,7 +102,7 @@ class Version
     /** @var SchemaDiffProviderInterface */
     private $schemaProvider;
 
-    public function __construct(Configuration $configuration, $version, $class)
+    public function __construct(Configuration $configuration, $version, $class, SchemaDiffProviderInterface $schemaProvider=null)
     {
         $this->configuration = $configuration;
         $this->outputWriter = $configuration->getOutputWriter();
@@ -111,9 +111,14 @@ class Version
         $this->migration = new $class($this);
         $this->version = $version;
 
-        $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
-            $this->connection->getDatabasePlatform());
-        $this->schemaProvider = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaProvider);
+        if ($schemaProvider !== null) {
+            $this->schemaProvider = $schemaProvider;
+        }
+        if($schemaProvider === null) {
+            $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
+                $this->connection->getDatabasePlatform());
+            $this->schemaProvider = new LazySchemaDiffProvider(new LazyLoadingValueHolderFactory(), $schemaProvider);
+        }
     }
 
     /**
