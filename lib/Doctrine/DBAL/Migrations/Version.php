@@ -189,6 +189,10 @@ class Version
         }
     }
 
+    /**
+     * @param mixed[] $params Array of prepared statement parameters
+     * @param string[] $types Array of the types of each statement parameters
+     */
     private function addQueryParams($params, $types)
     {
         $index = count($this->sql) - 1;
