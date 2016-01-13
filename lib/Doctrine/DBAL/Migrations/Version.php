@@ -181,19 +181,28 @@ class Version
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
-                if (isset($params[$key])) {
-                    $this->params[count($this->sql) - 1] = $params[$key];
-                    $this->types[count($this->sql) - 1] = isset($types[$key]) ? $types[$key] : [];
+                if (isset($params[$key]) && !empty($params[$key])) {
+                    $queryTypes = isset($types[$key]) ? $types[$key] : [];
+                    $this->addQueryParams($params[$key], $queryTypes);
                 }
             }
         } else {
             $this->sql[] = $sql;
             if (!empty($params)) {
-                $index = count($this->sql) - 1;
-                $this->params[$index] = $params;
-                $this->types[$index]  = $types;
+                $this->addQueryParams($params, $types);
             }
         }
+    }
+
+    /**
+     * @param mixed[] $params Array of prepared statement parameters
+     * @param string[] $types Array of the types of each statement parameters
+     */
+    private function addQueryParams($params, $types)
+    {
+        $index = count($this->sql) - 1;
+        $this->params[$index] = $params;
+        $this->types[$index] = $types;
     }
 
     /**
