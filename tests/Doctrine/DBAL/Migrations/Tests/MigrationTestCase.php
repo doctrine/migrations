@@ -48,7 +48,7 @@ abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
     public function getSqliteConfiguration()
     {
         $config = new Configuration($this->getSqliteConnection());
-        $config->setMigrationsDirectory(\sys_get_temp_dir());
+        $config->setMigrationsDirectory(__DIR__ . '/Stub/migration-empty-folder');
         $config->setMigrationsNamespace('DoctrineMigrations');
 
         return $config;
