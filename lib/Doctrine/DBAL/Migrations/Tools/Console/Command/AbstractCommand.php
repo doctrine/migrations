@@ -21,6 +21,10 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigurationLoader;
+use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionConfigurationLoader;
+use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
+use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionConfigurationChainLoader;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Symfony\Component\Console\Command\Command;
@@ -156,29 +160,23 @@ abstract class AbstractCommand extends Command
     private function getConnection(InputInterface $input)
     {
         if (!$this->connection) {
-            if ($input->getOption('db-configuration')) {
-                if (!file_exists($input->getOption('db-configuration'))) {
-                    throw new \InvalidArgumentException("The specified connection file is not a valid file.");
-                }
+            $chainLoader = new ConnectionConfigurationChainLoader(
+                [
+                    new ArrayConnectionConfigurationLoader($input->getOption('db-configuration')),
+                    new ArrayConnectionConfigurationLoader('migrations-db.php'),
+                    new ConnectionHelperLoader($this->getHelperSet(), 'connection'),
+                    new ConnectionConfigurationLoader($this->configuration),
+                ]
+            );
+            $connection = $chainLoader->chosen();
 
-                $params = include $input->getOption('db-configuration');
-                if (!is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
-                }
-                $this->connection = DriverManager::getConnection($params);
-            } elseif (file_exists('migrations-db.php')) {
-                $params = include 'migrations-db.php';
-                if (!is_array($params)) {
-                    throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
-                }
-                $this->connection = DriverManager::getConnection($params);
-            } elseif ($this->getHelperSet()->has('connection')) {
-                $this->connection = $this->getHelper('connection')->getConnection();
-            } elseif ($this->configuration) {
-                $this->connection = $this->configuration->getConnection();
-            } else {
-                throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
+            if ($connection) {
+                $this->connection = $connection;
+
+                return $this->connection;
             }
+
+            throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
         }
 
         return $this->connection;
