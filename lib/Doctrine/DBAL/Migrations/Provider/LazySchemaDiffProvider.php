@@ -21,7 +21,9 @@ namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Schema\Schema;
+use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
+use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
 class LazySchemaDiffProvider implements SchemaDiffProviderInterface
@@ -36,6 +38,15 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
     {
         $this->proxyFactory = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
+    }
+
+    public static function fromDefaultProxyFacyoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
+    {
+        $proxyConfig = new Configuration();
+        $proxyConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
+        $proxyFactory = new LazyLoadingValueHolderFactory($proxyConfig);
+
+        return new LazySchemaDiffProvider($proxyFactory, $originalSchemaManipulator);
     }
 
     /**
