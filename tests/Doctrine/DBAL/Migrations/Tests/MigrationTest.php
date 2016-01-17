@@ -35,7 +35,7 @@ class MigrationTest extends MigrationTestCase
     public function setUp()
     {
         $this->config = new Configuration($this->getSqliteConnection());
-        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
     }
 

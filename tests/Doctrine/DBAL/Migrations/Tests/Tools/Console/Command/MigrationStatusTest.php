@@ -7,6 +7,15 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationStatusTest extends MigrationTestCase
 {
+
+    private $migrationDirectory;
+
+    public function __construct()
+    {
+        parent::__construct(null, [], null);
+        $this->migrationDirectory = __DIR__ . '/../../../Stub/migration-empty-folder';
+    }
+
     /**
      * Tests the display of the previous/current/next/latest versions.
      */
@@ -46,7 +55,7 @@ class MigrationStatusTest extends MigrationTestCase
 
         $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
             ->setConstructorArgs([$this->getSqliteConnection()])
-            ->setMethods(['resolveVersionAlias', 'getDateTime'])
+            ->setMethods(['resolveVersionAlias', 'getDateTime', 'getAvailableVersions'])
             ->getMock();
 
         $configuration
@@ -61,8 +70,13 @@ class MigrationStatusTest extends MigrationTestCase
             ->method('getDateTime')
             ->will($this->returnValue('FORMATTED'));
 
+        $configuration
+            ->expects($this->any())
+            ->method('getAvailableVersions')
+            ->will($this->returnValue([]));
+
         $configuration->setMigrationsNamespace('DoctrineMigrations');
-        $configuration->setMigrationsDirectory(sys_get_temp_dir());
+        $configuration->setMigrationsDirectory($this->migrationDirectory);
 
         $command
             ->expects($this->once())
@@ -118,7 +132,7 @@ class MigrationStatusTest extends MigrationTestCase
             ->will($this->returnValue(1239));
 
         $configuration->setMigrationsNamespace('DoctrineMigrations');
-        $configuration->setMigrationsDirectory(sys_get_temp_dir());
+        $configuration->setMigrationsDirectory($this->migrationDirectory);
 
         $command
             ->expects($this->once())
