@@ -454,11 +454,11 @@ class Configuration
      */
     public function getVersion($version)
     {
-        if (!isset($this->migrations[$version])) {
-            throw MigrationException::unknownMigrationVersion($version);
+        if (isset($this->migrations[$version])) {
+            return $this->migrations[$version];
         }
 
-        return $this->migrations[$version];
+        throw MigrationException::unknownMigrationVersion($version);
     }
 
     /**
@@ -506,12 +506,8 @@ class Configuration
         $this->createMigrationTable();
 
         $ret = $this->connection->fetchAll("SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName);
-        $versions = [];
-        foreach ($ret as $version) {
-            $versions[] = current($version);
-        }
 
-        return $versions;
+        return array_map('current', $ret);
     }
 
     /**
@@ -708,22 +704,22 @@ class Configuration
             return false;
         }
 
-        if (!$this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
-            $columns = [
-                $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
-            ];
-            $table = new Table($this->migrationsTableName, $columns);
-            $table->setPrimaryKey([$this->migrationsColumnName]);
-            $this->connection->getSchemaManager()->createTable($table);
-
+        if ($this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $this->migrationTableCreated = true;
 
-            return true;
+            return false;
         }
+
+        $columns = [
+            $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
+        ];
+        $table = new Table($this->migrationsTableName, $columns);
+        $table->setPrimaryKey([$this->migrationsColumnName]);
+        $this->connection->getSchemaManager()->createTable($table);
 
         $this->migrationTableCreated = true;
 
-        return false;
+        return true;
     }
 
     /**
@@ -742,7 +738,7 @@ class Configuration
         }
 
         if ($direction === Version::DIRECTION_DOWN) {
-            if (count($this->migrations)) {
+            if ($this->migrations) {
                 $allVersions = array_reverse(array_keys($this->migrations));
                 $classes = array_reverse(array_values($this->migrations));
                 $allVersions = array_combine($allVersions, $classes);
