@@ -80,7 +80,7 @@ EOT
                 $this->showVersions($migrations, $configuration, $output);
             }
 
-            if (count($infos->getExecutedUnavailableMigrations())) {
+            if ($infos->getExecutedUnavailableMigrations()) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
                 foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
                     $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
@@ -90,7 +90,7 @@ EOT
         }
     }
 
-    private function writeStatusInfosLineAligned($output, $title, $value)
+    private function writeStatusInfosLineAligned(OutputInterface $output, $title, $value)
     {
         $output->writeln('    <comment>>></comment> ' . $title . ': ' . str_repeat(' ', 50 - strlen($title)) . $value);
     }
