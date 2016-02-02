@@ -125,7 +125,7 @@ EOT
             $code[] = sprintf("\$this->addSql(%s);", var_export($query, true));
         }
 
-        if (!empty($code)) {
+        if ($code) {
             array_unshift(
                 $code,
                 sprintf(
