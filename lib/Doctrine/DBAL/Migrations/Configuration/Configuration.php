@@ -506,12 +506,8 @@ class Configuration
         $this->createMigrationTable();
 
         $ret = $this->connection->fetchAll("SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName);
-        $versions = [];
-        foreach ($ret as $version) {
-            $versions[] = current($version);
-        }
 
-        return $versions;
+        return array_map('current', $ret);
     }
 
     /**
@@ -708,22 +704,22 @@ class Configuration
             return false;
         }
 
-        if (!$this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
-            $columns = [
-                $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
-            ];
-            $table = new Table($this->migrationsTableName, $columns);
-            $table->setPrimaryKey([$this->migrationsColumnName]);
-            $this->connection->getSchemaManager()->createTable($table);
-
+        if ($this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $this->migrationTableCreated = true;
 
-            return true;
+            return false;
         }
+
+        $columns = [
+            $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
+        ];
+        $table = new Table($this->migrationsTableName, $columns);
+        $table->setPrimaryKey([$this->migrationsColumnName]);
+        $this->connection->getSchemaManager()->createTable($table);
 
         $this->migrationTableCreated = true;
 
-        return false;
+        return true;
     }
 
     /**
