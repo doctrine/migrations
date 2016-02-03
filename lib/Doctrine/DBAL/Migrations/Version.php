@@ -158,11 +158,8 @@ class Version
 
     private function markVersion($direction)
     {
-        if ($direction == 'up') {
-            $action = 'insert';
-        } else {
-            $action = 'delete';
-        }
+        $action = $direction === 'up' ? 'insert' : 'delete';
+
         $this->configuration->createMigrationTable();
         $this->connection->$action(
             $this->configuration->getMigrationsTableName(),
@@ -187,7 +184,7 @@ class Version
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
-                if (isset($params[$key]) && !empty($params[$key])) {
+                if (!empty($params[$key])) {
                     $queryTypes = isset($types[$key]) ? $types[$key] : [];
                     $this->addQueryParams($params[$key], $queryTypes);
                 }

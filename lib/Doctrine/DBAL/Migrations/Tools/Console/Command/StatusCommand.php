@@ -90,7 +90,7 @@ EOT
         }
     }
 
-    private function writeStatusInfosLineAligned($output, $title, $value)
+    private function writeStatusInfosLineAligned(OutputInterface $output, $title, $value)
     {
         $output->writeln('    <comment>>></comment> ' . $title . ': ' . str_repeat(' ', 50 - strlen($title)) . $value);
     }
