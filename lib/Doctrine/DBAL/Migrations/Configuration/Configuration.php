@@ -454,11 +454,11 @@ class Configuration
      */
     public function getVersion($version)
     {
-        if (!isset($this->migrations[$version])) {
-            throw MigrationException::unknownMigrationVersion($version);
+        if (isset($this->migrations[$version])) {
+            return $this->migrations[$version];
         }
 
-        return $this->migrations[$version];
+        throw MigrationException::unknownMigrationVersion($version);
     }
 
     /**
@@ -738,7 +738,7 @@ class Configuration
         }
 
         if ($direction === Version::DIRECTION_DOWN) {
-            if (count($this->migrations)) {
+            if ($this->migrations) {
                 $allVersions = array_reverse(array_keys($this->migrations));
                 $classes = array_reverse(array_values($this->migrations));
                 $allVersions = array_combine($allVersions, $classes);

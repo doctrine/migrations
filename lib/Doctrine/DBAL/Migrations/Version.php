@@ -191,7 +191,7 @@ class Version
             }
         } else {
             $this->sql[] = $sql;
-            if (!empty($params)) {
+            if ($params) {
                 $this->addQueryParams($params, $types);
             }
         }
@@ -220,7 +220,7 @@ class Version
     {
         $queries = $this->execute($direction, true);
 
-        if ( ! empty($this->params)) {
+        if ($this->params) {
             throw MigrationException::migrationNotConvertibleToSql($this->class);
         }
 

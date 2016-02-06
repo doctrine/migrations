@@ -80,7 +80,7 @@ EOT
                 $this->showVersions($migrations, $configuration, $output);
             }
 
-            if (count($infos->getExecutedUnavailableMigrations())) {
+            if ($infos->getExecutedUnavailableMigrations()) {
                 $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
                 foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
                     $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
