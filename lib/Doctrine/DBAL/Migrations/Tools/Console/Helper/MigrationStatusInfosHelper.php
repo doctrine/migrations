@@ -61,23 +61,21 @@ class MigrationStatusInfosHelper
         $version = $this->configuration->resolveVersionAlias($alias);
         //No version found
         if ($version === null) {
-            if ($alias == 'next') {
-
+            if ($alias === 'next') {
                 return 'Already at latest version';
-            } elseif ($alias == 'prev') {
+            }
 
+            if ($alias === 'prev') {
                 return 'Already at first version';
             }
         }
         //Before first version "virtual" version number
         if ($version === '0') {
-
             return '<comment>0</comment>';
         }
 
         //Show normal version number
         return $this->configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
-
     }
 
     /** @var Version[] */

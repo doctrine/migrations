@@ -91,13 +91,13 @@ EOT
 
         $executedMigrations = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
-        $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
 
         $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
         if ($version === false) {
             return 1;
         }
 
+        $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
         if (!empty($executedUnavailableMigrations)) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations'
