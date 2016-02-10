@@ -27,6 +27,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
 
+use Doctrine\DBAL\Migrations\Generator\SqlGenerator;
+use Doctrine\DBAL\Migrations\Generator\PhpGenerator;
+
 /**
  * Command for generate migration classes by comparing your current database schema
  * to your mapping information.
@@ -55,6 +58,7 @@ class DiffCommand extends GenerateCommand
 
         $this
             ->setName('migrations:diff')
+            ->addOption('generator', null, InputOption::VALUE_OPTIONAL, 'Specify which generator to use. Available generators: <comment>php, sql</comment>', 'sql')
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
@@ -99,8 +103,14 @@ EOT
             }
         }
 
-        $up = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateToSql($toSchema, $platform));
-        $down = $this->buildCodeFromSql($configuration, $fromSchema->getMigrateFromSql($toSchema, $platform));
+        if ('php' == $input->getOption('generator')) {
+            $generator = new PhpGenerator($configuration);
+        } else {
+            $generator = new SqlGenerator($configuration);
+        }
+
+        $up = $generator->generateMigration($fromSchema, $toSchema);
+        $down = $generator->generateMigration($toSchema, $fromSchema);
 
         if (! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
@@ -113,7 +123,6 @@ EOT
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
     }
-
     private function buildCodeFromSql(Configuration $configuration, array $sql)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
