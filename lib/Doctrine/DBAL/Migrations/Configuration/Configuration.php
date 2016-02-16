@@ -454,6 +454,10 @@ class Configuration
      */
     public function getVersion($version)
     {
+        if (empty($this->migrations)) {
+            $this->registerMigrationsFromDirectory($this->getMigrationsDirectory());
+        }
+
         if (!isset($this->migrations[$version])) {
             throw MigrationException::unknownMigrationVersion($version);
         }
