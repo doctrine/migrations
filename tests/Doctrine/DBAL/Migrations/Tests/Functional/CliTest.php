@@ -111,6 +111,31 @@ class CliTest extends MigrationTestCase
         $this->assertContains('DROP TABLE bar', $versionClassContents);
     }
 
+    public function testMigrationDiffWritesNewMigrationWithFormattedSql()
+    {
+        $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
+        $this->assertVersionCount(0, 'should start with no versions');
+        $this->executeCommand(
+            'migrations:diff',
+            'config.yml',
+            [
+                '--formatted' => null,
+                '--line-length' => 50,
+            ]
+        );
+        $this->assertSuccessfulExit();
+        $this->assertVersionCount(1, 'diff command should add one version');
+
+        $output = $this->executeCommand('migrations:status');
+        $this->assertSuccessfulExit();
+        $this->assertRegExp('/available migrations:\s+2/im', $output);
+
+        $versionClassContents = $this->getFileContentsForLatestVersion();
+
+        $this->assertContains("CREATE TABLE foo (\n", $versionClassContents);
+        $this->assertContains('DROP TABLE bar', $versionClassContents);
+    }
+
     public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities()
     {
         $config = OrmSetup::createXMLMetadataConfiguration([__DIR__.'/_files/entities'], true);
