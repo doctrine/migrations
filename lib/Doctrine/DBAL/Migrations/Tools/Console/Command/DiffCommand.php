@@ -102,8 +102,18 @@ EOT
             }
         }
 
-        $up = $this->buildCodeFromSql($configuration, $input, $fromSchema->getMigrateToSql($toSchema, $platform));
-        $down = $this->buildCodeFromSql($configuration, $input, $fromSchema->getMigrateFromSql($toSchema, $platform));
+        $up = $this->buildCodeFromSql(
+            $configuration,
+            $fromSchema->getMigrateToSql($toSchema, $platform),
+            $input->getOption('formatted'),
+            $input->getOption('line-length')
+        );
+        $down = $this->buildCodeFromSql(
+            $configuration,
+            $fromSchema->getMigrateFromSql($toSchema, $platform),
+            $input->getOption('formatted'),
+            $input->getOption('line-length')
+        );
 
         if (! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.', 'ERROR');
@@ -117,7 +127,7 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
     }
 
-    private function buildCodeFromSql(Configuration $configuration, InputInterface $input, array $sql)
+    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted=false, $lineLength=0)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
         $code = [];
@@ -126,7 +136,7 @@ EOT
                 continue;
             }
 
-            if ($input->getOption('formatted')) {
+            if ($formatted) {
                 if (!class_exists('\SqlFormatter')) {
                     throw new \InvalidArgumentException(
                         'The "--formatted" option can only be used if the sql formatter is installed.'.
@@ -134,7 +144,7 @@ EOT
                     );
                 }
 
-                $maxLength = $input->getOption('line-length') - 18 - 8; // max - php code length - indentation
+                $maxLength = $lineLength - 18 - 8; // max - php code length - indentation
 
                 if (strlen($query) > $maxLength) {
                     $query = \SqlFormatter::format($query, false);
