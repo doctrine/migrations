@@ -53,7 +53,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations_namespace' => 'setMigrationsNamespace',
         'table_name' => 'setMigrationsTableName',
         'organize_migrations' => 'setMigrationOrganisation',
-        'name' => 'setName','name' => 'setName',
+        'name' => 'setName',
         'migrations_directory' => 'loadMigrationsFromDirectory',
         'migrations' => 'loadMigrations',
     ];
