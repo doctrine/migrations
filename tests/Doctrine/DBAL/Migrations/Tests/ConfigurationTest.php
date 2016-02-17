@@ -4,7 +4,6 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\MigrationException;
-use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -193,7 +192,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider getVersionProvider
+     * @dataProvider autoloadVersionProvider
      *
      * @param $version
      */
@@ -243,7 +242,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @return array
      */
-    public function getVersionProvider()
+    public function autoloadVersionProvider()
     {
         return [
             ['1Test'],
