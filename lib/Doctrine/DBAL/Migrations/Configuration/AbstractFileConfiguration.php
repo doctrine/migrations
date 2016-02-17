@@ -50,10 +50,10 @@ abstract class AbstractFileConfiguration extends Configuration
      * @var array of possible configuration properties in migrations configuration.
      */
     private $configurationProperties = [
-        'name' => 'setName',
-        'table_name' => 'setMigrationsTableName',
         'migrations_namespace' => 'setMigrationsNamespace',
+        'table_name' => 'setMigrationsTableName',
         'organize_migrations' => 'setMigrationOrganisation',
+        'name' => 'setName','name' => 'setName',
         'migrations_directory' => 'loadMigrationsFromDirectory',
         'migrations' => 'loadMigrations',
     ];
@@ -65,7 +65,11 @@ abstract class AbstractFileConfiguration extends Configuration
                 $msg = sprintf('Migrations configuration key "%s" does not exists.', $configurationKey);
                 throw MigrationException::configurationNotValid($msg);
             }
-            $this->{$this->configurationProperties[$configurationKey]}($configurationValue);
+        }
+        foreach($this->configurationProperties as $configurationKey => $configurationSetter) {
+            if (isset($config[$configurationKey])) {
+                $this->{$configurationSetter}($config[$configurationKey]);
+            }
         }
     }
 

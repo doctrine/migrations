@@ -137,4 +137,20 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $this->loadConfiguration('migrations_list');
         $this->loadConfiguration('migrations_list2');
     }
+
+    /**
+     * @dataProvider getConfigWithKeysInVariousOrder
+     */
+    public function testThatTheOrderOfConfigKeysDoesNotMatter($file)
+    {
+        $this->loadConfiguration($file);
+    }
+
+    public function getConfigWithKeysInVariousOrder()
+    {
+        return [
+            ['order_1'],
+            ['order_2'],
+        ];
+    }
 }
