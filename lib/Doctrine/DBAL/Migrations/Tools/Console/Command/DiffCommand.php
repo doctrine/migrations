@@ -127,7 +127,7 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
     }
 
-    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted=false, $lineLength=0)
+    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted=false, $lineLength=120)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
         $code = [];
