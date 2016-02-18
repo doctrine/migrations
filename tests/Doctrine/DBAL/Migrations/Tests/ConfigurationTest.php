@@ -196,7 +196,7 @@ class ConfigurationTest extends MigrationTestCase
      *
      * @param $version
      */
-    public function testGetVersion($version)
+    public function testGetVersionAutoloadVersion($version)
     {
         $config = $this->getSqliteConfiguration();
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions');
