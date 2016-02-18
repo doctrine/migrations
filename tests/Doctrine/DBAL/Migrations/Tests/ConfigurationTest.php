@@ -3,6 +3,7 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\MigrationException;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -191,6 +192,31 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
+     * @dataProvider autoloadVersionProvider
+     *
+     * @param $version
+     */
+    public function testGetVersion($version)
+    {
+        $config = $this->getSqliteConfiguration();
+        $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions');
+        $config->setMigrationsDirectory(__DIR__ . '/Stub/Configuration/AutoloadVersions');
+
+        $result = $config->getVersion($version);
+
+        $this->assertNotNull($result);
+    }
+
+    public function testGetVersionNotFound()
+    {
+        $this->setExpectedException(MigrationException::class);
+
+        $config = $this->getSqliteConfiguration();
+
+        $config->getVersion('foo');
+    }
+
+    /**
      * @dataProvider versionProvider
      */
     public function testGetDatetime($version, $return)
@@ -210,6 +236,20 @@ class ConfigurationTest extends MigrationTestCase
             ['20130101123545Version', '2013-01-01 12:35:45'],
             ['20150202042811', '2015-02-02 04:28:11'],
             ['20150202162811', '2015-02-02 16:28:11']
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function autoloadVersionProvider()
+    {
+        return [
+            ['1Test'],
+            ['2Test'],
+            ['3Test'],
+            ['4Test'],
+            ['5Test'],
         ];
     }
 }
