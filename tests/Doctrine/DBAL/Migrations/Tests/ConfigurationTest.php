@@ -209,9 +209,9 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testGetVersionNotFound()
     {
-        $this->setExpectedException(MigrationException::class);
-
         $config = $this->getSqliteConfiguration();
+        
+        $this->setExpectedException(MigrationException::class);
 
         $config->getVersion('foo');
     }
