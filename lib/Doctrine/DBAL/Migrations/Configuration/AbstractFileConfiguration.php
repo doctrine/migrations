@@ -52,6 +52,7 @@ abstract class AbstractFileConfiguration extends Configuration
     private $configurationProperties = [
         'migrations_namespace' => 'setMigrationsNamespace',
         'table_name' => 'setMigrationsTableName',
+        'column_name' => 'setMigrationsColumnName',
         'organize_migrations' => 'setMigrationOrganisation',
         'name' => 'setName',
         'migrations_directory' => 'loadMigrationsFromDirectory',
