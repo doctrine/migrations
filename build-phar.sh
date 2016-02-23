@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 
-git pull origin master --tags
+git fetch origin master --tags
 
 if [ -f composer.lock ]; then
   rm composer.lock
