@@ -41,7 +41,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "v1.4.x-dev"
+            "dev-master": "v1.5.x-dev"
         }
     },
     "bin": [
