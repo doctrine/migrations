@@ -4,8 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ## [1.4.0] - 2016-02-23
-### Fixed
-### Changed
+### Fixed  
+### Changed  
 ### Added
   - [431: Formatted diffs](https://github.com/doctrine/migrations/pull/431)
   - [437: Allowing to set the column name from config too](https://github.com/doctrine/migrations/pull/437)
