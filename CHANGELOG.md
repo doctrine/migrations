@@ -4,8 +4,8 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
 ## [1.4.0] - 2016-02-23
-### Fixed  
-### Changed  
+### Fixed
+### Changed
 ### Added
   - [431: Formatted diffs](https://github.com/doctrine/migrations/pull/431)
   - [437: Allowing to set the column name from config too](https://github.com/doctrine/migrations/pull/437)
@@ -14,9 +14,11 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 ### Fixed
   - [433: Fix: ExecuteCommand by making sure that it autoload the versions](https://github.com/doctrine/migrations/pull/433)
   - [434: Fixing an issue in the order at which some configuration key are loaded](https://github.com/doctrine/migrations/pull/434)
+
 ### Changed
   - [429: code refactoring for clarity](https://github.com/doctrine/migrations/pull/429)
   - [428: code refactoring for clarity](https://github.com/doctrine/migrations/pull/428)
+
 ### Added
   - [425: ProxyManager ~2.0 is also compatible with migrations](https://github.com/doctrine/migrations/pull/425)
 
