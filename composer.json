@@ -46,6 +46,6 @@
     },
     "bin": [
         "bin/doctrine-migrations",
-	"bin/doctrine-migrations.php"
+        "bin/doctrine-migrations.php"
     ]
 }
