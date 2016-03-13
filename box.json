@@ -10,7 +10,7 @@
     "finder": [
         {
             "exclude": ["Tests", "Test", "tests", "test", "box.phar"],
-            "in": ["lib", "vendor/composer", "vendor/doctrine", "vendor/symfony"]
+            "in": ["lib", "vendor/composer", "vendor/doctrine", "vendor/symfony", "vendor/ocramius", "vendor/zendframework"]
         }
     ],
     "files": [
