@@ -3,6 +3,13 @@ All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased]
+
+
+## [1.4.1] - 2016-03-14
+### Fixed
+  - [439: Add missing dependency in the phar build](https://github.com/doctrine/migrations/pull/439)
+
+  
 ## [1.4.0] - 2016-02-23
 ### Fixed
 ### Changed
