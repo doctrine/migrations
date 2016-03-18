@@ -78,27 +78,12 @@ if(class_exists('\Symfony\Component\Console\Helper\QuestionHelper')) {
 }
 
 
-$cli = new \Symfony\Component\Console\Application('Doctrine Migrations', \Doctrine\DBAL\Migrations\MigrationsVersion::VERSION());
-$cli->setCatchExceptions(true);
-$cli->setHelperSet($helperSet);
-$cli->addCommands(array(
-    // Migrations Commands
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\LatestCommand(),
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
-    new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
-));
-if ($helperSet->has('em')) {
-    $cli->add(new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand());
-}
-
 $input = file_exists('migrations-input.php')
        ? include 'migrations-input.php' : null;
 
 $output = file_exists('migrations-output.php')
         ? include 'migrations-output.php' : null;
 
+$cli = \Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner::createApplication($helperSet);
 $cli->run($input, $output);
 
