@@ -322,7 +322,7 @@ class Version
         } catch (SkipMigrationException $e) {
             if ($transaction) {
                 //only rollback transaction if in transactional mode
-                $this->connection->rollback();
+                $this->connection->rollBack();
             }
 
             if ($dryRun === false) {
@@ -348,7 +348,7 @@ class Version
 
             if ($transaction) {
                 //only rollback transaction if in transactional mode
-                $this->connection->rollback();
+                $this->connection->rollBack();
             }
 
             $this->state = self::STATE_NONE;

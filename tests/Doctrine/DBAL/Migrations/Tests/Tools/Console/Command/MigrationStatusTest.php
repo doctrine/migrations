@@ -90,7 +90,7 @@ class MigrationStatusTest extends MigrationTestCase
         );
 
         $textOutput = $commandTester->getDisplay();
-        $this->assertRegexp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
+        $this->assertRegExp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
     }
 
     /**
@@ -146,6 +146,6 @@ class MigrationStatusTest extends MigrationTestCase
         );
 
         $textOutput = $commandTester->getDisplay();
-        $this->assertRegexp('/\s+>> New Migrations:\s+1/m', $textOutput);
+        $this->assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
     }
 }
