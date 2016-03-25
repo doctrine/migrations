@@ -2,7 +2,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Stub\Functional;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 class MigrationSkipMigration extends MigrationMigrateUp

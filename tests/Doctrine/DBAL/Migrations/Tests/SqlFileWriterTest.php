@@ -19,8 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\SqlFileWriter;
 use Doctrine\DBAL\Migrations\Version;
 use \Mockery as m;

@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigurationLoader;
 use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionConfigurationLoader;

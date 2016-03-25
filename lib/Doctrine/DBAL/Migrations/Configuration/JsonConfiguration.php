@@ -18,7 +18,6 @@
  */
 
 namespace Doctrine\DBAL\Migrations\Configuration;
-use Doctrine\Common\Proxy\Exception\InvalidArgumentException;
 
 /**
  * Load migration configuration information from a PHP configuration file.

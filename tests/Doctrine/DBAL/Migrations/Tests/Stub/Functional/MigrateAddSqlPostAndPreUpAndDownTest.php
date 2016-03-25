@@ -4,7 +4,6 @@ namespace Doctrine\DBAL\Migrations\Tests\Stub\Functional;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Types\Type;
 
 class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
 {

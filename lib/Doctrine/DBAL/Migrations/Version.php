@@ -23,7 +23,6 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
-use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 
 /**
  * Class which wraps a migration version and allows execution of the

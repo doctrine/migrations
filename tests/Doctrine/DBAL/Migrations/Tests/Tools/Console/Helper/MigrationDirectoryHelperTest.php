@@ -1,15 +1,8 @@
 <?php
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Helper;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
-use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
-use Doctrine\ORM\Configuration;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\BufferedOutput;
-use Symfony\Component\Console\Output\OutputInterface;
 use InvalidArgumentException;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase

@@ -6,7 +6,6 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrateCommandTest extends MigrationTestCase
 {

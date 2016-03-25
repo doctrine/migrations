@@ -2,7 +2,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;

@@ -21,7 +21,6 @@ namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 

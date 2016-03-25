@@ -4,7 +4,6 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
-use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
 use InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 
