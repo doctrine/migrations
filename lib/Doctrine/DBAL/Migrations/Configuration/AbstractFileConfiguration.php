@@ -59,7 +59,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations' => 'loadMigrations',
     ];
 
-    protected function setConfiguration(Array $config)
+    protected function setConfiguration(array $config)
     {
         foreach($config as $configurationKey => $configurationValue) {
             if (!isset($this->configurationProperties[$configurationKey])) {
