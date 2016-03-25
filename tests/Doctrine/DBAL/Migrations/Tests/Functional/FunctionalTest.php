@@ -92,7 +92,7 @@ class FunctionalTest extends MigrationTestCase
         $this->assertEquals(0, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrationsToExecute('up', 3);
 
-        $this->assertEquals(3, count($migrations));
+        $this->assertCount(3, $migrations);
         $this->assertInstanceOf(MigrationMigrateUp::class, $migrations[1]->getMigration());
         $this->assertInstanceOf(MigrationSkipMigration::class, $migrations[2]->getMigration());
         $this->assertInstanceOf(MigrationMigrateFurther::class, $migrations[3]->getMigration());
@@ -266,7 +266,7 @@ class FunctionalTest extends MigrationTestCase
         $config->setMigrationsTableName('test_migrations_table');
         $config->setMigrationsColumnName('current_version');
 
-        $this->assertEquals(1, count($config->getMigrationsToExecute('up', 3)));
+        $this->assertCount(1, $config->getMigrationsToExecute('up', 3));
         $migrations = $config->getMigrationsToExecute('up', 3);
         $this->assertTrue(isset($migrations[2]));
         $this->assertEquals(2, $migrations[2]->getVersion());

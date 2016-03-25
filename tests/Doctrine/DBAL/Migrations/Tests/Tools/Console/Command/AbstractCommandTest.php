@@ -172,7 +172,7 @@ class AbstractCommandTest extends MigrationTestCase
         $this->assertInstanceOf(Configuration::class, $actualConfiguration);
         $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
         $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
-        $this->assertEquals(null, $actualConfiguration->getMigrationsNamespace());
+        $this->assertNull($actualConfiguration->getMigrationsNamespace());
     }
 
     /**
@@ -191,7 +191,7 @@ class AbstractCommandTest extends MigrationTestCase
         $this->assertInstanceOf(Configuration::class, $actualConfiguration);
         $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
         $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
-        $this->assertEquals(null, $actualConfiguration->getMigrationsNamespace());
+        $this->assertNull($actualConfiguration->getMigrationsNamespace());
     }
 
     public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration()
@@ -324,14 +324,14 @@ class AbstractCommandTest extends MigrationTestCase
         {
             @$helper = new DialogHelper();
 
-            @$this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
-            @$this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+            @$this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
+            @$this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
         }
 
         if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
             $helper = new QuestionHelper();
-            $this->assertEquals(true, $this->invokeAbstractCommandConfirmation($input, $helper));
-            $this->assertEquals(false, $this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+            $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
+            $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
         }
     }
 
