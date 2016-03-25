@@ -20,6 +20,11 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -50,7 +55,7 @@ class VersionTest extends MigrationTestCase
     public function testCreateVersion()
     {
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy');
+            VersionDummy::class);
         $this->assertEquals($versionName, $version->getVersion());
     }
 
@@ -62,7 +67,7 @@ class VersionTest extends MigrationTestCase
         $versionName = '003';
         $versionDescription = 'My super migration';
         $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription');
+            VersionDummyDescription::class);
         $this->assertEquals($versionName, $version->getVersion());
         $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
     }
@@ -72,17 +77,17 @@ class VersionTest extends MigrationTestCase
      */
     public function testOutputQueryTimeAllQueries()
     {
-        $outputWriterMock = $this->getMock('Doctrine\DBAL\Migrations\OutputWriter');
+        $outputWriterMock = $this->getMock(OutputWriter::class);
         $outputWriterMock->expects($this->once())->method('write');
         $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
-        $reflectionVersion = new \ReflectionClass('Doctrine\DBAL\Migrations\Version');
+        $reflectionVersion = new \ReflectionClass(Version::class);
         $method = $reflectionVersion->getMethod('outputQueryTime');
         $method->setAccessible(true);
 
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+            VersionDummy::class
         );
         $this->assertNull($method->invoke($version, 0, true));
     }
@@ -92,17 +97,17 @@ class VersionTest extends MigrationTestCase
      */
     public function testOutputQueryTimeNotAllQueries()
     {
-        $outputWriterMock = $this->getMock('Doctrine\DBAL\Migrations\OutputWriter');
+        $outputWriterMock = $this->getMock(OutputWriter::class);
         $outputWriterMock->expects($this->exactly(0))->method('write');
         $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
-        $reflectionVersion = new \ReflectionClass('Doctrine\DBAL\Migrations\Version');
+        $reflectionVersion = new \ReflectionClass(Version::class);
         $method = $reflectionVersion->getMethod('outputQueryTime');
         $method->setAccessible(true);
 
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+            VersionDummy::class
         );
         $this->assertNull($method->invoke($version, 0, false));
     }
@@ -117,9 +122,9 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+            VersionDummy::class
         );
-        $reflectionVersion = new \ReflectionClass('Doctrine\DBAL\Migrations\Version');
+        $reflectionVersion = new \ReflectionClass(Version::class);
         $stateProperty = $reflectionVersion->getProperty('state');
         $stateProperty->setAccessible(true);
         $stateProperty->setValue($version, $state);
@@ -150,7 +155,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+            VersionDummy::class
         );
         $this->assertNull($version->addSql('SELECT * FROM foo'));
         $this->assertNull($version->addSql(['SELECT * FROM foo']));
@@ -169,12 +174,12 @@ class VersionTest extends MigrationTestCase
     {
         $version = 1;
 
-        $outputWriter = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
+        $outputWriter = m::mock(OutputWriter::class);
         $outputWriter->shouldReceive('write');
 
         $connection = $this->getSqliteConnection();
 
-        $config = m::mock('Doctrine\DBAL\Migrations\Configuration\Configuration')
+        $config = m::mock(Configuration::class)
             ->makePartial();
         $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);
         $config->shouldReceive('getConnection')->andReturn($connection);
@@ -210,7 +215,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $this->config,
             $versionName = '003',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy'
+            VersionDummy::class
         );
 
         $version->execute('up');
@@ -230,7 +235,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $this->config,
             $versionName = '004',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException'
+            VersionDummyException::class
         );
 
         try {
@@ -253,7 +258,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $this->config,
             $versionName = '005',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql'
+            VersionOutputSql::class
         );
 
         $this->assertContains('Select 1', $version->execute('up'));
@@ -295,7 +300,7 @@ class VersionTest extends MigrationTestCase
         $version = new Version(
             $configuration,
             $versionName = '005',
-            'Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql'
+            VersionOutputSql::class
         );
         $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
 

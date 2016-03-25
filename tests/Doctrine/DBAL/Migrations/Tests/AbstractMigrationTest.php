@@ -2,8 +2,12 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Migrations\AbortMigrationException;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\IrreversibleMigrationException;
+use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\AbstractMigrationStub;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Version;
 
 /**
@@ -29,7 +33,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $this->version = new Version($this->config, 'Dummy', 'Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy');
+        $this->version = new Version($this->config, 'Dummy', VersionDummy::class);
         $this->migration = new AbstractMigrationStub($this->version);
     }
 
@@ -68,7 +72,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\AbortMigrationException', 'Something failed');
+        $this->setExpectedException(AbortMigrationException::class, 'Something failed');
         $this->migration->abortIf(true, 'Something failed');
     }
 
@@ -79,13 +83,13 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsExceptionEvenWithoutMessage()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\AbortMigrationException', 'Unknown Reason');
+        $this->setExpectedException(AbortMigrationException::class, 'Unknown Reason');
         $this->migration->abortIf(true);
     }
 
     public function testSkipIfThrowsException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\SkipMigrationException', 'Something skipped');
+        $this->setExpectedException(SkipMigrationException::class, 'Something skipped');
         $this->migration->skipIf(true, 'Something skipped');
     }
 
@@ -96,13 +100,13 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testThrowIrreversibleMigrationException()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'Irreversible migration');
+        $this->setExpectedException(IrreversibleMigrationException::class, 'Irreversible migration');
         $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
     }
 
     public function testThrowIrreversibleMigrationExceptionWithoutMessage()
     {
-        $this->setExpectedException('Doctrine\DBAL\Migrations\IrreversibleMigrationException', 'This migration is irreversible and cannot be reverted.');
+        $this->setExpectedException(IrreversibleMigrationException::class, 'This migration is irreversible and cannot be reverted.');
         $this->migration->exposed_ThrowIrreversibleMigrationException();
     }
 

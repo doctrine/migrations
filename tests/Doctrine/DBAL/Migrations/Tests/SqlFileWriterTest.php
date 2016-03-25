@@ -19,6 +19,9 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception\InvalidArgumentException;
+use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\SqlFileWriter;
 use Doctrine\DBAL\Migrations\Version;
 use \Mockery as m;
@@ -31,43 +34,43 @@ class SqlFileWriterTest extends MigrationTestCase
 
     public function setUp()
     {
-        $this->ow = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
+        $this->ow = m::mock(OutputWriter::class);
     }
 
     public function testGoodConstructor()
     {
         $instance = new SqlFileWriter('version', 'test', '/tmp', $this->ow);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
+        $this->assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyColumnName()
     {
         $expectedException = class_exists('Doctrine\DBAL\Exception\InvalidArgumentException') ?
-            'Doctrine\DBAL\Exception\InvalidArgumentException' :
-            'Doctrine\DBAL\DBALException';
+            InvalidArgumentException::class :
+            DBALException::class;
         $this->setExpectedException($expectedException);
         $instance = new SqlFileWriter('', 'test', '/tmp', $this->ow);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
+        $this->assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyTableName()
     {
         $expectedException = class_exists('Doctrine\DBAL\Exception\InvalidArgumentException') ?
-            'Doctrine\DBAL\Exception\InvalidArgumentException' :
-            'Doctrine\DBAL\DBALException';
+            InvalidArgumentException::class :
+            DBALException::class;
         $this->setExpectedException($expectedException);
         $instance = new SqlFileWriter('version', '', '/tmp', $this->ow);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
+        $this->assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyDestPath()
     {
         $expectedException = class_exists('Doctrine\DBAL\Exception\InvalidArgumentException') ?
-            'Doctrine\DBAL\Exception\InvalidArgumentException' :
-            'Doctrine\DBAL\DBALException';
+            InvalidArgumentException::class :
+            DBALException::class;
         $this->setExpectedException($expectedException);
         $instance = new SqlFileWriter('test', '', $this->ow);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\SqlFileWriter', $instance);
+        $this->assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     /**

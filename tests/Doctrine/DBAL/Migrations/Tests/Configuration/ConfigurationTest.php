@@ -28,7 +28,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $configuration = new Configuration($this->getConnectionMock());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\OutputWriter', $configuration->getOutputWriter());
+        $this->assertInstanceOf(OutputWriter::class, $configuration->getOutputWriter());
     }
 
     public function testOutputWriterCanBeSet()
@@ -50,7 +50,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->setMigrationsDirectory($migrationsDir);
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationException',
+            MigrationException::class,
             'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?'
         );
         $configuration->registerMigrationsFromDirectory($migrationsDir);
@@ -61,7 +61,7 @@ class ConfigurationTest extends MigrationTestCase
      */
     private function getConnectionMock()
     {
-        return $this->getMockBuilder('Doctrine\DBAL\Connection')
+        return $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;
@@ -71,7 +71,7 @@ class ConfigurationTest extends MigrationTestCase
      */
     private function getOutputWriterMock()
     {
-        return $this->getMockBuilder('Doctrine\DBAL\Migrations\OutputWriter')
+        return $this->getMockBuilder(OutputWriter::class)
             ->disableOriginalConstructor()
             ->getMock()
         ;

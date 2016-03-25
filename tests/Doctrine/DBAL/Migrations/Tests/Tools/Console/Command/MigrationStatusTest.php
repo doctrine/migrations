@@ -2,7 +2,9 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationStatusTest extends MigrationTestCase
@@ -44,7 +46,7 @@ class MigrationStatusTest extends MigrationTestCase
     protected function assertVersion($alias, $version, $label, $output)
     {
         $command = $this
-            ->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand')
+            ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
                 [
@@ -53,7 +55,7 @@ class MigrationStatusTest extends MigrationTestCase
             )
             ->getMock();
 
-        $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+        $configuration = $this->getMockBuilder(Configuration::class)
             ->setConstructorArgs([$this->getSqliteConnection()])
             ->setMethods(['resolveVersionAlias', 'getDateTime', 'getAvailableVersions'])
             ->getMock();
@@ -102,7 +104,7 @@ class MigrationStatusTest extends MigrationTestCase
     public function testIfAmountNewMigrationsIsCorrectWithUnavailableMigrations()
     {
         $command = $this
-            ->getMockBuilder('Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand')
+            ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
                 [
@@ -111,7 +113,7 @@ class MigrationStatusTest extends MigrationTestCase
             )
             ->getMock();
 
-        $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+        $configuration = $this->getMockBuilder(Configuration::class)
             ->setConstructorArgs([$this->getSqliteConnection()])
             ->setMethods(['getMigratedVersions', 'getAvailableVersions', 'getCurrentVersion'])
             ->getMock();

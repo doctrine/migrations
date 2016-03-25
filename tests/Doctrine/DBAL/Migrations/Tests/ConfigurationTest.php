@@ -4,6 +4,10 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
+use Doctrine\DBAL\Migrations\Tests\Stub\Version2Test;
+use Doctrine\DBAL\Migrations\Tests\Stub\Version3Test;
+use Doctrine\DBAL\Migrations\Version;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -79,7 +83,7 @@ class ConfigurationTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationException',
+            MigrationException::class,
             'Could not find migration version 1234'
         );
         $config->getVersion(1234);
@@ -88,13 +92,13 @@ class ConfigurationTest extends MigrationTestCase
     public function testRegisterMigration()
     {
         $config = $this->getSqliteConfiguration();
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $config->registerMigration(1234, Version1Test::class);
 
         $this->assertEquals(1, count($config->getMigrations()), "One Migration registered.");
         $this->assertTrue($config->hasVersion(1234));
 
         $version = $config->getVersion(1234);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Version', $version);
+        $this->assertInstanceOf(Version::class, $version);
         $this->assertEquals(1234, $version->getVersion());
         $this->assertFalse($version->isMigrated());
     }
@@ -103,39 +107,39 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
-            1234 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test',
-            1235 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version2Test',
+            1234 => Version1Test::class,
+            1235 => Version2Test::class,
         ]);
 
         $this->assertEquals(2, count($config->getMigrations()), "Two Migration registered.");
 
         $version = $config->getVersion(1234);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Version', $version);
+        $this->assertInstanceOf(Version::class, $version);
 
         $version = $config->getVersion(1235);
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Version', $version);
+        $this->assertInstanceOf(Version::class, $version);
     }
 
     public function testRegisterDuplicateVersion()
     {
         $config = $this->getSqliteConfiguration();
 
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $config->registerMigration(1234, Version1Test::class);
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationException',
+            MigrationException::class,
             'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version'
         );
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $config->registerMigration(1234, Version1Test::class);
     }
 
     public function testPreviousCurrentNextLatestVersion()
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
-            1234 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test',
-            1235 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version2Test',
-            1236 => 'Doctrine\DBAL\Migrations\Tests\Stub\Version3Test',
+            1234 => Version1Test::class,
+            1235 => Version2Test::class,
+            1236 => Version3Test::class,
         ]);
 
         $this->assertSame(null, $config->getPrevVersion(), "no prev version");
@@ -177,7 +181,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $config->registerMigration(1234, 'Doctrine\DBAL\Migrations\Tests\Stub\Version1Test');
+        $config->registerMigration(1234, Version1Test::class);
         $this->assertEquals([1234], $config->getAvailableVersions());
     }
 
