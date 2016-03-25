@@ -19,11 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use \Mockery as m;

@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console;
 
-use Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\MigrationsVersion;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;

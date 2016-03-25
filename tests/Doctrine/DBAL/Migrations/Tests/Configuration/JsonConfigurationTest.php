@@ -2,7 +2,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
-use Doctrine\DBAL\Migrations\Configuration\ArrayConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\JsonConfiguration;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 use Doctrine\DBAL\Migrations\OutputWriter;

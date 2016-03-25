@@ -9,11 +9,6 @@ use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
-use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version2Test;
-use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version3Test;
-use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version4Test;
-use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version5Test;
-use Doctrine\DBAL\Migrations\Version;
 
 class ConfigurationTest extends MigrationTestCase
 {

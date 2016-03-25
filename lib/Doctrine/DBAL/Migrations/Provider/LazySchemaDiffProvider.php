@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Provider;
 
-use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Schema\Schema;
 use ProxyManager\Configuration;
 use ProxyManager\Factory\LazyLoadingValueHolderFactory;
