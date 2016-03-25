@@ -36,7 +36,7 @@ class ConsoleRunner
      *
      * @return void
      */
-    public static function run(HelperSet $helperSet, $commands = array())
+    public static function run(HelperSet $helperSet, $commands = [])
     {
         $cli = self::createApplication($helperSet, $commands);
         $cli->run();
@@ -51,7 +51,7 @@ class ConsoleRunner
      *
      * @return \Symfony\Component\Console\Application
      */
-    public static function createApplication(HelperSet $helperSet, $commands = array())
+    public static function createApplication(HelperSet $helperSet, $commands = [])
     {
         $cli = new Application('Doctrine Migrations', MigrationsVersion::VERSION());
         $cli->setCatchExceptions(true);
@@ -69,14 +69,14 @@ class ConsoleRunner
      */
     public static function addCommands(Application $cli)
     {
-        $cli->addCommands(array(
+        $cli->addCommands([
             new Command\ExecuteCommand(),
             new Command\GenerateCommand(),
             new Command\LatestCommand(),
             new Command\MigrateCommand(),
             new Command\StatusCommand(),
             new Command\VersionCommand(),
-        ));
+        ]);
 
         if ($cli->getHelperSet()->has('em')) {
             $cli->add(new Command\DiffCommand());

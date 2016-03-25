@@ -102,13 +102,13 @@ class ConfigurationHelper extends Helper
 
     private function loadConfig($config, OutputWriter $outputWriter)
     {
-        $map = array(
+        $map = [
             'xml'   => XmlConfiguration::class,
             'yaml'  => YamlConfiguration::class,
             'yml'   => YamlConfiguration::class,
             'php'   => ArrayConfiguration::class,
             'json'  => JsonConfiguration::class,
-        );
+        ];
 
         $info = pathinfo($config);
         // check we can support this file type

@@ -17,10 +17,10 @@
  * <http://www.doctrine-project.org>.
  */
 
-$autoloadFiles = array(
+$autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
     __DIR__ . '/../../../autoload.php'
-);
+];
 
 $autoloader = false;
 foreach ($autoloadFiles as $autoloadFile) {
@@ -38,7 +38,7 @@ if (!$autoloader) {
 }
 
 // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
-$directories = array(getcwd(), getcwd() . DIRECTORY_SEPARATOR . 'config');
+$directories = [getcwd(), getcwd() . DIRECTORY_SEPARATOR . 'config'];
 
 $configFile = null;
 foreach ($directories as $directory) {
