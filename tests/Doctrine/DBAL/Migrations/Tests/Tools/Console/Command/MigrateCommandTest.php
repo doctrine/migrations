@@ -2,21 +2,23 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Input\ArrayInput;
 
 class MigrateCommandTest extends MigrationTestCase
 {
 
     public function testGetVersionNameFromAlias()
     {
-        $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand');
+        $class = new \ReflectionClass(MigrateCommand::class);
         $method = $class->getMethod('getVersionNameFromAlias');
         $method->setAccessible(true);
 
-        $configuration = $this->getMockBuilder('Doctrine\DBAL\Migrations\Configuration\Configuration')
+        $configuration = $this->getMockBuilder(Configuration::class)
             ->setConstructorArgs([$this->getSqliteConnection()])
             ->setMethods(['resolveVersionAlias'])
             ->getMock();
@@ -55,7 +57,7 @@ class MigrateCommandTest extends MigrationTestCase
             );
         }
 
-        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+        $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
             ->setMethods(['isInteractive'])
             ->getMock();
@@ -66,13 +68,13 @@ class MigrateCommandTest extends MigrationTestCase
 
         $output = $this->getOutputStream();
 
-        $class = new \ReflectionClass('Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand');
+        $class = new \ReflectionClass(MigrateCommand::class);
         $method = $class->getMethod('canExecute');
         $method->setAccessible(true);
 
         /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
         $command = $this->getMock(
-            'Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand',
+            MigrateCommand::class,
             ['getHelperSet']
         );
 
@@ -96,7 +98,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->assertEquals(false, $method->invokeArgs($command, ['test', $input, $output]));
 
         //should return true if non interactive
-        $input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+        $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
             ->setMethods(['isInteractive'])
             ->getMock();

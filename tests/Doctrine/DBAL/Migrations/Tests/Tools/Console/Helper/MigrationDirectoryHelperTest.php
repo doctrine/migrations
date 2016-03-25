@@ -12,7 +12,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper', $mirationDirectoryHelper);
+        $this->assertInstanceOf(MigrationDirectoryHelper::class, $mirationDirectoryHelper);
     }
 
     public function testMigrationDirectoryHelperReturnConfiguredDir() {

@@ -5,7 +5,7 @@ use Doctrine\DBAL\Migrations\MigrationsVersion;
 
 class MigrationsVersionTest extends \PHPUnit_Framework_TestCase {
 
-    private $MigrationVersionClass = 'Doctrine\DBAL\Migrations\MigrationsVersion';
+    private $MigrationVersionClass = MigrationsVersion::class;
 
     public function testVersionNumber()
     {

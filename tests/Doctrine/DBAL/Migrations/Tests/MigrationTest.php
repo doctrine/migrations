@@ -21,6 +21,8 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
+use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\OutputWriter;
 use \Mockery as m;
 
 /**
@@ -44,7 +46,7 @@ class MigrationTest extends MigrationTestCase
         $migration = new Migration($this->config);
 
         $this->setExpectedException(
-            'Doctrine\DBAL\Migrations\MigrationException',
+            MigrationException::class,
             'Could not find migration version 1234'
         );
         $migration->migrate('1234');
@@ -76,7 +78,7 @@ class MigrationTest extends MigrationTestCase
      */
     public function testGetSql($to)
     {
-        $migrationMock = m::mock('Doctrine\DBAL\Migrations\Migration');
+        $migrationMock = m::mock(Migration::class);
         $migrationMock->makePartial();
         $expected = 'something';
         $migrationMock->shouldReceive('migrate')->with($to, true)->andReturn($expected);
@@ -109,10 +111,10 @@ class MigrationTest extends MigrationTestCase
         $sqlWriter = m::instanceMock('overload:Doctrine\DBAL\Migrations\SqlFileWriter');
         $sqlWriter->shouldReceive('write')->with(m::type('array'), m::anyOf('up', 'down'))->andReturn($expectedReturn);
 
-        $outputWriter = m::mock('Doctrine\DBAL\Migrations\OutputWriter');
+        $outputWriter = m::mock(OutputWriter::class);
         $outputWriter->shouldReceive('write');
 
-        $config = m::mock('Doctrine\DBAL\Migrations\Configuration\Configuration')
+        $config = m::mock(Configuration::class)
             ->makePartial();
         $config->shouldReceive('getCurrentVersion')->andReturn($from);
         $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);

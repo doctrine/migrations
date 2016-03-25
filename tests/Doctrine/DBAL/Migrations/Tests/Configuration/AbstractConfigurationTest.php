@@ -2,8 +2,10 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Finder\GlobFinder;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
@@ -61,7 +63,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
 
     public function testSetMigrationFinder()
     {
-        $migrationFinderProphecy = $this->prophesize('Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface');
+        $migrationFinderProphecy = $this->prophesize(MigrationFinderInterface::class);
         /** @var $migrationFinder MigrationFinderInterface */
         $migrationFinder = $migrationFinderProphecy->reveal();
 
@@ -69,7 +71,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $config->setMigrationsFinder($migrationFinder);
 
         $migrationFinderPropertyReflected = new \ReflectionProperty(
-            'Doctrine\DBAL\Migrations\Configuration\Configuration',
+            Configuration::class,
             'migrationFinder'
         );
         $migrationFinderPropertyReflected->setAccessible(true);
@@ -79,7 +81,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testThrowExceptionIfAlreadyLoaded()
     {
         $config = $this->loadConfiguration();
-        $this->setExpectedException('Doctrine\DBAL\Migrations\MigrationException');
+        $this->setExpectedException(MigrationException::class);
         $config->load($config->getFile());
     }
 

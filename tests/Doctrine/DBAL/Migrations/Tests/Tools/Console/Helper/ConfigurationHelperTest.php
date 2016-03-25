@@ -2,10 +2,13 @@
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\Configuration\ArrayConfiguration;
+use Doctrine\DBAL\Migrations\Configuration\JsonConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\ORM\Configuration;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use InvalidArgumentException;
@@ -44,7 +47,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $this->connection = $this->getSqliteConnection();
 
-        $this->input = $this->getMockBuilder('Symfony\Component\Console\Input\ArrayInput')
+        $this->input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
             ->setMethods(['getOption'])
             ->getMock();
@@ -54,7 +57,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $configurationHelper = new ConfigurationHelper($this->connection, $this->configuration);
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper', $configurationHelper);
+        $this->assertInstanceOf(ConfigurationHelper::class, $configurationHelper);
     }
 
     //used in other tests to see if xml or yaml or yml config files are loaded.
@@ -118,7 +121,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\ArrayConfiguration', $migrationConfig);
+        $this->assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
         $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
@@ -131,7 +134,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\JsonConfiguration', $migrationConfig);
+        $this->assertInstanceOf(JsonConfiguration::class, $migrationConfig);
         $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
@@ -163,7 +166,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
+        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
 
         $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
     }
@@ -179,7 +182,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
+        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
         $this->assertStringMatchesFormat("Loading configuration from command option: %a", $this->getOutputStreamContent($this->output));
     }
 
@@ -194,7 +197,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf('Doctrine\DBAL\Migrations\Configuration\Configuration', $migrationConfig);
+        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
         $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 
