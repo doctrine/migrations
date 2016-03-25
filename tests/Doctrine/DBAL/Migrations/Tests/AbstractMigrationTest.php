@@ -25,7 +25,7 @@ class AbstractMigrationTest extends MigrationTestCase
     protected $outputWriter;
     protected $output;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->outputWriter = $this->getOutputWriter();
 

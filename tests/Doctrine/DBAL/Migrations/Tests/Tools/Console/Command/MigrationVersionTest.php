@@ -16,7 +16,7 @@ class MigrationVersionTest extends MigrationTestCase
     /** @var Configuration */
     private $configuration;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->command = $this
             ->getMockBuilder(VersionCommand::class)

@@ -41,7 +41,7 @@ class ConfigurationHelperTest extends MigrationTestCase
      */
     private $input;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->configuration = $this->getSqliteConfiguration();
 
