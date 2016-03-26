@@ -25,17 +25,17 @@ class MigrateCommandTest extends MigrationTestCase
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['prev', $output, $configuration]));
+        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['prev', $output, $configuration]));
         $this->assertContains('Already at first version.', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['next', $output, $configuration]));
+        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['next', $output, $configuration]));
         $this->assertContains('Already at latest version.', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
 
-        $this->assertEquals(false, $method->invokeArgs(new MigrateCommand(), ['giberich', $output, $configuration]));
+        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['giberich', $output, $configuration]));
         $this->assertContains('Unknown version: giberich', $this->getOutputStreamContent($output));
 
         $output = $this->getOutputStream();
@@ -91,11 +91,11 @@ class MigrateCommandTest extends MigrationTestCase
             ->will($this->returnValue($helperSet));
 
         //should return true if user confirm
-        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
+        $this->assertTrue($method->invokeArgs($command, ['test', $input, $output]));
 
         //shoudl return false if user cancel
         $helper->setInputStream($this->getInputStream("n\n"));
-        $this->assertEquals(false, $method->invokeArgs($command, ['test', $input, $output]));
+        $this->assertFalse($method->invokeArgs($command, ['test', $input, $output]));
 
         //should return true if non interactive
         $input = $this->getMockBuilder(ArrayInput::class)
@@ -105,6 +105,6 @@ class MigrateCommandTest extends MigrationTestCase
         $input->expects($this->any())
             ->method('isInteractive')
             ->will($this->returnValue(false));
-        $this->assertEquals(true, $method->invokeArgs($command, ['test', $input, $output]));
+        $this->assertTrue($method->invokeArgs($command, ['test', $input, $output]));
     }
 }

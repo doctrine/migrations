@@ -69,8 +69,8 @@ class ConfigurationTest extends MigrationTestCase
     public function testEmptyProjectDefaults()
     {
         $config = $this->getSqliteConfiguration();
-        $this->assertSame(null, $config->getPrevVersion(), "no prev version");
-        $this->assertSame(null, $config->getNextVersion(), "no next version");
+        $this->assertNull($config->getPrevVersion(), "no prev version");
+        $this->assertNull($config->getNextVersion(), "no next version");
         $this->assertSame('0', $config->getCurrentVersion(), "current version 0");
         $this->assertSame('0', $config->getLatestVersion(), "latest version 0");
         $this->assertEquals(0, $config->getNumberOfAvailableMigrations(), "number of available migrations 0");
@@ -94,7 +94,7 @@ class ConfigurationTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
         $config->registerMigration(1234, Version1Test::class);
 
-        $this->assertEquals(1, count($config->getMigrations()), "One Migration registered.");
+        $this->assertCount(1, $config->getMigrations(), "One Migration registered.");
         $this->assertTrue($config->hasVersion(1234));
 
         $version = $config->getVersion(1234);
@@ -111,7 +111,7 @@ class ConfigurationTest extends MigrationTestCase
             1235 => Version2Test::class,
         ]);
 
-        $this->assertEquals(2, count($config->getMigrations()), "Two Migration registered.");
+        $this->assertCount(2, $config->getMigrations(), "Two Migration registered.");
 
         $version = $config->getVersion(1234);
         $this->assertInstanceOf(Version::class, $version);
@@ -142,7 +142,7 @@ class ConfigurationTest extends MigrationTestCase
             1236 => Version3Test::class,
         ]);
 
-        $this->assertSame(null, $config->getPrevVersion(), "no prev version");
+        $this->assertNull($config->getPrevVersion(), "no prev version");
         $this->assertSame('0', $config->getCurrentVersion(), "current version 0");
         $this->assertSame('1234', $config->getNextVersion(), "next version 1234");
         $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
@@ -167,13 +167,13 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('1236', $config->resolveVersionAlias('next'), "next version is 1236");
         $this->assertSame('1236', $config->resolveVersionAlias('latest'), "latest version 1236");
         $this->assertSame('1236', $config->resolveVersionAlias('1236'), "identical version");
-        $this->assertSame(null, $config->resolveVersionAlias('123678'), "unknown version");
+        $this->assertNull($config->resolveVersionAlias('123678'), "unknown version");
 
         $config->getVersion(1236)->markMigrated();
 
         $this->assertSame('1235', $config->getPrevVersion(), "prev version 1235");
         $this->assertSame('1236', $config->getCurrentVersion(), "current version 1236");
-        $this->assertSame(null, $config->getNextVersion(), "no next version");
+        $this->assertNull($config->getNextVersion(), "no next version");
         $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
     }
 
