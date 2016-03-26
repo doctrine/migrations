@@ -28,7 +28,7 @@ class FunctionalTest extends MigrationTestCase
      */
     private $connection;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->connection = $this->getSqliteConnection();
         $this->config = new Configuration($this->connection);

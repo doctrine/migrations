@@ -32,7 +32,7 @@ class SqlFileWriterTest extends MigrationTestCase
     /** @var \Mockery\Mock */
     protected $ow;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->ow = m::mock(OutputWriter::class);
     }

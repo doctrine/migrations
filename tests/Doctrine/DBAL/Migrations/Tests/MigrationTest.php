@@ -34,7 +34,7 @@ class MigrationTest extends MigrationTestCase
     /** @var Configuration */
     private $config;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->config = new Configuration($this->getSqliteConnection());
         $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
