@@ -1,5 +1,5 @@
 <?php
-return array(
+return [
 'name'                 => 'Doctrine Sandbox Migrations',
 'table_name'           => 'doctrine_migration_versions_test',
 'migrations'           => [
@@ -19,4 +19,4 @@ return array(
             "version" => "Version3Test",
         ]
 ]
-);
+];
