@@ -93,7 +93,7 @@ EOT
         $availableMigrations = $configuration->getAvailableVersions();
 
         $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
-        if (false === $version) {
+        if ($version === false) {
             return 1;
         }
 
@@ -156,10 +156,9 @@ EOT
     }
 
     /**
-     * @param string          $question
-     * @param InputInterface  $input
+     * @param string $question
+     * @param InputInterface $input
      * @param OutputInterface $output
-     *
      * @return bool
      */
     private function canExecute($question, InputInterface $input, OutputInterface $output)
@@ -172,22 +171,21 @@ EOT
     }
 
     /**
-     * @param string          $versionAlias
+     * @param string $versionAlias
      * @param OutputInterface $output
-     * @param Configuration   $configuration
-     *
+     * @param Configuration $configuration
      * @return bool|string
      */
     private function getVersionNameFromAlias($versionAlias, OutputInterface $output, Configuration $configuration)
     {
         $version = $configuration->resolveVersionAlias($versionAlias);
         if ($version === null) {
-            if ('prev' === $versionAlias) {
+            if ($versionAlias == 'prev') {
                 $output->writeln('<error>Already at first version.</error>');
 
                 return false;
             }
-            if ('next' === $versionAlias) {
+            if ($versionAlias == 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
 
                 return false;
