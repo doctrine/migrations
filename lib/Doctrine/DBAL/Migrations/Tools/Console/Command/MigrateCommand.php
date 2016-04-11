@@ -21,10 +21,10 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for executing a migration to a specified version or the latest available version.
@@ -75,7 +75,7 @@ You can also time all the different queries if you wanna know which one is takin
 
     <info>%command.full_name% --query-time</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -83,17 +83,17 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration = new Migration($configuration);
+        $migration     = new Migration($configuration);
 
         $this->outputHeader($configuration, $output);
 
         $timeAllqueries = $input->getOption('query-time');
 
-        $executedMigrations = $configuration->getMigratedVersions();
+        $executedMigrations  = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
 
         $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
-        if ($version === false) {
+        if (false === $version) {
             return 1;
         }
 
@@ -114,7 +114,7 @@ EOT
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
-            if (! $this->canExecute($question, $input, $output)) {
+            if (!$this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return 1;
@@ -124,15 +124,17 @@ EOT
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
+
+            return 0;
         } else {
-            $dryRun = (boolean) $input->getOption('dry-run');
+            $dryRun = (boolean)$input->getOption('dry-run');
 
             // warn the user if no dry run and interaction is on
-            if (! $dryRun) {
+            if (!$dryRun) {
                 $question = 'WARNING! You are about to execute a database migration'
                     . ' that could result in schema changes and data lost.'
                     . ' Are you sure you wish to continue? (y/n)';
-                if (! $this->canExecute($question, $input, $output)) {
+                if (!$this->canExecute($question, $input, $output)) {
                     $output->writeln('<error>Migration cancelled!</error>');
 
                     return 1;
@@ -144,19 +146,25 @@ EOT
 
             if (empty($sql)) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
+                $exitCode = ($input->getOption('allow-no-migration')) ? 0 : 1;
+
+                return $exitCode;
             }
         }
+
+        return 1;
     }
 
     /**
-     * @param string $question
-     * @param InputInterface $input
+     * @param string          $question
+     * @param InputInterface  $input
      * @param OutputInterface $output
+     *
      * @return bool
      */
     private function canExecute($question, InputInterface $input, OutputInterface $output)
     {
-        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
+        if ($input->isInteractive() && !$this->askConfirmation($question, $input, $output)) {
             return false;
         }
 
@@ -164,21 +172,24 @@ EOT
     }
 
     /**
-     * @param string $versionAlias
+     * @param string          $versionAlias
      * @param OutputInterface $output
-     * @param Configuration $configuration
+     * @param Configuration   $configuration
+     *
      * @return bool|string
      */
     private function getVersionNameFromAlias($versionAlias, OutputInterface $output, Configuration $configuration)
     {
         $version = $configuration->resolveVersionAlias($versionAlias);
         if ($version === null) {
-            if ($versionAlias == 'prev') {
+            if ('prev' === $versionAlias) {
                 $output->writeln('<error>Already at first version.</error>');
+
                 return false;
             }
-            if ($versionAlias == 'next') {
+            if ('next' === $versionAlias) {
                 $output->writeln('<error>Already at latest version.</error>');
+
                 return false;
             }
 
@@ -186,6 +197,7 @@ EOT
                 '<error>Unknown version: %s</error>',
                 $output->getFormatter()->escape($versionAlias)
             ));
+
             return false;
         }
 
