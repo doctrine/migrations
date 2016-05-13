@@ -601,9 +601,9 @@ class Configuration
             $this->registerMigrationsFromDirectory($this->getMigrationsDirectory());
         }
 
-        $versions = array_keys($this->migrations);
-        array_unshift($versions, 0);
-        $offset = array_search($version, $versions);
+        $versions = array_map('strval', array_keys($this->migrations));
+        array_unshift($versions, '0');
+        $offset = array_search((string)$version, $versions, true);
         if ($offset === false || !isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.
             return null;
