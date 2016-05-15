@@ -603,13 +603,13 @@ class Configuration
 
         $versions = array_map('strval', array_keys($this->migrations));
         array_unshift($versions, '0');
-        $offset = array_search((string)$version, $versions, true);
+        $offset = array_search((string)$version, $versions);
         if ($offset === false || !isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.
             return null;
         }
 
-        return (string) $versions[$offset + $delta];
+        return $versions[$offset + $delta];
     }
 
     /**
