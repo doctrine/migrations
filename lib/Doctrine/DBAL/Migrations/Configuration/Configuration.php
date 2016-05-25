@@ -409,7 +409,7 @@ class Configuration
         }
         $version = new Version($this, $version, $class);
         $this->migrations[$version->getVersion()] = $version;
-        ksort($this->migrations);
+        ksort($this->migrations, SORT_STRING);
 
         return $version;
     }

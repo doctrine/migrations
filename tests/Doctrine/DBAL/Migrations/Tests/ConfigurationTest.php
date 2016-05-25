@@ -139,7 +139,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->registerMigrations([
             '0initial' => Version1Test::class,
             1 => Version2Test::class,
-            '2final' => Version3Test::class,
+            'final' => Version3Test::class,
         ]);
 
         // Relative to nonexistent version
@@ -152,7 +152,7 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('0', $config->getRelativeVersion(0, 0));
         $this->assertSame('0initial', $config->getRelativeVersion(0, 1));
         $this->assertSame('1', $config->getRelativeVersion(0, 2));
-        $this->assertSame('2final', $config->getRelativeVersion(0, 3));
+        $this->assertSame('final', $config->getRelativeVersion(0, 3));
         $this->assertNull($config->getRelativeVersion(0, 4));
 
         // Relative to version '0' as string
@@ -160,7 +160,7 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('0', $config->getRelativeVersion('0', 0));
         $this->assertSame('0initial', $config->getRelativeVersion('0', 1));
         $this->assertSame('1', $config->getRelativeVersion('0', 2));
-        $this->assertSame('2final', $config->getRelativeVersion('0', 3));
+        $this->assertSame('final', $config->getRelativeVersion('0', 3));
         $this->assertNull($config->getRelativeVersion('0', 4));
 
         // Relative to version '0initial'
@@ -168,7 +168,7 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('0', $config->getRelativeVersion('0initial', -1));
         $this->assertSame('0initial', $config->getRelativeVersion('0initial', 0));
         $this->assertSame('1', $config->getRelativeVersion('0initial', 1));
-        $this->assertSame('2final', $config->getRelativeVersion('0initial', 2));
+        $this->assertSame('final', $config->getRelativeVersion('0initial', 2));
         $this->assertNull($config->getRelativeVersion('0initial', 3));
 
         // Relative to version '1' as int
@@ -176,7 +176,7 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('0', $config->getRelativeVersion(1, -2));
         $this->assertSame('0initial', $config->getRelativeVersion(1, -1));
         $this->assertSame('1', $config->getRelativeVersion(1, 0));
-        $this->assertSame('2final', $config->getRelativeVersion(1, 1));
+        $this->assertSame('final', $config->getRelativeVersion(1, 1));
         $this->assertNull($config->getRelativeVersion(1, 2));
 
         // Relative to version '1' as string
@@ -184,16 +184,16 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('0', $config->getRelativeVersion('1', -2));
         $this->assertSame('0initial', $config->getRelativeVersion('1', -1));
         $this->assertSame('1', $config->getRelativeVersion('1', 0));
-        $this->assertSame('2final', $config->getRelativeVersion('1', 1));
+        $this->assertSame('final', $config->getRelativeVersion('1', 1));
         $this->assertNull($config->getRelativeVersion('1', 2));
 
-        // Relative to version '2final'
-        $this->assertNull($config->getRelativeVersion('2final', -4));
-        $this->assertSame('0', $config->getRelativeVersion('2final', -3));
-        $this->assertSame('0initial', $config->getRelativeVersion('2final', -2));
-        $this->assertSame('1', $config->getRelativeVersion('2final', -1));
-        $this->assertSame('2final', $config->getRelativeVersion('2final', 0));
-        $this->assertNull($config->getRelativeVersion('2final', 1));
+        // Relative to version 'final'
+        $this->assertNull($config->getRelativeVersion('final', -4));
+        $this->assertSame('0', $config->getRelativeVersion('final', -3));
+        $this->assertSame('0initial', $config->getRelativeVersion('final', -2));
+        $this->assertSame('1', $config->getRelativeVersion('final', -1));
+        $this->assertSame('final', $config->getRelativeVersion('final', 0));
+        $this->assertNull($config->getRelativeVersion('final', 1));
     }
 
     public function testPreviousCurrentNextLatestVersion()
