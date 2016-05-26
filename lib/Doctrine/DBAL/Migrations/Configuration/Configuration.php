@@ -409,7 +409,7 @@ class Configuration
         }
         $version = new Version($this, $version, $class);
         $this->migrations[$version->getVersion()] = $version;
-        ksort($this->migrations);
+        ksort($this->migrations, SORT_STRING);
 
         return $version;
     }
@@ -601,15 +601,15 @@ class Configuration
             $this->registerMigrationsFromDirectory($this->getMigrationsDirectory());
         }
 
-        $versions = array_keys($this->migrations);
-        array_unshift($versions, 0);
-        $offset = array_search($version, $versions);
+        $versions = array_map('strval', array_keys($this->migrations));
+        array_unshift($versions, '0');
+        $offset = array_search((string)$version, $versions);
         if ($offset === false || !isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.
             return null;
         }
 
-        return (string) $versions[$offset + $delta];
+        return $versions[$offset + $delta];
     }
 
     /**
