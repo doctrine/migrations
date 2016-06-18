@@ -112,6 +112,13 @@ class ConfigurationHelperTest extends MigrationTestCase
         );
     }
 
+    public function testConfigurationHelperLoadsPhpFormat() {
+        $this->assertStringMatchesFormat(
+            'Loading configuration from file: migrations.php',
+            $this->getConfigurationHelperLoadsASpecificFormat('config.php', 'migrations.php')
+        );
+    }
+
     public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() {
         $this->input->expects($this->any())
             ->method('getOption')
