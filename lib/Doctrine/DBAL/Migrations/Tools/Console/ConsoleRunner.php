@@ -76,6 +76,7 @@ class ConsoleRunner
             new Command\MigrateCommand(),
             new Command\StatusCommand(),
             new Command\VersionCommand(),
+            new Command\UpToDateCommand(),
         ]);
 
         if ($cli->getHelperSet()->has('em')) {
