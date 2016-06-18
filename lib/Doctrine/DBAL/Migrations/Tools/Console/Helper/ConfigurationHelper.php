@@ -81,7 +81,8 @@ class ConfigurationHelper extends Helper
             'migrations.xml',
             'migrations.yml',
             'migrations.yaml',
-            'migrations.json'
+            'migrations.json',
+            'migrations.php',
         ];
         foreach ($defaultConfig as $config) {
             if ($this->configExists($config)) {
