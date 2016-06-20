@@ -29,6 +29,8 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use \Mockery as m;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamFile;
 
 /**
  * @runTestsInSeparateProcesses
@@ -329,4 +331,29 @@ class VersionTest extends MigrationTestCase
             [Version::DIRECTION_DOWN, 'fkqsdmfjl', 'balalala'],
         ];
     }
+
+    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql()
+    {
+        $version = 1;
+
+        $connection = $this->getSqliteConnection();
+
+        $config = m::mock(Configuration::class)
+            ->makePartial();
+        $config->shouldReceive('getOutputWriter')->andReturn($this->getOutputWriter());
+        $config->shouldReceive('getConnection')->andReturn($connection);
+
+        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', [$config, $version, 'stdClass'])->makePartial();
+        $migration->shouldReceive('execute')->andReturn(['SHOW DATABASES;']);
+
+        $sqlFilesDir = vfsStream::setup('sql_files_dir');
+        $migration->writeSqlFile(vfsStream::url('sql_files_dir'), Version::DIRECTION_UP);
+
+        $this->assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
+
+        /** @var vfsStreamFile $sqlMigrationFile */
+        $sqlMigrationFile = current($sqlFilesDir->getChildren());
+        $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
+        $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+    }    
 }

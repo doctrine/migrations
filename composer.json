@@ -24,7 +24,8 @@
         "doctrine/coding-standard": "dev-master",
         "mockery/mockery": "^0.9.4",
         "johnkary/phpunit-speedtrap": "~1.0@dev",
-        "jdorn/sql-formatter": "~1.1"
+        "jdorn/sql-formatter": "~1.1",
+        "mikey179/vfsStream": "^1.6"
     },
     "suggest": {
         "jdorn/sql-formatter": "Allows to generate formatted SQL with the diff command."

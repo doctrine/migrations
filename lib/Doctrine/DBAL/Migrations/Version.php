@@ -223,7 +223,7 @@ class Version
             throw MigrationException::migrationNotConvertibleToSql($this->class);
         }
 
-        $this->outputWriter->write("\n# Version " . $this->version . "\n");
+        $this->outputWriter->write("\n-- Version " . $this->version . "\n");
 
         $sqlQueries = [$this->version => $queries];
         $sqlWriter = new SqlFileWriter(
