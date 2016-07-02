@@ -107,6 +107,7 @@ class SqlFileWriter
     {
         $path = $this->destPath;
         if (is_dir($path)) {
+            $path = realpath($path);
             $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
         }
 
