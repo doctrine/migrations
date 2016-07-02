@@ -92,7 +92,7 @@ class Migration
 
         $direction = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
 
-        $this->outputWriter->write(sprintf("# Migrating from %s to %s\n", $from, $to));
+        $this->outputWriter->write(sprintf("-- Migrating from %s to %s\n", $from, $to));
 
         $sqlWriter = new SqlFileWriter(
             $this->configuration->getMigrationsColumnName(),

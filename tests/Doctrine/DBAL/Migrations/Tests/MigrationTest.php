@@ -17,6 +17,27 @@
  * <http://www.doctrine-project.org>.
 */
 
+namespace Doctrine\DBAL\Migrations;
+
+if (!function_exists(__NAMESPACE__ . '\realpath')) {
+    /**
+     * Override realpath() in current namespace for testing
+     *
+     * @param $path
+     *
+     * @return string|false
+     */
+    function realpath($path)
+    {
+        // realpath issue with vfsStream
+        // @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
+        if (0 === strpos($path, 'vfs://')) {
+            return $path;
+        }
+        return \realpath($path);
+    }
+}
+
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -24,6 +45,8 @@ use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use \Mockery as m;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamFile;
 
 /**
  * @runTestsInSeparateProcesses
@@ -33,6 +56,8 @@ class MigrationTest extends MigrationTestCase
 {
     /** @var Configuration */
     private $config;
+    
+    protected $output;
 
     protected function setUp()
     {
@@ -140,4 +165,25 @@ class MigrationTest extends MigrationTestCase
         ];
     }
 
+    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql()
+    {
+        $config = m::mock(Configuration::class)->makePartial();
+        $config->shouldReceive('getCurrentVersion')->andReturn(0);
+        $config->shouldReceive('getOutputWriter')->andReturn($this->getOutputWriter());
+        $migration = m::mock('Doctrine\DBAL\Migrations\Migration[getSql]', [$config])->makePartial();
+        $migration->shouldReceive('getSql')->andReturn(['1' => ['SHOW DATABASES']]);
+
+
+        $sqlFilesDir = vfsStream::setup('sql_files_dir');
+        $migration->writeSqlFile(vfsStream::url('sql_files_dir'), 1);
+
+        $this->assertRegExp('/^\s*-- Migrating from 0 to 1/m', $this->getOutputStreamContent($this->output));
+
+        /** @var vfsStreamFile $sqlMigrationFile */
+        $sqlMigrationFile = current($sqlFilesDir->getChildren());
+        $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
+        $this->assertRegExp('/^\s*-- Doctrine Migration File Generated on/m', $sqlMigrationFile->getContent());
+        $this->assertRegExp('/^\s*-- Version 1/m', $sqlMigrationFile->getContent());
+        $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+    }
 }
