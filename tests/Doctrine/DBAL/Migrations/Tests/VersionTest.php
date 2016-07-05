@@ -45,6 +45,10 @@ use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunNamedParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunTypes;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
@@ -376,5 +380,96 @@ class VersionTest extends MigrationTestCase
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
         $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
         $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
-    }    
+    }
+
+    public function testDryRunCausesSqlToBeOutputViaTheOutputWriter()
+    {
+        $messages = [];
+        $ow = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = trim($msg);
+        });
+        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $version = new Version(
+            $config,
+            '006',
+            VersionDryRunWithoutParams::class
+        );
+
+        $version->execute(Version::DIRECTION_UP, true);
+
+        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        $this->assertContains('SELECT 1 WHERE 1', $messages[1]);
+    }
+
+    public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement()
+    {
+        $messages = [];
+        $ow = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = trim($msg);
+        });
+        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $version = new Version(
+            $config,
+            '006',
+            VersionDryRunQuestionMarkParams::class
+        );
+
+        $version->execute(Version::DIRECTION_UP, true);
+
+        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        $this->assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
+        $this->assertContains('with parameters (one, two)', $messages[1]);
+    }
+
+    public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement()
+    {
+        $messages = [];
+        $ow = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = trim($msg);
+        });
+        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $version = new Version(
+            $config,
+            '006',
+            VersionDryRunNamedParams::class
+        );
+
+        $version->execute(Version::DIRECTION_UP, true);
+
+        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        $this->assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
+        $this->assertContains('with parameters (:one => one, :two => two)', $messages[1]);
+    }
+
+    public static function dryRunTypes()
+    {
+        return [
+            'datetime' => [new \DateTime('2016-07-05 01:00:00'), 'datetime', '2016-07-05 01:00:00'],
+            'array' => [['one' => 'two'], 'array', serialize(['one' => 'two'])],
+        ];
+    }
+
+    /**
+     * @dataProvider dryRunTypes
+     */
+    public function testDryRunWithParametersOfComplexTypesCorrectFormatsParameters($value, $type, $output)
+    {
+        $messages = [];
+        $ow = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = trim($msg);
+        });
+        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $version = new Version(
+            $config,
+            '006',
+            VersionDryRunTypes::class
+        );
+        $version->getMigration()->setParam($value, $type);
+
+        $version->execute(Version::DIRECTION_UP, true);
+
+        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        $this->assertContains('INSERT INTO test VALUES (?)', $messages[1]);
+        $this->assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
+    }
 }
