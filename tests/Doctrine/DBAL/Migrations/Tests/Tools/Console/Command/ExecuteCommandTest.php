@@ -5,6 +5,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Helper\QuestionHelper;
+use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -15,7 +16,7 @@ class ExecuteCommandTest extends MigrationTestCase
 {
     const VERSION = '20160705000000';
 
-    private $commmand, $app, $config, $version, $questions;
+    private $commmand, $app, $config, $version, $questions, $isDialogHelper;
 
     public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
     {
@@ -23,12 +24,12 @@ class ExecuteCommandTest extends MigrationTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), 'up');
 
-        $tester = $this->executeCommand([
+        list(, $statusCode) = $this->executeCommand([
             '--write-sql' => true,
             '--up' => true,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $statusCode);
     }
 
     public function testWriteSqlOutputsSqlFileToTheSpecifiedDirectory()
@@ -37,63 +38,59 @@ class ExecuteCommandTest extends MigrationTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, 'down');
 
-        $tester = $this->executeCommand([
+        list(, $statusCode) = $this->executeCommand([
             '--write-sql' => __DIR__,
             '--down' => true,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $statusCode);
     }
 
     public function testNoMigrationIsExecuteWhenTheUserDoesNotConfirmTheAction()
     {
-        $this->questions->expects($this->once())
-            ->method('ask')
-            ->willReturn(false);
+        $this->willAskConfirmationAndReturn(false);
         $this->version->expects($this->never())
             ->method('execute');
 
-        $tester = $this->executeCommand([]);
+        list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $statusCode);
+        $this->assertContains('Migration cancelled', $tester->getDisplay());
     }
 
     public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction()
     {
-        $this->questions->expects($this->once())
-            ->method('ask')
-            ->willReturn(true);
+        $this->willAskConfirmationAndReturn(true);
         $this->version->expects($this->once())
             ->method('execute')
             ->with('up', true, true);
 
-        $tester = $this->executeCommand([
+        list(, $statusCode) = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $statusCode);
     }
 
     public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode()
     {
         $this->questions->expects($this->never())
-            ->method('ask');
+            ->method($this->isDialogHelper ? 'askConfirmation' : 'ask');
         $this->version->expects($this->once())
             ->method('execute')
             ->with('up', true, true);
 
-        $tester = $this->executeCommand([
+        list(, $statusCode) = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ], ['interactive' => false]);
 
-        $this->assertSame(0, $tester->getStatusCode());
+        $this->assertSame(0, $statusCode);
     }
 
     protected function setUp()
     {
-        $this->questions = $this->getMock(QuestionHelper::class);
         $this->config = $this->mockWithoutConstructor(Configuration::class);
         $this->config->expects($this->any())
             ->method('getConnection')
@@ -108,7 +105,14 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->app = new Application();
         $this->app->add($this->command);
 
-        $this->app->getHelperSet()->set($this->questions, 'question');
+        if (class_exists(QuestionHelper::class)) {
+            $this->isDialogHelper = false;
+            $this->questions = $this->getMock(QuestionHelper::class);
+        } else {
+            $this->isDialogHelper = true;
+            $this->questions = $this->getMock(DialogHelper::class);
+        }
+        $this->app->getHelperSet()->set($this->questions, $this->isDialogHelper ? 'dialog' : 'question');
     }
 
     private function mockWithoutConstructor($cls)
@@ -126,11 +130,18 @@ class ExecuteCommandTest extends MigrationTestCase
     private function executeCommand(array $args, array $options=[])
     {
         $tester = $this->createCommandTester();
-        $tester->execute(array_replace([
+        $statusCode = $tester->execute(array_replace([
             'command' => 'migrations:execute',
             'version' => self::VERSION,
         ], $args), $options);
 
-        return $tester;
+        return [$tester, $statusCode];
+    }
+
+    private function willAskConfirmationAndReturn($bool)
+    {
+        $this->questions->expects($this->once())
+            ->method($this->isDialogHelper ? 'askConfirmation' : 'ask')
+            ->willReturn($bool);
     }
 }
