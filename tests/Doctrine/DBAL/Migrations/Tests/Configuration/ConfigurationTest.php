@@ -3,6 +3,9 @@
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
@@ -169,6 +172,41 @@ class ConfigurationTest extends MigrationTestCase
         $version = $configuration->generateVersionNumber();
 
         $this->assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);
+    }
+
+    /**
+     * Connection is tested via the `getMigratedVersions` method which is the
+     * simplest to set up for.
+     *
+     * @see https://github.com/doctrine/migrations/issues/336
+     */
+    public function testMasterSlaveConnectionAlwaysConnectsToMaster()
+    {
+        $sm = $this->getMockForAbstractClass(AbstractSchemaManager::class, [], '', false, true, true, ['tablesExist']);
+        $sm->expects($this->once())
+            ->method('tablesExist')
+            ->willReturn(true);
+        $conn = $this->getMockBuilder(MasterSlaveConnection::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+        $conn->expects($this->atLeastOnce())
+            ->method('connect')
+            ->with('master')
+            ->willReturn(true);
+        $conn->expects($this->any())
+            ->method('getSchemaManager')
+            ->willReturn($sm);
+        $conn->expects($this->once())
+            ->method('fetchAll')
+            ->willReturn([
+                ['version' => '2016070600000'],
+            ]);
+
+        $config = new Configuration($conn);
+        $config->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
+        $config->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
+
+        $config->getMigratedVersions();
     }
 
     public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations()
