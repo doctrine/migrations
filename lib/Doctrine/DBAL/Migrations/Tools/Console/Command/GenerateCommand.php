@@ -94,7 +94,8 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $path = $this->generateMigration($configuration, $input);
+        $version = $configuration->generateVersionNumber();
+        $path = $this->generateMigration($configuration, $input, $version);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
@@ -104,7 +105,7 @@ EOT
         return self::$_template;
     }
 
-    protected function generateMigration(Configuration $configuration, InputInterface $input, $up = null, $down = null)
+    protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
         $placeHolders = [
             '<namespace>',
@@ -114,7 +115,7 @@ EOT
         ];
         $replacements = [
             $configuration->getMigrationsNamespace(),
-            $version = $configuration->generateVersionNumber(),
+            $version,
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
             $down ? "        " . implode("\n        ", explode("\n", $down)) : null
         ];
