@@ -805,13 +805,12 @@ class Configuration
     /**
      * Generate a new migration version. A version is (usually) a datetime string.
      *
-     * @param DateTimeInterface|null $now Defaults to the current time.
+     * @param DateTimeInterface|null $now Defaults to the current time in UTC
      * @return string The newly generated version
      */
     public function generateVersionNumber(\DateTimeInterface $now=null)
     {
-        // defaults to `now` in the current timezone.
-        $now = $now ?: new \DateTime();
+        $now = $now ?: new \DateTime('now', new \DateTimeZone('UTC'));
 
         return $now->format(self::VERSION_FORMAT);
     }
