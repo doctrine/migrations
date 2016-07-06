@@ -55,6 +55,11 @@ class Configuration
     const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
 
     /**
+     * The date format for new version numbers
+     */
+    const VERSION_FORMAT = 'YmdHis';
+
+    /**
      * Name of this set of migrations
      *
      * @var string
@@ -795,6 +800,19 @@ class Configuration
 
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYearAndMonth;
         $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
+    }
+
+    /**
+     * Generate a new migration version. A version is (usually) a datetime string.
+     *
+     * @param DateTimeInterface|null $now Defaults to the current time in UTC
+     * @return string The newly generated version
+     */
+    public function generateVersionNumber(\DateTimeInterface $now=null)
+    {
+        $now = $now ?: new \DateTime('now', new \DateTimeZone('UTC'));
+
+        return $now->format(self::VERSION_FORMAT);
     }
 
     /**

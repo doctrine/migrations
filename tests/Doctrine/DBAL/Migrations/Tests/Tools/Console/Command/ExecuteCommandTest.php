@@ -2,21 +2,17 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
 
-class ExecuteCommandTest extends MigrationTestCase
+class ExecuteCommandTest extends CommandTestCase
 {
     const VERSION = '20160705000000';
 
-    private $commmand, $app, $config, $version, $questions, $isDialogHelper;
+    private $version, $questions, $isDialogHelper;
 
     public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
     {
@@ -91,19 +87,12 @@ class ExecuteCommandTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->config = $this->mockWithoutConstructor(Configuration::class);
-        $this->config->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->getSqliteConnection());
+        parent::setUp();
         $this->version = $this->mockWithoutConstructor(Version::class);
         $this->config->expects($this->once())
             ->method('getVersion')
             ->with(self::VERSION)
             ->willReturn($this->version);
-        $this->command = new ExecuteCommand();
-        $this->command->setMigrationConfiguration($this->config);
-        $this->app = new Application();
-        $this->app->add($this->command);
 
         if (class_exists(QuestionHelper::class)) {
             $this->isDialogHelper = false;
@@ -115,27 +104,22 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->app->getHelperSet()->set($this->questions, $this->isDialogHelper ? 'dialog' : 'question');
     }
 
+    protected function createCommand()
+    {
+        return new ExecuteCommand();
+    }
+
+    protected function executeCommand(array $args, array $options=[])
+    {
+        $args['version'] = self::VERSION;
+        return parent::executeCommand($args, $options);
+    }
+
     private function mockWithoutConstructor($cls)
     {
         return $this->getMockBuilder($cls)
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    private function createCommandTester()
-    {
-        return new CommandTester($this->app->find('migrations:execute'));
-    }
-
-    private function executeCommand(array $args, array $options=[])
-    {
-        $tester = $this->createCommandTester();
-        $statusCode = $tester->execute(array_replace([
-            'command' => 'migrations:execute',
-            'version' => self::VERSION,
-        ], $args), $options);
-
-        return [$tester, $statusCode];
     }
 
     private function willAskConfirmationAndReturn($bool)

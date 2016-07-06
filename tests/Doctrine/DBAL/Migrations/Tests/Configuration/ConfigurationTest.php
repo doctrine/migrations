@@ -145,6 +145,32 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertEquals($expectedResult, $result);
     }
 
+    public function testGenerateVersionNumberFormatsTheDatePassedIn()
+    {
+        $configuration = new Configuration($this->getSqliteConnection());
+        $now = new \DateTime('2016-07-05 01:00:00');
+
+        $version = $configuration->generateVersionNumber($now);
+
+        $this->assertEquals('20160705010000', $version);
+    }
+
+    /**
+     * We don't actually test the full "time" part of this, since that would fail
+     * intermittently. Instead we just verify that we get a version number back
+     * that has the current date, hour, and minute. We're really just testing
+     * the `?: new \DateTime(...)` bit of generateVersionNumber
+     */
+    public function testGenerateVersionNumberWithoutNowUsesTheCurrentTime()
+    {
+        $configuration = new Configuration($this->getSqliteConnection());
+
+        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $version = $configuration->generateVersionNumber();
+
+        $this->assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);
+    }
+
     public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations()
     {
         return [
