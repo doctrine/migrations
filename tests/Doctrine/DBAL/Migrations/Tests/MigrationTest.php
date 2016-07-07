@@ -44,7 +44,7 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use \Mockery as m;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -207,7 +207,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->setOutputWriter($output);
         $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-        $this->config->registerMigration('20160707000000', VersionDummy::class);
+        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
         $this->conn->insert($this->config->getMigrationsTableName(), [
             'version' => '20160707000000',
@@ -219,5 +219,41 @@ class MigrationTest extends MigrationTestCase
 
         $this->assertCount(1, $messages, 'should output the no migrations message');
         $this->assertContains('No migrations', $messages[0]);
+    }
+
+    public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined()
+    {
+        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
+        $this->config->createMigrationTable();
+        $called = false;
+        $migration = new Migration($this->config);
+
+        $result = $migration->migrate(null, false, false, function () use (&$called) {
+            $called = true;
+            return false;
+        });
+
+        $this->assertFalse($result);
+        $this->assertTrue($called, 'should have called the confirmation callback');
+    }
+
+    public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback()
+    {
+        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
+        $this->config->createMigrationTable();
+        $called = false;
+        $migration = new Migration($this->config);
+
+        $result = $migration->migrate(null, true, false, function () use (&$called) {
+            $called = true;
+            return false;
+        });
+
+        $this->assertFalse($called);
+        $this->assertEquals(['20160707000000' => ['SELECT 1']], $result);
     }
 }

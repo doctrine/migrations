@@ -118,12 +118,11 @@ class Migration
      * @param string  $to             The version to migrate to.
      * @param boolean $dryRun         Whether or not to make this a dry run and not execute anything.
      * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
-     *
-     * @return array $sql     The array of migration sql statements
-     *
+     * @param callable|null $confirm A callback to confirm whether the migrations should be executed.
+     * @return array|false An array of migration sql statements or false if the confirm callback denied execution
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false, $timeAllQueries = false)
+    public function migrate($to = null, $dryRun = false, $timeAllQueries = false, callable $confirm = null)
     {
         /**
          * If no version to migrate to is given we default to the last available one.
@@ -159,6 +158,10 @@ class Migration
             return $this->noMigrations();
         }
 
+        if (!$dryRun && false === $this->migrationsCanExecute($confirm)) {
+            return false;
+        }
+
         $output = $dryRun ? 'Executing dry run of migration' : 'Migrating';
         $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
         $this->outputWriter->write(sprintf($output, $direction, $to, $from));
@@ -192,5 +195,10 @@ class Migration
     {
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
         return [];
+    }
+
+    private function migrationsCanExecute(callable $confirm=null)
+    {
+        return null === $confirm ? true : $confirm();
     }
 }
