@@ -124,27 +124,28 @@ EOT
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
-        } else {
-            $dryRun = (boolean) $input->getOption('dry-run');
+            return 0;
+        }
 
-            // warn the user if no dry run and interaction is on
-            if (! $dryRun) {
-                $question = 'WARNING! You are about to execute a database migration'
-                    . ' that could result in schema changes and data lost.'
-                    . ' Are you sure you wish to continue? (y/n)';
-                if (! $this->canExecute($question, $input, $output)) {
-                    $output->writeln('<error>Migration cancelled!</error>');
+        $dryRun = (boolean) $input->getOption('dry-run');
 
-                    return 1;
-                }
+        // warn the user if no dry run and interaction is on
+        if (! $dryRun) {
+            $question = 'WARNING! You are about to execute a database migration'
+                . ' that could result in schema changes and data lost.'
+                . ' Are you sure you wish to continue? (y/n)';
+            if (! $this->canExecute($question, $input, $output)) {
+                $output->writeln('<error>Migration cancelled!</error>');
+
+                return 1;
             }
+        }
 
-            $migration->setNoMigrationException($input->getOption('allow-no-migration'));
-            $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
+        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
+        $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
 
-            if (empty($sql)) {
-                $output->writeln('<comment>No migrations to execute.</comment>');
-            }
+        if (empty($sql)) {
+            $output->writeln('<comment>No migrations to execute.</comment>');
         }
     }
 
