@@ -44,6 +44,7 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use \Mockery as m;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -54,6 +55,7 @@ use org\bovigo\vfs\vfsStreamFile;
  */
 class MigrationTest extends MigrationTestCase
 {
+    private $conn;
     /** @var Configuration */
     private $config;
     
@@ -61,7 +63,8 @@ class MigrationTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->config = new Configuration($this->getSqliteConnection());
+        $this->conn = $this->getSqliteConnection();
+        $this->config = new Configuration($this->conn);
         $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
     }
@@ -90,10 +93,18 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption()
     {
+        $messages = [];
+        $output = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = $msg;
+        });
+        $this->config->setOutputWriter($output);
         $migration = new Migration($this->config);
 
         $migration->setNoMigrationException(true);
         $migration->migrate();
+
+        $this->assertCount(2, $messages, 'should output header and no migrations message');
+        $this->assertContains('No migrations', $messages[1]);
     }
 
     /**
@@ -185,5 +196,28 @@ class MigrationTest extends MigrationTestCase
         $this->assertRegExp('/^\s*-- Doctrine Migration File Generated on/m', $sqlMigrationFile->getContent());
         $this->assertRegExp('/^\s*-- Version 1/m', $sqlMigrationFile->getContent());
         $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+    }
+
+    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage()
+    {
+        $messages = [];
+        $output = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = $msg;
+        });
+        $this->config->setOutputWriter($output);
+        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $this->config->registerMigration('20160707000000', VersionDummy::class);
+        $this->config->createMigrationTable();
+        $this->conn->insert($this->config->getMigrationsTableName(), [
+            'version' => '20160707000000',
+        ]);
+
+        $migration = new Migration($this->config);
+
+        $migration->migrate();
+
+        $this->assertCount(1, $messages, 'should output the no migrations message');
+        $this->assertContains('No migrations', $messages[0]);
     }
 }

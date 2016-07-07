@@ -156,7 +156,7 @@ class Migration
          * to signify that there is nothing left to do.
          */
         if ($from === $to && empty($migrationsToExecute) && !empty($migrations)) {
-            return [];
+            return $this->noMigrations();
         }
 
         $output = $dryRun ? 'Executing dry run of migration' : 'Migrating';
@@ -168,6 +168,8 @@ class Migration
          */
         if (empty($migrationsToExecute) && !$this->noMigrationException) {
             throw MigrationException::noMigrationsToExecute();
+        } elseif (empty($migrationsToExecute)) {
+            return $this->noMigrations();
         }
 
         $sql = [];
@@ -184,5 +186,11 @@ class Migration
         $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
         return $sql;
+    }
+
+    private function noMigrations()
+    {
+        $this->outputWriter->write('<comment>No migrations to execute.</comment>');
+        return [];
     }
 }

@@ -142,11 +142,7 @@ EOT
         }
 
         $migration->setNoMigrationException($input->getOption('allow-no-migration'));
-        $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
-
-        if (empty($sql)) {
-            $output->writeln('<comment>No migrations to execute.</comment>');
-        }
+        $migration->migrate($version, $dryRun, $timeAllqueries);
     }
 
     /**
