@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations\Configuration;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
@@ -495,6 +496,7 @@ class Configuration
      */
     public function hasVersionMigrated(Version $version)
     {
+        $this->connect();
         $this->createMigrationTable();
 
         $version = $this->connection->fetchColumn(
@@ -512,6 +514,7 @@ class Configuration
      */
     public function getMigratedVersions()
     {
+        $this->connect();
         $this->createMigrationTable();
 
         $ret = $this->connection->fetchAll("SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName);
@@ -546,6 +549,7 @@ class Configuration
      */
     public function getCurrentVersion()
     {
+        $this->connect();
         $this->createMigrationTable();
 
         if (empty($this->migrations)) {
@@ -662,6 +666,7 @@ class Configuration
      */
     public function getNumberOfExecutedMigrations()
     {
+        $this->connect();
         $this->createMigrationTable();
 
         $result = $this->connection->fetchColumn("SELECT COUNT(" . $this->migrationsColumnName . ") FROM " . $this->migrationsTableName);
@@ -713,6 +718,7 @@ class Configuration
             return false;
         }
 
+        $this->connect();
         if ($this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $this->migrationTableCreated = true;
 
@@ -813,6 +819,24 @@ class Configuration
         $now = $now ?: new \DateTime('now', new \DateTimeZone('UTC'));
 
         return $now->format(self::VERSION_FORMAT);
+    }
+
+    /**
+     * Explicitely opens the database connection. This is done to play nice
+     * with DBAL's MasterSlaveConnection. Which, in some cases, connects to a
+     * follower when fetching the executed migrations. If a follower is lagging
+     * significantly behind that means the migrations system may see unexecuted
+     * migrations that were actually executed earlier.
+     *
+     * @return bool The same value returned from the `connect` method
+     */
+    protected function connect()
+    {
+        if ($this->connection instanceof MasterSlaveConnection) {
+            return $this->connection->connect('master');
+        }
+
+        return $this->connection->connect();
     }
 
     /**
