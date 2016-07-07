@@ -83,7 +83,7 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration = new Migration($configuration);
+        $migration = $this->createMigration($configuration);
 
         $this->outputHeader($configuration, $output);
 
@@ -146,6 +146,17 @@ EOT
                 $output->writeln('<comment>No migrations to execute.</comment>');
             }
         }
+    }
+
+    /**
+     * Create a new migration instance to execute the migrations.
+     *
+     * @param $configuration The configuration with which the migrations will be executed
+     * @return Migration a new migration instance
+     */
+    protected function createMigration(Configuration $configuration)
+    {
+        return new Migration($configuration);
     }
 
     /**

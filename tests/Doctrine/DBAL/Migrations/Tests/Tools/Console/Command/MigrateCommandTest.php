@@ -2,109 +2,215 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
 
-class MigrateCommandTest extends MigrationTestCase
+class MigrateCommandTest extends CommandTestCase
 {
+    use DialogSupport;
 
-    public function testGetVersionNameFromAlias()
+    const VERSION = '20160705000000';
+
+    private $migration;
+
+    public function testPreviousVersionErrorsWhenThereIsNoPreviousVersion()
     {
-        $class = new \ReflectionClass(MigrateCommand::class);
-        $method = $class->getMethod('getVersionNameFromAlias');
-        $method->setAccessible(true);
+        $this->willResolveVersionAlias('prev', null);
 
-        $configuration = $this->getMockBuilder(Configuration::class)
-            ->setConstructorArgs([$this->getSqliteConnection()])
-            ->setMethods(['resolveVersionAlias'])
-            ->getMock();
+        list($tester, $statusCode) = $this->executeCommand([
+            'version' => 'prev',
+        ]);
 
-        $output = $this->getOutputStream();
-
-        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['prev', $output, $configuration]));
-        $this->assertContains('Already at first version.', $this->getOutputStreamContent($output));
-
-        $output = $this->getOutputStream();
-
-        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['next', $output, $configuration]));
-        $this->assertContains('Already at latest version.', $this->getOutputStreamContent($output));
-
-        $output = $this->getOutputStream();
-
-        $this->assertFalse($method->invokeArgs(new MigrateCommand(), ['giberich', $output, $configuration]));
-        $this->assertContains('Unknown version: giberich', $this->getOutputStreamContent($output));
-
-        $output = $this->getOutputStream();
-
-        $configuration
-            ->expects($this->once())
-            ->method('resolveVersionAlias')
-            ->will($this->returnValue('1234'));
-
-        $this->assertEquals('1234', $method->invokeArgs(new MigrateCommand(), ['test', $output, $configuration]));
-        $this->assertEquals('', $this->getOutputStreamContent($output));
+        $this->assertSame(1, $statusCode);
+        $this->assertContains('Already at first version', $tester->getDisplay());
     }
 
-    public function testCanExecute()
+    public function testNextVersionErrorsWhenThereIsNoNextVersion()
     {
-        if (!class_exists('Symfony\Component\Console\Helper\QuestionHelper')) {
-            $this->markTestSkipped(
-                'The QuestionHelper must be available.'
-            );
-        }
+        $this->willResolveVersionAlias('next', null);
 
-        $input = $this->getMockBuilder(ArrayInput::class)
-            ->setConstructorArgs([[]])
-            ->setMethods(['isInteractive'])
+        list($tester, $statusCode) = $this->executeCommand([
+            'version' => 'next',
+        ]);
+
+        $this->assertSame(1, $statusCode);
+        $this->assertContains('Already at latest version', $tester->getDisplay());
+    }
+
+    public function testUnknownVersionAliasErrors()
+    {
+        $this->willResolveVersionAlias('nope', null);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            'version' => 'nope',
+        ]);
+
+        $this->assertSame(1, $statusCode);
+        $this->assertContains('Unknown version: nope', $tester->getDisplay());
+    }
+
+    public function testExecuteUnavailableMigrationsErrorWhenTheUserDeclinesToContinue()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->config->expects($this->once())
+            ->method('getMigratedVersions')
+            ->willReturn([self::VERSION]);
+        $this->config->expects($this->once())
+            ->method('getAvailableVersions')
+            ->willReturn([]);
+        $this->willAskConfirmationAndReturn(false);
+
+        list($tester, $statusCode) = $this->executeCommand([]);
+
+        $this->assertSame(1, $statusCode);
+        $this->assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
+    }
+
+    public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsTrue()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->once())
+            ->method('writeSqlFile')
+            ->with(getcwd(), self::VERSION);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--write-sql' => true,
+        ]);
+
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testWriteSqlOutputsToTheProvidedPathWhenProvided()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->once())
+            ->method('writeSqlFile')
+            ->with(__DIR__, self::VERSION);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--write-sql' => __DIR__,
+        ]);
+
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandExecutesMigrationsWithDryRunWhenProvided()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->once())
+            ->method('migrate')
+            ->with(self::VERSION, true, true);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--dry-run' => true,
+            '--query-time' => true,
+        ]);
+
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandExitsWithErrorWhenUserDeclinesToContinue()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->willAskConfirmationAndReturn(false);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->never())
+            ->method('migrate');
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--dry-run' => false
+        ]);
+
+        $this->assertSame(1, $statusCode);
+    }
+
+    public function testCommandMigratesWhenTheUserAcceptsThePrompt()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->willAskConfirmationAndReturn(true);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->once())
+            ->method('migrate')
+            ->with(self::VERSION, false, false)
+            ->willReturn(['SELECT 1']);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--dry-run' => false
+        ]);
+
+        $this->assertSame(0, $statusCode);
+    }
+
+    public function testCommandMigratesWhenTheConsoleIsInNonInteractiveMode()
+    {
+        $this->willResolveVersionAlias('latest', self::VERSION);
+        $this->withExecutedAndAvailableMigrations();
+        $this->migration->expects($this->once())
+            ->method('migrate')
+            ->with(self::VERSION, false, false)
+            ->willReturn(['SELECT 1']);
+
+        list($tester, $statusCode) = $this->executeCommand([
+            '--dry-run' => false
+        ], ['interactive' => false]);
+
+        $this->assertSame(0, $statusCode);
+    }
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->configureDialogs($this->app);
+    }
+
+    /**
+     * Mocks the `createMigration` method to return a mock migration class
+     * so we can test.
+     */
+    protected function createCommand()
+    {
+        $this->migration = $this->getMockBuilder(Migration::class)
+            ->disableOriginalConstructor()
             ->getMock();
-
-        $input->expects($this->any())
-            ->method('isInteractive')
-            ->will($this->returnValue(true));
-
-        $output = $this->getOutputStream();
-
-        $class = new \ReflectionClass(MigrateCommand::class);
-        $method = $class->getMethod('canExecute');
-        $method->setAccessible(true);
-
-        /** @var \Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand $command */
-        $command = $this->getMock(
+        $cmd = $this->getMockForAbstractClass(
             MigrateCommand::class,
-            ['getHelperSet']
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['createMigration']
         );
+        $cmd->expects($this->any())
+            ->method('createMigration')
+            ->with($this->isInstanceOf(Configuration::class))
+            ->willReturn($this->migration);
 
-        $helper = new QuestionHelper();
-        $helper->setInputStream($this->getInputStream("y\n"));
-        if ($helper instanceof QuestionHelper) {
-            $helperSet = new HelperSet([
-                'question' => $helper
-            ]);
-        }
-        $command->setHelperSet($helperSet);
-        $command->expects($this->any())
-            ->method('getHelperSet')
-            ->will($this->returnValue($helperSet));
+        return $cmd;
+    }
 
-        //should return true if user confirm
-        $this->assertTrue($method->invokeArgs($command, ['test', $input, $output]));
+    private function willResolveVersionAlias($alias, $returns)
+    {
+        $this->config->expects($this->once())
+            ->method('resolveVersionAlias')
+            ->with($alias)
+            ->willReturn($returns);
+    }
 
-        //shoudl return false if user cancel
-        $helper->setInputStream($this->getInputStream("n\n"));
-        $this->assertFalse($method->invokeArgs($command, ['test', $input, $output]));
-
-        //should return true if non interactive
-        $input = $this->getMockBuilder(ArrayInput::class)
-            ->setConstructorArgs([[]])
-            ->setMethods(['isInteractive'])
-            ->getMock();
-        $input->expects($this->any())
-            ->method('isInteractive')
-            ->will($this->returnValue(false));
-        $this->assertTrue($method->invokeArgs($command, ['test', $input, $output]));
+    private function withExecutedAndAvailableMigrations()
+    {
+        $this->config->expects($this->once())
+            ->method('getMigratedVersions')
+            ->willReturn([]);
+        $this->config->expects($this->once())
+            ->method('getAvailableVersions')
+            ->willReturn([self::VERSION]);
     }
 }
