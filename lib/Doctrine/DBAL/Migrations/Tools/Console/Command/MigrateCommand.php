@@ -129,20 +129,18 @@ EOT
 
         $dryRun = (boolean) $input->getOption('dry-run');
 
-        // warn the user if no dry run and interaction is on
-        if (! $dryRun) {
+        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
+        $result = $migration->migrate($version, $dryRun, $timeAllqueries, function () use ($input, $output) {
             $question = 'WARNING! You are about to execute a database migration'
                 . ' that could result in schema changes and data lost.'
                 . ' Are you sure you wish to continue? (y/n)';
-            if (! $this->canExecute($question, $input, $output)) {
-                $output->writeln('<error>Migration cancelled!</error>');
+            return $this->canExecute($question, $input, $output);
+        });
 
-                return 1;
-            }
+        if (false === $result) {
+            $output->writeln('<error>Migration cancelled!</error>');
+            return 1;
         }
-
-        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
-        $migration->migrate($version, $dryRun, $timeAllqueries);
     }
 
     /**

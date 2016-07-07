@@ -121,14 +121,19 @@ class MigrateCommandTest extends CommandTestCase
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->willAskConfirmationAndReturn(false);
         $this->withExecutedAndAvailableMigrations();
-        $this->migration->expects($this->never())
-            ->method('migrate');
+        $this->migration->expects($this->once())
+            ->method('migrate')
+            ->with(self::VERSION, false, false)
+            ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
+                return $confirm();
+            });
 
         list($tester, $statusCode) = $this->executeCommand([
             '--dry-run' => false
         ]);
 
         $this->assertSame(1, $statusCode);
+        $this->assertContains('Migration cancelled', $tester->getDisplay());
     }
 
     public function testCommandMigratesWhenTheUserAcceptsThePrompt()
@@ -139,7 +144,10 @@ class MigrateCommandTest extends CommandTestCase
         $this->migration->expects($this->once())
             ->method('migrate')
             ->with(self::VERSION, false, false)
-            ->willReturn(['SELECT 1']);
+            ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
+                $this->assertTrue($confirm());
+                return ['SELECT 1'];
+            });
 
         list($tester, $statusCode) = $this->executeCommand([
             '--dry-run' => false
@@ -155,7 +163,10 @@ class MigrateCommandTest extends CommandTestCase
         $this->migration->expects($this->once())
             ->method('migrate')
             ->with(self::VERSION, false, false)
-            ->willReturn(['SELECT 1']);
+            ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
+                $this->assertTrue($confirm());
+                return ['SELECT 1'];
+            });
 
         list($tester, $statusCode) = $this->executeCommand([
             '--dry-run' => false
