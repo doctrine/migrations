@@ -119,7 +119,9 @@ class Migration
      * @param boolean $dryRun         Whether or not to make this a dry run and not execute anything.
      * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
      * @param callable|null $confirm A callback to confirm whether the migrations should be executed.
+     *
      * @return array|false An array of migration sql statements or false if the confirm callback denied execution
+     *
      * @throws MigrationException
      */
     public function migrate($to = null, $dryRun = false, $timeAllQueries = false, callable $confirm = null)
