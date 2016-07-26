@@ -149,19 +149,19 @@ abstract class AbstractMigration
         }
     }
 
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema, $isDryRun = false)
     {
     }
 
-    public function postUp(Schema $schema)
+    public function postUp(Schema $schema, $isDryRun = false)
     {
     }
 
-    public function preDown(Schema $schema)
+    public function preDown(Schema $schema, $isDryRun = false)
     {
     }
 
-    public function postDown(Schema $schema)
+    public function postDown(Schema $schema, $isDryRun = false)
     {
     }
 
