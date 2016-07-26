@@ -14,22 +14,22 @@ class MigrationModifySchemaInPreAndPost extends AbstractMigration
         $table->addColumn('id', 'integer');
     }
 
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema, $isDryRun = false)
     {
         $this->addTable($schema, 'bar');
     }
 
-    public function preDown(Schema $schema)
+    public function preDown(Schema $schema, $isDryRun = false)
     {
         $this->addTable($schema, 'bar');
     }
 
-    public function postUp(Schema $schema)
+    public function postUp(Schema $schema, $isDryRun = false)
     {
         $this->addTable($schema, 'bar2');
     }
 
-    public function postDown(Schema $schema)
+    public function postDown(Schema $schema, $isDryRun = false)
     {
         $this->addTable($schema, 'bar2');
     }

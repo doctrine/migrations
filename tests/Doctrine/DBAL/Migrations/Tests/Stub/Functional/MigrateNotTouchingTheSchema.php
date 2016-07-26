@@ -7,7 +7,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 class MigrateNotTouchingTheSchema extends AbstractMigration
 {
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema, $dryRun = false)
     {
 
     }
@@ -17,12 +17,12 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
         $this->addSql("SELECT 1");
     }
 
-    public function postUp(Schema $schema)
+    public function postUp(Schema $schema, $dryRun = false)
     {
 
     }
 
-    public function preDown(Schema $schema)
+    public function preDown(Schema $schema, $dryRun = false)
     {
 
     }
@@ -32,7 +32,7 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
         $this->addSql("SELECT 1");
     }
 
-    public function postDown(Schema $schema)
+    public function postDown(Schema $schema, $dryRun = false)
     {
 
     }
