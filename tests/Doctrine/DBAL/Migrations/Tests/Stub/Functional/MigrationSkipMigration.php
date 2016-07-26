@@ -7,12 +7,12 @@ use Doctrine\DBAL\Schema\Schema;
 class MigrationSkipMigration extends MigrationMigrateUp
 {
 
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema, $isDryRun = false)
     {
         $this->skipIf(true);
     }
 
-    public function preDown(Schema $schema)
+    public function preDown(Schema $schema, $isDryRun = false)
     {
         $this->skipIf(true);
     }
