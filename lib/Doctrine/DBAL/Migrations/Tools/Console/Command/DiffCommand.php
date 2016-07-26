@@ -158,7 +158,7 @@ EOT
             array_unshift(
                 $code,
                 sprintf(
-                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() != %s, %s);",
+                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() !== %s, %s);",
                     var_export($currentPlatform, true),
                     var_export(sprintf("Migration can only be executed safely on '%s'.", $currentPlatform), true)
                 ),
