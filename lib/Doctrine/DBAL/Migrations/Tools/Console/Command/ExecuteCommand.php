@@ -64,7 +64,7 @@ You can output the would be executed SQL statements to a file with <comment>--wr
 
 Or you can also execute the migration without a warning message which you need to interact with:
 
-    <info>%command.full_name% --no-interaction</info>
+    <info>%command.full_name% YYYYMMDDHHMMSS --no-interaction</info>
 EOT
         );
 
