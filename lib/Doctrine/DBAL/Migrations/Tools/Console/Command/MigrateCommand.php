@@ -21,10 +21,10 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for executing a migration to a specified version or the latest available version.
@@ -124,6 +124,8 @@ EOT
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
+
+            return 0;
         } else {
             $dryRun = (boolean) $input->getOption('dry-run');
 
@@ -144,8 +146,13 @@ EOT
 
             if (empty($sql)) {
                 $output->writeln('<comment>No migrations to execute.</comment>');
+                $exitCode = ($input->getOption('allow-no-migration')) ? 0 : 1;
+
+                return $exitCode;
             }
         }
+
+        return 1;
     }
 
     /**
@@ -175,10 +182,12 @@ EOT
         if ($version === null) {
             if ($versionAlias == 'prev') {
                 $output->writeln('<error>Already at first version.</error>');
+
                 return false;
             }
             if ($versionAlias == 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
+
                 return false;
             }
 
@@ -186,6 +195,7 @@ EOT
                 '<error>Unknown version: %s</error>',
                 $output->getFormatter()->escape($versionAlias)
             ));
+
             return false;
         }
 
