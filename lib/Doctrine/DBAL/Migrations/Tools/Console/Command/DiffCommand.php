@@ -125,6 +125,7 @@ EOT
         $path = $this->generateMigration($configuration, $input, $version, $up, $down);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
+        $output->writeln(file_get_contents($path));
     }
 
     private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted=false, $lineLength=120)
