@@ -120,7 +120,7 @@ class Migration
      * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
      * @param callable|null $confirm A callback to confirm whether the migrations should be executed.
      *
-     * @return array|false An array of migration sql statements or false if the confirm callback denied execution
+     * @return array An array of migration sql statements. This will be empty if the the $confirm callback declines to execute the migration
      *
      * @throws MigrationException
      */
@@ -161,7 +161,7 @@ class Migration
         }
 
         if (!$dryRun && false === $this->migrationsCanExecute($confirm)) {
-            return false;
+            return [];
         }
 
         $output = $dryRun ? 'Executing dry run of migration' : 'Migrating';

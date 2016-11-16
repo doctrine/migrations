@@ -235,7 +235,7 @@ class MigrationTest extends MigrationTestCase
             return false;
         });
 
-        $this->assertFalse($result);
+        $this->assertSame([], $result);
         $this->assertTrue($called, 'should have called the confirmation callback');
     }
 
