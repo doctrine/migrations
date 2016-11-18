@@ -10,9 +10,11 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
 
 class ExecuteCommandTest extends CommandTestCase
 {
+    use DialogSupport;
+
     const VERSION = '20160705000000';
 
-    private $version, $questions, $isDialogHelper;
+    private $version;
 
     public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
     {
@@ -94,14 +96,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->with(self::VERSION)
             ->willReturn($this->version);
 
-        if (class_exists(QuestionHelper::class)) {
-            $this->isDialogHelper = false;
-            $this->questions = $this->getMock(QuestionHelper::class);
-        } else {
-            $this->isDialogHelper = true;
-            $this->questions = $this->getMock(DialogHelper::class);
-        }
-        $this->app->getHelperSet()->set($this->questions, $this->isDialogHelper ? 'dialog' : 'question');
+        $this->configureDialogs($this->app);
     }
 
     protected function createCommand()
@@ -120,12 +115,5 @@ class ExecuteCommandTest extends CommandTestCase
         return $this->getMockBuilder($cls)
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    private function willAskConfirmationAndReturn($bool)
-    {
-        $this->questions->expects($this->once())
-            ->method($this->isDialogHelper ? 'askConfirmation' : 'ask')
-            ->willReturn($bool);
     }
 }

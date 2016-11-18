@@ -83,7 +83,7 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration = new Migration($configuration);
+        $migration = $this->createMigration($configuration);
 
         $this->outputHeader($configuration, $output);
 
@@ -124,28 +124,38 @@ EOT
         if ($path = $input->getOption('write-sql')) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
-        } else {
-            $dryRun = (boolean) $input->getOption('dry-run');
-
-            // warn the user if no dry run and interaction is on
-            if (! $dryRun) {
-                $question = 'WARNING! You are about to execute a database migration'
-                    . ' that could result in schema changes and data lost.'
-                    . ' Are you sure you wish to continue? (y/n)';
-                if (! $this->canExecute($question, $input, $output)) {
-                    $output->writeln('<error>Migration cancelled!</error>');
-
-                    return 1;
-                }
-            }
-
-            $migration->setNoMigrationException($input->getOption('allow-no-migration'));
-            $sql = $migration->migrate($version, $dryRun, $timeAllqueries);
-
-            if (empty($sql)) {
-                $output->writeln('<comment>No migrations to execute.</comment>');
-            }
+            return 0;
         }
+
+        $dryRun = (boolean) $input->getOption('dry-run');
+
+        $cancelled = false;
+        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
+        $result = $migration->migrate($version, $dryRun, $timeAllqueries, function () use ($input, $output, &$cancelled) {
+            $question = 'WARNING! You are about to execute a database migration'
+                . ' that could result in schema changes and data lost.'
+                . ' Are you sure you wish to continue? (y/n)';
+            $canContinue = $this->canExecute($question, $input, $output);
+            $cancelled = !$canContinue;
+
+            return $canContinue;
+        });
+
+        if ($cancelled) {
+            $output->writeln('<error>Migration cancelled!</error>');
+            return 1;
+        }
+    }
+
+    /**
+     * Create a new migration instance to execute the migrations.
+     *
+     * @param $configuration The configuration with which the migrations will be executed
+     * @return Migration a new migration instance
+     */
+    protected function createMigration(Configuration $configuration)
+    {
+        return new Migration($configuration);
     }
 
     /**

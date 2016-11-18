@@ -118,12 +118,13 @@ class Migration
      * @param string  $to             The version to migrate to.
      * @param boolean $dryRun         Whether or not to make this a dry run and not execute anything.
      * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
+     * @param callable|null $confirm A callback to confirm whether the migrations should be executed.
      *
-     * @return array $sql     The array of migration sql statements
+     * @return array An array of migration sql statements. This will be empty if the the $confirm callback declines to execute the migration
      *
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false, $timeAllQueries = false)
+    public function migrate($to = null, $dryRun = false, $timeAllQueries = false, callable $confirm = null)
     {
         /**
          * If no version to migrate to is given we default to the last available one.
@@ -156,6 +157,10 @@ class Migration
          * to signify that there is nothing left to do.
          */
         if ($from === $to && empty($migrationsToExecute) && !empty($migrations)) {
+            return $this->noMigrations();
+        }
+
+        if (!$dryRun && false === $this->migrationsCanExecute($confirm)) {
             return [];
         }
 
@@ -168,6 +173,8 @@ class Migration
          */
         if (empty($migrationsToExecute) && !$this->noMigrationException) {
             throw MigrationException::noMigrationsToExecute();
+        } elseif (empty($migrationsToExecute)) {
+            return $this->noMigrations();
         }
 
         $sql = [];
@@ -184,5 +191,16 @@ class Migration
         $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
 
         return $sql;
+    }
+
+    private function noMigrations()
+    {
+        $this->outputWriter->write('<comment>No migrations to execute.</comment>');
+        return [];
+    }
+
+    private function migrationsCanExecute(callable $confirm=null)
+    {
+        return null === $confirm ? true : $confirm();
     }
 }
