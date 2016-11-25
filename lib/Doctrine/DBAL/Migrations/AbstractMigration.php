@@ -25,42 +25,44 @@ use Doctrine\DBAL\Schema\Schema;
  * Abstract class for individual migrations to extend from.
  *
  * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
+ *
  * @link        www.doctrine-project.org
  * @since       2.0
+ *
  * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 abstract class AbstractMigration
 {
     /**
-     * Reference to the Version instance representing this migration
+     * Reference to the Version instance representing this migration.
      *
      * @var Version
      */
     protected $version;
 
     /**
-     * The Doctrine\DBAL\Connection instance we are migrating
+     * The Doctrine\DBAL\Connection instance we are migrating.
      *
      * @var \Doctrine\DBAL\Connection
      */
     protected $connection;
 
     /**
-     * Reference to the SchemaManager instance referenced by $_connection
+     * Reference to the SchemaManager instance referenced by $_connection.
      *
      * @var \Doctrine\DBAL\Schema\AbstractSchemaManager
      */
     protected $sm;
 
     /**
-     * Reference to the DatabasePlatform instance referenced by $_connection
+     * Reference to the DatabasePlatform instance referenced by $_connection.
      *
      * @var \Doctrine\DBAL\Platforms\AbstractPlatform
      */
     protected $platform;
 
     /**
-     * The OutputWriter object instance used for outputting information
+     * The OutputWriter object instance used for outputting information.
      *
      * @var OutputWriter
      */
@@ -84,7 +86,7 @@ abstract class AbstractMigration
      *
      * Extending class should override this function to alter the return value
      *
-     * @return bool TRUE by default.
+     * @return bool TRUE by default
      */
     public function isTransactional()
     {
@@ -92,7 +94,7 @@ abstract class AbstractMigration
     }
 
     /**
-     * Get migration description
+     * Get migration description.
      *
      * @return string
      */
@@ -104,8 +106,8 @@ abstract class AbstractMigration
     /**
      * Print a warning message if the condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      */
     public function warnIf($condition, $message = '')
     {
@@ -122,8 +124,8 @@ abstract class AbstractMigration
     /**
      * Abort the migration if the condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      *
      * @throws AbortMigrationException
      */
@@ -137,8 +139,8 @@ abstract class AbstractMigration
     /**
      * Skip this migration (but not the next ones) if condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      *
      * @throws SkipMigrationException
      */
@@ -147,6 +149,50 @@ abstract class AbstractMigration
         if ($condition) {
             throw new SkipMigrationException($message ?: 'Unknown Reason');
         }
+    }
+
+    /**
+     * Check if a column exists in a table.
+     *
+     * @param string $tableName
+     * @param string $columnName
+     *
+     * @return bool
+     */
+    public function hasColumn($tableName, $columnName)
+    {
+        switch ($this->connection->getDatabasePlatform()->getName()) {
+            case 'sqlite':
+                $rows = $this->connection->executeQuery('pragma table_info('.$tableName.')')->fetchAll();
+                foreach ($rows as $column) {
+                    if (strcasecmp($column['name'], $columnName) === 0) {
+                        return true;
+                    }
+                }
+
+                return false;
+            case 'mysql':
+                $rows = $this->connection->executeQuery('SHOW COLUMNS FROM '.$tableName)->fetchAll();
+                foreach ($rows as $column) {
+                    if (strcasecmp($column['Field'], $columnName) === 0) {
+                        return true;
+                    }
+                }
+
+                return false;
+            case 'postgresql':
+                $sql = sprintf("SELECT count(*)
+                    FROM information_schema.columns
+                    WHERE table_schema = 'public' AND table_name = '%s' AND column_name = '%s'",
+                    $tableName,
+                    $columnName
+                );
+                $result = $this->connection->executeQuery($sql)->fetch();
+
+                return  $result['count'] > 0;
+        }
+
+        return false;
     }
 
     public function preUp(Schema $schema)
