@@ -116,7 +116,7 @@ EOT
         );
 
         if (! $up && ! $down) {
-            $output->writeln('No changes detected in your mapping information.', 'ERROR');
+            $output->writeln('No changes detected in your mapping information.');
 
             return;
         }
