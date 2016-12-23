@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 /**
@@ -44,6 +45,11 @@ class Migration
     private $configuration;
 
     /**
+     * @var Connection
+     */
+    private $connection;
+
+    /**
      * @var boolean
      */
     private $noMigrationException;
@@ -57,6 +63,7 @@ class Migration
     {
         $this->configuration = $configuration;
         $this->outputWriter = $configuration->getOutputWriter();
+        $this->connection = $configuration->getConnection();
         $this->noMigrationException = false;
     }
 
@@ -183,6 +190,10 @@ class Migration
             $versionSql = $version->execute($direction, $dryRun, $timeAllQueries);
             $sql[$version->getVersion()] = $versionSql;
             $time += $version->getTime();
+        }
+
+        if (!$dryRun && !$this->connection->isAutoCommit()) {
+            $this->connection->commit();
         }
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
