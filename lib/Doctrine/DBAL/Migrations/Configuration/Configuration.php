@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration;
 
+use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
@@ -772,6 +773,17 @@ class Configuration
         }
 
         return $versions;
+    }
+
+    /**
+     * Use the connection's event manager to emit an event.
+     *
+     * @param string $eventName The event to emit.
+     * @param $args The event args instance to emit.
+     */
+    public function dispatchEvent($eventName, EventArgs $args=null)
+    {
+        $this->connection->getEventManager()->dispatchEvent($eventName, $args);
     }
 
     /**
