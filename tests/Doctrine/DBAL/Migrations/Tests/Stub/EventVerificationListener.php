@@ -15,16 +15,34 @@ final class EventVerificationListener implements EventSubscriber
         return [
             Events::onMigrationsMigrating,
             Events::onMigrationsMigrated,
+            Events::onMigrationsVersionExecuting,
+            Events::onMigrationsVersionExecuted,
+            Events::onMigrationsVersionSkipped,
         ];
     }
 
     public function onMigrationsMigrating(EventArgs $args)
     {
-        $this->events[Events::onMigrationsMigrating][] = $args;
+        $this->events[__FUNCTION__][] = $args;
     }
 
     public function onMigrationsMigrated(EventArgs $args)
     {
-        $this->events[Events::onMigrationsMigrated][] = $args;
+        $this->events[__FUNCTION__][] = $args;
+    }
+
+    public function onMigrationsVersionExecuting(EventArgs $args)
+    {
+        $this->events[__FUNCTION__][] = $args;
+    }
+
+    public function onMigrationsVersionExecuted(EventArgs $args)
+    {
+        $this->events[__FUNCTION__][] = $args;
+    }
+
+    public function onMigrationsVersionSkipped(EventArgs $args)
+    {
+        $this->events[__FUNCTION__][] = $args;
     }
 }

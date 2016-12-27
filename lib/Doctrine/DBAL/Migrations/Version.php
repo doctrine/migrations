@@ -21,6 +21,7 @@ namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
@@ -262,6 +263,8 @@ class Version
      */
     public function execute($direction, $dryRun = false, $timeAllQueries = false)
     {
+        $this->dispatchEvent(Events::onMigrationsVersionExecuting, $direction, $dryRun);
+
         $this->sql = [];
 
         $transaction = $this->migration->isTransactional();
@@ -319,6 +322,8 @@ class Version
 
             $this->state = self::STATE_NONE;
 
+            $this->dispatchEvent(Events::onMigrationsVersionExecuted, $direction, $dryRun);
+
             return $this->sql;
         } catch (SkipMigrationException $e) {
             if ($transaction) {
@@ -339,6 +344,8 @@ class Version
 
             $this->state = self::STATE_NONE;
 
+            $this->dispatchEvent(Events::onMigrationsVersionSkipped, $direction, $dryRun);
+
             return [];
         } catch (\Exception $e) {
 
@@ -353,6 +360,7 @@ class Version
             }
 
             $this->state = self::STATE_NONE;
+
             throw $e;
         }
     }
@@ -469,5 +477,15 @@ class Version
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));
+    }
+
+    private function dispatchEvent($eventName, $direction, $dryRun)
+    {
+        $this->configuration->dispatchEvent($eventName, new MigrationsVersionEventArgs(
+            $this,
+            $this->configuration,
+            $direction,
+            $dryRun
+        ));
     }
 }

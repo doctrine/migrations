@@ -17,20 +17,28 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Migrations;
+namespace Doctrine\DBAL\Migrations\Event;
 
-final class Events
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Version;
+
+class MigrationsVersionEventArgs extends MigrationsEventArgs
 {
     /**
-     * Private constructor. This class cannot be instantiated.
+     * The version the event pertains to.
+     *
+     * @var Version
      */
-    private function __construct()
+    private $version;
+
+    public function __construct(Version $version, Configuration $config, $direction, $dryRun)
     {
+        parent::__construct($config, $direction, $dryRun);
+        $this->version = $version;
     }
 
-    const onMigrationsMigrating = 'onMigrationsMigrating';
-    const onMigrationsMigrated = 'onMigrationsMigrated';
-    const onMigrationsVersionExecuting = 'onMigrationsVersionExecuting';
-    const onMigrationsVersionExecuted = 'onMigrationsVersionExecuted';
-    const onMigrationsVersionSkipped = 'onMigrationsVersionSkipped';
+    public function getVersion()
+    {
+        return $this->version;
+    }
 }

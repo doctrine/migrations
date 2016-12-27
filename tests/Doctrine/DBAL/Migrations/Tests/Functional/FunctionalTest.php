@@ -379,7 +379,7 @@ class FunctionalTest extends MigrationTestCase
         }
     }
 
-    public function testMigrateDispatchesTheExpectedEvents()
+    public function testSuccessfulMigrationDispatchesTheExpectedEvents()
     {
         $this->config->registerMigration(1, MigrationMigrateUp::class);
         $this->config->getConnection()->getEventManager()->addEventSubscriber(
@@ -389,10 +389,33 @@ class FunctionalTest extends MigrationTestCase
         $migration = new Migration($this->config);
         $migration->migrate();
 
-        $this->assertCount(2, $listener->events);
+        $this->assertCount(4, $listener->events);
         foreach ([
             Events::onMigrationsMigrating,
             Events::onMigrationsMigrated,
+            Events::onMigrationsVersionExecuting,
+            Events::onMigrationsVersionExecuted,
+        ] as $eventName) {
+            $this->assertArrayHasKey($eventName, $listener->events);
+        }
+    }
+
+    public function testSkippedMigrationsDispatchesTheExpectedEvents()
+    {
+        $this->config->registerMigration(1, MigrationSkipMigration::class);
+        $this->config->getConnection()->getEventManager()->addEventSubscriber(
+            $listener = new EventVerificationListener()
+        );
+
+        $migration = new Migration($this->config);
+        $migration->migrate();
+
+        $this->assertCount(4, $listener->events);
+        foreach ([
+            Events::onMigrationsMigrating,
+            Events::onMigrationsMigrated,
+            Events::onMigrationsVersionExecuting,
+            Events::onMigrationsVersionSkipped,
         ] as $eventName) {
             $this->assertArrayHasKey($eventName, $listener->events);
         }
