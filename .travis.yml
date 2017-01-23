@@ -16,7 +16,7 @@ matrix:
     - php: 5.6
       env: deps=low
   allow_failures:
-    - php: nightly
+    - php: nigthly
     - php: hhvm
 
 cache:
