@@ -4,15 +4,20 @@ sudo: false
 language: php
 
 php:
-  - 5.5
   - 5.6
   - 7.0
+  - 7.1
+  - nigthly
   - hhvm
 
 matrix:
+  fast_finish: true
   include:
-    - php: 5.5
+    - php: 5.6
       env: deps=low
+  allow_failures:
+    - php: nightly
+    - php: hhvm
 
 cache:
   directories:
