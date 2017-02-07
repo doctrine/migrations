@@ -196,7 +196,7 @@ EOT
                 $output->writeln('<error>Already at latest version.</error>');
                 return false;
             }
-            if (substr($version, 0, 7) == 'current') {
+            if (substr($versionAlias, 0, 7) == 'current') {
                 $output->writeln('<error>The delta couldn\'t be reached.</error>');
                 return false;
             }
