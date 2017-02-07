@@ -664,7 +664,7 @@ class Configuration
                     }
 
                     if ($symbol == "+" || $symbol == "-") {
-                        return $this->getRelativeVersion($this->getCurrentVersion(), intValue($symbol.$number));
+                        return $this->getRelativeVersion($this->getCurrentVersion(), (int)($symbol.$number));
                     }
                 }
                 return null;
