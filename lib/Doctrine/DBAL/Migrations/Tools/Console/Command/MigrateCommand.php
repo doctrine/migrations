@@ -58,6 +58,7 @@ You can optionally manually specify the version you wish to migrate to:
 You can specify the version you wish to migrate to using an alias:
 
     <info>%command.full_name% prev</info>
+    <info>These alias are defined : first, lastest, prev, current and next</info>
 
 You can specify the version you wish to migrate to using an number against the current version:
 
