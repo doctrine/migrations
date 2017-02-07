@@ -655,6 +655,18 @@ class Configuration
             case 'latest':
                 return $this->getLatestVersion();
             default:
+                if (substr($alias, 0, 7) == 'current') {
+                    $symbol = substr($alias, 7, 1);
+                    $number = (int) substr($alias, 8);
+
+                    if ($number <= 0) {
+                        return null;
+                    }
+
+                    if ($symbol == "+" || $symbol == "-") {
+                        return $this->getRelativeVersion($this->getCurrentVersion(), intValue($symbol.$number));
+                    }
+                }
                 return null;
         }
     }

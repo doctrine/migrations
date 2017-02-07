@@ -59,6 +59,10 @@ You can specify the version you wish to migrate to using an alias:
 
     <info>%command.full_name% prev</info>
 
+You can specify the version you wish to migrate to using an number against the current version:
+
+    <info>%command.full_name% current+3</info>
+
 You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
@@ -189,6 +193,10 @@ EOT
             }
             if ($versionAlias == 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
+                return false;
+            }
+            if (substr($version, 0, 7) == 'current') {
+                $output->writeln('<error>The delta couldn\'t be reached.</error>');
                 return false;
             }
 
