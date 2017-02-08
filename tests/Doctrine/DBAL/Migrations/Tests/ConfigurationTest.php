@@ -240,6 +240,46 @@ class ConfigurationTest extends MigrationTestCase
         $this->assertSame('1236', $config->getLatestVersion(), "latest version 1236");
     }
 
+    public function testDeltaVersion()
+    {
+        $config = $this->getSqliteConfiguration();
+        $config->registerMigrations([
+            1234 => Version1Test::class,
+            1235 => Version2Test::class,
+            1236 => Version3Test::class,
+        ]);
+
+        $this->assertNull($config->getDeltaVersion('-1'), "no current-1 version");
+        $this->assertSame('1234', $config->getDeltaVersion('+1'), "current+1 is 1234");
+        $this->assertSame('1235', $config->getDeltaVersion('+2'), "current+2 is 1235");
+        $this->assertSame('1236', $config->getDeltaVersion('+3'), "current+3 is 1236");
+        $this->assertNull($config->getDeltaVersion('+4'), "no current+4 version");
+
+        $config->getVersion(1234)->markMigrated();
+
+        $this->assertNull($config->getDeltaVersion('-2'), "no current-2 version");
+        $this->assertSame('0', $config->getDeltaVersion('-1'), "current-1 is 0");
+        $this->assertSame('1235', $config->getDeltaVersion('+1'), "current+1 is 1235");
+        $this->assertSame('1236', $config->getDeltaVersion('+2'), "current+2 is 1236");
+        $this->assertNull($config->getDeltaVersion('+3'), "no current+3");
+
+        $config->getVersion(1235)->markMigrated();
+
+        $this->assertNull($config->getDeltaVersion('-3'), "no current-3 version");
+        $this->assertSame('0', $config->getDeltaVersion('-2'), "current-2 is 0");
+        $this->assertSame('1234', $config->getDeltaVersion('-1'), "current-1 is 1234");
+        $this->assertSame('1236', $config->getDeltaVersion('+1'), "current+1 is 1236");
+        $this->assertNull($config->getDeltaVersion('+2'), "no current+2");
+
+        $config->getVersion(1236)->markMigrated();
+
+        $this->assertNull($config->getDeltaVersion('-4'), "no current-4 version");
+        $this->assertSame('0', $config->getDeltaVersion('-3'), "current-3 is 0");
+        $this->assertSame('1234', $config->getDeltaVersion('-2'), "current-2 is 1234");
+        $this->assertSame('1235', $config->getDeltaVersion('-1'), "current-1 is 1235");
+        $this->assertNull($config->getDeltaVersion('+1'), "no current+1");
+    }
+
     public function testGetAvailableVersions()
     {
         $config = $this->getSqliteConfiguration();
