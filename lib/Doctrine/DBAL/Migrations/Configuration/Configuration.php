@@ -622,6 +622,27 @@ class Configuration
     }
 
     /**
+     * Returns the version with the specified to the current version.
+     *
+     * @return string|null A version string, or null if the specified delta is
+     *                     not within the list of available versions.
+     */
+    public function getDeltaVersion($delta) {
+        $symbol = substr($delta, 0, 1);
+        $number = (int) substr($delta, 1);
+
+        if ($number <= 0) {
+            return null;
+        }
+
+        if ($symbol == "+" || $symbol == "-") {
+            return $this->getRelativeVersion($this->getCurrentVersion(), (int) $delta);
+        }
+
+        return null;
+    }
+
+    /**
      * Returns the version number from an alias.
      *
      * Supported aliases are:
@@ -656,16 +677,7 @@ class Configuration
                 return $this->getLatestVersion();
             default:
                 if (substr($alias, 0, 7) == 'current') {
-                    $symbol = substr($alias, 7, 1);
-                    $number = (int) substr($alias, 8);
-
-                    if ($number <= 0) {
-                        return null;
-                    }
-
-                    if ($symbol == "+" || $symbol == "-") {
-                        return $this->getRelativeVersion($this->getCurrentVersion(), (int)($symbol.$number));
-                    }
+                    return $this->getDeltaVersion(substr($alias, 7));
                 }
                 return null;
         }
