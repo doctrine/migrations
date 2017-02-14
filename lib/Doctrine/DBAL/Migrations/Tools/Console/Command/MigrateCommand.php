@@ -58,6 +58,11 @@ You can optionally manually specify the version you wish to migrate to:
 You can specify the version you wish to migrate to using an alias:
 
     <info>%command.full_name% prev</info>
+    <info>These alias are defined : first, lastest, prev, current and next</info>
+
+You can specify the version you wish to migrate to using an number against the current version:
+
+    <info>%command.full_name% current+3</info>
 
 You can also execute the migration as a <comment>--dry-run</comment>:
 
@@ -189,6 +194,10 @@ EOT
             }
             if ($versionAlias == 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
+                return false;
+            }
+            if (substr($versionAlias, 0, 7) == 'current') {
+                $output->writeln('<error>The delta couldn\'t be reached.</error>');
                 return false;
             }
 
