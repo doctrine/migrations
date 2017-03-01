@@ -18,7 +18,7 @@ The repository containing the documentation is [there](https://github.com/doctri
     
 ### Using the integration of your framework
 
-  * [symfony 2](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
+  * [Symfony](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
   * [ZF2](https://packagist.org/packages/doctrine/doctrine-orm-module) 
   * [laravel](https://packagist.org/packages/laravel-doctrine/migrations)
   * [Silex](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
