@@ -2,12 +2,16 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
+use Doctrine\DBAL\Configuration as DbalConfig;
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateWithDataModification;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
@@ -31,11 +35,7 @@ class FunctionalTest extends MigrationTestCase
     protected function setUp()
     {
         $this->connection = $this->getSqliteConnection();
-        $this->config = new Configuration($this->connection);
-        $this->config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
-        $this->config->setMigrationsDirectory('.');
-        $this->config->setMigrationsTableName('test_migrations_table');
-        $this->config->setMigrationsColumnName('current_version');
+        $this->config = self::createConfiguration($this->connection);
     }
 
     public function testMigrateUp()
@@ -375,5 +375,55 @@ class FunctionalTest extends MigrationTestCase
         foreach($methods as $method) {
             $schema->expects($this->never())->method($method);
         }
+    }
+
+    /**
+     * This uses a file path based SQL database to actually test the closing
+     * of a connection with autocommit mode and re-opening it.
+     * @group https://github.com/doctrine/migrations/issues/496
+     */
+    public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges()
+    {
+        list($conn, $migration) = self::connAndMigrationForAutoCommit();
+        $conn->exec('CREATE TABLE test_data_migration (test INTEGER)');
+        $conn->commit();
+
+        $migration->migrate();
+
+        $this->assertCount(3, $conn->fetchAll('SELECT * FROM test_data_migration'), 'migration did not execute');
+        $conn->close();
+        $this->assertCount(3, $conn->fetchAll('SELECT * FROM test_data_migration'));
+    }
+
+
+    private static function connAndMigrationForAutoCommit()
+    {
+        $path = __DIR__.'/_files/db/sqlite_file_config.db';
+        if (file_exists($path)) {
+            @unlink($path);
+        }
+
+        $dbalConfig = new DbalConfig();
+        $dbalConfig->setAutoCommit(false);
+        $conn = DriverManager::getConnection([
+            'driver' => 'pdo_sqlite',
+            'path' => $path,
+        ], $dbalConfig);
+
+        $config = self::createConfiguration($conn);
+        $config->registerMigration(1, MigrateWithDataModification::class);
+
+        return [$conn, new Migration($config)];
+    }
+
+    private static function createConfiguration(Connection $conn)
+    {
+        $config = new Configuration($conn);
+        $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
+        $config->setMigrationsDirectory('.');
+        $config->setMigrationsTableName('test_migrations_table');
+        $config->setMigrationsColumnName('current_version');
+
+        return $config;
     }
 }
