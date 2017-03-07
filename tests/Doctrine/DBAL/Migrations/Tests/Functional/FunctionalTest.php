@@ -2,9 +2,11 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
+use Doctrine\DBAL\Migrations\Events;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateAddSqlTest;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
@@ -374,6 +376,48 @@ class FunctionalTest extends MigrationTestCase
         $methods = get_class_methods(Schema::class);
         foreach($methods as $method) {
             $schema->expects($this->never())->method($method);
+        }
+    }
+
+    public function testSuccessfulMigrationDispatchesTheExpectedEvents()
+    {
+        $this->config->registerMigration(1, MigrationMigrateUp::class);
+        $this->config->getConnection()->getEventManager()->addEventSubscriber(
+            $listener = new EventVerificationListener()
+        );
+
+        $migration = new Migration($this->config);
+        $migration->migrate();
+
+        $this->assertCount(4, $listener->events);
+        foreach ([
+            Events::onMigrationsMigrating,
+            Events::onMigrationsMigrated,
+            Events::onMigrationsVersionExecuting,
+            Events::onMigrationsVersionExecuted,
+        ] as $eventName) {
+            $this->assertArrayHasKey($eventName, $listener->events);
+        }
+    }
+
+    public function testSkippedMigrationsDispatchesTheExpectedEvents()
+    {
+        $this->config->registerMigration(1, MigrationSkipMigration::class);
+        $this->config->getConnection()->getEventManager()->addEventSubscriber(
+            $listener = new EventVerificationListener()
+        );
+
+        $migration = new Migration($this->config);
+        $migration->migrate();
+
+        $this->assertCount(4, $listener->events);
+        foreach ([
+            Events::onMigrationsMigrating,
+            Events::onMigrationsMigrated,
+            Events::onMigrationsVersionExecuting,
+            Events::onMigrationsVersionSkipped,
+        ] as $eventName) {
+            $this->assertArrayHasKey($eventName, $listener->events);
         }
     }
 }

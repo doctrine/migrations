@@ -3,7 +3,10 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Events;
+use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
 use Doctrine\DBAL\Migrations\MigrationException;
+use Doctrine\DBAL\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version2Test;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version3Test;
@@ -296,6 +299,22 @@ class ConfigurationTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
 
         $this->assertEquals($return, $config->formatVersion($version));
+    }
+
+    public function testDispatchEventProxiesToConnectionsEventManager()
+    {
+        $config = $this->getSqliteConfiguration();
+        $config->getConnection()
+            ->getEventManager()
+            ->addEventSubscriber($listener = new EventVerificationListener());
+
+        $config->dispatchEvent(
+            Events::onMigrationsMigrating,
+            $ea = new MigrationsEventArgs($config, 'up', false)
+        );
+
+        $this->assertArrayHasKey(Events::onMigrationsMigrating, $listener->events);
+        $this->assertSame($ea, $listener->events[Events::onMigrationsMigrating][0]);
     }
 
     /**

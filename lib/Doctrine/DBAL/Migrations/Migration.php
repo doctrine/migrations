@@ -20,6 +20,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
 
 /**
  * Class for running migrations to the current version or a manually specified version.
@@ -177,6 +178,11 @@ class Migration
             return $this->noMigrations();
         }
 
+        $this->configuration->dispatchEvent(
+            Events::onMigrationsMigrating,
+            new MigrationsEventArgs($this->configuration, $direction, $dryRun)
+        );
+
         $sql = [];
         $time = 0;
         foreach ($migrationsToExecute as $version) {
@@ -184,6 +190,11 @@ class Migration
             $sql[$version->getVersion()] = $versionSql;
             $time += $version->getTime();
         }
+
+        $this->configuration->dispatchEvent(
+            Events::onMigrationsMigrated,
+            new MigrationsEventArgs($this->configuration, $direction, $dryRun)
+        );
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
         $this->outputWriter->write(sprintf("  <info>++</info> finished in %ss", $time));
