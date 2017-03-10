@@ -55,6 +55,11 @@ class MigrationsEventArgs extends EventArgs
         return $this->config;
     }
 
+    public function getConnection()
+    {
+        return $this->config->getConnection();
+    }
+
     public function getDirection()
     {
         return $this->direction;
