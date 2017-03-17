@@ -429,11 +429,7 @@ class FunctionalTest extends MigrationTestCase
      */
     public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges()
     {
-        try {
-            $listener = new AutoCommitListener();
-        } catch (\LogicException $e) {
-            $this->markTestSkipped('Need DBAL 2.5 to do auto commit tests');
-        }
+        $listener = new AutoCommitListener();
         list($conn, $config) = self::fileConnectionAndConfig();
         $config->registerMigration(1, MigrateWithDataModification::class);
         $migration = new Migration($config);

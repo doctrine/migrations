@@ -45,11 +45,7 @@ class AutoCommitListenerTest extends MigrationTestCase
         $this->conn = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
-        try {
-            $this->listener = new AutoCommitListener();
-        } catch (\LogicException $e) {
-            $this->markTestSkipped('DBAL 2.5 required for auto commit tests');
-        }
+        $this->listener = new AutoCommitListener();
     }
 
     private function willNotCommit()
