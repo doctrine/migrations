@@ -17,56 +17,33 @@
  * <http://www.doctrine-project.org>.
  */
 
-namespace Doctrine\DBAL\Migrations\Event;
+namespace Doctrine\DBAL\Migrations\Event\Listeners;
 
-use Doctrine\Common\EventArgs;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\Common\EventSubscriber;
+use Doctrine\DBAL\Migrations\Events;
+use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
 
-class MigrationsEventArgs extends EventArgs
+/**
+ * Listens for `onMigrationsMigrated` and, if the conneciton is has autocommit
+ * makes sure to do the final commit to ensure changes stick around.
+ *
+ * @since 1.6
+ */
+final class AutoCommitListener implements EventSubscriber
 {
-    /**
-     * @var Configuration
-     */
-    private $config;
-
-    /**
-     * The direction of the migration.
-     *
-     * @var string (up|down)
-     */
-    private $direction;
+    public function onMigrationsMigrated(MigrationsEventArgs $args)
+    {
+        $conn = $args->getConnection();
+        if (!$args->isDryRun() && !$conn->isAutoCommit()) {
+            $conn->commit();
+        }
+    }
 
     /**
-     * Whether or not the migrations are executing in dry run mode.
-     *
-     * @var bool
+     * {@inheritdoc}
      */
-    private $dryRun;
-
-    public function __construct(Configuration $config, $direction, $dryRun)
+    public function getSubscribedEvents()
     {
-        $this->config = $config;
-        $this->direction = $direction;
-        $this->dryRun = (bool) $dryRun;
-    }
-
-    public function getConfiguration()
-    {
-        return $this->config;
-    }
-
-    public function getConnection()
-    {
-        return $this->config->getConnection();
-    }
-
-    public function getDirection()
-    {
-        return $this->direction;
-    }
-
-    public function isDryRun()
-    {
-        return $this->dryRun;
+        return [Events::onMigrationsMigrated];
     }
 }
