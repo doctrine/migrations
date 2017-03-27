@@ -110,7 +110,7 @@ EOT
 
             $output->writeln('    <comment>>></comment> ' . $formattedVersion .
                 ' (<comment>' . $version->getVersion() . '</comment>)' .
-                str_repeat(' ', 49 - strlen($formattedVersion) - strlen($version->getVersion()))  .
+                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion())))  .
                 $status  . $migrationDescription);
         }
     }
