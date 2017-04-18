@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -150,4 +151,47 @@ class MigrationStatusTest extends MigrationTestCase
         $textOutput = $commandTester->getDisplay();
         $this->assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
     }
+
+    public function testShowVersions() {
+        $configuration = new Configuration($this->getSqliteConnection());
+        $configuration->setMigrationsNamespace('DoctrineMigrations');
+        $configuration->setMigrationsDirectory($this->migrationDirectory);
+
+        $configuration->registerMigration(1233, Version1Test::class);
+        $configuration->registerMigration(1234, Version1Test::class);
+        $configuration->registerMigration(20170101010101, Version1Test::class);
+        $configuration->registerMigration(20170101010102, Version1Test::class);
+        $configuration->registerMigration('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1', Version1Test::class);
+
+        $configuration->registerMigration('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2', Version1Test::class);
+
+        $configuration->getVersion(1234)->markMigrated();
+        $configuration->getVersion(20170101010101)->markMigrated();
+        $configuration->getVersion('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1')->markMigrated();
+
+        $command = $this
+            ->getMockBuilder(StatusCommand::class)
+            ->setConstructorArgs(['migrations:status'])
+            ->setMethods(['getMigrationConfiguration'])
+            ->getMock();
+        $command
+            ->expects($this->once())
+            ->method('getMigrationConfiguration')
+            ->will($this->returnValue($configuration));
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            ['--show-versions' => true],
+            []
+        );
+
+        $textOutput = $commandTester->getDisplay();
+        $this->assertRegExp('/\s+>>  \(1233\)\s+not migrated/m', $textOutput);
+        $this->assertRegExp('/\s+>>  \(1234\)\s+migrated/m', $textOutput);
+        $this->assertRegExp('/\s+>> 2017-01-01 01:01:01 \(20170101010101\)\s+migrated/m', $textOutput);
+        $this->assertRegExp('/\s+>> 2017-01-01 01:01:02 \(20170101010102\)\s+not migrated/m', $textOutput);
+        $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1\)\s+migrated/m', $textOutput);
+        $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2\)\s+not migrated/m', $textOutput);
+    }
+
 }
