@@ -198,6 +198,12 @@ class Version
         }
     }
 
+
+   public function checkResultExists($sql, array $params = array(), array $types = array())
+   {
+     $result = $this->connection->executeQuery($sql,$params,$types);
+     return $result->rowCount() > 0;
+   }
     /**
      * @param mixed[] $params Array of prepared statement parameters
      * @param string[] $types Array of the types of each statement parameters

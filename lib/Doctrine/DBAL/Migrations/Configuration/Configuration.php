@@ -799,6 +799,13 @@ class Configuration
         return $versions;
     }
 
+
+    public function setMappingTypes($mapping_types) {
+        foreach($mapping_types as $field=>$type) {
+            $this->connection->getDatabasePlatform()->registerDoctrineTypeMapping($field, $type);
+        }
+    }    
+
     /**
      * Use the connection's event manager to emit an event.
      *
