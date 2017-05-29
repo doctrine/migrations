@@ -118,7 +118,7 @@ class Version
         if($schemaProvider === null) {
             $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
                 $this->connection->getDatabasePlatform());
-            $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFacyoryConfiguration($schemaProvider);
+            $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration($schemaProvider);
         }
     }
 

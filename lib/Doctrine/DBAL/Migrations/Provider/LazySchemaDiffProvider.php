@@ -39,7 +39,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
-    public static function fromDefaultProxyFacyoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
+    public static function fromDefaultProxyFactoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
     {
         $proxyConfig = new Configuration();
         $proxyConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
