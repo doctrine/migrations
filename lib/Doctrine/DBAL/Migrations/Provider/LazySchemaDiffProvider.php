@@ -39,6 +39,19 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
+    public static function fromDefaultProxyFacyoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
+    {
+        $message = 'Function %s::fromDefaultProxyFacyoryConfiguration() deprecated due to typo.'
+            . 'Use %s::fromDefaultProxyFactoryConfiguration() instead';
+
+        trigger_error(
+            sprintf($message, self::class),
+            E_USER_DEPRECATED
+        );
+
+        return self::fromDefaultProxyFactoryConfiguration($originalSchemaManipulator);
+    }
+
     public static function fromDefaultProxyFactoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
     {
         $proxyConfig = new Configuration();
