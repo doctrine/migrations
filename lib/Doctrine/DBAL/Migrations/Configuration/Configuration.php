@@ -744,12 +744,17 @@ class Configuration
         }
 
         $this->connect();
+        $config = $this->connection->getConfiguration();
+        $expr = $config->getFilterSchemaAssetsExpression();
+        $config->setFilterSchemaAssetsExpression(null);
         if ($this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
             $this->migrationTableCreated = true;
+            $config->setFilterSchemaAssetsExpression($expr);
 
             return false;
         }
 
+        $config->setFilterSchemaAssetsExpression($expr);
         $columns = [
             $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
         ];

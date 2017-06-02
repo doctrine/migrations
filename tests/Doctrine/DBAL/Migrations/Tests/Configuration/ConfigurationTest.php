@@ -12,6 +12,7 @@ use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
+use Doctrine\DBAL\Configuration as DBALConfiguration;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -186,6 +187,12 @@ class ConfigurationTest extends MigrationTestCase
         $sm->expects($this->once())
             ->method('tablesExist')
             ->willReturn(true);
+        $dbalConfig = $this->getMockBuilder(DBALConfiguration::class)->getMock();
+        $dbalConfig->expects($this->atLeastOnce())
+                ->method('getFilterSchemaAssetsExpression');
+        $dbalConfig->expects($this->atLeastOnce())
+            ->method('setFilterSchemaAssetsExpression')
+            ->with(null);
         $conn = $this->getMockBuilder(MasterSlaveConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -196,6 +203,9 @@ class ConfigurationTest extends MigrationTestCase
         $conn->expects($this->any())
             ->method('getSchemaManager')
             ->willReturn($sm);
+        $conn->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn($dbalConfig);
         $conn->expects($this->once())
             ->method('fetchAll')
             ->willReturn([
