@@ -279,7 +279,7 @@ class Version
             $this->state = self::STATE_PRE;
             $fromSchema = $this->schemaProvider->createFromSchema();
 
-            $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
+            $this->migration->{'pre' . ucfirst($direction)}($fromSchema, $dryRun);
 
             if ($direction === self::DIRECTION_UP) {
                 $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
@@ -297,7 +297,7 @@ class Version
             $this->executeRegisteredSql($dryRun, $timeAllQueries);
 
             $this->state = self::STATE_POST;
-            $this->migration->{'post' . ucfirst($direction)}($toSchema);
+            $this->migration->{'post' . ucfirst($direction)}($toSchema, $dryRun);
 
             if (! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {

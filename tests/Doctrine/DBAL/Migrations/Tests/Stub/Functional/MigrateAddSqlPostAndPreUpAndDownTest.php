@@ -9,7 +9,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
 {
     const TABLE_NAME = 'test_add_sql_post_up_table';
 
-    public function preUp(Schema $schema)
+    public function preUp(Schema $schema, $dryRun = false)
     {
         $this->addSql(
             sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
@@ -25,7 +25,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function postUp(Schema $schema)
+    public function postUp(Schema $schema, $dryRun = false)
     {
         $this->addSql(
             sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
@@ -33,7 +33,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function preDown(Schema $schema)
+    public function preDown(Schema $schema, $dryRun = false)
     {
         $this->addSql(
             sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
@@ -49,7 +49,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function postDown(Schema $schema)
+    public function postDown(Schema $schema, $dryRun = false)
     {
         $this->addSql(
             sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
