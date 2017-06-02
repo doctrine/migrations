@@ -11,8 +11,7 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Version;
 
 /**
- * Class AbstractMigrationTest
- * @package Doctrine\DBAL\Migrations\Tests
+ * Class AbstractMigrationTest.
  *
  * @author Robbert van den Bogerd <rvdbogerd@ibuildings.nl>
  */
@@ -20,7 +19,7 @@ class AbstractMigrationTest extends MigrationTestCase
 {
     private $config;
     private $version;
-    /** @var  AbstractMigrationStub */
+    /** @var AbstractMigrationStub */
     private $migration;
     protected $outputWriter;
     protected $output;
@@ -45,15 +44,13 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWarnIfOutputMessage()
     {
         $this->migration->warnIf(true, 'Warning was thrown');
-        $this->assertContains('Warning during No State: Warning was thrown'
-            , $this->getOutputStreamContent($this->output));
+        $this->assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfAddDefaultMessage()
     {
         $this->migration->warnIf(true);
-        $this->assertContains('Warning during No State: Unknown Reason'
-            , $this->getOutputStreamContent($this->output));
+        $this->assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfDontOutputMessageIfFalse()
@@ -65,9 +62,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWriteInvokesOutputWriter()
     {
         $this->migration->exposed_Write('Message');
-        $this->assertContains('Message'
-            , $this->getOutputStreamContent($this->output));
-
+        $this->assertContains('Message', $this->getOutputStreamContent($this->output));
     }
 
     public function testAbortIfThrowsException()
@@ -120,4 +115,12 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->exposed_AddSql('tralala');
     }
 
+    public function testHasColumn()
+    {
+        $this->config->getConnection()->executeQuery('CREATE TABLE IF NOT EXISTS table_with_column (test INT)');
+
+        $this->assertTrue($this->migration->hasColumn('table_with_column', 'test'));
+        $this->assertFalse($this->migration->hasColumn('table_with_column', 'invalid_column'));
+        $this->assertFalse($this->migration->hasColumn('invalid_table', 'test'));
+    }
 }
