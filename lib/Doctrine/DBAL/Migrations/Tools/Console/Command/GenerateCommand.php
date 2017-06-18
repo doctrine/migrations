@@ -38,7 +38,7 @@ class GenerateCommand extends AbstractCommand
 {
 
     private static $_template =
-            '<?php
+            '<?php declare(strict_types = 1);
 
 namespace <namespace>;
 
