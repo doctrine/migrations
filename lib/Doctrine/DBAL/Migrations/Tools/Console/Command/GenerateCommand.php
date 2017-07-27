@@ -140,9 +140,9 @@ EOT
 
     protected function manageCustomTemplate(Configuration $configuration, InputInterface $input, OutputInterface $output)
     {
-        if ($tpl = $input->getOption('template') !== null) {
+        if ($tpl = $input->getOption('template')) {
             $this->loadTemplateFile($tpl, $output);
-        } elseif ($configuredTemplate = $configuration->getCustomTemplate() !== null) {
+        } elseif ($configuredTemplate = $configuration->getCustomTemplate()) {
             $this->loadTemplateFile($configuredTemplate, $output);
         }
     }
