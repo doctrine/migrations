@@ -94,7 +94,7 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $this->manageCustomTemplate($input, $output);
+        $this->manageCustomTemplate($configuration, $input, $output);
 
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version);
@@ -138,21 +138,29 @@ EOT
         return $path;
     }
 
-    protected function manageCustomTemplate(InputInterface $input, OutputInterface $output) {
-        if ($tpl = $input->getOption('template')) {
-            $tpl = getcwd() . '/' . $tpl;
-            if(!is_file($tpl)) {
-                throw new \InvalidArgumentException('The specified template « ' . $tpl . ' » cannot be found.');
-            }
-
-            $tplContent = file_get_contents($tpl);
-
-            if($tplContent === false) {
-                throw new \InvalidArgumentException('Cannot read file contents of template « ' . $tpl . ' ».');
-            }
-
-            $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $tpl));
-            self::$_template = $tplContent;
+    protected function manageCustomTemplate(Configuration $configuration, InputInterface $input, OutputInterface $output)
+    {
+        if ($tpl = $input->getOption('template') !== null) {
+            $this->loadTemplateFile($tpl, $output);
+        } elseif ($configuredTemplate = $configuration->getCustomTemplate() !== null) {
+            $this->loadTemplateFile($configuredTemplate, $output);
         }
+    }
+
+    private function loadTemplateFile($tpl, OutputInterface $output)
+    {
+        $tpl = getcwd() . '/' . $tpl;
+        if(!is_file($tpl)) {
+            throw new \InvalidArgumentException('The specified template « ' . $tpl . ' » cannot be found.');
+        }
+
+        $tplContent = file_get_contents($tpl);
+
+        if($tplContent === false) {
+            throw new \InvalidArgumentException('Cannot read file contents of template « ' . $tpl . ' ».');
+        }
+
+        $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $tpl));
+        self::$_template = $tplContent;
     }
 }
