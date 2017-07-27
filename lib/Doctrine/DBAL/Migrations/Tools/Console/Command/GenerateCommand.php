@@ -94,7 +94,7 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $this->manageCustomTemplate();
+        $this->manageCustomTemplate($input, $output);
 
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version);
