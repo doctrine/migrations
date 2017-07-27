@@ -154,6 +154,13 @@ class Configuration
     private $migrationsAreOrganizedByYearAndMonth = false;
 
     /**
+     * The custom template path to be used in generate command
+     *
+     * @var string
+     */
+    private $customTemplate;
+
+    /**
      * Construct a migration configuration object.
      *
      * @param Connection               $connection   A Connection instance
@@ -363,6 +370,26 @@ class Configuration
     public function getMigrationsNamespace()
     {
         return $this->migrationsNamespace;
+    }
+
+    /**
+     * Returns the custom template path
+     *
+     * @return string $customTemplate The custom template path
+     */
+    public function getCustomTemplate()
+    {
+        return $this->customTemplate;
+    }
+
+    /**
+     * Set the custom template path
+     *
+     * @param string $customTemplate The custom template path
+     */
+    public function setCustomTemplate($customTemplate)
+    {
+        $this->customTemplate = $customTemplate;
     }
 
     /**
