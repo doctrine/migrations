@@ -69,6 +69,7 @@ class Version<version> extends AbstractMigration
                 ->setName('migrations:generate')
                 ->setDescription('Generate a blank migration class.')
                 ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
+                ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'The project relative path to a custom class template')
                 ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
@@ -77,6 +78,12 @@ The <info>%command.name%</info> command generates a blank migration class:
 You can optionally specify a <comment>--editor-cmd</comment> option to open the generated file in your favorite editor:
 
     <info>%command.full_name% --editor-cmd=mate</info>
+
+You can optionally specify a <comment>--template</comment> option to use a custom class template:
+
+    <info>%command.full_name% --template=src/MyApp/Resources/tpl/MyDoctrineMigrationTemplate.tpl</info>
+
+This template will not be handled by a template engine (like Twig).
 EOT
         );
 
@@ -86,6 +93,8 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
+
+        $this->manageCustomTemplate();
 
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version);
@@ -127,5 +136,23 @@ EOT
         }
 
         return $path;
+    }
+
+    protected function manageCustomTemplate(InputInterface $input, OutputInterface $output) {
+        if ($tpl = $input->getOption('template')) {
+            $tpl = getcwd() . '/' . $tpl;
+            if(!is_file($tpl)) {
+                throw new \InvalidArgumentException('The specified template « ' . $tpl . ' » cannot be found.');
+            }
+
+            $tplContent = file_get_contents($tpl);
+
+            if($tplContent === false) {
+                throw new \InvalidArgumentException('Cannot read file contents of template « ' . $tpl . ' ».');
+            }
+
+            $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $tpl));
+            self::$_template = $tplContent;
+        }
     }
 }
