@@ -8,6 +8,7 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
 class GenerateCommandTest extends CommandTestCase
 {
     const VERSION = '20160705000000';
+    const CUSTOM_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
 
     private $root;
     private $migrationFile;
@@ -24,6 +25,24 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains($this->migrationFile, $tester->getDisplay());
         self::assertTrue($this->root->hasChild($this->migrationFile));
         self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
+    }
+
+    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration()
+    {
+        $this->config->expects($this->once())
+            ->method('generateVersionNumber')
+            ->willReturn(self::VERSION);
+
+        $this->config->expects($this->once())
+            ->method('getCustomTemplate')
+            ->willReturn(self::CUSTOM_TEMPLATE_NAME);
+
+        list($tester, $statusCode) = $this->executeCommand([]);
+
+        $this->assertSame(0, $statusCode);
+        $this->assertContains($this->migrationFile, $tester->getDisplay());
+        $this->assertTrue($this->root->hasChild($this->migrationFile));
+        $this->assertContains('public function customTemplate()', $this->root->getChild($this->migrationFile)->getContent());
     }
 
     protected function setUp()
