@@ -74,7 +74,8 @@ class ExecuteCommandTest extends CommandTestCase
     public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode()
     {
         $this->questions->expects($this->never())
-            ->method($this->isDialogHelper ? 'askConfirmation' : 'ask');
+            ->method('ask');
+
         $this->version->expects($this->once())
             ->method('execute')
             ->with('up', true, true);

@@ -166,7 +166,7 @@ class AbstractCommandTest extends MigrationTestCase
     }
 
     /**
-     * Test if trhow an error if no connection is passed.
+     * Test if throw an error if no connection is passed.
      */
     public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided()
     {
@@ -291,26 +291,9 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        /**
-         * This test is testing a deprecated method.
-         * PHPunit convert those deprecations errors into tests failures.
-         * You can either use \PHPUnit_Framework_Error_Deprecated::$enabled = false;
-         * or use the @ operator to suppress the error.
-         * The advantage of the later is that it also remove the error message from the phpunit output.
-         */
-        if (class_exists("Symfony\\Component\\Console\\Helper\\DialogHelper"))
-        {
-            @$helper = new DialogHelper();
-
-            @$this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-            @$this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
-        }
-
-        if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
-            $helper = new QuestionHelper();
-            $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-            $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
-        }
+        $helper = new QuestionHelper();
+        $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
+        $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
     }
 
     protected function setUp()
