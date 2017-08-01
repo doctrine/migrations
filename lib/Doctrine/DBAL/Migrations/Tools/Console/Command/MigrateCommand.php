@@ -21,6 +21,7 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
+use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
@@ -203,7 +204,7 @@ EOT
 
             $output->writeln(sprintf(
                 '<error>Unknown version: %s</error>',
-                $output->getFormatter()->escape($versionAlias)
+                OutputFormatter::escape($versionAlias)
             ));
             return false;
         }
