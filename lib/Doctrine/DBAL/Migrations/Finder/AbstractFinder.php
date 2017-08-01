@@ -62,7 +62,7 @@ abstract class AbstractFinder implements MigrationFinderInterface
             $version = (string) substr($className, 7);
             if ($version === '0') {
                 throw new \InvalidArgumentException(sprintf(
-                    'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migraitons' . PHP_EOL .
+                    'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migrations' . PHP_EOL .
                     'It\'s used to revert all migrations including the first one.',
                     $version
                 ));
