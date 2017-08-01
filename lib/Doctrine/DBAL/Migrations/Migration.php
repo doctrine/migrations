@@ -95,14 +95,18 @@ class Migration
 
         $this->outputWriter->write(sprintf("-- Migrating from %s to %s\n", $from, $to));
 
-        $sqlWriter = new SqlFileWriter(
+        return $this->createSqlFileWriter($path)
+                    ->write($sql, $direction);
+    }
+
+    protected function createSqlFileWriter(string $path): SqlFileWriter
+    {
+        return new SqlFileWriter(
             $this->configuration->getMigrationsColumnName(),
             $this->configuration->getMigrationsTableName(),
             $path,
             $this->outputWriter
         );
-
-        return $sqlWriter->write($sql, $direction);
     }
 
     /**

@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<phpunit colors="true" bootstrap="vendor/autoload.php">
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
+         colors="true"
+         verbose="true"
+         beStrictAboutOutputDuringTests="true"
+>
     <testsuites>
         <testsuite name="Doctrine2 Database Migrations Test Suite">
             <directory>./tests/Doctrine/</directory>
@@ -12,26 +17,4 @@
             <directory>./lib/</directory>
         </whitelist>
     </filter>
-
-    <listeners>
-        <listener class="JohnKary\PHPUnit\Listener\SpeedTrapListener" >
-            <arguments>
-                <array>
-                    <element key="slowThreshold">
-                        <integer>200</integer>
-                    </element>
-                    <element key="reportLength">
-                        <integer>10</integer>
-                    </element>
-                </array>
-            </arguments>
-        </listener>
-    </listeners>
-
-    <logging>
-        <log type="coverage-html" target="build/coverage" title="doctrine migrations"
-             charset="UTF-8" yui="true" highlight="true" lowUpperBound="5"
-             highLowerBound="70" />
-        <log type="coverage-clover" target="build/logs/clover.xml"/>
-    </logging>
 </phpunit>

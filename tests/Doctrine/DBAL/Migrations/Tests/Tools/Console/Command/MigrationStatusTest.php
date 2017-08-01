@@ -69,12 +69,10 @@ class MigrationStatusTest extends MigrationTestCase
             }));
 
         $configuration
-            ->expects($this->any())
             ->method('getDateTime')
             ->will($this->returnValue('FORMATTED'));
 
         $configuration
-            ->expects($this->any())
             ->method('getAvailableVersions')
             ->will($this->returnValue([]));
 
@@ -130,7 +128,6 @@ class MigrationStatusTest extends MigrationTestCase
             ->will($this->returnValue([1234,1235,1239,1240]));
 
         $configuration
-            ->expects($this->any())
             ->method('getCurrentVersion')
             ->will($this->returnValue(1239));
 

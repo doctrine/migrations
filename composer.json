@@ -19,10 +19,8 @@
     },
     "require-dev": {
         "doctrine/orm": "~2.5",
-        "phpunit/phpunit": "~4.7",
+        "phpunit/phpunit": "~6.2",
         "doctrine/coding-standard": "dev-master",
-        "mockery/mockery": "^0.9.4",
-        "johnkary/phpunit-speedtrap": "~1.0@dev",
         "jdorn/sql-formatter": "~1.1",
         "mikey179/vfsStream": "^1.6"
     },

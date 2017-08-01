@@ -2,6 +2,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
+use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Finder\GlobFinder;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
@@ -53,11 +54,10 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $this->assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
     }
 
-    /**
-     * @expectedException Doctrine\DBAL\Migrations\MigrationException
-     */
     public function testFinderIsIncompatibleWithConfiguration()
     {
+        $this->expectException(MigrationException::class);
+
         $this->loadConfiguration('organize_by_year', null, new GlobFinder());
     }
 
@@ -81,7 +81,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testThrowExceptionIfAlreadyLoaded()
     {
         $config = $this->loadConfiguration();
-        $this->setExpectedException(MigrationException::class);
+        $this->expectException(MigrationException::class);
         $config->load($config->getFile());
     }
 
@@ -106,44 +106,40 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $this->assertTrue($config->areMigrationsOrganizedByYearAndMonth());
     }
 
-    /**
-     * @expectedException Doctrine\DBAL\Migrations\MigrationException
-     */
     public function testVersionsOrganizationInvalid()
     {
+        $this->expectException(MigrationException::class);
+
         $this->loadConfiguration('organize_invalid');
     }
 
-    /**
-     * @expectedException Doctrine\DBAL\Migrations\MigrationException
-     */
     public function testVersionsOrganizationIncompatibleFinder()
     {
+        $this->expectException(MigrationException::class);
+
         $config = $this->loadConfiguration('organize_by_year_and_month');
         $config->setMigrationsFinder(new GlobFinder());
     }
 
-    /**
-     * @expectedException Doctrine\DBAL\Migrations\MigrationException
-     * @expectedExceptionCode 10
-     */
     public function testConfigurationWithInvalidOption()
     {
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionCode(10);
+
         $this->loadConfiguration('invalid');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testConfigurationFileNotExists()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->loadConfiguration('file_not_exists');
     }
 
     public function testLoadMigrationsList()
     {
-        $this->loadConfiguration('migrations_list');
-        $this->loadConfiguration('migrations_list2');
+        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list'));
+        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list2'));
     }
 
     /**
@@ -151,7 +147,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
      */
     public function testThatTheOrderOfConfigKeysDoesNotMatter($file)
     {
-        $this->loadConfiguration($file);
+        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration($file));
     }
 
     public function getConfigWithKeysInVariousOrder()

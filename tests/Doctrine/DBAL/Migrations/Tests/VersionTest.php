@@ -42,6 +42,7 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\SqlFileWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
@@ -53,17 +54,11 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use \Mockery as m;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class VersionTest extends MigrationTestCase
 {
-
     private $config;
 
     protected $outputWriter;
@@ -104,7 +99,7 @@ class VersionTest extends MigrationTestCase
      */
     public function testOutputQueryTimeAllQueries()
     {
-        $outputWriterMock = $this->getMock(OutputWriter::class);
+        $outputWriterMock = $this->createMock(OutputWriter::class);
         $outputWriterMock->expects($this->once())->method('write');
         $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
         $reflectionVersion = new \ReflectionClass(Version::class);
@@ -124,7 +119,7 @@ class VersionTest extends MigrationTestCase
      */
     public function testOutputQueryTimeNotAllQueries()
     {
-        $outputWriterMock = $this->getMock(OutputWriter::class);
+        $outputWriterMock = $this->createMock(OutputWriter::class);
         $outputWriterMock->expects($this->exactly(0))->method('write');
         $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
         $reflectionVersion = new \ReflectionClass(Version::class);
@@ -201,24 +196,48 @@ class VersionTest extends MigrationTestCase
     {
         $version = 1;
 
-        $outputWriter = m::mock(OutputWriter::class);
-        $outputWriter->shouldReceive('write');
+        $connection   = $this->getSqliteConnection();
+        $outputWriter = $this->createMock(OutputWriter::class);
+        $sqlWriter    = $this->createMock(SqlFileWriter::class);
 
-        $connection = $this->getSqliteConnection();
+        $outputWriter->expects($this->atLeastOnce())
+                     ->method('write');
 
-        $config = m::mock(Configuration::class)
-            ->makePartial();
-        $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);
-        $config->shouldReceive('getConnection')->andReturn($connection);
+        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $config = $this->getMockBuilder(Configuration::class)
+                       ->disableOriginalConstructor()
+                       ->setMethods(['getConnection', 'getOutputWriter'])
+                       ->getMock();
 
-        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', [$config, $version, 'stdClass'])->makePartial();
-        $migration->shouldReceive('execute')->with($direction, true)->andReturn($getSqlReturn);
+        $config->method('getOutputWriter')
+               ->willReturn($outputWriter);
+
+        $config->method('getConnection')
+               ->willReturn($connection);
+
+        /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $migration = $this->getMockBuilder(Version::class)
+                          ->setConstructorArgs([$config, $version, 'stdClass'])
+                          ->setMethods(['execute', 'createSqlFileWriter'])
+                          ->getMock();
+
+        $migration->expects($this->once())
+                  ->method('execute')
+                  ->with($direction, true)
+                  ->willReturn($getSqlReturn);
+
+        $migration->method('createSqlFileWriter')
+                  ->willReturn($sqlWriter);
 
         $expectedReturn = 123;
-        $sqlWriter = m::instanceMock('overload:Doctrine\DBAL\Migrations\SqlFileWriter');
-        $sqlWriter->shouldReceive('write')->with(m::type('array'), m::anyOf('up', 'down'))->andReturn($expectedReturn);
+
+        $sqlWriter->expects($this->once())
+                  ->method('write')
+                  ->with($this->isType('array'), $direction)
+                  ->willReturn($expectedReturn);
 
         $result = $migration->writeSqlFile($path, $direction);
+
         $this->assertEquals($expectedReturn, $result);
     }
 
@@ -306,7 +325,8 @@ class VersionTest extends MigrationTestCase
             VersionOutputSqlWithParam::class
         );
 
-        $this->setExpectedException(MigrationException::class, 'contains a prepared statement.');
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('contains a prepared statement.');
         $version->writeSqlFile('tralala');
     }
 
@@ -363,13 +383,27 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        $config = m::mock(Configuration::class)
-            ->makePartial();
-        $config->shouldReceive('getOutputWriter')->andReturn($this->getOutputWriter());
-        $config->shouldReceive('getConnection')->andReturn($connection);
 
-        $migration = m::mock('Doctrine\DBAL\Migrations\Version[execute]', [$config, $version, 'stdClass'])->makePartial();
-        $migration->shouldReceive('execute')->andReturn(['SHOW DATABASES;']);
+        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $config = $this->getMockBuilder(Configuration::class)
+                       ->disableOriginalConstructor()
+                       ->setMethods(['getOutputWriter', 'getConnection'])
+                       ->getMock();
+
+        $config->method('getOutputWriter')
+               ->willReturn($this->getOutputWriter());
+
+        $config->method('getConnection')
+               ->willReturn($connection);
+
+
+        /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $migration = $this->getMockBuilder(Version::class)
+                          ->setConstructorArgs([$config, $version, 'stdClass'])
+                          ->setMethods(['execute'])
+                          ->getMock();
+
+        $migration->method('execute')->willReturn(['SHOW DATABASES;']);
 
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
         $migration->writeSqlFile(vfsStream::url('sql_files_dir'), Version::DIRECTION_UP);

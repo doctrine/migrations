@@ -187,9 +187,8 @@ class MigrateCommandTest extends CommandTestCase
      */
     protected function createCommand()
     {
-        $this->migration = $this->getMockBuilder(Migration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->migration = $this->createMock(Migration::class);
+
         $cmd = $this->getMockForAbstractClass(
             MigrateCommand::class,
             [],
@@ -199,8 +198,8 @@ class MigrateCommandTest extends CommandTestCase
             true,
             ['createMigration']
         );
-        $cmd->expects($this->any())
-            ->method('createMigration')
+
+        $cmd->method('createMigration')
             ->with($this->isInstanceOf(Configuration::class))
             ->willReturn($this->migration);
 

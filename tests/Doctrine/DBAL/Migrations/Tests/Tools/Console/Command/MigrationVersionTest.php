@@ -6,7 +6,6 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
-use InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -67,13 +66,14 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--add --range-from" options without "--range-to".
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Options --range-to and --range-from should be used together.
      */
     public function testAddRangeWithoutRangeToOption()
     {
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
+
         $commandTester->execute(
             [
                 '--add'        => true,
@@ -87,13 +87,14 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--add --range-to" options without "--range-from".
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Options --range-to and --range-from should be used together.
      */
     public function testAddRangeWithoutRangeFromOption()
     {
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
+
         $commandTester->execute(
             [
                 '--add'      => true,
@@ -107,13 +108,14 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--add --all --range-to" options.
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Options --all and --range-to/--range-from both used. You should use only one of them.
      */
     public function testAddAllOptionsWithRangeTo()
     {
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
+
         $commandTester->execute(
             [
                 '--add'      => true,
@@ -128,13 +130,14 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--add --all --range-from" options.
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Options --all and --range-to/--range-from both used. You should use only one of them.
      */
     public function testAddAllOptionsWithRangeFrom()
     {
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
+
         $commandTester->execute(
             [
                 '--add'      => true,
@@ -300,9 +303,6 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--add" option on migrate already migrated version.
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The version "1233" already exists in the version table.
      */
     public function testAddOptionIfVersionAlreadyMigrated()
     {
@@ -310,6 +310,10 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->getVersion('1233')->markMigrated();
 
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The version "1233" already exists in the version table.');
+
         $commandTester->execute(
             [
                 '--add'   => true,
@@ -323,15 +327,15 @@ class MigrationVersionTest extends MigrationTestCase
 
     /**
      * Test "--delete" option on not migrated version.
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage The version "1233" does not exists in the version table.
      */
     public function testDeleteOptionIfVersionNotMigrated()
     {
         $this->configuration->registerMigration(1233, Version1Test::class);
 
         $commandTester = new CommandTester($this->command);
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('The version "1233" does not exists in the version table.');
 
         $commandTester->execute(
             [

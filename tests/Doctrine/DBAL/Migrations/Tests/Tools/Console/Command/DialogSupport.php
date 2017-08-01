@@ -14,10 +14,10 @@ trait DialogSupport
     {
         if (class_exists(QuestionHelper::class)) {
             $this->isDialogHelper = false;
-            $this->questions = $this->getMock(QuestionHelper::class);
+            $this->questions = $this->createMock(QuestionHelper::class);
         } else {
             $this->isDialogHelper = true;
-            $this->questions = $this->getMock(DialogHelper::class);
+            $this->questions = $this->createMock(DialogHelper::class);
         }
         $app->getHelperSet()->set($this->questions, $this->isDialogHelper ? 'dialog' : 'question');
     }

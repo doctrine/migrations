@@ -228,14 +228,19 @@ class Version
         $this->outputWriter->write("\n-- Version " . $this->version . "\n");
 
         $sqlQueries = [$this->version => $queries];
-        $sqlWriter = new SqlFileWriter(
+
+        return $this->createSqlFileWriter($path)
+                    ->write($sqlQueries, $direction);
+    }
+
+    protected function createSqlFileWriter(string $path): SqlFileWriter
+    {
+        return new SqlFileWriter(
             $this->configuration->getMigrationsColumnName(),
             $this->configuration->getMigrationsTableName(),
             $path,
             $this->outputWriter
         );
-
-        return $sqlWriter->write($sqlQueries, $direction);
     }
 
     /**

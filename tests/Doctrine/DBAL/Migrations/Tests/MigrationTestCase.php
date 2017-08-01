@@ -25,7 +25,7 @@ use Doctrine\DBAL\Migrations\OutputWriter;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 
-abstract class MigrationTestCase extends \PHPUnit_Framework_TestCase
+abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 {
     /**
      * @var OutputWriter

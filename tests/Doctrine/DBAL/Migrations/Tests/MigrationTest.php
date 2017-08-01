@@ -40,25 +40,27 @@ if (!function_exists(__NAMESPACE__ . '\realpath')) {
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\SqlFileWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
-use \Mockery as m;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+use PHPUnit\Framework\Constraint\RegularExpression;
 
-/**
- * @runTestsInSeparateProcesses
- * @preserveGlobalState disabled
- */
 class MigrationTest extends MigrationTestCase
 {
+    /**
+     * @var Connection
+     */
     private $conn;
+
     /** @var Configuration */
     private $config;
-    
+
     protected $output;
 
     protected function setUp()
@@ -73,20 +75,18 @@ class MigrationTest extends MigrationTestCase
     {
         $migration = new Migration($this->config);
 
-        $this->setExpectedException(
-            MigrationException::class,
-            'Could not find migration version 1234'
-        );
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Could not find migration version 1234');
+
         $migration->migrate('1234');
     }
 
-    /**
-     * @expectedException \Doctrine\DBAL\Migrations\MigrationException
-     * @expectedExceptionMessage Could not find any migrations to execute.
-     */
     public function testMigrateWithNoMigrationsThrowsException()
     {
         $migration = new Migration($this->config);
+
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Could not find any migrations to execute.');
 
         $migration->migrate();
     }
@@ -114,11 +114,21 @@ class MigrationTest extends MigrationTestCase
      */
     public function testGetSql($to)
     {
-        $migrationMock = m::mock(Migration::class);
-        $migrationMock->makePartial();
+        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $migration = $this->getMockBuilder(Migration::class)
+                          ->disableOriginalConstructor()
+                          ->setMethods(['migrate'])
+                          ->getMock();
+
         $expected = 'something';
-        $migrationMock->shouldReceive('migrate')->with($to, true)->andReturn($expected);
-        $result = $migrationMock->getSql($to);
+
+        $migration->expects($this->once())
+                  ->method('migrate')
+                  ->with($to, true)
+                  ->willReturn($expected);
+
+        $result = $migration->getSql($to);
+
         $this->assertEquals($expected, $result);
     }
 
@@ -144,22 +154,47 @@ class MigrationTest extends MigrationTestCase
     public function testWriteSqlFile($path, $from, $to, $getSqlReturn)
     {
         $expectedReturn = 123;
-        $sqlWriter = m::instanceMock('overload:Doctrine\DBAL\Migrations\SqlFileWriter');
-        $sqlWriter->shouldReceive('write')->with(m::type('array'), m::anyOf('up', 'down'))->andReturn($expectedReturn);
 
-        $outputWriter = m::mock(OutputWriter::class);
-        $outputWriter->shouldReceive('write');
+        $sqlWriter    = $this->createMock(SqlFileWriter::class);
+        $outputWriter = $this->createMock(OutputWriter::class);
 
-        $config = m::mock(Configuration::class)
-            ->makePartial();
-        $config->shouldReceive('getCurrentVersion')->andReturn($from);
-        $config->shouldReceive('getOutputWriter')->andReturn($outputWriter);
+        $sqlWriter->method('write')
+                  ->with($this->isType('array'), new RegularExpression('/(up|down)/'))
+                  ->willReturn($expectedReturn);
+
+        $outputWriter->expects($this->atLeastOnce())
+                     ->method('write');
+
+        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $config = $this->getMockBuilder(Configuration::class)
+                          ->disableOriginalConstructor()
+                          ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion'])
+                          ->getMock();
+
+        $config->method('getCurrentVersion')
+               ->willReturn($from);
+
+        $config->method('getOutputWriter')
+               ->willReturn($outputWriter);
+
         if ($to == null) { // this will always just test the "up" direction
-            $config->shouldReceive('getLatestVersion')->andReturn($from + 1);
+            $config->method('getLatestVersion')
+                   ->willReturn($from + 1);
         }
 
-        $migration = m::mock('Doctrine\DBAL\Migrations\Migration[getSql]', [$config])->makePartial();
-        $migration->shouldReceive('getSql')->with($to)->andReturn($getSqlReturn);
+        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $migration = $this->getMockBuilder(Migration::class)
+                          ->setConstructorArgs([$config])
+                          ->setMethods(['getSql', 'createSqlFileWriter'])
+                          ->getMock();
+
+        $migration->expects($this->once())
+                  ->method('getSql')
+                  ->with($to)
+                  ->willReturn($getSqlReturn);
+
+        $migration->method('createSqlFileWriter')
+                  ->willReturn($sqlWriter);
 
         $result = $migration->writeSqlFile($path, $to);
         $this->assertEquals($expectedReturn, $result);
@@ -178,12 +213,26 @@ class MigrationTest extends MigrationTestCase
 
     public function testWriteSqlFileShouldUseStandardCommentMarkerInSql()
     {
-        $config = m::mock(Configuration::class)->makePartial();
-        $config->shouldReceive('getCurrentVersion')->andReturn(0);
-        $config->shouldReceive('getOutputWriter')->andReturn($this->getOutputWriter());
-        $migration = m::mock('Doctrine\DBAL\Migrations\Migration[getSql]', [$config])->makePartial();
-        $migration->shouldReceive('getSql')->andReturn(['1' => ['SHOW DATABASES']]);
+        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $config = $this->getMockBuilder(Configuration::class)
+                       ->disableOriginalConstructor()
+                       ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion'])
+                       ->getMock();
 
+        $config->method('getCurrentVersion')
+               ->willReturn(0);
+
+        $config->method('getOutputWriter')
+               ->willReturn($this->getOutputWriter());
+
+        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        $migration = $this->getMockBuilder(Migration::class)
+                          ->setConstructorArgs([$config])
+                          ->setMethods(['getSql'])
+                          ->getMock();
+
+        $migration->method('getSql')
+                  ->willReturn(['1' => ['SHOW DATABASES']]);
 
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
         $migration->writeSqlFile(vfsStream::url('sql_files_dir'), 1);

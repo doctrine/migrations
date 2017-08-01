@@ -11,7 +11,6 @@ use Doctrine\ORM\Configuration;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use InvalidArgumentException;
 
 class ConfigurationHelperTest extends MigrationTestCase
 {
@@ -37,7 +36,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     protected $output;
 
     /**
-     * @var InputInterface
+     * @var InputInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     private $input;
 
@@ -66,8 +65,7 @@ class ConfigurationHelperTest extends MigrationTestCase
             $file = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
             copy($file,$configFile);
 
-            $this->input->expects($this->any())
-                ->method('getOption')
+            $this->input->method('getOption')
                 ->with('configuration')
                 ->will($this->returnValue(null));
 
@@ -120,8 +118,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     }
 
     public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() {
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue( __DIR__ . '/files/config.php'));
 
@@ -133,8 +130,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     }
 
     public function testConfigurationHelperLoadsJsonFormatFromCommandLine() {
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue( __DIR__ . '/files/config.json'));
 
@@ -147,25 +143,24 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     /**
      * Test that unsupported file type throws exception
-     *
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage Given config file type is not supported
      */
     public function testConfigurationHelperFailsToLoadOtherFormat() {
 
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue('testconfig.wrong'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-        $configfileLoaded = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Given config file type is not supported');
+
+        $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
     }
 
     public function testConfigurationHelperWithConfigurationFromSetter()
     {
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue(null));
 
@@ -180,8 +175,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperWithConfigurationFromSetterAndOverrideFromCommandLine()
     {
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue(__DIR__ . '/../Command/_files/config.yml'));
 
@@ -195,8 +189,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath()
     {
-        $this->input->expects($this->any())
-            ->method('getOption')
+        $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue(null));
 
