@@ -140,27 +140,27 @@ EOT
 
     protected function manageCustomTemplate(Configuration $configuration, InputInterface $input, OutputInterface $output)
     {
-        if ($tpl = $input->getOption('template')) {
-            $this->loadTemplateFile($tpl, $output);
-        } elseif ($configuredTemplate = $configuration->getCustomTemplate()) {
-            $this->loadTemplateFile($configuredTemplate, $output);
+        $customTemplate = $input->getOption('template') ? $configuration->getCustomTemplate() : null;
+
+        if ($customTemplate !== null) {
+            $this->loadTemplateFile($customTemplate, $output);
         }
     }
 
-    private function loadTemplateFile($tpl, OutputInterface $output)
+    private function loadTemplateFile(string $customTemplate, OutputInterface $output): void
     {
-        $tpl = getcwd() . '/' . $tpl;
-        if(!is_file($tpl)) {
-            throw new \InvalidArgumentException('The specified template « ' . $tpl . ' » cannot be found.');
+        $customTemplate = getcwd() . '/' . $customTemplate;
+        if ( ! is_file($customTemplate)) {
+            throw new \InvalidArgumentException('The specified template « ' . $customTemplate . ' » cannot be found.');
         }
 
-        $tplContent = file_get_contents($tpl);
+        $templateContent = file_get_contents($customTemplate);
 
-        if($tplContent === false) {
-            throw new \InvalidArgumentException('Cannot read file contents of template « ' . $tpl . ' ».');
+        if ($templateContent === false) {
+            throw new \InvalidArgumentException('Cannot read file contents of template « ' . $customTemplate . ' ».');
         }
 
-        $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $tpl));
-        self::$_template = $tplContent;
+        $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
+        self::$_template = $templateContent;
     }
 }
