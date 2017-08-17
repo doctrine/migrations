@@ -112,6 +112,15 @@ class Configuration
     private $migrationsColumnName = 'version';
 
     /**
+     * The length of the string field in the migrations table. This can often be left at its default
+     * value, but can be modified if necessary, for example, to 191 for early MySQL servers using the
+     * UTF8MB4 character set.
+     *
+     * @var int
+     */
+    private $migrationsColumnLength = 255;
+
+    /**
      * The path to a directory where new migration classes will be written
      *
      * @var string
@@ -316,6 +325,26 @@ class Configuration
     public function getMigrationsColumnName()
     {
         return $this->migrationsColumnName;
+    }
+
+    /**
+     * Set the length of the migration string column.
+     *
+     * @param int $columnLength The migration string column length.
+     */
+    public function setMigrationsColumnLength($columnLength)
+    {
+        $this->migrationsColumnLength = $columnLength;
+    }
+
+    /**
+     * Returns the length of the migration string column.
+     * 
+     * @return int $migrationsColumnLength The migration string column length.
+     */
+    public function getMigrationsColumnLength()
+    {
+        return $this->migrationsColumnLength;
     }
 
     /**
@@ -751,7 +780,7 @@ class Configuration
         }
 
         $columns = [
-            $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
+            $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => $this->migrationsColumnLength]),
         ];
         $table = new Table($this->migrationsTableName, $columns);
         $table->setPrimaryKey([$this->migrationsColumnName]);
