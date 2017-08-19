@@ -56,8 +56,8 @@ class Migration
      */
     public function __construct(Configuration $configuration)
     {
-        $this->configuration = $configuration;
-        $this->outputWriter = $configuration->getOutputWriter();
+        $this->configuration        = $configuration;
+        $this->outputWriter         = $configuration->getOutputWriter();
         $this->noMigrationException = false;
     }
 
@@ -84,9 +84,9 @@ class Migration
      */
     public function writeSqlFile($path, $to = null)
     {
-        $sql = $this->getSql($to);
-
+        $sql  = $this->getSql($to);
         $from = $this->configuration->getCurrentVersion();
+
         if ($to === null) {
             $to = $this->configuration->getLatestVersion();
         }
@@ -187,8 +187,9 @@ class Migration
             new MigrationsEventArgs($this->configuration, $direction, $dryRun)
         );
 
-        $sql = [];
+        $sql  = [];
         $time = 0;
+
         foreach ($migrationsToExecute as $version) {
             $versionSql = $version->execute($direction, $dryRun, $timeAllQueries);
             $sql[$version->getVersion()] = $versionSql;
@@ -208,14 +209,15 @@ class Migration
         return $sql;
     }
 
-    private function noMigrations()
+    private function noMigrations() : array
     {
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
+
         return [];
     }
 
-    private function migrationsCanExecute(callable $confirm=null)
+    private function migrationsCanExecute(callable $confirm = null) : bool
     {
-        return null === $confirm ? true : $confirm();
+        return null === $confirm ? true : (bool) $confirm();
     }
 }
