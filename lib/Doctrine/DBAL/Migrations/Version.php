@@ -19,6 +19,8 @@
 
 namespace Doctrine\DBAL\Migrations;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Event\MigrationsVersionEventArgs;
@@ -44,6 +46,13 @@ class Version
 
     const DIRECTION_UP = 'up';
     const DIRECTION_DOWN = 'down';
+
+    private static $pdoToDbalTypes = [
+        \PDO::PARAM_BOOL => 'boolean',
+        \PDO::PARAM_STR => 'string',
+        \PDO::PARAM_INT => 'integer',
+        \PDO::PARAM_LOB => 'blob',
+    ];
 
     /**
      * The Migrations Configuration instance for this migration
@@ -472,12 +481,35 @@ class Version
         $out = [];
         foreach ($params as $key => $value) {
             $type = isset($types[$key]) ? $types[$key] : 'string';
-            $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
+            $outval = $this->formatParamValueForOutput($value, $type, $platform);
             $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));
     }
+
+    private function formatParamValueForOutput($value, $type, AbstractPlatform $platform)
+    {
+        if (Type::hasType($type)) {
+            return $this->formatParamValueWithDbal($value, $type, $platform);
+        }
+
+        if (isset(self::$pdoToDbalTypes[$type])) {
+            return $this->formatParamValueWithDbal($value, self::$pdoToDbalTypes[$type], $platform);
+        }
+
+        if ($type === Connection::PARAM_INT_ARRAY || $type === Connection::PARAM_STR_ARRAY) {
+            return '('.implode(', ', $value).')';
+        }
+
+        return null === $value ? 'NULL' : json_encode($value);
+    }
+
+    private function formatParamValueWithDbal($value, $type, AbstractPlatform $platform)
+    {
+        return Type::getType($type)->convertToDatabaseValue($value, $platform);
+    }
+
 
     private function dispatchEvent($eventName, $direction, $dryRun)
     {

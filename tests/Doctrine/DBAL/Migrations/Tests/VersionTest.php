@@ -40,6 +40,7 @@ if (!function_exists(__NAMESPACE__ . '\realpath')) {
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
@@ -446,6 +447,10 @@ class VersionTest extends MigrationTestCase
         return [
             'datetime' => [new \DateTime('2016-07-05 01:00:00'), 'datetime', '2016-07-05 01:00:00'],
             'array' => [['one' => 'two'], 'array', serialize(['one' => 'two'])],
+            'PDO::PARAM_*' => [1, \PDO::PARAM_INT, '1'],
+            'Connection::PARAM_*_ARRAY' => [[1, 2], Connection::PARAM_INT_ARRAY, '(1, 2)'],
+            'null value' => [null, \PDO::PARAM_NULL, 'NULL'],
+            'bad type' => [new \stdClass(), 'oops', '{}'],
         ];
     }
 
