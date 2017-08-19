@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 
 class SqlFileWriter
@@ -121,15 +120,8 @@ class SqlFileWriter
         return $path;
     }
 
-    /**
-     * This only exists for backwards-compatibility with DBAL 2.4
-     */
     protected function throwInvalidArgumentException($message)
     {
-        if (class_exists('Doctrine\DBAL\Exception\InvalidArgumentException')) {
-            throw new InvalidArgumentException($message);
-        } else {
-            throw new DBALException($message);
-        }
+        throw new InvalidArgumentException($message);
     }
 }
