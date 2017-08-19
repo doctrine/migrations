@@ -115,7 +115,7 @@ class SqlFileWriter
     }
 
     /**
-     * This only exists for backwards-compatibiliy with DBAL 2.4
+     * This only exists for backwards-compatibility with DBAL 2.4
      */
     protected function throwInvalidArgumentException($message)
     {
