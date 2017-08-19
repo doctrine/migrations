@@ -19,12 +19,13 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -261,7 +262,7 @@ class Version
      *
      * @throws \Exception when migration fails
      */
-    public function execute($direction, $dryRun = false, $timeAllQueries = false)
+    public function execute($direction, $dryRun = false, $timeAllQueries = false, $continueAfterErrors = false)
     {
         $this->dispatchEvent(Events::onMigrationsVersionExecuting, $direction, $dryRun);
 
@@ -294,7 +295,7 @@ class Version
 
             $this->addSql($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema));
 
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
+            $this->executeRegisteredSql($dryRun, $timeAllQueries, $continueAfterErrors);
 
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
@@ -404,19 +405,28 @@ class Version
         return $this->version;
     }
 
-    private function executeRegisteredSql($dryRun = false, $timeAllQueries = false)
+    private function executeRegisteredSql($dryRun = false, $timeAllQueries = false, $continueAfterErrors = false)
     {
         if (! $dryRun) {
             if (!empty($this->sql)) {
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
-                    if ( ! isset($this->params[$key])) {
-                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
-                        $this->connection->executeQuery($query);
-                    } else {
-                        $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
-                        $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                    try {
+                        if (!isset($this->params[$key])) {
+                            $this->outputWriter->write('     <comment>-></comment> ' . $query);
+                            $this->connection->executeQuery($query);
+                        } else {
+                            $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
+                            $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                        }
+                    }  catch (DBALException $e) {
+                        if ($continueAfterErrors) {
+                            $this->outputWriter->write(sprintf('         <error>- %s</error>', $e->getMessage()));
+                        } else {
+                            // Reraise exception
+                            throw $e;
+                        }
                     }
 
                     $this->outputQueryTime($queryStart, $timeAllQueries);
