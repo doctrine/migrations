@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -250,5 +251,23 @@ class ConfigurationTest extends MigrationTestCase
             ['getMigrationsToExecute', ['down', 0], []],
             ['getMigrationsToExecute', ['down', 2], []],
         ];
+    }
+
+    public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
+    {
+        $configuration = new Configuration($this->getConnectionMock());
+        $queryWriter   = $configuration->getQueryWriter();
+
+        self::assertAttributeSame($configuration->getMigrationsTableName(), 'tableName', $queryWriter);
+        self::assertAttributeSame($configuration->getMigrationsColumnName(), 'columnName', $queryWriter);
+        self::assertAttributeSame($configuration->getOutputWriter(), 'outputWriter', $queryWriter);
+    }
+
+    public function testGetQueryWriterShouldReturnTheObjectGivenOnTheConstructor() : void
+    {
+        $queryWriter   = $this->createMock(QueryWriter::class);
+        $configuration = new Configuration($this->getConnectionMock(), null, null, $queryWriter);
+
+        self::assertSame($queryWriter, $configuration->getQueryWriter());
     }
 }

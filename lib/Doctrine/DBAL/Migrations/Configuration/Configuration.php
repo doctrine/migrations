@@ -22,9 +22,11 @@ namespace Doctrine\DBAL\Migrations\Configuration;
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Migrations\FileQueryWriter;
 use Doctrine\DBAL\Migrations\Finder\MigrationDeepFinderInterface;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
@@ -98,6 +100,11 @@ class Configuration
     private $migrationFinder;
 
     /**
+     * @var QueryWriter
+     */
+    private $queryWriter;
+
+    /**
      * The migration table name to track versions in
      *
      * @var string
@@ -152,18 +159,18 @@ class Configuration
      * @param Connection               $connection   A Connection instance
      * @param OutputWriter             $outputWriter A OutputWriter instance
      * @param MigrationFinderInterface $finder       Migration files finder
+     * @param QueryWriter|null         $queryWriter
      */
-    public function __construct(Connection $connection, OutputWriter $outputWriter = null, MigrationFinderInterface $finder = null)
-    {
-        $this->connection = $connection;
-        if ($outputWriter === null) {
-            $outputWriter = new OutputWriter();
-        }
-        $this->outputWriter = $outputWriter;
-        if ($finder === null) {
-            $finder = new RecursiveRegexFinder();
-        }
-        $this->migrationFinder = $finder;
+    public function __construct(
+        Connection $connection,
+        OutputWriter $outputWriter = null,
+        MigrationFinderInterface $finder = null,
+        QueryWriter $queryWriter = null
+    ) {
+        $this->connection      = $connection;
+        $this->outputWriter    = $outputWriter ?? new OutputWriter();
+        $this->migrationFinder = $finder ?? new RecursiveRegexFinder();
+        $this->queryWriter     = $queryWriter;
     }
 
     /**
@@ -926,5 +933,18 @@ class Configuration
         if ( ! class_exists($class)) {
             throw MigrationException::migrationClassNotFound($class, $this->getMigrationsNamespace());
         }
+    }
+
+    public function getQueryWriter() : QueryWriter
+    {
+        if ($this->queryWriter === null) {
+            $this->queryWriter = new FileQueryWriter(
+                $this->migrationsColumnName,
+                $this->migrationsTableName,
+                $this->outputWriter
+            );
+        }
+
+        return $this->queryWriter;
     }
 }
