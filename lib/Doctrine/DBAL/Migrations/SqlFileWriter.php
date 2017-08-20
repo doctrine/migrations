@@ -21,6 +21,11 @@ namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 
+/**
+ * @deprecated
+ *
+ * @see \Doctrine\DBAL\Migrations\FileQueryWriter
+ */
 class SqlFileWriter
 {
     private $migrationsColumnName;
