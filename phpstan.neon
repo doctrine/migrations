@@ -2,6 +2,4 @@ parameters:
     ignoreErrors:
         # Ignore proxy manager magic
         - '#ProxyManager\\Proxy\\VirtualProxyInterface#'
-        # Igore issues related to file_put_contents()
-        - '#writeSqlFile() should return bool but returns bool|int#'
 

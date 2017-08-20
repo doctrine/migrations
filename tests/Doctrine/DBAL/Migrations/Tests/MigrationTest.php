@@ -45,7 +45,7 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
-use Doctrine\DBAL\Migrations\SqlFileWriter;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -151,16 +151,14 @@ class MigrationTest extends MigrationTestCase
      *
      * @dataProvider writeSqlFileProvider
      */
-    public function testWriteSqlFile($path, $from, $to, $getSqlReturn)
+    public function testWriteSqlFile($path, $from, $to, array $getSqlReturn)
     {
-        $expectedReturn = 123;
-
-        $sqlWriter    = $this->createMock(SqlFileWriter::class);
+        $queryWriter  = $this->createMock(QueryWriter::class);
         $outputWriter = $this->createMock(OutputWriter::class);
 
-        $sqlWriter->method('write')
-                  ->with($this->isType('array'), new RegularExpression('/(up|down)/'))
-                  ->willReturn($expectedReturn);
+        $queryWriter->method('write')
+                    ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
+                    ->willReturn(true);
 
         $outputWriter->expects($this->atLeastOnce())
                      ->method('write');
@@ -168,7 +166,7 @@ class MigrationTest extends MigrationTestCase
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
                           ->disableOriginalConstructor()
-                          ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion'])
+                          ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQueryWriter'])
                           ->getMock();
 
         $config->method('getCurrentVersion')
@@ -177,7 +175,10 @@ class MigrationTest extends MigrationTestCase
         $config->method('getOutputWriter')
                ->willReturn($outputWriter);
 
-        if ($to == null) { // this will always just test the "up" direction
+        $config->method('getQueryWriter')
+               ->willReturn($queryWriter);
+
+        if ($to === null) { // this will always just test the "up" direction
             $config->method('getLatestVersion')
                    ->willReturn($from + 1);
         }
@@ -185,7 +186,7 @@ class MigrationTest extends MigrationTestCase
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
                           ->setConstructorArgs([$config])
-                          ->setMethods(['getSql', 'createSqlFileWriter'])
+                          ->setMethods(['getSql'])
                           ->getMock();
 
         $migration->expects($this->once())
@@ -193,11 +194,7 @@ class MigrationTest extends MigrationTestCase
                   ->with($to)
                   ->willReturn($getSqlReturn);
 
-        $migration->method('createSqlFileWriter')
-                  ->willReturn($sqlWriter);
-
-        $result = $migration->writeSqlFile($path, $to);
-        $this->assertEquals($expectedReturn, $result);
+        self::assertTrue($migration->writeSqlFile($path, $to));
     }
 
     public function writeSqlFileProvider()

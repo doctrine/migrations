@@ -95,18 +95,12 @@ class Migration
 
         $this->outputWriter->write(sprintf("-- Migrating from %s to %s\n", $from, $to));
 
-        return $this->createSqlFileWriter($path)
-                    ->write($sql, $direction);
-    }
-
-    protected function createSqlFileWriter(string $path): SqlFileWriter
-    {
-        return new SqlFileWriter(
-            $this->configuration->getMigrationsColumnName(),
-            $this->configuration->getMigrationsTableName(),
-            $path,
-            $this->outputWriter
-        );
+        /*
+         * Since the configuration object changes during the creation we cannot inject things
+         * properly, so I had to violate LoD here (so please, let's find a way to solve it on v2).
+         */
+        return $this->configuration->getQueryWriter()
+                                   ->write($path, $direction, $sql);
     }
 
     /**

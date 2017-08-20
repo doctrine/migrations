@@ -19,12 +19,12 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\DBAL\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\DBAL\Types\Type;
 
 /**
  * Class which wraps a migration version and allows execution of the
@@ -229,18 +229,12 @@ class Version
 
         $sqlQueries = [$this->version => $queries];
 
-        return $this->createSqlFileWriter($path)
-                    ->write($sqlQueries, $direction);
-    }
-
-    protected function createSqlFileWriter(string $path): SqlFileWriter
-    {
-        return new SqlFileWriter(
-            $this->configuration->getMigrationsColumnName(),
-            $this->configuration->getMigrationsTableName(),
-            $path,
-            $this->outputWriter
-        );
+        /*
+         * Since the configuration object changes during the creation we cannot inject things
+         * properly, so I had to violate LoD here (so please, let's find a way to solve it on v2).
+         */
+        return $this->configuration->getQueryWriter()
+                                   ->write($path, $direction, $sqlQueries);
     }
 
     /**
