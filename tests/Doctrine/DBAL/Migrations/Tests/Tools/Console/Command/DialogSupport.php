@@ -8,24 +8,22 @@ use Symfony\Component\Console\Helper\DialogHelper;
 
 trait DialogSupport
 {
-    protected $questions, $isDialogHelper;
+    /**
+     * @var QuestionHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $questions;
 
     protected function configureDialogs(Application $app)
     {
-        if (class_exists(QuestionHelper::class)) {
-            $this->isDialogHelper = false;
-            $this->questions = $this->getMock(QuestionHelper::class);
-        } else {
-            $this->isDialogHelper = true;
-            $this->questions = $this->getMock(DialogHelper::class);
-        }
-        $app->getHelperSet()->set($this->questions, $this->isDialogHelper ? 'dialog' : 'question');
+        $this->questions = $this->createMock(QuestionHelper::class);
+
+        $app->getHelperSet()->set($this->questions, 'question');
     }
 
     protected function willAskConfirmationAndReturn($bool)
     {
         $this->questions->expects($this->once())
-            ->method($this->isDialogHelper ? 'askConfirmation' : 'ask')
-            ->willReturn($bool);
+                        ->method('ask')
+                        ->willReturn($bool);
     }
 }

@@ -6,8 +6,8 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -60,9 +60,6 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['doWrite', 'writeln'])
             ->getMock();
 
-        $output->expects($this->any())
-            ->method('doWrite');
-
         return $method->invokeArgs($command, [$input, $output]);
     }
 
@@ -77,15 +74,11 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
             ->will($this->returnValue(null));
 
-        $configuration = $this
-            ->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(Configuration::class);
 
         $this->assertEquals($configuration, $this->invokeMigrationConfigurationGetter($input, $configuration));
     }
@@ -100,8 +93,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
             ->will($this->returnValue(null));
 
@@ -121,8 +113,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->will($this->returnValueMap([
                 ['db-configuration', __DIR__ . '/_files/db-config.php']
             ]));
@@ -143,8 +134,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->will($this->returnValueMap([
                 ['configuration', __DIR__ . '/_files/config.yml']
             ]));
@@ -176,9 +166,7 @@ class AbstractCommandTest extends MigrationTestCase
     }
 
     /**
-     * Test if trhow an error if no connection is passed.
-     * @expectedException InvalidArgumentException
-     * @expectedExceptionMessage You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.
+     * Test if throw an error if no connection is passed.
      */
     public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided()
     {
@@ -186,12 +174,10 @@ class AbstractCommandTest extends MigrationTestCase
             ->setConstructorArgs([[]])
             ->getMock();
 
-        $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, true);
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
 
-        $this->assertInstanceOf(Configuration::class, $actualConfiguration);
-        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
-        $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
-        $this->assertNull($actualConfiguration->getMigrationsNamespace());
+        $this->invokeMigrationConfigurationGetter($input, null, true);
     }
 
     public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration()
@@ -201,8 +187,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->will($this->returnValueMap([
                 ['configuration', __DIR__ . '/_files/config.yml']
             ]));
@@ -231,16 +216,12 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        $input->expects($this->any())
-            ->method('getOption')
+        $input->method('getOption')
             ->will($this->returnValueMap([
                 ['configuration', null]
             ]));
 
-        $configuration = $this
-            ->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $configuration = $this->createMock(Configuration::class);
 
         chdir(__DIR__.'/_files');
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
@@ -300,9 +281,6 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['doWrite', 'writeln'])
             ->getMock();
 
-        $output->expects($this->any())
-            ->method('doWrite');
-
         return $method->invokeArgs($command, [$question, $input, $output]);
     }
 
@@ -313,26 +291,9 @@ class AbstractCommandTest extends MigrationTestCase
             ->setMethods(['getOption'])
             ->getMock();
 
-        /**
-         * This test is testing a deprecated method.
-         * PHPunit convert those deprecations errors into tests failures.
-         * You can either use \PHPUnit_Framework_Error_Deprecated::$enabled = false;
-         * or use the @ operator to suppress the error.
-         * The advantage of the later is that it also remove the error message from the phpunit output.
-         */
-        if (class_exists("Symfony\\Component\\Console\\Helper\\DialogHelper"))
-        {
-            @$helper = new DialogHelper();
-
-            @$this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-            @$this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
-        }
-
-        if (class_exists("Symfony\\Component\\Console\\Helper\\QuestionHelper")) {
-            $helper = new QuestionHelper();
-            $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-            $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
-        }
+        $helper = new QuestionHelper();
+        $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
+        $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
     }
 
     protected function setUp()

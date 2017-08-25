@@ -26,10 +26,8 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        $this->setExpectedException(
-            "Doctrine\DBAL\Migrations\MigrationException",
-            "Migrations namespace must be configured in order to use Doctrine migrations."
-        );
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Migrations namespace must be configured in order to use Doctrine migrations.');
         $config->validate();
     }
 
@@ -38,10 +36,9 @@ class ConfigurationTest extends MigrationTestCase
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsNamespace("DoctrineMigrations\\");
 
-        $this->setExpectedException(
-            "Doctrine\\DBAL\\Migrations\\MigrationException",
-            "Migrations directory must be configured in order to use Doctrine migrations."
-        );
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Migrations directory must be configured in order to use Doctrine migrations.');
+
         $config->validate();
     }
 
@@ -52,6 +49,8 @@ class ConfigurationTest extends MigrationTestCase
         $config->setMigrationsDirectory(sys_get_temp_dir());
 
         $config->validate();
+
+        $this->addToAssertionCount(1);
     }
 
     public function testSetGetName()
@@ -85,10 +84,9 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        $this->setExpectedException(
-            MigrationException::class,
-            'Could not find migration version 1234'
-        );
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Could not find migration version 1234');
+
         $config->getVersion(1234);
     }
 
@@ -129,7 +127,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $config->registerMigration(1234, Version1Test::class);
 
-        $this->setExpectedException(
+        $this->expectException(
             MigrationException::class,
             'Migration version 1234 already registered with class Doctrine\DBAL\Migrations\Version'
         );
@@ -336,8 +334,8 @@ class ConfigurationTest extends MigrationTestCase
     public function testGetVersionNotFound()
     {
         $config = $this->getSqliteConfiguration();
-        
-        $this->setExpectedException(MigrationException::class);
+
+        $this->expectException(MigrationException::class);
 
         $config->getVersion('foo');
     }

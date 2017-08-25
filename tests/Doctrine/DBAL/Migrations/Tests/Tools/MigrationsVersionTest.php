@@ -3,7 +3,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools;
 
 use Doctrine\DBAL\Migrations\MigrationsVersion;
 
-class MigrationsVersionTest extends \PHPUnit_Framework_TestCase {
+class MigrationsVersionTest extends \PHPUnit\Framework\TestCase {
 
     private $MigrationVersionClass = MigrationsVersion::class;
 

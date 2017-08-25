@@ -72,41 +72,53 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsException()
     {
-        $this->setExpectedException(AbortMigrationException::class, 'Something failed');
+        $this->expectException(AbortMigrationException::class);
+        $this->expectExceptionMessage('Something failed');
+
         $this->migration->abortIf(true, 'Something failed');
     }
 
     public function testAbortIfDontThrowsException()
     {
         $this->migration->abortIf(false, 'Something failed');
+        $this->addToAssertionCount(1);
     }
 
     public function testAbortIfThrowsExceptionEvenWithoutMessage()
     {
-        $this->setExpectedException(AbortMigrationException::class, 'Unknown Reason');
+        $this->expectException(AbortMigrationException::class);
+        $this->expectExceptionMessage('Unknown Reason');
+
         $this->migration->abortIf(true);
     }
 
     public function testSkipIfThrowsException()
     {
-        $this->setExpectedException(SkipMigrationException::class, 'Something skipped');
+        $this->expectException(SkipMigrationException::class);
+        $this->expectExceptionMessage('Something skipped');
+
         $this->migration->skipIf(true, 'Something skipped');
     }
 
     public function testSkipIfDontThrowsException()
     {
         $this->migration->skipIf(false, 'Something skipped');
+        $this->addToAssertionCount(1);
     }
 
     public function testThrowIrreversibleMigrationException()
     {
-        $this->setExpectedException(IrreversibleMigrationException::class, 'Irreversible migration');
+        $this->expectException(IrreversibleMigrationException::class);
+        $this->expectExceptionMessage('Irreversible migration');
+
         $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
     }
 
     public function testThrowIrreversibleMigrationExceptionWithoutMessage()
     {
-        $this->setExpectedException(IrreversibleMigrationException::class, 'This migration is irreversible and cannot be reverted.');
+        $this->expectException(IrreversibleMigrationException::class);
+        $this->expectExceptionMessage('This migration is irreversible and cannot be reverted.');
+
         $this->migration->exposed_ThrowIrreversibleMigrationException();
     }
 
@@ -118,6 +130,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testAddSql()
     {
         $this->migration->exposed_AddSql('tralala');
-    }
 
+        $this->assertAttributeCount(1, 'sql', $this->migration->getVersion());
+    }
 }

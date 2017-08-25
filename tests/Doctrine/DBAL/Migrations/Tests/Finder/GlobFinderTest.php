@@ -26,19 +26,17 @@ class GlobFinderTest extends MigrationTestCase
 {
     private $finder;
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testBadFilenameCausesErrorWhenFindingMigrations()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->finder->findMigrations(__DIR__.'/does/not/exist/at/all');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testNonDirectoryCausesErrorWhenFindingMigrations()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->finder->findMigrations(__FILE__);
     }
 

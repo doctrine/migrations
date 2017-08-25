@@ -13,24 +13,24 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @covers \Doctrine\DBAL\Migrations\Tools\Console\Command\UpToDateCommand
  */
-class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
+class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
     private $commandOutput;
-    
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|Configuration */
     private $configuration;
-    
+
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationHelper */
     private $configurationHelper;
-    
+
     /** @var UpToDateCommand */
     private $sut;
 
     protected function setUp()
     {
         parent::setUp();
-        
+
         $this->configuration = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,9 +38,9 @@ class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
         $this->configurationHelper = $this->getMockBuilder(ConfigurationHelper::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $this->commandOutput = $this->getMockBuilder(OutputInterface::class)->getMock();
-        
+
         $this->sut = new UpToDateCommand();
         $this->sut->setHelperSet(new HelperSet(array(
             'configuration' => $this->configurationHelper,
@@ -59,10 +59,10 @@ class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
         $this->configurationHelper->method('getMigrationConfig')->willReturn($this->configuration);
         $this->configuration->method('getMigrations')->willReturn($migrations);
         $this->configuration->method('getMigratedVersions')->willReturn($migratedVersions);
-        
+
         // Command should always tell the user something.
         $this->commandOutput->expects(self::atLeastOnce())->method('writeln');
-        
+
         $actual = $this->sut->execute(new ArrayInput([]), $this->commandOutput);
 
         // Assert.
@@ -86,10 +86,10 @@ class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
             ],
             'empty-migration-set' => [
                 [
-                    
+
                 ],
                 [
-                    
+
                 ],
                 0
             ],
@@ -98,7 +98,7 @@ class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
                     $this->createVersion('20150614015627'),
                 ],
                 [
-                    
+
                 ],
                 1
             ],
@@ -126,9 +126,9 @@ class UpToDateCommandTest extends \PHPUnit_Framework_TestCase
         $version = $this->getMockBuilder(Version::class)
             ->disableOriginalConstructor()
             ->getMock();
-        
+
         $version->method('getVersion')->willReturn($migration);
-        
+
         return $version;
     }
 }

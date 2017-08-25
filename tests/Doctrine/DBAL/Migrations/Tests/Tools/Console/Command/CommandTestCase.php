@@ -2,30 +2,49 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Tester\CommandTester;
+use Doctrine\DBAL\Driver\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class CommandTestCase extends MigrationTestCase
 {
-    protected $commmand, $app, $config, $connection;
+    /**
+     * @var AbstractCommand
+     */
+    protected $command;
+
+    /**
+     * @var Application
+     */
+    protected $app;
+
+    /**
+     * @var Configuration|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $config;
+
+    /**
+     * @var Connection
+     */
+    protected $connection;
 
     protected function setUp()
     {
         $this->connection = $this->createConnection();
-        $this->config = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->config->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
+        $this->config = $this->createMock(Configuration::class);
+        $this->config->method('getConnection')->willReturn($this->connection);
         $this->command = $this->createCommand();
         $this->command->setMigrationConfiguration($this->config);
         $this->app = new Application();
         $this->app->add($this->command);
     }
 
+    /**
+     * @return AbstractCommand
+     */
     abstract protected function createCommand();
 
     protected function createConnection()

@@ -26,27 +26,24 @@ class RecursiveRegexFinderTest extends MigrationTestCase
 {
     private $finder;
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testVersionNameCausesErrorWhen0()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->finder->findMigrations(__DIR__.'/_regression/NoVersionNamed0');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testBadFilenameCausesErrorWhenFindingMigrations()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->finder->findMigrations(__DIR__.'/does/not/exist/at/all');
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testNonDirectoryCausesErrorWhenFindingMigrations()
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         $this->finder->findMigrations(__FILE__);
     }
 

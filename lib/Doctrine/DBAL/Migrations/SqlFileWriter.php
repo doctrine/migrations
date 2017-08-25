@@ -19,9 +19,13 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Exception\InvalidArgumentException;
 
+/**
+ * @deprecated
+ *
+ * @see \Doctrine\DBAL\Migrations\FileQueryWriter
+ */
 class SqlFileWriter
 {
     private $migrationsColumnName;
@@ -39,23 +43,28 @@ class SqlFileWriter
      * @param string $destPath
      * @param \Doctrine\DBAL\Migrations\OutputWriter $outputWriter
      */
-    public function __construct($migrationsColumnName, $migrationsTableName, $destPath, OutputWriter $outputWriter = null)
-    {
+    public function __construct(
+        $migrationsColumnName,
+        $migrationsTableName,
+        $destPath,
+        OutputWriter $outputWriter = null
+    ) {
         if (empty($migrationsColumnName)) {
             $this->throwInvalidArgumentException('Migrations column name cannot be empty.');
         }
-        $this->migrationsColumnName = $migrationsColumnName;
+
         if (empty($migrationsTableName)) {
             $this->throwInvalidArgumentException('Migrations table name cannot be empty.');
         }
-        $this->migrationsTableName = $migrationsTableName;
 
         if (empty($destPath)) {
             $this->throwInvalidArgumentException('Destination file must be specified.');
         }
-        $this->destPath = $destPath;
 
-        $this->outputWriter = $outputWriter;
+        $this->migrationsColumnName = $migrationsColumnName;
+        $this->migrationsTableName  = $migrationsTableName;
+        $this->destPath             = $destPath;
+        $this->outputWriter         = $outputWriter;
     }
 
     /**
@@ -75,12 +84,13 @@ class SqlFileWriter
         return file_put_contents($path, $string);
     }
 
-    private function buildMigrationFile(array $queriesByVersion, $direction)
+    private function buildMigrationFile(array $queriesByVersion, string $direction) : string
     {
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
             $string .= "\n-- Version " . $version . "\n";
+
             foreach ($queries as $query) {
                 $string .= $query . ";\n";
             }
@@ -92,9 +102,9 @@ class SqlFileWriter
         return $string;
     }
 
-    private function getVersionUpdateQuery($version, $direction)
+    private function getVersionUpdateQuery(string $version, string $direction) : string
     {
-        if ($direction == Version::DIRECTION_DOWN) {
+        if ($direction === Version::DIRECTION_DOWN) {
             $query = "DELETE FROM %s WHERE %s = '%s';\n";
         } else {
             $query = "INSERT INTO %s (%s) VALUES ('%s');\n";
@@ -103,9 +113,10 @@ class SqlFileWriter
         return sprintf($query, $this->migrationsTableName, $this->migrationsColumnName, $version);
     }
 
-    private function buildMigrationFilePath()
+    private function buildMigrationFilePath() : string
     {
         $path = $this->destPath;
+
         if (is_dir($path)) {
             $path = realpath($path);
             $path = $path . '/doctrine_migration_' . date('YmdHis') . '.sql';
@@ -114,15 +125,8 @@ class SqlFileWriter
         return $path;
     }
 
-    /**
-     * This only exists for backwards-compatibility with DBAL 2.4
-     */
     protected function throwInvalidArgumentException($message)
     {
-        if (class_exists('Doctrine\DBAL\Exception\InvalidArgumentException')) {
-            throw new InvalidArgumentException($message);
-        } else {
-            throw new DBALException($message);
-        }
+        throw new InvalidArgumentException($message);
     }
 }

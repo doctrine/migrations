@@ -20,14 +20,14 @@
 namespace Doctrine\DBAL\Migrations\Tests\Provider;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
+use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\Tools\Setup;
-use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
-use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
@@ -57,11 +57,10 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->assertTrue($table->hasColumn('id'));
     }
 
-    /**
-     * @expectedException UnexpectedValueException
-     */
     public function testEntityManagerWithoutMetadataCausesError()
     {
+        $this->expectException(\UnexpectedValueException::class);
+
         $this->config->setMetadataDriverImpl(new XmlDriver([]));
 
         $this->ormProvider->createSchema();
@@ -80,10 +79,11 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
     /**
      * @dataProvider notEntityManagers
-     * @expectedException InvalidArgumentException
      */
     public function testPassingAnInvalidEntityManagerToConstructorCausesError($em)
     {
+        $this->expectException(\InvalidArgumentException::class);
+
         new OrmSchemaProvider($em);
     }
 

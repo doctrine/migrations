@@ -1,0 +1,5 @@
+parameters:
+    ignoreErrors:
+        # Ignore proxy manager magic
+        - '#ProxyManager\\Proxy\\VirtualProxyInterface#'
+

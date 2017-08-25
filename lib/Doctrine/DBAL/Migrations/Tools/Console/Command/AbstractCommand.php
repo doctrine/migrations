@@ -117,20 +117,13 @@ abstract class AbstractCommand extends Command
     }
 
     /**
-     * This method ensure that we stay compatible with symfony console 2.3 by using the deprecated dialog helper
-     * but use the ConfirmationQuestion when available.
-     *
-     * @param $question
+     * @param string $question
      * @param InputInterface $input
      * @param OutputInterface $output
      * @return mixed
      */
     protected function askConfirmation($question, InputInterface $input, OutputInterface $output)
     {
-        if (!$this->getHelperSet()->has('question')) {
-            return $this->getHelper('dialog')->askConfirmation($output, '<question>' . $question . '</question>', false);
-        }
-
         return $this->getHelper('question')->ask($input, $output, new ConfirmationQuestion($question));
     }
 
@@ -178,5 +171,4 @@ abstract class AbstractCommand extends Command
 
         throw new \InvalidArgumentException('You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.');
     }
-
 }

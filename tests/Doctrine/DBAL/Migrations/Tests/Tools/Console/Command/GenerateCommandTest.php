@@ -28,10 +28,10 @@ class GenerateCommandTest extends CommandTestCase
     protected function setUp()
     {
         parent::setUp();
+
         $this->migrationFile = sprintf('Version%s.php', self::VERSION);
         $this->root = vfsStream::setup('migrations');
-        $this->config->expects($this->any())
-            ->method('getMigrationsDirectory')
+        $this->config->method('getMigrationsDirectory')
             ->willReturn(vfsStream::url('migrations'));
     }
 

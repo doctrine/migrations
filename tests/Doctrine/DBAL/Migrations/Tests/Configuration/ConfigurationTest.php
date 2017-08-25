@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -52,7 +53,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->setMigrationsNamespace('Migrations');
         $configuration->setMigrationsDirectory($migrationsDir);
 
-        $this->setExpectedException(
+        $this->expectException(
             MigrationException::class,
             'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?'
         );
@@ -64,20 +65,14 @@ class ConfigurationTest extends MigrationTestCase
      */
     private function getConnectionMock()
     {
-        return $this->getMockBuilder(Connection::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        return $this->createMock(Connection::class);
     }
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|OutputWriter
      */
     private function getOutputWriterMock()
     {
-        return $this->getMockBuilder(OutputWriter::class)
-            ->disableOriginalConstructor()
-            ->getMock()
-        ;
+        return $this->createMock(OutputWriter::class);
     }
 
     public function testGetSetMigrationsColumnName()
@@ -95,7 +90,8 @@ class ConfigurationTest extends MigrationTestCase
      */
     public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfNoNamespaceSet($method, $args)
     {
-        $this->setExpectedException(MigrationException::class, 'Migrations namespace must be configured in order to use Doctrine migrations.');
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Migrations namespace must be configured in order to use Doctrine migrations.');
 
         $configuration = new Configuration($this->getConnectionMock());
         call_user_func_array([$configuration, $method], $args);
@@ -106,7 +102,8 @@ class ConfigurationTest extends MigrationTestCase
      */
     public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfNoDirectorySet($method, $args)
     {
-        $this->setExpectedException(MigrationException::class, 'Migrations directory must be configured in order to use Doctrine migrations.');
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage('Migrations directory must be configured in order to use Doctrine migrations.');
 
         $configuration = new Configuration($this->getConnectionMock());
         $configuration->setMigrationsNamespace('DoctrineMigrations\\');
@@ -193,8 +190,7 @@ class ConfigurationTest extends MigrationTestCase
             ->method('connect')
             ->with('master')
             ->willReturn(true);
-        $conn->expects($this->any())
-            ->method('getSchemaManager')
+        $conn->method('getSchemaManager')
             ->willReturn($sm);
         $conn->expects($this->once())
             ->method('fetchAll')
@@ -255,5 +251,23 @@ class ConfigurationTest extends MigrationTestCase
             ['getMigrationsToExecute', ['down', 0], []],
             ['getMigrationsToExecute', ['down', 2], []],
         ];
+    }
+
+    public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
+    {
+        $configuration = new Configuration($this->getConnectionMock());
+        $queryWriter   = $configuration->getQueryWriter();
+
+        self::assertAttributeSame($configuration->getMigrationsTableName(), 'tableName', $queryWriter);
+        self::assertAttributeSame($configuration->getMigrationsColumnName(), 'columnName', $queryWriter);
+        self::assertAttributeSame($configuration->getOutputWriter(), 'outputWriter', $queryWriter);
+    }
+
+    public function testGetQueryWriterShouldReturnTheObjectGivenOnTheConstructor() : void
+    {
+        $queryWriter   = $this->createMock(QueryWriter::class);
+        $configuration = new Configuration($this->getConnectionMock(), null, null, $queryWriter);
+
+        self::assertSame($queryWriter, $configuration->getQueryWriter());
     }
 }

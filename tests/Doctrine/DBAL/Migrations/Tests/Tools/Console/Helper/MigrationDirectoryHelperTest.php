@@ -3,7 +3,6 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
-use InvalidArgumentException;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
@@ -41,15 +40,14 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         $this->assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    /**
-     * @expectedException InvalidArgumentException
-     */
     public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists()
     {
         $dir = DIRECTORY_SEPARATOR . 'IDoNotExists';
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsDirectory($dir);
         $mirationDirectoryHelper = new MigrationDirectoryHelper($configuration);
+
+        $this->expectException(\InvalidArgumentException::class);
 
         $mirationDirectoryHelper->getMigrationDirectory();
     }

@@ -360,22 +360,23 @@ class FunctionalTest extends MigrationTestCase
 
     public function testMigrationWorksWhenNoCallsAreMadeToTheSchema()
     {
+        $schema = $this->createMock(Schema::class);
+        $schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
 
-        $schema = $this->getMock(Schema::class);
-        $schemaDiffProvider = $this->getMock(SchemaDiffProviderInterface::class);
-
-        $schemaDiffProvider->expects(self::any())->method('createFromSchema')->willReturn($schema);
-        $schemaDiffProvider->expects(self::any())->method('getSqlDiffToMigrate')->willReturn([]);
+        $schemaDiffProvider->method('createFromSchema')->willReturn($schema);
+        $schemaDiffProvider->method('getSqlDiffToMigrate')->willReturn([]);
         $schemaDiffProvider
-            ->expects(self::any())
             ->method('createToSchema')
             ->willReturnCallback(function () use ($schema) { return $schema; });
 
         $version = new Version($this->config, 1, MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
         $version->execute('up');
 
-        $methods = get_class_methods(Schema::class);
-        foreach($methods as $method) {
+        foreach (get_class_methods(Schema::class) as $method) {
+            if (in_array($method, ['__construct', '__clone'], true)) {
+                continue;
+            }
+
             $schema->expects($this->never())->method($method);
         }
     }
