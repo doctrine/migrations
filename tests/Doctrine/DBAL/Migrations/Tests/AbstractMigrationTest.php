@@ -62,7 +62,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testWriteInvokesOutputWriter()
     {
-        $this->migration->exposed_Write('Message');
+        $this->migration->exposedWrite('Message');
         $this->assertContains('Message', $this->getOutputStreamContent($this->output));
     }
 
@@ -107,7 +107,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->expectException(IrreversibleMigrationException::class);
         $this->expectExceptionMessage('Irreversible migration');
 
-        $this->migration->exposed_ThrowIrreversibleMigrationException('Irreversible migration');
+        $this->migration->exposedThrowIrreversibleMigrationException('Irreversible migration');
     }
 
     public function testThrowIrreversibleMigrationExceptionWithoutMessage()
@@ -115,7 +115,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->expectException(IrreversibleMigrationException::class);
         $this->expectExceptionMessage('This migration is irreversible and cannot be reverted.');
 
-        $this->migration->exposed_ThrowIrreversibleMigrationException();
+        $this->migration->exposedThrowIrreversibleMigrationException();
     }
 
     public function testIstransactional()
@@ -125,7 +125,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAddSql()
     {
-        $this->migration->exposed_AddSql('tralala');
+        $this->migration->exposedAddSql('tralala');
 
         $this->assertAttributeCount(1, 'sql', $this->migration->getVersion());
     }
