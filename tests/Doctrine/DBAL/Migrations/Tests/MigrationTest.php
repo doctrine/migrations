@@ -17,27 +17,6 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace Doctrine\DBAL\Migrations;
-
-if (!function_exists(__NAMESPACE__ . '\realpath')) {
-    /**
-     * Override realpath() in current namespace for testing
-     *
-     * @param $path
-     *
-     * @return string|false
-     */
-    function realpath($path)
-    {
-        // realpath issue with vfsStream
-        // @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
-        if (0 === strpos($path, 'vfs://')) {
-            return $path;
-        }
-        return \realpath($path);
-    }
-}
-
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Driver\Connection;
@@ -50,6 +29,8 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\Constraint\RegularExpression;
+
+require_once __DIR__ . '/realpath.php';
 
 class MigrationTest extends MigrationTestCase
 {
@@ -65,7 +46,7 @@ class MigrationTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getSqliteConnection();
+        $this->conn   = $this->getSqliteConnection();
         $this->config = new Configuration($this->conn);
         $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -94,7 +75,7 @@ class MigrationTest extends MigrationTestCase
     public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption()
     {
         $messages = [];
-        $output = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
@@ -103,8 +84,8 @@ class MigrationTest extends MigrationTestCase
         $migration->setNoMigrationException(true);
         $migration->migrate();
 
-        $this->assertCount(2, $messages, 'should output header and no migrations message');
-        $this->assertContains('No migrations', $messages[1]);
+        self::assertCount(2, $messages, 'should output header and no migrations message');
+        self::assertContains('No migrations', $messages[1]);
     }
 
     /**
@@ -129,7 +110,7 @@ class MigrationTest extends MigrationTestCase
 
         $result = $migration->getSql($to);
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     /**
@@ -234,24 +215,24 @@ class MigrationTest extends MigrationTestCase
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
         $migration->writeSqlFile(vfsStream::url('sql_files_dir'), 1);
 
-        $this->assertRegExp('/^\s*-- Migrating from 0 to 1/m', $this->getOutputStreamContent($this->output));
+        self::assertRegExp('/^\s*-- Migrating from 0 to 1/m', $this->getOutputStreamContent($this->output));
 
         /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
-        $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
-        $this->assertRegExp('/^\s*-- Doctrine Migration File Generated on/m', $sqlMigrationFile->getContent());
-        $this->assertRegExp('/^\s*-- Version 1/m', $sqlMigrationFile->getContent());
-        $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
+        self::assertRegExp('/^\s*-- Doctrine Migration File Generated on/m', $sqlMigrationFile->getContent());
+        self::assertRegExp('/^\s*-- Version 1/m', $sqlMigrationFile->getContent());
+        self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
     public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage()
     {
         $messages = [];
-        $output = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
@@ -263,17 +244,17 @@ class MigrationTest extends MigrationTestCase
 
         $migration->migrate();
 
-        $this->assertCount(1, $messages, 'should output the no migrations message');
-        $this->assertContains('No migrations', $messages[0]);
+        self::assertCount(1, $messages, 'should output the no migrations message');
+        self::assertContains('No migrations', $messages[0]);
     }
 
     public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined()
     {
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $called = false;
+        $called    = false;
         $migration = new Migration($this->config);
 
         $result = $migration->migrate(null, false, false, function () use (&$called) {
@@ -281,17 +262,17 @@ class MigrationTest extends MigrationTestCase
             return false;
         });
 
-        $this->assertSame([], $result);
-        $this->assertTrue($called, 'should have called the confirmation callback');
+        self::assertSame([], $result);
+        self::assertTrue($called, 'should have called the confirmation callback');
     }
 
     public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback()
     {
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $called = false;
+        $called    = false;
         $migration = new Migration($this->config);
 
         $result = $migration->migrate(null, true, false, function () use (&$called) {
@@ -299,7 +280,7 @@ class MigrationTest extends MigrationTestCase
             return false;
         });
 
-        $this->assertFalse($called);
-        $this->assertEquals(['20160707000000' => ['SELECT 1']], $result);
+        self::assertFalse($called);
+        self::assertEquals(['20160707000000' => ['SELECT 1']], $result);
     }
 }

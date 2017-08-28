@@ -9,7 +9,8 @@ class GenerateCommandTest extends CommandTestCase
 {
     const VERSION = '20160705000000';
 
-    private $root, $migrationFile;
+    private $root;
+    private $migrationFile;
 
     public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
     {
@@ -19,10 +20,10 @@ class GenerateCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $statusCode);
-        $this->assertContains($this->migrationFile, $tester->getDisplay());
-        $this->assertTrue($this->root->hasChild($this->migrationFile));
-        $this->assertContains('class Version'.self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
+        self::assertSame(0, $statusCode);
+        self::assertContains($this->migrationFile, $tester->getDisplay());
+        self::assertTrue($this->root->hasChild($this->migrationFile));
+        self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
     protected function setUp()
@@ -30,7 +31,7 @@ class GenerateCommandTest extends CommandTestCase
         parent::setUp();
 
         $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root = vfsStream::setup('migrations');
+        $this->root          = vfsStream::setup('migrations');
         $this->config->method('getMigrationsDirectory')
             ->willReturn(vfsStream::url('migrations'));
     }

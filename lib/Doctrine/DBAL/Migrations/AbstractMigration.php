@@ -70,10 +70,10 @@ abstract class AbstractMigration
     {
         $config = $version->getConfiguration();
 
-        $this->version = $version;
-        $this->connection = $config->getConnection();
-        $this->sm = $this->connection->getSchemaManager();
-        $this->platform = $this->connection->getDatabasePlatform();
+        $this->version      = $version;
+        $this->connection   = $config->getConnection();
+        $this->sm           = $this->connection->getSchemaManager();
+        $this->platform     = $this->connection->getDatabasePlatform();
         $this->outputWriter = $config->getOutputWriter();
     }
 

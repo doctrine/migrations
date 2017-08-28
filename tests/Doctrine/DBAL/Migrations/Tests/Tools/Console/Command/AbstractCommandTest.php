@@ -30,7 +30,7 @@ class AbstractCommandTest extends MigrationTestCase
      */
     public function invokeMigrationConfigurationGetter($input, $configuration = null, $noConnection = false, $helperSet = null)
     {
-        $class = new \ReflectionClass(AbstractCommand::class);
+        $class  = new \ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('getMigrationConfiguration');
         $method->setAccessible(true);
 
@@ -46,9 +46,10 @@ class AbstractCommandTest extends MigrationTestCase
             $command->setHelperSet(new HelperSet());
         }
 
-        if (!$noConnection) {
+        if ( ! $noConnection) {
             $command->getHelperSet()->set(
-                new ConnectionHelper($this->getSqliteConnection()), 'connection'
+                new ConnectionHelper($this->getSqliteConnection()),
+                'connection'
             );
         }
 
@@ -80,7 +81,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        $this->assertEquals($configuration, $this->invokeMigrationConfigurationGetter($input, $configuration));
+        self::assertEquals($configuration, $this->invokeMigrationConfigurationGetter($input, $configuration));
     }
 
     /**
@@ -99,8 +100,8 @@ class AbstractCommandTest extends MigrationTestCase
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
-        $this->assertInstanceOf(Configuration::class, $actualConfiguration);
-        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertInstanceOf(Configuration::class, $actualConfiguration);
+        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
     }
 
     /**
@@ -120,8 +121,8 @@ class AbstractCommandTest extends MigrationTestCase
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
-        $this->assertInstanceOf(Configuration::class, $actualConfiguration);
-        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertInstanceOf(Configuration::class, $actualConfiguration);
+        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
     }
 
     /**
@@ -141,10 +142,10 @@ class AbstractCommandTest extends MigrationTestCase
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
-        $this->assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
-        $this->assertEquals('name', $actualConfiguration->getName());
-        $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
-        $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+        self::assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
+        self::assertEquals('name', $actualConfiguration->getName());
+        self::assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
+        self::assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
     }
 
     /**
@@ -156,13 +157,13 @@ class AbstractCommandTest extends MigrationTestCase
             ->setConstructorArgs([[]])
             ->getMock();
 
-        $configuration = new Configuration($this->getSqliteConnection());
+        $configuration       = new Configuration($this->getSqliteConnection());
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration, true);
 
-        $this->assertInstanceOf(Configuration::class, $actualConfiguration);
-        $this->assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
-        $this->assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
-        $this->assertNull($actualConfiguration->getMigrationsNamespace());
+        self::assertInstanceOf(Configuration::class, $actualConfiguration);
+        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
+        self::assertNull($actualConfiguration->getMigrationsNamespace());
     }
 
     /**
@@ -199,10 +200,10 @@ class AbstractCommandTest extends MigrationTestCase
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
 
-        $this->assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
-        $this->assertEquals('name', $actualConfiguration->getName());
-        $this->assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
-        $this->assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+        self::assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
+        self::assertEquals('name', $actualConfiguration->getName());
+        self::assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
+        self::assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
     }
 
     /**
@@ -223,10 +224,10 @@ class AbstractCommandTest extends MigrationTestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        chdir(__DIR__.'/_files');
+        chdir(__DIR__ . '/_files');
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
 
-        $this->assertSame($configuration, $actualConfiguration);
+        self::assertSame($configuration, $actualConfiguration);
     }
 
     /**
@@ -243,18 +244,18 @@ class AbstractCommandTest extends MigrationTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $helperSet = new HelperSet();
+        $helperSet    = new HelperSet();
         $configHelper = new ConfigurationHelper($this->getSqliteConnection(), $configuration);
         $helperSet->set($configHelper, 'configuration');
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, false, $helperSet);
 
-        $this->assertSame($configuration, $actualConfiguration);
+        self::assertSame($configuration, $actualConfiguration);
     }
 
-    public function invokeAbstractCommandConfirmation($input, $helper, $response="y", $question="There is no question?")
+    public function invokeAbstractCommandConfirmation($input, $helper, $response = "y", $question = "There is no question?")
     {
-        $class = new \ReflectionClass(AbstractCommand::class);
+        $class  = new \ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('askConfirmation');
         $method->setAccessible(true);
 
@@ -292,8 +293,8 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $helper = new QuestionHelper();
-        $this->assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-        $this->assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+        self::assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
+        self::assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
     }
 
     protected function setUp()

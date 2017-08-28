@@ -61,13 +61,13 @@ abstract class AbstractFileConfiguration extends Configuration
 
     protected function setConfiguration(array $config)
     {
-        foreach($config as $configurationKey => $configurationValue) {
-            if (!isset($this->configurationProperties[$configurationKey])) {
+        foreach ($config as $configurationKey => $configurationValue) {
+            if ( ! isset($this->configurationProperties[$configurationKey])) {
                 $msg = sprintf('Migrations configuration key "%s" does not exists.', $configurationKey);
                 throw MigrationException::configurationNotValid($msg);
             }
         }
-        foreach($this->configurationProperties as $configurationKey => $configurationSetter) {
+        foreach ($this->configurationProperties as $configurationKey => $configurationSetter) {
             if (isset($config[$configurationKey])) {
                 $this->{$configurationSetter}($config[$configurationKey]);
             }
@@ -93,7 +93,7 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
             $this->setMigrationsAreOrganizedByYear();
-        } else if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+        } elseif (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
             $this->setMigrationsAreOrganizedByYearAndMonth();
         } else {
             $msg = 'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".';
@@ -118,7 +118,7 @@ abstract class AbstractFileConfiguration extends Configuration
         }
         $this->file = $file;
 
-        if (!file_exists($file)) {
+        if ( ! file_exists($file)) {
             throw new \InvalidArgumentException('Given config file does not exist');
         }
 

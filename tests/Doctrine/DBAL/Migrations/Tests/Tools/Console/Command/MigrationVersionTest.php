@@ -31,7 +31,6 @@ class MigrationVersionTest extends MigrationTestCase
             ->expects($this->once())
             ->method('getMigrationConfiguration')
             ->will($this->returnValue($this->configuration));
-
     }
 
     /**
@@ -57,11 +56,11 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1235')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1239')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1240')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1234')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1235')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1239')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1240')->isMigrated());
     }
 
     /**
@@ -179,11 +178,11 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1239')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1240')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1234')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1235')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1239')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1240')->isMigrated());
     }
 
     /**
@@ -208,11 +207,11 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1235')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1239')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1240')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1234')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1235')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1239')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1240')->isMigrated());
     }
 
     /**
@@ -240,11 +239,11 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1239')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1240')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1234')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1235')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1239')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1240')->isMigrated());
     }
 
     /**
@@ -269,9 +268,9 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertTrue($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertTrue($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
+        self::assertTrue($this->configuration->getVersion('1234')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1235')->isMigrated());
     }
 
     /**
@@ -296,9 +295,9 @@ class MigrationVersionTest extends MigrationTestCase
             ]
         );
 
-        $this->assertFalse($this->configuration->getVersion('1233')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1234')->isMigrated());
-        $this->assertFalse($this->configuration->getVersion('1235')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1234')->isMigrated());
+        self::assertFalse($this->configuration->getVersion('1235')->isMigrated());
     }
 
     /**

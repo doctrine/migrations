@@ -17,46 +17,26 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace Doctrine\DBAL\Migrations;
-
-if (!function_exists(__NAMESPACE__ . '\realpath')) {
-    /**
-     * Override realpath() in current namespace for testing
-     *
-     * @param $path
-     *
-     * @return string|false
-     */
-    function realpath($path)
-    {
-        // realpath issue with vfsStream
-        // @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
-        if (0 === strpos($path, 'vfs://')) {
-            return $path;
-        }
-        return \realpath($path);
-    }
-}
-
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\QueryWriter;
-use Doctrine\DBAL\Migrations\SqlFileWriter;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunNamedParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunTypes;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunNamedParams;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunTypes;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+
+require_once __DIR__ . '/realpath.php';
 
 class VersionTest extends MigrationTestCase
 {
@@ -68,8 +48,8 @@ class VersionTest extends MigrationTestCase
 
     public function testConstants()
     {
-        $this->assertSame('up', Version::DIRECTION_UP);
-        $this->assertSame('down', Version::DIRECTION_DOWN);
+        self::assertSame('up', Version::DIRECTION_UP);
+        self::assertSame('down', Version::DIRECTION_DOWN);
     }
 
     /**
@@ -77,9 +57,12 @@ class VersionTest extends MigrationTestCase
      */
     public function testCreateVersion()
     {
-        $version = new Version(new Configuration($this->getSqliteConnection()), $versionName = '003',
-            VersionDummy::class);
-        $this->assertEquals($versionName, $version->getVersion());
+        $version         = new Version(
+            new Configuration($this->getSqliteConnection()),
+            $versionName = '003',
+            VersionDummy::class
+        );
+        self::assertEquals($versionName, $version->getVersion());
     }
 
     /**
@@ -87,12 +70,15 @@ class VersionTest extends MigrationTestCase
      */
     public function testCreateVersionWithCustomName()
     {
-        $versionName = '003';
+        $versionName        = '003';
         $versionDescription = 'My super migration';
-        $version = new Version(new Configuration($this->getSqliteConnection()), $versionName,
-            VersionDummyDescription::class);
-        $this->assertEquals($versionName, $version->getVersion());
-        $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
+        $version            = new Version(
+            new Configuration($this->getSqliteConnection()),
+            $versionName,
+            VersionDummyDescription::class
+        );
+        self::assertEquals($versionName, $version->getVersion());
+        self::assertEquals($versionDescription, $version->getMigration()->getDescription());
     }
 
     /**
@@ -102,17 +88,17 @@ class VersionTest extends MigrationTestCase
     {
         $outputWriterMock = $this->createMock(OutputWriter::class);
         $outputWriterMock->expects($this->once())->method('write');
-        $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
+        $configuration     = new Configuration($this->getSqliteConnection(), $outputWriterMock);
         $reflectionVersion = new \ReflectionClass(Version::class);
-        $method = $reflectionVersion->getMethod('outputQueryTime');
+        $method            = $reflectionVersion->getMethod('outputQueryTime');
         $method->setAccessible(true);
 
-        $version = new Version(
+        $version         = new Version(
             $configuration,
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($method->invoke($version, 0, true));
+        self::assertNull($method->invoke($version, 0, true));
     }
 
     /**
@@ -122,17 +108,17 @@ class VersionTest extends MigrationTestCase
     {
         $outputWriterMock = $this->createMock(OutputWriter::class);
         $outputWriterMock->expects($this->exactly(0))->method('write');
-        $configuration = new Configuration($this->getSqliteConnection(), $outputWriterMock);
+        $configuration     = new Configuration($this->getSqliteConnection(), $outputWriterMock);
         $reflectionVersion = new \ReflectionClass(Version::class);
-        $method = $reflectionVersion->getMethod('outputQueryTime');
+        $method            = $reflectionVersion->getMethod('outputQueryTime');
         $method->setAccessible(true);
 
-        $version = new Version(
+        $version         = new Version(
             $configuration,
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($method->invoke($version, 0, false));
+        self::assertNull($method->invoke($version, 0, false));
     }
 
     /**
@@ -141,17 +127,17 @@ class VersionTest extends MigrationTestCase
      */
     public function testGetExecutionState($state)
     {
-        $configuration = new Configuration($this->getSqliteConnection());
-        $version = new Version(
+        $configuration     = new Configuration($this->getSqliteConnection());
+        $version           = new Version(
             $configuration,
-            $versionName = '003',
+            $versionName   = '003',
             VersionDummy::class
         );
         $reflectionVersion = new \ReflectionClass(Version::class);
-        $stateProperty = $reflectionVersion->getProperty('state');
+        $stateProperty     = $reflectionVersion->getProperty('state');
         $stateProperty->setAccessible(true);
         $stateProperty->setValue($version, $state);
-        $this->assertNotEmpty($version->getExecutionState());
+        self::assertNotEmpty($version->getExecutionState());
     }
 
     /**
@@ -174,16 +160,16 @@ class VersionTest extends MigrationTestCase
      */
     public function testAddSql()
     {
-        $configuration = new Configuration($this->getSqliteConnection());
-        $version = new Version(
+        $configuration   = new Configuration($this->getSqliteConnection());
+        $version         = new Version(
             $configuration,
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($version->addSql('SELECT * FROM foo'));
-        $this->assertNull($version->addSql(['SELECT * FROM foo']));
-        $this->assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1]));
-        $this->assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1], [\PDO::PARAM_INT]));
+        self::assertNull($version->addSql('SELECT * FROM foo'));
+        self::assertNull($version->addSql(['SELECT * FROM foo']));
+        self::assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1]));
+        self::assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1], [\PDO::PARAM_INT]));
     }
 
     /**
@@ -254,16 +240,17 @@ class VersionTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $version = new Version(
+        $version         = new Version(
             $this->config,
             $versionName = '003',
             VersionDummy::class
         );
 
         $version->execute('up');
-        $this->assertContains(
+        self::assertContains(
             'Migration 003 was executed but did not result in any SQL statements.',
-            $this->getOutputStreamContent($this->output));
+            $this->getOutputStreamContent($this->output)
+        );
     }
 
     public function testCatchExceptionDuringMigration()
@@ -274,7 +261,7 @@ class VersionTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $version = new Version(
+        $version         = new Version(
             $this->config,
             $versionName = '004',
             VersionDummyException::class
@@ -283,9 +270,10 @@ class VersionTest extends MigrationTestCase
         try {
             $version->execute('up');
         } catch (\Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 'Migration 004 failed during Execution. Error Super Exception',
-                $this->getOutputStreamContent($this->output));
+                $this->getOutputStreamContent($this->output)
+            );
         }
     }
 
@@ -297,14 +285,14 @@ class VersionTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $version = new Version(
+        $version         = new Version(
             $this->config,
             $versionName = '005',
             VersionOutputSql::class
         );
 
-        $this->assertContains('Select 1', $version->execute('up'));
-        $this->assertContains('Select 1', $version->execute('down'));
+        self::assertContains('Select 1', $version->execute('up'));
+        self::assertContains('Select 1', $version->execute('down'));
     }
 
     public function testReturnTheSqlWithParams()
@@ -315,7 +303,7 @@ class VersionTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $version = new Version(
+        $version         = new Version(
             $this->config,
             $versionName = '006',
             VersionOutputSqlWithParam::class
@@ -335,17 +323,17 @@ class VersionTest extends MigrationTestCase
      */
     public function testWriteSqlWriteToTheCorrectColumnName($direction, $columnName, $tableName)
     {
-        $connection = $this->getSqliteConnection();
+        $connection    = $this->getSqliteConnection();
         $configuration = new Configuration($connection, $this->outputWriter);
         $configuration->setMigrationsColumnName($columnName);
         $configuration->setMigrationsTableName($tableName);
 
-        $version = new Version(
+        $version         = new Version(
             $configuration,
             $versionName = '005',
             VersionOutputSql::class
         );
-        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
+        $path            = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
 
         $version->writeSqlFile($path, $direction);
 
@@ -353,11 +341,11 @@ class VersionTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
-            $this->assertNotEmpty($contents);
+            self::assertNotEmpty($contents);
             if ($direction == Version::DIRECTION_UP) {
-                $this->assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
+                self::assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
             } else {
-                $this->assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
+                self::assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
             }
             unlink($file);
         }
@@ -404,21 +392,21 @@ class VersionTest extends MigrationTestCase
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
         $migration->writeSqlFile(vfsStream::url('sql_files_dir'), Version::DIRECTION_UP);
 
-        $this->assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
+        self::assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
 
         /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
-        $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
-        $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
+        self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
     public function testDryRunCausesSqlToBeOutputViaTheOutputWriter()
     {
         $messages = [];
-        $ow = new OutputWriter(function ($msg) use (&$messages) {
+        $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config  = new Configuration($this->getSqliteConnection(), $ow);
         $version = new Version(
             $config,
             '006',
@@ -427,17 +415,17 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('SELECT 1 WHERE 1', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('SELECT 1 WHERE 1', $messages[1]);
     }
 
     public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement()
     {
         $messages = [];
-        $ow = new OutputWriter(function ($msg) use (&$messages) {
+        $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config  = new Configuration($this->getSqliteConnection(), $ow);
         $version = new Version(
             $config,
             '006',
@@ -446,18 +434,18 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
-        $this->assertContains('with parameters (one, two)', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
+        self::assertContains('with parameters (one, two)', $messages[1]);
     }
 
     public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement()
     {
         $messages = [];
-        $ow = new OutputWriter(function ($msg) use (&$messages) {
+        $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config  = new Configuration($this->getSqliteConnection(), $ow);
         $version = new Version(
             $config,
             '006',
@@ -466,9 +454,9 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
-        $this->assertContains('with parameters (:one => one, :two => two)', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
+        self::assertContains('with parameters (:one => one, :two => two)', $messages[1]);
     }
 
     public static function dryRunTypes()
@@ -485,10 +473,10 @@ class VersionTest extends MigrationTestCase
     public function testDryRunWithParametersOfComplexTypesCorrectFormatsParameters($value, $type, $output)
     {
         $messages = [];
-        $ow = new OutputWriter(function ($msg) use (&$messages) {
+        $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config  = new Configuration($this->getSqliteConnection(), $ow);
         $version = new Version(
             $config,
             '006',
@@ -498,8 +486,8 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        $this->assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
+        self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
     }
 }

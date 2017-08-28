@@ -51,10 +51,10 @@ class OrmSchemaProviderTest extends MigrationTestCase
     public function testCreateSchemaFetchesMetadataFromEntityManager()
     {
         $schema = $this->ormProvider->createSchema();
-        $this->assertInstanceOf(Schema::class, $schema);
-        $this->assertTrue($schema->hasTable('sample_entity'));
+        self::assertInstanceOf(Schema::class, $schema);
+        self::assertTrue($schema->hasTable('sample_entity'));
         $table = $schema->getTable('sample_entity');
-        $this->assertTrue($table->hasColumn('id'));
+        self::assertTrue($table->hasColumn('id'));
     }
 
     public function testEntityManagerWithoutMetadataCausesError()
@@ -89,9 +89,9 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getSqliteConnection();
-        $this->config = Setup::createXMLMetadataConfiguration([__DIR__.'/_files'], true);
+        $this->conn          = $this->getSqliteConnection();
+        $this->config        = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
         $this->entityManager = EntityManager::create($this->conn, $this->config);
-        $this->ormProvider = new OrmSchemaProvider($this->entityManager);
+        $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
     }
 }

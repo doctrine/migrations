@@ -12,7 +12,8 @@ class DiffCommandTest extends CommandTestCase
 {
     const VERSION = '20160705000000';
 
-    private $root, $migrationFile;
+    private $root;
+    private $migrationFile;
 
     public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
     {
@@ -22,12 +23,12 @@ class DiffCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $statusCode);
-        $this->assertContains($this->migrationFile, $tester->getDisplay());
-        $this->assertTrue($this->root->hasChild($this->migrationFile));
+        self::assertSame(0, $statusCode);
+        self::assertContains($this->migrationFile, $tester->getDisplay());
+        self::assertTrue($this->root->hasChild($this->migrationFile));
         $content = $this->root->getChild($this->migrationFile)->getContent();
-        $this->assertContains('class Version'.self::VERSION, $content);
-        $this->assertContains('CREATE TABLE example', $content);
+        self::assertContains('class Version' . self::VERSION, $content);
+        self::assertContains('CREATE TABLE example', $content);
     }
 
     protected function setUp()
@@ -35,7 +36,7 @@ class DiffCommandTest extends CommandTestCase
         parent::setUp();
 
         $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root = vfsStream::setup('migrations');
+        $this->root          = vfsStream::setup('migrations');
         $this->config->method('getMigrationsDirectory')
             ->willReturn(vfsStream::url('migrations'));
     }
@@ -43,7 +44,7 @@ class DiffCommandTest extends CommandTestCase
     protected function createCommand()
     {
         $schema = new Schema();
-        $t = $schema->createTable('example');
+        $t      = $schema->createTable('example');
         $t->addColumn('id', 'integer', ['autoincrement' => true]);
         $t->setPrimaryKey(['id']);
 

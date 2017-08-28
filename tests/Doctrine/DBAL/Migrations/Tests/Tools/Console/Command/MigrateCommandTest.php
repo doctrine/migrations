@@ -25,8 +25,8 @@ class MigrateCommandTest extends CommandTestCase
             'version' => 'prev',
         ]);
 
-        $this->assertSame(1, $statusCode);
-        $this->assertContains('Already at first version', $tester->getDisplay());
+        self::assertSame(1, $statusCode);
+        self::assertContains('Already at first version', $tester->getDisplay());
     }
 
     public function testNextVersionErrorsWhenThereIsNoNextVersion()
@@ -37,8 +37,8 @@ class MigrateCommandTest extends CommandTestCase
             'version' => 'next',
         ]);
 
-        $this->assertSame(1, $statusCode);
-        $this->assertContains('Already at latest version', $tester->getDisplay());
+        self::assertSame(1, $statusCode);
+        self::assertContains('Already at latest version', $tester->getDisplay());
     }
 
     public function testUnknownVersionAliasErrors()
@@ -49,8 +49,8 @@ class MigrateCommandTest extends CommandTestCase
             'version' => 'nope',
         ]);
 
-        $this->assertSame(1, $statusCode);
-        $this->assertContains('Unknown version: nope', $tester->getDisplay());
+        self::assertSame(1, $statusCode);
+        self::assertContains('Unknown version: nope', $tester->getDisplay());
     }
 
     public function testExecuteUnavailableMigrationsErrorWhenTheUserDeclinesToContinue()
@@ -66,8 +66,8 @@ class MigrateCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(1, $statusCode);
-        $this->assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
+        self::assertSame(1, $statusCode);
+        self::assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
     }
 
     public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsTrue()
@@ -82,7 +82,7 @@ class MigrateCommandTest extends CommandTestCase
             '--write-sql' => true,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testWriteSqlOutputsToTheProvidedPathWhenProvided()
@@ -97,7 +97,7 @@ class MigrateCommandTest extends CommandTestCase
             '--write-sql' => __DIR__,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testCommandExecutesMigrationsWithDryRunWhenProvided()
@@ -113,7 +113,7 @@ class MigrateCommandTest extends CommandTestCase
             '--query-time' => true,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testCommandExitsWithErrorWhenUserDeclinesToContinue()
@@ -132,8 +132,8 @@ class MigrateCommandTest extends CommandTestCase
             '--dry-run' => false
         ]);
 
-        $this->assertSame(1, $statusCode);
-        $this->assertContains('Migration cancelled', $tester->getDisplay());
+        self::assertSame(1, $statusCode);
+        self::assertContains('Migration cancelled', $tester->getDisplay());
     }
 
     public function testCommandMigratesWhenTheUserAcceptsThePrompt()
@@ -145,7 +145,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('migrate')
             ->with(self::VERSION, false, false)
             ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
-                $this->assertTrue($confirm());
+                self::assertTrue($confirm());
                 return ['SELECT 1'];
             });
 
@@ -153,7 +153,7 @@ class MigrateCommandTest extends CommandTestCase
             '--dry-run' => false
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testCommandMigratesWhenTheConsoleIsInNonInteractiveMode()
@@ -164,7 +164,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('migrate')
             ->with(self::VERSION, false, false)
             ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
-                $this->assertTrue($confirm());
+                self::assertTrue($confirm());
                 return ['SELECT 1'];
             });
 
@@ -172,7 +172,7 @@ class MigrateCommandTest extends CommandTestCase
             '--dry-run' => false
         ], ['interactive' => false]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     protected function setUp()

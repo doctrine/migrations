@@ -34,7 +34,7 @@ abstract class CommandTestCase extends MigrationTestCase
     protected function setUp()
     {
         $this->connection = $this->createConnection();
-        $this->config = $this->createMock(Configuration::class);
+        $this->config     = $this->createMock(Configuration::class);
         $this->config->method('getConnection')->willReturn($this->connection);
         $this->command = $this->createCommand();
         $this->command->setMigrationConfiguration($this->config);
@@ -57,9 +57,9 @@ abstract class CommandTestCase extends MigrationTestCase
         return new CommandTester($this->app->find($this->command->getName()));
     }
 
-    protected function executeCommand(array $args, array $options=[])
+    protected function executeCommand(array $args, array $options = [])
     {
-        $tester = $this->createCommandTester();
+        $tester     = $this->createCommandTester();
         $statusCode = $tester->execute(array_replace([
             'command' => $this->command->getName(),
         ], $args), $options);

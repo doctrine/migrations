@@ -27,31 +27,31 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testMigrationDirectory()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
+        self::assertEquals(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
     }
 
     public function testMigrationNamespace()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals("DoctrineMigrationsTest", $config->getMigrationsNamespace());
+        self::assertEquals("DoctrineMigrationsTest", $config->getMigrationsNamespace());
     }
 
     public function testMigrationName()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals("Doctrine Sandbox Migrations", $config->getName());
+        self::assertEquals("Doctrine Sandbox Migrations", $config->getName());
     }
 
     public function testMigrationsTable()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
+        self::assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
 
     public function testMigrationColumnName()
     {
         $config = $this->loadConfiguration();
-        $this->assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
+        self::assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
     }
 
     public function testFinderIsIncompatibleWithConfiguration()
@@ -75,7 +75,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
             'migrationFinder'
         );
         $migrationFinderPropertyReflected->setAccessible(true);
-        $this->assertSame($migrationFinder, $migrationFinderPropertyReflected->getValue($config));
+        self::assertSame($migrationFinder, $migrationFinderPropertyReflected->getValue($config));
     }
 
     public function testThrowExceptionIfAlreadyLoaded()
@@ -88,22 +88,22 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testVersionsOrganizationNoConfig()
     {
         $config = $this->loadConfiguration();
-        $this->assertFalse($config->areMigrationsOrganizedByYear());
-        $this->assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+        self::assertFalse($config->areMigrationsOrganizedByYear());
+        self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
     }
 
     public function testVersionsOrganizationByYear()
     {
         $config = $this->loadConfiguration('organize_by_year');
-        $this->assertTrue($config->areMigrationsOrganizedByYear());
-        $this->assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+        self::assertTrue($config->areMigrationsOrganizedByYear());
+        self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
     }
 
     public function testVersionsOrganizationByYearAndMonth()
     {
         $config = $this->loadConfiguration('organize_by_year_and_month');
-        $this->assertTrue($config->areMigrationsOrganizedByYear());
-        $this->assertTrue($config->areMigrationsOrganizedByYearAndMonth());
+        self::assertTrue($config->areMigrationsOrganizedByYear());
+        self::assertTrue($config->areMigrationsOrganizedByYearAndMonth());
     }
 
     public function testVersionsOrganizationInvalid()

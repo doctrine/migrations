@@ -34,7 +34,7 @@ final class AutoCommitListener implements EventSubscriber
     public function onMigrationsMigrated(MigrationsEventArgs $args)
     {
         $conn = $args->getConnection();
-        if (!$args->isDryRun() && !$conn->isAutoCommit()) {
+        if ( ! $args->isDryRun() && ! $conn->isAutoCommit()) {
             $conn->commit();
         }
     }

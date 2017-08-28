@@ -1,4 +1,5 @@
 <?php
+namespace Doctrine\DBAL\Migrations\Tests\Tools\Console;
 
 use Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
@@ -10,7 +11,7 @@ use Symfony\Component\Console\Helper\HelperSet;
  */
 class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
 {
-    /** @var  PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
     private $entityManagerHelper;
 
     /** @var Application */
@@ -20,7 +21,7 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->application = new Application();
+        $this->application         = new Application();
         $this->entityManagerHelper = $this->getMockBuilder(EntityManagerHelper::class)
             ->disableOriginalConstructor()
             ->getMock();

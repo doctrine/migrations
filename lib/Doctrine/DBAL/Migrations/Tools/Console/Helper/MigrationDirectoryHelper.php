@@ -46,7 +46,7 @@ class MigrationDirectoryHelper extends Helper
         $dir = $dir ? $dir : getcwd();
         $dir = rtrim($dir, '/');
 
-        if (!file_exists($dir)) {
+        if ( ! file_exists($dir)) {
             throw new \InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
         }
 
@@ -69,7 +69,7 @@ class MigrationDirectoryHelper extends Helper
 
     private function createDirIfNotExists($dir)
     {
-        if (!file_exists($dir)) {
+        if ( ! file_exists($dir)) {
             mkdir($dir, 0755, true);
         }
     }
@@ -85,6 +85,4 @@ class MigrationDirectoryHelper extends Helper
     {
         return 'MigrationDirectory';
     }
-
-
 }

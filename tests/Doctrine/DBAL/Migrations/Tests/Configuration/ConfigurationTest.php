@@ -25,14 +25,14 @@ class ConfigurationTest extends MigrationTestCase
             $outputWriter
         );
 
-        $this->assertSame($outputWriter, $configuration->getOutputWriter());
+        self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
     public function testOutputWriterIsCreatedIfNotInjected()
     {
         $configuration = new Configuration($this->getConnectionMock());
 
-        $this->assertInstanceOf(OutputWriter::class, $configuration->getOutputWriter());
+        self::assertInstanceOf(OutputWriter::class, $configuration->getOutputWriter());
     }
 
     public function testOutputWriterCanBeSet()
@@ -42,7 +42,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration = new Configuration($this->getConnectionMock());
         $configuration->setOutputWriter($outputWriter);
 
-        $this->assertSame($outputWriter, $configuration->getOutputWriter());
+        self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
     public function testRegisterMigrationsClassExistCheck()
@@ -79,10 +79,10 @@ class ConfigurationTest extends MigrationTestCase
     {
         $configuration = new Configuration($this->getConnectionMock());
 
-        $this->assertSame('version', $configuration->getMigrationsColumnName());
+        self::assertSame('version', $configuration->getMigrationsColumnName());
 
         $configuration->setMigrationsColumnName('foobar');
-        $this->assertSame('foobar', $configuration->getMigrationsColumnName());
+        self::assertSame('foobar', $configuration->getMigrationsColumnName());
     }
 
     /**
@@ -124,7 +124,7 @@ class ConfigurationTest extends MigrationTestCase
         if ($method == 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     /**
@@ -142,17 +142,17 @@ class ConfigurationTest extends MigrationTestCase
         if ($method == 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
-        $this->assertEquals($expectedResult, $result);
+        self::assertEquals($expectedResult, $result);
     }
 
     public function testGenerateVersionNumberFormatsTheDatePassedIn()
     {
         $configuration = new Configuration($this->getSqliteConnection());
-        $now = new \DateTime('2016-07-05 01:00:00');
+        $now           = new \DateTime('2016-07-05 01:00:00');
 
         $version = $configuration->generateVersionNumber($now);
 
-        $this->assertEquals('20160705010000', $version);
+        self::assertEquals('20160705010000', $version);
     }
 
     /**
@@ -165,10 +165,10 @@ class ConfigurationTest extends MigrationTestCase
     {
         $configuration = new Configuration($this->getSqliteConnection());
 
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $now     = new \DateTime('now', new \DateTimeZone('UTC'));
         $version = $configuration->generateVersionNumber();
 
-        $this->assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);
+        self::assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);
     }
 
     /**

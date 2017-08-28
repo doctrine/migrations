@@ -30,7 +30,7 @@ class GlobFinderTest extends MigrationTestCase
     {
         $this->expectException(\InvalidArgumentException::class);
 
-        $this->finder->findMigrations(__DIR__.'/does/not/exist/at/all');
+        $this->finder->findMigrations(__DIR__ . '/does/not/exist/at/all');
     }
 
     public function testNonDirectoryCausesErrorWhenFindingMigrations()
@@ -42,12 +42,12 @@ class GlobFinderTest extends MigrationTestCase
 
     public function testFindMigrationsReturnsTheExpectedFilesFromDirectory()
     {
-        $migrations = $this->finder->findMigrations(__DIR__.'/_files', 'TestMigrations');
+        $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
 
-        $this->assertArrayHasKey('20150502000000', $migrations);
-        $this->assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
-        $this->assertArrayHasKey('20150502000001', $migrations);
-        $this->assertEquals('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
+        self::assertArrayHasKey('20150502000000', $migrations);
+        self::assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
+        self::assertArrayHasKey('20150502000001', $migrations);
+        self::assertEquals('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
     }
 
     protected function setUp()

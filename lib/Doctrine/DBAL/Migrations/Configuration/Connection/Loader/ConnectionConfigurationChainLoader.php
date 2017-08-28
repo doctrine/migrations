@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
@@ -41,7 +40,7 @@ final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterf
      */
     public function chosen()
     {
-        foreach($this->loaders as $loader) {
+        foreach ($this->loaders as $loader) {
             if (null !== $confObj = $loader->chosen()) {
                 return $confObj;
             }

@@ -36,7 +36,6 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class GenerateCommand extends AbstractCommand
 {
-
     private static $_template =
             '<?php
 
@@ -89,7 +88,7 @@ EOT
         $configuration = $this->getMigrationConfiguration($input, $output);
 
         $version = $configuration->generateVersionNumber();
-        $path = $this->generateMigration($configuration, $input, $version);
+        $path    = $this->generateMigration($configuration, $input, $version);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
@@ -111,13 +110,15 @@ EOT
             $configuration->getMigrationsNamespace(),
             $version,
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null
+            $down ? "        " . implode("\n        ", explode("\n", $down)) : null,
         ];
+
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
         $code = preg_replace('/^ +$/m', '', $code);
-        $migrationDirectoryHelper = new MigrationDirectoryHelper($configuration);
-        $dir = $migrationDirectoryHelper->getMigrationDirectory();
-        $path = $dir . '/Version' . $version . '.php';
+
+        $directoryHelper = new MigrationDirectoryHelper($configuration);
+        $dir             = $directoryHelper->getMigrationDirectory();
+        $path            = $dir . '/Version' . $version . '.php';
 
         file_put_contents($path, $code);
 

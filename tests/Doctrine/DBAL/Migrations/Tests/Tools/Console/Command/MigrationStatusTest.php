@@ -24,17 +24,17 @@ class MigrationStatusTest extends MigrationTestCase
      */
     public function testVersions()
     {
-        $this->assertVersion('prev',    '123', 'Previous Version', 'FORMATTED (123)');
-        $this->assertVersion('current', '234', 'Current Version',  'FORMATTED (234)');
-        $this->assertVersion('next',    '345', 'Next Version',     'FORMATTED (345)');
-        $this->assertVersion('latest',  '456', 'Latest Version',   'FORMATTED (456)');
+        self::assertVersion('prev', '123', 'Previous Version', 'FORMATTED (123)');
+        self::assertVersion('current', '234', 'Current Version', 'FORMATTED (234)');
+        self::assertVersion('next', '345', 'Next Version', 'FORMATTED (345)');
+        self::assertVersion('latest', '456', 'Latest Version', 'FORMATTED (456)');
 
         // Initial version is not formatted as date.
-        $this->assertVersion('prev',    '0',   'Previous Version', '0');
+        self::assertVersion('prev', '0', 'Previous Version', '0');
 
         // The initial version has no previous version, and the latest has no next.
-        $this->assertVersion('prev',    null,  'Previous Version', 'Already at first version');
-        $this->assertVersion('next',    null,  'Next Version',     'Already at latest version');
+        self::assertVersion('prev', null, 'Previous Version', 'Already at first version');
+        self::assertVersion('next', null, 'Next Version', 'Already at latest version');
     }
 
     /**
@@ -64,7 +64,7 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects($this->exactly(4))
             ->method('resolveVersionAlias')
-            ->will($this->returnCallback(function($argAlias) use ($alias, $version) {
+            ->will($this->returnCallback(function ($argAlias) use ($alias, $version) {
                 return $argAlias === $alias ? $version : '999';
             }));
 
@@ -91,7 +91,7 @@ class MigrationStatusTest extends MigrationTestCase
         );
 
         $textOutput = $commandTester->getDisplay();
-        $this->assertRegExp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
+        self::assertRegExp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
     }
 
     /**
@@ -146,10 +146,11 @@ class MigrationStatusTest extends MigrationTestCase
         );
 
         $textOutput = $commandTester->getDisplay();
-        $this->assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
+        self::assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
     }
 
-    public function testShowVersions() {
+    public function testShowVersions()
+    {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsDirectory($this->migrationDirectory);
@@ -183,12 +184,11 @@ class MigrationStatusTest extends MigrationTestCase
         );
 
         $textOutput = $commandTester->getDisplay();
-        $this->assertRegExp('/\s+>>  \(1233\)\s+not migrated/m', $textOutput);
-        $this->assertRegExp('/\s+>>  \(1234\)\s+migrated/m', $textOutput);
-        $this->assertRegExp('/\s+>> 2017-01-01 01:01:01 \(20170101010101\)\s+migrated/m', $textOutput);
-        $this->assertRegExp('/\s+>> 2017-01-01 01:01:02 \(20170101010102\)\s+not migrated/m', $textOutput);
-        $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1\)\s+migrated/m', $textOutput);
-        $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2\)\s+not migrated/m', $textOutput);
+        self::assertRegExp('/\s+>>  \(1233\)\s+not migrated/m', $textOutput);
+        self::assertRegExp('/\s+>>  \(1234\)\s+migrated/m', $textOutput);
+        self::assertRegExp('/\s+>> 2017-01-01 01:01:01 \(20170101010101\)\s+migrated/m', $textOutput);
+        self::assertRegExp('/\s+>> 2017-01-01 01:01:02 \(20170101010102\)\s+not migrated/m', $textOutput);
+        self::assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1\)\s+migrated/m', $textOutput);
+        self::assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2\)\s+not migrated/m', $textOutput);
     }
-
 }

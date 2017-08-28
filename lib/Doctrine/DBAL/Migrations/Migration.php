@@ -140,11 +140,11 @@ class Migration
          * migrations.
          */
         $migrations = $this->configuration->getMigrations();
-        if (!isset($migrations[$to]) && $to > 0) {
+        if ( ! isset($migrations[$to]) && $to > 0) {
             throw MigrationException::unknownMigrationVersion($to);
         }
 
-        $direction = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
+        $direction           = $from > $to ? Version::DIRECTION_DOWN : Version::DIRECTION_UP;
         $migrationsToExecute = $this->configuration->getMigrationsToExecute($direction, $to);
 
         /**
@@ -155,22 +155,22 @@ class Migration
          * means we are already at the destination return an empty array()
          * to signify that there is nothing left to do.
          */
-        if ($from === $to && empty($migrationsToExecute) && !empty($migrations)) {
+        if ($from === $to && empty($migrationsToExecute) && ! empty($migrations)) {
             return $this->noMigrations();
         }
 
-        if (!$dryRun && false === $this->migrationsCanExecute($confirm)) {
+        if ( ! $dryRun && false === $this->migrationsCanExecute($confirm)) {
             return [];
         }
 
-        $output = $dryRun ? 'Executing dry run of migration' : 'Migrating';
+        $output  = $dryRun ? 'Executing dry run of migration' : 'Migrating';
         $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
         $this->outputWriter->write(sprintf($output, $direction, $to, $from));
 
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (empty($migrationsToExecute) && !$this->noMigrationException) {
+        if (empty($migrationsToExecute) && ! $this->noMigrationException) {
             throw MigrationException::noMigrationsToExecute();
         } elseif (empty($migrationsToExecute)) {
             return $this->noMigrations();
@@ -185,9 +185,9 @@ class Migration
         $time = 0;
 
         foreach ($migrationsToExecute as $version) {
-            $versionSql = $version->execute($direction, $dryRun, $timeAllQueries);
+            $versionSql                  = $version->execute($direction, $dryRun, $timeAllQueries);
             $sql[$version->getVersion()] = $versionSql;
-            $time += $version->getTime();
+            $time                       += $version->getTime();
         }
 
         $this->configuration->dispatchEvent(

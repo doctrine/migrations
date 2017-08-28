@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
@@ -60,7 +59,6 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
         if ($this->helperSet->has($this->helperName)) {
             $connectionHelper = $this->helperSet->get($this->helperName);
             if ($connectionHelper instanceof ConnectionHelper) {
-
                 return $connectionHelper->getConnection();
             }
         }

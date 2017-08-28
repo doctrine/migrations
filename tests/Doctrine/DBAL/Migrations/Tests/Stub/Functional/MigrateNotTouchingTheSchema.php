@@ -9,7 +9,6 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 {
     public function preUp(Schema $schema)
     {
-
     }
 
     public function up(Schema $schema)
@@ -19,12 +18,10 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 
     public function postUp(Schema $schema)
     {
-
     }
 
     public function preDown(Schema $schema)
     {
-
     }
 
     public function down(Schema $schema)
@@ -34,6 +31,5 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 
     public function postDown(Schema $schema)
     {
-
     }
 }

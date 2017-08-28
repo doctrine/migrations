@@ -89,13 +89,13 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration = $this->createMigration($configuration);
+        $migration     = $this->createMigration($configuration);
 
         $this->outputHeader($configuration, $output);
 
         $timeAllqueries = $input->getOption('query-time');
 
-        $executedMigrations = $configuration->getMigratedVersions();
+        $executedMigrations  = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
 
         $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
@@ -104,7 +104,7 @@ EOT
         }
 
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
-        if (!empty($executedUnavailableMigrations)) {
+        if ( ! empty($executedUnavailableMigrations)) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations'
                 . ' in the database that are not registered migrations.</error>',
@@ -120,7 +120,7 @@ EOT
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
-            if (! $this->canExecute($question, $input, $output)) {
+            if ( ! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return 1;
@@ -138,11 +138,11 @@ EOT
         $cancelled = false;
         $migration->setNoMigrationException($input->getOption('allow-no-migration'));
         $result = $migration->migrate($version, $dryRun, $timeAllqueries, function () use ($input, $output, &$cancelled) {
-            $question = 'WARNING! You are about to execute a database migration'
+            $question    = 'WARNING! You are about to execute a database migration'
                 . ' that could result in schema changes and data lost.'
                 . ' Are you sure you wish to continue? (y/n)';
             $canContinue = $this->canExecute($question, $input, $output);
-            $cancelled = !$canContinue;
+            $cancelled   = ! $canContinue;
 
             return $canContinue;
         });

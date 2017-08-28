@@ -10,7 +10,8 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    private $conn, $listener;
+    private $conn;
+    private $listener;
 
     public function testListenerDoesNothingDuringADryRun()
     {
@@ -42,7 +43,7 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getMockBuilder(Connection::class)
+        $this->conn     = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->listener = new AutoCommitListener();

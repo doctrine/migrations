@@ -73,11 +73,11 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $version = $input->getArgument('version');
+        $version   = $input->getArgument('version');
         $direction = $input->getOption('down') ? 'down' : 'up';
 
         $configuration = $this->getMigrationConfiguration($input, $output);
-        $version = $configuration->getVersion($version);
+        $version       = $configuration->getVersion($version);
 
         $timeAllqueries = $input->getOption('query-time');
 
@@ -87,7 +87,7 @@ EOT
         } else {
             if ($input->isInteractive()) {
                 $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
-                $execute = $this->askConfirmation($question, $input, $output);
+                $execute  = $this->askConfirmation($question, $input, $output);
             } else {
                 $execute = true;
             }
