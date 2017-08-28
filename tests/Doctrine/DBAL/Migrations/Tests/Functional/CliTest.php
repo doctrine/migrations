@@ -50,68 +50,68 @@ class CliTest extends MigrationTestCase
     public function testMigrationLifecycleFromCommandLine()
     {
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+1/im', $output);
-        $this->assertRegExp('/new migrations:\s+1/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+1/im', $output);
+        self::assertRegExp('/new migrations:\s+1/im', $output);
 
         $output = $this->executeCommand('migrations:latest');
-        $this->assertContains('20150426000000', $output);
+        self::assertContains('20150426000000', $output);
 
         $this->executeCommand('migrations:migrate', 'config.yml', ['--no-interaction']);
-        $this->assertSuccessfulExit();
+        self::assertSuccessfulExit();
 
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/^.*available migrations:\s+1/im', $output);
-        $this->assertRegExp('/^.*new migrations:\s+0/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/^.*available migrations:\s+1/im', $output);
+        self::assertRegExp('/^.*new migrations:\s+0/im', $output);
     }
 
     public function testGenerateCommandAddsNewVersion()
     {
-        $this->assertVersionCount(0, 'Should start with no versions');
+        self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'generate command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'generate command should add one version');
 
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+2/im', $output);
     }
 
     public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth()
     {
-        $this->assertVersionCount(0, 'Should start with no versions');
+        self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate', 'config_organize_by_year_and_month.xml');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'generate command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'generate command should add one version');
 
         $output = $this->executeCommand('migrations:status', 'config_organize_by_year_and_month.xml');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+1/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+1/im', $output);
     }
 
     public function testMigrationDiffWritesNewMigrationWithExpectedSql()
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
-        $this->assertVersionCount(0, 'should start with no versions');
+        self::assertVersionCount(0, 'should start with no versions');
         $this->executeCommand('migrations:diff');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'diff command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
 
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+2/im', $output);
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        $this->assertContains('CREATE TABLE bar', $versionClassContents);
-        $this->assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertContains('CREATE TABLE bar', $versionClassContents);
+        self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
     public function testMigrationDiffWritesNewMigrationWithFormattedSql()
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
-        $this->assertVersionCount(0, 'should start with no versions');
+        self::assertVersionCount(0, 'should start with no versions');
         $this->executeCommand(
             'migrations:diff',
             'config.yml',
@@ -120,17 +120,17 @@ class CliTest extends MigrationTestCase
                 '--line-length' => 50,
             ]
         );
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'diff command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
 
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+2/im', $output);
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        $this->assertContains("CREATE TABLE foo (\n", $versionClassContents);
-        $this->assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertContains("CREATE TABLE foo (\n", $versionClassContents);
+        self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
     public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities()
@@ -143,18 +143,18 @@ class CliTest extends MigrationTestCase
         );
         $this->withDiffCommand();
 
-        $this->assertVersionCount(0, 'should start with no versions');
+        self::assertVersionCount(0, 'should start with no versions');
         $this->executeCommand('migrations:diff');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'diff command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
 
         $output = $this->executeCommand('migrations:status');
-        $this->assertSuccessfulExit();
-        $this->assertRegExp('/available migrations:\s+2/im', $output);
+        self::assertSuccessfulExit();
+        self::assertRegExp('/available migrations:\s+2/im', $output);
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        $this->assertContains('CREATE TABLE sample_entity', $versionClassContents);
-        $this->assertContains('DROP TABLE sample_entity', $versionClassContents);
+        self::assertContains('CREATE TABLE sample_entity', $versionClassContents);
+        self::assertContains('DROP TABLE sample_entity', $versionClassContents);
     }
 
     public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter()
@@ -169,15 +169,15 @@ class CliTest extends MigrationTestCase
         $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^bar$/');
 
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
-        $this->assertVersionCount(0, 'should start with no versions');
+        self::assertVersionCount(0, 'should start with no versions');
         $this->executeCommand('migrations:diff');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'diff command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        $this->assertContains('CREATE TABLE bar', $versionClassContents);
-        $this->assertContains('DROP TABLE bar', $versionClassContents);
-        $this->assertNotContains(
+        self::assertContains('CREATE TABLE bar', $versionClassContents);
+        self::assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertNotContains(
             'CREATE TABLE foo',
             $versionClassContents,
             'should ignore the "foo" table due to schema asset filter'
@@ -205,14 +205,14 @@ class CliTest extends MigrationTestCase
         $t->setPrimaryKey(['id']);
 
         $this->withDiffCommand(new StubSchemaProvider($schema));
-        $this->assertVersionCount(0, 'should start with no versions');
+        self::assertVersionCount(0, 'should start with no versions');
         $output = $this->executeCommand('migrations:diff');
-        $this->assertSuccessfulExit();
-        $this->assertVersionCount(1, 'diff command should add one version');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        $this->assertContains('CREATE TABLE FOO', $versionClassContents);
-        $this->assertContains('DROP TABLE FOO', $versionClassContents);
+        self::assertContains('CREATE TABLE FOO', $versionClassContents);
+        self::assertContains('DROP TABLE FOO', $versionClassContents);
     }
 
     protected function setUp()
@@ -267,12 +267,12 @@ class CliTest extends MigrationTestCase
 
     protected function assertSuccessfulExit($msg = '')
     {
-        $this->assertEquals(0, $this->lastExit, $msg);
+        self::assertEquals(0, $this->lastExit, $msg);
     }
 
     protected function assertVersionCount($count, $msg = '')
     {
-        $this->assertCount($count, $this->findMigrations(), $msg);
+        self::assertCount($count, $this->findMigrations(), $msg);
     }
 
     protected function getSchema()
@@ -318,7 +318,7 @@ class CliTest extends MigrationTestCase
     private function getFileContentsForLatestVersion()
     {
         $versions = $this->findMigrations();
-        $this->assertCount(
+        self::assertCount(
             1,
             $versions,
             'This method is designed to work for one existing version, you have ' . count($versions) . ' versions'

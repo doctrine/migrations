@@ -23,12 +23,12 @@ class DiffCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $statusCode);
-        $this->assertContains($this->migrationFile, $tester->getDisplay());
-        $this->assertTrue($this->root->hasChild($this->migrationFile));
+        self::assertSame(0, $statusCode);
+        self::assertContains($this->migrationFile, $tester->getDisplay());
+        self::assertTrue($this->root->hasChild($this->migrationFile));
         $content = $this->root->getChild($this->migrationFile)->getContent();
-        $this->assertContains('class Version' . self::VERSION, $content);
-        $this->assertContains('CREATE TABLE example', $content);
+        self::assertContains('class Version' . self::VERSION, $content);
+        self::assertContains('CREATE TABLE example', $content);
     }
 
     protected function setUp()

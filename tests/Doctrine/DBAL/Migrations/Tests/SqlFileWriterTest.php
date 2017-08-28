@@ -39,7 +39,7 @@ class SqlFileWriterTest extends MigrationTestCase
     public function testGoodConstructor()
     {
         $instance = new SqlFileWriter('version', 'test', '/tmp', $this->ow);
-        $this->assertInstanceOf(SqlFileWriter::class, $instance);
+        self::assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyColumnName()
@@ -47,7 +47,7 @@ class SqlFileWriterTest extends MigrationTestCase
         $this->expectException(InvalidArgumentException::class);
 
         $instance = new SqlFileWriter('', 'test', '/tmp', $this->ow);
-        $this->assertInstanceOf(SqlFileWriter::class, $instance);
+        self::assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyTableName()
@@ -55,7 +55,7 @@ class SqlFileWriterTest extends MigrationTestCase
         $this->expectException(InvalidArgumentException::class);
 
         $instance = new SqlFileWriter('version', '', '/tmp', $this->ow);
-        $this->assertInstanceOf(SqlFileWriter::class, $instance);
+        self::assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     public function testConstructorEmptyDestPath()
@@ -63,7 +63,7 @@ class SqlFileWriterTest extends MigrationTestCase
         $this->expectException(InvalidArgumentException::class);
 
         $instance = new SqlFileWriter('test', '', $this->ow);
-        $this->assertInstanceOf(SqlFileWriter::class, $instance);
+        self::assertInstanceOf(SqlFileWriter::class, $instance);
     }
 
     /**
@@ -94,11 +94,11 @@ class SqlFileWriterTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
-            $this->assertNotEmpty($contents);
+            self::assertNotEmpty($contents);
             if ($direction == Version::DIRECTION_UP) {
-                $this->assertContains("INSERT INTO $tableName ($columnName) VALUES ('1');", $contents);
+                self::assertContains("INSERT INTO $tableName ($columnName) VALUES ('1');", $contents);
             } else {
-                $this->assertContains("DELETE FROM $tableName WHERE $columnName = '1'", $contents);
+                self::assertContains("DELETE FROM $tableName WHERE $columnName = '1'", $contents);
             }
             unlink($file);
         }

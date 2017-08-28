@@ -48,8 +48,8 @@ class VersionTest extends MigrationTestCase
 
     public function testConstants()
     {
-        $this->assertSame('up', Version::DIRECTION_UP);
-        $this->assertSame('down', Version::DIRECTION_DOWN);
+        self::assertSame('up', Version::DIRECTION_UP);
+        self::assertSame('down', Version::DIRECTION_DOWN);
     }
 
     /**
@@ -62,7 +62,7 @@ class VersionTest extends MigrationTestCase
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertEquals($versionName, $version->getVersion());
+        self::assertEquals($versionName, $version->getVersion());
     }
 
     /**
@@ -77,8 +77,8 @@ class VersionTest extends MigrationTestCase
             $versionName,
             VersionDummyDescription::class
         );
-        $this->assertEquals($versionName, $version->getVersion());
-        $this->assertEquals($versionDescription, $version->getMigration()->getDescription());
+        self::assertEquals($versionName, $version->getVersion());
+        self::assertEquals($versionDescription, $version->getMigration()->getDescription());
     }
 
     /**
@@ -98,7 +98,7 @@ class VersionTest extends MigrationTestCase
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($method->invoke($version, 0, true));
+        self::assertNull($method->invoke($version, 0, true));
     }
 
     /**
@@ -118,7 +118,7 @@ class VersionTest extends MigrationTestCase
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($method->invoke($version, 0, false));
+        self::assertNull($method->invoke($version, 0, false));
     }
 
     /**
@@ -137,7 +137,7 @@ class VersionTest extends MigrationTestCase
         $stateProperty     = $reflectionVersion->getProperty('state');
         $stateProperty->setAccessible(true);
         $stateProperty->setValue($version, $state);
-        $this->assertNotEmpty($version->getExecutionState());
+        self::assertNotEmpty($version->getExecutionState());
     }
 
     /**
@@ -166,10 +166,10 @@ class VersionTest extends MigrationTestCase
             $versionName = '003',
             VersionDummy::class
         );
-        $this->assertNull($version->addSql('SELECT * FROM foo'));
-        $this->assertNull($version->addSql(['SELECT * FROM foo']));
-        $this->assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1]));
-        $this->assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1], [\PDO::PARAM_INT]));
+        self::assertNull($version->addSql('SELECT * FROM foo'));
+        self::assertNull($version->addSql(['SELECT * FROM foo']));
+        self::assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1]));
+        self::assertNull($version->addSql(['SELECT * FROM foo WHERE id = ?'], [1], [\PDO::PARAM_INT]));
     }
 
     /**
@@ -247,7 +247,7 @@ class VersionTest extends MigrationTestCase
         );
 
         $version->execute('up');
-        $this->assertContains(
+        self::assertContains(
             'Migration 003 was executed but did not result in any SQL statements.',
             $this->getOutputStreamContent($this->output)
         );
@@ -270,7 +270,7 @@ class VersionTest extends MigrationTestCase
         try {
             $version->execute('up');
         } catch (\Exception $e) {
-            $this->assertContains(
+            self::assertContains(
                 'Migration 004 failed during Execution. Error Super Exception',
                 $this->getOutputStreamContent($this->output)
             );
@@ -291,8 +291,8 @@ class VersionTest extends MigrationTestCase
             VersionOutputSql::class
         );
 
-        $this->assertContains('Select 1', $version->execute('up'));
-        $this->assertContains('Select 1', $version->execute('down'));
+        self::assertContains('Select 1', $version->execute('up'));
+        self::assertContains('Select 1', $version->execute('down'));
     }
 
     public function testReturnTheSqlWithParams()
@@ -341,11 +341,11 @@ class VersionTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
-            $this->assertNotEmpty($contents);
+            self::assertNotEmpty($contents);
             if ($direction == Version::DIRECTION_UP) {
-                $this->assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
+                self::assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
             } else {
-                $this->assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
+                self::assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
             }
             unlink($file);
         }
@@ -392,12 +392,12 @@ class VersionTest extends MigrationTestCase
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
         $migration->writeSqlFile(vfsStream::url('sql_files_dir'), Version::DIRECTION_UP);
 
-        $this->assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
+        self::assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
 
         /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
-        $this->assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
-        $this->assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
+        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
+        self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
     public function testDryRunCausesSqlToBeOutputViaTheOutputWriter()
@@ -415,8 +415,8 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('SELECT 1 WHERE 1', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('SELECT 1 WHERE 1', $messages[1]);
     }
 
     public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement()
@@ -434,9 +434,9 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
-        $this->assertContains('with parameters (one, two)', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
+        self::assertContains('with parameters (one, two)', $messages[1]);
     }
 
     public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement()
@@ -454,9 +454,9 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
-        $this->assertContains('with parameters (:one => one, :two => two)', $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
+        self::assertContains('with parameters (:one => one, :two => two)', $messages[1]);
     }
 
     public static function dryRunTypes()
@@ -486,8 +486,8 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        $this->assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        $this->assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
+        self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
     }
 }

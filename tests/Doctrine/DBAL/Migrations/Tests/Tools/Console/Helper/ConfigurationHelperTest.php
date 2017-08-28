@@ -56,7 +56,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $configurationHelper = new ConfigurationHelper($this->connection, $this->configuration);
 
-        $this->assertInstanceOf(ConfigurationHelper::class, $configurationHelper);
+        self::assertInstanceOf(ConfigurationHelper::class, $configurationHelper);
     }
 
     //used in other tests to see if xml or yaml or yml config files are loaded.
@@ -84,7 +84,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperLoadsXmlFormat()
     {
-        $this->assertStringMatchesFormat(
+        self::assertStringMatchesFormat(
             'Loading configuration from file: migrations.xml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.xml', 'migrations.xml')
         );
@@ -92,7 +92,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperLoadsYamlFormat()
     {
-        $this->assertStringMatchesFormat(
+        self::assertStringMatchesFormat(
             'Loading configuration from file: migrations.yaml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yaml')
         );
@@ -100,7 +100,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperLoadsYmlFormat()
     {
-        $this->assertStringMatchesFormat(
+        self::assertStringMatchesFormat(
             'Loading configuration from file: migrations.yml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yml')
         );
@@ -108,7 +108,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperLoadsJsonFormat()
     {
-        $this->assertStringMatchesFormat(
+        self::assertStringMatchesFormat(
             'Loading configuration from file: migrations.json',
             $this->getConfigurationHelperLoadsASpecificFormat('config.json', 'migrations.json')
         );
@@ -116,7 +116,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testConfigurationHelperLoadsPhpFormat()
     {
-        $this->assertStringMatchesFormat(
+        self::assertStringMatchesFormat(
             'Loading configuration from file: migrations.php',
             $this->getConfigurationHelperLoadsASpecificFormat('config.php', 'migrations.php')
         );
@@ -131,8 +131,8 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
-        $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
+        self::assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
+        self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
     public function testConfigurationHelperLoadsJsonFormatFromCommandLine()
@@ -144,8 +144,8 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf(JsonConfiguration::class, $migrationConfig);
-        $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
+        self::assertInstanceOf(JsonConfiguration::class, $migrationConfig);
+        self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
     /**
@@ -176,9 +176,9 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
+        self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
 
-        $this->assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
+        self::assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
     }
 
     public function testConfigurationHelperWithConfigurationFromSetterAndOverrideFromCommandLine()
@@ -191,8 +191,8 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
-        $this->assertStringMatchesFormat("Loading configuration from command option: %a", $this->getOutputStreamContent($this->output));
+        self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
+        self::assertStringMatchesFormat("Loading configuration from command option: %a", $this->getOutputStreamContent($this->output));
     }
 
     public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath()
@@ -205,7 +205,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-        $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
-        $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
+        self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
+        self::assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 }

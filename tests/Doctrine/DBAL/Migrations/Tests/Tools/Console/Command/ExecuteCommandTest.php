@@ -27,7 +27,7 @@ class ExecuteCommandTest extends CommandTestCase
             '--up' => true,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testWriteSqlOutputsSqlFileToTheSpecifiedDirectory()
@@ -41,7 +41,7 @@ class ExecuteCommandTest extends CommandTestCase
             '--down' => true,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testNoMigrationIsExecuteWhenTheUserDoesNotConfirmTheAction()
@@ -52,8 +52,8 @@ class ExecuteCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $statusCode);
-        $this->assertContains('Migration cancelled', $tester->getDisplay());
+        self::assertSame(0, $statusCode);
+        self::assertContains('Migration cancelled', $tester->getDisplay());
     }
 
     public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction()
@@ -68,7 +68,7 @@ class ExecuteCommandTest extends CommandTestCase
             '--query-time' => true,
         ]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode()
@@ -85,7 +85,7 @@ class ExecuteCommandTest extends CommandTestCase
             '--query-time' => true,
         ], ['interactive' => false]);
 
-        $this->assertSame(0, $statusCode);
+        self::assertSame(0, $statusCode);
     }
 
     protected function setUp()

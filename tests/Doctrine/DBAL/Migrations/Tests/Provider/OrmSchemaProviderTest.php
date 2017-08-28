@@ -51,10 +51,10 @@ class OrmSchemaProviderTest extends MigrationTestCase
     public function testCreateSchemaFetchesMetadataFromEntityManager()
     {
         $schema = $this->ormProvider->createSchema();
-        $this->assertInstanceOf(Schema::class, $schema);
-        $this->assertTrue($schema->hasTable('sample_entity'));
+        self::assertInstanceOf(Schema::class, $schema);
+        self::assertTrue($schema->hasTable('sample_entity'));
         $table = $schema->getTable('sample_entity');
-        $this->assertTrue($table->hasColumn('id'));
+        self::assertTrue($table->hasColumn('id'));
     }
 
     public function testEntityManagerWithoutMetadataCausesError()

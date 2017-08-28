@@ -51,7 +51,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
 
-        $this->assertCount(6, $migrations);
+        self::assertCount(6, $migrations);
 
         $tests = [
             '20150502000000' => 'TestMigrations\\Version20150502000000',
@@ -62,20 +62,20 @@ class RecursiveRegexFinderTest extends MigrationTestCase
             '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
         ];
         foreach ($tests as $version => $namespace) {
-            $this->assertArrayHasKey($version, $migrations);
-            $this->assertEquals($namespace, $migrations[$version]);
+            self::assertArrayHasKey($version, $migrations);
+            self::assertEquals($namespace, $migrations[$version]);
         }
         $migrationsForTestSort = (array) $migrations;
 
         asort($migrationsForTestSort);
 
-        $this->assertTrue($migrationsForTestSort === $migrations, "Finder have to return sorted list of the files.");
-        $this->assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
-        $this->assertArrayNotHasKey('Version20150502000002', $migrations);
-        $this->assertArrayNotHasKey('20150502000002', $migrations);
-        $this->assertArrayNotHasKey('ADeeperRandomClass', $migrations);
-        $this->assertArrayNotHasKey('AnotherRandomClassNotStartingWithVersion', $migrations);
-        $this->assertArrayNotHasKey('ARandomClass', $migrations);
+        self::assertTrue($migrationsForTestSort === $migrations, "Finder have to return sorted list of the files.");
+        self::assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
+        self::assertArrayNotHasKey('Version20150502000002', $migrations);
+        self::assertArrayNotHasKey('20150502000002', $migrations);
+        self::assertArrayNotHasKey('ADeeperRandomClass', $migrations);
+        self::assertArrayNotHasKey('AnotherRandomClassNotStartingWithVersion', $migrations);
+        self::assertArrayNotHasKey('ARandomClass', $migrations);
     }
 
     protected function setUp()

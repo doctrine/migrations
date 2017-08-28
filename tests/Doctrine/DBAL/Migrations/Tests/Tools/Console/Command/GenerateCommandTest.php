@@ -20,10 +20,10 @@ class GenerateCommandTest extends CommandTestCase
 
         list($tester, $statusCode) = $this->executeCommand([]);
 
-        $this->assertSame(0, $statusCode);
-        $this->assertContains($this->migrationFile, $tester->getDisplay());
-        $this->assertTrue($this->root->hasChild($this->migrationFile));
-        $this->assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
+        self::assertSame(0, $statusCode);
+        self::assertContains($this->migrationFile, $tester->getDisplay());
+        self::assertTrue($this->root->hasChild($this->migrationFile));
+        self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
     protected function setUp()

@@ -39,31 +39,31 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testGetDescriptionReturnsEmptyString()
     {
-        $this->assertSame('', $this->migration->getDescription());
+        self::assertSame('', $this->migration->getDescription());
     }
 
     public function testWarnIfOutputMessage()
     {
         $this->migration->warnIf(true, 'Warning was thrown');
-        $this->assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
+        self::assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfAddDefaultMessage()
     {
         $this->migration->warnIf(true);
-        $this->assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
+        self::assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfDontOutputMessageIfFalse()
     {
         $this->migration->warnIf(false, 'trallala');
-        $this->assertEquals('', $this->getOutputStreamContent($this->output));
+        self::assertEquals('', $this->getOutputStreamContent($this->output));
     }
 
     public function testWriteInvokesOutputWriter()
     {
         $this->migration->exposedWrite('Message');
-        $this->assertContains('Message', $this->getOutputStreamContent($this->output));
+        self::assertContains('Message', $this->getOutputStreamContent($this->output));
     }
 
     public function testAbortIfThrowsException()
@@ -120,13 +120,13 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testIstransactional()
     {
-        $this->assertTrue($this->migration->isTransactional());
+        self::assertTrue($this->migration->isTransactional());
     }
 
     public function testAddSql()
     {
         $this->migration->exposedAddSql('tralala');
 
-        $this->assertAttributeCount(1, 'sql', $this->migration->getVersion());
+        self::assertAttributeCount(1, 'sql', $this->migration->getVersion());
     }
 }

@@ -15,8 +15,8 @@ class MigrationsVersionTest extends \PHPUnit\Framework\TestCase
         $property->setAccessible(true);
 
         $versionNumber = $property->getValue(new MigrationsVersion());
-        $this->assertRegExp('/^v[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}(-([a-z]){1,}[0-9]{1,}){0,1}$/', $versionNumber);
-        $this->assertEquals($versionNumber, MigrationsVersion::VERSION());
+        self::assertRegExp('/^v[0-9]{1,}\.[0-9]{1,}\.[0-9]{1,}(-([a-z]){1,}[0-9]{1,}){0,1}$/', $versionNumber);
+        self::assertEquals($versionNumber, MigrationsVersion::VERSION());
     }
 
     public function testIsACustomPharBuild()
@@ -25,7 +25,7 @@ class MigrationsVersionTest extends \PHPUnit\Framework\TestCase
         $method = $class->getMethod('isACustomPharBuild');
         $method->setAccessible(true);
 
-        $this->assertFalse($method->invokeArgs(new MigrationsVersion(), ['@git-version@']), 'This is not a custom phar build.');
-        $this->assertTrue($method->invokeArgs(new MigrationsVersion(), ['v1.0.0-alpha3-125435']), 'This has been replaced by box and is thus a phar build.');
+        self::assertFalse($method->invokeArgs(new MigrationsVersion(), ['@git-version@']), 'This is not a custom phar build.');
+        self::assertTrue($method->invokeArgs(new MigrationsVersion(), ['v1.0.0-alpha3-125435']), 'This has been replaced by box and is thus a phar build.');
     }
 }

@@ -44,10 +44,10 @@ class GlobFinderTest extends MigrationTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
 
-        $this->assertArrayHasKey('20150502000000', $migrations);
-        $this->assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
-        $this->assertArrayHasKey('20150502000001', $migrations);
-        $this->assertEquals('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
+        self::assertArrayHasKey('20150502000000', $migrations);
+        self::assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
+        self::assertArrayHasKey('20150502000001', $migrations);
+        self::assertEquals('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
     }
 
     protected function setUp()

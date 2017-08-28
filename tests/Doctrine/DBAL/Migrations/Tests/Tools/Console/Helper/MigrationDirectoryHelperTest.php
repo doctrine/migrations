@@ -11,14 +11,14 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
-        $this->assertInstanceOf(MigrationDirectoryHelper::class, $mirationDirectoryHelper);
+        self::assertInstanceOf(MigrationDirectoryHelper::class, $mirationDirectoryHelper);
     }
 
     public function testMigrationDirectoryHelperReturnConfiguredDir()
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
-        $this->assertEquals($this->getSqliteConfiguration()->getMigrationsDirectory(), $mirationDirectoryHelper->getMigrationDirectory());
+        self::assertEquals($this->getSqliteConfiguration()->getMigrationsDirectory(), $mirationDirectoryHelper->getMigrationDirectory());
     }
 
     public function testMigrationDirectoryHelperReturnConfiguredDirWithYear()
@@ -29,7 +29,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
 
         $dir = $configuration->getMigrationsDirectory() . DIRECTORY_SEPARATOR . date('Y');
 
-        $this->assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
+        self::assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
     public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth()
@@ -40,7 +40,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
 
         $dir = $configuration->getMigrationsDirectory() . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
 
-        $this->assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
+        self::assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
     public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists()
