@@ -20,7 +20,7 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
     {
         parent::setUp();
 
-        $this->application = new Application();
+        $this->application         = new Application();
         $this->entityManagerHelper = $this->getMockBuilder(EntityManagerHelper::class)
             ->disableOriginalConstructor()
             ->getMock();

@@ -18,5 +18,4 @@ class MigrationMigrateFurther extends AbstractMigration
         $table = $schema->createTable('bar');
         $table->addColumn('id', 'integer');
     }
-
 }

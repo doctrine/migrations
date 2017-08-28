@@ -7,7 +7,6 @@ use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Schema\Schema;
 
-
 /**
  * Class AbstractMigrationStub
  * @package Doctrine\DBAL\Migrations\Tests\Stub
@@ -35,14 +34,13 @@ class AbstractMigrationStub extends AbstractMigration
         $this->throwIrreversibleMigrationException($message);
     }
 
-    public function exposed_AddSql($sql, $params = [],  $types = [])
+    public function exposed_AddSql($sql, $params = [], $types = [])
     {
         $this->addSql($sql, $params, $types);
     }
 
-    public function getVersion(): Version
+    public function getVersion() : Version
     {
         return $this->version;
     }
-
 }

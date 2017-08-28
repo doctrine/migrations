@@ -23,7 +23,8 @@ class MigrationsVersion
 {
     private static $version = 'v1.5.0';
 
-    public static function VERSION() {
+    public static function VERSION()
+    {
         $gitversion = '@git-version@';
 
         if (self::isACustomPharBuild($gitversion)) {
@@ -39,7 +40,8 @@ class MigrationsVersion
      * Check if doctrine migration is installed by composer or
      * in a modified (not tagged) phar version.
      */
-    private static function isACustomPharBuild($gitversion) {
+    private static function isACustomPharBuild($gitversion)
+    {
         return $gitversion !== '@' . 'git-version@';
     }
 }

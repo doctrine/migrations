@@ -105,7 +105,7 @@ class ExecuteCommandTest extends CommandTestCase
         return new ExecuteCommand();
     }
 
-    protected function executeCommand(array $args, array $options=[])
+    protected function executeCommand(array $args, array $options = [])
     {
         $args['version'] = self::VERSION;
         return parent::executeCommand($args, $options);

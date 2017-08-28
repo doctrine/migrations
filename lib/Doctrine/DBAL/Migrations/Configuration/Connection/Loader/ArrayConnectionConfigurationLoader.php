@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
@@ -44,12 +43,12 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
             return null;
         }
 
-        if (!file_exists($this->filename)) {
+        if ( ! file_exists($this->filename)) {
             return null;
         }
 
         $params = include $this->filename;
-        if (!is_array($params)) {
+        if ( ! is_array($params)) {
             throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
         }
 

@@ -45,9 +45,9 @@ class MigrationsEventArgs extends EventArgs
 
     public function __construct(Configuration $config, $direction, $dryRun)
     {
-        $this->config = $config;
+        $this->config    = $config;
         $this->direction = $direction;
-        $this->dryRun = (bool) $dryRun;
+        $this->dryRun    = (bool) $dryRun;
     }
 
     public function getConfiguration()

@@ -60,82 +60,89 @@ class ConfigurationHelperTest extends MigrationTestCase
     }
 
     //used in other tests to see if xml or yaml or yml config files are loaded.
-    protected function getConfigurationHelperLoadsASpecificFormat($baseFile, $configFile) {
+    protected function getConfigurationHelperLoadsASpecificFormat($baseFile, $configFile)
+    {
         try {
             $file = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
-            copy($file,$configFile);
+            copy($file, $configFile);
 
             $this->input->method('getOption')
                 ->with('configuration')
                 ->will($this->returnValue(null));
 
             $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-            $configfileLoaded = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+            $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
             unlink($configFile);
 
             return trim($this->getOutputStreamContent($this->output));
-        }
-        catch(\Exception $e) {
+        } catch (\Exception $e) {
             unlink($configFile);//i want to be really sure to cleanup this file
         }
         return false;
     }
 
-    public function testConfigurationHelperLoadsXmlFormat() {
+    public function testConfigurationHelperLoadsXmlFormat()
+    {
         $this->assertStringMatchesFormat(
             'Loading configuration from file: migrations.xml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.xml', 'migrations.xml')
         );
     }
 
-    public function testConfigurationHelperLoadsYamlFormat() {
+    public function testConfigurationHelperLoadsYamlFormat()
+    {
         $this->assertStringMatchesFormat(
             'Loading configuration from file: migrations.yaml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yaml')
         );
     }
 
-    public function testConfigurationHelperLoadsYmlFormat() {
+    public function testConfigurationHelperLoadsYmlFormat()
+    {
         $this->assertStringMatchesFormat(
             'Loading configuration from file: migrations.yml',
             $this->getConfigurationHelperLoadsASpecificFormat('config.yml', 'migrations.yml')
         );
     }
 
-    public function testConfigurationHelperLoadsJsonFormat() {
+    public function testConfigurationHelperLoadsJsonFormat()
+    {
         $this->assertStringMatchesFormat(
             'Loading configuration from file: migrations.json',
             $this->getConfigurationHelperLoadsASpecificFormat('config.json', 'migrations.json')
         );
     }
 
-    public function testConfigurationHelperLoadsPhpFormat() {
+    public function testConfigurationHelperLoadsPhpFormat()
+    {
         $this->assertStringMatchesFormat(
             'Loading configuration from file: migrations.php',
             $this->getConfigurationHelperLoadsASpecificFormat('config.php', 'migrations.php')
         );
     }
 
-    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() {
+    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine()
+    {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue( __DIR__ . '/files/config.php'));
+            ->will($this->returnValue(__DIR__ . '/files/config.php'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-        $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+        $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
         $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
-    public function testConfigurationHelperLoadsJsonFormatFromCommandLine() {
+    public function testConfigurationHelperLoadsJsonFormatFromCommandLine()
+    {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue( __DIR__ . '/files/config.json'));
+            ->will($this->returnValue(__DIR__ . '/files/config.json'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-        $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
+        $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         $this->assertInstanceOf(JsonConfiguration::class, $migrationConfig);
         $this->assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
@@ -144,7 +151,8 @@ class ConfigurationHelperTest extends MigrationTestCase
     /**
      * Test that unsupported file type throws exception
      */
-    public function testConfigurationHelperFailsToLoadOtherFormat() {
+    public function testConfigurationHelperFailsToLoadOtherFormat()
+    {
 
         $this->input->method('getOption')
             ->with('configuration')
@@ -200,5 +208,4 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
         $this->assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
-
 }

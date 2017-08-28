@@ -22,7 +22,7 @@ class GenerateCommandTest extends CommandTestCase
         $this->assertSame(0, $statusCode);
         $this->assertContains($this->migrationFile, $tester->getDisplay());
         $this->assertTrue($this->root->hasChild($this->migrationFile));
-        $this->assertContains('class Version'.self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
+        $this->assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
     protected function setUp()
@@ -30,7 +30,7 @@ class GenerateCommandTest extends CommandTestCase
         parent::setUp();
 
         $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root = vfsStream::setup('migrations');
+        $this->root          = vfsStream::setup('migrations');
         $this->config->method('getMigrationsDirectory')
             ->willReturn(vfsStream::url('migrations'));
     }

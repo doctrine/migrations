@@ -12,15 +12,15 @@ class JsonConfigurationTest extends AbstractConfigurationTest
         $configFileSuffix = '',
         OutputWriter $outputWriter = null,
         MigrationFinderInterface $migrationFinder = null
-    )
-    {
+    ) {
         $configFile = 'config.json';
+
         if ('' !== $configFileSuffix) {
             $configFile = 'config_' . $configFileSuffix . '.json';
         }
 
         $config = new JsonConfiguration($this->getSqliteConnection(), $outputWriter, $migrationFinder);
-        $config->load(__DIR__  . DIRECTORY_SEPARATOR . "_files" . DIRECTORY_SEPARATOR . $configFile);
+        $config->load(__DIR__ . DIRECTORY_SEPARATOR . "_files" . DIRECTORY_SEPARATOR . $configFile);
 
         return $config;
     }

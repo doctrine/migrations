@@ -16,7 +16,7 @@ class ConfigurationTest extends MigrationTestCase
 {
     public function testGetConnection()
     {
-        $conn = $this->getSqliteConnection();
+        $conn   = $this->getSqliteConnection();
         $config = new Configuration($conn);
 
         $this->assertSame($conn, $config->getConnection());
@@ -301,7 +301,7 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testDispatchEventProxiesToConnectionsEventManager()
     {
-        $config = $this->getSqliteConfiguration();
+        $config                            = $this->getSqliteConfiguration();
         $config->getConnection()
             ->getEventManager()
             ->addEventSubscriber($listener = new EventVerificationListener());

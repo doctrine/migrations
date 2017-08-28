@@ -111,7 +111,6 @@ EOT
         } else {
             $this->markVersions($input);
         }
-
     }
 
     private function markVersions(InputInterface $input)
@@ -155,14 +154,14 @@ EOT
 
         $version = $this->configuration->getVersion($version);
         if ($this->markMigrated && $this->configuration->hasVersionMigrated($version)) {
-            if (! $all) {
+            if ( ! $all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
             }
             $marked = true;
         }
 
         if ( ! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
-            if (! $all) {
+            if ( ! $all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" does not exists in the version table.', $version));
             }
             $marked = false;

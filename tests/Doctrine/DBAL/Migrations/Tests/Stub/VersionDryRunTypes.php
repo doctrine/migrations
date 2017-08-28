@@ -13,7 +13,7 @@ class VersionDryRunTypes extends AbstractMigration
     public function setParam($value, $type)
     {
         $this->value = $value;
-        $this->type = $type;
+        $this->type  = $type;
     }
 
     public function down(Schema $schema)

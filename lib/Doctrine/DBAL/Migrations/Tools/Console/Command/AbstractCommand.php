@@ -103,7 +103,7 @@ abstract class AbstractCommand extends Command
      */
     protected function getMigrationConfiguration(InputInterface $input, OutputInterface $output)
     {
-        if (!$this->migrationConfiguration) {
+        if ( ! $this->migrationConfiguration) {
             if ($this->getHelperSet()->has('configuration')
                 && $this->getHelperSet()->get('configuration') instanceof ConfigurationHelper) {
                 $configHelper = $this->getHelperSet()->get('configuration');
@@ -134,8 +134,8 @@ abstract class AbstractCommand extends Command
      */
     private function getOutputWriter(OutputInterface $output)
     {
-        if (!$this->outputWriter) {
-            $this->outputWriter = new OutputWriter(function($message) use ($output) {
+        if ( ! $this->outputWriter) {
+            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
                 return $output->writeln($message);
             });
         }
@@ -163,7 +163,7 @@ abstract class AbstractCommand extends Command
                 new ConnectionConfigurationLoader($this->configuration),
             ]
         );
-        $connection = $chainLoader->chosen();
+        $connection  = $chainLoader->chosen();
 
         if ($connection) {
             return $this->connection = $connection;

@@ -38,7 +38,7 @@ class FunctionalTest extends MigrationTestCase
     protected function setUp()
     {
         $this->connection = $this->getSqliteConnection();
-        $this->config = self::createConfiguration($this->connection);
+        $this->config     = self::createConfiguration($this->connection);
     }
 
     public function testMigrateUp()
@@ -70,7 +70,6 @@ class FunctionalTest extends MigrationTestCase
         $schema = $this->connection->getSchemaManager()->createSchema();
         $this->assertFalse($schema->hasTable('foo'));
         $this->assertFalse($this->config->hasVersionMigrated($version));
-
     }
 
     public function testSkipMigrateUp()
@@ -311,7 +310,6 @@ class FunctionalTest extends MigrationTestCase
             $sql = $migration->migrate();
             $this->assertCount(1, $sql, 'should have executed one migration');
         }
-
     }
 
     public function testSchemaChangeAreNotTakenIntoAccountInPreAndPostMethod()
@@ -326,7 +324,7 @@ class FunctionalTest extends MigrationTestCase
         $this->assertFalse($schema->hasTable('bar'), 'The table bar is present');
         $this->assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
 
-        foreach($queries as $query) {
+        foreach ($queries as $query) {
             $this->assertNotContains('bar', $query);
             $this->assertNotContains('bar2', $query);
         };
@@ -338,7 +336,7 @@ class FunctionalTest extends MigrationTestCase
         $this->assertFalse($schema->hasTable('bar'), 'The table bar is present');
         $this->assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
 
-        foreach($queries as $query) {
+        foreach ($queries as $query) {
             $this->assertNotContains('bar', $query);
             $this->assertNotContains('bar2', $query);
         };
@@ -360,14 +358,16 @@ class FunctionalTest extends MigrationTestCase
 
     public function testMigrationWorksWhenNoCallsAreMadeToTheSchema()
     {
-        $schema = $this->createMock(Schema::class);
+        $schema             = $this->createMock(Schema::class);
         $schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
 
         $schemaDiffProvider->method('createFromSchema')->willReturn($schema);
         $schemaDiffProvider->method('getSqlDiffToMigrate')->willReturn([]);
         $schemaDiffProvider
             ->method('createToSchema')
-            ->willReturnCallback(function () use ($schema) { return $schema; });
+            ->willReturnCallback(function () use ($schema) {
+                return $schema;
+            });
 
         $version = new Version($this->config, 1, MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
         $version->execute('up');
@@ -430,7 +430,7 @@ class FunctionalTest extends MigrationTestCase
      */
     public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges()
     {
-        $listener = new AutoCommitListener();
+        $listener            = new AutoCommitListener();
         list($conn, $config) = self::fileConnectionAndConfig();
         $config->registerMigration(1, MigrateWithDataModification::class);
         $migration = new Migration($config);
@@ -447,7 +447,7 @@ class FunctionalTest extends MigrationTestCase
 
     private static function fileConnectionAndConfig()
     {
-        $path = __DIR__.'/_files/db/sqlite_file_config.db';
+        $path = __DIR__ . '/_files/db/sqlite_file_config.db';
         if (file_exists($path)) {
             @unlink($path);
         }

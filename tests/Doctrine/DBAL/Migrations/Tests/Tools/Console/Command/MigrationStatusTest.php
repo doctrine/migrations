@@ -24,17 +24,17 @@ class MigrationStatusTest extends MigrationTestCase
      */
     public function testVersions()
     {
-        $this->assertVersion('prev',    '123', 'Previous Version', 'FORMATTED (123)');
-        $this->assertVersion('current', '234', 'Current Version',  'FORMATTED (234)');
-        $this->assertVersion('next',    '345', 'Next Version',     'FORMATTED (345)');
-        $this->assertVersion('latest',  '456', 'Latest Version',   'FORMATTED (456)');
+        $this->assertVersion('prev', '123', 'Previous Version', 'FORMATTED (123)');
+        $this->assertVersion('current', '234', 'Current Version', 'FORMATTED (234)');
+        $this->assertVersion('next', '345', 'Next Version', 'FORMATTED (345)');
+        $this->assertVersion('latest', '456', 'Latest Version', 'FORMATTED (456)');
 
         // Initial version is not formatted as date.
-        $this->assertVersion('prev',    '0',   'Previous Version', '0');
+        $this->assertVersion('prev', '0', 'Previous Version', '0');
 
         // The initial version has no previous version, and the latest has no next.
-        $this->assertVersion('prev',    null,  'Previous Version', 'Already at first version');
-        $this->assertVersion('next',    null,  'Next Version',     'Already at latest version');
+        $this->assertVersion('prev', null, 'Previous Version', 'Already at first version');
+        $this->assertVersion('next', null, 'Next Version', 'Already at latest version');
     }
 
     /**
@@ -64,7 +64,7 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects($this->exactly(4))
             ->method('resolveVersionAlias')
-            ->will($this->returnCallback(function($argAlias) use ($alias, $version) {
+            ->will($this->returnCallback(function ($argAlias) use ($alias, $version) {
                 return $argAlias === $alias ? $version : '999';
             }));
 
@@ -149,7 +149,8 @@ class MigrationStatusTest extends MigrationTestCase
         $this->assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
     }
 
-    public function testShowVersions() {
+    public function testShowVersions()
+    {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsDirectory($this->migrationDirectory);
@@ -190,5 +191,4 @@ class MigrationStatusTest extends MigrationTestCase
         $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1\)\s+migrated/m', $textOutput);
         $this->assertRegExp('/\s+>>  \(VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2\)\s+not migrated/m', $textOutput);
     }
-
 }

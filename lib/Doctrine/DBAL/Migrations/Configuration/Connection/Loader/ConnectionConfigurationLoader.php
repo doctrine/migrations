@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
-
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
@@ -29,7 +28,7 @@ class ConnectionConfigurationLoader implements ConnectionLoaderInterface
     /** @var Configuration */
     private $configuration;
 
-    public function __construct(Configuration $configuration=null)
+    public function __construct(Configuration $configuration = null)
     {
         if ($configuration !== null) {
             $this->configuration = $configuration;
@@ -44,7 +43,6 @@ class ConnectionConfigurationLoader implements ConnectionLoaderInterface
     public function chosen()
     {
         if ($this->configuration) {
-
             return $this->configuration->getConnection();
         }
 

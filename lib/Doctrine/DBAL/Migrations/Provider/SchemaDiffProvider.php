@@ -34,7 +34,7 @@ class SchemaDiffProvider implements SchemaDiffProviderInterface
     public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
     {
         $this->schemaManager = $schemaManager;
-        $this->platform = $platform;
+        $this->platform      = $platform;
     }
 
     /**

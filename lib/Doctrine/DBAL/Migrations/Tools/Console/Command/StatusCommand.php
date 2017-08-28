@@ -66,7 +66,7 @@ EOT
             if ($name == 'New Migrations') {
                 $value = $value > 0 ? '<question>' . $value . '</question>' : 0;
             }
-            if($name == 'Executed Unavailable Migrations') {
+            if ($name == 'Executed Unavailable Migrations') {
                 $value = $value > 0 ? '<error>' . $value . '</error>' : 0;
             }
             $this->writeStatusInfosLineAligned($output, $name, $value);
@@ -98,9 +98,9 @@ EOT
     {
         $migratedVersions = $configuration->getMigratedVersions();
 
-        foreach($migrations as $version) {
+        foreach ($migrations as $version) {
             $isMigrated = in_array($version->getVersion(), $migratedVersions);
-            $status = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $status     = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
 
             $migrationDescription = $version->getMigration()->getDescription()
                 ? str_repeat(' ', 5) . $version->getMigration()->getDescription()
@@ -110,8 +110,8 @@ EOT
 
             $output->writeln('    <comment>>></comment> ' . $formattedVersion .
                 ' (<comment>' . $version->getVersion() . '</comment>)' .
-                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion())))  .
-                $status  . $migrationDescription);
+                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion()))) .
+                $status . $migrationDescription);
         }
     }
 }

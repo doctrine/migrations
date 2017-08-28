@@ -89,9 +89,9 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getSqliteConnection();
-        $this->config = Setup::createXMLMetadataConfiguration([__DIR__.'/_files'], true);
+        $this->conn          = $this->getSqliteConnection();
+        $this->config        = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
         $this->entityManager = EntityManager::create($this->conn, $this->config);
-        $this->ormProvider = new OrmSchemaProvider($this->entityManager);
+        $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
     }
 }

@@ -36,7 +36,6 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\Helper;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
-
 /**
  * Tests the entire console application, end to end.
  */
@@ -136,7 +135,7 @@ class CliTest extends MigrationTestCase
 
     public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities()
     {
-        $config = OrmSetup::createXMLMetadataConfiguration([__DIR__.'/_files/entities'], true);
+        $config        = OrmSetup::createXMLMetadataConfiguration([__DIR__ . '/_files/entities'], true);
         $entityManager = EntityManager::create($this->conn, $config);
         $this->application->getHelperSet()->set(
             new EntityManagerHelper($entityManager),
@@ -201,7 +200,7 @@ class CliTest extends MigrationTestCase
         $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^FOO$/');
 
         $schema = new Schema();
-        $t = $schema->createTable('FOO');
+        $t      = $schema->createTable('FOO');
         $t->addColumn('id', 'integer', ['autoincrement' => true]);
         $t->setPrimaryKey(['id']);
 
@@ -227,7 +226,7 @@ class CliTest extends MigrationTestCase
             __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
         );
 
-        $this->conn = $this->getSqliteConnection();
+        $this->conn        = $this->getSqliteConnection();
         $this->application = new Application('Doctrine Migrations Test', MigrationsVersion::VERSION());
         $this->application->setCatchExceptions(false);
         $this->application->setAutoExit(false);
@@ -245,14 +244,14 @@ class CliTest extends MigrationTestCase
         ]);
     }
 
-    protected function withDiffCommand(SchemaProviderInterface $provider=null)
+    protected function withDiffCommand(SchemaProviderInterface $provider = null)
     {
         $this->application->add(new MigrationCommands\DiffCommand($provider));
     }
 
     protected function executeCommand($commandName, $configFile = 'config.yml', array $args = [])
     {
-        $input = new ArrayInput(array_merge(
+        $input  = new ArrayInput(array_merge(
             [
                 'command'         => $commandName,
                 '--configuration' => __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile,
@@ -266,12 +265,12 @@ class CliTest extends MigrationTestCase
         return $this->getOutputStreamContent($output);
     }
 
-    protected function assertSuccessfulExit($msg='')
+    protected function assertSuccessfulExit($msg = '')
     {
         $this->assertEquals(0, $this->lastExit, $msg);
     }
 
-    protected function assertVersionCount($count, $msg='')
+    protected function assertVersionCount($count, $msg = '')
     {
         $this->assertCount($count, $this->findMigrations(), $msg);
     }
@@ -325,7 +324,7 @@ class CliTest extends MigrationTestCase
             'This method is designed to work for one existing version, you have ' . count($versions) . ' versions'
         );
 
-        $versionClassName = reset($versions);
+        $versionClassName      = reset($versions);
         $versionClassReflected = new \ReflectionClass($versionClassName);
 
         return file_get_contents($versionClassReflected->getFileName());

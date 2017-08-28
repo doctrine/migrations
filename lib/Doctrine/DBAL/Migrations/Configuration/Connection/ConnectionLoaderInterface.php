@@ -19,7 +19,6 @@
 
 namespace Doctrine\DBAL\Migrations\Configuration\Connection;
 
-
 use Doctrine\DBAL\Connection;
 
 interface ConnectionLoaderInterface

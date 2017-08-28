@@ -33,7 +33,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(\sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $this->version = new Version($this->config, 'Dummy', VersionDummy::class);
+        $this->version   = new Version($this->config, 'Dummy', VersionDummy::class);
         $this->migration = new AbstractMigrationStub($this->version);
     }
 
@@ -45,15 +45,13 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWarnIfOutputMessage()
     {
         $this->migration->warnIf(true, 'Warning was thrown');
-        $this->assertContains('Warning during No State: Warning was thrown'
-            , $this->getOutputStreamContent($this->output));
+        $this->assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfAddDefaultMessage()
     {
         $this->migration->warnIf(true);
-        $this->assertContains('Warning during No State: Unknown Reason'
-            , $this->getOutputStreamContent($this->output));
+        $this->assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
     }
 
     public function testWarnIfDontOutputMessageIfFalse()
@@ -65,9 +63,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWriteInvokesOutputWriter()
     {
         $this->migration->exposed_Write('Message');
-        $this->assertContains('Message'
-            , $this->getOutputStreamContent($this->output));
-
+        $this->assertContains('Message', $this->getOutputStreamContent($this->output));
     }
 
     public function testAbortIfThrowsException()

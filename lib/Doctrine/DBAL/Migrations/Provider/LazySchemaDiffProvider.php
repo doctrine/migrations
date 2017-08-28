@@ -35,7 +35,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
 
     public function __construct(LazyLoadingValueHolderFactory $proxyFactory, SchemaDiffProviderInterface $originalSchemaManipulator)
     {
-        $this->proxyFactory = $proxyFactory;
+        $this->proxyFactory              = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
@@ -90,7 +90,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         if ($fromSchema instanceof LazyLoadingInterface && ! $fromSchema->isProxyInitialized()) {
             return $this->proxyFactory->createProxy(
                 Schema::class,
-                function (& $wrappedObject, $proxy,  $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
+                function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
                     $initializer   = null;
                     $wrappedObject = $originalSchemaManipulator->createToSchema($fromSchema);
 
@@ -110,10 +110,8 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
      */
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema)
     {
-        if (
-            $toSchema instanceof LazyLoadingInterface
-            && ! $toSchema->isProxyInitialized()
-        ) {
+        if ($toSchema instanceof LazyLoadingInterface
+            && ! $toSchema->isProxyInitialized()) {
             return [];
         }
 

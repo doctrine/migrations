@@ -36,5 +36,4 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
         $config = new ArrayConfiguration($this->getSqliteConnection());
         $config->load(__DIR__ . "/_files/none.php");
     }
-
 }

@@ -2,7 +2,6 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 
-
 use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Version;
@@ -23,16 +22,16 @@ class MigrationStatusInfosHelper
 
     public function __construct(Configuration $configuration)
     {
-        $this->configuration = $configuration;
-        $this->executedMigrations = $this->configuration->getMigratedVersions();
-        $this->availableMigrations = $this->configuration->getAvailableVersions();
+        $this->configuration                 = $configuration;
+        $this->executedMigrations            = $this->configuration->getMigratedVersions();
+        $this->availableMigrations           = $this->configuration->getAvailableVersions();
         $this->executedUnavailableMigrations = array_diff($this->executedMigrations, $this->availableMigrations);
     }
 
     public function getMigrationsInfos()
     {
         $numExecutedUnavailableMigrations = count($this->executedUnavailableMigrations);
-        $numNewMigrations = count(array_diff($this->availableMigrations, $this->executedMigrations));
+        $numNewMigrations                 = count(array_diff($this->availableMigrations, $this->executedMigrations));
 
         $infos = [
             'Name'                              => $this->configuration->getName() ? $this->configuration->getName() : 'Doctrine Database Migrations',

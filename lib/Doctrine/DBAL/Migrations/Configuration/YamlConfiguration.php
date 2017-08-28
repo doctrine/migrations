@@ -38,7 +38,7 @@ class YamlConfiguration extends AbstractFileConfiguration
     {
         $config = Yaml::parse(file_get_contents($file));
 
-        if (!is_array($config)) {
+        if ( ! is_array($config)) {
             throw new \InvalidArgumentException('Not valid configuration.');
         }
 

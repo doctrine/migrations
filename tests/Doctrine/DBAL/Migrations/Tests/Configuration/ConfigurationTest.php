@@ -148,7 +148,7 @@ class ConfigurationTest extends MigrationTestCase
     public function testGenerateVersionNumberFormatsTheDatePassedIn()
     {
         $configuration = new Configuration($this->getSqliteConnection());
-        $now = new \DateTime('2016-07-05 01:00:00');
+        $now           = new \DateTime('2016-07-05 01:00:00');
 
         $version = $configuration->generateVersionNumber($now);
 
@@ -165,7 +165,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $configuration = new Configuration($this->getSqliteConnection());
 
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
+        $now     = new \DateTime('now', new \DateTimeZone('UTC'));
         $version = $configuration->generateVersionNumber();
 
         $this->assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);

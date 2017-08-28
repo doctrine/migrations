@@ -56,7 +56,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 
     public function getOutputStream()
     {
-        $stream = fopen('php://memory', 'r+', false);
+        $stream       = fopen('php://memory', 'r+', false);
         $streamOutput = new StreamOutput($stream);
 
         return $streamOutput;
@@ -81,9 +81,9 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 
     protected function getOutputWriter()
     {
-        if (!$this->outputWriter) {
-            $this->output = $this->getOutputStream();
-            $output = $this->output;
+        if ( ! $this->outputWriter) {
+            $this->output       = $this->getOutputStream();
+            $output             = $this->output;
             $this->outputWriter = new OutputWriter(function ($message) use ($output) {
                 return $output->writeln($message);
             });
@@ -93,7 +93,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 
     protected function createTempDirForMigrations($path)
     {
-        if (!mkdir($path)) {
+        if ( ! mkdir($path)) {
             throw new \Exception('fail to create a temporary folder for the tests at ' . $path);
         }
     }
@@ -102,7 +102,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
     {
         if (is_dir($path)) {
             return glob(realpath($path) . '/*.sql');
-        } elseif(is_file($path)) {
+        } elseif (is_file($path)) {
             return [$path];
         }
     }

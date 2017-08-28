@@ -42,7 +42,7 @@ class Version
     const STATE_EXEC = 2;
     const STATE_POST = 3;
 
-    const DIRECTION_UP = 'up';
+    const DIRECTION_UP   = 'up';
     const DIRECTION_DOWN = 'down';
 
     /**
@@ -103,21 +103,23 @@ class Version
     /** @var SchemaDiffProviderInterface */
     private $schemaProvider;
 
-    public function __construct(Configuration $configuration, $version, $class, SchemaDiffProviderInterface $schemaProvider=null)
+    public function __construct(Configuration $configuration, $version, $class, SchemaDiffProviderInterface $schemaProvider = null)
     {
         $this->configuration = $configuration;
-        $this->outputWriter = $configuration->getOutputWriter();
-        $this->class = $class;
-        $this->connection = $configuration->getConnection();
-        $this->migration = new $class($this);
-        $this->version = $version;
+        $this->outputWriter  = $configuration->getOutputWriter();
+        $this->class         = $class;
+        $this->connection    = $configuration->getConnection();
+        $this->migration     = new $class($this);
+        $this->version       = $version;
 
         if ($schemaProvider !== null) {
             $this->schemaProvider = $schemaProvider;
         }
-        if($schemaProvider === null) {
-            $schemaProvider = new SchemaDiffProvider($this->connection->getSchemaManager(),
-                $this->connection->getDatabasePlatform());
+        if ($schemaProvider === null) {
+            $schemaProvider       = new SchemaDiffProvider(
+                $this->connection->getSchemaManager(),
+                $this->connection->getDatabasePlatform()
+            );
             $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration($schemaProvider);
         }
     }
@@ -185,14 +187,14 @@ class Version
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
-                if (!empty($params[$key])) {
+                if ( ! empty($params[$key])) {
                     $queryTypes = isset($types[$key]) ? $types[$key] : [];
                     $this->addQueryParams($params[$key], $queryTypes);
                 }
             }
         } else {
             $this->sql[] = $sql;
-            if (!empty($params)) {
+            if ( ! empty($params)) {
                 $this->addQueryParams($params, $types);
             }
         }
@@ -204,9 +206,9 @@ class Version
      */
     private function addQueryParams($params, $types)
     {
-        $index = count($this->sql) - 1;
+        $index                = count($this->sql) - 1;
         $this->params[$index] = $params;
-        $this->types[$index] = $types;
+        $this->types[$index]  = $types;
     }
 
     /**
@@ -276,7 +278,7 @@ class Version
             $migrationStart = microtime(true);
 
             $this->state = self::STATE_PRE;
-            $fromSchema = $this->schemaProvider->createFromSchema();
+            $fromSchema  = $this->schemaProvider->createFromSchema();
 
             $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -298,7 +300,7 @@ class Version
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
 
-            if (! $dryRun) {
+            if ( ! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {
                     $this->markMigrated();
                 } else {
@@ -307,7 +309,7 @@ class Version
             }
 
             $migrationEnd = microtime(true);
-            $this->time = round($migrationEnd - $migrationStart, 2);
+            $this->time   = round($migrationEnd - $migrationStart, 2);
             if ($direction === self::DIRECTION_UP) {
                 $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
             } else {
@@ -339,7 +341,7 @@ class Version
                 }
             }
 
-            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)",  $e->getMessage()));
+            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)", $e->getMessage()));
 
             $this->state = self::STATE_NONE;
 
@@ -347,10 +349,11 @@ class Version
 
             return [];
         } catch (\Exception $e) {
-
             $this->outputWriter->write(sprintf(
                 '<error>Migration %s failed during %s. Error %s</error>',
-                $this->version, $this->getExecutionState(), $e->getMessage()
+                $this->version,
+                $this->getExecutionState(),
+                $e->getMessage()
             ));
 
             if ($transaction) {
@@ -381,7 +384,7 @@ class Version
     private function outputQueryTime($queryStart, $timeAllQueries = false)
     {
         if ($timeAllQueries !== false) {
-            $queryEnd = microtime(true);
+            $queryEnd  = microtime(true);
             $queryTime = round($queryEnd - $queryStart, 4);
 
             $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
@@ -405,8 +408,8 @@ class Version
 
     private function executeRegisteredSql($dryRun = false, $timeAllQueries = false)
     {
-        if (! $dryRun) {
-            if (!empty($this->sql)) {
+        if ( ! $dryRun) {
+            if ( ! empty($this->sql)) {
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
@@ -468,11 +471,11 @@ class Version
         }
 
         $platform = $this->connection->getDatabasePlatform();
-        $out = [];
+        $out      = [];
         foreach ($params as $key => $value) {
-            $type = isset($types[$key]) ? $types[$key] : 'string';
+            $type   = isset($types[$key]) ? $types[$key] : 'string';
             $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
-            $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
+            $out[]  = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));

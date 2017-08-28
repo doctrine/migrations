@@ -3,13 +3,14 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools;
 
 use Doctrine\DBAL\Migrations\MigrationsVersion;
 
-class MigrationsVersionTest extends \PHPUnit\Framework\TestCase {
+class MigrationsVersionTest extends \PHPUnit\Framework\TestCase
+{
 
     private $MigrationVersionClass = MigrationsVersion::class;
 
     public function testVersionNumber()
     {
-        $class = new \ReflectionClass($this->MigrationVersionClass);
+        $class    = new \ReflectionClass($this->MigrationVersionClass);
         $property = $class->getProperty('version');
         $property->setAccessible(true);
 
@@ -20,7 +21,7 @@ class MigrationsVersionTest extends \PHPUnit\Framework\TestCase {
 
     public function testIsACustomPharBuild()
     {
-        $class = new \ReflectionClass($this->MigrationVersionClass);
+        $class  = new \ReflectionClass($this->MigrationVersionClass);
         $method = $class->getMethod('isACustomPharBuild');
         $method->setAccessible(true);
 

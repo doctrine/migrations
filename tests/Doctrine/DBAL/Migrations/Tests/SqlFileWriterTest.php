@@ -77,7 +77,7 @@ class SqlFileWriterTest extends MigrationTestCase
     public function testWrite($path, $direction, array $queries, $withOw)
     {
         $columnName = 'columnName';
-        $tableName = 'tableName';
+        $tableName  = 'tableName';
         if ($withOw) {
             $instance = new SqlFileWriter($columnName, $tableName, $path, $this->ow);
 
@@ -113,6 +113,4 @@ class SqlFileWriterTest extends MigrationTestCase
             [__DIR__, Version::DIRECTION_DOWN, [1 => ['SHOW DATABASES']], false],
         ];
     }
-
 }
-

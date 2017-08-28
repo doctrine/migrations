@@ -28,9 +28,9 @@ final class Events
     {
     }
 
-    const onMigrationsMigrating = 'onMigrationsMigrating';
-    const onMigrationsMigrated = 'onMigrationsMigrated';
+    const onMigrationsMigrating        = 'onMigrationsMigrating';
+    const onMigrationsMigrated         = 'onMigrationsMigrated';
     const onMigrationsVersionExecuting = 'onMigrationsVersionExecuting';
-    const onMigrationsVersionExecuted = 'onMigrationsVersionExecuted';
-    const onMigrationsVersionSkipped = 'onMigrationsVersionSkipped';
+    const onMigrationsVersionExecuted  = 'onMigrationsVersionExecuted';
+    const onMigrationsVersionSkipped   = 'onMigrationsVersionSkipped';
 }

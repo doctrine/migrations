@@ -42,7 +42,7 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getMockBuilder(Connection::class)
+        $this->conn     = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
             ->getMock();
         $this->listener = new AutoCommitListener();

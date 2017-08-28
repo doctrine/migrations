@@ -19,7 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-if (!function_exists(__NAMESPACE__ . '\realpath')) {
+if ( ! function_exists(__NAMESPACE__ . '\realpath')) {
     /**
      * Override realpath() in current namespace for testing
      *
@@ -65,7 +65,7 @@ class MigrationTest extends MigrationTestCase
 
     protected function setUp()
     {
-        $this->conn = $this->getSqliteConnection();
+        $this->conn   = $this->getSqliteConnection();
         $this->config = new Configuration($this->conn);
         $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -94,7 +94,7 @@ class MigrationTest extends MigrationTestCase
     public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption()
     {
         $messages = [];
-        $output = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
@@ -247,11 +247,11 @@ class MigrationTest extends MigrationTestCase
     public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage()
     {
         $messages = [];
-        $output = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
@@ -269,11 +269,11 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined()
     {
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $called = false;
+        $called    = false;
         $migration = new Migration($this->config);
 
         $result = $migration->migrate(null, false, false, function () use (&$called) {
@@ -287,11 +287,11 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback()
     {
-        $this->config->setMigrationsDirectory(__DIR__.'/Stub/migrations-empty-folder');
+        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $called = false;
+        $called    = false;
         $migration = new Migration($this->config);
 
         $result = $migration->migrate(null, true, false, function () use (&$called) {

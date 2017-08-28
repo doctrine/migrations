@@ -37,7 +37,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
 
     public function __construct($em)
     {
-        if (!$this->isEntityManager($em)) {
+        if ( ! $this->isEntityManager($em)) {
             throw new \InvalidArgumentException(sprintf(
                 '$em is not a valid Doctrine ORM Entity Manager, got "%s"',
                 is_object($em) ? get_class($em) : gettype($em)
@@ -78,5 +78,4 @@ final class OrmSchemaProvider implements SchemaProviderInterface
     {
         return $manager instanceof EntityManagerInterface || $manager instanceof EntityManager;
     }
-
 }

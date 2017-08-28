@@ -34,8 +34,8 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
         
-        $migrations = count($configuration->getMigrations());
-        $migratedVersions = count($configuration->getMigratedVersions());
+        $migrations          = count($configuration->getMigrations());
+        $migratedVersions    = count($configuration->getMigratedVersions());
         $availableMigrations = $migrations - $migratedVersions;
         
         if ($availableMigrations === 0) {

@@ -31,7 +31,6 @@ class MigrationVersionTest extends MigrationTestCase
             ->expects($this->once())
             ->method('getMigrationConfiguration')
             ->will($this->returnValue($this->configuration));
-
     }
 
     /**

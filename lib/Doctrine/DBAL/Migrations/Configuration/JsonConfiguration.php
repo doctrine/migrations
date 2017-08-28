@@ -41,6 +41,5 @@ class JsonConfiguration extends AbstractFileConfiguration
         }
 
         $this->setConfiguration($config);
-
     }
 }
