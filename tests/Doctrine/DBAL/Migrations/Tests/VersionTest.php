@@ -17,46 +17,26 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace Doctrine\DBAL\Migrations;
-
-if ( ! function_exists(__NAMESPACE__ . '\realpath')) {
-    /**
-     * Override realpath() in current namespace for testing
-     *
-     * @param $path
-     *
-     * @return string|false
-     */
-    function realpath($path)
-    {
-        // realpath issue with vfsStream
-        // @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
-        if (0 === strpos($path, 'vfs://')) {
-            return $path;
-        }
-        return \realpath($path);
-    }
-}
-
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\QueryWriter;
-use Doctrine\DBAL\Migrations\SqlFileWriter;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunNamedParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunTypes;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunNamedParams;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunTypes;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
-use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+
+require_once __DIR__ . '/realpath.php';
 
 class VersionTest extends MigrationTestCase
 {

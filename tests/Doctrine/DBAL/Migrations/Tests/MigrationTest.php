@@ -17,27 +17,6 @@
  * <http://www.doctrine-project.org>.
 */
 
-namespace Doctrine\DBAL\Migrations;
-
-if ( ! function_exists(__NAMESPACE__ . '\realpath')) {
-    /**
-     * Override realpath() in current namespace for testing
-     *
-     * @param $path
-     *
-     * @return string|false
-     */
-    function realpath($path)
-    {
-        // realpath issue with vfsStream
-        // @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
-        if (0 === strpos($path, 'vfs://')) {
-            return $path;
-        }
-        return \realpath($path);
-    }
-}
-
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Driver\Connection;
@@ -50,6 +29,8 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\Constraint\RegularExpression;
+
+require_once __DIR__ . '/realpath.php';
 
 class MigrationTest extends MigrationTestCase
 {
