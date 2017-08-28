@@ -10,7 +10,8 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    private $conn, $listener;
+    private $conn;
+    private $listener;
 
     public function testListenerDoesNothingDuringADryRun()
     {

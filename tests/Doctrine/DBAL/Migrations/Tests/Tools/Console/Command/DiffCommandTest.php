@@ -12,7 +12,8 @@ class DiffCommandTest extends CommandTestCase
 {
     const VERSION = '20160705000000';
 
-    private $root, $migrationFile;
+    private $root;
+    private $migrationFile;
 
     public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
     {
