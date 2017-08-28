@@ -19,4 +19,8 @@
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
+
+    <rule ref="Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase">
+        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Events.php</exclude-pattern>
+    </rule>
 </ruleset>
