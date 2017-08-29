@@ -7,7 +7,7 @@ use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
 
 class GenerateCommandTest extends CommandTestCase
 {
-    const VERSION = '20160705000000';
+    const VERSION              = '20160705000000';
     const CUSTOM_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
 
     private $root;
