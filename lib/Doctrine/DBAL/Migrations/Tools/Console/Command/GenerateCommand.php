@@ -63,6 +63,8 @@ class Version<version> extends AbstractMigration
 }
 ';
 
+    private $instanceTemplate;
+
     protected function configure()
     {
         $this
@@ -87,6 +89,8 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
+        $this->loadCustomTemplate($configuration, $output);
+
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version);
 
@@ -95,7 +99,11 @@ EOT
 
     protected function getTemplate()
     {
-        return self::$_template;
+        if ($this->instanceTemplate === null) {
+            $this->instanceTemplate = self::$_template;
+        }
+
+        return $this->instanceTemplate;
     }
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
@@ -127,5 +135,31 @@ EOT
         }
 
         return $path;
+    }
+
+    private function loadCustomTemplate(Configuration $configuration, OutputInterface $output) : void
+    {
+        $customTemplate = $configuration->getCustomTemplate();
+
+        if ($customTemplate === null) {
+            return;
+        }
+
+        $filePath = getcwd() . '/' . $customTemplate;
+
+        if ( ! is_file($filePath) || ! is_readable($filePath)) {
+            throw new \InvalidArgumentException(
+                'The specified template "' . $customTemplate . '" cannot be found or is not readable.'
+            );
+        }
+
+        $content = file_get_contents($filePath);
+
+        if ($content === false) {
+            throw new \InvalidArgumentException('The specified template "' . $customTemplate . '" could not be read.');
+        }
+
+        $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
+        $this->instanceTemplate = $content;
     }
 }
