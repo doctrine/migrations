@@ -89,7 +89,7 @@ EOT
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $this->manageCustomTemplate($configuration, $input, $output);
+        $this->loadCustomTemplate($configuration, $output);
 
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version);
@@ -137,31 +137,29 @@ EOT
         return $path;
     }
 
-    protected function manageCustomTemplate(
-        Configuration $configuration,
-        InputInterface $input,
-        OutputInterface $output
-    ) : void {
+    private function loadCustomTemplate(Configuration $configuration, OutputInterface $output) : void
+    {
         $customTemplate = $configuration->getCustomTemplate();
 
-        if ($customTemplate !== null) {
-            $this->loadTemplateFile($customTemplate, $output);
+        if ($customTemplate === null) {
+            return;
         }
-    }
 
-    private function loadTemplateFile(string $customTemplate, OutputInterface $output) : void
-    {
-        $customTemplate = getcwd() . '/' . $customTemplate;
+        $filePath = getcwd() . '/' . $customTemplate;
 
-        if ( ! is_file($customTemplate) || ! is_readable($customTemplate)) {
+        if ( ! is_file($filePath) || ! is_readable($filePath)) {
             throw new \InvalidArgumentException(
                 'The specified template "' . $customTemplate . '" cannot be found or is not readable.'
             );
         }
 
-        $templateContent = file_get_contents($customTemplate);
+        $content = file_get_contents($filePath);
+
+        if ($content === false) {
+            throw new \InvalidArgumentException('The specified template "' . $customTemplate . '" could not be read.');
+        }
 
         $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
-        $this->instanceTemplate = $templateContent;
+        $this->instanceTemplate = $content;
     }
 }
