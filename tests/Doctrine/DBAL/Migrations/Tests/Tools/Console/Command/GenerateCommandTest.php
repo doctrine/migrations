@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use org\bovigo\vfs\vfsStream;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
+use org\bovigo\vfs\vfsStreamDirectory;
 
 class GenerateCommandTest extends CommandTestCase
 {
@@ -12,6 +13,17 @@ class GenerateCommandTest extends CommandTestCase
 
     private $root;
     private $migrationFile;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
+        $this->root          = vfsStream::setup('migrations');
+
+        $this->config->method('getMigrationsDirectory')
+                     ->willReturn(vfsStream::url('migrations'));
+    }
 
     public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
     {
@@ -45,14 +57,18 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains('public function customTemplate()', $this->root->getChild($this->migrationFile)->getContent());
     }
 
-    protected function setUp()
+    public function testExceptionShouldBeRaisedWhenCustomTemplateDoesNotExist()
     {
-        parent::setUp();
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessageRegExp('/The specified template ".*" cannot be found or is not readable\./');
 
-        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root          = vfsStream::setup('migrations');
-        $this->config->method('getMigrationsDirectory')
-            ->willReturn(vfsStream::url('migrations'));
+        $this->config->method('generateVersionNumber')
+                     ->willReturn(self::VERSION);
+
+        $this->config->method('getCustomTemplate')
+                     ->willReturn(self::CUSTOM_TEMPLATE_NAME . '-test');
+
+        $this->executeCommand([]);
     }
 
     protected function createCommand()
