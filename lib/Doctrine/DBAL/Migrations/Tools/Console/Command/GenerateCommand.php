@@ -36,8 +36,6 @@ use Symfony\Component\Console\Input\InputOption;
  */
 class GenerateCommand extends AbstractCommand
 {
-    private $_instanceTemplate;
-
     private static $_template =
             '<?php
 
@@ -64,6 +62,8 @@ class Version<version> extends AbstractMigration
     }
 }
 ';
+
+    private $instanceTemplate;
 
     protected function configure()
     {
@@ -99,11 +99,11 @@ EOT
 
     protected function getTemplate()
     {
-        if ($this->_instanceTemplate === null) {
-            $this->_instanceTemplate = self::$_template;
+        if ($this->instanceTemplate === null) {
+            $this->instanceTemplate = self::$_template;
         }
 
-        return $this->_instanceTemplate;
+        return $this->instanceTemplate;
     }
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
@@ -160,6 +160,6 @@ EOT
         }
 
         $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
-        $this->_instanceTemplate = $templateContent;
+        $this->instanceTemplate = $templateContent;
     }
 }
