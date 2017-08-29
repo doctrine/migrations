@@ -37,7 +37,7 @@ class GenerateCommandTest extends CommandTestCase
             ->method('getCustomTemplate')
             ->willReturn(self::CUSTOM_TEMPLATE_NAME);
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains($this->migrationFile, $tester->getDisplay());
