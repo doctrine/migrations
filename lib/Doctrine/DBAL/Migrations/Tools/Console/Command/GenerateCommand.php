@@ -71,7 +71,6 @@ class Version<version> extends AbstractMigration
                 ->setName('migrations:generate')
                 ->setDescription('Generate a blank migration class.')
                 ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
-                ->addOption('template', null, InputOption::VALUE_OPTIONAL, 'The project relative path to a custom class template')
                 ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
@@ -80,12 +79,6 @@ The <info>%command.name%</info> command generates a blank migration class:
 You can optionally specify a <comment>--editor-cmd</comment> option to open the generated file in your favorite editor:
 
     <info>%command.full_name% --editor-cmd=mate</info>
-
-You can optionally specify a <comment>--template</comment> option to use a custom class template:
-
-    <info>%command.full_name% --template=src/MyApp/Resources/tpl/MyDoctrineMigrationTemplate.tpl</info>
-
-This template will not be handled by a template engine (like Twig).
 EOT
         );
 
@@ -146,7 +139,7 @@ EOT
 
     protected function manageCustomTemplate(Configuration $configuration, InputInterface $input, OutputInterface $output)
     {
-        $customTemplate = $input->getOption('template') ?? $configuration->getCustomTemplate();
+        $customTemplate = $configuration->getCustomTemplate();
 
         if ($customTemplate !== null) {
             $this->loadTemplateFile($customTemplate, $output);
