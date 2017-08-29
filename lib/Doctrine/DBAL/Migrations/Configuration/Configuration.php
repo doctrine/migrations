@@ -377,7 +377,7 @@ class Configuration
      *
      * @return string $customTemplate The custom template path
      */
-    public function getCustomTemplate()
+    public function getCustomTemplate() : ?string
     {
         return $this->customTemplate;
     }
@@ -387,7 +387,7 @@ class Configuration
      *
      * @param string $customTemplate The custom template path
      */
-    public function setCustomTemplate($customTemplate)
+    public function setCustomTemplate(string $customTemplate) : void
     {
         $this->customTemplate = $customTemplate;
     }
