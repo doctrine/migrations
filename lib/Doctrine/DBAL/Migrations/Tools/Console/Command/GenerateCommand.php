@@ -154,13 +154,13 @@ EOT
         $customTemplate = getcwd() . '/' . $customTemplate;
 
         if ( ! is_file($customTemplate)) {
-            throw new \InvalidArgumentException('The specified template « ' . $customTemplate . ' » cannot be found.');
+            throw new \InvalidArgumentException('The specified template "' . $customTemplate . '" cannot be found.');
         }
 
         $templateContent = file_get_contents($customTemplate);
 
         if ($templateContent === false) {
-            throw new \InvalidArgumentException('Cannot read file contents of template « ' . $customTemplate . ' ».');
+            throw new \InvalidArgumentException('Cannot read file contents of template "' . $customTemplate . '".');
         }
 
         $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));
