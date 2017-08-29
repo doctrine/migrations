@@ -137,8 +137,11 @@ EOT
         return $path;
     }
 
-    protected function manageCustomTemplate(Configuration $configuration, InputInterface $input, OutputInterface $output)
-    {
+    protected function manageCustomTemplate(
+        Configuration $configuration,
+        InputInterface $input,
+        OutputInterface $output
+    ) : void {
         $customTemplate = $configuration->getCustomTemplate();
 
         if ($customTemplate !== null) {
@@ -146,9 +149,10 @@ EOT
         }
     }
 
-    private function loadTemplateFile(string $customTemplate, OutputInterface $output): void
+    private function loadTemplateFile(string $customTemplate, OutputInterface $output) : void
     {
         $customTemplate = getcwd() . '/' . $customTemplate;
+
         if ( ! is_file($customTemplate)) {
             throw new \InvalidArgumentException('The specified template « ' . $customTemplate . ' » cannot be found.');
         }
