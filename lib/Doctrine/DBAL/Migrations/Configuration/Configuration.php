@@ -387,7 +387,7 @@ class Configuration
      *
      * @param string $customTemplate The custom template path
      */
-    public function setCustomTemplate(string $customTemplate) : void
+    public function setCustomTemplate(?string $customTemplate) : void
     {
         $this->customTemplate = $customTemplate;
     }
