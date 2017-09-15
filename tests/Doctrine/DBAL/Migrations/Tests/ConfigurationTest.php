@@ -376,4 +376,23 @@ class ConfigurationTest extends MigrationTestCase
             ['5Test'],
         ];
     }
+
+    /**
+     * @dataProvider validCustomTemplates
+     */
+    public function testSetCustomTemplateShould(?string $template) : void
+    {
+        $config = new Configuration($this->getSqliteConnection());
+        $config->setCustomTemplate($template);
+
+        self::assertSame($template, $config->getCustomTemplate());
+    }
+
+    public function validCustomTemplates() : array
+    {
+        return [
+            'null template'  => [null],
+            'shiny template' => ['my-awesome-template.php'],
+        ];
+    }
 }
