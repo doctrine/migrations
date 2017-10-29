@@ -21,7 +21,7 @@ namespace Doctrine\DBAL\Migrations;
 
 class MigrationsVersion
 {
-    private static $version = 'v1.6.0';
+    private static $version = 'v1.5.0';
 
     public static function VERSION()
     {
