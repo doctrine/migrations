@@ -43,7 +43,7 @@ class DiffCommand extends GenerateCommand
      */
     protected $schemaProvider;
 
-    public function __construct(SchemaProviderInterface $schemaProvider = null)
+    public function __construct(SchemaProviderInterface $schemaProvider=null)
     {
         $this->schemaProvider = $schemaProvider;
         parent::__construct();
@@ -74,10 +74,10 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $isDbalOld     = (DbalVersion::compare('2.2.0') > 0);
+        $isDbalOld = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
-        $conn     = $configuration->getConnection();
+        $conn = $configuration->getConnection();
         $platform = $conn->getDatabasePlatform();
 
         if ($filterExpr = $input->getOption('filter-expression')) {
@@ -90,7 +90,7 @@ EOT
         }
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
-        $toSchema   = $this->getSchemaProvider()->createSchema();
+        $toSchema = $this->getSchemaProvider()->createSchema();
 
         //Not using value from options, because filters can be set from config.yml
         if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
@@ -102,7 +102,7 @@ EOT
             }
         }
 
-        $up   = $this->buildCodeFromSql(
+        $up = $this->buildCodeFromSql(
             $configuration,
             $fromSchema->getMigrateToSql($toSchema, $platform),
             $input->getOption('formatted'),
@@ -115,32 +115,32 @@ EOT
             $input->getOption('line-length')
         );
 
-        if ( ! $up && ! $down) {
-            $output->writeln('No changes detected in your mapping information.');
+        if (! $up && ! $down) {
+            $output->writeln('<error>No changes detected in your mapping information.</error>');
 
             return;
         }
 
         $version = $configuration->generateVersionNumber();
-        $path    = $this->generateMigration($configuration, $input, $version, $up, $down);
+        $path = $this->generateMigration($configuration, $input, $version, $up, $down);
 
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
         $output->writeln(file_get_contents($path));
     }
 
-    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted = false, $lineLength = 120)
+    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted=false, $lineLength=120)
     {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
-        $code            = [];
+        $code = [];
         foreach ($sql as $query) {
             if (stripos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
 
             if ($formatted) {
-                if ( ! class_exists('\SqlFormatter')) {
+                if (!class_exists('\SqlFormatter')) {
                     throw new \InvalidArgumentException(
-                        'The "--formatted" option can only be used if the sql formatter is installed.' .
+                        'The "--formatted" option can only be used if the sql formatter is installed.'.
                         'Please run "composer require jdorn/sql-formatter".'
                     );
                 }
@@ -155,7 +155,7 @@ EOT
             $code[] = sprintf("\$this->addSql(%s);", var_export($query, true));
         }
 
-        if ( ! empty($code)) {
+        if (!empty($code)) {
             array_unshift(
                 $code,
                 sprintf(
@@ -172,7 +172,7 @@ EOT
 
     private function getSchemaProvider()
     {
-        if ( ! $this->schemaProvider) {
+        if (!$this->schemaProvider) {
             $this->schemaProvider = new OrmSchemaProvider($this->getHelper('entityManager')->getEntityManager());
         }
 
