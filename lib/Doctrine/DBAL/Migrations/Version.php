@@ -473,9 +473,13 @@ class Version
         $platform = $this->connection->getDatabasePlatform();
         $out      = [];
         foreach ($params as $key => $value) {
-            $type   = isset($types[$key]) ? $types[$key] : 'string';
-            $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
-            $out[]  = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
+            $type = isset($types[$key]) ? $types[$key] : 'string';
+            if (Type::hasType($type)) {
+                $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
+            } else {
+                $outval = '?';
+            }
+            $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));
