@@ -958,6 +958,7 @@ class Configuration
 
     /**
      * @param string $class
+     * @throws MigrationException
      */
     private function ensureMigrationClassExists($class)
     {
