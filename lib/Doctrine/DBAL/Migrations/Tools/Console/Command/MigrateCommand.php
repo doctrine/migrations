@@ -156,7 +156,7 @@ EOT
     /**
      * Create a new migration instance to execute the migrations.
      *
-     * @param $configuration The configuration with which the migrations will be executed
+     * @param Configuration $configuration The configuration with which the migrations will be executed
      * @return Migration a new migration instance
      */
     protected function createMigration(Configuration $configuration)

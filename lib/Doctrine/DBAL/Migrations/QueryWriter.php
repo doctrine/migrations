@@ -28,7 +28,10 @@ namespace Doctrine\DBAL\Migrations;
 interface QueryWriter
 {
     /**
-     * @throws \Doctrine\DBAL\Exception\InvalidArgumentException
+     * @param string $path
+     * @param string $direction
+     * @param array $queriesByVersion
+     * @return bool
      */
     public function write(string $path, string $direction, array $queriesByVersion) : bool;
 }
