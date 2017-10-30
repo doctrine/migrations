@@ -19,6 +19,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
@@ -464,6 +465,7 @@ class VersionTest extends MigrationTestCase
         return [
             'datetime' => [new \DateTime('2016-07-05 01:00:00'), 'datetime', '2016-07-05 01:00:00'],
             'array' => [['one' => 'two'], 'array', serialize(['one' => 'two'])],
+            'doctrine_param' => [[1,2,3,4,5], Connection::PARAM_INT_ARRAY, '?'],
         ];
     }
 
