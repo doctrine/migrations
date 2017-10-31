@@ -34,6 +34,10 @@ final class FileQueryWriter implements QueryWriter
 
     /**
      * TODO: move SqlFileWriter's behaviour to this class - and kill it with fire (on the next major release)
+     * @param string $path
+     * @param string $direction
+     * @param array $queriesByVersion
+     * @return bool
      */
     public function write(string $path, string $direction, array $queriesByVersion) : bool
     {

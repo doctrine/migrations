@@ -77,7 +77,9 @@ class MigrationStatusInfosHelper
         return $this->configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
     }
 
-    /** @var Version[] */
+    /**
+     * @return Version[]
+     */
     public function getExecutedUnavailableMigrations()
     {
         return $this->executedUnavailableMigrations;

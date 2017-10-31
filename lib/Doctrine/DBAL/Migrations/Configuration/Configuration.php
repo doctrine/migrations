@@ -621,7 +621,9 @@ class Configuration
     /**
      * Returns the version with the specified offset to the specified version.
      *
-     * @return string|null A version string, or null if the specified version
+     * @param string $version
+     * @param string $delta
+     * @return null|string A version string, or null if the specified version
      *                     is unknown or the specified delta is not within the
      *                     list of available versions.
      */
@@ -645,7 +647,8 @@ class Configuration
     /**
      * Returns the version with the specified to the current version.
      *
-     * @return string|null A version string, or null if the specified delta is
+     * @param string $delta
+     * @return null|string A version string, or null if the specified delta is
      *                     not within the list of available versions.
      */
     public function getDeltaVersion($delta)
@@ -676,7 +679,8 @@ class Configuration
      *
      * If an existing version number is specified, it is returned verbatimly.
      *
-     * @return string|null A version number, or null if the specified alias
+     * @param string $alias
+     * @return null|string A version number, or null if the specified alias
      *                     does not map to an existing version, e.g. if "next"
      *                     is passed but the current version is already the
      *                     latest.
@@ -824,7 +828,7 @@ class Configuration
      * Use the connection's event manager to emit an event.
      *
      * @param string $eventName The event to emit.
-     * @param $args The event args instance to emit.
+     * @param EventArgs $args The event args instance to emit.
      */
     public function dispatchEvent($eventName, EventArgs $args = null)
     {
@@ -941,6 +945,7 @@ class Configuration
 
     /**
      * @param string $class
+     * @throws MigrationException
      */
     private function ensureMigrationClassExists($class)
     {

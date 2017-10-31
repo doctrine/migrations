@@ -201,6 +201,7 @@ class Version
      * @param string $direction The direction to execute.
      *
      * @return boolean $written
+     * @throws MigrationException
      */
     public function writeSqlFile($path, $direction = self::DIRECTION_UP)
     {
