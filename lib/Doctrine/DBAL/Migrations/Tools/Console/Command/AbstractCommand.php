@@ -9,6 +9,7 @@ use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionHelperLoa
 use Doctrine\DBAL\Migrations\Configuration\Connection\Loader\ConnectionConfigurationChainLoader;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
+use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -88,7 +89,7 @@ abstract class AbstractCommand extends Command
     {
         if ( ! $this->migrationConfiguration) {
             if ($this->getHelperSet()->has('configuration')
-                && $this->getHelperSet()->get('configuration') instanceof ConfigurationHelper) {
+                && $this->getHelperSet()->get('configuration') instanceof ConfigurationHelperInterface) {
                 $configHelper = $this->getHelperSet()->get('configuration');
             } else {
                 $configHelper = new ConfigurationHelper($this->getConnection($input), $this->configuration);
