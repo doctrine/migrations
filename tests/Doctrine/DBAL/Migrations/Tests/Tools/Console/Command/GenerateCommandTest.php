@@ -4,12 +4,12 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use org\bovigo\vfs\vfsStream;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
-use org\bovigo\vfs\vfsStreamDirectory;
 
 class GenerateCommandTest extends CommandTestCase
 {
-    const VERSION              = '20160705000000';
-    const CUSTOM_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    const VERSION                       = '20160705000000';
+    const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
 
     private $root;
     private $migrationFile;
@@ -39,7 +39,18 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
-    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration()
+    public static function provideCustomTemplateNames() : array
+    {
+        return [
+            'relativePath' => [self::CUSTOM_RELATIVE_TEMPLATE_NAME],
+            'absolutePath' => [self::CUSTOM_ABSOLUTE_TEMPLATE_NAME],
+        ];
+    }
+
+    /**
+     * @dataProvider provideCustomTemplateNames
+     */
+    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration(string $templateName)
     {
         $this->config->expects($this->once())
             ->method('generateVersionNumber')
@@ -47,7 +58,7 @@ class GenerateCommandTest extends CommandTestCase
 
         $this->config->expects($this->once())
             ->method('getCustomTemplate')
-            ->willReturn(self::CUSTOM_TEMPLATE_NAME);
+            ->willReturn($templateName);
 
         [$tester, $statusCode] = $this->executeCommand([]);
 
@@ -66,7 +77,7 @@ class GenerateCommandTest extends CommandTestCase
                      ->willReturn(self::VERSION);
 
         $this->config->method('getCustomTemplate')
-                     ->willReturn(self::CUSTOM_TEMPLATE_NAME . '-test');
+                     ->willReturn(self::CUSTOM_RELATIVE_TEMPLATE_NAME . '-test');
 
         $this->executeCommand([]);
     }

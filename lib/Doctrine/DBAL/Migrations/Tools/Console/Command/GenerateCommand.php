@@ -128,15 +128,13 @@ EOT
             return;
         }
 
-        $filePath = getcwd() . '/' . $customTemplate;
-
-        if ( ! is_file($filePath) || ! is_readable($filePath)) {
+        if ( ! is_file($customTemplate) || ! is_readable($customTemplate)) {
             throw new \InvalidArgumentException(
                 'The specified template "' . $customTemplate . '" cannot be found or is not readable.'
             );
         }
 
-        $content = file_get_contents($filePath);
+        $content = file_get_contents($customTemplate);
 
         if ($content === false) {
             throw new \InvalidArgumentException('The specified template "' . $customTemplate . '" could not be read.');
