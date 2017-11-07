@@ -34,7 +34,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
 
-        self::assertCount(6, $migrations);
+        self::assertCount(7, $migrations);
 
         $tests = [
             '20150502000000' => 'TestMigrations\\Version20150502000000',
@@ -43,6 +43,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
             '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
+            '1_symlinked_file' => 'TestMigrations\\Version1_symlinked_file',
         ];
         foreach ($tests as $version => $namespace) {
             self::assertArrayHasKey($version, $migrations);

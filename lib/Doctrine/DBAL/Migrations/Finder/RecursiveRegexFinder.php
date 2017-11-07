@@ -30,7 +30,7 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
     {
         return new \RegexIterator(
             new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS),
+                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
                 \RecursiveIteratorIterator::LEAVES_ONLY
             ),
             $this->getPattern(),
