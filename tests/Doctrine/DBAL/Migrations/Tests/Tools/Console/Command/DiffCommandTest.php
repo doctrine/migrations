@@ -17,13 +17,13 @@ class DiffCommandTest extends CommandTestCase
     private $root;
     private $migrationFile;
 
-    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
+    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration() : void
     {
         $this->config->expects($this->once())
             ->method('generateVersionNumber')
             ->willReturn(self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains($this->migrationFile, $tester->getDisplay());
@@ -44,7 +44,7 @@ class DiffCommandTest extends CommandTestCase
     /**
      * @dataProvider provideCustomTemplateNames
      */
-    public function testCommandCreatesNewMigrationsFileWithAVersionAndACustomTemplateFromConfiguration(string $templateName)
+    public function testCommandCreatesNewMigrationsFileWithAVersionAndACustomTemplateFromConfiguration(string $templateName) : void
     {
         $this->config->expects($this->once())
             ->method('generateVersionNumber')
@@ -54,7 +54,7 @@ class DiffCommandTest extends CommandTestCase
             ->method('getCustomTemplate')
             ->willReturn($templateName);
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains($this->migrationFile, $tester->getDisplay());
