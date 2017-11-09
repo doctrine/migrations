@@ -2,8 +2,27 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [Unreleased]
+## [1.6.0] - 2016-11-09
 
+### Fixed
+  - [536: Fix typo in exception message](https://github.com/doctrine/migrations/pull/536) - @mantiz
+  - [545: Allow nullable custom template](https://github.com/doctrine/migrations/pull/545) - @PapsOu
+  - [560: Fix `--dry-run` and `--write-sql` with `addSql`](https://github.com/doctrine/migrations/pull/560) - @mikeSimonson
+  - [569: Allow using absolute paths for custom template](https://github.com/doctrine/migrations/pull/569) - @alcaeus
+
+### Changed
+  - [537: Require PHP 7.1](https://github.com/doctrine/migrations/pull/537) - @lcobucci
+  - [563: Remove copyright headers](https://github.com/doctrine/migrations/pull/563) - @mikeSimonson
+  - [534: Change RecursiveRegexFinder to follow Symlinks](https://github.com/doctrine/migrations/pull/534) - @burci
+
+### Added
+  - [506: Add migration events](https://github.com/doctrine/migrations/pull/506) - @chrisguitarguy
+  - [509: Add delta in migrate command](https://github.com/doctrine/migrations/pull/509) - @Safranil
+  - [535: Allow changing migration class template in generate command](https://github.com/doctrine/migrations/pull/535) - @PapsOu
+  - [542: Enable phpcs to ensure coding style](https://github.com/doctrine/migrations/pull/542) - @lcobucci
+  - [562: Allow providing a path for file dump](https://github.com/doctrine/migrations/pull/562) - @mikeSimonson
+  - [568: Add `ConfigurationHelperInterface` to allow overriding internal class](https://github.com/doctrine/migrations/pull/568) - @alcaeus
+  - [571: Allow changing migration class template in diff command](https://github.com/doctrine/migrations/pull/571) - @alcaeus
 
 ## [1.5.0] - 2016-12-25
 
@@ -45,8 +64,6 @@ This project adheres to [Semantic Versioning](http://semver.org/).
 
   
 ## [1.4.0] - 2016-02-23
-### Fixed
-### Changed
 ### Added
   - [431: Formatted diffs](https://github.com/doctrine/migrations/pull/431)
   - [437: Allowing to set the column name from config too](https://github.com/doctrine/migrations/pull/437)
