@@ -60,6 +60,8 @@ EOT
         $isDbalOld     = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
+        $this->loadCustomTemplate($configuration, $output);
+
         $conn     = $configuration->getConnection();
         $platform = $conn->getDatabasePlatform();
 

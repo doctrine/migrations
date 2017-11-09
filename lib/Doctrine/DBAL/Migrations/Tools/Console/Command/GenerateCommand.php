@@ -120,7 +120,7 @@ EOT
         return $path;
     }
 
-    private function loadCustomTemplate(Configuration $configuration, OutputInterface $output) : void
+    protected function loadCustomTemplate(Configuration $configuration, OutputInterface $output) : void
     {
         $customTemplate = $configuration->getCustomTemplate();
 
