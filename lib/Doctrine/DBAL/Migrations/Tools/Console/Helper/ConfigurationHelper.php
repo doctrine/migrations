@@ -17,7 +17,7 @@ use Symfony\Component\Console\Helper\Helper;
  * @package Doctrine\DBAL\Migrations\Tools\Console\Helper
  * @internal
  */
-class ConfigurationHelper extends Helper
+class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
 
     /**
