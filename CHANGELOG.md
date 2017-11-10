@@ -2,7 +2,7 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
-## [1.6.0] - 2016-11-09
+## [1.6.0] - 2017-11-09
 
 ### Fixed
   - [536: Fix typo in exception message](https://github.com/doctrine/migrations/pull/536) - @mantiz
