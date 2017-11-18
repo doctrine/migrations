@@ -2,6 +2,11 @@
 All notable changes to this project will be documented in this file.
 This project adheres to [Semantic Versioning](http://semver.org/).
 
+## [1.6.1] - 2017-11-18
+
+### Fixed
+  - [572: Only show generated migration in verbose mode](https://github.com/doctrine/migrations/pull/572) - @alcaeus
+
 ## [1.6.0] - 2017-11-09
 
 ### Fixed
