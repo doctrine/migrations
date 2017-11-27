@@ -262,7 +262,7 @@ class MigrationTest extends MigrationTestCase
             return false;
         });
 
-        self::assertSame([], $result);
+        self::assertEmpty($result);
         self::assertTrue($called, 'should have called the confirmation callback');
     }
 
