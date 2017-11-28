@@ -397,11 +397,10 @@ class Version
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
+                    $this->outputSqlQuery($key, $query);
                     if ( ! isset($this->params[$key])) {
-                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->connection->executeQuery($query);
                     } else {
-                        $this->outputWriter->write(sprintf('    <comment>-</comment> %s (with parameters)', $query));
                         $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                     }
 

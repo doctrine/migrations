@@ -66,6 +66,22 @@ class VersionTest extends MigrationTestCase
         self::assertEquals($versionName, $version->getVersion());
     }
 
+    public function testShowSqlStatementsParameters()
+    {
+        $outputWriter = $this->getOutputWriter();
+        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
+        $configuration->setMigrationsNamespace('sdfq');
+        $configuration->setMigrationsDirectory('.');
+        $version = new Version($configuration, '0004', VersionOutputSqlWithParam::class);
+        $version->getMigration()->setParam([
+            0 => 456,
+            1 => 'tralala',
+            2 => 456,
+        ]);
+        $version->execute(Version::DIRECTION_UP);
+        $this->assertContains('(456, tralala, 456)', $this->getOutputStreamContent($this->output));
+    }
+
     /**
      * Create migration with description
      */
