@@ -23,7 +23,7 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
 
     /**
      * Create a recursive iterator to find all the migrations in the subdirectories.
-     * @param $dir
+     * @param string $dir
      * @return \RegexIterator
      */
     private function createIterator($dir)
@@ -45,7 +45,7 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
 
     /**
      * Transform the recursiveIterator result array of array into the expected array of migration file
-     * @param $iteratorFilesMatch
+     * @param iterable $iteratorFilesMatch
      * @return array
      */
     private function getMatches($iteratorFilesMatch)

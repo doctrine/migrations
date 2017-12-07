@@ -45,7 +45,7 @@ class Version
     /**
      * The version in timestamp format (YYYYMMDDHHMMSS)
      *
-     * @param int
+     * @var string
      */
     private $version;
 
@@ -444,8 +444,8 @@ class Version
     /**
      * Formats a set of sql parameters for output with dry run.
      *
-     * @param $params The query parameters
-     * @param $types The types of the query params. Default type is a string
+     * @param array $params The query parameters
+     * @param array $types The types of the query params. Default type is a string
      * @return string|null a string of the parameters present.
      */
     private function formatParamsForOutput(array $params, array $types)

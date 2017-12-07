@@ -250,7 +250,7 @@ class Configuration
     /**
      * Returns the datetime of a migration
      *
-     * @param $version
+     * @param string $version
      * @return string
      */
     public function getDateTime($version)
