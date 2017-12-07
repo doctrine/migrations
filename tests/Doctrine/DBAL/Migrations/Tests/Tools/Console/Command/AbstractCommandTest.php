@@ -253,7 +253,7 @@ class AbstractCommandTest extends MigrationTestCase
         self::assertSame($configuration, $actualConfiguration);
     }
 
-    public function invokeAbstractCommandConfirmation($input, $helper, $response = "y", $question = "There is no question?")
+    private function invokeAbstractCommandConfirmation($input, $helper, $response = "y", $question = "There is no question?")
     {
         $class  = new \ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('askConfirmation');
@@ -265,7 +265,7 @@ class AbstractCommandTest extends MigrationTestCase
             ['command']
         );
 
-        $helper->setInputStream($this->getInputStream($response . "\n"));
+        $input->setStream($this->getInputStream($response . "\n"));
         if ($helper instanceof QuestionHelper) {
             $helperSet = new HelperSet([
                 'question' => $helper
@@ -287,12 +287,9 @@ class AbstractCommandTest extends MigrationTestCase
 
     public function testAskConfirmation()
     {
-        $input = $this->getMockBuilder(ArrayInput::class)
-            ->setConstructorArgs([[]])
-            ->setMethods(['getOption'])
-            ->getMock();
-
+        $input  = new ArrayInput([]);
         $helper = new QuestionHelper();
+
         self::assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
         self::assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
     }

@@ -17,7 +17,7 @@ class MigrationsVersion
     }
 
     /**
-     * @param $gitversion
+     * @param string $gitversion
      * @return bool
      *
      * Check if doctrine migration is installed by composer or
