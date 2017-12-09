@@ -270,7 +270,7 @@ class FunctionalTest extends MigrationTestCase
 
         self::assertCount(1, $config->getMigrationsToExecute('up', 3));
         $migrations = $config->getMigrationsToExecute('up', 3);
-        self::assertTrue(isset($migrations[2]));
+        self::assertArrayHasKey(2, $migrations);
         self::assertEquals(2, $migrations[2]->getVersion());
 
         $migration = new Migration($config);

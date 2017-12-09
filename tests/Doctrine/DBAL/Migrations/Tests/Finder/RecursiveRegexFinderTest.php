@@ -53,7 +53,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
 
         asort($migrationsForTestSort);
 
-        self::assertTrue($migrationsForTestSort === $migrations, "Finder have to return sorted list of the files.");
+        self::assertSame($migrations, $migrationsForTestSort, "Finder have to return sorted list of the files.");
         self::assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
         self::assertArrayNotHasKey('Version20150502000002', $migrations);
         self::assertArrayNotHasKey('20150502000002', $migrations);
