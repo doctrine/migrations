@@ -171,7 +171,7 @@ class Version
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
                 if ( ! empty($params[$key])) {
-                    $queryTypes = isset($types[$key]) ? $types[$key] : [];
+                    $queryTypes = $types[$key] ?? [];
                     $this->addQueryParams($params[$key], $queryTypes);
                 }
             }
@@ -430,8 +430,8 @@ class Version
     private function outputSqlQuery($idx, $query)
     {
         $params = $this->formatParamsForOutput(
-            isset($this->params[$idx]) ? $this->params[$idx] : [],
-            isset($this->types[$idx]) ? $this->types[$idx] : []
+            $this->params[$idx] ?? [],
+            $this->types[$idx] ?? []
         );
 
         $this->outputWriter->write(rtrim(sprintf(
@@ -457,7 +457,7 @@ class Version
         $platform = $this->connection->getDatabasePlatform();
         $out      = [];
         foreach ($params as $key => $value) {
-            $type = isset($types[$key]) ? $types[$key] : 'string';
+            $type = $types[$key] ?? 'string';
             if (Type::hasType($type)) {
                 $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
             } else {
