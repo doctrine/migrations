@@ -24,6 +24,7 @@ class GenerateCommand extends AbstractCommand
 
 namespace <namespace>;
 
+use Doctrine\DBAL\Migrations\AbortMigrationException;
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
@@ -32,12 +33,22 @@ use Doctrine\DBAL\Schema\Schema;
  */
 final class Version<version> extends AbstractMigration
 {
+    /**
+     * @param Schema $schema
+     *
+     * @throws AbortMigrationException
+     */
     public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
 <up>
     }
 
+    /**
+     * @param Schema $schema
+     *
+     * @throws AbortMigrationException
+     */
     public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
