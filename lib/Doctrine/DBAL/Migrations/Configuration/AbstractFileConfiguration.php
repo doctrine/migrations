@@ -47,7 +47,7 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         foreach ($config as $configurationKey => $configurationValue) {
             if ( ! isset($this->configurationProperties[$configurationKey])) {
-                $msg = sprintf('Migrations configuration key "%s" does not exists.', $configurationKey);
+                $msg = sprintf('Migrations configuration key "%s" does not exist.', $configurationKey);
                 throw MigrationException::configurationNotValid($msg);
             }
         }

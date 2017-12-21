@@ -334,7 +334,7 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester = new CommandTester($this->command);
 
         $this->expectException(\InvalidArgumentException::class);
-        $this->expectExceptionMessage('The version "1233" does not exists in the version table.');
+        $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
 
         $commandTester->execute(
             [
