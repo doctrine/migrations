@@ -14,6 +14,7 @@ use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
@@ -769,18 +770,18 @@ class Configuration
         }
 
         $this->connect();
-        if ($this->connection->getSchemaManager()->tablesExist([$this->migrationsTableName])) {
+        $schemaManager = $this->connection->getSchemaManager();
+        if ($schemaManager->tablesExist([$this->migrationsTableName])) {
             $this->migrationTableCreated = true;
 
             return false;
         }
 
-        $columns = [
-            $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
-        ];
-        $table   = new Table($this->migrationsTableName, $columns);
+        $schema = new Schema([], [], $schemaManager->createSchemaConfig());
+        $table  = $schema->createTable($this->migrationsTableName);
+        $table->addColumn($this->migrationsColumnName, 'string', ['length' => 255]);
         $table->setPrimaryKey([$this->migrationsColumnName]);
-        $this->connection->getSchemaManager()->createTable($table);
+        $schemaManager->createTable($table);
 
         $this->migrationTableCreated = true;
 
