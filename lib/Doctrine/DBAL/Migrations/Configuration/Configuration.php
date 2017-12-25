@@ -144,6 +144,13 @@ class Configuration
     private $customTemplate;
 
     /**
+     * Prevent write queries.
+     *
+     * @var bool
+     */
+    private $isDryRun = false;
+
+    /**
      * Construct a migration configuration object.
      *
      * @param Connection               $connection   A Connection instance
@@ -531,8 +538,13 @@ class Configuration
      */
     public function getMigratedVersions()
     {
-        $this->connect();
         $this->createMigrationTable();
+
+        if (!$this->migrationTableCreated && $this->isDryRun) {
+            return [];
+        }
+
+        $this->connect();
 
         $ret = $this->connection->fetchAll("SELECT " . $this->migrationsColumnName . " FROM " . $this->migrationsTableName);
 
@@ -566,8 +578,13 @@ class Configuration
      */
     public function getCurrentVersion()
     {
-        $this->connect();
         $this->createMigrationTable();
+
+        if (!$this->migrationTableCreated && $this->isDryRun) {
+            return '0';
+        }
+
+        $this->connect();
 
         if (empty($this->migrations)) {
             $this->registerMigrationsFromDirectory($this->getMigrationsDirectory());
@@ -775,6 +792,10 @@ class Configuration
             return false;
         }
 
+        if ($this->isDryRun) {
+            return false;
+        }
+
         $columns = [
             $this->migrationsColumnName => new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]),
         ];
@@ -965,5 +986,13 @@ class Configuration
         }
 
         return $this->queryWriter;
+    }
+
+    /**
+     * @param bool $isDryRun
+     */
+    public function setIsDryRun($isDryRun)
+    {
+        $this->isDryRun = $isDryRun;
     }
 }
