@@ -540,7 +540,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        if (!$this->migrationTableCreated && $this->isDryRun) {
+        if ( ! $this->migrationTableCreated && $this->isDryRun) {
             return [];
         }
 
@@ -580,7 +580,7 @@ class Configuration
     {
         $this->createMigrationTable();
 
-        if (!$this->migrationTableCreated && $this->isDryRun) {
+        if ( ! $this->migrationTableCreated && $this->isDryRun) {
             return '0';
         }
 
