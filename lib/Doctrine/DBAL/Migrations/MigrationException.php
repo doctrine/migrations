@@ -49,6 +49,11 @@ class MigrationException extends \Exception
         return new self(sprintf('Migrations configuration file already loaded'), 8);
     }
 
+    public static function yamlConfigurationNotAvailable() : self
+    {
+        return new self('Unable to load yaml configuration files, please `composer require symfony/yaml` load yaml configuration files');
+    }
+
     public static function configurationIncompatibleWithFinder(
         $configurationParameterName,
         MigrationFinderInterface $finder

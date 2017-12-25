@@ -13,12 +13,12 @@
     "require": {
         "php": "^7.1",
         "doctrine/dbal": "~2.6",
-        "symfony/yaml": "~3.3|^4.0",
         "symfony/console": "~3.3|^4.0",
         "ocramius/proxy-manager": "^1.0|^2.0"
     },
     "require-dev": {
         "doctrine/orm": "~2.5",
+        "symfony/yaml": "~3.3|^4.0",
         "phpunit/phpunit": "~6.2",
         "doctrine/coding-standard": "^1.0",
         "jdorn/sql-formatter": "~1.1",
@@ -26,7 +26,8 @@
         "squizlabs/php_codesniffer": "^3.0"
     },
     "suggest": {
-        "jdorn/sql-formatter": "Allows to generate formatted SQL with the diff command."
+        "jdorn/sql-formatter": "Allows to generate formatted SQL with the diff command.",
+        "symfony/yaml": "Allows the use of yaml for migration configuration files."
     },
     "autoload": {
         "psr-4": {

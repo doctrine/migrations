@@ -4,6 +4,8 @@ namespace Doctrine\DBAL\Migrations\Configuration;
 
 use Symfony\Component\Yaml\Yaml;
 
+use Doctrine\DBAL\Migrations\MigrationException;
+
 /**
  * Load migration configuration information from a YAML configuration file.
  *
@@ -19,6 +21,10 @@ class YamlConfiguration extends AbstractFileConfiguration
      */
     protected function doLoad($file)
     {
+        if ( ! class_exists(Yaml::class)) {
+            throw MigrationException::yamlConfigurationNotAvailable();
+        }
+
         $config = Yaml::parse(file_get_contents($file));
 
         if ( ! is_array($config)) {
