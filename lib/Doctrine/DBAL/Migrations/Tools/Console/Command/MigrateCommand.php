@@ -78,6 +78,9 @@ EOT
 
         $timeAllqueries = $input->getOption('query-time');
 
+        $dryRun = (boolean) $input->getOption('dry-run');
+        $configuration->setIsDryRun($dryRun);
+
         $executedMigrations  = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
 
@@ -115,8 +118,6 @@ EOT
             $migration->writeSqlFile($path, $version);
             return 0;
         }
-
-        $dryRun = (boolean) $input->getOption('dry-run');
 
         $cancelled = false;
         $migration->setNoMigrationException($input->getOption('allow-no-migration'));

@@ -108,6 +108,15 @@ class MigrateCommandTest extends CommandTestCase
             ->method('migrate')
             ->with(self::VERSION, true, true);
 
+        // dry run is set before getting the migrated versions
+        $this->config->expects($this->at(2))
+            ->method('setIsDryRun')
+            ->with(true);
+        $this->config->expects($this->at(3))
+            ->method('getMigratedVersions');
+        $this->config->expects($this->at(4))
+            ->method('getAvailableVersions');
+
         list($tester, $statusCode) = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
