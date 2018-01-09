@@ -82,7 +82,7 @@ EOT
         $migratedVersions = $configuration->getMigratedVersions();
 
         foreach ($migrations as $version) {
-            $isMigrated = in_array($version->getVersion(), $migratedVersions);
+            $isMigrated = in_array($version->getVersion(), $migratedVersions, true);
             $status     = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
 
             $migrationDescription = $version->getMigration()->getDescription()

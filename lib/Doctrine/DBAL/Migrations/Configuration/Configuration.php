@@ -652,7 +652,7 @@ class Configuration
 
         $versions = array_map('strval', array_keys($this->migrations));
         array_unshift($versions, '0');
-        $offset = array_search((string) $version, $versions);
+        $offset = array_search((string) $version, $versions, true);
         if ($offset === false || ! isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.
             return null;
@@ -948,7 +948,7 @@ class Configuration
     private function shouldExecuteMigration($direction, Version $version, $to, $migrated)
     {
         if ($direction === Version::DIRECTION_DOWN) {
-            if ( ! in_array($version->getVersion(), $migrated)) {
+            if ( ! in_array($version->getVersion(), $migrated, true)) {
                 return false;
             }
 
@@ -956,7 +956,7 @@ class Configuration
         }
 
         if ($direction === Version::DIRECTION_UP) {
-            if (in_array($version->getVersion(), $migrated)) {
+            if (in_array($version->getVersion(), $migrated, true)) {
                 return false;
             }
 
