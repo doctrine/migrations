@@ -194,7 +194,7 @@ class MigrationTest extends MigrationTestCase
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
                        ->disableOriginalConstructor()
-                       ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion'])
+                       ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQuotedMigrationsColumnName'])
                        ->getMock();
 
         $config->method('getCurrentVersion')
@@ -202,6 +202,9 @@ class MigrationTest extends MigrationTestCase
 
         $config->method('getOutputWriter')
                ->willReturn($this->getOutputWriter());
+
+         $config->method('getQuotedMigrationsColumnName')
+               ->willReturn('version');
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)

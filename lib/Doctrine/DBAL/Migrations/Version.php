@@ -149,7 +149,7 @@ class Version
         $this->configuration->createMigrationTable();
         $this->connection->$action(
             $this->configuration->getMigrationsTableName(),
-            [$this->configuration->getMigrationsColumnName() => $this->version]
+            [$this->configuration->getQuotedMigrationsColumnName() => $this->version]
         );
     }
 
