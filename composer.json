@@ -19,7 +19,7 @@
     "require-dev": {
         "doctrine/orm": "~2.5",
         "symfony/yaml": "~3.3|^4.0",
-        "phpunit/phpunit": "~6.2",
+        "phpunit/phpunit": "~7.0",
         "doctrine/coding-standard": "^1.0",
         "jdorn/sql-formatter": "~1.1",
         "mikey179/vfsStream": "^1.6",
