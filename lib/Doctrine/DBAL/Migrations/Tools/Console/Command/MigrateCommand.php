@@ -156,11 +156,7 @@ EOT
      */
     private function canExecute($question, InputInterface $input, OutputInterface $output)
     {
-        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
-            return false;
-        }
-
-        return true;
+        return ! $input->isInteractive() || $this->askConfirmation($question, $input, $output);
     }
 
     /**
