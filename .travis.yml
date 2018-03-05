@@ -33,11 +33,8 @@ jobs:
         - rm composer.lock
         - travis_retry composer update --prefer-dist --prefer-lowest
 
-    - stage: Lint
-      install: travis_retry composer install --prefer-dist
-      script: vendor/bin/phpstan analyse -l 3 -c phpstan.neon lib
-
-    - stage: Coverage
+    - stage: Test
+      env: COVERAGE
       before_script:
         - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{.disabled,}
         - if [[ ! $(php -m | grep -si xdebug) ]]; then echo "xdebug required for coverage"; exit 1; fi
@@ -47,7 +44,12 @@ jobs:
         - wget https://scrutinizer-ci.com/ocular.phar
         - php ocular.phar code-coverage:upload --format=php-clover clover.xml
 
-    - stage: Coding standard
+    - stage: Code Quality
+      env: CODING_STANDARDS
       install: travis_retry composer install --prefer-dist
-      script:
-        - ./vendor/bin/phpcs
+      script: ./vendor/bin/phpcs
+
+    - stage: Code Quality
+      env: STATIC_ANALYSIS
+      install: travis_retry composer install --prefer-dist
+      script: vendor/bin/phpstan analyse -l 3 -c phpstan.neon lib
