@@ -34,7 +34,7 @@ class GenerateCommandTest extends CommandTestCase
             ->method('generateVersionNumber')
             ->willReturn(self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains($this->migrationFile, $tester->getDisplay());

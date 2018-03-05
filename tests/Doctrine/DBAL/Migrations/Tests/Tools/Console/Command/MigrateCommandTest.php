@@ -25,7 +25,7 @@ class MigrateCommandTest extends CommandTestCase
     {
         $this->willResolveVersionAlias('prev', null);
 
-        list($tester, $statusCode) = $this->executeCommand(['version' => 'prev']);
+        [$tester, $statusCode] = $this->executeCommand(['version' => 'prev']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at first version', $tester->getDisplay());
@@ -35,7 +35,7 @@ class MigrateCommandTest extends CommandTestCase
     {
         $this->willResolveVersionAlias('next', null);
 
-        list($tester, $statusCode) = $this->executeCommand(['version' => 'next']);
+        [$tester, $statusCode] = $this->executeCommand(['version' => 'next']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at latest version', $tester->getDisplay());
@@ -45,7 +45,7 @@ class MigrateCommandTest extends CommandTestCase
     {
         $this->willResolveVersionAlias('nope', null);
 
-        list($tester, $statusCode) = $this->executeCommand(['version' => 'nope']);
+        [$tester, $statusCode] = $this->executeCommand(['version' => 'nope']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Unknown version: nope', $tester->getDisplay());
@@ -62,7 +62,7 @@ class MigrateCommandTest extends CommandTestCase
             ->willReturn([]);
         $this->willAskConfirmationAndReturn(false);
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(1, $statusCode);
         self::assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
@@ -76,7 +76,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => true]);
+        [$tester, $statusCode] = $this->executeCommand(['--write-sql' => true]);
 
         self::assertSame(0, $statusCode);
     }
@@ -89,7 +89,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => __DIR__]);
+        [$tester, $statusCode] = $this->executeCommand(['--write-sql' => __DIR__]);
 
         self::assertSame(0, $statusCode);
     }
@@ -111,7 +111,7 @@ class MigrateCommandTest extends CommandTestCase
         $this->config->expects($this->at(4))
             ->method('getAvailableVersions');
 
-        list($tester, $statusCode) = $this->executeCommand([
+        [$tester, $statusCode] = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ]);
@@ -131,7 +131,7 @@ class MigrateCommandTest extends CommandTestCase
                 return $confirm();
             });
 
-        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
+        [$tester, $statusCode] = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Migration cancelled', $tester->getDisplay());
@@ -150,7 +150,7 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
+        [$tester, $statusCode] = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(0, $statusCode);
     }
@@ -167,7 +167,7 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false], ['interactive' => false]);
+        [$tester, $statusCode] = $this->executeCommand(['--dry-run' => false], ['interactive' => false]);
 
         self::assertSame(0, $statusCode);
     }

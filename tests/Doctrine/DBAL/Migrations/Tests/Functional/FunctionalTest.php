@@ -431,8 +431,8 @@ class FunctionalTest extends MigrationTestCase
      */
     public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges()
     {
-        $listener            = new AutoCommitListener();
-        list($conn, $config) = self::fileConnectionAndConfig();
+        $listener        = new AutoCommitListener();
+        [$conn, $config] = self::fileConnectionAndConfig();
         $config->registerMigration(1, MigrateWithDataModification::class);
         $migration = new Migration($config);
         $conn->getEventManager()->addEventSubscriber($listener);

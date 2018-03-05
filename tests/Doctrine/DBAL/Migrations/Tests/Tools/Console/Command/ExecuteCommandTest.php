@@ -20,7 +20,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), 'up');
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--write-sql' => true,
             '--up' => true,
         ]);
@@ -34,7 +34,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, 'down');
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--write-sql' => __DIR__,
             '--down' => true,
         ]);
@@ -48,7 +48,7 @@ class ExecuteCommandTest extends CommandTestCase
         $this->version->expects($this->never())
             ->method('execute');
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains('Migration cancelled', $tester->getDisplay());
@@ -61,7 +61,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('execute')
             ->with('up', true, true);
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ]);
@@ -78,7 +78,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('execute')
             ->with('up', true, true);
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ], ['interactive' => false]);
