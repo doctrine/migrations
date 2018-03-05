@@ -13,9 +13,11 @@ cache:
 
 before_install:
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
-  - composer self-update
+  - travis_retry composer self-update
 
-install: travis_retry composer update --prefer-dist
+install:
+  - rm composer.lock
+  - travis_retry composer update --prefer-dist
 
 script:
   - ./vendor/bin/phpunit
@@ -27,11 +29,12 @@ jobs:
   include:
     - stage: Test
       env: DEPENDENCIES=low
-      install: travis_retry composer update --prefer-dist --prefer-lowest
+      install:
+        - rm composer.lock
+        - travis_retry composer update --prefer-dist --prefer-lowest
 
     - stage: Lint
-      before_script:
-        - travis_retry composer require --dev --prefer-dist --prefer-stable phpstan/phpstan:^0.9
+      install: travis_retry composer install --prefer-dist
       script: vendor/bin/phpstan analyse -l 3 -c phpstan.neon lib
 
     - stage: Coverage
@@ -45,5 +48,6 @@ jobs:
         - php ocular.phar code-coverage:upload --format=php-clover clover.xml
 
     - stage: Coding standard
+      install: travis_retry composer install --prefer-dist
       script:
         - ./vendor/bin/phpcs
