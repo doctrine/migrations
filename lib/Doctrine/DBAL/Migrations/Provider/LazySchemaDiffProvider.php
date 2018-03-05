@@ -63,7 +63,6 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
     }
 
     /**
-     * @param Schema $fromSchema
      * @return Schema
      */
     public function createToSchema(Schema $fromSchema)
@@ -86,9 +85,6 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
     }
 
     /**
-     * @param Schema $fromSchema
-     * @param Schema $toSchema
-     *
      * @return string[]
      */
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema)

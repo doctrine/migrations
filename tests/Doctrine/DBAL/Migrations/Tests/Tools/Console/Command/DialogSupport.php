@@ -2,15 +2,13 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Helper\DialogHelper;
 
 trait DialogSupport
 {
-    /**
-     * @var QuestionHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var QuestionHelper|MockObject */
     protected $questions;
 
     protected function configureDialogs(Application $app)

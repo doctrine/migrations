@@ -16,6 +16,7 @@ final class FileQueryWriterTest extends MigrationTestCase
     private const DOWN_QUERY  = 'DELETE FROM %s WHERE %s = \'1\'';
 
     /**
+     * @param string[] $queries
      * @dataProvider writeProvider
      */
     public function testWrite(string $path, string $direction, array $queries, ?OutputWriter $outputWriter) : void
@@ -39,6 +40,9 @@ final class FileQueryWriterTest extends MigrationTestCase
         }
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function writeProvider() : array
     {
         $outputWriter = $this->createMock(OutputWriter::class);

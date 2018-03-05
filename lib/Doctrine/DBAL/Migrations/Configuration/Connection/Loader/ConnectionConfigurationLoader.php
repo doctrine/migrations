@@ -11,16 +11,15 @@ class ConnectionConfigurationLoader implements ConnectionLoaderInterface
     /** @var Configuration */
     private $configuration;
 
-    public function __construct(Configuration $configuration = null)
+    public function __construct(?Configuration $configuration = null)
     {
-        if ($configuration !== null) {
-            $this->configuration = $configuration;
-        }
+        $this->configuration = $configuration;
     }
 
     /**
      * read the input and return a Configuration, returns `false` if the config
      * is not supported
+     *
      * @return Connection|null
      */
     public function chosen()

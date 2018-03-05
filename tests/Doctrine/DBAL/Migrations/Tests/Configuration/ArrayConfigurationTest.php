@@ -10,17 +10,17 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
 {
     public function loadConfiguration(
         $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinderInterface $migrationFinder = null
     ) {
         $configFile = 'config.php';
 
-        if ('' !== $configFileSuffix) {
+        if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.php';
         }
 
         $config = new ArrayConfiguration($this->getSqliteConnection(), $outputWriter, $migrationFinder);
-        $config->load(__DIR__ . DIRECTORY_SEPARATOR . "_files" . DIRECTORY_SEPARATOR . $configFile);
+        $config->load(__DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile);
 
         return $config;
     }
@@ -34,6 +34,6 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
         $this->expectExceptionMessage('Given config file does not exist');
 
         $config = new ArrayConfiguration($this->getSqliteConnection());
-        $config->load(__DIR__ . "/_files/none.php");
+        $config->load(__DIR__ . '/_files/none.php');
     }
 }

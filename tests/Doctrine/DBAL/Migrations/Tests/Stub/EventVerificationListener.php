@@ -8,8 +8,12 @@ use Doctrine\DBAL\Migrations\Events;
 
 final class EventVerificationListener implements EventSubscriber
 {
+    /** @var EventArgs[][] */
     public $events = [];
 
+    /**
+     * @return string[]
+     */
     public function getSubscribedEvents()
     {
         return [

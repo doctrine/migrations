@@ -8,6 +8,7 @@ use Doctrine\DBAL\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
 class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
+    /** @var string */
     private $filename;
 
     public function __construct($filename)
@@ -18,6 +19,7 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
     /**
      * read the input and return a Configuration, returns `false` if the config
      * is not supported
+     *
      * @return Connection|null
      */
     public function chosen()
@@ -26,12 +28,12 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
             return null;
         }
 
-        if ( ! file_exists($this->filename)) {
+        if (! file_exists($this->filename)) {
             return null;
         }
 
         $params = include $this->filename;
-        if ( ! is_array($params)) {
+        if (! is_array($params)) {
             throw new \InvalidArgumentException('The connection file has to return an array with database configuration parameters.');
         }
 

@@ -5,24 +5,31 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\Migrations\AbortMigrationException;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\IrreversibleMigrationException;
+use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Version;
+use Symfony\Component\Console\Output\StreamOutput;
 
 /**
  * Class AbstractMigrationTest
- * @package Doctrine\DBAL\Migrations\Tests
- *
- * @author Robbert van den Bogerd <rvdbogerd@ibuildings.nl>
  */
 class AbstractMigrationTest extends MigrationTestCase
 {
+    /** @var Configuration */
     private $config;
+
+    /** @var Version */
     private $version;
+
     /** @var  AbstractMigrationStub */
     private $migration;
+
+    /** @var OutputWriter */
     protected $outputWriter;
+
+    /** @var StreamOutput */
     protected $output;
 
     protected function setUp()

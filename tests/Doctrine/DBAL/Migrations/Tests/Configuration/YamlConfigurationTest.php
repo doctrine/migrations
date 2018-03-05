@@ -2,9 +2,9 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
-use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\OutputWriter;
 
 class YamlConfigurationTest extends AbstractConfigurationTest
 {
@@ -13,11 +13,11 @@ class YamlConfigurationTest extends AbstractConfigurationTest
      */
     public function loadConfiguration(
         $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinderInterface $migrationFinder = null
     ) {
         $configFile = 'config.yml';
-        if ('' !== $configFileSuffix) {
+        if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.yml';
         }
 

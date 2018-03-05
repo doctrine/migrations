@@ -2,33 +2,66 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Doctrine\DBAL\Version as DbalVersion;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup as OrmSetup;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\AbstractMigration;
-use Doctrine\DBAL\Migrations\MigrationsVersion;
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\DBAL\Migrations\MigrationsVersion;
 use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
-use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\Helper;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\DBAL\Version as DbalVersion;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Doctrine\ORM\Tools\Setup as OrmSetup;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
 
 /**
  * Tests the entire console application, end to end.
  */
 class CliTest extends MigrationTestCase
 {
+    /** @var Connection */
     private $conn;
 
+    /** @var Application */
     private $application;
 
+    /** @var int|null */
     private $lastExit;
+
+    protected function setUp()
+    {
+        $migrationsDbFilePath =
+            __DIR__ . DIRECTORY_SEPARATOR . '_files ' . DIRECTORY_SEPARATOR . 'migrations.db';
+        if (file_exists($migrationsDbFilePath)) {
+            @unlink($migrationsDbFilePath);
+        }
+        Helper::deleteDir(
+            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
+        );
+
+        $this->conn        = $this->getSqliteConnection();
+        $this->application = new Application('Doctrine Migrations Test', MigrationsVersion::VERSION());
+        $this->application->setCatchExceptions(false);
+        $this->application->setAutoExit(false);
+        $this->application->getHelperSet()->set(
+            new ConnectionHelper($this->conn),
+            'connection'
+        );
+        $this->application->addCommands([
+            new MigrationCommands\ExecuteCommand(),
+            new MigrationCommands\GenerateCommand(),
+            new MigrationCommands\LatestCommand(),
+            new MigrationCommands\MigrateCommand(),
+            new MigrationCommands\StatusCommand(),
+            new MigrationCommands\VersionCommand(),
+        ]);
+    }
 
     public function testMigrationLifecycleFromCommandLine()
     {
@@ -198,40 +231,14 @@ class CliTest extends MigrationTestCase
         self::assertContains('DROP TABLE FOO', $versionClassContents);
     }
 
-    protected function setUp()
-    {
-        $migrationsDbFilePath =
-            __DIR__ . DIRECTORY_SEPARATOR . '_files ' . DIRECTORY_SEPARATOR . 'migrations.db';
-        if (file_exists($migrationsDbFilePath)) {
-            @unlink($migrationsDbFilePath);
-        }
-        Helper::deleteDir(
-            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
-        );
-
-        $this->conn        = $this->getSqliteConnection();
-        $this->application = new Application('Doctrine Migrations Test', MigrationsVersion::VERSION());
-        $this->application->setCatchExceptions(false);
-        $this->application->setAutoExit(false);
-        $this->application->getHelperSet()->set(
-            new ConnectionHelper($this->conn),
-            'connection'
-        );
-        $this->application->addCommands([
-            new MigrationCommands\ExecuteCommand(),
-            new MigrationCommands\GenerateCommand(),
-            new MigrationCommands\LatestCommand(),
-            new MigrationCommands\MigrateCommand(),
-            new MigrationCommands\StatusCommand(),
-            new MigrationCommands\VersionCommand(),
-        ]);
-    }
-
-    protected function withDiffCommand(SchemaProviderInterface $provider = null)
+    protected function withDiffCommand(?SchemaProviderInterface $provider = null)
     {
         $this->application->add(new MigrationCommands\DiffCommand($provider));
     }
 
+    /**
+     * @param mixed[] $args
+     */
     protected function executeCommand($commandName, $configFile = 'config.yml', array $args = [])
     {
         $input  = new ArrayInput(array_merge(
@@ -262,15 +269,11 @@ class CliTest extends MigrationTestCase
     {
         $s = new Schema();
         $t = $s->createTable('foo');
-        $t->addColumn('id', 'integer', [
-            'autoincrement' => true,
-        ]);
+        $t->addColumn('id', 'integer', ['autoincrement' => true]);
         $t->setPrimaryKey(['id']);
 
         $t = $s->createTable('bar');
-        $t->addColumn('id', 'integer', [
-            'autoincrement' => true,
-        ]);
+        $t->addColumn('id', 'integer', ['autoincrement' => true]);
         $t->setPrimaryKey(['id']);
 
         return $s;
@@ -329,5 +332,11 @@ class FirstMigration extends AbstractMigration
 
 class SampleEntity
 {
+    /** @var mixed */
     private $id;
+
+    public function getId()
+    {
+        return $this->id;
+    }
 }

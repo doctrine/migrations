@@ -2,15 +2,10 @@
 
 namespace Doctrine\DBAL\Migrations;
 
-use \Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
 
 /**
  * Class for Migrations specific exceptions
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class MigrationException extends \Exception
 {

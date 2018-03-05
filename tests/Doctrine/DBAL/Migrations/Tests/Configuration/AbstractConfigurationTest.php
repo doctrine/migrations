@@ -13,15 +13,13 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 abstract class AbstractConfigurationTest extends MigrationTestCase
 {
     /**
-     * @param string                   $configFileSuffix Specify config to load.
-     * @param OutputWriter             $outputWriter
-     * @param MigrationFinderInterface $migrationFinder
+     * @param string $configFileSuffix Specify config to load.
      * @return \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration
      */
     abstract public function loadConfiguration(
         $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinderInterface $migrationFinder = null
     );
 
     public function testMigrationDirectory()
@@ -33,13 +31,13 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testMigrationNamespace()
     {
         $config = $this->loadConfiguration();
-        self::assertEquals("DoctrineMigrationsTest", $config->getMigrationsNamespace());
+        self::assertEquals('DoctrineMigrationsTest', $config->getMigrationsNamespace());
     }
 
     public function testMigrationName()
     {
         $config = $this->loadConfiguration();
-        self::assertEquals("Doctrine Sandbox Migrations", $config->getName());
+        self::assertEquals('Doctrine Sandbox Migrations', $config->getName());
     }
 
     public function testMigrationsTable()
@@ -64,7 +62,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testSetMigrationFinder()
     {
         $migrationFinderProphecy = $this->prophesize(MigrationFinderInterface::class);
-        /** @var $migrationFinder MigrationFinderInterface */
+        /** @var MigrationFinderInterface $migrationFinder */
         $migrationFinder = $migrationFinderProphecy->reveal();
 
         $config = $this->loadConfiguration();
@@ -150,6 +148,9 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration($file));
     }
 
+    /**
+     * @return string[][]
+     */
     public function getConfigWithKeysInVariousOrder()
     {
         return [

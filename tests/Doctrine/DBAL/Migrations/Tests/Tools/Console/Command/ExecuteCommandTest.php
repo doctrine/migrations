@@ -2,18 +2,16 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Helper\DialogHelper;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\DBAL\Migrations\Version;
 
 class ExecuteCommandTest extends CommandTestCase
 {
     use DialogSupport;
 
-    const VERSION = '20160705000000';
+    private const VERSION = '20160705000000';
 
+    /** @var Version */
     private $version;
 
     public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
@@ -105,6 +103,11 @@ class ExecuteCommandTest extends CommandTestCase
         return new ExecuteCommand();
     }
 
+    /**
+     * @param mixed[] $args
+     * @param mixed[] $options
+     * @return mixed[]
+     */
     protected function executeCommand(array $args, array $options = [])
     {
         $args['version'] = self::VERSION;

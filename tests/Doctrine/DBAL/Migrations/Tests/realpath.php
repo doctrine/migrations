@@ -7,13 +7,13 @@ namespace Doctrine\DBAL\Migrations;
  *
  * @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
  *
- * @param $path
+ * @param string $path
  *
  * @return string|false
  */
 function realpath($path)
 {
-    if (0 === strpos($path, 'vfs://')) {
+    if (strpos($path, 'vfs://') === 0) {
         return $path;
     }
 

@@ -4,17 +4,16 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 
 use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Version;
 
 class MigrationStatusInfosHelper
 {
-    /** @var Version[] */
+    /** @var string[] */
     private $executedMigrations;
 
-    /** @var Version[] */
+    /** @var string[] */
     private $availableMigrations;
 
-    /** @var Version[] */
+    /** @var string[] */
     private $executedUnavailableMigrations;
 
     /** @var Configuration  */
@@ -78,7 +77,7 @@ class MigrationStatusInfosHelper
     }
 
     /**
-     * @return Version[]
+     * @return string[]
      */
     public function getExecutedUnavailableMigrations()
     {

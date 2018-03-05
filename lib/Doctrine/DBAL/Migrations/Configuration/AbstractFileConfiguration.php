@@ -7,11 +7,6 @@ use Doctrine\DBAL\Migrations\MigrationException;
 /**
  * Abstract Migration Configuration class for loading configuration information
  * from a configuration file (xml or yml).
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 abstract class AbstractFileConfiguration extends Configuration
 {
@@ -25,13 +20,11 @@ abstract class AbstractFileConfiguration extends Configuration
     /**
      * Whether or not the configuration file has been loaded yet or not
      *
-     * @var boolean
+     * @var bool
      */
     private $loaded = false;
 
-    /**
-     * @var array of possible configuration properties in migrations configuration.
-     */
+    /** @var string[] of possible configuration properties in migrations configuration. */
     private $configurationProperties = [
         'migrations_namespace' => 'setMigrationsNamespace',
         'table_name' => 'setMigrationsTableName',
@@ -43,18 +36,25 @@ abstract class AbstractFileConfiguration extends Configuration
         'custom_template' => 'setCustomTemplate',
     ];
 
+    /**
+     * @param mixed[] $config
+     *
+     * @throws MigrationException
+     */
     protected function setConfiguration(array $config)
     {
         foreach ($config as $configurationKey => $configurationValue) {
-            if ( ! isset($this->configurationProperties[$configurationKey])) {
+            if (! isset($this->configurationProperties[$configurationKey])) {
                 $msg = sprintf('Migrations configuration key "%s" does not exist.', $configurationKey);
                 throw MigrationException::configurationNotValid($msg);
             }
         }
         foreach ($this->configurationProperties as $configurationKey => $configurationSetter) {
-            if (isset($config[$configurationKey])) {
-                $this->{$configurationSetter}($config[$configurationKey]);
+            if (! isset($config[$configurationKey])) {
+                continue;
             }
+
+            $this->{$configurationSetter}($config[$configurationKey]);
         }
     }
 
@@ -66,18 +66,20 @@ abstract class AbstractFileConfiguration extends Configuration
 
     private function loadMigrations($migrations)
     {
-        if (is_array($migrations)) {
-            foreach ($migrations as $migration) {
-                $this->registerMigration($migration['version'], $migration['class']);
-            }
+        if (! is_array($migrations)) {
+            return;
+        }
+
+        foreach ($migrations as $migration) {
+            $this->registerMigration($migration['version'], $migration['class']);
         }
     }
 
     private function setMigrationOrganisation($migrationOrganisation)
     {
-        if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR) == 0) {
+        if (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();
-        } elseif (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) == 0) {
+        } elseif (strcasecmp($migrationOrganisation, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
             $this->setMigrationsAreOrganizedByYearAndMonth();
         } else {
             $msg = 'Unknown ' . var_export($migrationOrganisation, true) . ' for configuration "organize_migrations".';
@@ -90,19 +92,22 @@ abstract class AbstractFileConfiguration extends Configuration
      *
      * @param string $file The path to the configuration file
      *
-     * @throws MigrationException Throws exception if configuration file was already loaded
+     * @throws MigrationException Throws exception if configuration file was already loaded.
      */
     public function load($file)
     {
         if ($this->loaded) {
             throw MigrationException::configurationFileAlreadyLoaded();
         }
-        if (file_exists($path = getcwd() . '/' . $file)) {
+
+        $path = getcwd() . '/' . $file;
+
+        if (file_exists($path)) {
             $file = $path;
         }
         $this->file = $file;
 
-        if ( ! file_exists($file)) {
+        if (! file_exists($file)) {
             throw new \InvalidArgumentException('Given config file does not exist');
         }
 

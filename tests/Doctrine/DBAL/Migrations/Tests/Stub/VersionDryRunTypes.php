@@ -7,7 +7,10 @@ use Doctrine\DBAL\Schema\Schema;
 
 class VersionDryRunTypes extends AbstractMigration
 {
+    /** @var mixed */
     private $value;
+
+    /** @var string */
     private $type;
 
     public function setParam($value, $type)

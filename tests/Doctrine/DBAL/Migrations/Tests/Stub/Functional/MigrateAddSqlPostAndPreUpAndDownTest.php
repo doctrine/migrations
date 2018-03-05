@@ -7,12 +7,12 @@ use Doctrine\DBAL\Schema\Schema;
 
 class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
 {
-    const TABLE_NAME = 'test_add_sql_post_up_table';
+    public const TABLE_NAME = 'test_add_sql_post_up_table';
 
     public function preUp(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [1]
         );
     }
@@ -20,7 +20,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
     public function up(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [2]
         );
     }
@@ -28,7 +28,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
     public function postUp(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [3]
         );
     }
@@ -36,7 +36,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
     public function preDown(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [4]
         );
     }
@@ -44,7 +44,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
     public function down(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [5]
         );
     }
@@ -52,7 +52,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
     public function postDown(Schema $schema)
     {
         $this->addSql(
-            sprintf("INSERT INTO %s (test) values (?)", self::TABLE_NAME),
+            sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
             [6]
         );
     }

@@ -14,22 +14,28 @@ use Doctrine\ORM\Tools\Setup;
 
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
- *
- * @since   1.0.0-alpha3
  */
 class OrmSchemaProviderTest extends MigrationTestCase
 {
-    /** @var  Connection */
+    /** @var Connection */
     private $conn;
 
-    /** @var  Configuration */
+    /** @var Configuration */
     private $config;
 
-    /** @var  EntityManagerInterface */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /** @var  OrmSchemaProvider */
+    /** @var OrmSchemaProvider */
     private $ormProvider;
+
+    protected function setUp()
+    {
+        $this->conn          = $this->getSqliteConnection();
+        $this->config        = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
+        $this->entityManager = EntityManager::create($this->conn, $this->config);
+        $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
+    }
 
     public function testCreateSchemaFetchesMetadataFromEntityManager()
     {
@@ -49,10 +55,13 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->ormProvider->createSchema();
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function notEntityManagers()
     {
         return [
-            [new \stdClass],
+            [new \stdClass()],
             [false],
             [1],
             ['oops'],
@@ -68,13 +77,5 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->expectException(\InvalidArgumentException::class);
 
         new OrmSchemaProvider($em);
-    }
-
-    protected function setUp()
-    {
-        $this->conn          = $this->getSqliteConnection();
-        $this->config        = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
-        $this->entityManager = EntityManager::create($this->conn, $this->config);
-        $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
     }
 }

@@ -5,17 +5,16 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 
-abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
+abstract class MigrationTestCase extends TestCase
 {
-    /**
-     * @var OutputWriter
-     */
+    /** @var OutputWriter */
     private $outputWriter;
 
-    /** @var  Output */
+    /** @var Output */
     protected $output;
 
     public function getSqliteConnection()
@@ -56,7 +55,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
     public function getInputStream($input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
+        fwrite($stream, $input);
         rewind($stream);
 
         return $stream;
@@ -64,7 +63,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 
     protected function getOutputWriter()
     {
-        if ( ! $this->outputWriter) {
+        if (! $this->outputWriter) {
             $this->output       = $this->getOutputStream();
             $output             = $this->output;
             $this->outputWriter = new OutputWriter(function ($message) use ($output) {
@@ -76,7 +75,7 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
 
     protected function createTempDirForMigrations($path)
     {
-        if ( ! mkdir($path)) {
+        if (! mkdir($path)) {
             throw new \Exception('fail to create a temporary folder for the tests at ' . $path);
         }
     }
@@ -85,8 +84,12 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
     {
         if (is_dir($path)) {
             return glob(realpath($path) . '/*.sql');
-        } elseif (is_file($path)) {
+        }
+
+        if (is_file($path)) {
             return [$path];
         }
+
+        return null;
     }
 }

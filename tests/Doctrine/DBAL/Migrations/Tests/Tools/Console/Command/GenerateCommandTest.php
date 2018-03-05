@@ -2,16 +2,19 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use org\bovigo\vfs\vfsStream;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
+use org\bovigo\vfs\vfsStream;
 
 class GenerateCommandTest extends CommandTestCase
 {
-    const VERSION                       = '20160705000000';
-    const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
-    const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
+    private const VERSION                       = '20160705000000';
+    private const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    private const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
 
+    /** @var string */
     private $root;
+
+    /** @var string */
     private $migrationFile;
 
     protected function setUp()
@@ -39,6 +42,9 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
+    /**
+     * @return string[][]
+     */
     public static function provideCustomTemplateNames() : array
     {
         return [

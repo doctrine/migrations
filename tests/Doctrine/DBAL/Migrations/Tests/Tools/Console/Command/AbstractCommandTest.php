@@ -8,7 +8,6 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -16,6 +15,7 @@ use Symfony\Component\Console\Output\Output;
 
 class AbstractCommandTest extends MigrationTestCase
 {
+    /** @var string */
     private $originalCwd;
 
     /**
@@ -23,7 +23,7 @@ class AbstractCommandTest extends MigrationTestCase
      *
      * @param mixed $input
      * @param mixed $configuration
-     * @param bool $noConnection
+     * @param bool  $noConnection
      * @param mixed $helperSet
      *
      * @return Configuration
@@ -40,20 +40,20 @@ class AbstractCommandTest extends MigrationTestCase
             ['command']
         );
 
-        if ($helperSet != null && $helperSet instanceof HelperSet) {
+        if ($helperSet !== null && $helperSet instanceof HelperSet) {
             $command->setHelperSet($helperSet);
         } else {
             $command->setHelperSet(new HelperSet());
         }
 
-        if ( ! $noConnection) {
+        if (! $noConnection) {
             $command->getHelperSet()->set(
                 new ConnectionHelper($this->getSqliteConnection()),
                 'connection'
             );
         }
 
-        if (null !== $configuration) {
+        if ($configuration !== null) {
             $command->setMigrationConfiguration($configuration);
         }
 
@@ -116,7 +116,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $input->method('getOption')
             ->will($this->returnValueMap([
-                ['db-configuration', __DIR__ . '/_files/db-config.php']
+                ['db-configuration', __DIR__ . '/_files/db-config.php'],
             ]));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
@@ -137,7 +137,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $input->method('getOption')
             ->will($this->returnValueMap([
-                ['configuration', __DIR__ . '/_files/config.yml']
+                ['configuration', __DIR__ . '/_files/config.yml'],
             ]));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
@@ -190,7 +190,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $input->method('getOption')
             ->will($this->returnValueMap([
-                ['configuration', __DIR__ . '/_files/config.yml']
+                ['configuration', __DIR__ . '/_files/config.yml'],
             ]));
 
         $configuration = $this
@@ -219,7 +219,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $input->method('getOption')
             ->will($this->returnValueMap([
-                ['configuration', null]
+                ['configuration', null],
             ]));
 
         $configuration = $this->createMock(Configuration::class);
@@ -253,7 +253,7 @@ class AbstractCommandTest extends MigrationTestCase
         self::assertSame($configuration, $actualConfiguration);
     }
 
-    private function invokeAbstractCommandConfirmation($input, $helper, $response = "y", $question = "There is no question?")
+    private function invokeAbstractCommandConfirmation($input, $helper, $response = 'y', $question = 'There is no question?')
     {
         $class  = new \ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('askConfirmation');
@@ -267,13 +267,9 @@ class AbstractCommandTest extends MigrationTestCase
 
         $input->setStream($this->getInputStream($response . "\n"));
         if ($helper instanceof QuestionHelper) {
-            $helperSet = new HelperSet([
-                'question' => $helper
-            ]);
+            $helperSet = new HelperSet(['question' => $helper]);
         } else {
-            $helperSet = new HelperSet([
-                'dialog' => $helper
-            ]);
+            $helperSet = new HelperSet(['dialog' => $helper]);
         }
 
         $command->setHelperSet($helperSet);
@@ -291,7 +287,7 @@ class AbstractCommandTest extends MigrationTestCase
         $helper = new QuestionHelper();
 
         self::assertTrue($this->invokeAbstractCommandConfirmation($input, $helper));
-        self::assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, "n"));
+        self::assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, 'n'));
     }
 
     protected function setUp()
@@ -301,8 +297,10 @@ class AbstractCommandTest extends MigrationTestCase
 
     protected function tearDown()
     {
-        if (getcwd() !== $this->originalCwd) {
-            chdir($this->originalCwd);
+        if (getcwd() === $this->originalCwd) {
+            return;
         }
+
+        chdir($this->originalCwd);
     }
 }

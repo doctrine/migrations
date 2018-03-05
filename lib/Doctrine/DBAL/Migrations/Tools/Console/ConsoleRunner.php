@@ -13,10 +13,7 @@ class ConsoleRunner
     /**
      * Runs console with the given helperset.
      *
-     * @param \Symfony\Component\Console\Helper\HelperSet  $helperSet
      * @param \Symfony\Component\Console\Command\Command[] $commands
-     *
-     * @return void
      */
     public static function run(HelperSet $helperSet, $commands = [])
     {
@@ -28,8 +25,7 @@ class ConsoleRunner
      * Creates a console application with the given helperset and
      * optional commands.
      *
-     * @param \Symfony\Component\Console\Helper\HelperSet $helperSet
-     * @param array $commands
+     * @param \Symfony\Component\Console\Command\Command[] $commands
      *
      * @return \Symfony\Component\Console\Application
      */
@@ -44,11 +40,6 @@ class ConsoleRunner
         return $cli;
     }
 
-    /**
-     * @param Application $cli
-     *
-     * @return void
-     */
     public static function addCommands(Application $cli)
     {
         $cli->addCommands([
@@ -61,8 +52,10 @@ class ConsoleRunner
             new Command\UpToDateCommand(),
         ]);
 
-        if ($cli->getHelperSet()->has('em')) {
-            $cli->add(new Command\DiffCommand());
+        if (! $cli->getHelperSet()->has('em')) {
+            return;
         }
+
+        $cli->add(new Command\DiffCommand());
     }
 }

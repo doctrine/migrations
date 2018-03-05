@@ -7,7 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 class MigrationMigrateFurther extends AbstractMigration
 {
-
     public function down(Schema $schema)
     {
         $schema->dropTable('bar');

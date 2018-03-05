@@ -7,9 +7,7 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 class MigrationsEventArgs extends EventArgs
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $config;
 
     /**

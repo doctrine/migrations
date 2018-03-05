@@ -6,19 +6,15 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for generating new blank migration classes
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class GenerateCommand extends AbstractCommand
 {
+    /** @var string */
     private static $_template =
             '<?php declare(strict_types=1);
 
@@ -46,6 +42,7 @@ final class Version<version> extends AbstractMigration
 }
 ';
 
+    /** @var string */
     private $instanceTemplate;
 
     protected function configure()
@@ -100,8 +97,8 @@ EOT
         $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
-            $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null,
+            $up ? '        ' . implode("\n        ", explode("\n", $up)) : null,
+            $down ? '        ' . implode("\n        ", explode("\n", $down)) : null,
         ];
 
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
@@ -113,7 +110,9 @@ EOT
 
         file_put_contents($path, $code);
 
-        if ($editorCmd = $input->getOption('editor-cmd')) {
+        $editorCmd = $input->getOption('editor-cmd');
+
+        if ($editorCmd) {
             proc_open($editorCmd . ' ' . escapeshellarg($path), [], $pipes);
         }
 
@@ -128,7 +127,7 @@ EOT
             return;
         }
 
-        if ( ! is_file($customTemplate) || ! is_readable($customTemplate)) {
+        if (! is_file($customTemplate) || ! is_readable($customTemplate)) {
             throw new \InvalidArgumentException(
                 'The specified template "' . $customTemplate . '" cannot be found or is not readable.'
             );

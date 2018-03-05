@@ -2,20 +2,32 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use org\bovigo\vfs\vfsStream;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\DBAL\Schema\Schema;
+use org\bovigo\vfs\vfsStream;
 
 class DiffCommandTest extends CommandTestCase
 {
-    const VERSION                       = '20160705000000';
-    const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
-    const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
+    private const VERSION                       = '20160705000000';
+    private const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    private const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
 
+    /** @var string */
     private $root;
+
+    /** @var string */
     private $migrationFile;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
+        $this->root          = vfsStream::setup('migrations');
+        $this->config->method('getMigrationsDirectory')
+            ->willReturn(vfsStream::url('migrations'));
+    }
 
     public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration() : void
     {
@@ -33,6 +45,9 @@ class DiffCommandTest extends CommandTestCase
         self::assertContains('CREATE TABLE example', $content);
     }
 
+    /**
+     * @return string[][]
+     */
     public static function provideCustomTemplateNames() : array
     {
         return [
@@ -63,16 +78,6 @@ class DiffCommandTest extends CommandTestCase
         self::assertContains('class Version' . self::VERSION, $content);
         self::assertContains('CREATE TABLE example', $content);
         self::assertContains('public function customTemplate()', $content);
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-
-        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root          = vfsStream::setup('migrations');
-        $this->config->method('getMigrationsDirectory')
-            ->willReturn(vfsStream::url('migrations'));
     }
 
     protected function createCommand()

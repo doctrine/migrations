@@ -5,9 +5,10 @@ namespace Doctrine\DBAL\Migrations\Tests\Functional;
 use Doctrine\DBAL\Configuration as DbalConfig;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\DBAL\Migrations\Events;
 use Doctrine\DBAL\Migrations\Migration;
-use Doctrine\DBAL\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\EventVerificationListener;
@@ -17,22 +18,17 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateWithDataModification;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
 class FunctionalTest extends MigrationTestCase
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $config;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     private $connection;
 
     protected function setUp()
@@ -197,7 +193,7 @@ class FunctionalTest extends MigrationTestCase
         $this->config->registerMigration(1, MigrateAddSqlPostAndPreUpAndDownTest::class);
         $tableName = MigrateAddSqlPostAndPreUpAndDownTest::TABLE_NAME;
 
-        $this->config->getConnection()->executeQuery(sprintf("CREATE TABLE IF NOT EXISTS %s (test INT)", $tableName));
+        $this->config->getConnection()->executeQuery(sprintf('CREATE TABLE IF NOT EXISTS %s (test INT)', $tableName));
 
         $migration = new Migration($this->config);
         $migration->migrate(1);
@@ -205,19 +201,18 @@ class FunctionalTest extends MigrationTestCase
         $migrations = $this->config->getMigrations();
         self::assertTrue($migrations[1]->isMigrated());
 
-        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $check = $this->config->getConnection()->fetchColumn('select SUM(test) as sum from ' . $tableName);
 
         self::assertNotEmpty($check);
         self::assertEquals(3, $check);
 
         $migration->migrate(0);
         self::assertFalse($migrations[1]->isMigrated());
-        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $check = $this->config->getConnection()->fetchColumn('select SUM(test) as sum from ' . $tableName);
         self::assertNotEmpty($check);
         self::assertEquals(12, $check);
 
-
-        $this->config->getConnection()->executeQuery(sprintf("DROP TABLE %s ", $tableName));
+        $this->config->getConnection()->executeQuery(sprintf('DROP TABLE %s ', $tableName));
     }
 
     public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
@@ -298,6 +293,7 @@ class FunctionalTest extends MigrationTestCase
     }
 
     /**
+     * @param string[] $migrations
      * @see https://github.com/doctrine/migrations/issues/61
      * @group regresion
      * @dataProvider provideTestMigrationNames
@@ -342,17 +338,22 @@ class FunctionalTest extends MigrationTestCase
         };
     }
 
+    /**
+     * @return string[][]
+     */
     public function provideTestMigrationNames()
     {
         return [
             [[
                 '20120228123443' => MigrateAddSqlTest::class,
                 '20120228114838' => MigrationMigrateFurther::class,
-            ]],
+            ],
+            ],
             [[
                 '002Test' => MigrateAddSqlTest::class,
                 '001Test' => MigrationMigrateFurther::class,
-            ]]
+            ],
+            ],
         ];
     }
 

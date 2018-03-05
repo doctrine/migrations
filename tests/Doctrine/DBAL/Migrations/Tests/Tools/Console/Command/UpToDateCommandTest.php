@@ -6,6 +6,8 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\DBAL\Migrations\Version;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -13,15 +15,15 @@ use Symfony\Component\Console\Output\OutputInterface;
 /**
  * @covers \Doctrine\DBAL\Migrations\Tools\Console\Command\UpToDateCommand
  */
-class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
+class UpToDateCommandTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
+    /** @var OutputInterface|MockObject */
     private $commandOutput;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationHelper */
+    /** @var ConfigurationHelper|MockObject */
     private $configurationHelper;
 
     /** @var UpToDateCommand */
@@ -42,16 +44,16 @@ class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
         $this->commandOutput = $this->getMockBuilder(OutputInterface::class)->getMock();
 
         $this->sut = new UpToDateCommand();
-        $this->sut->setHelperSet(new HelperSet(array(
+        $this->sut->setHelperSet(new HelperSet([
             'configuration' => $this->configurationHelper,
-        )));
+        ]));
     }
 
     /**
      * @dataProvider dataIsUpToDate
      * @param Version[] $migrations
-     * @param string[] $migratedVersions
-     * @param int $exitCode
+     * @param string[]  $migratedVersions
+     * @param int       $exitCode
      */
     public function testIsUpToDate($migrations, $migratedVersions, $exitCode)
     {
@@ -70,7 +72,7 @@ class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
     }
 
     /**
-     * @return array[]
+     * @return mixed[][]
      */
     public function dataIsUpToDate()
     {
@@ -79,28 +81,20 @@ class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
                 [
                     $this->createVersion('20160614015627'),
                 ],
-                [
-                    '20160614015627',
-                ],
-                0
+                ['20160614015627'],
+                0,
             ],
             'empty-migration-set' => [
-                [
-
-                ],
-                [
-
-                ],
-                0
+                [],
+                [],
+                0,
             ],
             'one-migration-available' => [
                 [
                     $this->createVersion('20150614015627'),
                 ],
-                [
-
-                ],
-                1
+                [],
+                1,
             ],
             'many-migrations-available' => [
                 [
@@ -109,10 +103,8 @@ class UpToDateCommandTest extends \PHPUnit\Framework\TestCase
                     $this->createVersion('20130614015627'),
                     $this->createVersion('20140614015627'),
                 ],
-                [
-                    '20110614015627',
-                ],
-                1
+                ['20110614015627'],
+                1,
             ],
         ];
     }

@@ -9,9 +9,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 
 class ConnectionHelperLoader implements ConnectionLoaderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $helperName;
 
     /** @var  HelperSet */
@@ -19,11 +17,9 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
 
 
     /**
-     * ConnectionHelperLoader constructor.
-     * @param HelperSet $helperSet
      * @param string $helperName
      */
-    public function __construct(HelperSet $helperSet = null, $helperName)
+    public function __construct(?HelperSet $helperSet = null, $helperName)
     {
         $this->helperName = $helperName;
         if ($helperSet === null) {
@@ -35,6 +31,7 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
     /**
      * read the input and return a Configuration, returns `false` if the config
      * is not supported
+     *
      * @return Connection|null
      */
     public function chosen()

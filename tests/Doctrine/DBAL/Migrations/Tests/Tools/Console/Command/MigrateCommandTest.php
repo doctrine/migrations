@@ -2,28 +2,30 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArrayInput;
 
 class MigrateCommandTest extends CommandTestCase
 {
     use DialogSupport;
 
-    const VERSION = '20160705000000';
+    private const VERSION = '20160705000000';
 
+    /** @var Migration */
     private $migration;
+
+    protected function setUp()
+    {
+        parent::setUp();
+        $this->configureDialogs($this->app);
+    }
 
     public function testPreviousVersionErrorsWhenThereIsNoPreviousVersion()
     {
         $this->willResolveVersionAlias('prev', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'prev',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'prev']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at first version', $tester->getDisplay());
@@ -33,9 +35,7 @@ class MigrateCommandTest extends CommandTestCase
     {
         $this->willResolveVersionAlias('next', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'next',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'next']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at latest version', $tester->getDisplay());
@@ -45,9 +45,7 @@ class MigrateCommandTest extends CommandTestCase
     {
         $this->willResolveVersionAlias('nope', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'nope',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'nope']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Unknown version: nope', $tester->getDisplay());
@@ -78,9 +76,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--write-sql' => true,
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => true]);
 
         self::assertSame(0, $statusCode);
     }
@@ -93,9 +89,7 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--write-sql' => __DIR__,
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => __DIR__]);
 
         self::assertSame(0, $statusCode);
     }
@@ -137,9 +131,7 @@ class MigrateCommandTest extends CommandTestCase
                 return $confirm();
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Migration cancelled', $tester->getDisplay());
@@ -158,9 +150,7 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(0, $statusCode);
     }
@@ -177,17 +167,9 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ], ['interactive' => false]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false], ['interactive' => false]);
 
         self::assertSame(0, $statusCode);
-    }
-
-    protected function setUp()
-    {
-        parent::setUp();
-        $this->configureDialogs($this->app);
     }
 
     /**

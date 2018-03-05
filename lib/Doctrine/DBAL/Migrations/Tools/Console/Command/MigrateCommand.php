@@ -5,18 +5,13 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for executing a migration to a specified version or the latest available version.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class MigrateCommand extends AbstractCommand
 {
@@ -78,7 +73,7 @@ EOT
 
         $timeAllqueries = $input->getOption('query-time');
 
-        $dryRun = (boolean) $input->getOption('dry-run');
+        $dryRun = (bool) $input->getOption('dry-run');
         $configuration->setIsDryRun($dryRun);
 
         $executedMigrations  = $configuration->getMigratedVersions();
@@ -90,7 +85,7 @@ EOT
         }
 
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
-        if ( ! empty($executedUnavailableMigrations)) {
+        if (! empty($executedUnavailableMigrations)) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations'
                 . ' in the database that are not registered migrations.</error>',
@@ -106,14 +101,16 @@ EOT
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
-            if ( ! $this->canExecute($question, $input, $output)) {
+            if (! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return 1;
             }
         }
 
-        if ($path = $input->getOption('write-sql')) {
+        $path = $input->getOption('write-sql');
+
+        if ($path) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
             return 0;
@@ -150,8 +147,6 @@ EOT
 
     /**
      * @param string $question
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return bool
      */
     private function canExecute($question, InputInterface $input, OutputInterface $output)
@@ -165,23 +160,21 @@ EOT
 
     /**
      * @param string $versionAlias
-     * @param OutputInterface $output
-     * @param Configuration $configuration
      * @return bool|string
      */
     private function getVersionNameFromAlias($versionAlias, OutputInterface $output, Configuration $configuration)
     {
         $version = $configuration->resolveVersionAlias($versionAlias);
         if ($version === null) {
-            if ($versionAlias == 'prev') {
+            if ($versionAlias === 'prev') {
                 $output->writeln('<error>Already at first version.</error>');
                 return false;
             }
-            if ($versionAlias == 'next') {
+            if ($versionAlias === 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
                 return false;
             }
-            if (substr($versionAlias, 0, 7) == 'current') {
+            if (substr($versionAlias, 0, 7) === 'current') {
                 $output->writeln('<error>The delta couldn\'t be reached.</error>');
                 return false;
             }

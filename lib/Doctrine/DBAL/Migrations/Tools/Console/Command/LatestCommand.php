@@ -7,8 +7,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Outputs the latest version number.
- *
- * @author Kris Wallsmith <kris.wallsmith@gmail.com>
  */
 class LatestCommand extends AbstractCommand
 {

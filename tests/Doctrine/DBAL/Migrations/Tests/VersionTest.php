@@ -36,15 +36,20 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\DBAL\Migrations\Version;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
+use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Console\Output\StreamOutput;
 
 require_once __DIR__ . '/realpath.php';
 
 class VersionTest extends MigrationTestCase
 {
+    /** @var Configuration */
     private $config;
 
+    /** @var OutputWriter */
     protected $outputWriter;
 
+    /** @var StreamOutput */
     protected $output;
 
     public function testConstants()
@@ -143,7 +148,7 @@ class VersionTest extends MigrationTestCase
 
     /**
      * Provides states
-     * @return array
+     * @return int[][]
      */
     public function stateProvider()
     {
@@ -174,10 +179,6 @@ class VersionTest extends MigrationTestCase
     }
 
     /**
-     * @param $path
-     * @param $to
-     * @param $getSqlReturn
-     *
      * @dataProvider writeSqlFileProvider
      */
     public function testWriteSqlFile($path, $direction, $getSqlReturn)
@@ -224,6 +225,9 @@ class VersionTest extends MigrationTestCase
         self::assertTrue($version->writeSqlFile($path, $direction));
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function writeSqlFileProvider()
     {
         return [
@@ -316,10 +320,6 @@ class VersionTest extends MigrationTestCase
     }
 
     /**
-     * @param $direction
-     * @param $columnName
-     * @param $tableName
-     *
      * @dataProvider sqlWriteProvider
      */
     public function testWriteSqlWriteToTheCorrectColumnName($direction, $columnName, $tableName)
@@ -343,15 +343,18 @@ class VersionTest extends MigrationTestCase
         foreach ($files as $file) {
             $contents = file_get_contents($file);
             self::assertNotEmpty($contents);
-            if ($direction == Version::DIRECTION_UP) {
-                self::assertContains("INSERT INTO $tableName ($columnName) VALUES ('$versionName');", $contents);
+            if ($direction === Version::DIRECTION_UP) {
+                self::assertContains('INSERT INTO ' . $tableName . ' (' . $columnName . ") VALUES ('" . $versionName . "');", $contents);
             } else {
-                self::assertContains("DELETE FROM $tableName WHERE $columnName = '$versionName'", $contents);
+                self::assertContains('DELETE FROM ' . $tableName . ' WHERE ' . $columnName . " = '" . $versionName . "'", $contents);
             }
             unlink($file);
         }
     }
 
+    /**
+     * @return string[][]
+     */
     public function sqlWriteProvider()
     {
         return [
@@ -368,8 +371,7 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-
-        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Configuration|MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
                        ->disableOriginalConstructor()
                        ->setMethods(['getOutputWriter', 'getConnection'])
@@ -380,7 +382,6 @@ class VersionTest extends MigrationTestCase
 
         $config->method('getConnection')
                ->willReturn($connection);
-
 
         /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Version::class)
@@ -407,8 +408,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunWithoutParams::class
@@ -426,8 +427,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunQuestionMarkParams::class
@@ -446,8 +447,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunNamedParams::class
@@ -478,8 +479,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunTypes::class

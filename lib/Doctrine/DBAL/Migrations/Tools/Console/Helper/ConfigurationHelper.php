@@ -9,28 +9,21 @@ use Doctrine\DBAL\Migrations\Configuration\JsonConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
-use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Input\InputInterface;
 
 /**
- * Class ConfigurationHelper
- * @package Doctrine\DBAL\Migrations\Tools\Console\Helper
  * @internal
  */
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
-
-    /**
-     * @var Connection
-     */
+    /** @var Connection|null */
     private $connection;
 
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration|null */
     private $configuration;
 
-    public function __construct(Connection $connection = null, Configuration $configuration = null)
+    public function __construct(?Connection $connection = null, ?Configuration $configuration = null)
     {
         $this->connection    = $connection;
         $this->configuration = $configuration;
@@ -43,7 +36,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
          * instead of any other one.
          */
         if ($input->getOption('configuration')) {
-            $outputWriter->write("Loading configuration from command option: " . $input->getOption('configuration'));
+            $outputWriter->write('Loading configuration from command option: ' . $input->getOption('configuration'));
 
             return $this->loadConfig($input->getOption('configuration'), $outputWriter);
         }
@@ -52,7 +45,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
          * If a configuration has already been set using DI or a Setter use it.
          */
         if ($this->configuration) {
-            $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
+            $outputWriter->write('Loading configuration from the integration code of your framework (setter).');
 
             return $this->configuration;
         }
@@ -69,7 +62,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         ];
         foreach ($defaultConfig as $config) {
             if ($this->configExists($config)) {
-                $outputWriter->write("Loading configuration from file: $config");
+                $outputWriter->write('Loading configuration from file: ' . $config);
 
                 return $this->loadConfig($config, $outputWriter);
             }

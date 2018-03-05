@@ -10,7 +10,9 @@ final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterf
     /** @var  ConnectionLoaderInterface[] */
     private $loaders;
 
-
+    /**
+     * @param ConnectionLoaderInterface[] $loaders
+     */
     public function __construct(array $loaders)
     {
         $this->loaders = $loaders;
@@ -24,7 +26,8 @@ final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterf
     public function chosen()
     {
         foreach ($this->loaders as $loader) {
-            if (null !== $confObj = $loader->chosen()) {
+            $confObj = $loader->chosen();
+            if ($confObj !== null) {
                 return $confObj;
             }
         }

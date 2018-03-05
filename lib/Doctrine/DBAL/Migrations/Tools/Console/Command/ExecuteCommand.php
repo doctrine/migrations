@@ -2,18 +2,13 @@
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for executing single migrations up or down manually.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class ExecuteCommand extends AbstractCommand
 {
@@ -64,7 +59,9 @@ EOT
 
         $timeAllqueries = $input->getOption('query-time');
 
-        if ($path = $input->getOption('write-sql')) {
+        $path = $input->getOption('write-sql');
+
+        if ($path) {
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {
@@ -76,7 +73,7 @@ EOT
             }
 
             if ($execute) {
-                $version->execute($direction, (boolean) $input->getOption('dry-run'), $timeAllqueries);
+                $version->execute($direction, (bool) $input->getOption('dry-run'), $timeAllqueries);
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }

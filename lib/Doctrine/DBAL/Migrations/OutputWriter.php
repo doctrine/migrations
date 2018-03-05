@@ -5,16 +5,14 @@ namespace Doctrine\DBAL\Migrations;
 /**
  * Simple class for outputting information from migrations.
  *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
  * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class OutputWriter
 {
+    /** @var \Closure|null */
     private $closure;
 
-    public function __construct(\Closure $closure = null)
+    public function __construct(?\Closure $closure = null)
     {
         if ($closure === null) {
             $closure = function ($message) {

@@ -10,17 +10,17 @@ class JsonConfigurationTest extends AbstractConfigurationTest
 {
     public function loadConfiguration(
         $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinderInterface $migrationFinder = null
     ) {
         $configFile = 'config.json';
 
-        if ('' !== $configFileSuffix) {
+        if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.json';
         }
 
         $config = new JsonConfiguration($this->getSqliteConnection(), $outputWriter, $migrationFinder);
-        $config->load(__DIR__ . DIRECTORY_SEPARATOR . "_files" . DIRECTORY_SEPARATOR . $configFile);
+        $config->load(__DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile);
 
         return $config;
     }
@@ -35,6 +35,6 @@ class JsonConfigurationTest extends AbstractConfigurationTest
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Given config file does not exist');
 
-        $config->load(__DIR__ . "/_files/none.json");
+        $config->load(__DIR__ . '/_files/none.json');
     }
 }

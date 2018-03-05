@@ -9,8 +9,6 @@ namespace Doctrine\DBAL\Migrations\Finder;
  * The migrations are expected to reside in files with the filename
  * `VersionYYYYMMDDHHMMSS.php`. Each file should contain one class named
  * `VersionYYYYMMDDHHMMSS`.
- *
- * @since   1.0.0-alpha3
  */
 final class GlobFinder extends AbstractFinder
 {
