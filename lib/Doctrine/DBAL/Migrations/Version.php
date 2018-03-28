@@ -463,7 +463,10 @@ class Version
         $out = [];
         foreach ($params as $key => $value) {
             $type = isset($types[$key]) ? $types[$key] : 'string';
-            $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
+            $outval = $value;
+            if (is_string($type)) {
+                $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
+            }
             $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 

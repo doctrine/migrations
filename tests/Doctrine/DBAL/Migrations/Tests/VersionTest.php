@@ -40,6 +40,7 @@ if (!function_exists(__NAMESPACE__ . '\realpath')) {
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
@@ -51,6 +52,7 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDryRunWithoutParams;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParamAndType;
 use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use \Mockery as m;
@@ -98,6 +100,23 @@ class VersionTest extends MigrationTestCase
             1 => 'tralala',
             2 => 456,
         ]);
+        $version->execute(Version::DIRECTION_UP);
+        $this->assertContains('(456, tralala, 456)', $this->getOutputStreamContent($this->output));
+    }
+
+    public function testShowSqlStatementsParametersWithTypes()
+    {
+        $outputWriter = $this->getOutputWriter();
+        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
+        $configuration->setMigrationsNamespace('sdfq');
+        $configuration->setMigrationsDirectory('.');
+        $version = new Version($configuration, '0004', VersionOutputSqlWithParamAndType::class);
+        $version->getMigration()->setParam([
+            0 => 456,
+            1 => 'tralala',
+            2 => 456,
+        ]);
+        $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
         $version->execute(Version::DIRECTION_UP);
         $this->assertContains('(456, tralala, 456)', $this->getOutputStreamContent($this->output));
     }
