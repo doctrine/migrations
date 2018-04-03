@@ -407,8 +407,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunWithoutParams::class
@@ -426,8 +426,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunQuestionMarkParams::class
@@ -446,8 +446,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunNamedParams::class
@@ -478,8 +478,8 @@ class VersionTest extends MigrationTestCase
         $ow       = new OutputWriter(function ($msg) use (&$messages) {
             $messages[] = trim($msg);
         });
-        $config  = new Configuration($this->getSqliteConnection(), $ow);
-        $version = new Version(
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
             $config,
             '006',
             VersionDryRunTypes::class
