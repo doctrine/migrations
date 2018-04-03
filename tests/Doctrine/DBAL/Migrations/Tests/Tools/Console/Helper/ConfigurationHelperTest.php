@@ -73,13 +73,10 @@ class ConfigurationHelperTest extends MigrationTestCase
             $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
             $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
-            unlink($configFile);
-
             return trim($this->getOutputStreamContent($this->output));
-        } catch (\Exception $e) {
-            unlink($configFile);//i want to be really sure to cleanup this file
+        } finally {
+            unlink($configFile); //i want to be really sure to cleanup this file
         }
-        return false;
     }
 
     public function testConfigurationHelperLoadsXmlFormat()
@@ -153,7 +150,6 @@ class ConfigurationHelperTest extends MigrationTestCase
      */
     public function testConfigurationHelperFailsToLoadOtherFormat()
     {
-
         $this->input->method('getOption')
             ->with('configuration')
             ->will($this->returnValue('testconfig.wrong'));
