@@ -73,6 +73,8 @@ class ConfigurationHelperTest extends MigrationTestCase
             $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
             $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
+            self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $configfileLoaded);
+
             return trim($this->getOutputStreamContent($this->output));
         } finally {
             unlink($configFile); //i want to be really sure to cleanup this file
@@ -129,6 +131,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         self::assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
+        self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $migrationConfig);
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
@@ -142,6 +145,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         self::assertInstanceOf(JsonConfiguration::class, $migrationConfig);
+        self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $migrationConfig);
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
@@ -173,7 +177,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
-
+        self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $migrationConfig);
         self::assertStringMatchesFormat("Loading configuration from the integration code of your framework (setter).", trim($this->getOutputStreamContent($this->output)));
     }
 
@@ -188,6 +192,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
+        self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $migrationConfig);
         self::assertStringMatchesFormat("Loading configuration from command option: %a", $this->getOutputStreamContent($this->output));
     }
 
@@ -202,6 +207,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input, $this->getOutputWriter());
 
         self::assertInstanceOf(\Doctrine\DBAL\Migrations\Configuration\Configuration::class, $migrationConfig);
+        self::assertAttributeSame($this->getOutputWriter(), 'outputWriter', $migrationConfig);
         self::assertStringMatchesFormat("", $this->getOutputStreamContent($this->output));
     }
 }
