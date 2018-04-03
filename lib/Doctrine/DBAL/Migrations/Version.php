@@ -397,11 +397,10 @@ class Version
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
+                    $this->outputSqlQuery($key, $query);
                     if ( ! isset($this->params[$key])) {
-                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->connection->executeQuery($query);
                     } else {
-                        $this->outputWriter->write(sprintf('    <comment>-></comment> %s (with parameters)', $query));
                         $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                     }
 
@@ -461,7 +460,7 @@ class Version
             if (Type::hasType($type)) {
                 $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
             } else {
-                $outval = '?';
+                $outval = $this->parameterToString($value);
             }
             $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
@@ -477,5 +476,23 @@ class Version
             $direction,
             $dryRun
         ));
+    }
+
+    private function parameterToString(array $values) : string
+    {
+        $output = [];
+        foreach ($values as $value) {
+            $outval = '?';
+            if (is_int($value) || is_string($value)) {
+                $outval = (string) $value;
+            }
+            if (is_bool($value)) {
+                $outval = $value ? 'true' : 'false';
+            }
+
+            $output[] = $outval;
+        }
+
+        return implode(', ', $output);
     }
 }

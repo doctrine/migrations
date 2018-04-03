@@ -33,6 +33,7 @@ use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyDescription;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummyException;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParam;
+use Doctrine\DBAL\Migrations\Tests\Stub\VersionOutputSqlWithParamAndType;
 use Doctrine\DBAL\Migrations\Version;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
@@ -64,6 +65,41 @@ class VersionTest extends MigrationTestCase
             VersionDummy::class
         );
         self::assertEquals($versionName, $version->getVersion());
+    }
+
+    public function testShowSqlStatementsParameters()
+    {
+        $outputWriter  = $this->getOutputWriter();
+        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
+        $configuration->setMigrationsNamespace('sdfq');
+        $configuration->setMigrationsDirectory('.');
+        $version = new Version($configuration, '0004', VersionOutputSqlWithParam::class);
+        $version->getMigration()->setParam([
+            0 => 456,
+            1 => 'tralala',
+            2 => 456,
+        ]);
+        $version->execute(Version::DIRECTION_UP);
+        $this->assertContains('(456, tralala, 456)', $this->getOutputStreamContent($this->output));
+    }
+
+    public function testShowSqlStatementsParametersWithTypes()
+    {
+        $outputWriter  = $this->getOutputWriter();
+        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
+        $configuration->setMigrationsNamespace('sdfq');
+        $configuration->setMigrationsDirectory('.');
+        $version = new Version($configuration, '0004', VersionOutputSqlWithParamAndType::class);
+        $version->getMigration()->setParam([
+            0 => [
+                456,
+                3,
+                456,
+            ],
+        ]);
+        $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
+        $version->execute(Version::DIRECTION_UP, true);
+        $this->assertContains('(456, 3, 456)', $this->getOutputStreamContent($this->output));
     }
 
     /**
@@ -465,7 +501,8 @@ class VersionTest extends MigrationTestCase
         return [
             'datetime' => [new \DateTime('2016-07-05 01:00:00'), 'datetime', '2016-07-05 01:00:00'],
             'array' => [['one' => 'two'], 'array', serialize(['one' => 'two'])],
-            'doctrine_param' => [[1,2,3,4,5], Connection::PARAM_INT_ARRAY, '?'],
+            'doctrine_param' => [[1,2,3,4,5], Connection::PARAM_INT_ARRAY, '1, 2, 3, 4, 5'],
+            'boolean' => [[true], '', 'true'],
         ];
     }
 
