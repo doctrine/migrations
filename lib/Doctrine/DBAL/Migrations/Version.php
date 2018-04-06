@@ -453,11 +453,11 @@ class Version
             return '';
         }
 
-        $out      = [];
+        $out = [];
         foreach ($params as $key => $value) {
-            $type = $types[$key] ?? 'string';
-            $outval = $this->formatParameter($value, $type);
-            $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
+            $type   = $types[$key] ?? 'string';
+            $outval = '[' . $this->formatParameter($value, $type) . ']';
+            $out[]  = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));

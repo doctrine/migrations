@@ -80,7 +80,7 @@ class VersionTest extends MigrationTestCase
             2 => 456,
         ]);
         $version->execute(Version::DIRECTION_UP);
-        $this->assertContains('(456, tralala, 456)', $this->getOutputStreamContent($this->output));
+        $this->assertContains('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
     }
 
     public function testShowSqlStatementsParametersWithTypes()
@@ -99,7 +99,7 @@ class VersionTest extends MigrationTestCase
         ]);
         $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
         $version->execute(Version::DIRECTION_UP, true);
-        $this->assertContains('(456, 3, 456)', $this->getOutputStreamContent($this->output));
+        $this->assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
 
     /**
@@ -473,7 +473,7 @@ class VersionTest extends MigrationTestCase
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
-        self::assertContains('with parameters (one, two)', $messages[1]);
+        self::assertContains('with parameters ([one], [two])', $messages[1]);
     }
 
     public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement()
@@ -493,16 +493,17 @@ class VersionTest extends MigrationTestCase
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
-        self::assertContains('with parameters (:one => one, :two => two)', $messages[1]);
+        self::assertContains('with parameters (:one => [one], :two => [two])', $messages[1]);
     }
 
     public static function dryRunTypes()
     {
         return [
-            'datetime' => [new \DateTime('2016-07-05 01:00:00'), 'datetime', '2016-07-05 01:00:00'],
-            'array' => [['one' => 'two'], 'array', serialize(['one' => 'two'])],
-            'doctrine_param' => [[1,2,3,4,5], Connection::PARAM_INT_ARRAY, '1, 2, 3, 4, 5'],
-            'boolean' => [[true], '', 'true'],
+            'datetime' => [[new \DateTime('2016-07-05 01:00:00')], ['datetime'], '[2016-07-05 01:00:00]'],
+            'array' => [[['one' => 'two']], ['array'], '[' . serialize(['one' => 'two']) . ']'],
+            'doctrine_param' => [[[1,2,3,4,5]], [Connection::PARAM_INT_ARRAY], '[1, 2, 3, 4, 5]'],
+            'doctrine_param_grouped' => [[[1,2],[3,4,5]], [Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY], '[1, 2], [3, 4, 5]'],
+            'boolean' => [[true], [''], '[true]'],
         ];
     }
 
