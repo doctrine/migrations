@@ -453,15 +453,10 @@ class Version
             return '';
         }
 
-        $platform = $this->connection->getDatabasePlatform();
         $out      = [];
         foreach ($params as $key => $value) {
             $type = $types[$key] ?? 'string';
-            if (Type::hasType($type)) {
-                $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
-            } else {
-                $outval = $this->parameterToString($value);
-            }
+            $outval = $this->formatParameter($value, $type);
             $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
@@ -478,21 +473,32 @@ class Version
         ));
     }
 
-    private function parameterToString(array $values) : string
+    private function formatParameter($value, string $type) : string
     {
-        $output = [];
-        foreach ($values as $value) {
-            $outval = '?';
-            if (is_int($value) || is_string($value)) {
-                $outval = (string) $value;
-            }
-            if (is_bool($value)) {
-                $outval = $value ? 'true' : 'false';
-            }
-
-            $output[] = $outval;
+        if (Type::hasType($type)) {
+            return Type::getType($type)->convertToDatabaseValue(
+                $value,
+                $this->connection->getDatabasePlatform()
+            );
         }
 
-        return implode(', ', $output);
+        return $this->parameterToString($value);
+    }
+
+    private function parameterToString($value) : string
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, 'parameterToString'], $value));
+        }
+
+        if (is_int($value) || is_string($value)) {
+            return (string) $value;
+        }
+
+        if (is_bool($value)) {
+            return $value === true ? 'true' : 'false';
+        }
+
+        return '?';
     }
 }
