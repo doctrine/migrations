@@ -54,6 +54,8 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         if ($this->configuration) {
             $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
 
+            $this->configuration->setOutputWriter($outputWriter);
+
             return $this->configuration;
         }
 
