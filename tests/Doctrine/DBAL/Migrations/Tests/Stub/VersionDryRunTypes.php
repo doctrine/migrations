@@ -22,6 +22,6 @@ class VersionDryRunTypes extends AbstractMigration
 
     public function up(Schema $schema)
     {
-        $this->addSql('INSERT INTO test VALUES (?)', [$this->value], [$this->type]);
+        $this->addSql('INSERT INTO test VALUES (?)', $this->value, $this->type);
     }
 }

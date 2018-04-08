@@ -397,11 +397,10 @@ class Version
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
+                    $this->outputSqlQuery($key, $query);
                     if ( ! isset($this->params[$key])) {
-                        $this->outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->connection->executeQuery($query);
                     } else {
-                        $this->outputWriter->write(sprintf('    <comment>-></comment> %s (with parameters)', $query));
                         $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
                     }
 
@@ -454,16 +453,11 @@ class Version
             return '';
         }
 
-        $platform = $this->connection->getDatabasePlatform();
-        $out      = [];
+        $out = [];
         foreach ($params as $key => $value) {
-            $type = $types[$key] ?? 'string';
-            if (Type::hasType($type)) {
-                $outval = Type::getType($type)->convertToDatabaseValue($value, $platform);
-            } else {
-                $outval = '?';
-            }
-            $out[] = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
+            $type   = $types[$key] ?? 'string';
+            $outval = '[' . $this->formatParameter($value, $type) . ']';
+            $out[]  = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
         }
 
         return sprintf('with parameters (%s)', implode(', ', $out));
@@ -477,5 +471,34 @@ class Version
             $direction,
             $dryRun
         ));
+    }
+
+    private function formatParameter($value, string $type) : string
+    {
+        if (Type::hasType($type)) {
+            return Type::getType($type)->convertToDatabaseValue(
+                $value,
+                $this->connection->getDatabasePlatform()
+            );
+        }
+
+        return $this->parameterToString($value);
+    }
+
+    private function parameterToString($value) : string
+    {
+        if (is_array($value)) {
+            return implode(', ', array_map([$this, 'parameterToString'], $value));
+        }
+
+        if (is_int($value) || is_string($value)) {
+            return (string) $value;
+        }
+
+        if (is_bool($value)) {
+            return $value === true ? 'true' : 'false';
+        }
+
+        return '?';
     }
 }
