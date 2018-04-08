@@ -6,11 +6,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Abstract class for individual migrations to extend from.
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 abstract class AbstractMigration
 {
@@ -87,26 +82,28 @@ abstract class AbstractMigration
     /**
      * Print a warning message if the condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      */
     public function warnIf($condition, $message = '')
     {
-        if ($condition) {
-            $message = $message ?: 'Unknown Reason';
-            $this->outputWriter->write(sprintf(
-                '    <comment>Warning during %s: %s</comment>',
-                $this->version->getExecutionState(),
-                $message
-            ));
+        if (! $condition) {
+            return;
         }
+
+        $message = $message ?: 'Unknown Reason';
+        $this->outputWriter->write(sprintf(
+            '    <comment>Warning during %s: %s</comment>',
+            $this->version->getExecutionState(),
+            $message
+        ));
     }
 
     /**
      * Abort the migration if the condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      *
      * @throws AbortMigrationException
      */
@@ -120,8 +117,8 @@ abstract class AbstractMigration
     /**
      * Skip this migration (but not the next ones) if condition evaluates to TRUE.
      *
-     * @param boolean $condition
-     * @param string  $message
+     * @param bool   $condition
+     * @param string $message
      *
      * @throws SkipMigrationException
      */
@@ -151,6 +148,10 @@ abstract class AbstractMigration
     abstract public function up(Schema $schema);
     abstract public function down(Schema $schema);
 
+    /**
+     * @param string[] $params
+     * @param mixed[]  $types
+     */
     protected function addSql($sql, array $params = [], array $types = [])
     {
         $this->version->addSql($sql, $params, $types);
@@ -163,7 +164,7 @@ abstract class AbstractMigration
 
     protected function throwIrreversibleMigrationException($message = null)
     {
-        if (null === $message) {
+        if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';
         }
 

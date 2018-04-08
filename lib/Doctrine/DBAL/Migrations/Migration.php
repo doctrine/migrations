@@ -7,11 +7,6 @@ use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
 
 /**
  * Class for running migrations to the current version or a manually specified version.
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class Migration
 {
@@ -22,14 +17,10 @@ class Migration
      */
     private $outputWriter;
 
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
-    /**
-     * @var boolean
-     */
+    /** @var bool */
     private $noMigrationException;
 
     /**
@@ -50,7 +41,7 @@ class Migration
      *
      * @param string $to The version to migrate to.
      *
-     * @return array $sql  The array of SQL queries.
+     * @return string[][] The array of SQL queries.
      */
     public function getSql($to = null)
     {
@@ -63,7 +54,7 @@ class Migration
      * @param string $path The path to write the migration SQL file.
      * @param string $to   The version to migrate to.
      *
-     * @return boolean $written
+     * @return bool
      */
     public function writeSqlFile($path, $to = null)
     {
@@ -87,7 +78,7 @@ class Migration
     }
 
     /**
-     * @param boolean $noMigrationException Throw an exception or not if no migration is found. Mostly for Continuous Integration.
+     * @param bool $noMigrationException Throw an exception or not if no migration is found. Mostly for Continuous Integration.
      */
     public function setNoMigrationException($noMigrationException = false)
     {
@@ -97,16 +88,16 @@ class Migration
     /**
      * Run a migration to the current version or the given target version.
      *
-     * @param string  $to             The version to migrate to.
-     * @param boolean $dryRun         Whether or not to make this a dry run and not execute anything.
-     * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
-     * @param callable|null $confirm A callback to confirm whether the migrations should be executed.
+     * @param string        $to             The version to migrate to.
+     * @param bool          $dryRun         Whether or not to make this a dry run and not execute anything.
+     * @param bool          $timeAllQueries Measuring or not the execution time of each SQL query.
+     * @param callable|null $confirm        A callback to confirm whether the migrations should be executed.
      *
-     * @return array An array of migration sql statements. This will be empty if the the $confirm callback declines to execute the migration
+     * @return string[][] An array of migration sql statements. This will be empty if the the $confirm callback declines to execute the migration
      *
      * @throws MigrationException
      */
-    public function migrate($to = null, $dryRun = false, $timeAllQueries = false, callable $confirm = null)
+    public function migrate($to = null, $dryRun = false, $timeAllQueries = false, ?callable $confirm = null)
     {
         /**
          * If no version to migrate to is given we default to the last available one.
@@ -123,7 +114,7 @@ class Migration
          * migrations.
          */
         $migrations = $this->configuration->getMigrations();
-        if ( ! isset($migrations[$to]) && $to > 0) {
+        if (! isset($migrations[$to]) && $to > 0) {
             throw MigrationException::unknownMigrationVersion($to);
         }
 
@@ -142,7 +133,7 @@ class Migration
             return $this->noMigrations();
         }
 
-        if ( ! $dryRun && false === $this->migrationsCanExecute($confirm)) {
+        if (! $dryRun && $this->migrationsCanExecute($confirm) === false) {
             return [];
         }
 
@@ -179,13 +170,16 @@ class Migration
         );
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
-        $this->outputWriter->write(sprintf("  <info>++</info> finished in %ss", $time));
-        $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrationsToExecute)));
-        $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
+        $this->outputWriter->write(sprintf('  <info>++</info> finished in %ss', $time));
+        $this->outputWriter->write(sprintf('  <info>++</info> %s migrations executed', count($migrationsToExecute)));
+        $this->outputWriter->write(sprintf('  <info>++</info> %s sql queries', count($sql, true) - count($sql)));
 
         return $sql;
     }
 
+    /**
+     * @return string[][]
+     */
     private function noMigrations() : array
     {
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
@@ -193,8 +187,8 @@ class Migration
         return [];
     }
 
-    private function migrationsCanExecute(callable $confirm = null) : bool
+    private function migrationsCanExecute(?callable $confirm = null) : bool
     {
-        return null === $confirm ? true : (bool) $confirm();
+        return $confirm === null ? true : (bool) $confirm();
     }
 }

@@ -11,24 +11,16 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 abstract class CommandTestCase extends MigrationTestCase
 {
-    /**
-     * @var AbstractCommand
-     */
+    /** @var AbstractCommand */
     protected $command;
 
-    /**
-     * @var Application
-     */
+    /** @var Application */
     protected $app;
 
-    /**
-     * @var Configuration|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject */
     protected $config;
 
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     protected $connection;
 
     protected function setUp()
@@ -57,6 +49,11 @@ abstract class CommandTestCase extends MigrationTestCase
         return new CommandTester($this->app->find($this->command->getName()));
     }
 
+    /**
+     * @param mixed[] $args
+     * @param mixed[] $options
+     * @return mixed[]
+     */
     protected function executeCommand(array $args, array $options = [])
     {
         $tester     = $this->createCommandTester();

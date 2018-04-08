@@ -3,8 +3,8 @@
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Events;
 use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
+use Doctrine\DBAL\Migrations\Events;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
@@ -34,7 +34,7 @@ class ConfigurationTest extends MigrationTestCase
     public function testValidateMigrationsDirectoryRequired()
     {
         $config = new Configuration($this->getSqliteConnection());
-        $config->setMigrationsNamespace("DoctrineMigrations\\");
+        $config->setMigrationsNamespace('DoctrineMigrations\\');
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Migrations directory must be configured in order to use Doctrine migrations.');
@@ -45,7 +45,7 @@ class ConfigurationTest extends MigrationTestCase
     public function testValidateMigrations()
     {
         $config = new Configuration($this->getSqliteConnection());
-        $config->setMigrationsNamespace("DoctrineMigrations\\");
+        $config->setMigrationsNamespace('DoctrineMigrations\\');
         $config->setMigrationsDirectory(sys_get_temp_dir());
 
         $config->validate();
@@ -65,18 +65,18 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertEquals("doctrine_migration_versions", $config->getMigrationsTableName());
+        self::assertEquals('doctrine_migration_versions', $config->getMigrationsTableName());
     }
 
     public function testEmptyProjectDefaults()
     {
         $config = $this->getSqliteConfiguration();
-        self::assertNull($config->getPrevVersion(), "no prev version");
-        self::assertNull($config->getNextVersion(), "no next version");
-        self::assertSame('0', $config->getCurrentVersion(), "current version 0");
-        self::assertSame('0', $config->getLatestVersion(), "latest version 0");
-        self::assertEquals(0, $config->getNumberOfAvailableMigrations(), "number of available migrations 0");
-        self::assertEquals(0, $config->getNumberOfExecutedMigrations(), "number of executed migrations 0");
+        self::assertNull($config->getPrevVersion(), 'no prev version');
+        self::assertNull($config->getNextVersion(), 'no next version');
+        self::assertSame('0', $config->getCurrentVersion(), 'current version 0');
+        self::assertSame('0', $config->getLatestVersion(), 'latest version 0');
+        self::assertEquals(0, $config->getNumberOfAvailableMigrations(), 'number of available migrations 0');
+        self::assertEquals(0, $config->getNumberOfExecutedMigrations(), 'number of executed migrations 0');
         self::assertEquals([], $config->getMigrations());
     }
 
@@ -95,7 +95,7 @@ class ConfigurationTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
         $config->registerMigration(1234, Version1Test::class);
 
-        self::assertCount(1, $config->getMigrations(), "One Migration registered.");
+        self::assertCount(1, $config->getMigrations(), 'One Migration registered.');
         self::assertTrue($config->hasVersion(1234));
 
         $version = $config->getVersion(1234);
@@ -112,7 +112,7 @@ class ConfigurationTest extends MigrationTestCase
             1235 => Version2Test::class,
         ]);
 
-        self::assertCount(2, $config->getMigrations(), "Two Migration registered.");
+        self::assertCount(2, $config->getMigrations(), 'Two Migration registered.');
 
         $version = $config->getVersion(1234);
         self::assertInstanceOf(Version::class, $version);
@@ -206,39 +206,39 @@ class ConfigurationTest extends MigrationTestCase
             1236 => Version3Test::class,
         ]);
 
-        self::assertNull($config->getPrevVersion(), "no prev version");
-        self::assertSame('0', $config->getCurrentVersion(), "current version 0");
-        self::assertSame('1234', $config->getNextVersion(), "next version 1234");
-        self::assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+        self::assertNull($config->getPrevVersion(), 'no prev version');
+        self::assertSame('0', $config->getCurrentVersion(), 'current version 0');
+        self::assertSame('1234', $config->getNextVersion(), 'next version 1234');
+        self::assertSame('1236', $config->getLatestVersion(), 'latest version 1236');
 
         $config->getVersion(1234)->markMigrated();
 
-        self::assertSame('0', $config->getPrevVersion(), "prev version 0");
-        self::assertSame('1234', $config->getCurrentVersion(), "current version 1234");
-        self::assertSame('1235', $config->getNextVersion(), "next version 1235");
-        self::assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+        self::assertSame('0', $config->getPrevVersion(), 'prev version 0');
+        self::assertSame('1234', $config->getCurrentVersion(), 'current version 1234');
+        self::assertSame('1235', $config->getNextVersion(), 'next version 1235');
+        self::assertSame('1236', $config->getLatestVersion(), 'latest version 1236');
 
         $config->getVersion(1235)->markMigrated();
 
-        self::assertSame('1234', $config->getPrevVersion(), "prev version 1234");
-        self::assertSame('1235', $config->getCurrentVersion(), "current version 1235");
-        self::assertSame('1236', $config->getNextVersion(), "next version is 1236");
-        self::assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+        self::assertSame('1234', $config->getPrevVersion(), 'prev version 1234');
+        self::assertSame('1235', $config->getCurrentVersion(), 'current version 1235');
+        self::assertSame('1236', $config->getNextVersion(), 'next version is 1236');
+        self::assertSame('1236', $config->getLatestVersion(), 'latest version 1236');
 
-        self::assertSame('0', $config->resolveVersionAlias('first'), "first version 0");
-        self::assertSame('1234', $config->resolveVersionAlias('prev'), "prev version 1234");
-        self::assertSame('1235', $config->resolveVersionAlias('current'), "current version 1235");
-        self::assertSame('1236', $config->resolveVersionAlias('next'), "next version is 1236");
-        self::assertSame('1236', $config->resolveVersionAlias('latest'), "latest version 1236");
-        self::assertSame('1236', $config->resolveVersionAlias('1236'), "identical version");
-        self::assertNull($config->resolveVersionAlias('123678'), "unknown version");
+        self::assertSame('0', $config->resolveVersionAlias('first'), 'first version 0');
+        self::assertSame('1234', $config->resolveVersionAlias('prev'), 'prev version 1234');
+        self::assertSame('1235', $config->resolveVersionAlias('current'), 'current version 1235');
+        self::assertSame('1236', $config->resolveVersionAlias('next'), 'next version is 1236');
+        self::assertSame('1236', $config->resolveVersionAlias('latest'), 'latest version 1236');
+        self::assertSame('1236', $config->resolveVersionAlias('1236'), 'identical version');
+        self::assertNull($config->resolveVersionAlias('123678'), 'unknown version');
 
         $config->getVersion(1236)->markMigrated();
 
-        self::assertSame('1235', $config->getPrevVersion(), "prev version 1235");
-        self::assertSame('1236', $config->getCurrentVersion(), "current version 1236");
-        self::assertNull($config->getNextVersion(), "no next version");
-        self::assertSame('1236', $config->getLatestVersion(), "latest version 1236");
+        self::assertSame('1235', $config->getPrevVersion(), 'prev version 1235');
+        self::assertSame('1236', $config->getCurrentVersion(), 'current version 1236');
+        self::assertNull($config->getNextVersion(), 'no next version');
+        self::assertSame('1236', $config->getLatestVersion(), 'latest version 1236');
     }
 
     public function testDeltaVersion()
@@ -250,35 +250,35 @@ class ConfigurationTest extends MigrationTestCase
             1236 => Version3Test::class,
         ]);
 
-        self::assertNull($config->getDeltaVersion('-1'), "no current-1 version");
-        self::assertSame('1234', $config->getDeltaVersion('+1'), "current+1 is 1234");
-        self::assertSame('1235', $config->getDeltaVersion('+2'), "current+2 is 1235");
-        self::assertSame('1236', $config->getDeltaVersion('+3'), "current+3 is 1236");
-        self::assertNull($config->getDeltaVersion('+4'), "no current+4 version");
+        self::assertNull($config->getDeltaVersion('-1'), 'no current-1 version');
+        self::assertSame('1234', $config->getDeltaVersion('+1'), 'current+1 is 1234');
+        self::assertSame('1235', $config->getDeltaVersion('+2'), 'current+2 is 1235');
+        self::assertSame('1236', $config->getDeltaVersion('+3'), 'current+3 is 1236');
+        self::assertNull($config->getDeltaVersion('+4'), 'no current+4 version');
 
         $config->getVersion(1234)->markMigrated();
 
-        self::assertNull($config->getDeltaVersion('-2'), "no current-2 version");
-        self::assertSame('0', $config->getDeltaVersion('-1'), "current-1 is 0");
-        self::assertSame('1235', $config->getDeltaVersion('+1'), "current+1 is 1235");
-        self::assertSame('1236', $config->getDeltaVersion('+2'), "current+2 is 1236");
-        self::assertNull($config->getDeltaVersion('+3'), "no current+3");
+        self::assertNull($config->getDeltaVersion('-2'), 'no current-2 version');
+        self::assertSame('0', $config->getDeltaVersion('-1'), 'current-1 is 0');
+        self::assertSame('1235', $config->getDeltaVersion('+1'), 'current+1 is 1235');
+        self::assertSame('1236', $config->getDeltaVersion('+2'), 'current+2 is 1236');
+        self::assertNull($config->getDeltaVersion('+3'), 'no current+3');
 
         $config->getVersion(1235)->markMigrated();
 
-        self::assertNull($config->getDeltaVersion('-3'), "no current-3 version");
-        self::assertSame('0', $config->getDeltaVersion('-2'), "current-2 is 0");
-        self::assertSame('1234', $config->getDeltaVersion('-1'), "current-1 is 1234");
-        self::assertSame('1236', $config->getDeltaVersion('+1'), "current+1 is 1236");
-        self::assertNull($config->getDeltaVersion('+2'), "no current+2");
+        self::assertNull($config->getDeltaVersion('-3'), 'no current-3 version');
+        self::assertSame('0', $config->getDeltaVersion('-2'), 'current-2 is 0');
+        self::assertSame('1234', $config->getDeltaVersion('-1'), 'current-1 is 1234');
+        self::assertSame('1236', $config->getDeltaVersion('+1'), 'current+1 is 1236');
+        self::assertNull($config->getDeltaVersion('+2'), 'no current+2');
 
         $config->getVersion(1236)->markMigrated();
 
-        self::assertNull($config->getDeltaVersion('-4'), "no current-4 version");
-        self::assertSame('0', $config->getDeltaVersion('-3'), "current-3 is 0");
-        self::assertSame('1234', $config->getDeltaVersion('-2'), "current-2 is 1234");
-        self::assertSame('1235', $config->getDeltaVersion('-1'), "current-1 is 1235");
-        self::assertNull($config->getDeltaVersion('+1'), "no current+1");
+        self::assertNull($config->getDeltaVersion('-4'), 'no current-4 version');
+        self::assertSame('0', $config->getDeltaVersion('-3'), 'current-3 is 0');
+        self::assertSame('1234', $config->getDeltaVersion('-2'), 'current-2 is 1234');
+        self::assertSame('1235', $config->getDeltaVersion('-1'), 'current-1 is 1235');
+        self::assertNull($config->getDeltaVersion('+1'), 'no current+1');
     }
 
     public function testGetAvailableVersions()
@@ -317,8 +317,6 @@ class ConfigurationTest extends MigrationTestCase
 
     /**
      * @dataProvider autoloadVersionProvider
-     *
-     * @param $version
      */
     public function testGetVersionAutoloadVersion($version)
     {
@@ -356,7 +354,7 @@ class ConfigurationTest extends MigrationTestCase
         $config1 = $this->getSqliteConfiguration();
         $config1->setIsDryRun(false);
 
-        self::assertSame('0', $config1->getCurrentVersion(), "current version 0");
+        self::assertSame('0', $config1->getCurrentVersion(), 'current version 0');
         $this->assertTrue($config1->getConnection()->getSchemaManager()->tablesExist([$config1->getMigrationsTableName()]));
 
         // migrations table created
@@ -370,7 +368,7 @@ class ConfigurationTest extends MigrationTestCase
         $config3 = $this->getSqliteConfiguration();
         $config3->setIsDryRun(true);
 
-        self::assertSame('0', $config3->getCurrentVersion(), "current version 0");
+        self::assertSame('0', $config3->getCurrentVersion(), 'current version 0');
         $this->assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
 
         self::assertEquals([], $config3->getMigratedVersions());
@@ -386,13 +384,16 @@ class ConfigurationTest extends MigrationTestCase
         $config->getVersion(1234)->markMigrated();
         $config->setIsDryRun(true);
 
-        self::assertSame('1234', $config->getCurrentVersion(), "current version 1234");
-        self::assertSame('1235', $config->getNextVersion(), "next version 1235");
+        self::assertSame('1234', $config->getCurrentVersion(), 'current version 1234');
+        self::assertSame('1235', $config->getNextVersion(), 'next version 1235');
 
         self::assertEquals(['1234'], $config->getMigratedVersions());
         $this->assertTrue($config->getConnection()->getSchemaManager()->tablesExist([$config->getMigrationsTableName()]));
     }
 
+    /**
+     * @return string[][]
+     */
     public function versionProvider()
     {
         return [
@@ -402,12 +403,12 @@ class ConfigurationTest extends MigrationTestCase
             ['0000254BaldlfqjdVersion', ''],
             ['20130101123545Version', '2013-01-01 12:35:45'],
             ['20150202042811', '2015-02-02 04:28:11'],
-            ['20150202162811', '2015-02-02 16:28:11']
+            ['20150202162811', '2015-02-02 16:28:11'],
         ];
     }
 
     /**
-     * @return array
+     * @return string[][]
      */
     public function autoloadVersionProvider()
     {
@@ -431,6 +432,9 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($template, $config->getCustomTemplate());
     }
 
+    /**
+     * @return string[]|null[]
+     */
     public function validCustomTemplates() : array
     {
         return [

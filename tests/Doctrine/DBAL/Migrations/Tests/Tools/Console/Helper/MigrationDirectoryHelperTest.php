@@ -6,7 +6,6 @@ use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-
     public function testMigrationDirectoryHelper()
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());

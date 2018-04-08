@@ -4,25 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\DBAL\Migrations;
 
-/**
- * @since  1.6.0
- * @author Luís Cobucci <lcobucci@gmail.com>
- */
 final class FileQueryWriter implements QueryWriter
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $columnName;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $tableName;
 
-    /**
-     * @var null|OutputWriter
-     */
+    /** @var null|OutputWriter */
     private $outputWriter;
 
     public function __construct(string $columnName, string $tableName, ?OutputWriter $outputWriter)
@@ -34,10 +24,7 @@ final class FileQueryWriter implements QueryWriter
 
     /**
      * TODO: move SqlFileWriter's behaviour to this class - and kill it with fire (on the next major release)
-     * @param string $path
-     * @param string $direction
-     * @param array $queriesByVersion
-     * @return bool
+     * @param string[][] $queriesByVersion
      */
     public function write(string $path, string $direction, array $queriesByVersion) : bool
     {

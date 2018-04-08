@@ -26,23 +26,21 @@ EOT
     }
 
     /**
-     * @param InputInterface $input
-     * @param OutputInterface $output
      * @return int|null
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
-        
+
         $migrations          = count($configuration->getMigrations());
         $migratedVersions    = count($configuration->getMigratedVersions());
         $availableMigrations = $migrations - $migratedVersions;
-        
+
         if ($availableMigrations === 0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
             return 0;
         }
-        
+
         $output->writeln(sprintf(
             '<comment>Out-of-date! %u migration%s available to execute.</comment>',
             $availableMigrations,

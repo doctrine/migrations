@@ -29,19 +29,19 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\Constraint\RegularExpression;
+use Symfony\Component\Console\Output\StreamOutput;
 
 require_once __DIR__ . '/realpath.php';
 
 class MigrationTest extends MigrationTestCase
 {
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $conn;
 
     /** @var Configuration */
     private $config;
 
+    /** @var StreamOutput|null */
     protected $output;
 
     protected function setUp()
@@ -89,8 +89,6 @@ class MigrationTest extends MigrationTestCase
     }
 
     /**
-     * @param $to
-     *
      * @dataProvider getSqlProvider
      */
     public function testGetSql($to)
@@ -115,7 +113,7 @@ class MigrationTest extends MigrationTestCase
 
     /**
      * Data provider for ::testGetSql()
-     * @return array
+     * @return mixed[][]
      */
     public function getSqlProvider()
     {
@@ -126,9 +124,7 @@ class MigrationTest extends MigrationTestCase
     }
 
     /**
-     * @param $path
-     * @param $to
-     * @param $getSqlReturn
+     * @param string[] $getSqlReturn
      *
      * @dataProvider writeSqlFileProvider
      */
@@ -178,6 +174,9 @@ class MigrationTest extends MigrationTestCase
         self::assertTrue($migration->writeSqlFile($path, $to));
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function writeSqlFileProvider()
     {
         return [
@@ -236,9 +235,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $this->conn->insert($this->config->getMigrationsTableName(), [
-            'version' => '20160707000000',
-        ]);
+        $this->conn->insert($this->config->getMigrationsTableName(), ['version' => '20160707000000']);
 
         $migration = new Migration($this->config);
 

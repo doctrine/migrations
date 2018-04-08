@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations;
 
 class MigrationsVersion
 {
+    /** @var string */
     private static $version = 'v1.6.2';
 
     public static function VERSION()
@@ -17,11 +18,12 @@ class MigrationsVersion
     }
 
     /**
-     * @param string $gitversion
-     * @return bool
-     *
      * Check if doctrine migration is installed by composer or
      * in a modified (not tagged) phar version.
+     *
+     * @param string $gitversion
+     *
+     * @return bool
      */
     private static function isACustomPharBuild($gitversion)
     {

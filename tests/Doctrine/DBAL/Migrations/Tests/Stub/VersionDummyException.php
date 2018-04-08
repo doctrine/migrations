@@ -7,8 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Class DummyMigration
- *
- * @author Robbert van den Bogerd <rvdbogerd@ibuildings.nl>
  */
 class VersionDummyException extends AbstractMigration
 {

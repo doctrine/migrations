@@ -10,7 +10,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationStatusTest extends MigrationTestCase
 {
-
+    /** @var string */
     private $migrationDirectory;
 
     public function __construct()
@@ -50,9 +50,7 @@ class MigrationStatusTest extends MigrationTestCase
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                [
-                    'getMigrationConfiguration',
-                ]
+                ['getMigrationConfiguration']
             )
             ->getMock();
 
@@ -106,9 +104,7 @@ class MigrationStatusTest extends MigrationTestCase
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                [
-                    'getMigrationConfiguration',
-                ]
+                ['getMigrationConfiguration']
             )
             ->getMock();
 
@@ -120,12 +116,12 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects($this->once())
             ->method('getMigratedVersions')
-            ->will($this->returnValue([1234,1235,1237,1238,1239]));
+            ->will($this->returnValue([1234, 1235, 1237, 1238, 1239]));
 
         $configuration
             ->expects($this->once())
             ->method('getAvailableVersions')
-            ->will($this->returnValue([1234,1235,1239,1240]));
+            ->will($this->returnValue([1234, 1235, 1239, 1240]));
 
         $configuration
             ->method('getCurrentVersion')

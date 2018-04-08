@@ -7,7 +7,6 @@ use Doctrine\DBAL\Schema\Schema;
 
 class MigrationModifySchemaInPreAndPost extends AbstractMigration
 {
-
     private function addTable(Schema $schema, $tableName)
     {
         $table = $schema->createTable($tableName);

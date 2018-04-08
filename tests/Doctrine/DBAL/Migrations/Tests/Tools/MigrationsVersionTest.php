@@ -2,10 +2,11 @@
 namespace Doctrine\DBAL\Migrations\Tests\Tools;
 
 use Doctrine\DBAL\Migrations\MigrationsVersion;
+use PHPUnit\Framework\TestCase;
 
-class MigrationsVersionTest extends \PHPUnit\Framework\TestCase
+class MigrationsVersionTest extends TestCase
 {
-
+    /** @var string */
     private $MigrationVersionClass = MigrationsVersion::class;
 
     public function testVersionNumber()

@@ -13,7 +13,7 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 
     public function up(Schema $schema)
     {
-        $this->addSql("SELECT 1");
+        $this->addSql('SELECT 1');
     }
 
     public function postUp(Schema $schema)
@@ -26,7 +26,7 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 
     public function down(Schema $schema)
     {
-        $this->addSql("SELECT 1");
+        $this->addSql('SELECT 1');
     }
 
     public function postDown(Schema $schema)

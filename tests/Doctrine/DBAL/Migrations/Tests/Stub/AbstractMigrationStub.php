@@ -9,13 +9,9 @@ use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Class AbstractMigrationStub
- * @package Doctrine\DBAL\Migrations\Tests\Stub
- *
- * @author Robbert van den Bogerd <rvdbogerd@ibuildings.nl>
  */
 class AbstractMigrationStub extends AbstractMigration
 {
-
     public function up(Schema $schema)
     {
     }
@@ -34,6 +30,10 @@ class AbstractMigrationStub extends AbstractMigration
         $this->throwIrreversibleMigrationException($message);
     }
 
+    /**
+     * @param mixed[]  $params
+     * @param string[] $types
+     */
     public function exposedAddSql($sql, $params = [], $types = [])
     {
         $this->addSql($sql, $params, $types);

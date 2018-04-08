@@ -4,7 +4,6 @@ namespace Doctrine\DBAL\Migrations\Tests;
 
 class Helper
 {
-
     /**
      * Delete a directory.
      *
@@ -15,7 +14,7 @@ class Helper
      */
     public static function deleteDir($path)
     {
-        if ('' === $path) {
+        if ($path === '') {
             return false;
         }
         $class_func = [__CLASS__, __FUNCTION__];

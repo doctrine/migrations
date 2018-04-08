@@ -8,19 +8,15 @@ use Doctrine\ORM\Tools\SchemaTool;
 
 /**
  * A schema provider that uses the doctrine ORM to generate schemas.
- *
- * @since   1.0.0-alpha3
  */
 final class OrmSchemaProvider implements SchemaProviderInterface
 {
-    /**
-     * @var     EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
     public function __construct($em)
     {
-        if ( ! $this->isEntityManager($em)) {
+        if (! $this->isEntityManager($em)) {
             throw new \InvalidArgumentException(sprintf(
                 '$em is not a valid Doctrine ORM Entity Manager, got "%s"',
                 is_object($em) ? get_class($em) : gettype($em)
@@ -55,7 +51,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
      * doesn't care.
      *
      * @param   mixed $manager Hopefully an entity manager, but it may be anything
-     * @return  boolean
+     * @return  bool
      */
     private function isEntityManager($manager)
     {

@@ -2,18 +2,16 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Helper\DialogHelper;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Doctrine\DBAL\Migrations\Version;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\DBAL\Migrations\Version;
 
 class ExecuteCommandTest extends CommandTestCase
 {
     use DialogSupport;
 
-    const VERSION = '20160705000000';
+    private const VERSION = '20160705000000';
 
+    /** @var Version */
     private $version;
 
     public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
@@ -22,7 +20,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), 'up');
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--write-sql' => true,
             '--up' => true,
         ]);
@@ -36,7 +34,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, 'down');
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--write-sql' => __DIR__,
             '--down' => true,
         ]);
@@ -50,7 +48,7 @@ class ExecuteCommandTest extends CommandTestCase
         $this->version->expects($this->never())
             ->method('execute');
 
-        list($tester, $statusCode) = $this->executeCommand([]);
+        [$tester, $statusCode] = $this->executeCommand([]);
 
         self::assertSame(0, $statusCode);
         self::assertContains('Migration cancelled', $tester->getDisplay());
@@ -63,7 +61,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('execute')
             ->with('up', true, true);
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ]);
@@ -80,7 +78,7 @@ class ExecuteCommandTest extends CommandTestCase
             ->method('execute')
             ->with('up', true, true);
 
-        list(, $statusCode) = $this->executeCommand([
+        [, $statusCode] = $this->executeCommand([
             '--dry-run' => true,
             '--query-time' => true,
         ], ['interactive' => false]);
@@ -105,6 +103,11 @@ class ExecuteCommandTest extends CommandTestCase
         return new ExecuteCommand();
     }
 
+    /**
+     * @param mixed[] $args
+     * @param mixed[] $options
+     * @return mixed[]
+     */
     protected function executeCommand(array $args, array $options = [])
     {
         $args['version'] = self::VERSION;

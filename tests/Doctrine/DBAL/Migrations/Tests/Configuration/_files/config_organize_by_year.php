@@ -1,2 +1,2 @@
 <?php
-return ["organize_migrations" => "year"];
+return ['organize_migrations' => 'year'];

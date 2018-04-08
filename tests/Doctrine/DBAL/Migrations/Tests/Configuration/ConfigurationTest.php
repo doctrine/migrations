@@ -4,15 +4,14 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
-use Doctrine\DBAL\Migrations\QueryWriter;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -121,7 +120,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
 
         $result = call_user_func_array([$configuration, $method], $args);
-        if ($method == 'getMigrationsToExecute') {
+        if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
         self::assertEquals($expectedResult, $result);
@@ -139,7 +138,7 @@ class ConfigurationTest extends MigrationTestCase
         $migration->migrate('3Test');
 
         $result = call_user_func_array([$configuration, $method], $args);
-        if ($method == 'getMigrationsToExecute') {
+        if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
         self::assertEquals($expectedResult, $result);
@@ -205,6 +204,9 @@ class ConfigurationTest extends MigrationTestCase
         $config->getMigratedVersions();
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations()
     {
         return [
@@ -214,24 +216,32 @@ class ConfigurationTest extends MigrationTestCase
             ['getRelativeVersion', ['3Test', -1], '2Test'],
             ['getNumberOfAvailableMigrations', [], 5],
             ['getLatestVersion', [], '5Test'],
-            ['getMigrationsToExecute', ['up', 5], [
-                '4Test',
-                '5Test',
-            ]],
-            ['getMigrationsToExecute', ['up', 4], [
-                '4Test',
-            ]],
-            ['getMigrationsToExecute', ['down', 0], [
-                '3Test',
-                '2Test',
-                '1Test',
-            ]],
-            ['getMigrationsToExecute', ['down', 2], [
-                '3Test',
-            ]],
+            [
+                'getMigrationsToExecute',
+                ['up', 5],
+                ['4Test', '5Test'],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['up', 4],
+                ['4Test'],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['down', 0],
+                ['3Test', '2Test', '1Test'],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['down', 2],
+                ['3Test'],
+            ],
         ];
     }
 
+    /**
+     * @return mixed[][]
+     */
     public function methodsThatNeedsVersionsLoaded()
     {
         return [
@@ -241,13 +251,17 @@ class ConfigurationTest extends MigrationTestCase
             ['getRelativeVersion', ['3Test', -1], '2Test'],
             ['getNumberOfAvailableMigrations', [], 5],
             ['getLatestVersion', [], '5Test'],
-            ['getMigrationsToExecute', ['up', 5], [
+            [
+        'getMigrationsToExecute',
+        ['up', 5],
+        [
                 '1Test',
                 '2Test',
                 '3Test',
                 '4Test',
                 '5Test',
-            ]],
+            ],
+            ],
             ['getMigrationsToExecute', ['down', 0], []],
             ['getMigrationsToExecute', ['down', 2], []],
         ];

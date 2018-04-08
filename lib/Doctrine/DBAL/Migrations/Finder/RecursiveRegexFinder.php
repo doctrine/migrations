@@ -5,12 +5,9 @@ namespace Doctrine\DBAL\Migrations\Finder;
 /**
  * A MigrationFinderInterface implementation that uses a RegexIterator along with a
  * RecursiveDirectoryIterator.
- *
- * @since   1.0.0-alpha3
  */
 final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeepFinderInterface
 {
-
     /**
      * {@inheritdoc}
      */
@@ -45,8 +42,8 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
 
     /**
      * Transform the recursiveIterator result array of array into the expected array of migration file
-     * @param iterable $iteratorFilesMatch
-     * @return array
+     * @param iterable|string[][] $iteratorFilesMatch
+     * @return string[]
      */
     private function getMatches($iteratorFilesMatch)
     {
@@ -54,7 +51,7 @@ final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeep
         foreach ($iteratorFilesMatch as $file) {
             $files[] = $file[0];
         }
-        
+
         return $files;
     }
 }

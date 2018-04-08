@@ -3,15 +3,17 @@ namespace Doctrine\DBAL\Migrations\Tests\Tools\Console;
 
 use Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * @covers \Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner
  */
-class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
+class ConsoleRunnerTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
+    /** @var EntityManagerHelper|MockObject */
     private $entityManagerHelper;
 
     /** @var Application */
@@ -78,9 +80,9 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
 
     public function testHasDiffCommand()
     {
-        $this->application->setHelperSet(new HelperSet(array(
+        $this->application->setHelperSet(new HelperSet([
             'em' => $this->entityManagerHelper,
-        )));
+        ]));
 
         ConsoleRunner::addCommands($this->application);
 
@@ -89,9 +91,7 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
 
     public function testNotHasDiffCommand()
     {
-        $this->application->setHelperSet(new HelperSet(array(
-
-        )));
+        $this->application->setHelperSet(new HelperSet([]));
 
         ConsoleRunner::addCommands($this->application);
 

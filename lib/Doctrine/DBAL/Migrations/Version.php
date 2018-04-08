@@ -12,21 +12,16 @@ use Doctrine\DBAL\Types\Type;
 /**
  * Class which wraps a migration version and allows execution of the
  * individual migration version up or down method.
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
  */
 class Version
 {
-    const STATE_NONE = 0;
-    const STATE_PRE  = 1;
-    const STATE_EXEC = 2;
-    const STATE_POST = 3;
+    public const STATE_NONE = 0;
+    public const STATE_PRE  = 1;
+    public const STATE_EXEC = 2;
+    public const STATE_POST = 3;
 
-    const DIRECTION_UP   = 'up';
-    const DIRECTION_DOWN = 'down';
+    public const DIRECTION_UP   = 'up';
+    public const DIRECTION_DOWN = 'down';
 
     /**
      * The Migrations Configuration instance for this migration
@@ -56,37 +51,31 @@ class Version
      */
     private $migration;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var \Doctrine\DBAL\Connection */
     private $connection;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $class;
 
-    /** The array of collected SQL statements for this version */
+    /** @var string[] The collected SQL statements for this version */
     private $sql = [];
 
-    /** The array of collected parameters for SQL statements for this version */
+    /** @var mixed[][] The collected parameters for SQL statements for this version */
     private $params = [];
 
-    /** The array of collected types for SQL statements for this version */
+    /** @var string[][] The collected types for SQL statements for this version */
     private $types = [];
 
-    /** The time in seconds that this migration version took to execute */
+    /** @var int The time in seconds that this migration version took to execute */
     private $time;
 
-    /**
-     * @var int
-     */
+    /** @var int */
     private $state = self::STATE_NONE;
 
     /** @var SchemaDiffProviderInterface */
     private $schemaProvider;
 
-    public function __construct(Configuration $configuration, $version, $class, SchemaDiffProviderInterface $schemaProvider = null)
+    public function __construct(Configuration $configuration, $version, $class, ?SchemaDiffProviderInterface $schemaProvider = null)
     {
         $this->configuration = $configuration;
         $this->outputWriter  = $configuration->getOutputWriter();
@@ -97,14 +86,15 @@ class Version
 
         if ($schemaProvider !== null) {
             $this->schemaProvider = $schemaProvider;
+            return;
         }
-        if ($schemaProvider === null) {
-            $schemaProvider       = new SchemaDiffProvider(
-                $this->connection->getSchemaManager(),
-                $this->connection->getDatabasePlatform()
-            );
-            $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration($schemaProvider);
-        }
+
+        $schemaProvider = new SchemaDiffProvider(
+            $this->connection->getSchemaManager(),
+            $this->connection->getDatabasePlatform()
+        );
+
+        $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration($schemaProvider);
     }
 
     /**
@@ -130,7 +120,7 @@ class Version
     /**
      * Check if this version has been migrated or not.
      *
-     * @return boolean
+     * @return bool
      */
     public function isMigrated()
     {
@@ -161,31 +151,33 @@ class Version
     /**
      * Add some SQL queries to this versions migration
      *
-     * @param array|string $sql
-     * @param array        $params
-     * @param array        $types
+     * @param string|string[]     $sql
+     * @param mixed[]|mixed[][]   $params
+     * @param string[]|string[][] $types
      */
     public function addSql($sql, array $params = [], array $types = [])
     {
         if (is_array($sql)) {
             foreach ($sql as $key => $query) {
                 $this->sql[] = $query;
-                if ( ! empty($params[$key])) {
-                    $queryTypes = $types[$key] ?? [];
-                    $this->addQueryParams($params[$key], $queryTypes);
+                if (empty($params[$key])) {
+                    continue;
                 }
+
+                $queryTypes = $types[$key] ?? [];
+                $this->addQueryParams($params[$key], $queryTypes);
             }
         } else {
             $this->sql[] = $sql;
-            if ( ! empty($params)) {
+            if (! empty($params)) {
                 $this->addQueryParams($params, $types);
             }
         }
     }
 
     /**
-     * @param mixed[] $params Array of prepared statement parameters
-     * @param string[] $types Array of the types of each statement parameters
+     * @param mixed[]  $params Array of prepared statement parameters
+     * @param string[] $types  Array of the types of each statement parameters
      */
     private function addQueryParams($params, $types)
     {
@@ -200,14 +192,14 @@ class Version
      * @param string $path      The path to write the migration SQL file.
      * @param string $direction The direction to execute.
      *
-     * @return boolean $written
+     * @return bool
      * @throws MigrationException
      */
     public function writeSqlFile($path, $direction = self::DIRECTION_UP)
     {
         $queries = $this->execute($direction, true);
 
-        if ( ! empty($this->params)) {
+        if (! empty($this->params)) {
             throw MigrationException::migrationNotConvertibleToSql($this->class);
         }
 
@@ -238,13 +230,13 @@ class Version
      * The schema is passed to the pre and post method only to be able to test the presence of some table, And the
      * connection that can get used trough it allow for the test of the presence of records.
      *
-     * @param string  $direction      The direction to execute the migration.
-     * @param boolean $dryRun         Whether to not actually execute the migration SQL and just do a dry run.
-     * @param boolean $timeAllQueries Measuring or not the execution time of each SQL query.
+     * @param string $direction      The direction to execute the migration.
+     * @param bool   $dryRun         Whether to not actually execute the migration SQL and just do a dry run.
+     * @param bool   $timeAllQueries Measuring or not the execution time of each SQL query.
      *
-     * @return array $sql
+     * @return string[]
      *
-     * @throws \Exception when migration fails
+     * @throws \Exception When migration fails.
      */
     public function execute($direction, $dryRun = false, $timeAllQueries = false)
     {
@@ -284,7 +276,7 @@ class Version
             $this->state = self::STATE_POST;
             $this->migration->{'post' . ucfirst($direction)}($toSchema);
 
-            if ( ! $dryRun) {
+            if (! $dryRun) {
                 if ($direction === self::DIRECTION_UP) {
                     $this->markMigrated();
                 } else {
@@ -367,18 +359,20 @@ class Version
 
     private function outputQueryTime($queryStart, $timeAllQueries = false)
     {
-        if ($timeAllQueries !== false) {
-            $queryEnd  = microtime(true);
-            $queryTime = round($queryEnd - $queryStart, 4);
-
-            $this->outputWriter->write(sprintf("  <info>%ss</info>", $queryTime));
+        if ($timeAllQueries === false) {
+            return;
         }
+
+        $queryEnd  = microtime(true);
+        $queryTime = round($queryEnd - $queryStart, 4);
+
+        $this->outputWriter->write(sprintf('  <info>%ss</info>', $queryTime));
     }
 
     /**
      * Returns the time this migration version took to execute
      *
-     * @return integer $time The time this migration version took to execute
+     * @return int The time this migration version took to execute
      */
     public function getTime()
     {
@@ -392,12 +386,12 @@ class Version
 
     private function executeRegisteredSql($dryRun = false, $timeAllQueries = false)
     {
-        if ( ! $dryRun) {
-            if ( ! empty($this->sql)) {
+        if (! $dryRun) {
+            if (! empty($this->sql)) {
                 foreach ($this->sql as $key => $query) {
                     $queryStart = microtime(true);
 
-                    if ( ! isset($this->params[$key])) {
+                    if (! isset($this->params[$key])) {
                         $this->outputWriter->write('     <comment>-></comment> ' . $query);
                         $this->connection->executeQuery($query);
                     } else {
@@ -423,9 +417,8 @@ class Version
     /**
      * Outputs a SQL query via the `OutputWriter`.
      *
-     * @param int $idx The SQL query index. Used to look up params.
+     * @param int    $idx   The SQL query index. Used to look up params.
      * @param string $query the query to output
-     * @return void
      */
     private function outputSqlQuery($idx, $query)
     {
@@ -444,8 +437,9 @@ class Version
     /**
      * Formats a set of sql parameters for output with dry run.
      *
-     * @param array $params The query parameters
-     * @param array $types The types of the query params. Default type is a string
+     * @param mixed[]  $params The query parameters
+     * @param string[] $types  The types of the query params. Default type is a string
+     *
      * @return string|null a string of the parameters present.
      */
     private function formatParamsForOutput(array $params, array $types)

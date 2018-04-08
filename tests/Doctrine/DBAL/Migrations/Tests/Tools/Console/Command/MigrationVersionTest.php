@@ -6,10 +6,12 @@ use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Tester\CommandTester;
 
 class MigrationVersionTest extends MigrationTestCase
 {
+    /** @var Command */
     private $command;
 
     /** @var Configuration */
@@ -51,9 +53,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -78,9 +78,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'        => true,
                 '--range-from' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
@@ -99,9 +97,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'      => true,
                 '--range-to' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
@@ -121,9 +117,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-to' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
@@ -143,9 +137,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-from' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
@@ -165,7 +157,6 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->getVersion('1239')->markMigrated();
         $this->configuration->getVersion('1240')->markMigrated();
 
-
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
             [
@@ -173,9 +164,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -202,9 +191,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add' => true,
                 '--all' => true,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -234,9 +221,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 '--all'    => true,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -263,9 +248,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'   => true,
                 'version' => 1234,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -290,9 +273,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 'version'  => 1234,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -318,9 +299,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'   => true,
                 'version' => 1233,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
@@ -341,9 +320,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 'version'  => 1233,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 }

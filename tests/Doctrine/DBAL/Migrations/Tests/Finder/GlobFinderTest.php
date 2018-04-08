@@ -7,6 +7,7 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 
 class GlobFinderTest extends MigrationTestCase
 {
+    /** @var GlobFinder */
     private $finder;
 
     public function testBadFilenameCausesErrorWhenFindingMigrations()

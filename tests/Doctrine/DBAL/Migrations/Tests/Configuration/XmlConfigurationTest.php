@@ -2,9 +2,9 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
-use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\OutputWriter;
 
 class XmlConfigurationTest extends AbstractConfigurationTest
 {
@@ -13,11 +13,11 @@ class XmlConfigurationTest extends AbstractConfigurationTest
      */
     public function loadConfiguration(
         $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinderInterface $migrationFinder = null
     ) {
         $configFile = 'config.xml';
-        if ('' !== $configFileSuffix) {
+        if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.xml';
         }
 

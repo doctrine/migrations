@@ -11,10 +11,13 @@ use Doctrine\DBAL\Exception\InvalidArgumentException;
  */
 class SqlFileWriter
 {
+    /** @var string */
     private $migrationsColumnName;
 
+    /** @var string */
     private $migrationsTableName;
 
+    /** @var string */
     private $destPath;
 
     /** @var null|OutputWriter */
@@ -24,13 +27,12 @@ class SqlFileWriter
      * @param string $migrationsColumnName
      * @param string $migrationsTableName
      * @param string $destPath
-     * @param \Doctrine\DBAL\Migrations\OutputWriter $outputWriter
      */
     public function __construct(
         $migrationsColumnName,
         $migrationsTableName,
         $destPath,
-        OutputWriter $outputWriter = null
+        ?OutputWriter $outputWriter = null
     ) {
         if (empty($migrationsColumnName)) {
             $this->throwInvalidArgumentException('Migrations column name cannot be empty.');
@@ -51,8 +53,8 @@ class SqlFileWriter
     }
 
     /**
-     * @param array $queriesByVersion array Keys are versions and values are arrays of SQL queries (they must be castable to string)
-     * @param string $direction
+     * @param string[][] $queriesByVersion array Keys are versions and values are arrays of SQL queries (they must be castable to string)
+     * @param string     $direction
      * @return int|bool
      */
     public function write(array $queriesByVersion, $direction)
@@ -67,6 +69,9 @@ class SqlFileWriter
         return file_put_contents($path, $string);
     }
 
+    /**
+     * @param string[][] $queriesByVersion
+     */
     private function buildMigrationFile(array $queriesByVersion, string $direction) : string
     {
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", date('Y-m-d H:i:s'));
@@ -77,7 +82,6 @@ class SqlFileWriter
             foreach ($queries as $query) {
                 $string .= $query . ";\n";
             }
-
 
             $string .= $this->getVersionUpdateQuery($version, $direction);
         }

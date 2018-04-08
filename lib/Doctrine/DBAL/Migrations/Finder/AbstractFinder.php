@@ -5,7 +5,6 @@ namespace Doctrine\DBAL\Migrations\Finder;
 /**
  * Abstract base class for MigrationFinders
  *
- * @since   1.0.0-alpha3
  */
 abstract class AbstractFinder implements MigrationFinderInterface
 {
@@ -17,7 +16,7 @@ abstract class AbstractFinder implements MigrationFinderInterface
     protected function getRealPath($directory)
     {
         $dir = realpath($directory);
-        if (false === $dir || ! is_dir($dir)) {
+        if ($dir === false || ! is_dir($dir)) {
             throw new \InvalidArgumentException(sprintf(
                 'Cannot load migrations from "%s" because it is not a valid directory',
                 $directory
@@ -29,9 +28,9 @@ abstract class AbstractFinder implements MigrationFinderInterface
 
     /**
      * Load the migrations and return an array of thoses loaded migrations
-     * @param array $files array of migration filename found
-     * @param string $namespace namespace of thoses migrations
-     * @return array constructed with the migration name as key and the value is the fully qualified name of the migration
+     * @param string[] $files     array of migration filename found
+     * @param string   $namespace namespace of thoses migrations
+     * @return string[] constructed with the migration name as key and the value is the fully qualified name of the migration
      */
     protected function loadMigrations($files, $namespace)
     {

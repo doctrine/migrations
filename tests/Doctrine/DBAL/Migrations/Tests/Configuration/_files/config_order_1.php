@@ -4,5 +4,5 @@ return [
 'migrations_namespace' => 'DoctrineMigrationsTest',
 'table_name'           => 'doctrine_migration_versions_test',
 'migrations_directory' => '.',
-'migrations'           => []
+'migrations'           => [],
 ];

@@ -3,18 +3,13 @@
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\MigrationException;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command for manually adding and deleting migration versions from the version table.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class VersionCommand extends AbstractCommand
 {
@@ -28,7 +23,7 @@ class VersionCommand extends AbstractCommand
     /**
      * Whether or not the versions have to be marked as migrated or not
      *
-     * @var boolean
+     * @var bool
      */
     private $markMigrated;
 
@@ -75,11 +70,11 @@ EOT
     {
         $this->configuration = $this->getMigrationConfiguration($input, $output);
 
-        if ( ! $input->getOption('add') && ! $input->getOption('delete')) {
+        if (! $input->getOption('add') && ! $input->getOption('delete')) {
             throw new \InvalidArgumentException('You must specify whether you want to --add or --delete the specified version.');
         }
 
-        $this->markMigrated = (boolean) $input->getOption('add');
+        $this->markMigrated = (bool) $input->getOption('add');
 
         if ($input->isInteractive()) {
             $question = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)';
@@ -120,9 +115,11 @@ EOT
         } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
             $availableVersions = $this->configuration->getAvailableVersions();
             foreach ($availableVersions as $version) {
-                if ($version >= $rangeFromOption && $version <= $rangeToOption) {
-                    $this->mark($version, true);
+                if ($version < $rangeFromOption || $version > $rangeToOption) {
+                    continue;
                 }
+
+                $this->mark($version, true);
             }
         } else {
             $this->mark($affectedVersion);
@@ -131,31 +128,33 @@ EOT
 
     private function mark($version, $all = false)
     {
-        if ( ! $this->configuration->hasVersion($version)) {
+        if (! $this->configuration->hasVersion($version)) {
             throw MigrationException::unknownMigrationVersion($version);
         }
 
         $version = $this->configuration->getVersion($version);
         if ($this->markMigrated && $this->configuration->hasVersionMigrated($version)) {
-            if ( ! $all) {
+            if (! $all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" already exists in the version table.', $version));
             }
             $marked = true;
         }
 
-        if ( ! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
-            if ( ! $all) {
+        if (! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
+            if (! $all) {
                 throw new \InvalidArgumentException(sprintf('The version "%s" does not exist in the version table.', $version));
             }
             $marked = false;
         }
 
-        if ( ! isset($marked)) {
-            if ($this->markMigrated) {
-                $version->markMigrated();
-            } else {
-                $version->markNotMigrated();
-            }
+        if (isset($marked)) {
+            return;
+        }
+
+        if ($this->markMigrated) {
+            $version->markMigrated();
+        } else {
+            $version->markNotMigrated();
         }
     }
 }

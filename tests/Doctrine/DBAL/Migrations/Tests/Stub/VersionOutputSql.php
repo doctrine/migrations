@@ -2,7 +2,7 @@
 
 namespace Doctrine\DBAL\Migrations\Tests\Stub;
 
-use \Doctrine\DBAL\Migrations\AbstractMigration;
+use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
 
 class VersionOutputSql extends AbstractMigration

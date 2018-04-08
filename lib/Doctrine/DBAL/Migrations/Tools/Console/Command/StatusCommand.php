@@ -5,16 +5,11 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 /**
  * Command to view the status of a set of migrations.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
  */
 class StatusCommand extends AbstractCommand
 {
@@ -46,29 +41,35 @@ EOT
 
         $output->writeln("\n <info>==</info> Configuration\n");
         foreach ($infos->getMigrationsInfos() as $name => $value) {
-            if ($name == 'New Migrations') {
+            if ($name === 'New Migrations') {
                 $value = $value > 0 ? '<question>' . $value . '</question>' : 0;
             }
-            if ($name == 'Executed Unavailable Migrations') {
+            if ($name === 'Executed Unavailable Migrations') {
                 $value = $value > 0 ? '<error>' . $value . '</error>' : 0;
             }
             $this->writeStatusInfosLineAligned($output, $name, $value);
         }
 
-        if ($input->getOption('show-versions')) {
-            if ($migrations = $configuration->getMigrations()) {
-                $output->writeln("\n <info>==</info> Available Migration Versions\n");
+        if (! $input->getOption('show-versions')) {
+            return;
+        }
 
-                $this->showVersions($migrations, $configuration, $output);
-            }
+        $migrations = $configuration->getMigrations();
 
-            if (count($infos->getExecutedUnavailableMigrations())) {
-                $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
-                foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
-                    $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
-                        ' (<comment>' . $executedUnavailableMigration . '</comment>)');
-                }
-            }
+        if ($migrations) {
+            $output->writeln("\n <info>==</info> Available Migration Versions\n");
+
+            $this->showVersions($migrations, $configuration, $output);
+        }
+
+        if (count($infos->getExecutedUnavailableMigrations()) === 0) {
+            return;
+        }
+
+        $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
+        foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
+            $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
+                ' (<comment>' . $executedUnavailableMigration . '</comment>)');
         }
     }
 
