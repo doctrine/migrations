@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Driver\IBMDB2\DB2Driver;
 use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -13,6 +14,21 @@ use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\Keywords\KeywordList;
+
+final class EmptyKeywordList extends KeywordList
+{
+    protected function getKeywords() 
+    {
+        return [];
+    }
+
+    public function getName()
+    {
+        return "EMPTY";
+    }
+}
 
 class ConfigurationTest extends MigrationTestCase
 {
@@ -183,6 +199,9 @@ class ConfigurationTest extends MigrationTestCase
         $sm->expects($this->once())
             ->method('tablesExist')
             ->willReturn(true);
+        $dp = $this->getMockForAbstractClass(AbstractPlatform::class,[], '', false, true, true, ['getReservedKeywordsClass']);
+        $dp->method('getReservedKeywordsClass')
+            ->willReturn(EmptyKeywordList::class);
         $conn = $this->getMockBuilder(MasterSlaveConnection::class)
             ->disableOriginalConstructor()
             ->getMock();
@@ -192,6 +211,8 @@ class ConfigurationTest extends MigrationTestCase
             ->willReturn(true);
         $conn->method('getSchemaManager')
             ->willReturn($sm);
+        $conn->method('getDatabasePlatform')
+            ->willReturn($dp);
         $conn->expects($this->once())
             ->method('fetchAll')
             ->willReturn([
@@ -255,7 +276,14 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
     {
-        $configuration = new Configuration($this->getConnectionMock());
+        $dp = $this->getMockForAbstractClass(AbstractPlatform::class,[], '', false, true, true, ['getReservedKeywordsClass']);
+        $dp->method('getReservedKeywordsClass')
+            ->willReturn(EmptyKeywordList::class);
+        $conn = $this->getConnectionMock();
+        $conn->method('getDatabasePlatform')
+            ->willReturn($dp);
+
+        $configuration = new Configuration($conn);
         $queryWriter   = $configuration->getQueryWriter();
 
         self::assertAttributeSame($configuration->getMigrationsTableName(), 'tableName', $queryWriter);
@@ -269,5 +297,12 @@ class ConfigurationTest extends MigrationTestCase
         $configuration = new Configuration($this->getConnectionMock(), null, null, $queryWriter);
 
         self::assertSame($queryWriter, $configuration->getQueryWriter());
+    }
+
+    public function testDBWhereVersionIsKeywordReturnsColumnNameWithQuotes()
+    {
+        $config = new Configuration(new Connection([], new DB2Driver()));
+
+        $this->assertEquals('"version"', $config->getQuotedMigrationsColumnName());
     }
 }

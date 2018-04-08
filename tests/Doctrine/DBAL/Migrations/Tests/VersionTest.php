@@ -408,7 +408,7 @@ class VersionTest extends MigrationTestCase
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
                        ->disableOriginalConstructor()
-                       ->setMethods(['getOutputWriter', 'getConnection'])
+                       ->setMethods(['getOutputWriter', 'getConnection', 'getQuotedMigrationsColumnName'])
                        ->getMock();
 
         $config->method('getOutputWriter')
@@ -416,6 +416,9 @@ class VersionTest extends MigrationTestCase
 
         $config->method('getConnection')
                ->willReturn($connection);
+
+        $config->method('getQuotedMigrationsColumnName')
+                ->willReturn('version');
 
 
         /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
