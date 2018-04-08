@@ -1006,7 +1006,7 @@ class Configuration
         $this->isDryRun = $isDryRun;
     }
 
-    private function getMigrationsColumn(): Column
+    private function getMigrationsColumn() : Column
     {
         return new Column($this->migrationsColumnName, Type::getType('string'), ['length' => 255]);
     }
