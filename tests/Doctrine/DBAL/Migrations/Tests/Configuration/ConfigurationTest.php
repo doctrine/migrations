@@ -19,7 +19,7 @@ use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 
 final class EmptyKeywordList extends KeywordList
 {
-    protected function getKeywords() 
+    protected function getKeywords()
     {
         return [];
     }
@@ -199,7 +199,7 @@ class ConfigurationTest extends MigrationTestCase
         $sm->expects($this->once())
             ->method('tablesExist')
             ->willReturn(true);
-        $dp = $this->getMockForAbstractClass(AbstractPlatform::class,[], '', false, true, true, ['getReservedKeywordsClass']);
+        $dp = $this->getMockForAbstractClass(AbstractPlatform::class, [], '', false, true, true, ['getReservedKeywordsClass']);
         $dp->method('getReservedKeywordsClass')
             ->willReturn(EmptyKeywordList::class);
         $conn = $this->getMockBuilder(MasterSlaveConnection::class)
@@ -276,7 +276,7 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
     {
-        $dp = $this->getMockForAbstractClass(AbstractPlatform::class,[], '', false, true, true, ['getReservedKeywordsClass']);
+        $dp = $this->getMockForAbstractClass(AbstractPlatform::class, [], '', false, true, true, ['getReservedKeywordsClass']);
         $dp->method('getReservedKeywordsClass')
             ->willReturn(EmptyKeywordList::class);
         $conn = $this->getConnectionMock();
