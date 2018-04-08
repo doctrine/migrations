@@ -504,6 +504,7 @@ class VersionTest extends MigrationTestCase
             'doctrine_param' => [[[1,2,3,4,5]], [Connection::PARAM_INT_ARRAY], '[1, 2, 3, 4, 5]'],
             'doctrine_param_grouped' => [[[1,2],[3,4,5]], [Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY], '[1, 2], [3, 4, 5]'],
             'boolean' => [[true], [''], '[true]'],
+            'object' => [[new \stdClass('test')], [''], '[?]'],
         ];
     }
 
