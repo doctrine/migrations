@@ -1,6 +1,3 @@
-.. index::
-   single: Generating Migrations
-
 Generating Migrations
 =====================
 
@@ -57,7 +54,7 @@ changes required to update your database!
     $ ./doctrine migrations:diff
     Generated new migration class to "/path/to/migrations/DoctrineMigrations/Version20100416130459.php" from schema differences.
 
-The migration class that is generated contains the SQL statements required to 
+The migration class that is generated contains the SQL statements required to
 update your database:
 
 .. code-block:: php
@@ -176,8 +173,10 @@ added to the migration class.
 
 Therefore you can configure doctrine with a schema filter.
 
+.. code-block:: php
+
     $connection->getConfiguration()->setFilterSchemaAssetsExpression("~^(?!t_)~");
-    
+
 With this expression all tables prefixed with t_ will ignored by the schema tool.
 
 If you use the DoctrineBundle with Symfony2 you can set the schema_filter option

@@ -1,6 +1,3 @@
-.. index::
-   single: Integrations
-
 Integrations
 ============
 
@@ -13,5 +10,5 @@ If you want to start quickly, there are integrations for a lot of frameworks alr
   * `Silex <https://packagist.org/packages/dbtlr/silex-doctrine-migrations>`_
   * `nette <https://packagist.org/packages/zenify/doctrine-migrations>`_
 
-Don't hesitate to make a `Pull Request <https://github.com/doctrine/migrations-documentation>`_
+Don't hesitate to make a `Pull Request <https://github.com/doctrine/migrations>`_
 if you want to add your integration to this list.
