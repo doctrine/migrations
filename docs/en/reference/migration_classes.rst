@@ -1,6 +1,3 @@
-.. index::
-   single: Migration Classes
-
 Migration Classes
 =================
 
@@ -35,8 +32,6 @@ the following:
 
         }
     }
-
-
 
 You can now use the *addSql()* method within the up and down method.
 

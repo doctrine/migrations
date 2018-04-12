@@ -1,6 +1,3 @@
-.. index::
-   single: Custom Configuration
-
 Custom Configuration
 ====================
 

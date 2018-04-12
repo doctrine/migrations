@@ -1,6 +1,3 @@
-.. index::
-   single: Version Numbers
-
 Version Numbers
 ===============
 

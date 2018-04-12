@@ -1,11 +1,8 @@
-.. index::
-   single: Building a framework specifc integration of doctrine migration
-
-Building your integration of doctrine migration
-===============================================
+Custom Integration
+==================
 
 For up to date code take a look at `the doctrine migrations command line integration <https://github.com/doctrine/migrations/blob/master/bin/doctrine-migrations.php>`_.
-None the less the main steps required to make a functional integration are presented bellow.
+None the less the main steps required to make a functional integration are presented below.
 
 Installation
 ~~~~~~~~~~~~
@@ -16,7 +13,6 @@ First you need to require Doctrine Migrations as a dependency of your code
 
     composer require doctrine/migrations
 
-
 Then you have to require the composer autoloader to use the classes from the `Doctrine\DBAL\Migrations`
 namespace in your project:
 
@@ -25,7 +21,7 @@ namespace in your project:
     $autoloadFiles = array(
         __DIR__ . '/../vendor/autoload.php',
         __DIR__ . '/../../../autoload.php'
-);
+    );
 
     $autoloader = false;
     foreach ($autoloadFiles as $autoloadFile) {

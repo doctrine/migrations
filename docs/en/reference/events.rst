@@ -1,6 +1,3 @@
-.. index::
-   single: Migrations Events
-
 Migrations Events
 =================
 
