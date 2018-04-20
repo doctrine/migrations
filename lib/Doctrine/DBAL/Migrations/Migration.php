@@ -4,6 +4,7 @@ namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
+use const COUNT_RECURSIVE;
 
 /**
  * Class for running migrations to the current version or a manually specified version.
@@ -181,7 +182,7 @@ class Migration
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
         $this->outputWriter->write(sprintf("  <info>++</info> finished in %ss", $time));
         $this->outputWriter->write(sprintf("  <info>++</info> %s migrations executed", count($migrationsToExecute)));
-        $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, true) - count($sql)));
+        $this->outputWriter->write(sprintf("  <info>++</info> %s sql queries", count($sql, COUNT_RECURSIVE) - count($sql)));
 
         return $sql;
     }
