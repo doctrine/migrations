@@ -123,7 +123,7 @@ EOT
         $migration->setNoMigrationException($input->getOption('allow-no-migration'));
         $result = $migration->migrate($version, $dryRun, $timeAllqueries, function () use ($input, $output, &$cancelled) {
             $question    = 'WARNING! You are about to execute a database migration'
-                . ' that could result in schema changes and data lost.'
+                . ' that could result in schema changes and data loss.'
                 . ' Are you sure you wish to continue? (y/n)';
             $canContinue = $this->canExecute($question, $input, $output);
             $cancelled   = ! $canContinue;
