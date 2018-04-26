@@ -26,7 +26,7 @@ class MigrateCommand extends AbstractCommand
             ->setName('migrations:migrate')
             ->setDescription('Execute a migration to a specified version or the latest available version.')
             ->addArgument('version', InputArgument::OPTIONAL, 'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.', 'latest')
-            ->addOption('write-sql', null, InputOption::VALUE_OPTIONAL, 'The path to output the migration SQL file instead of executing it. Default to current working directory.')
+            ->addOption('write-sql', null, InputOption::VALUE_OPTIONAL, 'The path to output the migration SQL file instead of executing it. Default to current working directory.', false)
             ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
             ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
             ->addOption('allow-no-migration', null, InputOption::VALUE_NONE, 'Don\'t throw an exception if no migration is available (CI).')
@@ -113,8 +113,8 @@ EOT
             }
         }
 
-        if ($path = $input->getOption('write-sql')) {
-            $path = is_bool($path) ? getcwd() : $path;
+        if (($path = $input->getOption('write-sql')) !== false) {
+            $path = is_null($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
             return 0;
         }

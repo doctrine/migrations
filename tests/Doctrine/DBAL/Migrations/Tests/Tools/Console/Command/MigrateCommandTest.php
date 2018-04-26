@@ -70,7 +70,7 @@ class MigrateCommandTest extends CommandTestCase
         self::assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
     }
 
-    public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsTrue()
+    public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsNull()
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->withExecutedAndAvailableMigrations();
@@ -79,7 +79,7 @@ class MigrateCommandTest extends CommandTestCase
             ->with(getcwd(), self::VERSION);
 
         list($tester, $statusCode) = $this->executeCommand([
-            '--write-sql' => true,
+            '--write-sql' => null,
         ]);
 
         self::assertSame(0, $statusCode);
