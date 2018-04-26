@@ -65,7 +65,9 @@ Register Console helpers
 ~~~~~~~~~~~~~~~~~~~~~~~~
 
 Additionally you have to make sure the 'db' and 'dialog' Helpers are added to your Symfony
-Console HelperSet.
+Console HelperSet in a cli-config.php file.
+
+This file can be either in the directory you are calling the console tool from or in as config subfolder.
 
 .. code-block:: php
 
@@ -78,6 +80,8 @@ Console HelperSet.
         'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($db),
         'question' => new \Symfony\Component\Console\Helper\QuestionHelper(),
     ));
+    
+    return $helperset;
 
 Note that the db helper is not required as you might want to pass the connection information
 from the command line directly.
