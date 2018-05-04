@@ -1,60 +1,59 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Finder;
 
-/**
- * A MigrationFinderInterface implementation that uses a RegexIterator along with a
- * RecursiveDirectoryIterator.
- *
- * @since   1.0.0-alpha3
- */
-final class RecursiveRegexFinder extends AbstractFinder implements MigrationDeepFinderInterface
-{
+use FilesystemIterator;
+use RecursiveDirectoryIterator;
+use RecursiveIteratorIterator;
+use RegexIterator;
+use const DIRECTORY_SEPARATOR;
+use function sprintf;
 
+final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
+{
     /**
-     * {@inheritdoc}
+     * @return string[]
      */
-    public function findMigrations($directory, $namespace = null)
+    public function findMigrations(string $directory, ?string $namespace = null) : array
     {
         $dir = $this->getRealPath($directory);
 
         return $this->loadMigrations($this->getMatches($this->createIterator($dir)), $namespace);
     }
 
-    /**
-     * Create a recursive iterator to find all the migrations in the subdirectories.
-     * @param string $dir
-     * @return \RegexIterator
-     */
-    private function createIterator($dir)
+    private function createIterator(string $dir) : RegexIterator
     {
-        return new \RegexIterator(
-            new \RecursiveIteratorIterator(
-                new \RecursiveDirectoryIterator($dir, \FilesystemIterator::SKIP_DOTS | \FilesystemIterator::FOLLOW_SYMLINKS),
-                \RecursiveIteratorIterator::LEAVES_ONLY
+        return new RegexIterator(
+            new RecursiveIteratorIterator(
+                new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
+                RecursiveIteratorIterator::LEAVES_ONLY
             ),
             $this->getPattern(),
-            \RegexIterator::GET_MATCH
+            RegexIterator::GET_MATCH
         );
     }
 
-    private function getPattern()
+    private function getPattern() : string
     {
-        return sprintf('#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i', DIRECTORY_SEPARATOR, DIRECTORY_SEPARATOR);
+        return sprintf(
+            '#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i',
+            DIRECTORY_SEPARATOR,
+            DIRECTORY_SEPARATOR
+        );
     }
 
     /**
-     * Transform the recursiveIterator result array of array into the expected array of migration file
-     * @param iterable $iteratorFilesMatch
-     * @return array
+     * @return string[]
      */
-    private function getMatches($iteratorFilesMatch)
+    private function getMatches(RegexIterator $iteratorFilesMatch) : array
     {
         $files = [];
         foreach ($iteratorFilesMatch as $file) {
             $files[] = $file[0];
         }
-        
+
         return $files;
     }
 }

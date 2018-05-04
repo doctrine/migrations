@@ -1,15 +1,19 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console;
 
 use Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
  * @covers \Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner
  */
-class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
+class ConsoleRunnerTest extends TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
     private $entityManagerHelper;
@@ -17,7 +21,7 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
     /** @var Application */
     private $application;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -27,78 +31,76 @@ class ConsoleRunnerTest extends \PHPUnit\Framework\TestCase
             ->getMock();
     }
 
-    public function testHasExecuteCommand()
+    public function testHasExecuteCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:execute'));
     }
 
-    public function testHasGenerateCommand()
+    public function testHasGenerateCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:generate'));
     }
 
-    public function testHasLatestCommand()
+    public function testHasLatestCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:latest'));
     }
 
-    public function testHasMigrateCommand()
+    public function testHasMigrateCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:migrate'));
     }
 
-    public function testHasStatusCommand()
+    public function testHasStatusCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:status'));
     }
 
-    public function testHasVersionCommand()
+    public function testHasVersionCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:version'));
     }
 
-    public function testHasUpToDateCommand()
+    public function testHasUpToDateCommand() : void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:up-to-date'));
     }
 
-    public function testHasDiffCommand()
+    public function testHasDiffCommand() : void
     {
-        $this->application->setHelperSet(new HelperSet(array(
+        $this->application->setHelperSet(new HelperSet([
             'em' => $this->entityManagerHelper,
-        )));
+        ]));
 
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:diff'));
     }
 
-    public function testNotHasDiffCommand()
+    public function testNotHasDiffCommand() : void
     {
-        $this->application->setHelperSet(new HelperSet(array(
-
-        )));
+        $this->application->setHelperSet(new HelperSet([]));
 
         ConsoleRunner::addCommands($this->application);
 
         self::assertFalse($this->application->has('migrations:diff'));
     }
 
-    public function testCreateApplication()
+    public function testCreateApplication() : void
     {
         $actual = ConsoleRunner::createApplication(new HelperSet());
 

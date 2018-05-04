@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
@@ -7,10 +9,11 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+use function preg_quote;
 
 class MigrationStatusTest extends MigrationTestCase
 {
-
+    /** @var string */
     private $migrationDirectory;
 
     public function __construct()
@@ -22,7 +25,7 @@ class MigrationStatusTest extends MigrationTestCase
     /**
      * Tests the display of the previous/current/next/latest versions.
      */
-    public function testVersions()
+    public function testVersions() : void
     {
         self::assertVersion('prev', '123', 'Previous Version', 'FORMATTED (123)');
         self::assertVersion('current', '234', 'Current Version', 'FORMATTED (234)');
@@ -44,15 +47,13 @@ class MigrationStatusTest extends MigrationTestCase
      * @param  string      $label   The expected row label.
      * @param  string      $output  The expected row value.
      */
-    protected function assertVersion($alias, $version, $label, $output)
+    protected function assertVersion(string $alias, ?string $version, string $label, string $output) : void
     {
         $command = $this
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                [
-                    'getMigrationConfiguration',
-                ]
+                ['getMigrationConfiguration']
             )
             ->getMock();
 
@@ -100,15 +101,13 @@ class MigrationStatusTest extends MigrationTestCase
      * This test prevents an incorrect amount of new migrations when unavailable migrations were executed. When there
      * are still new ones, it should show the correct number of new migrations.
      */
-    public function testIfAmountNewMigrationsIsCorrectWithUnavailableMigrations()
+    public function testIfAmountNewMigrationsIsCorrectWithUnavailableMigrations() : void
     {
         $command = $this
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                [
-                    'getMigrationConfiguration',
-                ]
+                ['getMigrationConfiguration']
             )
             ->getMock();
 
@@ -120,16 +119,16 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects($this->once())
             ->method('getMigratedVersions')
-            ->will($this->returnValue([1234,1235,1237,1238,1239]));
+            ->will($this->returnValue(['1234', '1235', '1237', '1238', '1239']));
 
         $configuration
             ->expects($this->once())
             ->method('getAvailableVersions')
-            ->will($this->returnValue([1234,1235,1239,1240]));
+            ->will($this->returnValue(['1234', '1235', '1239', '1240']));
 
         $configuration
             ->method('getCurrentVersion')
-            ->will($this->returnValue(1239));
+            ->will($this->returnValue('1239'));
 
         $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsDirectory($this->migrationDirectory);
@@ -149,22 +148,22 @@ class MigrationStatusTest extends MigrationTestCase
         self::assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
     }
 
-    public function testShowVersions()
+    public function testShowVersions() : void
     {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsDirectory($this->migrationDirectory);
 
-        $configuration->registerMigration(1233, Version1Test::class);
-        $configuration->registerMigration(1234, Version1Test::class);
-        $configuration->registerMigration(20170101010101, Version1Test::class);
-        $configuration->registerMigration(20170101010102, Version1Test::class);
+        $configuration->registerMigration('1233', Version1Test::class);
+        $configuration->registerMigration('1234', Version1Test::class);
+        $configuration->registerMigration('20170101010101', Version1Test::class);
+        $configuration->registerMigration('20170101010102', Version1Test::class);
         $configuration->registerMigration('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1', Version1Test::class);
 
         $configuration->registerMigration('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_2', Version1Test::class);
 
-        $configuration->getVersion(1234)->markMigrated();
-        $configuration->getVersion(20170101010101)->markMigrated();
+        $configuration->getVersion('1234')->markMigrated();
+        $configuration->getVersion('20170101010101')->markMigrated();
         $configuration->getVersion('VeryLongMigrationName_VeryLongMigrationName_VeryLongMigrationName_1')->markMigrated();
 
         $command = $this
@@ -172,6 +171,7 @@ class MigrationStatusTest extends MigrationTestCase
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(['getMigrationConfiguration'])
             ->getMock();
+
         $command
             ->expects($this->once())
             ->method('getMigrationConfiguration')

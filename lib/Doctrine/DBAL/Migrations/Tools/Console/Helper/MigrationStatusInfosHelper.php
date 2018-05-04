@@ -1,20 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 
 use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Migrations\Version;
+use function array_diff;
+use function count;
+use function sprintf;
 
 class MigrationStatusInfosHelper
 {
-    /** @var Version[] */
+    /** @var string[] */
     private $executedMigrations;
 
-    /** @var Version[] */
+    /** @var string[] */
     private $availableMigrations;
 
-    /** @var Version[] */
+    /** @var string[] */
     private $executedUnavailableMigrations;
 
     /** @var Configuration  */
@@ -25,13 +29,21 @@ class MigrationStatusInfosHelper
         $this->configuration                 = $configuration;
         $this->executedMigrations            = $this->configuration->getMigratedVersions();
         $this->availableMigrations           = $this->configuration->getAvailableVersions();
-        $this->executedUnavailableMigrations = array_diff($this->executedMigrations, $this->availableMigrations);
+        $this->executedUnavailableMigrations = array_diff(
+            $this->executedMigrations,
+            $this->availableMigrations
+        );
     }
 
-    public function getMigrationsInfos()
+    /** @return string[]|int[]|null[] */
+    public function getMigrationsInfos() : array
     {
         $numExecutedUnavailableMigrations = count($this->executedUnavailableMigrations);
-        $numNewMigrations                 = count(array_diff($this->availableMigrations, $this->executedMigrations));
+
+        $numNewMigrations = count(array_diff(
+            $this->availableMigrations,
+            $this->executedMigrations
+        ));
 
         $infos = [
             'Name'                              => $this->configuration->getName() ? $this->configuration->getName() : 'Doctrine Database Migrations',
@@ -55,10 +67,11 @@ class MigrationStatusInfosHelper
         return $infos;
     }
 
-    private function getFormattedVersionAlias($alias)
+    private function getFormattedVersionAlias(string $alias) : string
     {
         $version = $this->configuration->resolveVersionAlias($alias);
-        //No version found
+
+        // No version found
         if ($version === null) {
             if ($alias === 'next') {
                 return 'Already at latest version';
@@ -68,19 +81,22 @@ class MigrationStatusInfosHelper
                 return 'Already at first version';
             }
         }
-        //Before first version "virtual" version number
+
+        // Before first version "virtual" version number
         if ($version === '0') {
             return '<comment>0</comment>';
         }
 
-        //Show normal version number
-        return $this->configuration->getDateTime($version) . ' (<comment>' . $version . '</comment>)';
+        // Show normal version number
+        return sprintf(
+            '%s (<comment>%s</comment>)',
+            $this->configuration->getDateTime((string) $version),
+            $version
+        );
     }
 
-    /**
-     * @return Version[]
-     */
-    public function getExecutedUnavailableMigrations()
+    /** @return string[] */
+    public function getExecutedUnavailableMigrations() : array
     {
         return $this->executedUnavailableMigrations;
     }

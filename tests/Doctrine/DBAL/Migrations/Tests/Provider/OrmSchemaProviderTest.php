@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Provider;
 
 use Doctrine\DBAL\Connection;
@@ -11,11 +13,10 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\Tools\Setup;
+use UnexpectedValueException;
 
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
- *
- * @since   1.0.0-alpha3
  */
 class OrmSchemaProviderTest extends MigrationTestCase
 {
@@ -31,7 +32,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
     /** @var  OrmSchemaProvider */
     private $ormProvider;
 
-    public function testCreateSchemaFetchesMetadataFromEntityManager()
+    public function testCreateSchemaFetchesMetadataFromEntityManager() : void
     {
         $schema = $this->ormProvider->createSchema();
         self::assertInstanceOf(Schema::class, $schema);
@@ -40,37 +41,16 @@ class OrmSchemaProviderTest extends MigrationTestCase
         self::assertTrue($table->hasColumn('id'));
     }
 
-    public function testEntityManagerWithoutMetadataCausesError()
+    public function testEntityManagerWithoutMetadataCausesError() : void
     {
-        $this->expectException(\UnexpectedValueException::class);
+        $this->expectException(UnexpectedValueException::class);
 
         $this->config->setMetadataDriverImpl(new XmlDriver([]));
 
         $this->ormProvider->createSchema();
     }
 
-    public function notEntityManagers()
-    {
-        return [
-            [new \stdClass],
-            [false],
-            [1],
-            ['oops'],
-            [1.0],
-        ];
-    }
-
-    /**
-     * @dataProvider notEntityManagers
-     */
-    public function testPassingAnInvalidEntityManagerToConstructorCausesError($em)
-    {
-        $this->expectException(\InvalidArgumentException::class);
-
-        new OrmSchemaProvider($em);
-    }
-
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->conn          = $this->getSqliteConnection();
         $this->config        = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);

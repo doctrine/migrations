@@ -1,22 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Helper\DialogHelper;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Doctrine\DBAL\Migrations\Version;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\DBAL\Migrations\Version;
+use function getcwd;
 
 class ExecuteCommandTest extends CommandTestCase
 {
     use DialogSupport;
 
-    const VERSION = '20160705000000';
+    public const VERSION = '20160705000000';
 
+    /** @var Version */
     private $version;
 
-    public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory()
+    public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory() : void
     {
         $this->version->expects($this->once())
             ->method('writeSqlFile')
@@ -30,7 +32,7 @@ class ExecuteCommandTest extends CommandTestCase
         self::assertSame(0, $statusCode);
     }
 
-    public function testWriteSqlOutputsSqlFileToTheSpecifiedDirectory()
+    public function testWriteSqlOutputsSqlFileToTheSpecifiedDirectory() : void
     {
         $this->version->expects($this->once())
             ->method('writeSqlFile')
@@ -44,7 +46,7 @@ class ExecuteCommandTest extends CommandTestCase
         self::assertSame(0, $statusCode);
     }
 
-    public function testNoMigrationIsExecuteWhenTheUserDoesNotConfirmTheAction()
+    public function testNoMigrationIsExecuteWhenTheUserDoesNotConfirmTheAction() : void
     {
         $this->willAskConfirmationAndReturn(false);
         $this->version->expects($this->never())
@@ -56,7 +58,7 @@ class ExecuteCommandTest extends CommandTestCase
         self::assertContains('Migration cancelled', $tester->getDisplay());
     }
 
-    public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction()
+    public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction() : void
     {
         $this->willAskConfirmationAndReturn(true);
         $this->version->expects($this->once())
@@ -71,7 +73,7 @@ class ExecuteCommandTest extends CommandTestCase
         self::assertSame(0, $statusCode);
     }
 
-    public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode()
+    public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode() : void
     {
         $this->questions->expects($this->never())
             ->method('ask');
@@ -88,10 +90,14 @@ class ExecuteCommandTest extends CommandTestCase
         self::assertSame(0, $statusCode);
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
-        $this->version = $this->mockWithoutConstructor(Version::class);
+
+        $this->version = $this->getMockBuilder(Version::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->config->expects($this->once())
             ->method('getVersion')
             ->with(self::VERSION)
@@ -100,21 +106,21 @@ class ExecuteCommandTest extends CommandTestCase
         $this->configureDialogs($this->app);
     }
 
-    protected function createCommand()
+    protected function createCommand() : AbstractCommand
     {
         return new ExecuteCommand();
     }
 
-    protected function executeCommand(array $args, array $options = [])
+    /**
+     * @param mixed[] $args
+     * @param mixed[] $options
+     *
+     * @return CommandTester|int[]
+     */
+    protected function executeCommand(array $args, array $options = []) : array
     {
         $args['version'] = self::VERSION;
-        return parent::executeCommand($args, $options);
-    }
 
-    private function mockWithoutConstructor($cls)
-    {
-        return $this->getMockBuilder($cls)
-            ->disableOriginalConstructor()
-            ->getMock();
+        return parent::executeCommand($args, $options);
     }
 }

@@ -4,5 +4,5 @@ migrations_namespace: "TestMigrations"
 migrations_directory: migrations
 migrations:
     migration1:
-        version: 20150426000000
+        version: '20150426000000'
         class: Doctrine\DBAL\Migrations\Tests\Functional\FirstMigration

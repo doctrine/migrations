@@ -7,6 +7,9 @@ namespace Doctrine\DBAL\Migrations\Tests;
 use Doctrine\DBAL\Migrations\FileQueryWriter;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Version;
+use function file_get_contents;
+use function sprintf;
+use function unlink;
 
 final class FileQueryWriterTest extends MigrationTestCase
 {
@@ -17,9 +20,15 @@ final class FileQueryWriterTest extends MigrationTestCase
 
     /**
      * @dataProvider writeProvider
+     *
+     * @param string[][] $queries
      */
-    public function testWrite(string $path, string $direction, array $queries, ?OutputWriter $outputWriter) : void
-    {
+    public function testWrite(
+        string $path,
+        string $direction,
+        array $queries,
+        ?OutputWriter $outputWriter
+    ) : void {
         $writer = new FileQueryWriter(self::COLUMN_NAME, self::TABLE_NAME, $outputWriter);
 
         self::assertTrue($writer->write($path, $direction, $queries));
@@ -39,6 +48,7 @@ final class FileQueryWriterTest extends MigrationTestCase
         }
     }
 
+    /** @return string[][] */
     public function writeProvider() : array
     {
         $outputWriter = $this->createMock(OutputWriter::class);
@@ -48,10 +58,10 @@ final class FileQueryWriterTest extends MigrationTestCase
                      ->with($this->isType('string'));
 
         return [
-            [__DIR__, Version::DIRECTION_UP, [1 => ['SHOW DATABASES']], $outputWriter],
-            [__DIR__, Version::DIRECTION_DOWN, [1 => ['SHOW DATABASES']], $outputWriter],
-            [__DIR__, Version::DIRECTION_UP, [1 => ['SHOW DATABASES']], null],
-            [__DIR__, Version::DIRECTION_DOWN, [1 => ['SHOW DATABASES']], null],
+            [__DIR__, Version::DIRECTION_UP, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, Version::DIRECTION_DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, Version::DIRECTION_UP, ['1' => ['SHOW DATABASES']], null],
+            [__DIR__, Version::DIRECTION_DOWN, ['1' => ['SHOW DATABASES']], null],
         ];
     }
 }

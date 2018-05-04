@@ -1,21 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Version1Test;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
+use InvalidArgumentException;
 use Symfony\Component\Console\Tester\CommandTester;
+use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
 {
+    /** @var VersionCommand */
     private $command;
 
     /** @var Configuration */
     private $configuration;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->command = $this
             ->getMockBuilder(VersionCommand::class)
@@ -36,13 +41,13 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-to --range-from" options on migrate only versions in interval.
      */
-    public function testAddRangeOption()
+    public function testAddRangeOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
-        $this->configuration->registerMigration(1239, Version1Test::class);
-        $this->configuration->registerMigration(1240, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
+        $this->configuration->registerMigration('1239', Version1Test::class);
+        $this->configuration->registerMigration('1240', Version1Test::class);
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
@@ -51,9 +56,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -66,11 +69,11 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-from" options without "--range-to".
      */
-    public function testAddRangeWithoutRangeToOption()
+    public function testAddRangeWithoutRangeToOption() : void
     {
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
 
         $commandTester->execute(
@@ -78,20 +81,18 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'        => true,
                 '--range-from' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
     /**
      * Test "--add --range-to" options without "--range-from".
      */
-    public function testAddRangeWithoutRangeFromOption()
+    public function testAddRangeWithoutRangeFromOption() : void
     {
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
 
         $commandTester->execute(
@@ -99,20 +100,18 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'      => true,
                 '--range-to' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
     /**
      * Test "--add --all --range-to" options.
      */
-    public function testAddAllOptionsWithRangeTo()
+    public function testAddAllOptionsWithRangeTo() : void
     {
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
 
         $commandTester->execute(
@@ -121,20 +120,18 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-to' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
     /**
      * Test "--add --all --range-from" options.
      */
-    public function testAddAllOptionsWithRangeFrom()
+    public function testAddAllOptionsWithRangeFrom() : void
     {
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
 
         $commandTester->execute(
@@ -143,28 +140,25 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-from' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
     /**
      * Test "--delete --range-to --range-from" options on migrate down only versions in interval.
      */
-    public function testDeleteRangeOption()
+    public function testDeleteRangeOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
-        $this->configuration->registerMigration(1239, Version1Test::class);
-        $this->configuration->registerMigration(1240, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
+        $this->configuration->registerMigration('1239', Version1Test::class);
+        $this->configuration->registerMigration('1240', Version1Test::class);
 
         $this->configuration->getVersion('1233')->markMigrated();
         $this->configuration->getVersion('1234')->markMigrated();
         $this->configuration->getVersion('1239')->markMigrated();
         $this->configuration->getVersion('1240')->markMigrated();
-
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
@@ -173,9 +167,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -188,13 +180,13 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all" options on migrate all versions.
      */
-    public function testAddAllOption()
+    public function testAddAllOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
-        $this->configuration->registerMigration(1239, Version1Test::class);
-        $this->configuration->registerMigration(1240, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
+        $this->configuration->registerMigration('1239', Version1Test::class);
+        $this->configuration->registerMigration('1240', Version1Test::class);
 
         $commandTester = new CommandTester($this->command);
         $commandTester->execute(
@@ -202,9 +194,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add' => true,
                 '--all' => true,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -217,13 +207,13 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete --all" options on migrate down all versions.
      */
-    public function testDeleteAllOption()
+    public function testDeleteAllOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
-        $this->configuration->registerMigration(1239, Version1Test::class);
-        $this->configuration->registerMigration(1240, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
+        $this->configuration->registerMigration('1239', Version1Test::class);
+        $this->configuration->registerMigration('1240', Version1Test::class);
 
         $this->configuration->getVersion('1233')->markMigrated();
         $this->configuration->getVersion('1234')->markMigrated();
@@ -234,9 +224,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 '--all'    => true,
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -249,11 +237,11 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate one version.
      */
-    public function testAddOption()
+    public function testAddOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
 
         $this->configuration->getVersion('1233')->markMigrated();
 
@@ -261,11 +249,9 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester->execute(
             [
                 '--add'   => true,
-                'version' => 1234,
+                'version' => '1234',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
@@ -276,11 +262,11 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" options on migrate down one version.
      */
-    public function testDeleteOption()
+    public function testDeleteOption() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
-        $this->configuration->registerMigration(1234, Version1Test::class);
-        $this->configuration->registerMigration(1235, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->registerMigration('1234', Version1Test::class);
+        $this->configuration->registerMigration('1235', Version1Test::class);
 
         $this->configuration->getVersion('1234')->markMigrated();
 
@@ -288,11 +274,9 @@ class MigrationVersionTest extends MigrationTestCase
         $commandTester->execute(
             [
                 '--delete' => true,
-                'version'  => 1234,
+                'version'  => '1234',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
 
         self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
@@ -303,47 +287,43 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate already migrated version.
      */
-    public function testAddOptionIfVersionAlreadyMigrated()
+    public function testAddOptionIfVersionAlreadyMigrated() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->getVersion('1233')->markMigrated();
 
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" already exists in the version table.');
 
         $commandTester->execute(
             [
                 '--add'   => true,
-                'version' => 1233,
+                'version' => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 
     /**
      * Test "--delete" option on not migrated version.
      */
-    public function testDeleteOptionIfVersionNotMigrated()
+    public function testDeleteOptionIfVersionNotMigrated() : void
     {
-        $this->configuration->registerMigration(1233, Version1Test::class);
+        $this->configuration->registerMigration('1233', Version1Test::class);
 
         $commandTester = new CommandTester($this->command);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
 
         $commandTester->execute(
             [
                 '--delete' => true,
-                'version'  => 1233,
+                'version'  => '1233',
             ],
-            [
-                'interactive' => false,
-            ]
+            ['interactive' => false]
         );
     }
 }

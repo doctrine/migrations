@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Helper;
 
 use Doctrine\DBAL\Connection;
@@ -9,41 +11,42 @@ use Doctrine\DBAL\Migrations\Configuration\JsonConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\XmlConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
 use Doctrine\DBAL\Migrations\OutputWriter;
-use Symfony\Component\Console\Input\InputInterface;
+use InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
+use Symfony\Component\Console\Input\InputInterface;
+use function file_exists;
+use function pathinfo;
+use function sprintf;
 
-/**
- * Class ConfigurationHelper
- * @package Doctrine\DBAL\Migrations\Tools\Console\Helper
- * @internal
- */
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
-
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $connection;
 
-    /**
-     * @var Configuration
-     */
+    /** @var null|Configuration */
     private $configuration;
 
-    public function __construct(Connection $connection = null, Configuration $configuration = null)
-    {
+    public function __construct(
+        Connection $connection,
+        ?Configuration $configuration = null
+    ) {
         $this->connection    = $connection;
         $this->configuration = $configuration;
     }
 
-    public function getMigrationConfig(InputInterface $input, OutputWriter $outputWriter)
+    public function getMigrationConfig(InputInterface $input, OutputWriter $outputWriter) : Configuration
     {
         /**
          * If a configuration option is passed to the command line, use that configuration
          * instead of any other one.
          */
         if ($input->getOption('configuration')) {
-            $outputWriter->write("Loading configuration from command option: " . $input->getOption('configuration'));
+            $outputWriter->write(
+                sprintf(
+                    'Loading configuration from command option: %s',
+                    $input->getOption('configuration')
+                )
+            );
 
             return $this->loadConfig($input->getOption('configuration'), $outputWriter);
         }
@@ -52,7 +55,9 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
          * If a configuration has already been set using DI or a Setter use it.
          */
         if ($this->configuration) {
-            $outputWriter->write("Loading configuration from the integration code of your framework (setter).");
+            $outputWriter->write(
+                'Loading configuration from the integration code of your framework (setter).'
+            );
 
             $this->configuration->setOutputWriter($outputWriter);
 
@@ -69,9 +74,10 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
             'migrations.json',
             'migrations.php',
         ];
+
         foreach ($defaultConfig as $config) {
             if ($this->configExists($config)) {
-                $outputWriter->write("Loading configuration from file: $config");
+                $outputWriter->write(sprintf('Loading configuration from file: %s', $config));
 
                 return $this->loadConfig($config, $outputWriter);
             }
@@ -81,12 +87,13 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     }
 
 
-    private function configExists($config)
+    private function configExists(string $config) : bool
     {
         return file_exists($config);
     }
 
-    private function loadConfig($config, OutputWriter $outputWriter)
+    /** @throws InvalidArgumentException */
+    private function loadConfig(string $config, OutputWriter $outputWriter) : Configuration
     {
         $map = [
             'xml'   => XmlConfiguration::class,
@@ -97,9 +104,10 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         ];
 
         $info = pathinfo($config);
+
         // check we can support this file type
         if (empty($map[$info['extension']])) {
-            throw new \InvalidArgumentException('Given config file type is not supported');
+            throw new InvalidArgumentException('Given config file type is not supported');
         }
 
         $class         = $map[$info['extension']];
@@ -112,7 +120,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     /**
      * {@inheritdoc}
      */
-    public function getName()
+    public function getName() : string
     {
         return 'configuration';
     }

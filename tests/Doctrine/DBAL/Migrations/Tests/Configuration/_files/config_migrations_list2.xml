@@ -7,9 +7,9 @@
     <name>Doctrine Sandbox Migrations</name>
     <table name="doctrine_migration_versions_test" />
     <migrations>
-        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version1Test" version="Version1Test.php">migration1</migration>
-        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version2Test" version="Version2Test.php">migration2</migration>
-        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version3Test" version="Version3Test.php">migration3</migration>
+        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version1Test" version="Version1Test" />
+        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version2Test" version="Version2Test" />
+        <migration class="Doctrine\DBAL\Migrations\Tests\Stub\Version3Test" version="Version3Test" />
     </migrations>
 
 </doctrine-migrations>

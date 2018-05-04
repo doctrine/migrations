@@ -1,39 +1,33 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console;
 
 use Doctrine\DBAL\Migrations\MigrationsVersion;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\LatestCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\UpToDateCommand;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
-/**
- * Handles running the Console Tools inside Symfony Console context.
- */
 class ConsoleRunner
 {
-    /**
-     * Runs console with the given helperset.
-     *
-     * @param \Symfony\Component\Console\Helper\HelperSet  $helperSet
-     * @param \Symfony\Component\Console\Command\Command[] $commands
-     *
-     * @return void
-     */
-    public static function run(HelperSet $helperSet, $commands = [])
+    /** @param AbstractCommand[] $commands */
+    public static function run(HelperSet $helperSet, array $commands = []) : void
     {
         $cli = self::createApplication($helperSet, $commands);
         $cli->run();
     }
 
-    /**
-     * Creates a console application with the given helperset and
-     * optional commands.
-     *
-     * @param \Symfony\Component\Console\Helper\HelperSet $helperSet
-     * @param array $commands
-     *
-     * @return \Symfony\Component\Console\Application
-     */
-    public static function createApplication(HelperSet $helperSet, $commands = [])
+    /** @param AbstractCommand[] $commands */
+    public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
     {
         $cli = new Application('Doctrine Migrations', MigrationsVersion::VERSION());
         $cli->setCatchExceptions(true);
@@ -44,25 +38,22 @@ class ConsoleRunner
         return $cli;
     }
 
-    /**
-     * @param Application $cli
-     *
-     * @return void
-     */
-    public static function addCommands(Application $cli)
+    public static function addCommands(Application $cli) : void
     {
         $cli->addCommands([
-            new Command\ExecuteCommand(),
-            new Command\GenerateCommand(),
-            new Command\LatestCommand(),
-            new Command\MigrateCommand(),
-            new Command\StatusCommand(),
-            new Command\VersionCommand(),
-            new Command\UpToDateCommand(),
+            new ExecuteCommand(),
+            new GenerateCommand(),
+            new LatestCommand(),
+            new MigrateCommand(),
+            new StatusCommand(),
+            new VersionCommand(),
+            new UpToDateCommand(),
         ]);
 
-        if ($cli->getHelperSet()->has('em')) {
-            $cli->add(new Command\DiffCommand());
+        if (! $cli->getHelperSet()->has('em')) {
+            return;
         }
+
+        $cli->add(new DiffCommand());
     }
 }

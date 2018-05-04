@@ -1,23 +1,24 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
-use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\YamlConfiguration;
-use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinder;
+use Doctrine\DBAL\Migrations\OutputWriter;
+use const DIRECTORY_SEPARATOR;
 
 class YamlConfigurationTest extends AbstractConfigurationTest
 {
-    /**
-     * @inheritdoc
-     */
     public function loadConfiguration(
-        $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
-    ) {
+        string $configFileSuffix = '',
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinder $migrationFinder = null
+    ) : AbstractFileConfiguration {
         $configFile = 'config.yml';
-        if ('' !== $configFileSuffix) {
+        if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.yml';
         }
 

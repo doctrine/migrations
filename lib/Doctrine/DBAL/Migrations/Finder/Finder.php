@@ -1,24 +1,31 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Finder;
 
-/**
- * Abstract base class for MigrationFinders
- *
- * @since   1.0.0-alpha3
- */
-abstract class AbstractFinder implements MigrationFinderInterface
+use InvalidArgumentException;
+use const PHP_EOL;
+use function basename;
+use function is_dir;
+use function realpath;
+use function sprintf;
+use function substr;
+use function uasort;
+
+abstract class Finder implements MigrationFinder
 {
-    protected static function requireOnce($path)
+    protected static function requireOnce(string $path) : void
     {
         require_once $path;
     }
 
-    protected function getRealPath($directory)
+    protected function getRealPath(string $directory) : string
     {
         $dir = realpath($directory);
-        if (false === $dir || ! is_dir($dir)) {
-            throw new \InvalidArgumentException(sprintf(
+
+        if ($dir === false || ! is_dir($dir)) {
+            throw new InvalidArgumentException(sprintf(
                 'Cannot load migrations from "%s" because it is not a valid directory',
                 $directory
             ));
@@ -28,12 +35,11 @@ abstract class AbstractFinder implements MigrationFinderInterface
     }
 
     /**
-     * Load the migrations and return an array of thoses loaded migrations
-     * @param array $files array of migration filename found
-     * @param string $namespace namespace of thoses migrations
-     * @return array constructed with the migration name as key and the value is the fully qualified name of the migration
+     * @param string[] $files
+     *
+     * @return string[]
      */
-    protected function loadMigrations($files, $namespace)
+    protected function loadMigrations(array $files, ?string $namespace) : array
     {
         $migrations = [];
 
@@ -43,27 +49,24 @@ abstract class AbstractFinder implements MigrationFinderInterface
             static::requireOnce($file);
             $className = basename($file, '.php');
             $version   = (string) substr($className, 7);
+
             if ($version === '0') {
-                throw new \InvalidArgumentException(sprintf(
+                throw new InvalidArgumentException(sprintf(
                     'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migrations' . PHP_EOL .
                     'It\'s used to revert all migrations including the first one.',
                     $version
                 ));
             }
+
             $migrations[$version] = sprintf('%s\\%s', $namespace, $className);
         }
 
         return $migrations;
     }
 
-    /**
-     * Return callable for files basename uasort
-     *
-     * @return callable
-     */
-    protected function getFileSortCallback()
+    protected function getFileSortCallback() : callable
     {
-        return function ($a, $b) {
+        return function (string $a, string $b) {
             return (basename($a) < basename($b)) ? -1 : 1;
         };
     }

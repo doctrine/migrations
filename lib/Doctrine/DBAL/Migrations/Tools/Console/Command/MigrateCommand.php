@@ -1,35 +1,62 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Symfony\Component\Console\Formatter\OutputFormatter;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function array_diff;
+use function count;
+use function getcwd;
+use function is_bool;
+use function sprintf;
+use function substr;
 
-/**
- * Command for executing a migration to a specified version or the latest available version.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
- */
 class MigrateCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure() : void
     {
         $this
             ->setName('migrations:migrate')
-            ->setDescription('Execute a migration to a specified version or the latest available version.')
-            ->addArgument('version', InputArgument::OPTIONAL, 'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.', 'latest')
-            ->addOption('write-sql', null, InputOption::VALUE_OPTIONAL, 'The path to output the migration SQL file instead of executing it. Default to current working directory.')
-            ->addOption('dry-run', null, InputOption::VALUE_NONE, 'Execute the migration as a dry run.')
-            ->addOption('query-time', null, InputOption::VALUE_NONE, 'Time all the queries individually.')
-            ->addOption('allow-no-migration', null, InputOption::VALUE_NONE, 'Don\'t throw an exception if no migration is available (CI).')
+            ->setDescription(
+                'Execute a migration to a specified version or the latest available version.'
+            )
+            ->addArgument(
+                'version',
+                InputArgument::OPTIONAL,
+                'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.',
+                'latest'
+            )
+            ->addOption(
+                'write-sql',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'The path to output the migration SQL file instead of executing it. Default to current working directory.'
+            )
+            ->addOption(
+                'dry-run',
+                null,
+                InputOption::VALUE_NONE,
+                'Execute the migration as a dry run.'
+            )
+            ->addOption(
+                'query-time',
+                null,
+                InputOption::VALUE_NONE,
+                'Time all the queries individually.'
+            )
+            ->addOption(
+                'allow-no-migration',
+                null,
+                InputOption::VALUE_NONE,
+                'Don\'t throw an exception if no migration is available (CI).'
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -69,7 +96,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output) : int
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
         $migration     = $this->createMigration($configuration);
@@ -78,22 +105,27 @@ EOT
 
         $timeAllqueries = $input->getOption('query-time');
 
-        $dryRun = (boolean) $input->getOption('dry-run');
+        $dryRun = (bool) $input->getOption('dry-run');
         $configuration->setIsDryRun($dryRun);
 
         $executedMigrations  = $configuration->getMigratedVersions();
         $availableMigrations = $configuration->getAvailableVersions();
 
-        $version = $this->getVersionNameFromAlias($input->getArgument('version'), $output, $configuration);
-        if ($version === false) {
+        $version = $this->getVersionNameFromAlias(
+            $input->getArgument('version'),
+            $output,
+            $configuration
+        );
+
+        if ($version === '') {
             return 1;
         }
 
         $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
-        if ( ! empty($executedUnavailableMigrations)) {
+
+        if (! empty($executedUnavailableMigrations)) {
             $output->writeln(sprintf(
-                '<error>WARNING! You have %s previously executed migrations'
-                . ' in the database that are not registered migrations.</error>',
+                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
                 count($executedUnavailableMigrations)
             ));
 
@@ -106,56 +138,60 @@ EOT
             }
 
             $question = 'Are you sure you wish to continue? (y/n)';
-            if ( ! $this->canExecute($question, $input, $output)) {
+
+            if (! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return 1;
             }
         }
 
-        if ($path = $input->getOption('write-sql')) {
+        $path = $input->getOption('write-sql');
+
+        if ($path) {
             $path = is_bool($path) ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
+
             return 0;
         }
 
         $cancelled = false;
-        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
-        $result = $migration->migrate($version, $dryRun, $timeAllqueries, function () use ($input, $output, &$cancelled) {
-            $question    = 'WARNING! You are about to execute a database migration'
-                . ' that could result in schema changes and data loss.'
-                . ' Are you sure you wish to continue? (y/n)';
-            $canContinue = $this->canExecute($question, $input, $output);
-            $cancelled   = ! $canContinue;
 
-            return $canContinue;
-        });
+        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
+
+        $result = $migration->migrate(
+            $version,
+            $dryRun,
+            $timeAllqueries,
+            function () use ($input, $output, &$cancelled) {
+                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
+
+                $canContinue = $this->canExecute($question, $input, $output);
+                $cancelled   = ! $canContinue;
+
+                return $canContinue;
+            }
+        );
 
         if ($cancelled) {
             $output->writeln('<error>Migration cancelled!</error>');
+
             return 1;
         }
+
+        return 0;
     }
 
-    /**
-     * Create a new migration instance to execute the migrations.
-     *
-     * @param Configuration $configuration The configuration with which the migrations will be executed
-     * @return Migration a new migration instance
-     */
-    protected function createMigration(Configuration $configuration)
+    protected function createMigration(Configuration $configuration) : Migration
     {
         return new Migration($configuration);
     }
 
-    /**
-     * @param string $question
-     * @param InputInterface $input
-     * @param OutputInterface $output
-     * @return bool
-     */
-    private function canExecute($question, InputInterface $input, OutputInterface $output)
-    {
+    private function canExecute(
+        string $question,
+        InputInterface $input,
+        OutputInterface $output
+    ) : bool {
         if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
             return false;
         }
@@ -163,34 +199,38 @@ EOT
         return true;
     }
 
-    /**
-     * @param string $versionAlias
-     * @param OutputInterface $output
-     * @param Configuration $configuration
-     * @return bool|string
-     */
-    private function getVersionNameFromAlias($versionAlias, OutputInterface $output, Configuration $configuration)
-    {
+    private function getVersionNameFromAlias(
+        string $versionAlias,
+        OutputInterface $output,
+        Configuration $configuration
+    ) : string {
         $version = $configuration->resolveVersionAlias($versionAlias);
+
         if ($version === null) {
-            if ($versionAlias == 'prev') {
+            if ($versionAlias === 'prev') {
                 $output->writeln('<error>Already at first version.</error>');
-                return false;
+
+                return '';
             }
-            if ($versionAlias == 'next') {
+
+            if ($versionAlias === 'next') {
                 $output->writeln('<error>Already at latest version.</error>');
-                return false;
+
+                return '';
             }
-            if (substr($versionAlias, 0, 7) == 'current') {
+
+            if (substr($versionAlias, 0, 7) === 'current') {
                 $output->writeln('<error>The delta couldn\'t be reached.</error>');
-                return false;
+
+                return '';
             }
 
             $output->writeln(sprintf(
                 '<error>Unknown version: %s</error>',
                 OutputFormatter::escape($versionAlias)
             ));
-            return false;
+
+            return '';
         }
 
         return $version;

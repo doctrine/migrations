@@ -1,19 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Provider;
 
-/**
- * Generates `Schema` objects for the diff command. A schema provider should
- * return the schema to which the database should be migrated.
- *
- * @since   1.0.0-alpha3
- */
+use Doctrine\DBAL\Schema\Schema;
+
 interface SchemaProviderInterface
 {
-    /**
-     * Create the schema to which the database should be migrated.
-     *
-     * @return  \Doctrine\DBAL\Schema\Schema
-     */
-    public function createSchema();
+    public function createSchema() : Schema;
 }

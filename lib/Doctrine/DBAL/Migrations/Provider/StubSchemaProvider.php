@@ -1,19 +1,14 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
 
-/**
- * A schemea provider implementation that just returns the schema its given.
- *
- * @since   1.0.0-alpha3
- */
 final class StubSchemaProvider implements SchemaProviderInterface
 {
-    /**
-     * @var     Schema
-     */
+    /** @var Schema */
     private $toSchema;
 
     public function __construct(Schema $schema)
@@ -21,10 +16,7 @@ final class StubSchemaProvider implements SchemaProviderInterface
         $this->toSchema = $schema;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function createSchema()
+    public function createSchema() : Schema
     {
         return $this->toSchema;
     }

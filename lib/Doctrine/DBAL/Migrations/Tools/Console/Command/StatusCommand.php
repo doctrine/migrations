@@ -1,29 +1,35 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
+use Doctrine\DBAL\Migrations\Version;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function count;
+use function in_array;
+use function max;
+use function sprintf;
+use function str_repeat;
+use function strlen;
 
-/**
- * Command to view the status of a set of migrations.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
- */
 class StatusCommand extends AbstractCommand
 {
-    protected function configure()
+    protected function configure() : void
     {
         $this
             ->setName('migrations:status')
             ->setDescription('View the status of a set of migrations.')
-            ->addOption('show-versions', null, InputOption::VALUE_NONE, 'This will display a list of all available migrations and their status')
+            ->addOption(
+                'show-versions',
+                null,
+                InputOption::VALUE_NONE,
+                'This will display a list of all available migrations and their status'
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command outputs the status of a set of migrations:
 
@@ -38,46 +44,73 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output) : void
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
         $infos = new MigrationStatusInfosHelper($configuration);
 
         $output->writeln("\n <info>==</info> Configuration\n");
+
         foreach ($infos->getMigrationsInfos() as $name => $value) {
-            if ($name == 'New Migrations') {
-                $value = $value > 0 ? '<question>' . $value . '</question>' : 0;
+            $string = (string) $value;
+
+            if ($name === 'New Migrations') {
+                $string = $value > 0 ? '<question>' . $value . '</question>' : '0';
             }
-            if ($name == 'Executed Unavailable Migrations') {
-                $value = $value > 0 ? '<error>' . $value . '</error>' : 0;
+
+            if ($name === 'Executed Unavailable Migrations') {
+                $string = $value > 0 ? '<error>' . $value . '</error>' : '0';
             }
-            $this->writeStatusInfosLineAligned($output, $name, $value);
+
+            $this->writeStatusInfosLineAligned($output, $name, $string);
         }
 
-        if ($input->getOption('show-versions')) {
-            if ($migrations = $configuration->getMigrations()) {
-                $output->writeln("\n <info>==</info> Available Migration Versions\n");
+        if (! $input->getOption('show-versions')) {
+            return;
+        }
 
-                $this->showVersions($migrations, $configuration, $output);
-            }
+        $migrations = $configuration->getMigrations();
 
-            if (count($infos->getExecutedUnavailableMigrations())) {
-                $output->writeln("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
-                foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
-                    $output->writeln('    <comment>>></comment> ' . $configuration->getDateTime($executedUnavailableMigration) .
-                        ' (<comment>' . $executedUnavailableMigration . '</comment>)');
-                }
-            }
+        if ($migrations) {
+            $output->writeln("\n <info>==</info> Available Migration Versions\n");
+
+            $this->showVersions($migrations, $configuration, $output);
+        }
+
+        if (! count($infos->getExecutedUnavailableMigrations())) {
+            return;
+        }
+
+        $output->writeln(
+            "\n <info>==</info> Previously Executed Unavailable Migration Versions\n"
+        );
+
+        foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
+            $output->writeln(
+                sprintf(
+                    '    <comment>>></comment> %s (<comment>%s</comment>)',
+                    $configuration->getDateTime($executedUnavailableMigration),
+                    $executedUnavailableMigration
+                )
+            );
         }
     }
 
-    private function writeStatusInfosLineAligned(OutputInterface $output, $title, $value)
+    private function writeStatusInfosLineAligned(OutputInterface $output, string $title, ?string $value) : void
     {
-        $output->writeln('    <comment>>></comment> ' . $title . ': ' . str_repeat(' ', 50 - strlen($title)) . $value);
+        $output->writeln(sprintf(
+            '    <comment>>></comment> %s: %s%s',
+            $title,
+            str_repeat(' ', 50 - strlen($title)),
+            $value
+        ));
     }
 
-    private function showVersions($migrations, Configuration $configuration, OutputInterface $output)
+    /**
+     * @param Version[] $migrations
+     */
+    private function showVersions(array $migrations, Configuration $configuration, OutputInterface $output) : void
     {
         $migratedVersions = $configuration->getMigratedVersions();
 
@@ -91,10 +124,14 @@ EOT
 
             $formattedVersion = $configuration->getDateTime($version->getVersion());
 
-            $output->writeln('    <comment>>></comment> ' . $formattedVersion .
-                ' (<comment>' . $version->getVersion() . '</comment>)' .
-                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion()))) .
-                $status . $migrationDescription);
+            $output->writeln(sprintf(
+                '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s',
+                $formattedVersion,
+                $version->getVersion(),
+                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion()))),
+                $status,
+                $migrationDescription
+            ));
         }
     }
 }

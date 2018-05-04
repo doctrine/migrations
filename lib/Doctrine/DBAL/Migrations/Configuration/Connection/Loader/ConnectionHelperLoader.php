@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
@@ -9,38 +11,32 @@ use Symfony\Component\Console\Helper\HelperSet;
 
 class ConnectionHelperLoader implements ConnectionLoaderInterface
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $helperName;
 
     /** @var  HelperSet */
     private $helperSet;
 
-
-    /**
-     * ConnectionHelperLoader constructor.
-     * @param HelperSet $helperSet
-     * @param string $helperName
-     */
-    public function __construct(HelperSet $helperSet = null, $helperName)
+    public function __construct(?HelperSet $helperSet = null, string $helperName)
     {
         $this->helperName = $helperName;
+
         if ($helperSet === null) {
             $helperSet = new HelperSet();
         }
+
         $this->helperSet = $helperSet;
     }
 
     /**
-     * read the input and return a Configuration, returns `false` if the config
-     * is not supported
-     * @return Connection|null
+     * Read the input and return a Configuration, returns null if the config
+     * is not supported.
      */
-    public function chosen()
+    public function chosen() : ?Connection
     {
         if ($this->helperSet->has($this->helperName)) {
             $connectionHelper = $this->helperSet->get($this->helperName);
+
             if ($connectionHelper instanceof ConnectionHelper) {
                 return $connectionHelper->getConnection();
             }

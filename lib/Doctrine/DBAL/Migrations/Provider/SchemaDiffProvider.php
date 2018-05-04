@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -8,10 +10,10 @@ use Doctrine\DBAL\Schema\Schema;
 
 class SchemaDiffProvider implements SchemaDiffProviderInterface
 {
-    /** @var  AbstractPlatform */
+    /** @var AbstractPlatform */
     private $platform;
 
-    /** @var  AbstractSchemaManager */
+    /** @var AbstractSchemaManager */
     private $schemaManager;
 
     public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
@@ -20,29 +22,18 @@ class SchemaDiffProvider implements SchemaDiffProviderInterface
         $this->platform      = $platform;
     }
 
-    /**
-     * @return Schema
-     */
-    public function createFromSchema()
+    public function createFromSchema() : Schema
     {
         return $this->schemaManager->createSchema();
     }
 
-    /**
-     * @param Schema $fromSchema
-     * @return Schema
-     */
-    public function createToSchema(Schema $fromSchema)
+    public function createToSchema(Schema $fromSchema) : Schema
     {
         return clone $fromSchema;
     }
 
-    /**
-     * @param Schema $fromSchema
-     * @param Schema $toSchema
-     * @return string[]
-     */
-    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema)
+    /** @return string[] */
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema) : array
     {
         return $fromSchema->getMigrateToSql($toSchema, $this->platform);
     }

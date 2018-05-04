@@ -1,26 +1,33 @@
 <?php
 
+declare(strict_types=1);
 
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
+use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function escapeshellarg;
+use function explode;
+use function file_get_contents;
+use function file_put_contents;
+use function implode;
+use function is_file;
+use function is_readable;
+use function preg_replace;
+use function proc_open;
+use function sprintf;
+use function str_replace;
 
-/**
- * Command for generating new blank migration classes
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
- */
 class GenerateCommand extends AbstractCommand
 {
-    private static $_template =
-            '<?php declare(strict_types=1);
+    private const MIGRATION_TEMPLATE = <<<'TEMPLATE'
+<?php
+
+declare(strict_types=1);
 
 namespace <namespace>;
 
@@ -44,17 +51,24 @@ final class Version<version> extends AbstractMigration
 <down>
     }
 }
-';
 
+TEMPLATE;
+
+    /** @var null|string */
     private $instanceTemplate;
 
-    protected function configure()
+    protected function configure() : void
     {
         $this
-                ->setName('migrations:generate')
-                ->setDescription('Generate a blank migration class.')
-                ->addOption('editor-cmd', null, InputOption::VALUE_OPTIONAL, 'Open file with this command upon creation.')
-                ->setHelp(<<<EOT
+            ->setName('migrations:generate')
+            ->setDescription('Generate a blank migration class.')
+            ->addOption(
+                'editor-cmd',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Open file with this command upon creation.'
+            )
+            ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
     <info>%command.full_name%</info>
@@ -68,7 +82,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output) : void
     {
         $configuration = $this->getMigrationConfiguration($input, $output);
 
@@ -80,17 +94,22 @@ EOT
         $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
     }
 
-    protected function getTemplate()
+    protected function getTemplate() : string
     {
         if ($this->instanceTemplate === null) {
-            $this->instanceTemplate = self::$_template;
+            $this->instanceTemplate = self::MIGRATION_TEMPLATE;
         }
 
         return $this->instanceTemplate;
     }
 
-    protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
-    {
+    protected function generateMigration(
+        Configuration $configuration,
+        InputInterface $input,
+        string $version,
+        ?string $up = null,
+        ?string $down = null
+    ) : string {
         $placeHolders = [
             '<namespace>',
             '<version>',
@@ -100,8 +119,8 @@ EOT
         $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
-            $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null,
+            $up ? '        ' . implode("\n        ", explode("\n", $up)) : null,
+            $down ? '        ' . implode("\n        ", explode("\n", $down)) : null,
         ];
 
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
@@ -113,7 +132,9 @@ EOT
 
         file_put_contents($path, $code);
 
-        if ($editorCmd = $input->getOption('editor-cmd')) {
+        $editorCmd = $input->getOption('editor-cmd');
+
+        if ($editorCmd) {
             proc_open($editorCmd . ' ' . escapeshellarg($path), [], $pipes);
         }
 
@@ -128,8 +149,8 @@ EOT
             return;
         }
 
-        if ( ! is_file($customTemplate) || ! is_readable($customTemplate)) {
-            throw new \InvalidArgumentException(
+        if (! is_file($customTemplate) || ! is_readable($customTemplate)) {
+            throw new InvalidArgumentException(
                 'The specified template "' . $customTemplate . '" cannot be found or is not readable.'
             );
         }
@@ -137,7 +158,12 @@ EOT
         $content = file_get_contents($customTemplate);
 
         if ($content === false) {
-            throw new \InvalidArgumentException('The specified template "' . $customTemplate . '" could not be read.');
+            throw new InvalidArgumentException(
+                sprintf(
+                    'The specified template "%s" could not be read.',
+                    $customTemplate
+                )
+            );
         }
 
         $output->writeln(sprintf('Using custom migration template "<info>%s</info>"', $customTemplate));

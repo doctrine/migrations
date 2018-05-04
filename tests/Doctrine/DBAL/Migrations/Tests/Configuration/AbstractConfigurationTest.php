@@ -1,76 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Finder\GlobFinder;
-use Doctrine\DBAL\Migrations\Finder\MigrationFinderInterface;
+use Doctrine\DBAL\Migrations\Finder\MigrationFinder;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use InvalidArgumentException;
+use ReflectionProperty;
+use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractConfigurationTest extends MigrationTestCase
 {
-    /**
-     * @param string                   $configFileSuffix Specify config to load.
-     * @param OutputWriter             $outputWriter
-     * @param MigrationFinderInterface $migrationFinder
-     * @return \Doctrine\DBAL\Migrations\Configuration\AbstractFileConfiguration
-     */
     abstract public function loadConfiguration(
-        $configFileSuffix = '',
-        OutputWriter $outputWriter = null,
-        MigrationFinderInterface $migrationFinder = null
-    );
+        string $configFileSuffix = '',
+        ?OutputWriter $outputWriter = null,
+        ?MigrationFinder $migrationFinder = null
+    ) : AbstractFileConfiguration;
 
-    public function testMigrationDirectory()
+    public function testMigrationDirectory() : void
     {
         $config = $this->loadConfiguration();
         self::assertEquals(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
     }
 
-    public function testMigrationNamespace()
+    public function testMigrationNamespace() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals("DoctrineMigrationsTest", $config->getMigrationsNamespace());
+        self::assertEquals('DoctrineMigrationsTest', $config->getMigrationsNamespace());
     }
 
-    public function testMigrationName()
+    public function testMigrationName() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals("Doctrine Sandbox Migrations", $config->getName());
+        self::assertEquals('Doctrine Sandbox Migrations', $config->getName());
     }
 
-    public function testMigrationsTable()
+    public function testMigrationsTable() : void
     {
         $config = $this->loadConfiguration();
         self::assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
 
-    public function testMigrationColumnName()
+    public function testMigrationColumnName() : void
     {
         $config = $this->loadConfiguration();
         self::assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
     }
 
-    public function testFinderIsIncompatibleWithConfiguration()
+    public function testFinderIsIncompatibleWithConfiguration() : void
     {
         $this->expectException(MigrationException::class);
 
         $this->loadConfiguration('organize_by_year', null, new GlobFinder());
     }
 
-    public function testSetMigrationFinder()
+    public function testSetMigrationFinder() : void
     {
-        $migrationFinderProphecy = $this->prophesize(MigrationFinderInterface::class);
-        /** @var $migrationFinder MigrationFinderInterface */
+        $migrationFinderProphecy = $this->prophesize(MigrationFinder::class);
+        /** @var MigrationFinder $migrationFinder */
         $migrationFinder = $migrationFinderProphecy->reveal();
 
         $config = $this->loadConfiguration();
         $config->setMigrationsFinder($migrationFinder);
 
-        $migrationFinderPropertyReflected = new \ReflectionProperty(
+        $migrationFinderPropertyReflected = new ReflectionProperty(
             Configuration::class,
             'migrationFinder'
         );
@@ -78,42 +77,42 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         self::assertSame($migrationFinder, $migrationFinderPropertyReflected->getValue($config));
     }
 
-    public function testThrowExceptionIfAlreadyLoaded()
+    public function testThrowExceptionIfAlreadyLoaded() : void
     {
         $config = $this->loadConfiguration();
         $this->expectException(MigrationException::class);
         $config->load($config->getFile());
     }
 
-    public function testVersionsOrganizationNoConfig()
+    public function testVersionsOrganizationNoConfig() : void
     {
         $config = $this->loadConfiguration();
         self::assertFalse($config->areMigrationsOrganizedByYear());
         self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
     }
 
-    public function testVersionsOrganizationByYear()
+    public function testVersionsOrganizationByYear() : void
     {
         $config = $this->loadConfiguration('organize_by_year');
         self::assertTrue($config->areMigrationsOrganizedByYear());
         self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
     }
 
-    public function testVersionsOrganizationByYearAndMonth()
+    public function testVersionsOrganizationByYearAndMonth() : void
     {
         $config = $this->loadConfiguration('organize_by_year_and_month');
         self::assertTrue($config->areMigrationsOrganizedByYear());
         self::assertTrue($config->areMigrationsOrganizedByYearAndMonth());
     }
 
-    public function testVersionsOrganizationInvalid()
+    public function testVersionsOrganizationInvalid() : void
     {
         $this->expectException(MigrationException::class);
 
         $this->loadConfiguration('organize_invalid');
     }
 
-    public function testVersionsOrganizationIncompatibleFinder()
+    public function testVersionsOrganizationIncompatibleFinder() : void
     {
         $this->expectException(MigrationException::class);
 
@@ -121,7 +120,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $config->setMigrationsFinder(new GlobFinder());
     }
 
-    public function testConfigurationWithInvalidOption()
+    public function testConfigurationWithInvalidOption() : void
     {
         $this->expectException(MigrationException::class);
         $this->expectExceptionCode(10);
@@ -129,14 +128,14 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $this->loadConfiguration('invalid');
     }
 
-    public function testConfigurationFileNotExists()
+    public function testConfigurationFileNotExists() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->loadConfiguration('file_not_exists');
     }
 
-    public function testLoadMigrationsList()
+    public function testLoadMigrationsList() : void
     {
         self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list'));
         self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list2'));
@@ -145,12 +144,13 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     /**
      * @dataProvider getConfigWithKeysInVariousOrder
      */
-    public function testThatTheOrderOfConfigKeysDoesNotMatter($file)
+    public function testThatTheOrderOfConfigKeysDoesNotMatter(string $file) : void
     {
         self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration($file));
     }
 
-    public function getConfigWithKeysInVariousOrder()
+    /** @return string[] */
+    public function getConfigWithKeysInVariousOrder() : array
     {
         return [
             ['order_1'],

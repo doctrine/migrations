@@ -1,36 +1,26 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations;
 
-/**
- * Simple class for outputting information from migrations.
- *
- * @license     http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link        www.doctrine-project.org
- * @since       2.0
- * @author      Jonathan H. Wage <jonwage@gmail.com>
- */
 class OutputWriter
 {
-    private $closure;
+    /** @var callable */
+    private $callback;
 
-    public function __construct(\Closure $closure = null)
+    public function __construct(?callable $callback = null)
     {
-        if ($closure === null) {
-            $closure = function ($message) {
+        if ($callback === null) {
+            $callback = function ($message) : void {
             };
         }
-        $this->closure = $closure;
+
+        $this->callback = $callback;
     }
 
-    /**
-     * Write output using the configured closure.
-     *
-     * @param string $message The message to write.
-     */
-    public function write($message)
+    public function write(string $message) : void
     {
-        $closure = $this->closure;
-        $closure($message);
+        ($this->callback)($message);
     }
 }

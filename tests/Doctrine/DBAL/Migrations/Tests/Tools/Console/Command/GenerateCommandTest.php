@@ -1,20 +1,34 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use org\bovigo\vfs\vfsStream;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand;
+use InvalidArgumentException;
+use org\bovigo\vfs\vfsStream;
+use org\bovigo\vfs\vfsStreamDirectory;
+use function sprintf;
 
 class GenerateCommandTest extends CommandTestCase
 {
-    const VERSION                       = '20160705000000';
-    const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
-    const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
+    /** @var string */
+    public const VERSION = '20160705000000';
 
+    /** @var string */
+    public const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+
+    /** @var string */
+    public const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
+
+    /** @var vfsStreamDirectory */
     private $root;
+
+    /** @var string */
     private $migrationFile;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
 
@@ -22,10 +36,10 @@ class GenerateCommandTest extends CommandTestCase
         $this->root          = vfsStream::setup('migrations');
 
         $this->config->method('getMigrationsDirectory')
-                     ->willReturn(vfsStream::url('migrations'));
+            ->willReturn(vfsStream::url('migrations'));
     }
 
-    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration()
+    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration() : void
     {
         $this->config->expects($this->once())
             ->method('generateVersionNumber')
@@ -39,6 +53,7 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
     }
 
+    /** @return string[][] */
     public static function provideCustomTemplateNames() : array
     {
         return [
@@ -50,7 +65,7 @@ class GenerateCommandTest extends CommandTestCase
     /**
      * @dataProvider provideCustomTemplateNames
      */
-    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration(string $templateName)
+    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration(string $templateName) : void
     {
         $this->config->expects($this->once())
             ->method('generateVersionNumber')
@@ -68,9 +83,9 @@ class GenerateCommandTest extends CommandTestCase
         self::assertContains('public function customTemplate()', $this->root->getChild($this->migrationFile)->getContent());
     }
 
-    public function testExceptionShouldBeRaisedWhenCustomTemplateDoesNotExist()
+    public function testExceptionShouldBeRaisedWhenCustomTemplateDoesNotExist() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageRegExp('/The specified template ".*" cannot be found or is not readable\./');
 
         $this->config->method('generateVersionNumber')
@@ -82,7 +97,7 @@ class GenerateCommandTest extends CommandTestCase
         $this->executeCommand([]);
     }
 
-    protected function createCommand()
+    protected function createCommand() : AbstractCommand
     {
         return new GenerateCommand();
     }

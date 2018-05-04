@@ -1,2 +1,5 @@
 <?php
-return ["organize_migrations" => "year"];
+
+declare(strict_types=1);
+
+return ['organize_migrations' => 'year'];

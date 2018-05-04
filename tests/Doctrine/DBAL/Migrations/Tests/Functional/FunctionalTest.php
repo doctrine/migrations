@@ -1,13 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
 use Doctrine\DBAL\Configuration as DbalConfig;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\DBAL\Migrations\Events;
 use Doctrine\DBAL\Migrations\Migration;
-use Doctrine\DBAL\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\DBAL\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\EventVerificationListener;
@@ -17,33 +20,33 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateWithDataModification;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
+use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\DBAL\Migrations\Version;
-use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use function file_exists;
+use function get_class_methods;
+use function in_array;
+use function sprintf;
+use function unlink;
 
 class FunctionalTest extends MigrationTestCase
 {
-    /**
-     * @var Configuration
-     */
+    /** @var Configuration */
     private $config;
 
-    /**
-     * @var \Doctrine\DBAL\Connection
-     */
+    /** @var Connection */
     private $connection;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->connection = $this->getSqliteConnection();
         $this->config     = self::createConfiguration($this->connection);
     }
 
-    public function testMigrateUp()
+    public function testMigrateUp() : void
     {
-        $version = new Version($this->config, 1, MigrationMigrateUp::class);
+        $version = new Version($this->config, '1', MigrationMigrateUp::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -54,9 +57,9 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($this->config->hasVersionMigrated($version));
     }
 
-    public function testMigrateDown()
+    public function testMigrateDown() : void
     {
-        $version = new Version($this->config, 1, MigrationMigrateUp::class);
+        $version = new Version($this->config, '1', MigrationMigrateUp::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -72,9 +75,9 @@ class FunctionalTest extends MigrationTestCase
         self::assertFalse($this->config->hasVersionMigrated($version));
     }
 
-    public function testSkipMigrateUp()
+    public function testSkipMigrateUp() : void
     {
-        $version = new Version($this->config, 1, MigrationSkipMigration::class);
+        $version = new Version($this->config, '1', MigrationSkipMigration::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -85,57 +88,57 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($this->config->hasVersionMigrated($version));
     }
 
-    public function testMigrateSeveralSteps()
+    public function testMigrateSeveralSteps() : void
     {
-        $this->config->registerMigration(1, MigrationMigrateUp::class);
-        $this->config->registerMigration(2, MigrationSkipMigration::class);
-        $this->config->registerMigration(3, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrationMigrateUp::class);
+        $this->config->registerMigration('2', MigrationSkipMigration::class);
+        $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         self::assertEquals(0, $this->config->getCurrentVersion());
-        $migrations = $this->config->getMigrationsToExecute('up', 3);
+        $migrations = $this->config->getMigrationsToExecute('up', '3');
 
         self::assertCount(3, $migrations);
-        self::assertInstanceOf(MigrationMigrateUp::class, $migrations[1]->getMigration());
-        self::assertInstanceOf(MigrationSkipMigration::class, $migrations[2]->getMigration());
-        self::assertInstanceOf(MigrationMigrateFurther::class, $migrations[3]->getMigration());
+        self::assertInstanceOf(MigrationMigrateUp::class, $migrations['1']->getMigration());
+        self::assertInstanceOf(MigrationSkipMigration::class, $migrations['2']->getMigration());
+        self::assertInstanceOf(MigrationMigrateFurther::class, $migrations['3']->getMigration());
 
         $migration = new Migration($this->config);
-        $migration->migrate(3);
+        $migration->migrate('3');
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertTrue($schema->hasTable('foo'));
         self::assertTrue($schema->hasTable('bar'));
 
         self::assertEquals(3, $this->config->getCurrentVersion());
-        self::assertTrue($migrations[1]->isMigrated());
-        self::assertTrue($migrations[2]->isMigrated());
-        self::assertTrue($migrations[3]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
+        self::assertTrue($migrations['2']->isMigrated());
+        self::assertTrue($migrations['3']->isMigrated());
     }
 
-    public function testMigrateToLastVersion()
+    public function testMigrateToLastVersion() : void
     {
-        $this->config->registerMigration(1, MigrationMigrateUp::class);
-        $this->config->registerMigration(2, MigrationSkipMigration::class);
-        $this->config->registerMigration(3, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrationMigrateUp::class);
+        $this->config->registerMigration('2', MigrationSkipMigration::class);
+        $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
         $migration->migrate();
 
         self::assertEquals(3, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
-        self::assertTrue($migrations[2]->isMigrated());
-        self::assertTrue($migrations[3]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
+        self::assertTrue($migrations['2']->isMigrated());
+        self::assertTrue($migrations['3']->isMigrated());
     }
 
-    public function testDryRunMigration()
+    public function testDryRunMigration() : void
     {
-        $this->config->registerMigration(1, MigrationMigrateUp::class);
-        $this->config->registerMigration(2, MigrationSkipMigration::class);
-        $this->config->registerMigration(3, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrationMigrateUp::class);
+        $this->config->registerMigration('2', MigrationSkipMigration::class);
+        $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
-        $migration->migrate(3, true);
+        $migration->migrate('3', true);
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
@@ -143,21 +146,21 @@ class FunctionalTest extends MigrationTestCase
 
         self::assertEquals(0, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
-        self::assertFalse($migrations[1]->isMigrated());
-        self::assertFalse($migrations[2]->isMigrated());
-        self::assertFalse($migrations[3]->isMigrated());
+        self::assertFalse($migrations['1']->isMigrated());
+        self::assertFalse($migrations['2']->isMigrated());
+        self::assertFalse($migrations['3']->isMigrated());
     }
 
-    public function testMigrateDownSeveralSteps()
+    public function testMigrateDownSeveralSteps() : void
     {
-        $this->config->registerMigration(1, MigrationMigrateUp::class);
-        $this->config->registerMigration(2, MigrationSkipMigration::class);
-        $this->config->registerMigration(3, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrationMigrateUp::class);
+        $this->config->registerMigration('2', MigrationSkipMigration::class);
+        $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
-        $migration->migrate(3);
+        $migration->migrate('3');
         self::assertEquals(3, $this->config->getCurrentVersion());
-        $migration->migrate(0);
+        $migration->migrate('0');
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
@@ -165,20 +168,20 @@ class FunctionalTest extends MigrationTestCase
 
         self::assertEquals(0, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
-        self::assertFalse($migrations[1]->isMigrated());
-        self::assertFalse($migrations[2]->isMigrated());
-        self::assertFalse($migrations[3]->isMigrated());
+        self::assertFalse($migrations['1']->isMigrated());
+        self::assertFalse($migrations['2']->isMigrated());
+        self::assertFalse($migrations['3']->isMigrated());
     }
 
-    public function testAddSql()
+    public function testAddSql() : void
     {
-        $this->config->registerMigration(1, MigrateAddSqlTest::class);
+        $this->config->registerMigration('1', MigrateAddSqlTest::class);
 
         $migration = new Migration($this->config);
-        $migration->migrate(1);
+        $migration->migrate('1');
 
         $migrations = $this->config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertTrue($schema->hasTable('test_add_sql_table'));
@@ -186,44 +189,49 @@ class FunctionalTest extends MigrationTestCase
         self::assertNotEmpty($check);
         self::assertEquals('test', $check[0]['test']);
 
-        $migration->migrate(0);
-        self::assertFalse($migrations[1]->isMigrated());
+        $migration->migrate('0');
+        self::assertFalse($migrations['1']->isMigrated());
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('test_add_sql_table'));
     }
 
-    public function testAddSqlInPostUp()
+    public function testAddSqlInPostUp() : void
     {
-        $this->config->registerMigration(1, MigrateAddSqlPostAndPreUpAndDownTest::class);
+        $this->config->registerMigration('1', MigrateAddSqlPostAndPreUpAndDownTest::class);
         $tableName = MigrateAddSqlPostAndPreUpAndDownTest::TABLE_NAME;
 
-        $this->config->getConnection()->executeQuery(sprintf("CREATE TABLE IF NOT EXISTS %s (test INT)", $tableName));
+        $this->config->getConnection()->executeQuery(sprintf('CREATE TABLE IF NOT EXISTS %s (test INT)', $tableName));
 
         $migration = new Migration($this->config);
-        $migration->migrate(1);
+        $migration->migrate('1');
 
         $migrations = $this->config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
 
-        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $check = $this->config->getConnection()->fetchColumn(
+            sprintf('select SUM(test) as sum from %s', $tableName)
+        );
 
         self::assertNotEmpty($check);
         self::assertEquals(3, $check);
 
-        $migration->migrate(0);
-        self::assertFalse($migrations[1]->isMigrated());
-        $check = $this->config->getConnection()->fetchColumn("select SUM(test) as sum from $tableName");
+        $migration->migrate('0');
+        self::assertFalse($migrations['1']->isMigrated());
+
+        $check = $this->config->getConnection()->fetchColumn(
+            sprintf('select SUM(test) as sum from %s', $tableName)
+        );
+
         self::assertNotEmpty($check);
         self::assertEquals(12, $check);
 
-
-        $this->config->getConnection()->executeQuery(sprintf("DROP TABLE %s ", $tableName));
+        $this->config->getConnection()->executeQuery(sprintf('DROP TABLE %s ', $tableName));
     }
 
-    public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates()
+    public function testVersionInDatabaseWithoutRegisteredMigrationStillMigrates() : void
     {
-        $this->config->registerMigration(1, MigrateAddSqlTest::class);
-        $this->config->registerMigration(10, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrateAddSqlTest::class);
+        $this->config->registerMigration('10', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
         $migration->migrate();
@@ -231,8 +239,8 @@ class FunctionalTest extends MigrationTestCase
         $config = new Configuration($this->connection);
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $config->setMigrationsDirectory('.');
-        $config->registerMigration(1, MigrateAddSqlTest::class);
-        $config->registerMigration(2, MigrationMigrateUp::class);
+        $config->registerMigration('1', MigrateAddSqlTest::class);
+        $config->registerMigration('2', MigrationMigrateUp::class);
         $config->setMigrationsTableName('test_migrations_table');
         $config->setMigrationsColumnName('current_version');
 
@@ -240,54 +248,54 @@ class FunctionalTest extends MigrationTestCase
         $migration->migrate();
 
         $migrations = $config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
-        self::assertTrue($migrations[2]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
+        self::assertTrue($migrations['2']->isMigrated());
 
         self::assertEquals(2, $config->getCurrentVersion());
     }
 
-    public function testInterweavedMigrationsAreExecuted()
+    public function testInterweavedMigrationsAreExecuted() : void
     {
-        $this->config->registerMigration(1, MigrateAddSqlTest::class);
-        $this->config->registerMigration(3, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrateAddSqlTest::class);
+        $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
         $migration->migrate();
 
         $migrations = $this->config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
-        self::assertTrue($migrations[3]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
+        self::assertTrue($migrations['3']->isMigrated());
         self::assertEquals(3, $this->config->getCurrentVersion());
 
         $config = new Configuration($this->connection);
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');
         $config->setMigrationsDirectory('.');
-        $config->registerMigration(1, MigrateAddSqlTest::class);
-        $config->registerMigration(2, MigrationMigrateUp::class);
-        $config->registerMigration(3, MigrationMigrateFurther::class);
+        $config->registerMigration('1', MigrateAddSqlTest::class);
+        $config->registerMigration('2', MigrationMigrateUp::class);
+        $config->registerMigration('3', MigrationMigrateFurther::class);
         $config->setMigrationsTableName('test_migrations_table');
         $config->setMigrationsColumnName('current_version');
 
-        self::assertCount(1, $config->getMigrationsToExecute('up', 3));
-        $migrations = $config->getMigrationsToExecute('up', 3);
+        self::assertCount(1, $config->getMigrationsToExecute('up', '3'));
+        $migrations = $config->getMigrationsToExecute('up', '3');
         self::assertArrayHasKey(2, $migrations);
-        self::assertEquals(2, $migrations[2]->getVersion());
+        self::assertEquals(2, $migrations['2']->getVersion());
 
         $migration = new Migration($config);
         $migration->migrate();
 
         $migrations = $config->getMigrations();
-        self::assertTrue($migrations[1]->isMigrated());
-        self::assertTrue($migrations[2]->isMigrated());
-        self::assertTrue($migrations[3]->isMigrated());
+        self::assertTrue($migrations['1']->isMigrated());
+        self::assertTrue($migrations['2']->isMigrated());
+        self::assertTrue($migrations['3']->isMigrated());
 
         self::assertEquals(3, $config->getCurrentVersion());
     }
 
-    public function testMigrateToCurrentVersionReturnsEmpty()
+    public function testMigrateToCurrentVersionReturnsEmpty() : void
     {
-        $this->config->registerMigration(1, MigrateAddSqlTest::class);
-        $this->config->registerMigration(2, MigrationMigrateFurther::class);
+        $this->config->registerMigration('1', MigrateAddSqlTest::class);
+        $this->config->registerMigration('2', MigrationMigrateFurther::class);
 
         $migration = new Migration($this->config);
         $migration->migrate();
@@ -298,23 +306,25 @@ class FunctionalTest extends MigrationTestCase
     }
 
     /**
+     * @param string[] $migrations
+     *
      * @see https://github.com/doctrine/migrations/issues/61
-     * @group regresion
+     * @group regression
      * @dataProvider provideTestMigrationNames
      */
-    public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated(array $migrations)
+    public function testMigrateExecutesOlderVersionsThatHaveNetYetBeenMigrated(array $migrations) : void
     {
         foreach ($migrations as $key => $class) {
             $migration = new Migration($this->config);
-            $this->config->registerMigration($key, $class);
+            $this->config->registerMigration((string) $key, $class);
             $sql = $migration->migrate();
             self::assertCount(1, $sql, 'should have executed one migration');
         }
     }
 
-    public function testSchemaChangeAreNotTakenIntoAccountInPreAndPostMethod()
+    public function testSchemaChangeAreNotTakenIntoAccountInPreAndPostMethod() : void
     {
-        $version = new Version($this->config, 1, MigrationModifySchemaInPreAndPost::class);
+        $version = new Version($this->config, '1', MigrationModifySchemaInPreAndPost::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $queries = $version->execute('up');
@@ -342,21 +352,28 @@ class FunctionalTest extends MigrationTestCase
         };
     }
 
-    public function provideTestMigrationNames()
+    /**
+     * @return string[][]
+     */
+    public function provideTestMigrationNames() : array
     {
         return [
-            [[
-                '20120228123443' => MigrateAddSqlTest::class,
-                '20120228114838' => MigrationMigrateFurther::class,
-            ]],
-            [[
-                '002Test' => MigrateAddSqlTest::class,
-                '001Test' => MigrationMigrateFurther::class,
-            ]]
+            [
+                [
+                    '20120228123443' => MigrateAddSqlTest::class,
+                    '20120228114838' => MigrationMigrateFurther::class,
+                ],
+            ],
+            [
+                [
+                    '002Test' => MigrateAddSqlTest::class,
+                    '001Test' => MigrationMigrateFurther::class,
+                ],
+            ],
         ];
     }
 
-    public function testMigrationWorksWhenNoCallsAreMadeToTheSchema()
+    public function testMigrationWorksWhenNoCallsAreMadeToTheSchema() : void
     {
         $schema             = $this->createMock(Schema::class);
         $schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
@@ -369,7 +386,7 @@ class FunctionalTest extends MigrationTestCase
                 return $schema;
             });
 
-        $version = new Version($this->config, 1, MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
+        $version = new Version($this->config, '1', MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
         $version->execute('up');
 
         foreach (get_class_methods(Schema::class) as $method) {
@@ -381,9 +398,10 @@ class FunctionalTest extends MigrationTestCase
         }
     }
 
-    public function testSuccessfulMigrationDispatchesTheExpectedEvents()
+    public function testSuccessfulMigrationDispatchesTheExpectedEvents() : void
     {
-        $this->config->registerMigration(1, MigrationMigrateUp::class);
+        $this->config->registerMigration('1', MigrationMigrateUp::class);
+
         $this->config->getConnection()->getEventManager()->addEventSubscriber(
             $listener = new EventVerificationListener()
         );
@@ -392,6 +410,7 @@ class FunctionalTest extends MigrationTestCase
         $migration->migrate();
 
         self::assertCount(4, $listener->events);
+
         foreach ([
             Events::onMigrationsMigrating,
             Events::onMigrationsMigrated,
@@ -402,9 +421,10 @@ class FunctionalTest extends MigrationTestCase
         }
     }
 
-    public function testSkippedMigrationsDispatchesTheExpectedEvents()
+    public function testSkippedMigrationsDispatchesTheExpectedEvents() : void
     {
-        $this->config->registerMigration(1, MigrationSkipMigration::class);
+        $this->config->registerMigration('1', MigrationSkipMigration::class);
+
         $this->config->getConnection()->getEventManager()->addEventSubscriber(
             $listener = new EventVerificationListener()
         );
@@ -413,6 +433,7 @@ class FunctionalTest extends MigrationTestCase
         $migration->migrate();
 
         self::assertCount(4, $listener->events);
+
         foreach ([
             Events::onMigrationsMigrating,
             Events::onMigrationsMigrated,
@@ -428,11 +449,11 @@ class FunctionalTest extends MigrationTestCase
      * of a connection with autocommit mode and re-opening it.
      * @group https://github.com/doctrine/migrations/issues/496
      */
-    public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges()
+    public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges() : void
     {
         $listener            = new AutoCommitListener();
         list($conn, $config) = self::fileConnectionAndConfig();
-        $config->registerMigration(1, MigrateWithDataModification::class);
+        $config->registerMigration('1', MigrateWithDataModification::class);
         $migration = new Migration($config);
         $conn->getEventManager()->addEventSubscriber($listener);
         $conn->exec('CREATE TABLE test_data_migration (test INTEGER)');
@@ -445,9 +466,13 @@ class FunctionalTest extends MigrationTestCase
         self::assertCount(3, $conn->fetchAll('SELECT * FROM test_data_migration'));
     }
 
-    private static function fileConnectionAndConfig()
+    /**
+     * @return Connection|Configuration[]
+     */
+    private static function fileConnectionAndConfig() : array
     {
         $path = __DIR__ . '/_files/db/sqlite_file_config.db';
+
         if (file_exists($path)) {
             @unlink($path);
         }
@@ -462,7 +487,7 @@ class FunctionalTest extends MigrationTestCase
         return [$conn, self::createConfiguration($conn)];
     }
 
-    private static function createConfiguration(Connection $conn)
+    private static function createConfiguration(Connection $conn) : Configuration
     {
         $config = new Configuration($conn);
         $config->setMigrationsNamespace('Doctrine\DBAL\Migrations\Tests\Functional');

@@ -1,38 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
-use Doctrine\DBAL\Version as DbalVersion;
-use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
+use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
+use Doctrine\DBAL\Version as DbalVersion;
+use InvalidArgumentException;
+use SqlFormatter;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
+use function array_unshift;
+use function class_exists;
+use function file_get_contents;
+use function implode;
+use function preg_match;
+use function sprintf;
+use function stripos;
+use function strlen;
+use function strpos;
+use function substr;
+use function var_export;
 
-/**
- * Command for generate migration classes by comparing your current database schema
- * to your mapping information.
- *
- * @license http://www.opensource.org/licenses/lgpl-license.php LGPL
- * @link    www.doctrine-project.org
- * @since   2.0
- * @author  Jonathan Wage <jonwage@gmail.com>
- */
 class DiffCommand extends GenerateCommand
 {
-    /**
-     * @var     SchemaProviderInterface
-     */
+    /** @var null|SchemaProviderInterface */
     protected $schemaProvider;
 
-    public function __construct(SchemaProviderInterface $schemaProvider = null)
+    public function __construct(?SchemaProviderInterface $schemaProvider = null)
     {
         $this->schemaProvider = $schemaProvider;
+
         parent::__construct();
     }
 
-    protected function configure()
+    protected function configure() : void
     {
         parent::configure();
 
@@ -49,25 +54,48 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
             )
-            ->addOption('filter-expression', null, InputOption::VALUE_OPTIONAL, 'Tables which are filtered by Regular Expression.')
-            ->addOption('formatted', null, InputOption::VALUE_NONE, 'Format the generated SQL.')
-            ->addOption('line-length', null, InputOption::VALUE_OPTIONAL, 'Max line length of unformatted lines.', 120)
+            ->addOption(
+                'filter-expression',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Tables which are filtered by Regular Expression.'
+            )
+            ->addOption(
+                'formatted',
+                null,
+                InputOption::VALUE_NONE,
+                'Format the generated SQL.'
+            )
+            ->addOption(
+                'line-length',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Max line length of unformatted lines.',
+                120
+            )
         ;
     }
 
-    public function execute(InputInterface $input, OutputInterface $output)
-    {
+    public function execute(
+        InputInterface $input,
+        OutputInterface $output
+    ) : void {
         $isDbalOld     = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
         $this->loadCustomTemplate($configuration, $output);
 
-        $conn     = $configuration->getConnection();
+        $conn = $configuration->getConnection();
+
         $platform = $conn->getDatabasePlatform();
 
-        if ($filterExpr = $input->getOption('filter-expression')) {
+        $filterExpr = $input->getOption('filter-expression');
+
+        if ($filterExpr) {
             if ($isDbalOld) {
-                throw new \InvalidArgumentException('The "--filter-expression" option can only be used as of Doctrine DBAL 2.2');
+                throw new InvalidArgumentException(
+                    'The "--filter-expression" option can only be used as of Doctrine DBAL 2.2'
+                );
             }
 
             $conn->getConfiguration()
@@ -75,24 +103,30 @@ EOT
         }
 
         $fromSchema = $conn->getSchemaManager()->createSchema();
-        $toSchema   = $this->getSchemaProvider()->createSchema();
 
-        //Not using value from options, because filters can be set from config.yml
-        if ( ! $isDbalOld && $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression()) {
+        $toSchema = $this->getSchemaProvider()->createSchema();
+
+        $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression();
+
+        // Not using value from options, because filters can be set from config.yml
+        if (! $isDbalOld && $filterExpr) {
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
-                if ( ! preg_match($filterExpr, $this->resolveTableName($tableName))) {
-                    $toSchema->dropTable($tableName);
+                if (preg_match($filterExpr, $this->resolveTableName($tableName))) {
+                    continue;
                 }
+
+                $toSchema->dropTable($tableName);
             }
         }
 
-        $up   = $this->buildCodeFromSql(
+        $up = $this->buildCodeFromSql(
             $configuration,
             $fromSchema->getMigrateToSql($toSchema, $platform),
             $input->getOption('formatted'),
             $input->getOption('line-length')
         );
+
         $down = $this->buildCodeFromSql(
             $configuration,
             $fromSchema->getMigrateFromSql($toSchema, $platform),
@@ -100,7 +134,7 @@ EOT
             $input->getOption('line-length')
         );
 
-        if ( ! $up && ! $down) {
+        if (! $up && ! $down) {
             $output->writeln('No changes detected in your mapping information.');
 
             return;
@@ -109,56 +143,72 @@ EOT
         $version = $configuration->generateVersionNumber();
         $path    = $this->generateMigration($configuration, $input, $version, $up, $down);
 
-        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>" from schema differences.', $path));
-        $output->writeln(file_get_contents($path), OutputInterface::VERBOSITY_VERBOSE);
+        $output->writeln(
+            sprintf(
+                'Generated new migration class to "<info>%s</info>" from schema differences.',
+                $path
+            )
+        );
+
+        $output->writeln(
+            file_get_contents($path),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
     }
 
-    private function buildCodeFromSql(Configuration $configuration, array $sql, $formatted = false, $lineLength = 120)
-    {
+    /** @param string[] $sql */
+    private function buildCodeFromSql(
+        Configuration $configuration,
+        array $sql,
+        bool $formatted = false,
+        int $lineLength = 120
+    ) : string {
         $currentPlatform = $configuration->getConnection()->getDatabasePlatform()->getName();
         $code            = [];
+
         foreach ($sql as $query) {
             if (stripos($query, $configuration->getMigrationsTableName()) !== false) {
                 continue;
             }
 
             if ($formatted) {
-                if ( ! class_exists('\SqlFormatter')) {
-                    throw new \InvalidArgumentException(
-                        'The "--formatted" option can only be used if the sql formatter is installed.' .
-                        'Please run "composer require jdorn/sql-formatter".'
+                if (! class_exists('SqlFormatter')) {
+                    throw new InvalidArgumentException(
+                        'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require jdorn/sql-formatter".'
                     );
                 }
 
                 $maxLength = $lineLength - 18 - 8; // max - php code length - indentation
 
                 if (strlen($query) > $maxLength) {
-                    $query = \SqlFormatter::format($query, false);
+                    $query = SqlFormatter::format($query, false);
                 }
             }
 
-            $code[] = sprintf("\$this->addSql(%s);", var_export($query, true));
+            $code[] = sprintf('$this->addSql(%s);', var_export($query, true));
         }
 
-        if ( ! empty($code)) {
+        if (! empty($code)) {
             array_unshift(
                 $code,
                 sprintf(
-                    "\$this->abortIf(\$this->connection->getDatabasePlatform()->getName() !== %s, %s);",
+                    '$this->abortIf($this->connection->getDatabasePlatform()->getName() !== %s, %s);',
                     var_export($currentPlatform, true),
                     var_export(sprintf("Migration can only be executed safely on '%s'.", $currentPlatform), true)
                 ),
-                ""
+                ''
             );
         }
 
         return implode("\n", $code);
     }
 
-    private function getSchemaProvider()
+    private function getSchemaProvider() : SchemaProviderInterface
     {
-        if ( ! $this->schemaProvider) {
-            $this->schemaProvider = new OrmSchemaProvider($this->getHelper('entityManager')->getEntityManager());
+        if (! $this->schemaProvider) {
+            $this->schemaProvider = new OrmSchemaProvider(
+                $this->getHelper('entityManager')->getEntityManager()
+            );
         }
 
         return $this->schemaProvider;
@@ -169,14 +219,11 @@ EOT
      * comes from Doctrine\DBAL\Schema\Table#getName which can sometimes return
      * a namespaced name with the form `{namespace}.{tableName}`. This extracts
      * the table name from that.
-     *
-     * @param   string $name
-     * @return  string
      */
-    private function resolveTableName($name)
+    private function resolveTableName(string $name) : string
     {
         $pos = strpos($name, '.');
 
-        return false === $pos ? $name : substr($name, $pos + 1);
+        return $pos === false ? $name : substr($name, $pos + 1);
     }
 }
