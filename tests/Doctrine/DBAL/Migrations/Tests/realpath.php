@@ -1,5 +1,10 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations;
+
+use function strpos;
 
 /**
  * Override realpath() in current namespace for testing since it
@@ -7,13 +12,11 @@ namespace Doctrine\DBAL\Migrations;
  *
  * @see https://github.com/mikey179/vfsStream/wiki/Known-Issues
  *
- * @param $path
- *
  * @return string|false
  */
-function realpath($path)
+function realpath(string $path)
 {
-    if (0 === strpos($path, 'vfs://')) {
+    if (strpos($path, 'vfs://') === 0) {
         return $path;
     }
 

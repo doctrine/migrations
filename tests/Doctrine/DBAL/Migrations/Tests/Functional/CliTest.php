@@ -1,36 +1,50 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Functional;
 
-use Symfony\Component\Console\Application;
-use Symfony\Component\Console\Input\ArrayInput;
-use Doctrine\DBAL\Version as DbalVersion;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Tools\Setup as OrmSetup;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\DBAL\Migrations\AbstractMigration;
-use Doctrine\DBAL\Migrations\MigrationsVersion;
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\DBAL\Migrations\MigrationsVersion;
 use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\DBAL\Migrations\Provider\StubSchemaProvider;
-use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Migrations\Tests\Helper;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
+use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\DBAL\Version as DbalVersion;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Doctrine\ORM\Tools\Setup as OrmSetup;
+use ReflectionClass;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Input\ArrayInput;
+use const DIRECTORY_SEPARATOR;
+use function array_merge;
+use function count;
+use function file_exists;
+use function file_get_contents;
+use function reset;
+use function sprintf;
+use function unlink;
 
 /**
  * Tests the entire console application, end to end.
  */
 class CliTest extends MigrationTestCase
 {
+    /** @var Connection */
     private $conn;
 
+    /** @var Application */
     private $application;
 
+    /** @var null|int */
     private $lastExit;
 
-    public function testMigrationLifecycleFromCommandLine()
+    public function testMigrationLifecycleFromCommandLine() : void
     {
         $output = $this->executeCommand('migrations:status');
         self::assertSuccessfulExit();
@@ -49,7 +63,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/^.*new migrations:\s+0/im', $output);
     }
 
-    public function testGenerateCommandAddsNewVersion()
+    public function testGenerateCommandAddsNewVersion() : void
     {
         self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate');
@@ -61,7 +75,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/available migrations:\s+2/im', $output);
     }
 
-    public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth()
+    public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth() : void
     {
         self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate', 'config_organize_by_year_and_month.xml');
@@ -73,7 +87,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/available migrations:\s+1/im', $output);
     }
 
-    public function testMigrationDiffWritesNewMigrationWithExpectedSql()
+    public function testMigrationDiffWritesNewMigrationWithExpectedSql() : void
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         self::assertVersionCount(0, 'should start with no versions');
@@ -91,7 +105,7 @@ class CliTest extends MigrationTestCase
         self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
-    public function testMigrationDiffWritesNewMigrationWithFormattedSql()
+    public function testMigrationDiffWritesNewMigrationWithFormattedSql() : void
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         self::assertVersionCount(0, 'should start with no versions');
@@ -116,7 +130,7 @@ class CliTest extends MigrationTestCase
         self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
-    public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities()
+    public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities() : void
     {
         $config        = OrmSetup::createXMLMetadataConfiguration([__DIR__ . '/_files/entities'], true);
         $entityManager = EntityManager::create($this->conn, $config);
@@ -140,7 +154,7 @@ class CliTest extends MigrationTestCase
         self::assertContains('DROP TABLE sample_entity', $versionClassContents);
     }
 
-    public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter()
+    public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter() : void
     {
         if ($this->isDbalOld()) {
             $this->markTestSkipped(sprintf(
@@ -171,7 +185,7 @@ class CliTest extends MigrationTestCase
      * @see https://github.com/doctrine/migrations/issues/179
      * @group regression
      */
-    public function testDiffCommandSchemaFilterAreCaseSensitive()
+    public function testDiffCommandSchemaFilterAreCaseSensitive() : void
     {
         if ($this->isDbalOld()) {
             $this->markTestSkipped(sprintf(
@@ -198,7 +212,7 @@ class CliTest extends MigrationTestCase
         self::assertContains('DROP TABLE FOO', $versionClassContents);
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $migrationsDbFilePath =
             __DIR__ . DIRECTORY_SEPARATOR . '_files ' . DIRECTORY_SEPARATOR . 'migrations.db';
@@ -227,20 +241,27 @@ class CliTest extends MigrationTestCase
         ]);
     }
 
-    protected function withDiffCommand(SchemaProviderInterface $provider = null)
+    protected function withDiffCommand(?SchemaProviderInterface $provider = null) : void
     {
         $this->application->add(new MigrationCommands\DiffCommand($provider));
     }
 
-    protected function executeCommand($commandName, $configFile = 'config.yml', array $args = [])
-    {
-        $input  = new ArrayInput(array_merge(
+    /**
+     * @param mixed[] $args
+     */
+    protected function executeCommand(
+        string $commandName,
+        string $configFile = 'config.yml',
+        array $args = []
+    ) : string {
+        $input = new ArrayInput(array_merge(
             [
                 'command'         => $commandName,
                 '--configuration' => __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile,
             ],
             $args
         ));
+
         $output = $this->getOutputStream();
 
         $this->lastExit = $this->application->run($input, $output);
@@ -248,44 +269,40 @@ class CliTest extends MigrationTestCase
         return $this->getOutputStreamContent($output);
     }
 
-    protected function assertSuccessfulExit($msg = '')
+    protected function assertSuccessfulExit(string $msg = '') : void
     {
         self::assertEquals(0, $this->lastExit, $msg);
     }
 
-    protected function assertVersionCount($count, $msg = '')
+    protected function assertVersionCount(int $count, string $msg = '') : void
     {
         self::assertCount($count, $this->findMigrations(), $msg);
     }
 
-    protected function getSchema()
+    protected function getSchema() : Schema
     {
-        $s = new Schema();
-        $t = $s->createTable('foo');
-        $t->addColumn('id', 'integer', [
-            'autoincrement' => true,
-        ]);
-        $t->setPrimaryKey(['id']);
+        $schema = new Schema();
 
-        $t = $s->createTable('bar');
-        $t->addColumn('id', 'integer', [
-            'autoincrement' => true,
-        ]);
-        $t->setPrimaryKey(['id']);
+        $table = $schema->createTable('foo');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->setPrimaryKey(['id']);
 
-        return $s;
+        $table = $schema->createTable('bar');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->setPrimaryKey(['id']);
+
+        return $schema;
     }
 
-    protected function isDbalOld()
+    protected function isDbalOld() : bool
     {
         return DbalVersion::compare('2.2.0') > 0;
     }
 
     /**
-     * @param string $namespace
      * @return array|\string[]
      */
-    private function findMigrations($namespace = 'TestMigrations')
+    private function findMigrations(string $namespace = 'TestMigrations') : array
     {
         $finder = new RecursiveRegexFinder();
 
@@ -298,7 +315,7 @@ class CliTest extends MigrationTestCase
     /**
      * @return string file content for latest version
      */
-    private function getFileContentsForLatestVersion()
+    private function getFileContentsForLatestVersion() : string
     {
         $versions = $this->findMigrations();
         self::assertCount(
@@ -308,7 +325,7 @@ class CliTest extends MigrationTestCase
         );
 
         $versionClassName      = reset($versions);
-        $versionClassReflected = new \ReflectionClass($versionClassName);
+        $versionClassReflected = new ReflectionClass($versionClassName);
 
         return file_get_contents($versionClassReflected->getFileName());
     }
@@ -316,12 +333,12 @@ class CliTest extends MigrationTestCase
 
 class FirstMigration extends AbstractMigration
 {
-    public function up(Schema $schema)
+    public function up(Schema $schema) : void
     {
         $this->addSql('CREATE TABLE foo (id INTEGER AUTO_INCREMENT, PRIMARY KEY (id))');
     }
 
-    public function down(Schema $schema)
+    public function down(Schema $schema) : void
     {
         $this->addSql('DROP TABLE foo');
     }
@@ -329,5 +346,11 @@ class FirstMigration extends AbstractMigration
 
 class SampleEntity
 {
+    /** @var null|int */
     private $id;
+
+    public function getId() : ?int
+    {
+        return $this->id;
+    }
 }

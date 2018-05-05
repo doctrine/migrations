@@ -6,22 +6,17 @@ namespace Doctrine\DBAL\Migrations\Tests\Stub;
 
 use Doctrine\DBAL\Migrations\AbstractMigration;
 use Doctrine\DBAL\Schema\Schema;
+use Exception;
 
-/**
- * Class DummyMigration
- */
-class VersionDummyDescription extends AbstractMigration
+class ExceptionVersionDummy extends AbstractMigration
 {
-    public function getDescription() : string
-    {
-        return 'My super migration';
-    }
-
     public function up(Schema $schema) : void
     {
+        throw new Exception('Super Exception');
     }
 
     public function down(Schema $schema) : void
     {
+        throw new Exception('Super Exception');
     }
 }

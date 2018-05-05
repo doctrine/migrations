@@ -1,34 +1,43 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Exception;
+use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
+use function fopen;
+use function fwrite;
+use function glob;
+use function is_dir;
+use function is_file;
+use function mkdir;
+use function realpath;
+use function rewind;
+use function stream_get_contents;
 
-abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
+abstract class MigrationTestCase extends TestCase
 {
-    /**
-     * @var OutputWriter
-     */
+    /** @var OutputWriter */
     private $outputWriter;
 
     /** @var  Output */
     protected $output;
 
-    public function getSqliteConnection()
+    public function getSqliteConnection() : Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
         return DriverManager::getConnection($params);
     }
 
-    /**
-     * @return Configuration
-     */
-    public function getSqliteConfiguration()
+    public function getSqliteConfiguration() : Configuration
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsDirectory(__DIR__ . '/Stub/migration-empty-folder');
@@ -37,15 +46,14 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
         return $config;
     }
 
-    public function getOutputStream()
+    public function getOutputStream() : StreamOutput
     {
-        $stream       = fopen('php://memory', 'r+', false);
-        $streamOutput = new StreamOutput($stream);
+        $stream = fopen('php://memory', 'r+', false);
 
-        return $streamOutput;
+        return new StreamOutput($stream);
     }
 
-    public function getOutputStreamContent(StreamOutput $streamOutput)
+    public function getOutputStreamContent(StreamOutput $streamOutput) : string
     {
         $stream = $streamOutput->getStream();
         rewind($stream);
@@ -53,18 +61,19 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
         return stream_get_contents($stream);
     }
 
-    public function getInputStream($input)
+    /** @return resource */
+    public function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+', false);
-        fputs($stream, $input);
+        fwrite($stream, $input);
         rewind($stream);
 
         return $stream;
     }
 
-    protected function getOutputWriter()
+    protected function getOutputWriter() : OutputWriter
     {
-        if ( ! $this->outputWriter) {
+        if (! $this->outputWriter) {
             $this->output       = $this->getOutputStream();
             $output             = $this->output;
             $this->outputWriter = new OutputWriter(function ($message) use ($output) {
@@ -74,19 +83,25 @@ abstract class MigrationTestCase extends \PHPUnit\Framework\TestCase
         return $this->outputWriter;
     }
 
-    protected function createTempDirForMigrations($path)
+    /** @throws Exception */
+    protected function createTempDirForMigrations(string $path) : void
     {
-        if ( ! mkdir($path)) {
-            throw new \Exception('fail to create a temporary folder for the tests at ' . $path);
+        if (! mkdir($path)) {
+            throw new Exception('fail to create a temporary folder for the tests at ' . $path);
         }
     }
 
-    protected function getSqlFilesList($path)
+    /** @return string[] */
+    protected function getSqlFilesList(string $path) : array
     {
         if (is_dir($path)) {
             return glob(realpath($path) . '/*.sql');
-        } elseif (is_file($path)) {
+        }
+
+        if (is_file($path)) {
             return [$path];
         }
+
+        return [];
     }
 }

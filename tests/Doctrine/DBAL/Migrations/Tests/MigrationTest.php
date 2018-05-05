@@ -1,21 +1,6 @@
 <?php
-/*
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
- * LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
- * A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
- * OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
- * DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
- * THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
- * (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * This software consists of voluntary contributions made by many individuals
- * and is licensed under the LGPL. For more information, see
- * <http://www.doctrine-project.org>.
-*/
+
+declare(strict_types=1);
 
 namespace Doctrine\DBAL\Migrations\Tests;
 
@@ -29,22 +14,24 @@ use Doctrine\DBAL\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PHPUnit\Framework\Constraint\RegularExpression;
+use Symfony\Component\Console\Output\StreamOutput;
+use const DIRECTORY_SEPARATOR;
+use function current;
 
 require_once __DIR__ . '/realpath.php';
 
 class MigrationTest extends MigrationTestCase
 {
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $conn;
 
     /** @var Configuration */
     private $config;
 
+    /** @var StreamOutput */
     protected $output;
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->conn   = $this->getSqliteConnection();
         $this->config = new Configuration($this->conn);
@@ -52,7 +39,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
     }
 
-    public function testMigrateToUnknownVersionThrowsException()
+    public function testMigrateToUnknownVersionThrowsException() : void
     {
         $migration = new Migration($this->config);
 
@@ -62,7 +49,7 @@ class MigrationTest extends MigrationTestCase
         $migration->migrate('1234');
     }
 
-    public function testMigrateWithNoMigrationsThrowsException()
+    public function testMigrateWithNoMigrationsThrowsException() : void
     {
         $migration = new Migration($this->config);
 
@@ -72,10 +59,10 @@ class MigrationTest extends MigrationTestCase
         $migration->migrate();
     }
 
-    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption()
+    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption() : void
     {
         $messages = [];
-        $output   = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) : void {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
@@ -89,11 +76,9 @@ class MigrationTest extends MigrationTestCase
     }
 
     /**
-     * @param $to
-     *
      * @dataProvider getSqlProvider
      */
-    public function testGetSql($to)
+    public function testGetSql(?string $to) : void
     {
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
@@ -101,7 +86,7 @@ class MigrationTest extends MigrationTestCase
                           ->setMethods(['migrate'])
                           ->getMock();
 
-        $expected = 'something';
+        $expected = ['something'];
 
         $migration->expects($this->once())
                   ->method('migrate')
@@ -113,11 +98,8 @@ class MigrationTest extends MigrationTestCase
         self::assertEquals($expected, $result);
     }
 
-    /**
-     * Data provider for ::testGetSql()
-     * @return array
-     */
-    public function getSqlProvider()
+    /** @return string|null[] */
+    public function getSqlProvider() : array
     {
         return [
             [null],
@@ -126,97 +108,100 @@ class MigrationTest extends MigrationTestCase
     }
 
     /**
-     * @param $path
-     * @param $to
-     * @param $getSqlReturn
-     *
      * @dataProvider writeSqlFileProvider
+     *
+     * @param string[] $getSqlReturn
      */
-    public function testWriteSqlFile($path, $from, $to, array $getSqlReturn)
+    public function testWriteSqlFile(string $path, string $from, ?string $to, array $getSqlReturn) : void
     {
         $queryWriter  = $this->createMock(QueryWriter::class);
         $outputWriter = $this->createMock(OutputWriter::class);
 
         $queryWriter->method('write')
-                    ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
-                    ->willReturn(true);
+            ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
+            ->willReturn(true);
 
         $outputWriter->expects($this->atLeastOnce())
-                     ->method('write');
+            ->method('write');
 
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
-                          ->disableOriginalConstructor()
-                          ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQueryWriter'])
-                          ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQueryWriter'])
+            ->getMock();
 
         $config->method('getCurrentVersion')
-               ->willReturn($from);
+            ->willReturn($from);
 
         $config->method('getOutputWriter')
-               ->willReturn($outputWriter);
+            ->willReturn($outputWriter);
 
         $config->method('getQueryWriter')
-               ->willReturn($queryWriter);
+            ->willReturn($queryWriter);
 
         if ($to === null) { // this will always just test the "up" direction
             $config->method('getLatestVersion')
-                   ->willReturn($from + 1);
+                ->willReturn($from + 1);
         }
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
-                          ->setConstructorArgs([$config])
-                          ->setMethods(['getSql'])
-                          ->getMock();
+            ->setConstructorArgs([$config])
+            ->setMethods(['getSql'])
+            ->getMock();
 
         $migration->expects($this->once())
-                  ->method('getSql')
-                  ->with($to)
-                  ->willReturn($getSqlReturn);
+            ->method('getSql')
+            ->with($to)
+            ->willReturn($getSqlReturn);
 
         self::assertTrue($migration->writeSqlFile($path, $to));
     }
 
-    public function writeSqlFileProvider()
+    /**
+     * @return string[][]
+     */
+    public function writeSqlFileProvider() : array
     {
         return [
-            [__DIR__, 0, 1, ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, 0, null, ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, 1, 1, ['1' => ['SHOW DATABASES;']]], // up (same)
-            [__DIR__, 1, 0, ['1' => ['SHOW DATABASES;']]], // down
-            [__DIR__ . '/tmpfile.sql', 0, 1, ['1' => ['SHOW DATABASES']]], // tests something actually got written
+            [__DIR__, '0', '1', ['1' => ['SHOW DATABASES;']]], // up
+            [__DIR__, '0', null, ['1' => ['SHOW DATABASES;']]], // up
+            [__DIR__, '1', '1', ['1' => ['SHOW DATABASES;']]], // up (same)
+            [__DIR__, '1', '0', ['1' => ['SHOW DATABASES;']]], // down
+            [__DIR__ . '/tmpfile.sql', '0', '1', ['1' => ['SHOW DATABASES']]], // tests something actually got written
         ];
     }
 
-    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql()
+    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql() : void
     {
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
-                       ->disableOriginalConstructor()
-                       ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQuotedMigrationsColumnName'])
-                       ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQuotedMigrationsColumnName'])
+            ->getMock();
 
         $config->method('getCurrentVersion')
-               ->willReturn(0);
+            ->willReturn(0);
 
         $config->method('getOutputWriter')
-               ->willReturn($this->getOutputWriter());
+            ->willReturn($this->getOutputWriter());
 
-         $config->method('getQuotedMigrationsColumnName')
-               ->willReturn('version');
+        $config->method('getQuotedMigrationsColumnName')
+            ->willReturn('version');
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
-                          ->setConstructorArgs([$config])
-                          ->setMethods(['getSql'])
-                          ->getMock();
+            ->setConstructorArgs([$config])
+            ->setMethods(['getSql'])
+            ->getMock();
 
         $migration->method('getSql')
-                  ->willReturn(['1' => ['SHOW DATABASES']]);
+            ->willReturn(['1' => ['SHOW DATABASES']]);
 
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
-        $migration->writeSqlFile(vfsStream::url('sql_files_dir'), 1);
+        $result      = $migration->writeSqlFile(vfsStream::url('sql_files_dir'), '1');
+
+        $this->assertTrue($result);
 
         self::assertRegExp('/^\s*-- Migrating from 0 to 1/m', $this->getOutputStreamContent($this->output));
 
@@ -228,10 +213,10 @@ class MigrationTest extends MigrationTestCase
         self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
-    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage()
+    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage() : void
     {
         $messages = [];
-        $output   = new OutputWriter(function ($msg) use (&$messages) {
+        $output   = new OutputWriter(function ($msg) use (&$messages) : void {
             $messages[] = $msg;
         });
         $this->config->setOutputWriter($output);
@@ -239,9 +224,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $this->conn->insert($this->config->getMigrationsTableName(), [
-            'version' => '20160707000000',
-        ]);
+        $this->conn->insert($this->config->getMigrationsTableName(), ['version' => '20160707000000']);
 
         $migration = new Migration($this->config);
 
@@ -251,7 +234,7 @@ class MigrationTest extends MigrationTestCase
         self::assertContains('No migrations', $messages[0]);
     }
 
-    public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined()
+    public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined() : void
     {
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -269,7 +252,7 @@ class MigrationTest extends MigrationTestCase
         self::assertTrue($called, 'should have called the confirmation callback');
     }
 
-    public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback()
+    public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback() : void
     {
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');

@@ -1,36 +1,41 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Finder;
 
 use Doctrine\DBAL\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
+use InvalidArgumentException;
+use function asort;
 
 class RecursiveRegexFinderTest extends MigrationTestCase
 {
+    /** @var RecursiveRegexFinder */
     private $finder;
 
-    public function testVersionNameCausesErrorWhen0()
+    public function testVersionNameCausesErrorWhen0() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__DIR__ . '/_regression/NoVersionNamed0');
     }
 
-    public function testBadFilenameCausesErrorWhenFindingMigrations()
+    public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__DIR__ . '/does/not/exist/at/all');
     }
 
-    public function testNonDirectoryCausesErrorWhenFindingMigrations()
+    public function testNonDirectoryCausesErrorWhenFindingMigrations() : void
     {
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__FILE__);
     }
 
-    public function testFindMigrationsReturnsTheExpectedFilesFromDirectory()
+    public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
 
@@ -53,7 +58,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
 
         asort($migrationsForTestSort);
 
-        self::assertSame($migrations, $migrationsForTestSort, "Finder have to return sorted list of the files.");
+        self::assertSame($migrations, $migrationsForTestSort, 'Finder have to return sorted list of the files.');
         self::assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
         self::assertArrayNotHasKey('Version20150502000002', $migrations);
         self::assertArrayNotHasKey('20150502000002', $migrations);
@@ -62,7 +67,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
         self::assertArrayNotHasKey('ARandomClass', $migrations);
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
         $this->finder = new RecursiveRegexFinder();
     }

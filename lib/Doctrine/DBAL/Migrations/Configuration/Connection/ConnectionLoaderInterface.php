@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Configuration\Connection;
 
 use Doctrine\DBAL\Connection;
@@ -7,9 +9,8 @@ use Doctrine\DBAL\Connection;
 interface ConnectionLoaderInterface
 {
     /**
-     * read the input and return a Configuration, returns `false` if the config
-     * is not supported
-     * @return Connection|null
+     * Read the input and return a Configuration, returns null if the config
+     * is not supported.
      */
-    public function chosen();
+    public function chosen() : ?Connection;
 }

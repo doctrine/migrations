@@ -1,4 +1,5 @@
 <?php
-return [
-'OptionThatDoesNotExists' => 'Doctrine Sandbox Migrations',
-];
+
+declare(strict_types=1);
+
+return ['OptionThatDoesNotExists' => 'Doctrine Sandbox Migrations'];

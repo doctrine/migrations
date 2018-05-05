@@ -1,72 +1,75 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests;
 
 use Doctrine\DBAL\Migrations\AbortMigrationException;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\IrreversibleMigrationException;
+use Doctrine\DBAL\Migrations\OutputWriter;
 use Doctrine\DBAL\Migrations\SkipMigrationException;
 use Doctrine\DBAL\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\DBAL\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\DBAL\Migrations\Version;
+use function sys_get_temp_dir;
 
-/**
- * Class AbstractMigrationTest
- * @package Doctrine\DBAL\Migrations\Tests
- *
- * @author Robbert van den Bogerd <rvdbogerd@ibuildings.nl>
- */
 class AbstractMigrationTest extends MigrationTestCase
 {
+    /** @var Configuration */
     private $config;
-    private $version;
-    /** @var  AbstractMigrationStub */
-    private $migration;
-    protected $outputWriter;
-    protected $output;
 
-    protected function setUp()
+    /** @var Version */
+    private $version;
+
+    /** @var AbstractMigrationStub */
+    private $migration;
+
+    /** @var OutputWriter */
+    protected $outputWriter;
+
+    protected function setUp() : void
     {
         $this->outputWriter = $this->getOutputWriter();
 
         $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(\sys_get_temp_dir());
+        $this->config->setMigrationsDirectory(sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
         $this->version   = new Version($this->config, 'Dummy', VersionDummy::class);
         $this->migration = new AbstractMigrationStub($this->version);
     }
 
-    public function testGetDescriptionReturnsEmptyString()
+    public function testGetDescriptionReturnsEmptyString() : void
     {
         self::assertSame('', $this->migration->getDescription());
     }
 
-    public function testWarnIfOutputMessage()
+    public function testWarnIfOutputMessage() : void
     {
         $this->migration->warnIf(true, 'Warning was thrown');
         self::assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
     }
 
-    public function testWarnIfAddDefaultMessage()
+    public function testWarnIfAddDefaultMessage() : void
     {
         $this->migration->warnIf(true);
         self::assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
     }
 
-    public function testWarnIfDontOutputMessageIfFalse()
+    public function testWarnIfDontOutputMessageIfFalse() : void
     {
         $this->migration->warnIf(false, 'trallala');
         self::assertEquals('', $this->getOutputStreamContent($this->output));
     }
 
-    public function testWriteInvokesOutputWriter()
+    public function testWriteInvokesOutputWriter() : void
     {
         $this->migration->exposedWrite('Message');
         self::assertContains('Message', $this->getOutputStreamContent($this->output));
     }
 
-    public function testAbortIfThrowsException()
+    public function testAbortIfThrowsException() : void
     {
         $this->expectException(AbortMigrationException::class);
         $this->expectExceptionMessage('Something failed');
@@ -74,13 +77,13 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->abortIf(true, 'Something failed');
     }
 
-    public function testAbortIfDontThrowsException()
+    public function testAbortIfDontThrowsException() : void
     {
         $this->migration->abortIf(false, 'Something failed');
         $this->addToAssertionCount(1);
     }
 
-    public function testAbortIfThrowsExceptionEvenWithoutMessage()
+    public function testAbortIfThrowsExceptionEvenWithoutMessage() : void
     {
         $this->expectException(AbortMigrationException::class);
         $this->expectExceptionMessage('Unknown Reason');
@@ -88,7 +91,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->abortIf(true);
     }
 
-    public function testSkipIfThrowsException()
+    public function testSkipIfThrowsException() : void
     {
         $this->expectException(SkipMigrationException::class);
         $this->expectExceptionMessage('Something skipped');
@@ -96,13 +99,13 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->skipIf(true, 'Something skipped');
     }
 
-    public function testSkipIfDontThrowsException()
+    public function testSkipIfDontThrowsException() : void
     {
         $this->migration->skipIf(false, 'Something skipped');
         $this->addToAssertionCount(1);
     }
 
-    public function testThrowIrreversibleMigrationException()
+    public function testThrowIrreversibleMigrationException() : void
     {
         $this->expectException(IrreversibleMigrationException::class);
         $this->expectExceptionMessage('Irreversible migration');
@@ -110,7 +113,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->exposedThrowIrreversibleMigrationException('Irreversible migration');
     }
 
-    public function testThrowIrreversibleMigrationExceptionWithoutMessage()
+    public function testThrowIrreversibleMigrationExceptionWithoutMessage() : void
     {
         $this->expectException(IrreversibleMigrationException::class);
         $this->expectExceptionMessage('This migration is irreversible and cannot be reverted.');
@@ -118,12 +121,12 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->exposedThrowIrreversibleMigrationException();
     }
 
-    public function testIstransactional()
+    public function testIstransactional() : void
     {
         self::assertTrue($this->migration->isTransactional());
     }
 
-    public function testAddSql()
+    public function testAddSql() : void
     {
         $this->migration->exposedAddSql('tralala');
 

@@ -1,30 +1,27 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations;
 
 class MigrationsVersion
 {
-    private static $version = 'v1.6.2';
+    /** @var string */
+    private static $version = 'v2.0.0';
 
-    public static function VERSION()
+    public static function VERSION() : string
     {
-        $gitversion = '@git-version@';
+        $gitVersion = '@git-version@';
 
-        if (self::isACustomPharBuild($gitversion)) {
-            return $gitversion;
+        if (self::isACustomPharBuild($gitVersion)) {
+            return $gitVersion;
         }
+
         return self::$version;
     }
 
-    /**
-     * @param string $gitversion
-     * @return bool
-     *
-     * Check if doctrine migration is installed by composer or
-     * in a modified (not tagged) phar version.
-     */
-    private static function isACustomPharBuild($gitversion)
+    private static function isACustomPharBuild(string $gitVersion) : bool
     {
-        return $gitversion !== '@' . 'git-version@';
+        return $gitVersion !== '@' . 'git-version@';
     }
 }

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
@@ -10,33 +12,23 @@ use ProxyManager\Proxy\LazyLoadingInterface;
 
 class LazySchemaDiffProvider implements SchemaDiffProviderInterface
 {
-    /** @var  LazyLoadingValueHolderFactory */
+    /** @var LazyLoadingValueHolderFactory */
     private $proxyFactory;
 
     /** @var SchemaDiffProviderInterface */
     private $originalSchemaManipulator;
 
-    public function __construct(LazyLoadingValueHolderFactory $proxyFactory, SchemaDiffProviderInterface $originalSchemaManipulator)
-    {
+    public function __construct(
+        LazyLoadingValueHolderFactory $proxyFactory,
+        SchemaDiffProviderInterface $originalSchemaManipulator
+    ) {
         $this->proxyFactory              = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
-    public static function fromDefaultProxyFacyoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
-    {
-        $message = 'Function %s::fromDefaultProxyFacyoryConfiguration() deprecated due to typo.'
-            . 'Use %s::fromDefaultProxyFactoryConfiguration() instead';
-
-        trigger_error(
-            sprintf($message, self::class),
-            E_USER_DEPRECATED
-        );
-
-        return self::fromDefaultProxyFactoryConfiguration($originalSchemaManipulator);
-    }
-
-    public static function fromDefaultProxyFactoryConfiguration(SchemaDiffProviderInterface $originalSchemaManipulator)
-    {
+    public static function fromDefaultProxyFactoryConfiguration(
+        SchemaDiffProviderInterface $originalSchemaManipulator
+    ) : LazySchemaDiffProvider {
         $proxyConfig = new Configuration();
         $proxyConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());
         $proxyFactory = new LazyLoadingValueHolderFactory($proxyConfig);
@@ -44,16 +36,13 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         return new LazySchemaDiffProvider($proxyFactory, $originalSchemaManipulator);
     }
 
-    /**
-     * @return Schema
-     */
-    public function createFromSchema()
+    public function createFromSchema() : Schema
     {
         $originalSchemaManipulator = $this->originalSchemaManipulator;
 
         return $this->proxyFactory->createProxy(
             Schema::class,
-            function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) use ($originalSchemaManipulator) {
+            function (&$wrappedObject, $proxy, $method, array $parameters, &$initializer) use ($originalSchemaManipulator) {
                 $initializer   = null;
                 $wrappedObject = $originalSchemaManipulator->createFromSchema();
 
@@ -62,11 +51,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         );
     }
 
-    /**
-     * @param Schema $fromSchema
-     * @return Schema
-     */
-    public function createToSchema(Schema $fromSchema)
+    public function createToSchema(Schema $fromSchema) : Schema
     {
         $originalSchemaManipulator = $this->originalSchemaManipulator;
 
@@ -85,13 +70,8 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         return $this->originalSchemaManipulator->createToSchema($fromSchema);
     }
 
-    /**
-     * @param Schema $fromSchema
-     * @param Schema $toSchema
-     *
-     * @return string[]
-     */
-    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema)
+    /** @return string[] */
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema) : array
     {
         if ($toSchema instanceof LazyLoadingInterface
             && ! $toSchema->isProxyInitialized()) {

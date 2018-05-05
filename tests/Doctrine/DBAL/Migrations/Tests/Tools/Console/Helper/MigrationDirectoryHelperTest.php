@@ -1,27 +1,32 @@
 <?php
+
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
+use InvalidArgumentException;
+use const DIRECTORY_SEPARATOR;
+use function date;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-
-    public function testMigrationDirectoryHelper()
+    public function testMigrationDirectoryHelper() : void
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
         self::assertInstanceOf(MigrationDirectoryHelper::class, $mirationDirectoryHelper);
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDir()
+    public function testMigrationDirectoryHelperReturnConfiguredDir() : void
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
         self::assertEquals($this->getSqliteConfiguration()->getMigrationsDirectory(), $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear()
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear() : void
     {
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsAreOrganizedByYear(true);
@@ -32,7 +37,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         self::assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth()
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth() : void
     {
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsAreOrganizedByYearAndMonth(true);
@@ -43,14 +48,14 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         self::assertEquals($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists()
+    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists() : void
     {
         $dir           = DIRECTORY_SEPARATOR . 'IDoNotExists';
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsDirectory($dir);
         $mirationDirectoryHelper = new MigrationDirectoryHelper($configuration);
 
-        $this->expectException(\InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $mirationDirectoryHelper->getMigrationDirectory();
     }

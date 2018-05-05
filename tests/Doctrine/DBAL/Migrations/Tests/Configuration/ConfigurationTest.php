@@ -1,38 +1,32 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Configuration;
 
+use DateTime;
+use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Driver\IBMDB2\DB2Driver;
-use Doctrine\DBAL\Migrations\QueryWriter;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\MigrationException;
 use Doctrine\DBAL\Migrations\OutputWriter;
+use Doctrine\DBAL\Migrations\QueryWriter;
 use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
-
-final class EmptyKeywordList extends KeywordList
-{
-    protected function getKeywords()
-    {
-        return [];
-    }
-
-    public function getName()
-    {
-        return "EMPTY";
-    }
-}
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use function array_keys;
+use function call_user_func_array;
+use function sprintf;
+use function str_replace;
 
 class ConfigurationTest extends MigrationTestCase
 {
-    public function testConstructorSetsOutputWriter()
+    public function testConstructorSetsOutputWriter() : void
     {
         $outputWriter = $this->getOutputWriterMock();
 
@@ -44,14 +38,14 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
-    public function testOutputWriterIsCreatedIfNotInjected()
+    public function testOutputWriterIsCreatedIfNotInjected() : void
     {
         $configuration = new Configuration($this->getConnectionMock());
 
         self::assertInstanceOf(OutputWriter::class, $configuration->getOutputWriter());
     }
 
-    public function testOutputWriterCanBeSet()
+    public function testOutputWriterCanBeSet() : void
     {
         $outputWriter = $this->getOutputWriterMock();
 
@@ -61,7 +55,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
-    public function testRegisterMigrationsClassExistCheck()
+    public function testRegisterMigrationsClassExistCheck() : void
     {
         $migrationsDir = __DIR__ . '/ConfigurationTestSource/Migrations';
 
@@ -76,22 +70,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->registerMigrationsFromDirectory($migrationsDir);
     }
 
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
-     */
-    private function getConnectionMock()
-    {
-        return $this->createMock(Connection::class);
-    }
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OutputWriter
-     */
-    private function getOutputWriterMock()
-    {
-        return $this->createMock(OutputWriter::class);
-    }
-
-    public function testGetSetMigrationsColumnName()
+    public function testGetSetMigrationsColumnName() : void
     {
         $configuration = new Configuration($this->getConnectionMock());
 
@@ -103,51 +82,39 @@ class ConfigurationTest extends MigrationTestCase
 
     /**
      * @dataProvider methodsThatNeedsVersionsLoaded
+     *
+     * @param mixed[] $args
+     * @param mixed   $expectedResult
      */
-    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfNoNamespaceSet($method, $args)
-    {
-        $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Migrations namespace must be configured in order to use Doctrine migrations.');
-
-        $configuration = new Configuration($this->getConnectionMock());
-        call_user_func_array([$configuration, $method], $args);
-    }
-
-    /**
-     * @dataProvider methodsThatNeedsVersionsLoaded
-     */
-    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfNoDirectorySet($method, $args)
-    {
-        $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Migrations directory must be configured in order to use Doctrine migrations.');
-
-        $configuration = new Configuration($this->getConnectionMock());
-        $configuration->setMigrationsNamespace('DoctrineMigrations\\');
-
-        call_user_func_array([$configuration, $method], $args);
-    }
-
-    /**
-     * @dataProvider methodsThatNeedsVersionsLoaded
-     */
-    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThem($method, $args, $expectedResult)
-    {
+    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThem(
+        string $method,
+        array $args,
+        $expectedResult
+    ) : void {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
 
         $result = call_user_func_array([$configuration, $method], $args);
-        if ($method == 'getMigrationsToExecute') {
+
+        if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
+
         self::assertEquals($expectedResult, $result);
     }
 
     /**
      * @dataProvider methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations
+     *
+     * @param mixed[] $args
+     * @param mixed   $expectedResult
      */
-    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfSomeMigrationsAreAlreadyMigrated($method, $args, $expectedResult)
-    {
+    public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfSomeMigrationsAreAlreadyMigrated(
+        string $method,
+        array $args,
+        $expectedResult
+    ) : void {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
@@ -155,16 +122,18 @@ class ConfigurationTest extends MigrationTestCase
         $migration->migrate('3Test');
 
         $result = call_user_func_array([$configuration, $method], $args);
-        if ($method == 'getMigrationsToExecute') {
+
+        if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
         }
+
         self::assertEquals($expectedResult, $result);
     }
 
-    public function testGenerateVersionNumberFormatsTheDatePassedIn()
+    public function testGenerateVersionNumberFormatsTheDatePassedIn() : void
     {
         $configuration = new Configuration($this->getSqliteConnection());
-        $now           = new \DateTime('2016-07-05 01:00:00');
+        $now           = new DateTime('2016-07-05 01:00:00');
 
         $version = $configuration->generateVersionNumber($now);
 
@@ -175,13 +144,13 @@ class ConfigurationTest extends MigrationTestCase
      * We don't actually test the full "time" part of this, since that would fail
      * intermittently. Instead we just verify that we get a version number back
      * that has the current date, hour, and minute. We're really just testing
-     * the `?: new \DateTime(...)` bit of generateVersionNumber
+     * the `?: new DateTime(...)` bit of generateVersionNumber
      */
-    public function testGenerateVersionNumberWithoutNowUsesTheCurrentTime()
+    public function testGenerateVersionNumberWithoutNowUsesTheCurrentTime() : void
     {
         $configuration = new Configuration($this->getSqliteConnection());
 
-        $now     = new \DateTime('now', new \DateTimeZone('UTC'));
+        $now     = new DateTime('now', new DateTimeZone('UTC'));
         $version = $configuration->generateVersionNumber();
 
         self::assertRegExp(sprintf('/^%s\d{2}$/', $now->format('YmdHi')), $version);
@@ -193,7 +162,7 @@ class ConfigurationTest extends MigrationTestCase
      *
      * @see https://github.com/doctrine/migrations/issues/336
      */
-    public function testMasterSlaveConnectionAlwaysConnectsToMaster()
+    public function testMasterSlaveConnectionAlwaysConnectsToMaster() : void
     {
         $sm = $this->getMockForAbstractClass(AbstractSchemaManager::class, [], '', false, true, true, ['tablesExist']);
         $sm->expects($this->once())
@@ -226,7 +195,8 @@ class ConfigurationTest extends MigrationTestCase
         $config->getMigratedVersions();
     }
 
-    public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations()
+    /** @return mixed[] */
+    public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations() : array
     {
         return [
             ['hasVersion', ['4Test'], true],
@@ -235,25 +205,38 @@ class ConfigurationTest extends MigrationTestCase
             ['getRelativeVersion', ['3Test', -1], '2Test'],
             ['getNumberOfAvailableMigrations', [], 5],
             ['getLatestVersion', [], '5Test'],
-            ['getMigrationsToExecute', ['up', 5], [
-                '4Test',
-                '5Test',
-            ]],
-            ['getMigrationsToExecute', ['up', 4], [
-                '4Test',
-            ]],
-            ['getMigrationsToExecute', ['down', 0], [
-                '3Test',
-                '2Test',
-                '1Test',
-            ]],
-            ['getMigrationsToExecute', ['down', 2], [
-                '3Test',
-            ]],
+            [
+                'getMigrationsToExecute',
+                ['up', '5'],
+                [
+                    '4Test',
+                    '5Test',
+                ],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['up', '4'],
+                ['4Test'],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['down', '0'],
+                [
+                    '3Test',
+                    '2Test',
+                    '1Test',
+                ],
+            ],
+            [
+                'getMigrationsToExecute',
+                ['down', '2'],
+                ['3Test'],
+            ],
         ];
     }
 
-    public function methodsThatNeedsVersionsLoaded()
+    /** @return mixed[] */
+    public function methodsThatNeedsVersionsLoaded() : array
     {
         return [
             ['hasVersion', ['3Test'], true],
@@ -262,15 +245,19 @@ class ConfigurationTest extends MigrationTestCase
             ['getRelativeVersion', ['3Test', -1], '2Test'],
             ['getNumberOfAvailableMigrations', [], 5],
             ['getLatestVersion', [], '5Test'],
-            ['getMigrationsToExecute', ['up', 5], [
-                '1Test',
-                '2Test',
-                '3Test',
-                '4Test',
-                '5Test',
-            ]],
-            ['getMigrationsToExecute', ['down', 0], []],
-            ['getMigrationsToExecute', ['down', 2], []],
+            [
+                'getMigrationsToExecute',
+                ['up', '5'],
+                [
+                    '1Test',
+                    '2Test',
+                    '3Test',
+                    '4Test',
+                    '5Test',
+                ],
+            ],
+            ['getMigrationsToExecute', ['down', '0'], []],
+            ['getMigrationsToExecute', ['down', '2'], []],
         ];
     }
 
@@ -299,10 +286,40 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($queryWriter, $configuration->getQueryWriter());
     }
 
-    public function testDBWhereVersionIsKeywordReturnsColumnNameWithQuotes()
+    public function testDBWhereVersionIsKeywordReturnsColumnNameWithQuotes() : void
     {
         $config = new Configuration(new Connection([], new DB2Driver()));
 
         $this->assertEquals('"version"', $config->getQuotedMigrationsColumnName());
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     */
+    private function getConnectionMock()
+    {
+        return $this->createMock(Connection::class);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|OutputWriter
+     */
+    private function getOutputWriterMock()
+    {
+        return $this->createMock(OutputWriter::class);
+    }
+}
+
+final class EmptyKeywordList extends KeywordList
+{
+    /** @return string[] */
+    protected function getKeywords() : array
+    {
+        return [];
+    }
+
+    public function getName() : string
+    {
+        return 'EMPTY';
     }
 }

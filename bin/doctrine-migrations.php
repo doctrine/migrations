@@ -1,11 +1,19 @@
 <?php
 
+declare(strict_types=1);
+
+use Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner;
+use Symfony\Component\Console\Helper\DialogHelper;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
+
 $autoloadFiles = [
     __DIR__ . '/../vendor/autoload.php',
     __DIR__ . '/../../../autoload.php'
 ];
 
 $autoloader = false;
+
 foreach ($autoloadFiles as $autoloadFile) {
     if (file_exists($autoloadFile)) {
         require_once $autoloadFile;
@@ -17,6 +25,7 @@ if (!$autoloader) {
     if (extension_loaded('phar') && ($uri = Phar::running())) {
         echo 'The phar has been built without dependencies' . PHP_EOL;
     }
+
     die('vendor/autoload.php could not be found. Did you run `php composer.phar install`?');
 }
 
@@ -42,9 +51,9 @@ if (file_exists($configFile)) {
 
     $helperSet = require $configFile;
 
-    if ( ! ($helperSet instanceof \Symfony\Component\Console\Helper\HelperSet)) {
+    if ( ! ($helperSet instanceof HelperSet)) {
         foreach ($GLOBALS as $helperSetCandidate) {
-            if ($helperSetCandidate instanceof \Symfony\Component\Console\Helper\HelperSet) {
+            if ($helperSetCandidate instanceof HelperSet) {
                 $helperSet = $helperSetCandidate;
                 break;
             }
@@ -52,21 +61,21 @@ if (file_exists($configFile)) {
     }
 }
 
-$helperSet = ($helperSet) ?: new \Symfony\Component\Console\Helper\HelperSet();
+$helperSet = ($helperSet) ?: new HelperSet();
 
 if(class_exists('\Symfony\Component\Console\Helper\QuestionHelper')) {
-    $helperSet->set(new \Symfony\Component\Console\Helper\QuestionHelper(), 'question');
+    $helperSet->set(new QuestionHelper(), 'question');
 } else {
-    $helperSet->set(new \Symfony\Component\Console\Helper\DialogHelper(), 'dialog');
+    $helperSet->set(new DialogHelper(), 'dialog');
 }
 
-
 $input = file_exists('migrations-input.php')
-       ? include 'migrations-input.php' : null;
+    ? include 'migrations-input.php'
+    : null;
 
 $output = file_exists('migrations-output.php')
-        ? include 'migrations-output.php' : null;
+    ? include 'migrations-output.php'
+    : null;
 
-$cli = \Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner::createApplication($helperSet);
+$cli = ConsoleRunner::createApplication($helperSet);
 $cli->run($input, $output);
-

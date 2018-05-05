@@ -1,59 +1,56 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\DBAL\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\DBAL\Migrations\Migration;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Migrations\Migration;
+use Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\ArrayInput;
+use function getcwd;
 
 class MigrateCommandTest extends CommandTestCase
 {
     use DialogSupport;
 
-    const VERSION = '20160705000000';
+    /** @var string */
+    public const VERSION = '20160705000000';
 
+    /** @var Migration */
     private $migration;
 
-    public function testPreviousVersionErrorsWhenThereIsNoPreviousVersion()
+    public function testPreviousVersionErrorsWhenThereIsNoPreviousVersion() : void
     {
         $this->willResolveVersionAlias('prev', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'prev',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'prev']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at first version', $tester->getDisplay());
     }
 
-    public function testNextVersionErrorsWhenThereIsNoNextVersion()
+    public function testNextVersionErrorsWhenThereIsNoNextVersion() : void
     {
         $this->willResolveVersionAlias('next', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'next',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'next']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Already at latest version', $tester->getDisplay());
     }
 
-    public function testUnknownVersionAliasErrors()
+    public function testUnknownVersionAliasErrors() : void
     {
         $this->willResolveVersionAlias('nope', null);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            'version' => 'nope',
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['version' => 'nope']);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Unknown version: nope', $tester->getDisplay());
     }
 
-    public function testExecuteUnavailableMigrationsErrorWhenTheUserDeclinesToContinue()
+    public function testExecuteUnavailableMigrationsErrorWhenTheUserDeclinesToContinue() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->config->expects($this->once())
@@ -70,7 +67,7 @@ class MigrateCommandTest extends CommandTestCase
         self::assertContains('previously executed migrations in the database that are not registered', $tester->getDisplay());
     }
 
-    public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsTrue()
+    public function testWriteSqlOutputsToCurrentWorkingDirWhenWriteSqlArgumentIsTrue() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->withExecutedAndAvailableMigrations();
@@ -78,14 +75,12 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(getcwd(), self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--write-sql' => true,
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => true]);
 
         self::assertSame(0, $statusCode);
     }
 
-    public function testWriteSqlOutputsToTheProvidedPathWhenProvided()
+    public function testWriteSqlOutputsToTheProvidedPathWhenProvided() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->withExecutedAndAvailableMigrations();
@@ -93,14 +88,12 @@ class MigrateCommandTest extends CommandTestCase
             ->method('writeSqlFile')
             ->with(__DIR__, self::VERSION);
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--write-sql' => __DIR__,
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--write-sql' => __DIR__]);
 
         self::assertSame(0, $statusCode);
     }
 
-    public function testCommandExecutesMigrationsWithDryRunWhenProvided()
+    public function testCommandExecutesMigrationsWithDryRunWhenProvided() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->withExecutedAndAvailableMigrations();
@@ -125,7 +118,7 @@ class MigrateCommandTest extends CommandTestCase
         self::assertSame(0, $statusCode);
     }
 
-    public function testCommandExitsWithErrorWhenUserDeclinesToContinue()
+    public function testCommandExitsWithErrorWhenUserDeclinesToContinue() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->willAskConfirmationAndReturn(false);
@@ -134,18 +127,16 @@ class MigrateCommandTest extends CommandTestCase
             ->method('migrate')
             ->with(self::VERSION, false, false)
             ->willReturnCallback(function ($version, $dryRun, $timed, callable $confirm) {
-                return $confirm();
+                return [$confirm()];
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(1, $statusCode);
         self::assertContains('Migration cancelled', $tester->getDisplay());
     }
 
-    public function testCommandMigratesWhenTheUserAcceptsThePrompt()
+    public function testCommandMigratesWhenTheUserAcceptsThePrompt() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->willAskConfirmationAndReturn(true);
@@ -158,14 +149,12 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false]);
 
         self::assertSame(0, $statusCode);
     }
 
-    public function testCommandMigratesWhenTheConsoleIsInNonInteractiveMode()
+    public function testCommandMigratesWhenTheConsoleIsInNonInteractiveMode() : void
     {
         $this->willResolveVersionAlias('latest', self::VERSION);
         $this->withExecutedAndAvailableMigrations();
@@ -177,14 +166,12 @@ class MigrateCommandTest extends CommandTestCase
                 return ['SELECT 1'];
             });
 
-        list($tester, $statusCode) = $this->executeCommand([
-            '--dry-run' => false
-        ], ['interactive' => false]);
+        list($tester, $statusCode) = $this->executeCommand(['--dry-run' => false], ['interactive' => false]);
 
         self::assertSame(0, $statusCode);
     }
 
-    protected function setUp()
+    protected function setUp() : void
     {
         parent::setUp();
         $this->configureDialogs($this->app);
@@ -194,7 +181,7 @@ class MigrateCommandTest extends CommandTestCase
      * Mocks the `createMigration` method to return a mock migration class
      * so we can test.
      */
-    protected function createCommand()
+    protected function createCommand() : AbstractCommand
     {
         $this->migration = $this->createMock(Migration::class);
 
@@ -215,7 +202,7 @@ class MigrateCommandTest extends CommandTestCase
         return $cmd;
     }
 
-    private function willResolveVersionAlias($alias, $returns)
+    private function willResolveVersionAlias(string $alias, ?string $returns) : void
     {
         $this->config->expects($this->once())
             ->method('resolveVersionAlias')
@@ -223,7 +210,7 @@ class MigrateCommandTest extends CommandTestCase
             ->willReturn($returns);
     }
 
-    private function withExecutedAndAvailableMigrations()
+    private function withExecutedAndAvailableMigrations() : void
     {
         $this->config->expects($this->once())
             ->method('getMigratedVersions')
