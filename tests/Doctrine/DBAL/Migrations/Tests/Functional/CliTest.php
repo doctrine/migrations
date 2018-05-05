@@ -14,7 +14,6 @@ use Doctrine\DBAL\Migrations\Tests\MigrationTestCase;
 use Doctrine\DBAL\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\DBAL\Version as DbalVersion;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Tools\Setup as OrmSetup;
@@ -27,7 +26,6 @@ use function count;
 use function file_exists;
 use function file_get_contents;
 use function reset;
-use function sprintf;
 use function unlink;
 
 /**
@@ -156,13 +154,6 @@ class CliTest extends MigrationTestCase
 
     public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter() : void
     {
-        if ($this->isDbalOld()) {
-            $this->markTestSkipped(sprintf(
-                'Schema filters were added in DBAL 2.2, version %s installed',
-                DbalVersion::VERSION
-            ));
-        }
-
         $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^bar$/');
 
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
@@ -187,13 +178,6 @@ class CliTest extends MigrationTestCase
      */
     public function testDiffCommandSchemaFilterAreCaseSensitive() : void
     {
-        if ($this->isDbalOld()) {
-            $this->markTestSkipped(sprintf(
-                'Schema filters were added in DBAL 2.2, version %s installed',
-                DbalVersion::VERSION
-            ));
-        }
-
         $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^FOO$/');
 
         $schema = new Schema();
@@ -292,11 +276,6 @@ class CliTest extends MigrationTestCase
         $table->setPrimaryKey(['id']);
 
         return $schema;
-    }
-
-    protected function isDbalOld() : bool
-    {
-        return DbalVersion::compare('2.2.0') > 0;
     }
 
     /**
