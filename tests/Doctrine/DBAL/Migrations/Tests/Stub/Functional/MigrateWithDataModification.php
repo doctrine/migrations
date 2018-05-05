@@ -9,7 +9,9 @@ class MigrateWithDataModification extends AbstractMigration
 {
     public function up(Schema $schema)
     {
-        $this->addSql('INSERT INTO test_data_migration (test) VALUES (1), (2), (3)');
+        $this->addSql('INSERT INTO test_data_migration (test) VALUES (1)');
+        $this->addSql('INSERT INTO test_data_migration (test) VALUES (2)');
+        $this->addSql('INSERT INTO test_data_migration (test) VALUES (3)');
     }
 
     public function down(Schema $schema)
