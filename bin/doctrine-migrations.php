@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-use Doctrine\DBAL\Migrations\Tools\Console\ConsoleRunner;
+use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Symfony\Component\Console\Helper\DialogHelper;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
