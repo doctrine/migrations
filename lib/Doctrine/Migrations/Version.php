@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
@@ -14,13 +13,8 @@ use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Throwable;
-use function array_map;
 use function count;
-use function implode;
 use function is_array;
-use function is_bool;
-use function is_int;
-use function is_string;
 use function microtime;
 use function round;
 use function rtrim;
@@ -73,6 +67,9 @@ class Version
     /** @var SchemaDiffProviderInterface */
     private $schemaProvider;
 
+    /** @var ParameterFormatter */
+    private $parameterFormatter;
+
     public function __construct(
         Configuration $configuration,
         string $version,
@@ -86,22 +83,20 @@ class Version
         $this->migration     = new $class($this);
         $this->version       = $version;
 
-        if ($schemaProvider !== null) {
-            $this->schemaProvider = $schemaProvider;
+        if ($schemaProvider === null) {
+            $schemaProvider = new SchemaDiffProvider(
+                $this->connection->getSchemaManager(),
+                $this->connection->getDatabasePlatform()
+            );
+
+            $schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
+                $schemaProvider
+            );
         }
 
-        if ($schemaProvider !== null) {
-            return;
-        }
+        $this->schemaProvider = $schemaProvider;
 
-        $schemaProvider = new SchemaDiffProvider(
-            $this->connection->getSchemaManager(),
-            $this->connection->getDatabasePlatform()
-        );
-
-        $this->schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
-            $schemaProvider
-        );
+        $this->parameterFormatter = new ParameterFormatter($this->connection);
     }
 
     public function getVersion() : string
@@ -377,6 +372,7 @@ class Version
                     $queryStart = microtime(true);
 
                     $this->outputSqlQuery($key, $query);
+
                     if (! isset($this->params[$key])) {
                         $this->connection->executeQuery($query);
                     } else {
@@ -396,40 +392,6 @@ class Version
                 $this->outputSqlQuery($idx, $query);
             }
         }
-    }
-
-    private function outputSqlQuery(int $idx, string $query) : void
-    {
-        $params = $this->formatParamsForOutput(
-            $this->params[$idx] ?? [],
-            $this->types[$idx] ?? []
-        );
-
-        $this->outputWriter->write(rtrim(sprintf(
-            '     <comment>-></comment> %s %s',
-            $query,
-            $params
-        )));
-    }
-
-    /**
-     * @param mixed[] $params
-     * @param mixed[] $types
-     */
-    private function formatParamsForOutput(array $params, array $types) : string
-    {
-        if (empty($params)) {
-            return '';
-        }
-
-        $out = [];
-        foreach ($params as $key => $value) {
-            $type   = $types[$key] ?? 'string';
-            $outval = '[' . $this->formatParameter($value, $type) . ']';
-            $out[]  = is_string($key) ? sprintf(':%s => %s', $key, $outval) : $outval;
-        }
-
-        return sprintf('with parameters (%s)', implode(', ', $out));
     }
 
     private function dispatchEvent(
@@ -461,41 +423,17 @@ class Version
         );
     }
 
-    /**
-     * @param string|int $value
-     * @param string|int $type
-     *
-     * @return string|int
-     */
-    private function formatParameter($value, $type)
+    private function outputSqlQuery(int $idx, string $query) : void
     {
-        if (is_string($type) && Type::hasType($type)) {
-            return Type::getType($type)->convertToDatabaseValue(
-                $value,
-                $this->connection->getDatabasePlatform()
-            );
-        }
+        $params = $this->parameterFormatter->formatParameters(
+            $this->params[$idx] ?? [],
+            $this->types[$idx] ?? []
+        );
 
-        return $this->parameterToString($value);
-    }
-
-    /**
-     * @param int[]|bool[]|string[]|array|int|string|bool $value
-     */
-    private function parameterToString($value) : string
-    {
-        if (is_array($value)) {
-            return implode(', ', array_map([$this, 'parameterToString'], $value));
-        }
-
-        if (is_int($value) || is_string($value)) {
-            return (string) $value;
-        }
-
-        if (is_bool($value)) {
-            return $value === true ? 'true' : 'false';
-        }
-
-        return '?';
+        $this->outputWriter->write(rtrim(sprintf(
+            '     <comment>-></comment> %s %s',
+            $query,
+            $params
+        )));
     }
 }
