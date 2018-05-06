@@ -66,19 +66,19 @@ EOT
             $this->writeStatusInfosLineAligned($output, $name, $string);
         }
 
-        if (! $input->getOption('show-versions')) {
+        if ($input->getOption('show-versions') === false) {
             return;
         }
 
         $migrations = $configuration->getMigrations();
 
-        if ($migrations) {
+        if (count($migrations) !== 0) {
             $output->writeln("\n <info>==</info> Available Migration Versions\n");
 
             $this->showVersions($migrations, $configuration, $output);
         }
 
-        if (! count($infos->getExecutedUnavailableMigrations())) {
+        if (count($infos->getExecutedUnavailableMigrations()) === 0) {
             return;
         }
 
@@ -118,7 +118,7 @@ EOT
             $isMigrated = in_array($version->getVersion(), $migratedVersions, true);
             $status     = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
 
-            $migrationDescription = $version->getMigration()->getDescription()
+            $migrationDescription = $version->getMigration()->getDescription() !== ''
                 ? str_repeat(' ', 5) . $version->getMigration()->getDescription()
                 : '';
 

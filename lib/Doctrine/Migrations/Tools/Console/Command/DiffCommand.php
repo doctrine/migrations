@@ -89,7 +89,7 @@ EOT
 
         $filterExpr = $input->getOption('filter-expression');
 
-        if ($filterExpr) {
+        if ($filterExpr !== null) {
             $conn->getConfiguration()
                 ->setFilterSchemaAssetsExpression($filterExpr);
         }
@@ -126,7 +126,7 @@ EOT
             $input->getOption('line-length')
         );
 
-        if (! $up && ! $down) {
+        if ($up === '' && $down === '') {
             $output->writeln('No changes detected in your mapping information.');
 
             return;
@@ -197,7 +197,7 @@ EOT
 
     private function getSchemaProvider() : SchemaProviderInterface
     {
-        if (! $this->schemaProvider) {
+        if ($this->schemaProvider === null) {
             $this->schemaProvider = new OrmSchemaProvider(
                 $this->getHelper('entityManager')->getEntityManager()
             );

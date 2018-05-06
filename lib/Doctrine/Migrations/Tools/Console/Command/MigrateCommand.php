@@ -14,7 +14,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function array_diff;
 use function count;
 use function getcwd;
-use function is_bool;
 use function sprintf;
 use function substr;
 
@@ -148,8 +147,8 @@ EOT
 
         $path = $input->getOption('write-sql');
 
-        if ($path) {
-            $path = is_bool($path) ? getcwd() : $path;
+        if ($path !== null) {
+            $path = $path === true ? getcwd() : $path;
             $migration->writeSqlFile($path, $version);
 
             return 0;

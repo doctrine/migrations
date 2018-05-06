@@ -24,7 +24,7 @@ class ConnectionConfigurationLoader implements ConnectionLoaderInterface
      */
     public function chosen() : ?Connection
     {
-        if ($this->configuration) {
+        if ($this->configuration !== null) {
             return $this->configuration->getConnection();
         }
 

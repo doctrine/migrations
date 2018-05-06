@@ -47,7 +47,7 @@ class MigrationStatusInfosHelper
         ));
 
         $infos = [
-            'Name'                              => $this->configuration->getName() ? $this->configuration->getName() : 'Doctrine Database Migrations',
+            'Name'                              => $this->configuration->getName() ?? 'Doctrine Database Migrations',
             'Database Driver'                   => $this->configuration->getConnection()->getDriver()->getName(),
             'Database Host'                     => $this->configuration->getConnection()->getHost(),
             'Database Name'                     => $this->configuration->getConnection()->getDatabase(),
