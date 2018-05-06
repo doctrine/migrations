@@ -31,12 +31,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Doctrine\\DBAL\\Migrations\\": "lib/Doctrine/DBAL/Migrations"
+            "Doctrine\\Migrations\\": "lib/Doctrine/Migrations"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Doctrine\\DBAL\\Migrations\\Tests\\": "tests/Doctrine/DBAL/Migrations/Tests"
+            "Doctrine\\Migrations\\Tests\\": "tests/Doctrine/Migrations/Tests"
         }
     },
     "extra": {
