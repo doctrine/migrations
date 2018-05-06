@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use function array_diff;
+use function array_values;
 use function count;
 use function sprintf;
 
@@ -29,10 +30,10 @@ class MigrationStatusInfosHelper
         $this->configuration                 = $configuration;
         $this->executedMigrations            = $this->configuration->getMigratedVersions();
         $this->availableMigrations           = $this->configuration->getAvailableVersions();
-        $this->executedUnavailableMigrations = array_diff(
+        $this->executedUnavailableMigrations = array_values(array_diff(
             $this->executedMigrations,
             $this->availableMigrations
-        );
+        ));
     }
 
     /** @return string[]|int[]|null[] */
@@ -68,6 +69,12 @@ class MigrationStatusInfosHelper
         return $infos;
     }
 
+    /** @return string[] */
+    public function getExecutedUnavailableMigrations() : array
+    {
+        return $this->executedUnavailableMigrations;
+    }
+
     private function getFormattedVersionAlias(string $alias) : string
     {
         $version = $this->configuration->resolveVersionAlias($alias);
@@ -94,11 +101,5 @@ class MigrationStatusInfosHelper
             $this->configuration->getDateTime((string) $version),
             $version
         );
-    }
-
-    /** @return string[] */
-    public function getExecutedUnavailableMigrations() : array
-    {
-        return $this->executedUnavailableMigrations;
     }
 }
