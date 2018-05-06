@@ -1,5 +1,7 @@
 # Doctrine Database Migrations
 
+[![Join the chat at https://gitter.im/doctrine/migrations](https://badges.gitter.im/doctrine/migrations.svg)](https://gitter.im/doctrine/migrations?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 ## Status
 
 [![Build Status](https://travis-ci.org/doctrine/migrations.svg)](https://travis-ci.org/doctrine/migrations)
