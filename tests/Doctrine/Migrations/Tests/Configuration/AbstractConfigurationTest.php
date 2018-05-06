@@ -6,9 +6,9 @@ namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
-use Doctrine\Migrations\MigrationException;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;

@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Events;
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tests\Stub\Version2Test;

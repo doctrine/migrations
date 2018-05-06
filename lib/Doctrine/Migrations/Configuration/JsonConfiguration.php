@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Configuration\Exception\JsonNotValid;
 use function file_get_contents;
 use function json_decode;
 
@@ -16,7 +16,7 @@ class JsonConfiguration extends AbstractFileConfiguration
         $config = json_decode(file_get_contents($file), true);
 
         if ($config === false) {
-            throw MigrationException::configurationNotValid('Configuration is not valid JSON.');
+            throw JsonNotValid::new();
         }
 
         if (isset($config['migrations_directory'])) {

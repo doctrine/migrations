@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Exception\MigrationException;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -169,7 +170,7 @@ EOT
     private function mark(string $version, bool $all = false) : void
     {
         if (! $this->configuration->hasVersion($version)) {
-            throw MigrationException::unknownMigrationVersion($version);
+            throw UnknownMigrationVersion::new($version);
         }
 
         $version = $this->configuration->getVersion($version);

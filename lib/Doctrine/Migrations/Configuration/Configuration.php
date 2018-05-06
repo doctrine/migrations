@@ -13,11 +13,17 @@ use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
+use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
+use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
+use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
+use Doctrine\Migrations\Exception\MigrationClassNotFound;
+use Doctrine\Migrations\Exception\MigrationException;
+use Doctrine\Migrations\Exception\MigrationsDirectoryRequired;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\MigrationException;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Version;
@@ -119,11 +125,11 @@ class Configuration
     public function validate() : void
     {
         if ($this->migrationsNamespace === null) {
-            throw MigrationException::migrationsNamespaceRequired();
+            throw MigrationsNamespaceRequired::new();
         }
 
         if ($this->migrationsDirectory === null) {
-            throw MigrationException::migrationsDirectoryRequired();
+            throw MigrationsDirectoryRequired::new();
         }
     }
 
@@ -224,7 +230,7 @@ class Configuration
     {
         if (($this->migrationsAreOrganizedByYear || $this->migrationsAreOrganizedByYearAndMonth)
             && ! ($finder instanceof MigrationDeepFinder)) {
-            throw MigrationException::configurationIncompatibleWithFinder(
+            throw ParameterIncompatibleWithFinder::new(
                 'organize-migrations',
                 $finder
             );
@@ -247,7 +253,7 @@ class Configuration
         $this->ensureMigrationClassExists($class);
 
         if (isset($this->migrations[$version])) {
-            throw MigrationException::duplicateMigrationVersion(
+            throw DuplicateMigrationVersion::new(
                 $version,
                 get_class($this->migrations[$version])
             );
@@ -291,7 +297,7 @@ class Configuration
         $this->loadMigrationsFromDirectory();
 
         if (! isset($this->migrations[$version])) {
-            throw MigrationException::unknownMigrationVersion($version);
+            throw UnknownMigrationVersion::new($version);
         }
 
         return $this->migrations[$version];
@@ -644,7 +650,7 @@ class Configuration
     private function ensureOrganizeMigrationsIsCompatibleWithFinder() : void
     {
         if (! ($this->migrationFinder instanceof MigrationDeepFinder)) {
-            throw MigrationException::configurationIncompatibleWithFinder(
+            throw ParameterIncompatibleWithFinder::new(
                 'organize-migrations',
                 $this->migrationFinder
             );
@@ -683,7 +689,7 @@ class Configuration
     private function ensureMigrationClassExists(string $class) : void
     {
         if (! class_exists($class)) {
-            throw MigrationException::migrationClassNotFound(
+            throw MigrationClassNotFound::new(
                 $class,
                 $this->getMigrationsNamespace()
             );

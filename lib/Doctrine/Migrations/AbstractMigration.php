@@ -8,6 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\Migrations\Exception\IrreversibleMigration;
+use Doctrine\Migrations\Exception\SkipMigration;
 use function sprintf;
 
 abstract class AbstractMigration
@@ -73,22 +76,22 @@ abstract class AbstractMigration
     }
 
     /**
-     * @throws AbortMigrationException
+     * @throws AbortMigration
      */
     public function abortIf(bool $condition, string $message = '') : void
     {
         if ($condition) {
-            throw new AbortMigrationException($message ?: 'Unknown Reason');
+            throw new AbortMigration($message ?: 'Unknown Reason');
         }
     }
 
     /**
-     * @throws SkipMigrationException
+     * @throws SkipMigration
      */
     public function skipIf(bool $condition, string $message = '') : void
     {
         if ($condition) {
-            throw new SkipMigrationException($message ?: 'Unknown Reason');
+            throw new SkipMigration($message ?: 'Unknown Reason');
         }
     }
 
@@ -134,6 +137,6 @@ abstract class AbstractMigration
             $message = 'This migration is irreversible and cannot be reverted.';
         }
 
-        throw new IrreversibleMigrationException($message);
+        throw new IrreversibleMigration($message);
     }
 }

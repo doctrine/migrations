@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use DOMDocument;
 use const DIRECTORY_SEPARATOR;
 use const LIBXML_NOCDATA;
@@ -27,7 +27,7 @@ class XmlConfiguration extends AbstractFileConfiguration
         if (! $xml->schemaValidate($xsdPath)) {
             libxml_clear_errors();
 
-            throw MigrationException::configurationNotValid('XML configuration did not pass the validation test.');
+            throw XmlNotValid::new();
         }
 
         $xml    = simplexml_load_file($file, 'SimpleXMLElement', LIBXML_NOCDATA);

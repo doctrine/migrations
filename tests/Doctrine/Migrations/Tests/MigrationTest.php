@@ -6,8 +6,8 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Migration;
-use Doctrine\Migrations\MigrationException;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;

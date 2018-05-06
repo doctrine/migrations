@@ -8,6 +8,8 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
+use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -161,7 +163,7 @@ class Version
         $queries = $this->execute($direction, true);
 
         if (! empty($this->params)) {
-            throw MigrationException::migrationNotConvertibleToSql($this->class);
+            throw MigrationNotConvertibleToSql::new($this->class);
         }
 
         $this->outputWriter->write("\n-- Version " . $this->version . "\n");
@@ -250,7 +252,7 @@ class Version
             $this->dispatchEvent(Events::onMigrationsVersionExecuted, $direction, $dryRun);
 
             return $this->sql;
-        } catch (SkipMigrationException $e) {
+        } catch (SkipMigration $e) {
             if ($transaction) {
                 //only rollback transaction if in transactional mode
                 $this->connection->rollBack();

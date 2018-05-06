@@ -48,14 +48,6 @@
         <exclude-pattern>tests/Doctrine/Migrations/Tests/Tools/Console/Command/AbstractCommandTest.php</exclude-pattern>
     </rule>
 
-    <rule ref="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix">
-        <exclude-pattern>lib/Doctrine/Migrations/AbortMigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/MigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/IrreversibleMigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/SkipMigrationException.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/Stub/VersionDummyException.php</exclude-pattern>
-    </rule>
-
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaDiffProviderInterface.php</exclude-pattern>
