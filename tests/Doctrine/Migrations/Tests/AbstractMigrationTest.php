@@ -4,11 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\Migrations\AbortMigrationException;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\IrreversibleMigrationException;
+use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\Migrations\Exception\IrreversibleMigration;
+use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\OutputWriter;
-use Doctrine\Migrations\SkipMigrationException;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\Migrations\Version;
@@ -71,7 +71,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsException() : void
     {
-        $this->expectException(AbortMigrationException::class);
+        $this->expectException(AbortMigration::class);
         $this->expectExceptionMessage('Something failed');
 
         $this->migration->abortIf(true, 'Something failed');
@@ -85,7 +85,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testAbortIfThrowsExceptionEvenWithoutMessage() : void
     {
-        $this->expectException(AbortMigrationException::class);
+        $this->expectException(AbortMigration::class);
         $this->expectExceptionMessage('Unknown Reason');
 
         $this->migration->abortIf(true);
@@ -93,7 +93,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testSkipIfThrowsException() : void
     {
-        $this->expectException(SkipMigrationException::class);
+        $this->expectException(SkipMigration::class);
         $this->expectExceptionMessage('Something skipped');
 
         $this->migration->skipIf(true, 'Something skipped');
@@ -107,7 +107,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testThrowIrreversibleMigrationException() : void
     {
-        $this->expectException(IrreversibleMigrationException::class);
+        $this->expectException(IrreversibleMigration::class);
         $this->expectExceptionMessage('Irreversible migration');
 
         $this->migration->exposedThrowIrreversibleMigrationException('Irreversible migration');
@@ -115,7 +115,7 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testThrowIrreversibleMigrationExceptionWithoutMessage() : void
     {
-        $this->expectException(IrreversibleMigrationException::class);
+        $this->expectException(IrreversibleMigration::class);
         $this->expectExceptionMessage('This migration is irreversible and cannot be reverted.');
 
         $this->migration->exposedThrowIrreversibleMigrationException();

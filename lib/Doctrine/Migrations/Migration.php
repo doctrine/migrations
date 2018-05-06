@@ -6,6 +6,9 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
+use Doctrine\Migrations\Exception\MigrationException;
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use const COUNT_RECURSIVE;
 use function count;
 use function sprintf;
@@ -92,7 +95,7 @@ class Migration
          */
         $migrations = $this->configuration->getMigrations();
         if (! isset($migrations[$to]) && $to > 0) {
-            throw MigrationException::unknownMigrationVersion($to);
+            throw UnknownMigrationVersion::new($to);
         }
 
         $direction = $from > $to
@@ -126,7 +129,7 @@ class Migration
          * If there are no migrations to execute throw an exception.
          */
         if (empty($migrationsToExecute) && ! $this->noMigrationException) {
-            throw MigrationException::noMigrationsToExecute();
+            throw NoMigrationsToExecute::new();
         } elseif (empty($migrationsToExecute)) {
             return $this->noMigrations();
         }

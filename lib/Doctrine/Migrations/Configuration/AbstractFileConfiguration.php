@@ -4,16 +4,17 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Configuration\Exception\FileAlreadyLoaded;
+use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
+use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
+use Doctrine\Migrations\Exception\MigrationException;
 use InvalidArgumentException;
 use function dirname;
 use function file_exists;
 use function getcwd;
 use function in_array;
 use function realpath;
-use function sprintf;
 use function strcasecmp;
-use function var_export;
 
 abstract class AbstractFileConfiguration extends Configuration
 {
@@ -42,9 +43,7 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         foreach ($config as $configurationKey => $configurationValue) {
             if (! in_array($configurationKey, self::ALLOWED_CONFIGURATION_KEYS, true)) {
-                $msg = sprintf('Migrations configuration key "%s" does not exist.', $configurationKey);
-
-                throw MigrationException::configurationNotValid($msg);
+                throw InvalidConfigurationKey::new($configurationKey);
             }
         }
 
@@ -107,8 +106,7 @@ abstract class AbstractFileConfiguration extends Configuration
         } elseif (strcasecmp($migrationOrganization, static::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
             $this->setMigrationsAreOrganizedByYearAndMonth();
         } else {
-            $msg = 'Unknown ' . var_export($migrationOrganization, true) . ' for configuration "organize_migrations".';
-            throw MigrationException::configurationNotValid($msg);
+            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
         }
     }
 
@@ -116,7 +114,7 @@ abstract class AbstractFileConfiguration extends Configuration
     public function load(string $file) : void
     {
         if ($this->loaded) {
-            throw MigrationException::configurationFileAlreadyLoaded();
+            throw FileAlreadyLoaded::new();
         }
 
         $path = getcwd() . '/' . $file;

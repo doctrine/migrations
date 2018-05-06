@@ -4,7 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
+use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Yaml;
 use function class_exists;
 use function file_get_contents;
@@ -18,13 +19,13 @@ class YamlConfiguration extends AbstractFileConfiguration
     protected function doLoad(string $file) : void
     {
         if (! class_exists(Yaml::class)) {
-            throw MigrationException::yamlConfigurationNotAvailable();
+            throw YamlNotAvailable::new();
         }
 
         $config = Yaml::parse(file_get_contents($file));
 
         if (! is_array($config)) {
-            throw MigrationException::configurationNotValid('Configuration is not valid YAML.');
+            throw YamlNotValid::new();
         }
 
         if (isset($config['migrations_directory'])) {

@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\MigrationException;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Stub\ExceptionVersionDummy;
