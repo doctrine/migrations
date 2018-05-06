@@ -24,6 +24,7 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\Migrations\Version;
+use Symfony\Component\Process\Process;
 use function file_exists;
 use function get_class_methods;
 use function in_array;
@@ -42,6 +43,26 @@ class FunctionalTest extends MigrationTestCase
     {
         $this->connection = $this->getSqliteConnection();
         $this->config     = self::createConfiguration($this->connection);
+    }
+
+    public function testDoctrineMigrationsBin() : void
+    {
+        $process = new Process(__DIR__ . '/../../../../../bin/doctrine-migrations');
+        $process->run();
+
+        self::assertTrue($process->isSuccessful());
+
+        $output = $process->getOutput();
+
+        self::assertNotEmpty($output);
+
+        self::assertContains('migrations:execute', $output);
+        self::assertContains('migrations:generate', $output);
+        self::assertContains('migrations:latest', $output);
+        self::assertContains('migrations:migrate', $output);
+        self::assertContains('migrations:status', $output);
+        self::assertContains('migrations:up-to-date', $output);
+        self::assertContains('migrations:version', $output);
     }
 
     public function testMigrateUp() : void
