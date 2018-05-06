@@ -3,7 +3,7 @@
     "type": "library",
     "description": "Database Schema migrations using Doctrine DBAL",
     "keywords": ["migrations", "database"],
-    "homepage": "http://www.doctrine-project.org",
+    "homepage": "https://www.doctrine-project.org",
     "license": "LGPL-2.1",
     "authors": [
         {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
@@ -13,19 +13,19 @@
     "require": {
         "php": "^7.1",
         "doctrine/dbal": "^2.6",
-        "symfony/console": "~3.3|^4.0",
-        "ocramius/proxy-manager": "^1.0|^2.0"
+        "ocramius/proxy-manager": "^2.0.2",
+        "symfony/console": "^4.0"
     },
     "require-dev": {
-        "doctrine/orm": "~2.5",
-        "symfony/yaml": "~3.3|^4.0",
-        "phpunit/phpunit": "~7.0",
         "doctrine/coding-standard": "^4.0",
-        "jdorn/sql-formatter": "~1.1",
+        "doctrine/orm": "^2.6",
+        "jdorn/sql-formatter": "^1.1",
         "mikey179/vfsStream": "^1.6",
         "phpstan/phpstan": "^0.9.2",
+        "phpstan/phpstan-strict-rules": "^0.9",
+        "phpunit/phpunit": "^7.0",
         "symfony/process": "^4.0",
-        "phpstan/phpstan-strict-rules": "^0.9"
+        "symfony/yaml": "^4.0"
     },
     "suggest": {
         "jdorn/sql-formatter": "Allows to generate formatted SQL with the diff command.",
@@ -40,6 +40,9 @@
         "psr-4": {
             "Doctrine\\Migrations\\Tests\\": "tests/Doctrine/Migrations/Tests"
         }
+    },
+    "config": {
+        "sort-packages": true
     },
     "extra": {
         "branch-alias": {
