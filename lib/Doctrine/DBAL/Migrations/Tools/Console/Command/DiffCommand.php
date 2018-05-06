@@ -7,7 +7,6 @@ namespace Doctrine\DBAL\Migrations\Tools\Console\Command;
 use Doctrine\DBAL\Migrations\Configuration\Configuration;
 use Doctrine\DBAL\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\DBAL\Migrations\Provider\SchemaProviderInterface;
-use Doctrine\DBAL\Version as DbalVersion;
 use InvalidArgumentException;
 use SqlFormatter;
 use Symfony\Component\Console\Input\InputInterface;
@@ -80,7 +79,6 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : void {
-        $isDbalOld     = (DbalVersion::compare('2.2.0') > 0);
         $configuration = $this->getMigrationConfiguration($input, $output);
 
         $this->loadCustomTemplate($configuration, $output);
@@ -92,12 +90,6 @@ EOT
         $filterExpr = $input->getOption('filter-expression');
 
         if ($filterExpr) {
-            if ($isDbalOld) {
-                throw new InvalidArgumentException(
-                    'The "--filter-expression" option can only be used as of Doctrine DBAL 2.2'
-                );
-            }
-
             $conn->getConfiguration()
                 ->setFilterSchemaAssetsExpression($filterExpr);
         }
@@ -109,7 +101,7 @@ EOT
         $filterExpr = $conn->getConfiguration()->getFilterSchemaAssetsExpression();
 
         // Not using value from options, because filters can be set from config.yml
-        if (! $isDbalOld && $filterExpr) {
+        if ($filterExpr !== null) {
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
                 if (preg_match($filterExpr, $this->resolveTableName($tableName))) {
