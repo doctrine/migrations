@@ -48,7 +48,7 @@ class Configuration
 
     public const VERSION_FORMAT = 'YmdHis';
 
-    /** @var string */
+    /** @var string|null */
     private $name;
 
     /** @var bool */
@@ -63,7 +63,7 @@ class Configuration
     /** @var MigrationFinder */
     private $migrationFinder;
 
-    /** @var null|QueryWriter */
+    /** @var QueryWriter|null */
     private $queryWriter;
 
     /** @var string */
@@ -72,10 +72,10 @@ class Configuration
     /** @var string */
     private $migrationsColumnName = 'version';
 
-    /** @var string */
+    /** @var string|null */
     private $migrationsDirectory;
 
-    /** @var string */
+    /** @var string|null */
     private $migrationsNamespace;
 
     /** @var Version[] */
@@ -87,7 +87,7 @@ class Configuration
     /** @var bool */
     private $migrationsAreOrganizedByYearAndMonth = false;
 
-    /** @var null|string */
+    /** @var string|null */
     private $customTemplate;
 
     /** @var bool */
@@ -118,11 +118,11 @@ class Configuration
     /** @throws MigrationException */
     public function validate() : void
     {
-        if (! $this->migrationsNamespace) {
+        if ($this->migrationsNamespace === null) {
             throw MigrationException::migrationsNamespaceRequired();
         }
 
-        if (! $this->migrationsDirectory) {
+        if ($this->migrationsDirectory === null) {
             throw MigrationException::migrationsDirectoryRequired();
         }
     }
@@ -556,7 +556,7 @@ class Configuration
         $this->loadMigrationsFromDirectory();
 
         if ($direction === Version::DIRECTION_DOWN) {
-            if (count($this->migrations)) {
+            if (count($this->migrations) !== 0) {
                 $allVersions = array_reverse(array_keys($this->migrations));
                 $classes     = array_reverse(array_values($this->migrations));
                 $allVersions = array_combine($allVersions, $classes);
@@ -710,7 +710,7 @@ class Configuration
 
     private function loadMigrationsFromDirectory() : void
     {
-        if (! empty($this->migrations) || ! $this->migrationsDirectory) {
+        if (count($this->migrations) !== 0 || $this->migrationsDirectory === null) {
             return;
         }
 

@@ -3,3 +3,5 @@ parameters:
         # Ignore proxy manager magic
         - '#ProxyManager\\Proxy\\VirtualProxyInterface#'
 
+includes:
+    - vendor/phpstan/phpstan-strict-rules/rules.neon

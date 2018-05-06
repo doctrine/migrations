@@ -86,7 +86,7 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output) : void
     {
         $version   = $input->getArgument('version');
-        $direction = $input->getOption('down')
+        $direction = $input->getOption('down') !== false
             ? Version::DIRECTION_DOWN
             : Version::DIRECTION_UP;
 
@@ -98,7 +98,7 @@ EOT
 
         $path = $input->getOption('write-sql');
 
-        if ($path) {
+        if ($path !== false) {
             $path = is_bool($path) ? getcwd() : $path;
             $version->writeSqlFile($path, $direction);
         } else {

@@ -119,8 +119,8 @@ EOT
         $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
-            $up ? '        ' . implode("\n        ", explode("\n", $up)) : null,
-            $down ? '        ' . implode("\n        ", explode("\n", $down)) : null,
+            $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
+            $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
         ];
 
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
@@ -134,7 +134,7 @@ EOT
 
         $editorCmd = $input->getOption('editor-cmd');
 
-        if ($editorCmd) {
+        if ($editorCmd !== null) {
             proc_open($editorCmd . ' ' . escapeshellarg($path), [], $pipes);
         }
 

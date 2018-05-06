@@ -94,7 +94,7 @@ EOT
     {
         $this->configuration = $this->getMigrationConfiguration($input, $output);
 
-        if (! $input->getOption('add') && ! $input->getOption('delete')) {
+        if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw new InvalidArgumentException(
                 'You must specify whether you want to --add or --delete the specified version.'
             );
@@ -129,7 +129,7 @@ EOT
         $rangeFromOption = $input->getOption('range-from');
         $rangeToOption   = $input->getOption('range-to');
 
-        if ($allOption && ($rangeFromOption !== null || $rangeToOption !== null)) {
+        if ($allOption === true && ($rangeFromOption !== null || $rangeToOption !== null)) {
             throw new InvalidArgumentException(
                 'Options --all and --range-to/--range-from both used. You should use only one of them.'
             );

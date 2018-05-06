@@ -29,7 +29,7 @@ class MigrationDirectoryHelper extends Helper
     public function getMigrationDirectory() : string
     {
         $dir = $this->configuration->getMigrationsDirectory();
-        $dir = $dir ? $dir : getcwd();
+        $dir = $dir ?? getcwd();
         $dir = rtrim($dir, '/');
 
         if (! file_exists($dir)) {

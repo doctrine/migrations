@@ -27,13 +27,13 @@ abstract class AbstractCommand extends Command
     /** @var Configuration */
     private $configuration;
 
-    /** @var Configuration */
+    /** @var Configuration|null */
     private $migrationConfiguration;
 
-    /** @var OutputWriter */
+    /** @var OutputWriter|null */
     private $outputWriter;
 
-    /** @var Connection */
+    /** @var Connection|null */
     private $connection;
 
     protected function configure() : void
@@ -58,7 +58,7 @@ abstract class AbstractCommand extends Command
         OutputInterface $output
     ) : void {
         $name = $configuration->getName();
-        $name = $name ? $name : 'Doctrine Database Migrations';
+        $name = $name ?? 'Doctrine Database Migrations';
         $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
         $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
         $output->writeln('<question>' . $name . '</question>');
@@ -75,7 +75,7 @@ abstract class AbstractCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) : Configuration {
-        if (! $this->migrationConfiguration) {
+        if ($this->migrationConfiguration === null) {
             if ($this->hasConfigurationHelper()) {
                 /** @var ConfigurationHelper $configHelper */
                 $configHelper = $this->getHelperSet()->get('configuration');
@@ -118,7 +118,7 @@ abstract class AbstractCommand extends Command
 
     private function getOutputWriter(OutputInterface $output) : OutputWriter
     {
-        if (! $this->outputWriter) {
+        if ($this->outputWriter === null) {
             $this->outputWriter = new OutputWriter(
                 function (string $message) use ($output) : void {
                     $output->writeln($message);
@@ -131,7 +131,7 @@ abstract class AbstractCommand extends Command
 
     private function getConnection(InputInterface $input) : Connection
     {
-        if ($this->connection) {
+        if ($this->connection !== null) {
             return $this->connection;
         }
 
@@ -146,7 +146,7 @@ abstract class AbstractCommand extends Command
 
         $connection = $chainLoader->chosen();
 
-        if ($connection) {
+        if ($connection !== null) {
             return $this->connection = $connection;
         }
 

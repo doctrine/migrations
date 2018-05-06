@@ -40,21 +40,22 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
          * If a configuration option is passed to the command line, use that configuration
          * instead of any other one.
          */
-        if ($input->getOption('configuration')) {
+        $configuration = $input->getOption('configuration');
+        if ($configuration !== null) {
             $outputWriter->write(
                 sprintf(
                     'Loading configuration from command option: %s',
-                    $input->getOption('configuration')
+                    $configuration
                 )
             );
 
-            return $this->loadConfig($input->getOption('configuration'), $outputWriter);
+            return $this->loadConfig($configuration, $outputWriter);
         }
 
         /**
          * If a configuration has already been set using DI or a Setter use it.
          */
-        if ($this->configuration) {
+        if ($this->configuration !== null) {
             $outputWriter->write(
                 'Loading configuration from the integration code of your framework (setter).'
             );
