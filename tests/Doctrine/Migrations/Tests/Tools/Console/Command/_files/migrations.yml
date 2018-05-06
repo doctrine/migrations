@@ -1,0 +1,5 @@
+# tests the "fallback configuration"
+name: "name"
+table_name: "migrations_table_name"
+migrations_namespace: "migrations_namespace"
+custom_template: "tests/Doctrine/Migrations/Tests/Tools/Console/Command/_files/migration.tpl"

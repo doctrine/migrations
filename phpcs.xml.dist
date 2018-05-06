@@ -15,8 +15,8 @@
     <rule ref="Doctrine"/>
 
     <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/FileQueryWriter.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/DBAL/Migrations/Tests/realpath.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/FileQueryWriter.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/realpath.php</exclude-pattern>
     </rule>
 
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
@@ -28,40 +28,40 @@
     </rule>
 
     <rule ref="Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Events.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Events.php</exclude-pattern>
     </rule>
 
     <rule ref="Generic.Strings.UnnecessaryStringConcat.Found">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/MigrationsVersion.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedMethod">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Tools/Console/Command/AbstractCommand.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Finder/AbstractFinder.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/AbstractMigration.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/DBAL/Migrations/Tests/Configuration/AbstractConfigurationTest.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/DBAL/Migrations/Tests/Tools/Console/Command/AbstractCommandTest.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Command/AbstractCommand.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Finder/AbstractFinder.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/AbstractConfigurationTest.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Tools/Console/Command/AbstractCommandTest.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousExceptionNaming.SuperfluousSuffix">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/AbortMigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/MigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/IrreversibleMigrationException.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/SkipMigrationException.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/DBAL/Migrations/Tests/Stub/VersionDummyException.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/AbortMigrationException.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/MigrationException.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/IrreversibleMigrationException.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/SkipMigrationException.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Stub/VersionDummyException.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Provider/SchemaDiffProviderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Provider/SchemaProviderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Tools/Console/Helper/ConfigurationHelperInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Finder/MigrationFinderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/DBAL/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaDiffProviderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaProviderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Helper/ConfigurationHelperInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationFinderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
     </rule>
 </ruleset>
