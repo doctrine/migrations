@@ -579,10 +579,10 @@ class VersionTest extends MigrationTestCase
         self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
     }
 
-    public function testRunWithInsertNullValue()
+    public function testRunWithInsertNullValue() : void
     {
         $messages = [];
-        $ow       = new OutputWriter(function ($msg) use (&$messages) {
+        $ow       = new OutputWriter(function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
         $config   = new Configuration($this->getSqliteConnection(), $ow);
