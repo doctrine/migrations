@@ -1,26 +1,30 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Migrations;
 
 use Doctrine\Common\EventArgs;
-use Doctrine\DBAL\Connection;
+use Doctrine\Common\EventManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
-use Doctrine\Migrations\Version;
 
+/**
+ * @internal
+ */
 final class EventDispatcher
 {
     /** @var Configuration */
     private $configuration;
 
-    /** @var Connection */
-    private $connection;
+    /** @var EventManager */
+    private $eventManager;
 
-    public function __construct(Configuration $configuration, Connection $connection)
+    public function __construct(Configuration $configuration, EventManager $eventManager)
     {
         $this->configuration = $configuration;
-        $this->connection = $connection;
+        $this->eventManager  = $eventManager;
     }
 
     public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun) : void
@@ -47,7 +51,7 @@ final class EventDispatcher
 
     public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
     {
-        $this->connection->getEventManager()->dispatchEvent($eventName, $args);
+        $this->eventManager->dispatchEvent($eventName, $args);
     }
 
     private function createMigrationEventArgs(string $direction, bool $dryRun) : MigrationsEventArgs

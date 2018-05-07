@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionExecutionResult;
 use function getcwd;
 
 class ExecuteCommandTest extends CommandTestCase
@@ -61,9 +62,13 @@ class ExecuteCommandTest extends CommandTestCase
     public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction() : void
     {
         $this->willAskConfirmationAndReturn(true);
+
+        $versionExecutionResult = new VersionExecutionResult();
+
         $this->version->expects($this->once())
             ->method('execute')
-            ->with('up', true, true);
+            ->with('up', true, true)
+            ->willReturn($versionExecutionResult);
 
         list(, $statusCode) = $this->executeCommand([
             '--dry-run' => true,
@@ -78,9 +83,12 @@ class ExecuteCommandTest extends CommandTestCase
         $this->questions->expects($this->never())
             ->method('ask');
 
+        $versionExecutionResult = new VersionExecutionResult();
+
         $this->version->expects($this->once())
             ->method('execute')
-            ->with('up', true, true);
+            ->with('up', true, true)
+            ->willReturn($versionExecutionResult);
 
         list(, $statusCode) = $this->executeCommand([
             '--dry-run' => true,

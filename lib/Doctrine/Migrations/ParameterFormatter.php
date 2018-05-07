@@ -14,7 +14,10 @@ use function is_int;
 use function is_string;
 use function sprintf;
 
-final class ParameterFormatter
+/**
+ * @var internal
+ */
+final class ParameterFormatter implements ParameterFormatterInterface
 {
     /** @var Connection */
     private $connection;

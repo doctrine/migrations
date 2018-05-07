@@ -12,6 +12,9 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Migration;
+use Doctrine\Migrations\ParameterFormatter;
+use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
+use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
@@ -24,6 +27,7 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionExecutor;
 use Symfony\Component\Process\Process;
 use function file_exists;
 use function get_class_methods;
@@ -67,7 +71,7 @@ class FunctionalTest extends MigrationTestCase
 
     public function testMigrateUp() : void
     {
-        $version = new Version($this->config, '1', MigrationMigrateUp::class);
+        $version = $this->createTestVersion($this->config, '1', MigrationMigrateUp::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -80,7 +84,7 @@ class FunctionalTest extends MigrationTestCase
 
     public function testMigrateDown() : void
     {
-        $version = new Version($this->config, '1', MigrationMigrateUp::class);
+        $version = $this->createTestVersion($this->config, '1', MigrationMigrateUp::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -98,7 +102,7 @@ class FunctionalTest extends MigrationTestCase
 
     public function testSkipMigrateUp() : void
     {
-        $version = new Version($this->config, '1', MigrationSkipMigration::class);
+        $version = $this->createTestVersion($this->config, '1', MigrationSkipMigration::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $version->execute('up');
@@ -345,7 +349,7 @@ class FunctionalTest extends MigrationTestCase
 
     public function testSchemaChangeAreNotTakenIntoAccountInPreAndPostMethod() : void
     {
-        $version = new Version($this->config, '1', MigrationModifySchemaInPreAndPost::class);
+        $version = $this->createTestVersion($this->config, '1', MigrationModifySchemaInPreAndPost::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
         $queries = $version->execute('up');
@@ -407,7 +411,13 @@ class FunctionalTest extends MigrationTestCase
                 return $schema;
             });
 
-        $version = new Version($this->config, '1', MigrateNotTouchingTheSchema::class, $schemaDiffProvider);
+        $version = $this->createTestVersion(
+            $this->config,
+            '1',
+            MigrateNotTouchingTheSchema::class,
+            $schemaDiffProvider
+        );
+
         $version->execute('up');
 
         foreach (get_class_methods(Schema::class) as $method) {
@@ -517,5 +527,35 @@ class FunctionalTest extends MigrationTestCase
         $config->setMigrationsColumnName('current_version');
 
         return $config;
+    }
+
+    private function createTestVersion(
+        Configuration $configuration,
+        string $versionName,
+        string $className,
+        ?SchemaDiffProviderInterface $schemaDiffProvider = null
+    ) : Version {
+        if ($schemaDiffProvider === null) {
+            $schemaDiffProvider = new SchemaDiffProvider(
+                $this->connection->getSchemaManager(),
+                $this->connection->getDatabasePlatform()
+            );
+
+            $schemaDiffProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
+                $schemaDiffProvider
+            );
+        }
+
+        $parameterFormatter = new ParameterFormatter($this->connection);
+
+        $versionExecutor = new VersionExecutor(
+            $this->config,
+            $this->connection,
+            $schemaDiffProvider,
+            $this->config->getOutputWriter(),
+            $parameterFormatter
+        );
+
+        return new Version($configuration, $versionName, $className, $versionExecutor);
     }
 }

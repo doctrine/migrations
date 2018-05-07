@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
@@ -31,7 +30,12 @@ class Migration
         $this->noMigrationException = false;
     }
 
-    /** @return string[] */
+    public function setNoMigrationException(bool $noMigrationException = false) : void
+    {
+        $this->noMigrationException = $noMigrationException;
+    }
+
+    /** @return string[][] */
     public function getSql(?string $to = null) : array
     {
         return $this->migrate($to, true);
@@ -39,7 +43,8 @@ class Migration
 
     public function writeSqlFile(string $path, ?string $to = null) : bool
     {
-        $sql  = $this->getSql($to);
+        $sql = $this->getSql($to);
+
         $from = $this->configuration->getCurrentVersion();
 
         if ($to === null) {
@@ -63,15 +68,10 @@ class Migration
             ->write($path, $direction, $sql);
     }
 
-    public function setNoMigrationException(bool $noMigrationException = false) : void
-    {
-        $this->noMigrationException = $noMigrationException;
-    }
-
     /**
      * @throws MigrationException
      *
-     * @return string[]
+     * @return string[][]
      */
     public function migrate(
         ?string $to = null,
@@ -142,9 +142,10 @@ class Migration
         $time = 0;
 
         foreach ($migrationsToExecute as $version) {
-            $versionSql                  = $version->execute($direction, $dryRun, $timeAllQueries);
-            $sql[$version->getVersion()] = $versionSql;
-            $time                       += $version->getTime();
+            $versionExecutionResult = $version->execute($direction, $dryRun, $timeAllQueries);
+
+            $sql[$version->getVersion()] = $versionExecutionResult->getSql();
+            $time                       += $versionExecutionResult->getTime();
         }
 
         $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
@@ -157,7 +158,7 @@ class Migration
         return $sql;
     }
 
-    /** @return string[] */
+    /** @return string[][] */
     private function noMigrations() : array
     {
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
