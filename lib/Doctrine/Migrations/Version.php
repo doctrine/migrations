@@ -99,6 +99,11 @@ class Version
         $this->parameterFormatter = new ParameterFormatter($this->connection);
     }
 
+    public function __toString() : string
+    {
+        return $this->version;
+    }
+
     public function getVersion() : string
     {
         return $this->version;
@@ -122,6 +127,28 @@ class Version
     public function markNotMigrated() : void
     {
         $this->markVersion(self::DIRECTION_DOWN);
+    }
+
+    public function getExecutionState() : string
+    {
+        switch ($this->state) {
+            case self::STATE_PRE:
+                return 'Pre-Checks';
+
+            case self::STATE_POST:
+                return 'Post-Checks';
+
+            case self::STATE_EXEC:
+                return 'Execution';
+
+            default:
+                return 'No State';
+        }
+    }
+
+    public function getTime() : ?float
+    {
+        return $this->time;
     }
 
     /**
@@ -288,31 +315,41 @@ class Version
         }
     }
 
-    public function getExecutionState() : string
-    {
-        switch ($this->state) {
-            case self::STATE_PRE:
-                return 'Pre-Checks';
+    private function executeRegisteredSql(
+        bool $dryRun = false,
+        bool $timeAllQueries = false
+    ) : void {
+        if (! $dryRun) {
+            if (! empty($this->sql)) {
+                foreach ($this->sql as $key => $query) {
+                    $queryStart = microtime(true);
 
-            case self::STATE_POST:
-                return 'Post-Checks';
+                    $this->outputSqlQuery($key, $query);
 
-            case self::STATE_EXEC:
-                return 'Execution';
+                    if (! isset($this->params[$key])) {
+                        $this->connection->executeQuery($query);
+                    } else {
+                        $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                    }
 
-            default:
-                return 'No State';
+                    $this->outputQueryTime($queryStart, $timeAllQueries);
+                }
+            } else {
+                $this->outputWriter->write(sprintf(
+                    '<error>Migration %s was executed but did not result in any SQL statements.</error>',
+                    $this->version
+                ));
+            }
+        } else {
+            foreach ($this->sql as $idx => $query) {
+                $this->outputSqlQuery($idx, $query);
+            }
         }
     }
 
-    public function getTime() : ?float
+    private function dispatchEvent(string $eventName, string $direction, bool $dryRun) : void
     {
-        return $this->time;
-    }
-
-    public function __toString() : string
-    {
-        return $this->version;
+        $this->configuration->dispatchVersionEvent($this, $eventName, $direction, $dryRun);
     }
 
     private function outputQueryTime(float $queryStart, bool $timeAllQueries = false) : void
@@ -360,67 +397,6 @@ class Version
         $index                = count($this->sql) - 1;
         $this->params[$index] = $params;
         $this->types[$index]  = $types;
-    }
-
-    private function executeRegisteredSql(
-        bool $dryRun = false,
-        bool $timeAllQueries = false
-    ) : void {
-        if (! $dryRun) {
-            if (! empty($this->sql)) {
-                foreach ($this->sql as $key => $query) {
-                    $queryStart = microtime(true);
-
-                    $this->outputSqlQuery($key, $query);
-
-                    if (! isset($this->params[$key])) {
-                        $this->connection->executeQuery($query);
-                    } else {
-                        $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
-                    }
-
-                    $this->outputQueryTime($queryStart, $timeAllQueries);
-                }
-            } else {
-                $this->outputWriter->write(sprintf(
-                    '<error>Migration %s was executed but did not result in any SQL statements.</error>',
-                    $this->version
-                ));
-            }
-        } else {
-            foreach ($this->sql as $idx => $query) {
-                $this->outputSqlQuery($idx, $query);
-            }
-        }
-    }
-
-    private function dispatchEvent(
-        string $eventName,
-        string $direction,
-        bool $dryRun
-    ) : void {
-        $event = $this->createMigrationsVersionEventArgs(
-            $this,
-            $this->configuration,
-            $direction,
-            $dryRun
-        );
-
-        $this->configuration->dispatchEvent($eventName, $event);
-    }
-
-    private function createMigrationsVersionEventArgs(
-        Version $version,
-        Configuration $config,
-        string $direction,
-        bool $dryRun
-    ) : MigrationsVersionEventArgs {
-        return new MigrationsVersionEventArgs(
-            $this,
-            $this->configuration,
-            $direction,
-            $dryRun
-        );
     }
 
     private function outputSqlQuery(int $idx, string $query) : void

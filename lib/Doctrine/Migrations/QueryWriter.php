@@ -7,7 +7,7 @@ namespace Doctrine\Migrations;
 interface QueryWriter
 {
     /**
-     * @param string[][]|string[] $queriesByVersion
+     * @param string[][] $queriesByVersion
      */
     public function write(
         string $path,

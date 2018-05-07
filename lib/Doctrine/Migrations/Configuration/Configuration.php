@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
+use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -72,6 +73,9 @@ class Configuration
     /** @var QueryWriter|null */
     private $queryWriter;
 
+    /** @var EventDispatcher */
+    private $eventDispatcher;
+
     /** @var string */
     private $migrationsTableName = 'doctrine_migration_versions';
 
@@ -109,6 +113,7 @@ class Configuration
         $this->outputWriter    = $outputWriter ?? new OutputWriter();
         $this->migrationFinder = $finder ?? new RecursiveRegexFinder();
         $this->queryWriter     = $queryWriter;
+        $this->eventDispatcher = new EventDispatcher($this, $this->connection);
     }
 
     public function areMigrationsOrganizedByYear() : bool
@@ -587,11 +592,6 @@ class Configuration
         return $versions;
     }
 
-    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
-    {
-        $this->connection->getEventManager()->dispatchEvent($eventName, $args);
-    }
-
     /**
      * @return string[]
      */
@@ -707,6 +707,27 @@ class Configuration
         }
 
         return $this->queryWriter;
+    }
+
+    public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun) : void
+    {
+        $this->eventDispatcher->dispatchMigrationEvent($eventName, $direction, $dryRun);
+    }
+
+    public function dispatchVersionEvent(
+        Version $version,
+        string $eventName,
+        string $direction,
+        bool $dryRun
+    ) : void {
+        $this->eventDispatcher->dispatchVersionEvent(
+            $version, $eventName, $direction, $dryRun
+        );
+    }
+
+    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
+    {
+        $this->eventDispatcher->dispatchEvent($eventName, $args);
     }
 
     public function setIsDryRun(bool $isDryRun) : void

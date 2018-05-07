@@ -94,6 +94,7 @@ class Migration
          * migrations.
          */
         $migrations = $this->configuration->getMigrations();
+
         if (! isset($migrations[$to]) && $to > 0) {
             throw UnknownMigrationVersion::new($to);
         }
@@ -123,6 +124,7 @@ class Migration
 
         $output  = $dryRun ? 'Executing dry run of migration' : 'Migrating';
         $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
+
         $this->outputWriter->write(sprintf($output, $direction, $to, $from));
 
         /**
@@ -134,10 +136,7 @@ class Migration
             return $this->noMigrations();
         }
 
-        $this->configuration->dispatchEvent(
-            Events::onMigrationsMigrating,
-            new MigrationsEventArgs($this->configuration, $direction, $dryRun)
-        );
+        $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
 
         $sql  = [];
         $time = 0;
@@ -148,10 +147,7 @@ class Migration
             $time                       += $version->getTime();
         }
 
-        $this->configuration->dispatchEvent(
-            Events::onMigrationsMigrated,
-            new MigrationsEventArgs($this->configuration, $direction, $dryRun)
-        );
+        $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
         $this->outputWriter->write(sprintf('  <info>++</info> finished in %ss', $time));
