@@ -14,7 +14,7 @@
         "php": "^7.1",
         "doctrine/dbal": "^2.6",
         "ocramius/proxy-manager": "^2.0.2",
-        "symfony/console": "^4.0"
+        "symfony/console": "^3.4||^4.0"
     },
     "require-dev": {
         "doctrine/coding-standard": "^4.0",
