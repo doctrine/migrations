@@ -473,7 +473,7 @@ class Version
         ));
     }
 
-    private function formatParameter($value, string $type) : string
+    private function formatParameter($value, string $type) : ?string
     {
         if (Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(

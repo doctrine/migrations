@@ -534,4 +534,25 @@ class VersionTest extends MigrationTestCase
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
         self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
     }
+
+    public function testRunWithInsertNullValue()
+    {
+        $messages = [];
+        $ow       = new OutputWriter(function ($msg) use (&$messages) {
+            $messages[] = trim($msg);
+        });
+        $config   = new Configuration($this->getSqliteConnection(), $ow);
+        $version  = new Version(
+            $config,
+            '001',
+            VersionDryRunTypes::class
+        );
+        $version->getMigration()->setParam([null], []);
+
+        $version->execute(Version::DIRECTION_UP, true);
+
+        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
+        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
+        self::assertContains('with parameters ([])', $messages[1]);
+    }
 }
