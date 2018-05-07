@@ -15,6 +15,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
+use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -24,9 +25,16 @@ use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\MigrationFileBuilder;
 use Doctrine\Migrations\OutputWriter;
+use Doctrine\Migrations\ParameterFormatter;
+use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
+use Doctrine\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionExecutor;
+use Doctrine\Migrations\VersionExecutorInterface;
 use const SORT_STRING;
 use function array_combine;
 use function array_keys;
@@ -54,16 +62,10 @@ class Configuration
 
     public const VERSION_FORMAT = 'YmdHis';
 
-    /** @var string|null */
-    private $name;
-
-    /** @var bool */
-    private $migrationTableCreated = false;
-
     /** @var Connection */
     private $connection;
 
-    /** @var OutputWriter */
+    /** @var OutputWriter|null */
     private $outputWriter;
 
     /** @var MigrationFinder */
@@ -71,6 +73,27 @@ class Configuration
 
     /** @var QueryWriter|null */
     private $queryWriter;
+
+    /** @var string|null */
+    private $name;
+
+    /** @var bool */
+    private $migrationTableCreated = false;
+
+    /** @var EventDispatcher|null */
+    private $eventDispatcher;
+
+    /** @var SchemaDiffProviderInterface|null */
+    private $schemaDiffProvider;
+
+    /** @var VersionExecutorInterface|null */
+    private $versionExecutor;
+
+    /** @var MigrationFileBuilder|null */
+    private $migrationFileBuilder;
+
+    /** @var ParameterFormatter|null */
+    private $parameterFormatter;
 
     /** @var string */
     private $migrationsTableName = 'doctrine_migration_versions';
@@ -102,12 +125,12 @@ class Configuration
     public function __construct(
         Connection $connection,
         ?OutputWriter $outputWriter = null,
-        ?MigrationFinder $finder = null,
+        ?MigrationFinder $migrationFinder = null,
         ?QueryWriter $queryWriter = null
     ) {
         $this->connection      = $connection;
-        $this->outputWriter    = $outputWriter ?? new OutputWriter();
-        $this->migrationFinder = $finder ?? new RecursiveRegexFinder();
+        $this->outputWriter    = $outputWriter;
+        $this->migrationFinder = $migrationFinder ?? new RecursiveRegexFinder();
         $this->queryWriter     = $queryWriter;
     }
 
@@ -150,6 +173,10 @@ class Configuration
 
     public function getOutputWriter() : OutputWriter
     {
+        if ($this->outputWriter === null) {
+            $this->outputWriter = new OutputWriter();
+        }
+
         return $this->outputWriter;
     }
 
@@ -226,17 +253,17 @@ class Configuration
     }
 
     /** @throws MigrationException */
-    public function setMigrationsFinder(MigrationFinder $finder) : void
+    public function setMigrationsFinder(MigrationFinder $migrationFinder) : void
     {
         if (($this->migrationsAreOrganizedByYear || $this->migrationsAreOrganizedByYearAndMonth)
-            && ! ($finder instanceof MigrationDeepFinder)) {
+            && ! ($migrationFinder instanceof MigrationDeepFinder)) {
             throw ParameterIncompatibleWithFinder::new(
                 'organize-migrations',
-                $finder
+                $migrationFinder
             );
         }
 
-        $this->migrationFinder = $finder;
+        $this->migrationFinder = $migrationFinder;
     }
 
     /** @return Version[] */
@@ -259,7 +286,12 @@ class Configuration
             );
         }
 
-        $version = new Version($this, $version, $class);
+        $version = new Version(
+            $this,
+            $version,
+            $class,
+            $this->getVersionExecutor()
+        );
 
         $this->migrations[$version->getVersion()] = $version;
 
@@ -587,11 +619,6 @@ class Configuration
         return $versions;
     }
 
-    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
-    {
-        $this->connection->getEventManager()->dispatchEvent($eventName, $args);
-    }
-
     /**
      * @return string[]
      */
@@ -700,13 +727,36 @@ class Configuration
     {
         if ($this->queryWriter === null) {
             $this->queryWriter = new FileQueryWriter(
-                $this->getQuotedMigrationsColumnName(),
-                $this->migrationsTableName,
-                $this->outputWriter
+                $this->getOutputWriter(),
+                $this->getMigrationFileBuilder()
             );
         }
 
         return $this->queryWriter;
+    }
+
+    public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun) : void
+    {
+        $this->getEventDispatcher()->dispatchMigrationEvent($eventName, $direction, $dryRun);
+    }
+
+    public function dispatchVersionEvent(
+        Version $version,
+        string $eventName,
+        string $direction,
+        bool $dryRun
+    ) : void {
+        $this->getEventDispatcher()->dispatchVersionEvent(
+            $version,
+            $eventName,
+            $direction,
+            $dryRun
+        );
+    }
+
+    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
+    {
+        $this->getEventDispatcher()->dispatchEvent($eventName, $args);
     }
 
     public function setIsDryRun(bool $isDryRun) : void
@@ -721,6 +771,65 @@ class Configuration
         }
 
         $this->registerMigrationsFromDirectory($this->migrationsDirectory);
+    }
+
+    private function getEventDispatcher() : EventDispatcher
+    {
+        if ($this->eventDispatcher === null) {
+            $this->eventDispatcher = new EventDispatcher($this, $this->connection->getEventManager());
+        }
+
+        return $this->eventDispatcher;
+    }
+
+    private function getSchemaDiffProvider() : SchemaDiffProviderInterface
+    {
+        if ($this->schemaDiffProvider === null) {
+            $this->schemaDiffProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
+                new SchemaDiffProvider(
+                    $this->connection->getSchemaManager(),
+                    $this->connection->getDatabasePlatform()
+                )
+            );
+        }
+
+        return $this->schemaDiffProvider;
+    }
+
+    private function getVersionExecutor() : VersionExecutorInterface
+    {
+        if ($this->versionExecutor === null) {
+            $this->versionExecutor = new VersionExecutor(
+                $this,
+                $this->connection,
+                $this->getSchemaDiffProvider(),
+                $this->getOutputWriter(),
+                $this->getParameterFormatter()
+            );
+        }
+
+        return $this->versionExecutor;
+    }
+
+    private function getMigrationFileBuilder() : MigrationFileBuilder
+    {
+        if ($this->migrationFileBuilder === null) {
+            $this->migrationFileBuilder = new MigrationFileBuilder(
+                $this->migrationsTableName,
+                $this->getQuotedMigrationsColumnName()
+            );
+        }
+
+        return $this->migrationFileBuilder;
+    }
+
+    private function getParameterFormatter() : ParameterFormatter
+    {
+        if ($this->parameterFormatter === null) {
+            $this->parameterFormatter = new ParameterFormatter($this->connection);
+        }
+
+        return $this->parameterFormatter;
     }
 
     private function getMigrationsColumn() : Column

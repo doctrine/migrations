@@ -273,8 +273,6 @@ class ConfigurationTest extends MigrationTestCase
         $configuration = new Configuration($conn);
         $queryWriter   = $configuration->getQueryWriter();
 
-        self::assertAttributeSame($configuration->getMigrationsTableName(), 'tableName', $queryWriter);
-        self::assertAttributeSame($configuration->getMigrationsColumnName(), 'columnName', $queryWriter);
         self::assertAttributeSame($configuration->getOutputWriter(), 'outputWriter', $queryWriter);
     }
 

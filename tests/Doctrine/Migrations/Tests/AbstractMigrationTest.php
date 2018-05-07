@@ -12,6 +12,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionExecutorInterface;
 use function sys_get_temp_dir;
 
 class AbstractMigrationTest extends MigrationTestCase
@@ -26,7 +27,7 @@ class AbstractMigrationTest extends MigrationTestCase
     private $migration;
 
     /** @var OutputWriter */
-    protected $outputWriter;
+    private $outputWriter;
 
     protected function setUp() : void
     {
@@ -36,7 +37,15 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $this->version   = new Version($this->config, 'Dummy', VersionDummy::class);
+        $versionExecutor = $this->createMock(VersionExecutorInterface::class);
+
+        $this->version = new Version(
+            $this->config,
+            'Dummy',
+            VersionDummy::class,
+            $versionExecutor
+        );
+
         $this->migration = new AbstractMigrationStub($this->version);
     }
 
@@ -124,12 +133,5 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testIstransactional() : void
     {
         self::assertTrue($this->migration->isTransactional());
-    }
-
-    public function testAddSql() : void
-    {
-        $this->migration->exposedAddSql('tralala');
-
-        self::assertAttributeCount(1, 'sql', $this->migration->getVersion());
     }
 }

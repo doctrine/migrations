@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\FileQueryWriter;
+use Doctrine\Migrations\MigrationFileBuilder;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Version;
 use function file_get_contents;
@@ -27,9 +28,17 @@ final class FileQueryWriterTest extends MigrationTestCase
         string $path,
         string $direction,
         array $queries,
-        ?OutputWriter $outputWriter
+        OutputWriter $outputWriter
     ) : void {
-        $writer = new FileQueryWriter(self::COLUMN_NAME, self::TABLE_NAME, $outputWriter);
+        $migrationFileBuilder = new MigrationFileBuilder(
+            self::TABLE_NAME,
+            self::COLUMN_NAME
+        );
+
+        $writer = new FileQueryWriter(
+            $outputWriter,
+            $migrationFileBuilder
+        );
 
         self::assertTrue($writer->write($path, $direction, $queries));
 
@@ -60,8 +69,6 @@ final class FileQueryWriterTest extends MigrationTestCase
         return [
             [__DIR__, Version::DIRECTION_UP, ['1' => ['SHOW DATABASES']], $outputWriter],
             [__DIR__, Version::DIRECTION_DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
-            [__DIR__, Version::DIRECTION_UP, ['1' => ['SHOW DATABASES']], null],
-            [__DIR__, Version::DIRECTION_DOWN, ['1' => ['SHOW DATABASES']], null],
         ];
     }
 }

@@ -6,20 +6,10 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
-use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
-use Doctrine\Migrations\Provider\SchemaDiffProvider;
-use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
-use Throwable;
+use function assert;
 use function count;
-use function is_array;
-use function microtime;
-use function round;
-use function rtrim;
-use function sprintf;
-use function ucfirst;
+use function in_array;
 
 class Version
 {
@@ -30,6 +20,13 @@ class Version
 
     public const DIRECTION_UP   = 'up';
     public const DIRECTION_DOWN = 'down';
+
+    private const STATES = [
+        self::STATE_NONE,
+        self::STATE_PRE,
+        self::STATE_EXEC,
+        self::STATE_POST,
+    ];
 
     /** @var Configuration */
     private $configuration;
@@ -49,54 +46,30 @@ class Version
     /** @var string */
     private $class;
 
-    /** @var string[] */
-    private $sql = [];
-
-    /** @var mixed[] */
-    private $params = [];
-
-    /** @var mixed[] */
-    private $types = [];
-
-    /** @var float */
-    private $time;
-
     /** @var int */
     private $state = self::STATE_NONE;
 
-    /** @var SchemaDiffProviderInterface */
-    private $schemaProvider;
-
-    /** @var ParameterFormatter */
-    private $parameterFormatter;
+    /** @var VersionExecutorInterface */
+    private $versionExecutor;
 
     public function __construct(
         Configuration $configuration,
         string $version,
         string $class,
-        ?SchemaDiffProviderInterface $schemaProvider = null
+        VersionExecutorInterface $versionExecutor
     ) {
-        $this->configuration = $configuration;
-        $this->outputWriter  = $configuration->getOutputWriter();
-        $this->class         = $class;
-        $this->connection    = $configuration->getConnection();
-        $this->migration     = new $class($this);
-        $this->version       = $version;
+        $this->configuration   = $configuration;
+        $this->outputWriter    = $configuration->getOutputWriter();
+        $this->class           = $class;
+        $this->connection      = $configuration->getConnection();
+        $this->migration       = new $class($this);
+        $this->version         = $version;
+        $this->versionExecutor = $versionExecutor;
+    }
 
-        if ($schemaProvider === null) {
-            $schemaProvider = new SchemaDiffProvider(
-                $this->connection->getSchemaManager(),
-                $this->connection->getDatabasePlatform()
-            );
-
-            $schemaProvider = LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
-                $schemaProvider
-            );
-        }
-
-        $this->schemaProvider = $schemaProvider;
-
-        $this->parameterFormatter = new ParameterFormatter($this->connection);
+    public function __toString() : string
+    {
+        return $this->version;
     }
 
     public function getVersion() : string
@@ -109,183 +82,21 @@ class Version
         return $this->configuration;
     }
 
-    public function isMigrated() : bool
-    {
-        return $this->configuration->hasVersionMigrated($this);
-    }
-
-    public function markMigrated() : void
-    {
-        $this->markVersion(self::DIRECTION_UP);
-    }
-
-    public function markNotMigrated() : void
-    {
-        $this->markVersion(self::DIRECTION_DOWN);
-    }
-
-    /**
-     * @param string[]|string $sql
-     * @param mixed[]         $params
-     * @param mixed[]         $types
-     */
-    public function addSql($sql, array $params = [], array $types = []) : void
-    {
-        if (is_array($sql)) {
-            foreach ($sql as $key => $query) {
-                $this->sql[] = $query;
-
-                if (empty($params[$key])) {
-                    continue;
-                }
-
-                $queryTypes = $types[$key] ?? [];
-                $this->addQueryParams($params[$key], $queryTypes);
-            }
-        } else {
-            $this->sql[] = $sql;
-
-            if (! empty($params)) {
-                $this->addQueryParams($params, $types);
-            }
-        }
-    }
-
-    public function writeSqlFile(
-        string $path,
-        string $direction = self::DIRECTION_UP
-    ) : bool {
-        $queries = $this->execute($direction, true);
-
-        if (! empty($this->params)) {
-            throw MigrationNotConvertibleToSql::new($this->class);
-        }
-
-        $this->outputWriter->write("\n-- Version " . $this->version . "\n");
-
-        $sqlQueries = [$this->version => $queries];
-
-        /*
-         * Since the configuration object changes during the creation we cannot inject things
-         * properly, so I had to violate LoD here (so please, let's find a way to solve it on v2).
-         */
-        return $this->configuration
-            ->getQueryWriter()
-            ->write($path, $direction, $sqlQueries);
-    }
-
     public function getMigration() : AbstractMigration
     {
         return $this->migration;
     }
 
-    /** @return string[] */
-    public function execute(
-        string $direction,
-        bool $dryRun = false,
-        bool $timeAllQueries = false
-    ) : array {
-        $this->dispatchEvent(Events::onMigrationsVersionExecuting, $direction, $dryRun);
+    public function isMigrated() : bool
+    {
+        return $this->configuration->hasVersionMigrated($this);
+    }
 
-        $this->sql = [];
+    public function setState(int $state) : void
+    {
+        assert(in_array($state, self::STATES, true));
 
-        $transaction = $this->migration->isTransactional();
-        if ($transaction) {
-            //only start transaction if in transactional mode
-            $this->connection->beginTransaction();
-        }
-
-        try {
-            $migrationStart = microtime(true);
-
-            $this->state = self::STATE_PRE;
-            $fromSchema  = $this->schemaProvider->createFromSchema();
-
-            $this->migration->{'pre' . ucfirst($direction)}($fromSchema);
-
-            if ($direction === self::DIRECTION_UP) {
-                $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $this->version) . "\n");
-            } else {
-                $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $this->version) . "\n");
-            }
-
-            $this->state = self::STATE_EXEC;
-
-            $toSchema = $this->schemaProvider->createToSchema($fromSchema);
-            $this->migration->$direction($toSchema);
-
-            $this->addSql($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema));
-
-            $this->executeRegisteredSql($dryRun, $timeAllQueries);
-
-            $this->state = self::STATE_POST;
-            $this->migration->{'post' . ucfirst($direction)}($toSchema);
-
-            if (! $dryRun) {
-                if ($direction === self::DIRECTION_UP) {
-                    $this->markMigrated();
-                } else {
-                    $this->markNotMigrated();
-                }
-            }
-
-            $migrationEnd = microtime(true);
-            $this->time   = round($migrationEnd - $migrationStart, 2);
-            if ($direction === self::DIRECTION_UP) {
-                $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $this->time));
-            } else {
-                $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $this->time));
-            }
-
-            if ($transaction) {
-                //commit only if running in transactional mode
-                $this->connection->commit();
-            }
-
-            $this->state = self::STATE_NONE;
-
-            $this->dispatchEvent(Events::onMigrationsVersionExecuted, $direction, $dryRun);
-
-            return $this->sql;
-        } catch (SkipMigration $e) {
-            if ($transaction) {
-                //only rollback transaction if in transactional mode
-                $this->connection->rollBack();
-            }
-
-            if ($dryRun === false) {
-                // now mark it as migrated
-                if ($direction === self::DIRECTION_UP) {
-                    $this->markMigrated();
-                } else {
-                    $this->markNotMigrated();
-                }
-            }
-
-            $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)", $e->getMessage()));
-
-            $this->state = self::STATE_NONE;
-
-            $this->dispatchEvent(Events::onMigrationsVersionSkipped, $direction, $dryRun);
-
-            return [];
-        } catch (Throwable $e) {
-            $this->outputWriter->write(sprintf(
-                '<error>Migration %s failed during %s. Error %s</error>',
-                $this->version,
-                $this->getExecutionState(),
-                $e->getMessage()
-            ));
-
-            if ($transaction) {
-                //only rollback transaction if in transactional mode
-                $this->connection->rollBack();
-            }
-
-            $this->state = self::STATE_NONE;
-
-            throw $e;
-        }
+        $this->state = $state;
     }
 
     public function getExecutionState() : string
@@ -305,29 +116,63 @@ class Version
         }
     }
 
-    public function getTime() : ?float
+    /**
+     * @param mixed[] $params
+     * @param mixed[] $types
+     */
+    public function addSql(string $sql, array $params = [], array $types = []) : void
     {
-        return $this->time;
+        $this->versionExecutor->addSql($sql, $params, $types);
     }
 
-    public function __toString() : string
-    {
-        return $this->version;
-    }
+    public function writeSqlFile(
+        string $path,
+        string $direction = self::DIRECTION_UP
+    ) : bool {
+        $versionExecutionResult = $this->execute($direction, true);
 
-    private function outputQueryTime(float $queryStart, bool $timeAllQueries = false) : void
-    {
-        if ($timeAllQueries === false) {
-            return;
+        if (count($versionExecutionResult->getParams()) !== 0) {
+            throw MigrationNotConvertibleToSql::new($this->class);
         }
 
-        $queryEnd  = microtime(true);
-        $queryTime = round($queryEnd - $queryStart, 4);
+        $this->outputWriter->write("\n-- Version " . $this->version . "\n");
 
-        $this->outputWriter->write(sprintf('  <info>%ss</info>', $queryTime));
+        $sqlQueries = [$this->version => $versionExecutionResult->getSql()];
+
+        /*
+         * Since the configuration object changes during the creation we cannot inject things
+         * properly, so I had to violate LoD here (so please, let's find a way to solve it on v2).
+         */
+        return $this->configuration
+            ->getQueryWriter()
+            ->write($path, $direction, $sqlQueries);
     }
 
-    private function markVersion(string $direction) : void
+    public function execute(
+        string $direction,
+        bool $dryRun = false,
+        bool $timeAllQueries = false
+    ) : VersionExecutionResult {
+        return $this->versionExecutor->execute(
+            $this,
+            $this->migration,
+            $direction,
+            $dryRun,
+            $timeAllQueries
+        );
+    }
+
+    public function markMigrated() : void
+    {
+        $this->markVersion(self::DIRECTION_UP);
+    }
+
+    public function markNotMigrated() : void
+    {
+        $this->markVersion(self::DIRECTION_DOWN);
+    }
+
+    public function markVersion(string $direction) : void
     {
         $this->configuration->createMigrationTable();
 
@@ -349,91 +194,5 @@ class Version
                 ]
             );
         }
-    }
-
-    /**
-     * @param mixed[]|int $params
-     * @param mixed[]|int $types
-     */
-    private function addQueryParams($params, $types) : void
-    {
-        $index                = count($this->sql) - 1;
-        $this->params[$index] = $params;
-        $this->types[$index]  = $types;
-    }
-
-    private function executeRegisteredSql(
-        bool $dryRun = false,
-        bool $timeAllQueries = false
-    ) : void {
-        if (! $dryRun) {
-            if (! empty($this->sql)) {
-                foreach ($this->sql as $key => $query) {
-                    $queryStart = microtime(true);
-
-                    $this->outputSqlQuery($key, $query);
-
-                    if (! isset($this->params[$key])) {
-                        $this->connection->executeQuery($query);
-                    } else {
-                        $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
-                    }
-
-                    $this->outputQueryTime($queryStart, $timeAllQueries);
-                }
-            } else {
-                $this->outputWriter->write(sprintf(
-                    '<error>Migration %s was executed but did not result in any SQL statements.</error>',
-                    $this->version
-                ));
-            }
-        } else {
-            foreach ($this->sql as $idx => $query) {
-                $this->outputSqlQuery($idx, $query);
-            }
-        }
-    }
-
-    private function dispatchEvent(
-        string $eventName,
-        string $direction,
-        bool $dryRun
-    ) : void {
-        $event = $this->createMigrationsVersionEventArgs(
-            $this,
-            $this->configuration,
-            $direction,
-            $dryRun
-        );
-
-        $this->configuration->dispatchEvent($eventName, $event);
-    }
-
-    private function createMigrationsVersionEventArgs(
-        Version $version,
-        Configuration $config,
-        string $direction,
-        bool $dryRun
-    ) : MigrationsVersionEventArgs {
-        return new MigrationsVersionEventArgs(
-            $this,
-            $this->configuration,
-            $direction,
-            $dryRun
-        );
-    }
-
-    private function outputSqlQuery(int $idx, string $query) : void
-    {
-        $params = $this->parameterFormatter->formatParameters(
-            $this->params[$idx] ?? [],
-            $this->types[$idx] ?? []
-        );
-
-        $this->outputWriter->write(rtrim(sprintf(
-            '     <comment>-></comment> %s %s',
-            $query,
-            $params
-        )));
     }
 }
