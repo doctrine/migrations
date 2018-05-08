@@ -6,6 +6,10 @@ Your migration classes that previously used to extend `Doctrine\DBAL\Migrations\
 `Doctrine\Migrations\AbstractMigration` instead. The `Doctrine\DBAL\Migrations\AbstractMigration` class will be
 deprecated in the `1.7.1` release to prepare for the BC break.
 
+## BC Break: Removed `Doctrine\DBAL\Migrations\MigrationsVersion`
+
+The `Doctrine\DBAL\Migrations\MigrationsVersion` class is no longer available: please refrain from checking the Migrations version at runtime.
+
 # Upgrade from 1.0-alpha1 to 1.0.0-alpha3
 
 ## AbstractMigration

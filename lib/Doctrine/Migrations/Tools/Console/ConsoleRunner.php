@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console;
 
-use Doctrine\Migrations\MigrationsVersion;
 use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
@@ -14,6 +13,7 @@ use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
+use PackageVersions\Versions;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
@@ -29,7 +29,7 @@ class ConsoleRunner
     /** @param AbstractCommand[] $commands */
     public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
     {
-        $cli = new Application('Doctrine Migrations', MigrationsVersion::VERSION());
+        $cli = new Application('Doctrine Migrations', Versions::getVersion('doctrine/migrations'));
         $cli->setCatchExceptions(true);
         $cli->setHelperSet($helperSet);
         self::addCommands($cli);

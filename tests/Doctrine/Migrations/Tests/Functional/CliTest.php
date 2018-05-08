@@ -8,7 +8,6 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\MigrationsVersion;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Provider\StubSchemaProvider;
 use Doctrine\Migrations\Tests\Helper;
@@ -17,6 +16,7 @@ use Doctrine\Migrations\Tools\Console\Command as MigrationCommands;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Tools\Setup as OrmSetup;
+use PackageVersions\Versions;
 use ReflectionClass;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -208,7 +208,7 @@ class CliTest extends MigrationTestCase
         );
 
         $this->conn        = $this->getSqliteConnection();
-        $this->application = new Application('Doctrine Migrations Test', MigrationsVersion::VERSION());
+        $this->application = new Application('Doctrine Migrations Test', Versions::getVersion('doctrine/migrations'));
         $this->application->setCatchExceptions(false);
         $this->application->setAutoExit(false);
         $this->application->getHelperSet()->set(

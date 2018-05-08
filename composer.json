@@ -13,6 +13,7 @@
     "require": {
         "php": "^7.1",
         "doctrine/dbal": "^2.6",
+        "ocramius/package-versions": "^1.3",
         "ocramius/proxy-manager": "^2.0.2",
         "symfony/console": "^3.4||^4.0"
     },
