@@ -11,7 +11,7 @@ use function assert;
 use function count;
 use function in_array;
 
-class Version
+class Version implements VersionInterface
 {
     public const STATE_NONE = 0;
     public const STATE_PRE  = 1;
