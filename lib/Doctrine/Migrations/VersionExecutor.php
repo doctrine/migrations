@@ -16,6 +16,9 @@ use function rtrim;
 use function sprintf;
 use function ucfirst;
 
+/**
+ * @internal
+ */
 final class VersionExecutor implements VersionExecutorInterface
 {
     /** @var Configuration */

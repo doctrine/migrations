@@ -59,7 +59,20 @@ class ConfigurationTest extends MigrationTestCase
     {
         $migrationsDir = __DIR__ . '/ConfigurationTestSource/Migrations';
 
-        $configuration = new Configuration($this->getConnectionMock());
+        $connection = $this->getConnectionMock();
+
+        $platform      = $this->createMock(AbstractPlatform::class);
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+
+        $connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->willReturn($platform);
+
+        $connection->expects($this->once())
+            ->method('getSchemaManager')
+            ->willReturn($schemaManager);
+
+        $configuration = new Configuration($connection);
         $configuration->setMigrationsNamespace('Migrations');
         $configuration->setMigrationsDirectory($migrationsDir);
 
@@ -264,11 +277,19 @@ class ConfigurationTest extends MigrationTestCase
     public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
     {
         $dp = $this->getMockForAbstractClass(AbstractPlatform::class, [], '', false, true, true, ['getReservedKeywordsClass']);
+
         $dp->method('getReservedKeywordsClass')
             ->willReturn(EmptyKeywordList::class);
+
         $conn = $this->getConnectionMock();
         $conn->method('getDatabasePlatform')
             ->willReturn($dp);
+
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+
+        $conn->expects($this->once())
+            ->method('getSchemaManager')
+            ->willReturn($schemaManager);
 
         $configuration = new Configuration($conn);
         $queryWriter   = $configuration->getQueryWriter();

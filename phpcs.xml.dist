@@ -57,5 +57,6 @@
         <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/VersionExecutorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/VersionInterface.php</exclude-pattern>
     </rule>
 </ruleset>
