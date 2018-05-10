@@ -40,7 +40,7 @@ final class VersionAliasResolverTest extends TestCase
             }
         }
 
-        $this->assertEquals($expectedVersion, $this->versionAliasResolver->resolveVersionAlias($alias));
+        self::assertEquals($expectedVersion, $this->versionAliasResolver->resolveVersionAlias($alias));
     }
 
     /**
@@ -66,7 +66,7 @@ final class VersionAliasResolverTest extends TestCase
             ->with('test')
             ->willReturn(true);
 
-        $this->assertEquals('test', $this->versionAliasResolver->resolveVersionAlias('test'));
+        self::assertEquals('test', $this->versionAliasResolver->resolveVersionAlias('test'));
     }
 
     protected function setUp() : void

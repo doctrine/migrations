@@ -348,24 +348,24 @@ class ConfigurationTest extends MigrationTestCase
         $config1->setIsDryRun(false);
 
         self::assertSame('0', $config1->getCurrentVersion(), 'current version 0');
-        $this->assertTrue($config1->getConnection()->getSchemaManager()->tablesExist([$config1->getMigrationsTableName()]));
+        self::assertTrue($config1->getConnection()->getSchemaManager()->tablesExist([$config1->getMigrationsTableName()]));
 
         // migrations table created
         $config2 = $this->getSqliteConfiguration();
         $config2->setIsDryRun(false);
 
         self::assertEquals([], $config2->getMigratedVersions());
-        $this->assertTrue($config2->getConnection()->getSchemaManager()->tablesExist([$config2->getMigrationsTableName()]));
+        self::assertTrue($config2->getConnection()->getSchemaManager()->tablesExist([$config2->getMigrationsTableName()]));
 
         // no migrations table created
         $config3 = $this->getSqliteConfiguration();
         $config3->setIsDryRun(true);
 
         self::assertSame('0', $config3->getCurrentVersion(), 'current version 0');
-        $this->assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
+        self::assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
 
         self::assertEquals([], $config3->getMigratedVersions());
-        $this->assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
+        self::assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
 
         // gets the correct migration from the table, if the table exists
         $config = $this->getSqliteConfiguration();
@@ -381,7 +381,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('1235', $config->getNextVersion(), 'next version 1235');
 
         self::assertEquals(['1234'], $config->getMigratedVersions());
-        $this->assertTrue($config->getConnection()->getSchemaManager()->tablesExist([$config->getMigrationsTableName()]));
+        self::assertTrue($config->getConnection()->getSchemaManager()->tablesExist([$config->getMigrationsTableName()]));
     }
 
     /**

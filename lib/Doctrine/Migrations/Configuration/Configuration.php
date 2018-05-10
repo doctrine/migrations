@@ -444,6 +444,15 @@ class Configuration
         return $this->queryWriter;
     }
 
+    public function getDependencyFactory() : DependencyFactory
+    {
+        if ($this->dependencyFactory === null) {
+            $this->dependencyFactory = new DependencyFactory($this);
+        }
+
+        return $this->dependencyFactory;
+    }
+
     /**
      * @throws MigrationException
      */
@@ -455,14 +464,5 @@ class Configuration
                 $this->getMigrationsFinder()
             );
         }
-    }
-
-    private function getDependencyFactory() : DependencyFactory
-    {
-        if ($this->dependencyFactory === null) {
-            $this->dependencyFactory = new DependencyFactory($this);
-        }
-
-        return $this->dependencyFactory;
     }
 }

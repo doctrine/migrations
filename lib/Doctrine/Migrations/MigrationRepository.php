@@ -11,6 +11,7 @@ use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use const SORT_STRING;
+use function array_diff;
 use function array_keys;
 use function array_map;
 use function array_search;
@@ -42,7 +43,7 @@ class MigrationRepository
     private $versionFactory;
 
     /** @var Version[] */
-    private $migrations = [];
+    private $versions = [];
 
     public function __construct(
         Configuration $configuration,
@@ -75,18 +76,18 @@ class MigrationRepository
     {
         $this->ensureMigrationClassExists($migrationClassName);
 
-        if (isset($this->migrations[$version])) {
+        if (isset($this->versions[$version])) {
             throw DuplicateMigrationVersion::new(
                 $version,
-                get_class($this->migrations[$version])
+                get_class($this->versions[$version])
             );
         }
 
         $version = $this->versionFactory->createVersion($version, $migrationClassName);
 
-        $this->migrations[$version->getVersion()] = $version;
+        $this->versions[$version->getVersion()] = $version;
 
-        ksort($this->migrations, SORT_STRING);
+        ksort($this->versions, SORT_STRING);
 
         return $version;
     }
@@ -121,10 +122,10 @@ class MigrationRepository
 
         $where = null;
 
-        if (! empty($this->migrations)) {
+        if (! empty($this->versions)) {
             $migratedVersions = [];
 
-            foreach ($this->migrations as $migration) {
+            foreach ($this->versions as $migration) {
                 $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
             }
 
@@ -153,18 +154,18 @@ class MigrationRepository
     {
         $this->loadMigrationsFromDirectory();
 
-        if (! isset($this->migrations[$version])) {
+        if (! isset($this->versions[$version])) {
             throw UnknownMigrationVersion::new($version);
         }
 
-        return $this->migrations[$version];
+        return $this->versions[$version];
     }
 
     public function hasVersion(string $version) : bool
     {
         $this->loadMigrationsFromDirectory();
 
-        return isset($this->migrations[$version]);
+        return isset($this->versions[$version]);
     }
 
     public function hasVersionMigrated(Version $version) : bool
@@ -191,7 +192,7 @@ class MigrationRepository
     {
         $this->loadMigrationsFromDirectory();
 
-        return $this->migrations;
+        return $this->versions;
     }
 
     /** @return string[] */
@@ -201,11 +202,20 @@ class MigrationRepository
 
         $this->loadMigrationsFromDirectory();
 
-        foreach ($this->migrations as $migration) {
+        foreach ($this->versions as $migration) {
             $availableVersions[] = $migration->getVersion();
         }
 
         return $availableVersions;
+    }
+
+    /** @return string[] */
+    public function getNewVersions() : array
+    {
+        $availableMigrations = $this->getAvailableVersions();
+        $executedMigrations  = $this->getMigratedVersions();
+
+        return array_diff($availableMigrations, $executedMigrations);
     }
 
     /** @return string[] */
@@ -230,18 +240,29 @@ class MigrationRepository
         return array_map('current', $result);
     }
 
+    /**
+     * @return string[]
+     */
+    public function getExecutedUnavailableMigrations() : array
+    {
+        $executedMigrations  = $this->getMigratedVersions();
+        $availableMigrations = $this->getAvailableVersions();
+
+        return array_diff($executedMigrations, $availableMigrations);
+    }
+
     public function getNumberOfAvailableMigrations() : int
     {
         $this->loadMigrationsFromDirectory();
 
-        return count($this->migrations);
+        return count($this->versions);
     }
 
     public function getLatestVersion() : string
     {
         $this->loadMigrationsFromDirectory();
 
-        $versions = array_keys($this->migrations);
+        $versions = array_keys($this->versions);
         $latest   = end($versions);
 
         return $latest !== false ? (string) $latest : '0';
@@ -267,7 +288,7 @@ class MigrationRepository
     {
         $this->loadMigrationsFromDirectory();
 
-        $versions = array_map('strval', array_keys($this->migrations));
+        $versions = array_map('strval', array_keys($this->versions));
 
         array_unshift($versions, '0');
 
@@ -311,7 +332,7 @@ class MigrationRepository
     {
         $migrationsDirectory = $this->configuration->getMigrationsDirectory();
 
-        if (count($this->migrations) !== 0 || $migrationsDirectory === null) {
+        if (count($this->versions) !== 0 || $migrationsDirectory === null) {
             return;
         }
 

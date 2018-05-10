@@ -36,6 +36,34 @@ abstract class AbstractFileConfiguration extends Configuration
     /** @var bool */
     private $loaded = false;
 
+    /** @throws MigrationException */
+    public function load(string $file) : void
+    {
+        if ($this->loaded) {
+            throw FileAlreadyLoaded::new();
+        }
+
+        $path = getcwd() . '/' . $file;
+
+        if (file_exists($path)) {
+            $file = $path;
+        }
+
+        $this->file = $file;
+
+        if (! file_exists($file)) {
+            throw new InvalidArgumentException('Given config file does not exist');
+        }
+
+        $this->doLoad($file);
+        $this->loaded = true;
+    }
+
+    public function getFile() : string
+    {
+        return $this->file;
+    }
+
     /**
      * @param mixed[] $config
      */
@@ -82,6 +110,20 @@ abstract class AbstractFileConfiguration extends Configuration
         $this->setCustomTemplate($config['custom_template']);
     }
 
+    protected function getDirectoryRelativeToFile(string $file, string $input) : string
+    {
+        $path = realpath(dirname($file) . '/' . $input);
+
+        return ($path !== false) ? $path : $input;
+    }
+
+    /**
+     * Abstract method that each file configuration driver must implement to
+     * load the given configuration file whether it be xml, yaml, etc. or something
+     * else.
+     */
+    abstract protected function doLoad(string $file) : void;
+
     private function loadMigrationsFromDirectory(string $migrationsDirectory) : void
     {
         $this->setMigrationsDirectory($migrationsDirectory);
@@ -109,46 +151,4 @@ abstract class AbstractFileConfiguration extends Configuration
             throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
         }
     }
-
-    /** @throws MigrationException */
-    public function load(string $file) : void
-    {
-        if ($this->loaded) {
-            throw FileAlreadyLoaded::new();
-        }
-
-        $path = getcwd() . '/' . $file;
-
-        if (file_exists($path)) {
-            $file = $path;
-        }
-
-        $this->file = $file;
-
-        if (! file_exists($file)) {
-            throw new InvalidArgumentException('Given config file does not exist');
-        }
-
-        $this->doLoad($file);
-        $this->loaded = true;
-    }
-
-    protected function getDirectoryRelativeToFile(string $file, string $input) : string
-    {
-        $path = realpath(dirname($file) . '/' . $input);
-
-        return ($path !== false) ? $path : $input;
-    }
-
-    public function getFile() : string
-    {
-        return $this->file;
-    }
-
-    /**
-     * Abstract method that each file configuration driver must implement to
-     * load the given configuration file whether it be xml, yaml, etc. or something
-     * else.
-     */
-    abstract protected function doLoad(string $file) : void;
 }

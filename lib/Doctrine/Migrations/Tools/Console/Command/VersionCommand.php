@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use InvalidArgumentException;
 use Symfony\Component\Console\Input\InputArgument;
@@ -16,9 +14,6 @@ use function sprintf;
 
 class VersionCommand extends AbstractCommand
 {
-    /** @var Configuration */
-    private $configuration;
-
     /** @var bool */
     private $markMigrated;
 
@@ -93,8 +88,6 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : void
     {
-        $this->configuration = $this->getMigrationConfiguration($input, $output);
-
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw new InvalidArgumentException(
                 'You must specify whether you want to --add or --delete the specified version.'
@@ -109,23 +102,22 @@ EOT
             $confirmation = $this->askConfirmation($question, $input, $output);
 
             if ($confirmation) {
-                $this->markVersions($input);
+                $this->markVersions($input, $output);
             } else {
                 $output->writeln('<error>Migration cancelled!</error>');
             }
         } else {
-            $this->markVersions($input);
+            $this->markVersions($input, $output);
         }
     }
 
     /**
      * @throws InvalidArgumentException
-     * @throws MigrationException
+     * @throws UnknownMigrationVersion
      */
-    private function markVersions(InputInterface $input) : void
+    private function markVersions(InputInterface $input, OutputInterface $output) : void
     {
         $affectedVersion = $input->getArgument('version');
-
         $allOption       = $input->getOption('all');
         $rangeFromOption = $input->getOption('range-from');
         $rangeToOption   = $input->getOption('range-to');
@@ -143,41 +135,41 @@ EOT
         }
 
         if ($allOption === true) {
-            $availableVersions = $this->configuration->getAvailableVersions();
+            $availableVersions = $this->migrationRepository->getAvailableVersions();
 
             foreach ($availableVersions as $version) {
-                $this->mark($version, true);
+                $this->mark($output, $version, true);
             }
         } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
-            $availableVersions = $this->configuration->getAvailableVersions();
+            $availableVersions = $this->migrationRepository->getAvailableVersions();
 
             foreach ($availableVersions as $version) {
                 if ($version < $rangeFromOption || $version > $rangeToOption) {
                     continue;
                 }
 
-                $this->mark($version, true);
+                $this->mark($output, $version, true);
             }
         } else {
-            $this->mark($affectedVersion);
+            $this->mark($output, $affectedVersion);
         }
     }
 
     /**
      * @throws InvalidArgumentException
-     * @throws MigrationException
+     * @throws UnknownMigrationVersion
      */
-    private function mark(string $version, bool $all = false) : void
+    private function mark(OutputInterface $output, string $version, bool $all = false) : void
     {
-        if (! $this->configuration->hasVersion($version)) {
+        if (! $this->migrationRepository->hasVersion($version)) {
             throw UnknownMigrationVersion::new($version);
         }
 
-        $version = $this->configuration->getVersion($version);
+        $version = $this->migrationRepository->getVersion($version);
 
         $marked = false;
 
-        if ($this->markMigrated && $this->configuration->hasVersionMigrated($version)) {
+        if ($this->markMigrated && $this->migrationRepository->hasVersionMigrated($version)) {
             if (! $all) {
                 throw new InvalidArgumentException(
                     sprintf('The version "%s" already exists in the version table.', $version)
@@ -187,7 +179,7 @@ EOT
             $marked = true;
         }
 
-        if (! $this->markMigrated && ! $this->configuration->hasVersionMigrated($version)) {
+        if (! $this->markMigrated && ! $this->migrationRepository->hasVersionMigrated($version)) {
             if (! $all) {
                 throw new InvalidArgumentException(
                     sprintf('The version "%s" does not exist in the version table.', $version)
@@ -203,8 +195,18 @@ EOT
 
         if ($this->markMigrated) {
             $version->markMigrated();
+
+            $output->writeln(sprintf(
+                '<info>%s</info> added to the version table.',
+                $version->getVersion()
+            ));
         } else {
             $version->markNotMigrated();
+
+            $output->writeln(sprintf(
+                '<info>%s</info> deleted from the version table.',
+                $version->getVersion()
+            ));
         }
     }
 }

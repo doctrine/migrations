@@ -4,14 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Migration;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function array_diff;
 use function count;
 use function getcwd;
 use function sprintf;
@@ -97,55 +95,30 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $configuration = $this->getMigrationConfiguration($input, $output);
-        $migration     = $this->createMigration($configuration);
+        $migration = $this->createMigration();
 
-        $this->outputHeader($configuration, $output);
+        $this->outputHeader($output);
 
-        $timeAllqueries = $input->getOption('query-time');
+        $version          = (string) $input->getArgument('version');
+        $path             = $input->getOption('write-sql');
+        $allowNoMigration = (bool) $input->getOption('allow-no-migration');
+        $timeAllqueries   = (bool) $input->getOption('query-time');
+        $dryRun           = (bool) $input->getOption('dry-run');
 
-        $dryRun = (bool) $input->getOption('dry-run');
-        $configuration->setIsDryRun($dryRun);
-
-        $executedMigrations  = $configuration->getMigratedVersions();
-        $availableMigrations = $configuration->getAvailableVersions();
+        $this->configuration->setIsDryRun($dryRun);
 
         $version = $this->getVersionNameFromAlias(
-            $input->getArgument('version'),
-            $output,
-            $configuration
+            $version,
+            $output
         );
 
         if ($version === '') {
             return 1;
         }
 
-        $executedUnavailableMigrations = array_diff($executedMigrations, $availableMigrations);
-
-        if (! empty($executedUnavailableMigrations)) {
-            $output->writeln(sprintf(
-                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
-                count($executedUnavailableMigrations)
-            ));
-
-            foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
-                $output->writeln(sprintf(
-                    '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $configuration->getDateTime($executedUnavailableMigration),
-                    $executedUnavailableMigration
-                ));
-            }
-
-            $question = 'Are you sure you wish to continue? (y/n)';
-
-            if (! $this->canExecute($question, $input, $output)) {
-                $output->writeln('<error>Migration cancelled!</error>');
-
-                return 1;
-            }
+        if ($this->checkExecutedUnavailableMigrations($input, $output) === 1) {
+            return 1;
         }
-
-        $path = $input->getOption('write-sql');
 
         if ($path !== null) {
             $path = $path === true ? getcwd() : $path;
@@ -156,7 +129,7 @@ EOT
 
         $cancelled = false;
 
-        $migration->setNoMigrationException($input->getOption('allow-no-migration'));
+        $migration->setNoMigrationException($allowNoMigration);
 
         $result = $migration->migrate(
             $version,
@@ -181,29 +154,48 @@ EOT
         return 0;
     }
 
-    protected function createMigration(Configuration $configuration) : Migration
+    protected function createMigration() : Migration
     {
-        return new Migration($configuration);
+        return $this->dependencyFactory->getMigration();
     }
 
-    private function canExecute(
-        string $question,
+    private function checkExecutedUnavailableMigrations(
         InputInterface $input,
         OutputInterface $output
-    ) : bool {
-        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
-            return false;
+    ) : int {
+        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
+
+        if (! empty($executedUnavailableMigrations)) {
+            $output->writeln(sprintf(
+                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
+                count($executedUnavailableMigrations)
+            ));
+
+            foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+                $output->writeln(sprintf(
+                    '    <comment>>></comment> %s (<comment>%s</comment>)',
+                    $this->configuration->getDateTime($executedUnavailableMigration),
+                    $executedUnavailableMigration
+                ));
+            }
+
+            $question = 'Are you sure you wish to continue? (y/n)';
+
+            if (! $this->canExecute($question, $input, $output)) {
+                $output->writeln('<error>Migration cancelled!</error>');
+
+                return 1;
+            }
         }
 
-        return true;
+        return 0;
     }
 
     private function getVersionNameFromAlias(
         string $versionAlias,
-        OutputInterface $output,
-        Configuration $configuration
+        OutputInterface $output
     ) : string {
-        $version = $configuration->resolveVersionAlias($versionAlias);
+        $version = $this->configuration->resolveVersionAlias($versionAlias);
 
         if ($version === null) {
             if ($versionAlias === 'prev') {

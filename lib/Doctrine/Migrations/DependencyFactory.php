@@ -10,11 +10,12 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 
 /**
  * @internal
  */
-final class DependencyFactory
+class DependencyFactory
 {
     /** @var Configuration */
     private $configuration;
@@ -138,6 +139,44 @@ final class DependencyFactory
     {
         return $this->getDependency(RecursiveRegexFinder::class, function () {
             return new RecursiveRegexFinder();
+        });
+    }
+
+    public function getMigrationGenerator() : MigrationGenerator
+    {
+        return $this->getDependency(MigrationGenerator::class, function () {
+            return new MigrationGenerator($this->configuration);
+        });
+    }
+
+    public function getMigrationSqlGenerator() : MigrationSqlGenerator
+    {
+        return $this->getDependency(MigrationSqlGenerator::class, function () {
+            return new MigrationSqlGenerator(
+                $this->configuration,
+                $this->getConnection()->getDatabasePlatform()
+            );
+        });
+    }
+
+    public function getMigrationStatusInfosHelper() : MigrationStatusInfosHelper
+    {
+        return $this->getDependency(MigrationStatusInfosHelper::class, function () {
+            return new MigrationStatusInfosHelper(
+                $this->configuration,
+                $this->getMigrationRepository()
+            );
+        });
+    }
+
+    public function getMigration() : Migration
+    {
+        return $this->getDependency(Migration::class, function () {
+            return new Migration(
+                $this->configuration,
+                $this->getMigrationRepository(),
+                $this->getOutputWriter()
+            );
         });
     }
 

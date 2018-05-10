@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use PHPUnit\Framework\TestCase;
 
@@ -87,18 +88,12 @@ class MigrationStatusInfosHelperTest extends TestCase
         self::assertEquals($expected, $infos);
     }
 
-    public function testGetExecutedUnavailableMigrations() : void
-    {
-        self::assertEquals(['003'], $this->migrationStatusInfosHelper->getExecutedUnavailableMigrations());
-    }
-
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-
-        $this->connection = $this->createMock(Connection::class);
-
-        $this->driver = $this->createMock(Driver::class);
+        $this->configuration       = $this->createMock(Configuration::class);
+        $this->migrationRepository = $this->createMock(MigrationRepository::class);
+        $this->connection          = $this->createMock(Connection::class);
+        $this->driver              = $this->createMock(Driver::class);
 
         $this->configuration->expects($this->any())
             ->method('getConnection')
@@ -108,7 +103,7 @@ class MigrationStatusInfosHelperTest extends TestCase
             ->method('getDriver')
             ->willReturn($this->driver);
 
-        $this->configuration->expects($this->once())
+        $this->migrationRepository->expects($this->once())
             ->method('getMigratedVersions')
             ->willReturn([
                 '001',
@@ -116,7 +111,7 @@ class MigrationStatusInfosHelperTest extends TestCase
                 '003',
             ]);
 
-        $this->configuration->expects($this->once())
+        $this->migrationRepository->expects($this->once())
             ->method('getAvailableVersions')
             ->willReturn([
                 '001',
@@ -124,6 +119,17 @@ class MigrationStatusInfosHelperTest extends TestCase
                 '004',
             ]);
 
-        $this->migrationStatusInfosHelper = new MigrationStatusInfosHelper($this->configuration);
+        $this->migrationRepository->expects($this->once())
+            ->method('getNewVersions')
+            ->willReturn(['004']);
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(['001']);
+
+        $this->migrationStatusInfosHelper = new MigrationStatusInfosHelper(
+            $this->configuration,
+            $this->migrationRepository
+        );
     }
 }

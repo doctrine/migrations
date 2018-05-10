@@ -131,7 +131,14 @@ class ConfigurationTest extends MigrationTestCase
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
-        $migration = new Migration($configuration);
+
+        $dependencyFactory = $configuration->getDependencyFactory();
+
+        $migration = new Migration(
+            $configuration,
+            $dependencyFactory->getMigrationRepository(),
+            $dependencyFactory->getOutputWriter()
+        );
         $migration->migrate('3Test');
 
         $result = call_user_func_array([$configuration, $method], $args);
@@ -309,7 +316,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration(new Connection([], new DB2Driver()));
 
-        $this->assertEquals('"version"', $config->getQuotedMigrationsColumnName());
+        self::assertEquals('"version"', $config->getQuotedMigrationsColumnName());
     }
 
     /**

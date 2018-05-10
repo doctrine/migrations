@@ -6,15 +6,13 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigurationLoader;
-use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionConfigurationChainLoader;
-use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionConfigurationLoader;
-use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
-use Doctrine\Migrations\OutputWriter;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
-use InvalidArgumentException;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,16 +23,50 @@ use function strlen;
 abstract class AbstractCommand extends Command
 {
     /** @var Configuration */
-    private $configuration;
+    protected $configuration;
+
+    /** @var Connection */
+    protected $connection;
+
+    /** @var DependencyFactory */
+    protected $dependencyFactory;
+
+    /** @var MigrationRepository */
+    protected $migrationRepository;
 
     /** @var Configuration|null */
-    private $migrationConfiguration;
+    protected $migrationConfiguration;
 
-    /** @var OutputWriter|null */
-    private $outputWriter;
+    public function setMigrationConfiguration(Configuration $configuration) : void
+    {
+        $this->configuration = $configuration;
 
-    /** @var Connection|null */
-    private $connection;
+        $this->initializeDependencies();
+    }
+
+    public function setConnection(Connection $connection) : void
+    {
+        $this->connection = $connection;
+    }
+
+    public function setDependencyFactory(DependencyFactory $dependencyFactory) : void
+    {
+        $this->dependencyFactory = $dependencyFactory;
+    }
+
+    public function setMigrationRepository(MigrationRepository $migrationRepository) : void
+    {
+        $this->migrationRepository = $migrationRepository;
+    }
+
+    public function initialize(
+        InputInterface $input,
+        OutputInterface $output
+    ) : void {
+        $this->configuration = $this->getMigrationConfiguration($input, $output);
+
+        $this->initializeDependencies();
+    }
 
     protected function configure() : void
     {
@@ -54,21 +86,15 @@ abstract class AbstractCommand extends Command
     }
 
     protected function outputHeader(
-        Configuration $configuration,
         OutputInterface $output
     ) : void {
-        $name = $configuration->getName();
+        $name = $this->configuration->getName();
         $name = $name ?? 'Doctrine Database Migrations';
         $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
         $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
         $output->writeln('<question>' . $name . '</question>');
         $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
         $output->writeln('');
-    }
-
-    public function setMigrationConfiguration(Configuration $config) : void
-    {
-        $this->configuration = $config;
     }
 
     protected function getMigrationConfiguration(
@@ -86,10 +112,17 @@ abstract class AbstractCommand extends Command
                 );
             }
 
-            $this->migrationConfiguration = $configHelper->getMigrationConfig(
-                $input,
-                $this->getOutputWriter($output)
+            $this->migrationConfiguration = $configHelper->getMigrationConfig($input);
+
+            $this->migrationConfiguration->getOutputWriter()->setCallback(
+                function (string $message) use ($output) : void {
+                    $output->writeln($message);
+                }
             );
+        }
+
+        if ($this->migrationConfiguration === null && $this->configuration instanceof Configuration) {
+            $this->migrationConfiguration = $this->configuration;
         }
 
         return $this->migrationConfiguration;
@@ -107,51 +140,47 @@ abstract class AbstractCommand extends Command
         );
     }
 
-    private function hasConfigurationHelper() : bool
-    {
-        if (! $this->getHelperSet()->has('configuration')) {
+    protected function canExecute(
+        string $question,
+        InputInterface $input,
+        OutputInterface $output
+    ) : bool {
+        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
             return false;
         }
 
-        return $this->getHelperSet()->get('configuration') instanceof ConfigurationHelperInterface;
+        return true;
     }
 
-    private function getOutputWriter(OutputInterface $output) : OutputWriter
+    private function initializeDependencies() : void
     {
-        if ($this->outputWriter === null) {
-            $this->outputWriter = new OutputWriter(
-                function (string $message) use ($output) : void {
-                    $output->writeln($message);
-                }
-            );
+        $this->connection          = $this->configuration->getConnection();
+        $this->dependencyFactory   = $this->configuration->getDependencyFactory();
+        $this->migrationRepository = $this->dependencyFactory->getMigrationRepository();
+    }
+
+    private function hasConfigurationHelper() : bool
+    {
+        $helperSet = $this->getHelperSet();
+
+        if (! $helperSet instanceof HelperSet) {
+            return false;
         }
 
-        return $this->outputWriter;
+        if (! $helperSet->has('configuration')) {
+            return false;
+        }
+
+        return $helperSet->get('configuration') instanceof ConfigurationHelperInterface;
     }
 
     private function getConnection(InputInterface $input) : Connection
     {
-        if ($this->connection !== null) {
-            return $this->connection;
+        if ($this->connection === null) {
+            $this->connection = (new ConnectionLoader($this->configuration))
+                ->getConnection($input, $this->getHelperSet());
         }
 
-        $chainLoader = new ConnectionConfigurationChainLoader(
-            [
-                new ArrayConnectionConfigurationLoader($input->getOption('db-configuration')),
-                new ArrayConnectionConfigurationLoader('migrations-db.php'),
-                new ConnectionHelperLoader($this->getHelperSet(), 'connection'),
-                new ConnectionConfigurationLoader($this->configuration),
-            ]
-        );
-
-        $connection = $chainLoader->chosen();
-
-        if ($connection !== null) {
-            return $this->connection = $connection;
-        }
-
-        throw new InvalidArgumentException(
-            'You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.'
-        );
+        return $this->connection;
     }
 }
