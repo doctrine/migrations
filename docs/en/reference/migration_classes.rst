@@ -53,7 +53,7 @@ query with different parameters. You can just pass those differents parameters t
             }
         }
 
-For more infos on `how the doctrine dbal executeQuery method works go tho the doctrine dbal documentation`_.
+For more infos on `how the doctrine dbal executeQuery method works go to the doctrine dbal documentation`_.
 
 Additionally, there is also the preUp, postUp and preDown, postDown method, that are respectivelly called before and
  after the up and down method are called.
