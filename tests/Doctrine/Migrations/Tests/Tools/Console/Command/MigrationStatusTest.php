@@ -95,59 +95,6 @@ class MigrationStatusTest extends MigrationTestCase
         self::assertRegExp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
     }
 
-    /**
-     * Tests if the amount of new migrations remains valid.
-     *
-     * This test prevents an incorrect amount of new migrations when unavailable migrations were executed. When there
-     * are still new ones, it should show the correct number of new migrations.
-     */
-    public function testIfAmountNewMigrationsIsCorrectWithUnavailableMigrations() : void
-    {
-        $command = $this
-            ->getMockBuilder(StatusCommand::class)
-            ->setConstructorArgs(['migrations:status'])
-            ->setMethods(
-                ['getMigrationConfiguration']
-            )
-            ->getMock();
-
-        $configuration = $this->getMockBuilder(Configuration::class)
-            ->setConstructorArgs([$this->getSqliteConnection()])
-            ->setMethods(['getMigratedVersions', 'getAvailableVersions', 'getCurrentVersion'])
-            ->getMock();
-
-        $configuration
-            ->expects($this->once())
-            ->method('getMigratedVersions')
-            ->will($this->returnValue(['1234', '1235', '1237', '1238', '1239']));
-
-        $configuration
-            ->expects($this->once())
-            ->method('getAvailableVersions')
-            ->will($this->returnValue(['1234', '1235', '1239', '1240']));
-
-        $configuration
-            ->method('getCurrentVersion')
-            ->will($this->returnValue('1239'));
-
-        $configuration->setMigrationsNamespace('DoctrineMigrations');
-        $configuration->setMigrationsDirectory($this->migrationDirectory);
-
-        $command
-            ->expects($this->once())
-            ->method('getMigrationConfiguration')
-            ->will($this->returnValue($configuration));
-
-        $commandTester = new CommandTester($command);
-        $commandTester->execute(
-            [],
-            []
-        );
-
-        $textOutput = $commandTester->getDisplay();
-        self::assertRegExp('/\s+>> New Migrations:\s+1/m', $textOutput);
-    }
-
     public function testShowVersions() : void
     {
         $configuration = new Configuration($this->getSqliteConnection());

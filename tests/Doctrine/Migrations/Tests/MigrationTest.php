@@ -6,17 +6,17 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Driver\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Migration;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamFile;
+use Doctrine\Migrations\Version;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use Symfony\Component\Console\Output\StreamOutput;
 use const DIRECTORY_SEPARATOR;
-use function current;
 
 require_once __DIR__ . '/realpath.php';
 
@@ -39,9 +39,47 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
     }
 
+    public function testWriteSqlDown() : void
+    {
+        $configuration       = $this->createMock(Configuration::class);
+        $migrationRepository = $this->createMock(MigrationRepository::class);
+        $outputWriter        = $this->createMock(OutputWriter::class);
+        $queryWriter         = $this->createMock(QueryWriter::class);
+
+        $sql = ['SELECT 1'];
+
+        $migration = $this->getMockBuilder(Migration::class)
+            ->setConstructorArgs([$configuration, $migrationRepository, $outputWriter])
+            ->setMethods(['getSql'])
+            ->getMock();
+
+        $migration->expects($this->once())
+            ->method('getSql')
+            ->with('1')
+            ->willReturn($sql);
+
+        $migrationRepository->expects($this->once())
+            ->method('getCurrentVersion')
+            ->willReturn('5');
+
+        $outputWriter->expects($this->once())
+            ->method('write')
+            ->with("-- Migrating from 5 to 1\n");
+
+        $configuration->expects($this->once())
+            ->method('getQueryWriter')
+            ->willReturn($queryWriter);
+
+        $queryWriter->expects($this->once())
+            ->method('write')
+            ->with('/path', Version::DIRECTION_DOWN, $sql);
+
+        $migration->writeSqlFile('/path', '1');
+    }
+
     public function testMigrateToUnknownVersionThrowsException() : void
     {
-        $migration = new Migration($this->config);
+        $migration = $this->createTestMigration($this->config);
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Could not find migration version 1234');
@@ -51,7 +89,7 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateWithNoMigrationsThrowsException() : void
     {
-        $migration = new Migration($this->config);
+        $migration = $this->createTestMigration($this->config);
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Could not find any migrations to execute.');
@@ -62,11 +100,14 @@ class MigrationTest extends MigrationTestCase
     public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption() : void
     {
         $messages = [];
-        $output   = new OutputWriter(function ($msg) use (&$messages) : void {
+
+        $callback = function ($msg) use (&$messages) : void {
             $messages[] = $msg;
-        });
-        $this->config->setOutputWriter($output);
-        $migration = new Migration($this->config);
+        };
+
+        $this->config->getOutputWriter()->setCallback($callback);
+
+        $migration = $this->createTestMigration($this->config);
 
         $migration->setNoMigrationException(true);
         $migration->migrate();
@@ -82,9 +123,9 @@ class MigrationTest extends MigrationTestCase
     {
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
-                          ->disableOriginalConstructor()
-                          ->setMethods(['migrate'])
-                          ->getMock();
+          ->disableOriginalConstructor()
+          ->setMethods(['migrate'])
+          ->getMock();
 
         $expected = ['something'];
 
@@ -125,10 +166,22 @@ class MigrationTest extends MigrationTestCase
             ->method('write');
 
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
-        $config = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQueryWriter'])
-            ->getMock();
+        $config = $this->createMock(Configuration::class);
+
+        $dependencyFactory   = $this->createMock(DependencyFactory::class);
+        $migrationRepository = $this->createMock(MigrationRepository::class);
+
+        $config->expects($this->once())
+            ->method('getDependencyFactory')
+            ->willReturn($dependencyFactory);
+
+        $dependencyFactory->expects($this->once())
+            ->method('getMigrationRepository')
+            ->willReturn($migrationRepository);
+
+        $dependencyFactory->expects($this->once())
+            ->method('getOutputWriter')
+            ->willReturn($outputWriter);
 
         $config->method('getCurrentVersion')
             ->willReturn($from);
@@ -146,7 +199,7 @@ class MigrationTest extends MigrationTestCase
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migration::class)
-            ->setConstructorArgs([$config])
+            ->setConstructorArgs($this->getMigrationConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
 
@@ -172,61 +225,22 @@ class MigrationTest extends MigrationTestCase
         ];
     }
 
-    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql() : void
-    {
-        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
-        $config = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getCurrentVersion', 'getOutputWriter', 'getLatestVersion', 'getQuotedMigrationsColumnName'])
-            ->getMock();
-
-        $config->method('getCurrentVersion')
-            ->willReturn(0);
-
-        $config->method('getOutputWriter')
-            ->willReturn($this->getOutputWriter());
-
-        $config->method('getQuotedMigrationsColumnName')
-            ->willReturn('version');
-
-        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
-        $migration = $this->getMockBuilder(Migration::class)
-            ->setConstructorArgs([$config])
-            ->setMethods(['getSql'])
-            ->getMock();
-
-        $migration->method('getSql')
-            ->willReturn(['1' => ['SHOW DATABASES']]);
-
-        $sqlFilesDir = vfsStream::setup('sql_files_dir');
-        $result      = $migration->writeSqlFile(vfsStream::url('sql_files_dir'), '1');
-
-        $this->assertTrue($result);
-
-        self::assertRegExp('/^\s*-- Migrating from 0 to 1/m', $this->getOutputStreamContent($this->output));
-
-        /** @var vfsStreamFile $sqlMigrationFile */
-        $sqlMigrationFile = current($sqlFilesDir->getChildren());
-        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
-        self::assertRegExp('/^\s*-- Doctrine Migration File Generated on/m', $sqlMigrationFile->getContent());
-        self::assertRegExp('/^\s*-- Version 1/m', $sqlMigrationFile->getContent());
-        self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
-    }
-
     public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage() : void
     {
         $messages = [];
-        $output   = new OutputWriter(function ($msg) use (&$messages) : void {
+
+        $callback = function ($msg) use (&$messages) : void {
             $messages[] = $msg;
-        });
-        $this->config->setOutputWriter($output);
+        };
+
+        $this->config->getOutputWriter()->setCallback($callback);
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
         $this->conn->insert($this->config->getMigrationsTableName(), ['version' => '20160707000000']);
 
-        $migration = new Migration($this->config);
+        $migration = $this->createTestMigration($this->config);
 
         $migration->migrate();
 
@@ -241,7 +255,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
         $called    = false;
-        $migration = new Migration($this->config);
+        $migration = $this->createTestMigration($this->config);
 
         $result = $migration->migrate(null, false, false, function () use (&$called) {
             $called = true;
@@ -259,7 +273,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
         $called    = false;
-        $migration = new Migration($this->config);
+        $migration = $this->createTestMigration($this->config);
 
         $result = $migration->migrate(null, true, false, function () use (&$called) {
             $called = true;

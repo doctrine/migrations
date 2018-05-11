@@ -34,7 +34,7 @@ class MigrationTableCreatorTest extends TestCase
             ->with(['table_name'])
             ->willReturn(true);
 
-        $this->assertTrue($this->migrationTableCreator->isMigrationTableCreated());
+        self::assertTrue($this->migrationTableCreator->isMigrationTableCreated());
     }
 
     public function testDreateMigrationTableAlreadyCreated() : void
@@ -54,7 +54,7 @@ class MigrationTableCreatorTest extends TestCase
             ->with(['table_name'])
             ->willReturn(true);
 
-        $this->assertFalse($this->migrationTableCreator->createMigrationTable());
+        self::assertFalse($this->migrationTableCreator->createMigrationTable());
     }
 
     public function testCreateMigrationTable() : void
@@ -89,7 +89,7 @@ class MigrationTableCreatorTest extends TestCase
         $this->schemaManager->expects($this->once())
             ->method('createTable');
 
-        $this->assertTrue($this->migrationTableCreator->createMigrationTable());
+        self::assertTrue($this->migrationTableCreator->createMigrationTable());
     }
 
     protected function setUp() : void

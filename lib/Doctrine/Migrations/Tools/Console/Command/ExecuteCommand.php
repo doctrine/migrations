@@ -83,37 +83,36 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : void
+    public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $version   = $input->getArgument('version');
-        $direction = $input->getOption('down') !== false
+        $version        = $input->getArgument('version');
+        $timeAllqueries = $input->getOption('query-time');
+        $dryRun         = $input->getOption('dry-run');
+        $path           = $input->getOption('write-sql');
+        $direction      = $input->getOption('down') !== false
             ? Version::DIRECTION_DOWN
             : Version::DIRECTION_UP;
 
-        $configuration = $this->getMigrationConfiguration($input, $output);
-
-        $version = $configuration->getVersion($version);
-
-        $timeAllqueries = $input->getOption('query-time');
-
-        $path = $input->getOption('write-sql');
+        $version = $this->migrationRepository->getVersion($version);
 
         if ($path !== false) {
             $path = is_bool($path) ? getcwd() : $path;
-            $version->writeSqlFile($path, $direction);
-        } else {
-            if ($input->isInteractive()) {
-                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
-                $execute  = $this->askConfirmation($question, $input, $output);
-            } else {
-                $execute = true;
-            }
 
-            if ($execute) {
-                $version->execute($direction, (bool) $input->getOption('dry-run'), $timeAllqueries);
-            } else {
-                $output->writeln('<error>Migration cancelled!</error>');
-            }
+            $version->writeSqlFile($path, $direction);
+
+            return 0;
         }
+
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
+
+        if (! $this->canExecute($question, $input, $output)) {
+            $output->writeln('<error>Migration cancelled!</error>');
+
+            return 1;
+        }
+
+        $version->execute($direction, $dryRun, $timeAllqueries);
+
+        return 0;
     }
 }

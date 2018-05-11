@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -46,11 +44,9 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : void
     {
-        $configuration = $this->getMigrationConfiguration($input, $output);
-
-        $infos = new MigrationStatusInfosHelper($configuration);
-
         $output->writeln("\n <info>==</info> Configuration\n");
+
+        $infos = $this->dependencyFactory->getMigrationStatusInfosHelper();
 
         foreach ($infos->getMigrationsInfos() as $name => $value) {
             $string = (string) $value;
@@ -70,15 +66,16 @@ EOT
             return;
         }
 
-        $migrations = $configuration->getMigrations();
+        $versions                      = $this->migrationRepository->getMigrations();
+        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
 
-        if (count($migrations) !== 0) {
+        if (count($versions) !== 0) {
             $output->writeln("\n <info>==</info> Available Migration Versions\n");
 
-            $this->showVersions($migrations, $configuration, $output);
+            $this->showVersions($versions, $output);
         }
 
-        if (count($infos->getExecutedUnavailableMigrations()) === 0) {
+        if (count($executedUnavailableMigrations) === 0) {
             return;
         }
 
@@ -86,11 +83,11 @@ EOT
             "\n <info>==</info> Previously Executed Unavailable Migration Versions\n"
         );
 
-        foreach ($infos->getExecutedUnavailableMigrations() as $executedUnavailableMigration) {
+        foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
             $output->writeln(
                 sprintf(
                     '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $configuration->getDateTime($executedUnavailableMigration),
+                    $this->configuration->getDateTime($executedUnavailableMigration),
                     $executedUnavailableMigration
                 )
             );
@@ -108,27 +105,34 @@ EOT
     }
 
     /**
-     * @param Version[] $migrations
+     * @param Version[] $versions
      */
-    private function showVersions(array $migrations, Configuration $configuration, OutputInterface $output) : void
-    {
-        $migratedVersions = $configuration->getMigratedVersions();
+    private function showVersions(
+        array $versions,
+        OutputInterface $output
+    ) : void {
+        $migratedVersions = $this->migrationRepository->getMigratedVersions();
 
-        foreach ($migrations as $version) {
-            $isMigrated = in_array($version->getVersion(), $migratedVersions, true);
+        foreach ($versions as $version) {
+            $versionName = $version->getVersion();
+
+            $isMigrated = in_array($versionName, $migratedVersions, true);
             $status     = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
 
-            $migrationDescription = $version->getMigration()->getDescription() !== ''
-                ? str_repeat(' ', 5) . $version->getMigration()->getDescription()
+            $migration   = $version->getMigration();
+            $description = $migration->getDescription();
+
+            $migrationDescription = $description !== ''
+                ? str_repeat(' ', 5) . $description
                 : '';
 
-            $formattedVersion = $configuration->getDateTime($version->getVersion());
+            $formattedVersion = $version->getDateTime();
 
             $output->writeln(sprintf(
                 '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s',
                 $formattedVersion,
-                $version->getVersion(),
-                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($version->getVersion()))),
+                $versionName,
+                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($versionName))),
                 $status,
                 $migrationDescription
             ));

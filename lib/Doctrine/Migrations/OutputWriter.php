@@ -19,6 +19,11 @@ class OutputWriter
         $this->callback = $callback;
     }
 
+    public function setCallback(callable $callback) : void
+    {
+        $this->callback = $callback;
+    }
+
     public function write(string $message) : void
     {
         ($this->callback)($message);

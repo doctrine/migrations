@@ -28,10 +28,8 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $configuration = $this->getMigrationConfiguration($input, $output);
-
-        $migrations          = count($configuration->getMigrations());
-        $migratedVersions    = count($configuration->getMigratedVersions());
+        $migrations          = count($this->migrationRepository->getMigrations());
+        $migratedVersions    = count($this->migrationRepository->getMigratedVersions());
         $availableMigrations = $migrations - $migratedVersions;
 
         if ($availableMigrations === 0) {

@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
 use function assert;
 use function count;
 use function in_array;
+use function str_replace;
 
 class Version implements VersionInterface
 {
@@ -75,6 +77,18 @@ class Version implements VersionInterface
     public function getVersion() : string
     {
         return $this->version;
+    }
+
+    public function getDateTime() : string
+    {
+        $datetime = str_replace('Version', '', $this->version);
+        $datetime = DateTime::createFromFormat('YmdHis', $datetime);
+
+        if ($datetime === false) {
+            return '';
+        }
+
+        return $datetime->format('Y-m-d H:i:s');
     }
 
     public function getConfiguration() : Configuration

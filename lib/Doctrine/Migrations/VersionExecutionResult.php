@@ -10,7 +10,7 @@ use function count;
 /**
  * @var internal
  */
-final class VersionExecutionResult
+class VersionExecutionResult
 {
     /** @var string[] */
     private $sql = [];

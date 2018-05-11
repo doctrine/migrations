@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\YamlConfiguration;
@@ -15,7 +16,9 @@ use ReflectionClass;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use function chdir;
 use function getcwd;
 
@@ -26,15 +29,13 @@ class AbstractCommandTest extends MigrationTestCase
 
     /**
      * Invoke invisible migration configuration getter
-     *
-     * @param mixed $input
-     * @param mixed $configuration
-     * @param bool  $noConnection
-     * @param mixed $helperSet
-     *
      */
-    public function invokeMigrationConfigurationGetter($input, $configuration = null, $noConnection = false, $helperSet = null) : Configuration
-    {
+    public function invokeMigrationConfigurationGetter(
+        InputInterface $input,
+        ?Configuration $configuration = null,
+        bool $noConnection = false,
+        ?HelperSet $helperSet = null
+    ) : Configuration {
         $class  = new ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('getMigrationConfiguration');
         $method->setAccessible(true);
@@ -69,6 +70,27 @@ class AbstractCommandTest extends MigrationTestCase
         return $method->invokeArgs($command, [$input, $output]);
     }
 
+    public function testSetConnection() : void
+    {
+        $command    = new TestAbstractCommand();
+        $connection = $this->createMock(Connection::class);
+
+        $command->setConnection($connection);
+
+        $this->assertSame($connection, $command->getConnection());
+    }
+
+    public function testGetMigrationConfigurationDefaultsToConnection() : void
+    {
+        $configuration = $this->createMock(Configuration::class);
+        $input         = $this->createMock(InputInterface::class);
+        $output        = $this->createMock(OutputInterface::class);
+
+        $command = new TestAbstractCommand();
+        $command->setMigrationConfiguration($configuration);
+
+        $this->assertSame($configuration, $command->getConfiguration($input, $output));
+    }
 
     /**
      * Test if the returned migration configuration is the injected one
@@ -162,11 +184,12 @@ class AbstractCommandTest extends MigrationTestCase
             ->setConstructorArgs([[]])
             ->getMock();
 
-        $configuration       = new Configuration($this->getSqliteConnection());
+        $connection          = $this->getSqliteConnection();
+        $configuration       = new Configuration($connection);
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration, true);
 
         self::assertInstanceOf(Configuration::class, $actualConfiguration);
-        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertSame($connection, $actualConfiguration->getConnection());
         self::assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
         self::assertNull($actualConfiguration->getMigrationsNamespace());
     }
@@ -312,5 +335,18 @@ class AbstractCommandTest extends MigrationTestCase
         }
 
         chdir($this->originalCwd);
+    }
+}
+
+class TestAbstractCommand extends AbstractCommand
+{
+    public function getConnection() : Connection
+    {
+        return $this->connection;
+    }
+
+    public function getConfiguration(InputInterface $input, OutputInterface $output) : Configuration
+    {
+        return $this->getMigrationConfiguration($input, $output);
     }
 }

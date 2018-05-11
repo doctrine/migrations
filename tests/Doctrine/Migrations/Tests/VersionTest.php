@@ -92,7 +92,7 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP);
 
-        $this->assertContains('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
+        self::assertContains('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
     }
 
     public function testShowSqlStatementsParametersWithTypes() : void
@@ -116,7 +116,7 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Version::DIRECTION_UP, true);
 
-        $this->assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
+        self::assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
 
     public function testCreateVersionWithCustomName() : void

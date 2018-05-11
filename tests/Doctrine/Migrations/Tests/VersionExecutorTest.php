@@ -72,9 +72,9 @@ class VersionExecutorTest extends TestCase
     {
         $this->versionExecutor->addSql('SELECT 1', [1], [2]);
 
-        $this->assertEquals(['SELECT 1'], $this->versionExecutor->getSql());
-        $this->assertEquals([[1]], $this->versionExecutor->getParams());
-        $this->assertEquals([[2]], $this->versionExecutor->getTypes());
+        self::assertEquals(['SELECT 1'], $this->versionExecutor->getSql());
+        self::assertEquals([[1]], $this->versionExecutor->getParams());
+        self::assertEquals([[2]], $this->versionExecutor->getTypes());
     }
 
     public function testExecuteUp() : void

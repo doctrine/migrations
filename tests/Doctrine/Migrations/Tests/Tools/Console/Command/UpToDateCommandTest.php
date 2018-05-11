@@ -4,50 +4,27 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
-use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Version;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
-/**
- * @covers \Doctrine\Migrations\Tools\Console\Command\UpToDateCommand
- */
 class UpToDateCommandTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OutputInterface */
-    private $commandOutput;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Configuration */
-    private $configuration;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigurationHelper */
-    private $configurationHelper;
+    /** @var MigrationRepository */
+    private $migrationRepository;
 
     /** @var UpToDateCommand */
-    private $sut;
+    private $upToDateCommand;
 
     protected function setUp() : void
     {
-        parent::setUp();
+        $this->migrationRepository = $this->createMock(MigrationRepository::class);
 
-        $this->configuration = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->configurationHelper = $this->getMockBuilder(ConfigurationHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->commandOutput = $this->getMockBuilder(OutputInterface::class)->getMock();
-
-        $this->sut = new UpToDateCommand();
-        $this->sut->setHelperSet(new HelperSet([
-            'configuration' => $this->configurationHelper,
-        ]));
+        $this->upToDateCommand = new UpToDateCommand();
+        $this->upToDateCommand->setMigrationRepository($this->migrationRepository);
     }
 
     /**
@@ -58,17 +35,21 @@ class UpToDateCommandTest extends TestCase
      */
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode) : void
     {
-        // Set up mocks based on data provider.
-        $this->configurationHelper->method('getMigrationConfig')->willReturn($this->configuration);
-        $this->configuration->method('getMigrations')->willReturn($migrations);
-        $this->configuration->method('getMigratedVersions')->willReturn($migratedVersions);
+        $this->migrationRepository
+            ->method('getMigrations')
+            ->willReturn($migrations);
 
-        // Command should always tell the user something.
-        $this->commandOutput->expects(self::atLeastOnce())->method('writeln');
+        $this->migrationRepository
+            ->method('getMigratedVersions')
+            ->willReturn($migratedVersions);
 
-        $actual = $this->sut->execute(new ArrayInput([]), $this->commandOutput);
+        $output = $this->createMock(OutputInterface::class);
 
-        // Assert.
+        $output->expects($this->once())
+            ->method('writeln');
+
+        $actual = $this->upToDateCommand->execute(new ArrayInput([]), $output);
+
         self::assertSame($exitCode, $actual);
     }
 
@@ -112,11 +93,10 @@ class UpToDateCommandTest extends TestCase
 
     private function createVersion(string $migration) : Version
     {
-        $version = $this->getMockBuilder(Version::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $version = $this->createMock(Version::class);
 
-        $version->method('getVersion')->willReturn($migration);
+        $version->method('getVersion')
+            ->willReturn($migration);
 
         return $version;
     }

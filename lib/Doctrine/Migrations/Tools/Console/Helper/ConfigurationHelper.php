@@ -10,13 +10,11 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Configuration\XmlConfiguration;
 use Doctrine\Migrations\Configuration\YamlConfiguration;
-use Doctrine\Migrations\OutputWriter;
 use InvalidArgumentException;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
 use function file_exists;
 use function pathinfo;
-use function sprintf;
 
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
@@ -34,34 +32,22 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         $this->configuration = $configuration;
     }
 
-    public function getMigrationConfig(InputInterface $input, OutputWriter $outputWriter) : Configuration
+    public function getMigrationConfig(InputInterface $input) : Configuration
     {
         /**
          * If a configuration option is passed to the command line, use that configuration
          * instead of any other one.
          */
         $configuration = $input->getOption('configuration');
-        if ($configuration !== null) {
-            $outputWriter->write(
-                sprintf(
-                    'Loading configuration from command option: %s',
-                    $configuration
-                )
-            );
 
-            return $this->loadConfig($configuration, $outputWriter);
+        if ($configuration !== null) {
+            return $this->loadConfig($configuration);
         }
 
         /**
          * If a configuration has already been set using DI or a Setter use it.
          */
         if ($this->configuration !== null) {
-            $outputWriter->write(
-                'Loading configuration from the integration code of your framework (setter).'
-            );
-
-            $this->configuration->setOutputWriter($outputWriter);
-
             return $this->configuration;
         }
 
@@ -78,13 +64,11 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 
         foreach ($defaultConfig as $config) {
             if ($this->configExists($config)) {
-                $outputWriter->write(sprintf('Loading configuration from file: %s', $config));
-
-                return $this->loadConfig($config, $outputWriter);
+                return $this->loadConfig($config);
             }
         }
 
-        return new Configuration($this->connection, $outputWriter);
+        return new Configuration($this->connection);
     }
 
 
@@ -94,7 +78,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     }
 
     /** @throws InvalidArgumentException */
-    private function loadConfig(string $config, OutputWriter $outputWriter) : Configuration
+    private function loadConfig(string $config) : Configuration
     {
         $map = [
             'xml'   => XmlConfiguration::class,
@@ -112,7 +96,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         }
 
         $class         = $map[$info['extension']];
-        $configuration = new $class($this->connection, $outputWriter);
+        $configuration = new $class($this->connection);
         $configuration->load($config);
 
         return $configuration;

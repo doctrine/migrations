@@ -4,131 +4,161 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version;
-use Doctrine\Migrations\VersionExecutionResult;
-use function getcwd;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class ExecuteCommandTest extends CommandTestCase
+class ExecuteCommandTest extends TestCase
 {
-    use DialogSupport;
+    /** @var MigrationRepository */
+    private $migrationRepository;
 
-    public const VERSION = '20160705000000';
+    /** @var ExecuteCommand */
+    private $executeCommand;
 
-    /** @var Version */
-    private $version;
-
-    public function testWriteSqlCommandOutputsSqlFileToTheCurrentWorkingDirectory() : void
+    public function testWriteSql() : void
     {
-        $this->version->expects($this->once())
+        $versionName = '1';
+
+        $input   = $this->createMock(InputInterface::class);
+        $output  = $this->createMock(OutputInterface::class);
+        $version = $this->createMock(Version::class);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn($versionName);
+
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn('/path');
+
+        $input->expects($this->at(4))
+            ->method('getOption')
+            ->with('down')
+            ->willReturn(true);
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getVersion')
+            ->with($versionName)
+            ->willReturn($version);
+
+        $version->expects($this->once())
             ->method('writeSqlFile')
-            ->with(getcwd(), 'up');
+            ->with('/path', 'down');
 
-        list(, $statusCode) = $this->executeCommand([
-            '--write-sql' => true,
-            '--up' => true,
-        ]);
-
-        self::assertSame(0, $statusCode);
+        self::assertEquals(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testWriteSqlOutputsSqlFileToTheSpecifiedDirectory() : void
+    public function testExecute() : void
     {
-        $this->version->expects($this->once())
-            ->method('writeSqlFile')
-            ->with(__DIR__, 'down');
+        $versionName = '1';
 
-        list(, $statusCode) = $this->executeCommand([
-            '--write-sql' => __DIR__,
-            '--down' => true,
-        ]);
+        $input   = $this->createMock(InputInterface::class);
+        $output  = $this->createMock(OutputInterface::class);
+        $version = $this->createMock(Version::class);
 
-        self::assertSame(0, $statusCode);
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn($versionName);
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('query-time')
+            ->willReturn(true);
+
+        $input->expects($this->at(2))
+            ->method('getOption')
+            ->with('dry-run')
+            ->willReturn(true);
+
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $input->expects($this->at(4))
+            ->method('getOption')
+            ->with('down')
+            ->willReturn(true);
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getVersion')
+            ->with($versionName)
+            ->willReturn($version);
+
+        $this->executeCommand->expects($this->once())
+            ->method('canExecute')
+            ->willReturn(true);
+
+        $version->expects($this->once())
+            ->method('execute')
+            ->with('down', true, true);
+
+        self::assertEquals(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testNoMigrationIsExecuteWhenTheUserDoesNotConfirmTheAction() : void
+    public function testExecuteCanExecuteFalse() : void
     {
-        $this->willAskConfirmationAndReturn(false);
-        $this->version->expects($this->never())
+        $versionName = '1';
+
+        $input   = $this->createMock(InputInterface::class);
+        $output  = $this->createMock(OutputInterface::class);
+        $version = $this->createMock(Version::class);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn($versionName);
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('query-time')
+            ->willReturn(true);
+
+        $input->expects($this->at(2))
+            ->method('getOption')
+            ->with('dry-run')
+            ->willReturn(true);
+
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $input->expects($this->at(4))
+            ->method('getOption')
+            ->with('down')
+            ->willReturn(true);
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getVersion')
+            ->with($versionName)
+            ->willReturn($version);
+
+        $this->executeCommand->expects($this->once())
+            ->method('canExecute')
+            ->willReturn(false);
+
+        $version->expects($this->never())
             ->method('execute');
 
-        list($tester, $statusCode) = $this->executeCommand([]);
-
-        self::assertSame(0, $statusCode);
-        self::assertContains('Migration cancelled', $tester->getDisplay());
-    }
-
-    public function testMigrationsIsExecutedWhenTheUserConfirmsTheAction() : void
-    {
-        $this->willAskConfirmationAndReturn(true);
-
-        $versionExecutionResult = new VersionExecutionResult();
-
-        $this->version->expects($this->once())
-            ->method('execute')
-            ->with('up', true, true)
-            ->willReturn($versionExecutionResult);
-
-        list(, $statusCode) = $this->executeCommand([
-            '--dry-run' => true,
-            '--query-time' => true,
-        ]);
-
-        self::assertSame(0, $statusCode);
-    }
-
-    public function testMigrationIsExecutedWhenTheConsoleIsNotInInteractiveMode() : void
-    {
-        $this->questions->expects($this->never())
-            ->method('ask');
-
-        $versionExecutionResult = new VersionExecutionResult();
-
-        $this->version->expects($this->once())
-            ->method('execute')
-            ->with('up', true, true)
-            ->willReturn($versionExecutionResult);
-
-        list(, $statusCode) = $this->executeCommand([
-            '--dry-run' => true,
-            '--query-time' => true,
-        ], ['interactive' => false]);
-
-        self::assertSame(0, $statusCode);
+        self::assertEquals(1, $this->executeCommand->execute($input, $output));
     }
 
     protected function setUp() : void
     {
-        parent::setUp();
+        $this->migrationRepository = $this->createMock(MigrationRepository::class);
 
-        $this->version = $this->getMockBuilder(Version::class)
-            ->disableOriginalConstructor()
+        $this->executeCommand = $this->getMockBuilder(ExecuteCommand::class)
+            ->setMethods(['canExecute'])
             ->getMock();
 
-        $this->config->expects($this->once())
-            ->method('getVersion')
-            ->with(self::VERSION)
-            ->willReturn($this->version);
-
-        $this->configureDialogs($this->app);
-    }
-
-    protected function createCommand() : AbstractCommand
-    {
-        return new ExecuteCommand();
-    }
-
-    /**
-     * @param mixed[] $args
-     * @param mixed[] $options
-     *
-     * @return CommandTester|int[]
-     */
-    protected function executeCommand(array $args, array $options = []) : array
-    {
-        $args['version'] = self::VERSION;
-
-        return parent::executeCommand($args, $options);
+        $this->executeCommand->setMigrationRepository($this->migrationRepository);
     }
 }

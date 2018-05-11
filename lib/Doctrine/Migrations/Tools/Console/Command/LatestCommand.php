@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sprintf;
 
 class LatestCommand extends AbstractCommand
 {
@@ -21,8 +22,14 @@ class LatestCommand extends AbstractCommand
 
     public function execute(InputInterface $input, OutputInterface $output) : void
     {
-        $configuration = $this->getMigrationConfiguration($input, $output);
+        $latestVersion = $this->migrationRepository->getLatestVersion();
+        $version       = $this->migrationRepository->getVersion($latestVersion);
+        $description   = $version->getMigration()->getDescription();
 
-        $output->writeln($configuration->getLatestVersion());
+        $output->writeln(sprintf(
+            '<info>%s</info>%s',
+            $latestVersion,
+            $description !== '' ? ' - ' . $description : ''
+        ));
     }
 }

@@ -4,97 +4,71 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Provider\StubSchemaProvider;
-use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
+use Doctrine\Migrations\MigrationDiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-use function sprintf;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class DiffCommandTest extends CommandTestCase
+final class DiffCommandTest extends TestCase
 {
-    /** @var string */
-    public const VERSION = '20160705000000';
+    /** @var MigrationDiffGenerator */
+    private $migrationDiffGenerator;
 
-    /** @var string */
-    public const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    /** @var DiffCommand */
+    private $diffCommand;
 
-    /** @var string */
-    public const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
-
-    /** @var vfsStreamDirectory */
-    private $root;
-
-    /** @var string */
-    private $migrationFile;
-
-    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration() : void
+    public function testExecute() : void
     {
-        $this->config->expects($this->once())
-            ->method('generateVersionNumber')
-            ->willReturn(self::VERSION);
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
 
-        [$tester, $statusCode] = $this->executeCommand([]);
+        $input->expects($this->at(0))
+            ->method('getOption')
+            ->with('filter-expression')
+            ->willReturn('filter expression');
 
-        self::assertSame(0, $statusCode);
-        self::assertContains($this->migrationFile, $tester->getDisplay());
-        self::assertTrue($this->root->hasChild($this->migrationFile));
-        $content = $this->root->getChild($this->migrationFile)->getContent();
-        self::assertContains('class Version' . self::VERSION, $content);
-        self::assertContains('CREATE TABLE example', $content);
-    }
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('formatted')
+            ->willReturn(true);
 
-    /** @return string[][] */
-    public static function provideCustomTemplateNames() : array
-    {
-        return [
-            'relativePath' => [self::CUSTOM_RELATIVE_TEMPLATE_NAME],
-            'absolutePath' => [self::CUSTOM_ABSOLUTE_TEMPLATE_NAME],
-        ];
-    }
+        $input->expects($this->at(2))
+            ->method('getOption')
+            ->with('line-length')
+            ->willReturn(80);
 
-    /**
-     * @dataProvider provideCustomTemplateNames
-     */
-    public function testCommandCreatesNewMigrationsFileWithAVersionAndACustomTemplateFromConfiguration(string $templateName) : void
-    {
-        $this->config->expects($this->once())
-            ->method('generateVersionNumber')
-            ->willReturn(self::VERSION);
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('editor-cmd')
+            ->willReturn('mate');
 
-        $this->config->expects($this->once())
-            ->method('getCustomTemplate')
-            ->willReturn($templateName);
+        $this->migrationDiffGenerator->expects($this->once())
+            ->method('generate')
+            ->with('filter expression', true, 80)
+            ->willReturn('/path/to/migration.php');
 
-        [$tester, $statusCode] = $this->executeCommand([]);
+        $this->diffCommand->expects($this->once())
+            ->method('procOpen')
+            ->with('mate', '/path/to/migration.php');
 
-        self::assertSame(0, $statusCode);
-        self::assertContains($this->migrationFile, $tester->getDisplay());
-        self::assertTrue($this->root->hasChild($this->migrationFile));
-        $content = $this->root->getChild($this->migrationFile)->getContent();
-        self::assertContains('class Version' . self::VERSION, $content);
-        self::assertContains('CREATE TABLE example', $content);
-        self::assertContains('public function customTemplate()', $content);
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with('Generated new migration class to "<info>/path/to/migration.php</info>"');
+
+        $this->diffCommand->execute($input, $output);
     }
 
     protected function setUp() : void
     {
-        parent::setUp();
+        $this->migrationDiffGenerator = $this->createMock(MigrationDiffGenerator::class);
 
-        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root          = vfsStream::setup('migrations');
-        $this->config->method('getMigrationsDirectory')
-            ->willReturn(vfsStream::url('migrations'));
-    }
+        $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
+            ->setMethods(['createMigrationDiffGenerator', 'procOpen'])
+            ->getMock();
 
-    protected function createCommand() : AbstractCommand
-    {
-        $schema = new Schema();
-        $t      = $schema->createTable('example');
-        $t->addColumn('id', 'integer', ['autoincrement' => true]);
-        $t->setPrimaryKey(['id']);
-
-        return new DiffCommand(new StubSchemaProvider($schema));
+        $this->diffCommand->expects($this->once())
+            ->method('createMigrationDiffGenerator')
+            ->willReturn($this->migrationDiffGenerator);
     }
 }

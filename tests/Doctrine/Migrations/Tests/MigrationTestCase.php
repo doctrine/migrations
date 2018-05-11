@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\OutputWriter;
 use Exception;
 use PHPUnit\Framework\TestCase;
@@ -103,5 +104,26 @@ abstract class MigrationTestCase extends TestCase
         }
 
         return [];
+    }
+
+    protected function createTestMigration(Configuration $config) : Migration
+    {
+        $dependencyFactory   = $config->getDependencyFactory();
+        $migrationRepository = $dependencyFactory->getMigrationRepository();
+        $outputWriter        = $dependencyFactory->getOutputWriter();
+
+        return new Migration($config, $migrationRepository, $outputWriter);
+    }
+
+    /**
+     * @return mixed[]
+     */
+    protected function getMigrationConstructorArgs(Configuration $config) : array
+    {
+        $dependencyFactory   = $config->getDependencyFactory();
+        $migrationRepository = $dependencyFactory->getMigrationRepository();
+        $outputWriter        = $dependencyFactory->getOutputWriter();
+
+        return [$config, $migrationRepository, $outputWriter];
     }
 }

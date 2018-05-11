@@ -14,20 +14,26 @@ use function sprintf;
 
 class Migration
 {
-    /** @var OutputWriter */
-    private $outputWriter;
-
     /** @var Configuration */
     private $configuration;
 
-    /** @var bool */
-    private $noMigrationException;
+    /** @var MigrationRepository */
+    private $migrationRepository;
 
-    public function __construct(Configuration $configuration)
-    {
-        $this->configuration        = $configuration;
-        $this->outputWriter         = $configuration->getOutputWriter();
-        $this->noMigrationException = false;
+    /** @var OutputWriter */
+    private $outputWriter;
+
+    /** @var bool */
+    private $noMigrationException = false;
+
+    public function __construct(
+        Configuration $configuration,
+        MigrationRepository $migrationRepository,
+        OutputWriter $outputWriter
+    ) {
+        $this->configuration       = $configuration;
+        $this->migrationRepository = $migrationRepository;
+        $this->outputWriter        = $outputWriter;
     }
 
     public function setNoMigrationException(bool $noMigrationException = false) : void
@@ -45,10 +51,10 @@ class Migration
     {
         $sql = $this->getSql($to);
 
-        $from = $this->configuration->getCurrentVersion();
+        $from = $this->migrationRepository->getCurrentVersion();
 
         if ($to === null) {
-            $to = $this->configuration->getLatestVersion();
+            $to = $this->migrationRepository->getLatestVersion();
         }
 
         $direction = $from > $to
@@ -79,23 +85,16 @@ class Migration
         bool $timeAllQueries = false,
         ?callable $confirm = null
     ) : array {
-        /**
-         * If no version to migrate to is given we default to the last available one.
-         */
         if ($to === null) {
-            $to = $this->configuration->getLatestVersion();
+            $to = $this->migrationRepository->getLatestVersion();
         }
 
-        $from = $this->configuration->getCurrentVersion();
+        $from = $this->migrationRepository->getCurrentVersion();
         $to   = $to;
 
-        /**
-         * Throw an error if we can't find the migration to migrate to in the registered
-         * migrations.
-         */
-        $migrations = $this->configuration->getMigrations();
+        $versions = $this->migrationRepository->getMigrations();
 
-        if (! isset($migrations[$to]) && $to > 0) {
+        if (! isset($versions[$to]) && $to > 0) {
             throw UnknownMigrationVersion::new($to);
         }
 
@@ -114,7 +113,7 @@ class Migration
          * means we are already at the destination return an empty array()
          * to signify that there is nothing left to do.
          */
-        if ($from === $to && empty($migrationsToExecute) && ! empty($migrations)) {
+        if ($from === $to && empty($migrationsToExecute) && ! empty($versions)) {
             return $this->noMigrations();
         }
 

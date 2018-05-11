@@ -4,101 +4,73 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\MigrationGenerator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
-use InvalidArgumentException;
-use org\bovigo\vfs\vfsStream;
-use org\bovigo\vfs\vfsStreamDirectory;
-use function sprintf;
+use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 
-class GenerateCommandTest extends CommandTestCase
+final class GenerateCommandTest extends TestCase
 {
-    /** @var string */
-    public const VERSION = '20160705000000';
+    /** @var Configuration */
+    private $configuration;
 
-    /** @var string */
-    public const CUSTOM_RELATIVE_TEMPLATE_NAME = 'tests/Doctrine/Migrations/Tests/Tools/Console/Command/_files/migration.tpl';
+    /** @var DependencyFactory */
+    private $dependencyFactory;
 
-    /** @var string */
-    public const CUSTOM_ABSOLUTE_TEMPLATE_NAME = __DIR__ . '/_files/migration.tpl';
+    /** @var MigrationGenerator */
+    private $migrationGenerator;
 
-    /** @var vfsStreamDirectory */
-    private $root;
+    /** @var GenerateCommand */
+    private $generateCommand;
 
-    /** @var string */
-    private $migrationFile;
+    public function testExecute() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $input->expects($this->once())
+            ->method('getOption')
+            ->with('editor-cmd')
+            ->willReturn('mate');
+
+        $this->configuration->expects($this->once())
+            ->method('generateVersionNumber')
+            ->willReturn('1234');
+
+        $this->migrationGenerator->expects($this->once())
+            ->method('generateMigration')
+            ->with('1234')
+            ->willReturn('/path/to/migration.php');
+
+        $this->generateCommand->expects($this->once())
+            ->method('procOpen')
+            ->with('mate', '/path/to/migration.php');
+
+        $output->expects($this->once())
+            ->method('writeln')
+            ->with('Generated new migration class to "<info>/path/to/migration.php</info>"');
+
+        $this->generateCommand->execute($input, $output);
+    }
 
     protected function setUp() : void
     {
-        parent::setUp();
+        $this->configuration      = $this->createMock(Configuration::class);
+        $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
+        $this->migrationGenerator = $this->createMock(MigrationGenerator::class);
 
-        $this->migrationFile = sprintf('Version%s.php', self::VERSION);
-        $this->root          = vfsStream::setup('migrations');
+        $this->dependencyFactory->expects($this->once())
+            ->method('getMigrationGenerator')
+            ->willReturn($this->migrationGenerator);
 
-        $this->config->method('getMigrationsDirectory')
-            ->willReturn(vfsStream::url('migrations'));
-    }
+        $this->generateCommand = $this->getMockBuilder(GenerateCommand::class)
+            ->setMethods(['procOpen'])
+            ->getMock();
 
-    public function testCommandCreatesNewMigrationsFileWithAVersionFromConfiguration() : void
-    {
-        $this->config->expects($this->once())
-            ->method('generateVersionNumber')
-            ->willReturn(self::VERSION);
-
-        list($tester, $statusCode) = $this->executeCommand([]);
-
-        self::assertSame(0, $statusCode);
-        self::assertContains($this->migrationFile, $tester->getDisplay());
-        self::assertTrue($this->root->hasChild($this->migrationFile));
-        self::assertContains('class Version' . self::VERSION, $this->root->getChild($this->migrationFile)->getContent());
-    }
-
-    /** @return string[][] */
-    public static function provideCustomTemplateNames() : array
-    {
-        return [
-            'relativePath' => [self::CUSTOM_RELATIVE_TEMPLATE_NAME],
-            'absolutePath' => [self::CUSTOM_ABSOLUTE_TEMPLATE_NAME],
-        ];
-    }
-
-    /**
-     * @dataProvider provideCustomTemplateNames
-     */
-    public function testCommandCreatesNewMigrationsFileWithACustomTemplateFromConfiguration(string $templateName) : void
-    {
-        $this->config->expects($this->once())
-            ->method('generateVersionNumber')
-            ->willReturn(self::VERSION);
-
-        $this->config->expects($this->once())
-            ->method('getCustomTemplate')
-            ->willReturn($templateName);
-
-        [$tester, $statusCode] = $this->executeCommand([]);
-
-        self::assertSame(0, $statusCode);
-        self::assertContains($this->migrationFile, $tester->getDisplay());
-        self::assertTrue($this->root->hasChild($this->migrationFile));
-        self::assertContains('public function customTemplate()', $this->root->getChild($this->migrationFile)->getContent());
-    }
-
-    public function testExceptionShouldBeRaisedWhenCustomTemplateDoesNotExist() : void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageRegExp('/The specified template ".*" cannot be found or is not readable\./');
-
-        $this->config->method('generateVersionNumber')
-                     ->willReturn(self::VERSION);
-
-        $this->config->method('getCustomTemplate')
-                     ->willReturn(self::CUSTOM_RELATIVE_TEMPLATE_NAME . '-test');
-
-        $this->executeCommand([]);
-    }
-
-    protected function createCommand() : AbstractCommand
-    {
-        return new GenerateCommand();
+        $this->generateCommand->setMigrationConfiguration($this->configuration);
+        $this->generateCommand->setDependencyFactory($this->dependencyFactory);
     }
 }

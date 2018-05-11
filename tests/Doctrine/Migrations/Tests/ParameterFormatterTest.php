@@ -55,7 +55,7 @@ class ParameterFormatterTest extends TestCase
 
         $expected = 'with parameters ([string value], [1], [1,1,,string value], [], [], [string value], [1], [true], [false], [1, true, false, string value], :named => [string value])';
 
-        $this->assertEquals($expected, $result);
+        self::assertEquals($expected, $result);
     }
 
     protected function setUp() : void

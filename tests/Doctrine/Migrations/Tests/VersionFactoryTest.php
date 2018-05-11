@@ -30,9 +30,9 @@ final class VersionFactoryTest extends TestCase
             VersionFactoryTestMigration::class
         );
 
-        $this->assertInstanceOf(Version::class, $version);
-        $this->assertSame($this->configuration, $version->getConfiguration());
-        $this->assertInstanceOf(VersionFactoryTestMigration::class, $version->getMigration());
+        self::assertInstanceOf(Version::class, $version);
+        self::assertSame($this->configuration, $version->getConfiguration());
+        self::assertInstanceOf(VersionFactoryTestMigration::class, $version->getMigration());
     }
 
     protected function setUp() : void
