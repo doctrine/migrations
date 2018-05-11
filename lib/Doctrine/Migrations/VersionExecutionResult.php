@@ -8,7 +8,7 @@ use Throwable;
 use function count;
 
 /**
- * @var internal
+ * @internal
  */
 class VersionExecutionResult
 {
