@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use const SORT_STRING;
