@@ -90,7 +90,6 @@ class Migration
         }
 
         $from = $this->migrationRepository->getCurrentVersion();
-        $to   = $to;
 
         $versions = $this->migrationRepository->getMigrations();
 
