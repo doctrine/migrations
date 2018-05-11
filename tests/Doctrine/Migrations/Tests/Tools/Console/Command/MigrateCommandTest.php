@@ -12,6 +12,7 @@ use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function getcwd;
 
 class MigrateCommandTest extends TestCase
 {
@@ -150,7 +151,6 @@ class MigrateCommandTest extends TestCase
         self::assertEquals(1, $this->migrateCommand->execute($input, $output));
     }
 
-
     public function testExecutedUnavailableMigrationsCancel() : void
     {
         $input  = $this->createMock(InputInterface::class);
@@ -181,7 +181,7 @@ class MigrateCommandTest extends TestCase
         self::assertEquals(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteWriteSql() : void
+    public function testExecuteWriteSqlCustomPath() : void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -226,21 +226,30 @@ class MigrateCommandTest extends TestCase
         self::assertEquals(0, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteMigrate() : void
+    public function testExecuteWriteSqlCurrentWorkingDirectory() : void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $migration = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(Migrator::class);
 
         $this->dependencyFactory->expects($this->once())
             ->method('getMigrator')
-            ->willReturn($migration);
+            ->willReturn($migrator);
+
+        $migrator->expects($this->once())
+            ->method('writeSqlFile')
+            ->with(getcwd(), '1234');
 
         $input->expects($this->once())
             ->method('getArgument')
             ->with('version')
             ->willReturn('prev');
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(null);
 
         $this->configuration->expects($this->once())
             ->method('setIsDryRun')
@@ -259,11 +268,52 @@ class MigrateCommandTest extends TestCase
             ->method('canExecute')
             ->willReturn(true);
 
-        $migration->expects($this->once())
+        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+    }
+
+    public function testExecuteMigrate() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $migrator = $this->createMock(Migrator::class);
+
+        $this->dependencyFactory->expects($this->once())
+            ->method('getMigrator')
+            ->willReturn($migrator);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn('prev');
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $this->configuration->expects($this->once())
+            ->method('setIsDryRun')
+            ->with(false);
+
+        $this->configuration->expects($this->once())
+            ->method('resolveVersionAlias')
+            ->with('prev')
+            ->willReturn('1234');
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(['1235']);
+
+        $this->migrateCommand->expects($this->once())
+            ->method('canExecute')
+            ->willReturn(true);
+
+        $migrator->expects($this->once())
             ->method('setNoMigrationException')
             ->with(false);
 
-        $migration->expects($this->once())
+        $migrator->expects($this->once())
             ->method('migrate')
             ->with('1234', false, false);
 

@@ -227,6 +227,26 @@ executed SQL outputted in a nice format:
     # Version 20100416130422
     CREATE TABLE addresses (id INT NOT NULL, street VARCHAR(255) NOT NULL, PRIMARY KEY(id)) ENGINE = InnoDB;
 
+The ``--write-sql`` option also accepts an optional value for where to write the sql file.
+
+It can be a relative path to a file that will write to the current working directory:
+
+.. code-block:: bash
+
+    $ ./doctrine migrations:migrate --write-sql=migration.sql
+
+Or it can be an absolute path to the file:
+
+.. code-block:: bash
+
+    $ ./doctrine migrations:migrate --write-sql=/path/to/migration.sql
+
+Or it can be a directory and it will generate the filename to write to that directory:
+
+.. code-block:: bash
+
+    $ ./doctrine migrations:migrate --write-sql=/path/to/directory
+
 .. _managing-versions-table:
 
 Managing the Version Table

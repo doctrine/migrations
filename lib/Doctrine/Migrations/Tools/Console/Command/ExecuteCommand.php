@@ -10,7 +10,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
-use function is_bool;
 
 class ExecuteCommand extends AbstractCommand
 {
@@ -30,8 +29,9 @@ class ExecuteCommand extends AbstractCommand
             ->addOption(
                 'write-sql',
                 null,
-                InputOption::VALUE_NONE,
-                'The path to output the migration SQL file instead of executing it.'
+                InputOption::VALUE_OPTIONAL,
+                'The path to output the migration SQL file instead of executing it. Defaults to current working directory.',
+                false
             )
             ->addOption(
                 'dry-run',
@@ -96,7 +96,7 @@ EOT
         $version = $this->migrationRepository->getVersion($version);
 
         if ($path !== false) {
-            $path = is_bool($path) ? getcwd() : $path;
+            $path = $path === null ? getcwd() : $path;
 
             $version->writeSqlFile($path, $direction);
 
