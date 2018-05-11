@@ -15,7 +15,7 @@ use function is_string;
 use function sprintf;
 
 /**
- * @var internal
+ * @internal
  */
 final class ParameterFormatter implements ParameterFormatterInterface
 {

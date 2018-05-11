@@ -8,7 +8,7 @@ use DateTimeInterface;
 use function sprintf;
 
 /**
- * @var internal
+ * @internal
  */
 final class MigrationFileBuilder
 {
