@@ -123,7 +123,7 @@ class MigrationRepository
 
         $where = null;
 
-        if (! empty($this->versions)) {
+        if (count($this->versions) !== 0) {
             $migratedVersions = [];
 
             foreach ($this->versions as $migration) {

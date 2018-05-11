@@ -29,7 +29,7 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
      */
     public function chosen() : ?Connection
     {
-        if (empty($this->filename)) {
+        if ($this->filename === null) {
             return null;
         }
 

@@ -165,7 +165,7 @@ EOT
     ) : int {
         $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
 
-        if (! empty($executedUnavailableMigrations)) {
+        if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
                 count($executedUnavailableMigrations)

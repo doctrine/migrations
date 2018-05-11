@@ -91,7 +91,7 @@ final class VersionExecutor implements VersionExecutorInterface
     {
         $this->sql[] = $sql;
 
-        if (empty($params)) {
+        if (count($params) === 0) {
             return;
         }
 

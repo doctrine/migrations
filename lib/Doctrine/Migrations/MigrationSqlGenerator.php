@@ -8,6 +8,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use SqlFormatter;
 use function array_unshift;
+use function count;
 use function implode;
 use function sprintf;
 use function stripos;
@@ -55,7 +56,7 @@ class MigrationSqlGenerator
             $code[] = sprintf('$this->addSql(%s);', var_export($query, true));
         }
 
-        if (! empty($code)) {
+        if (count($code) !== 0) {
             $currentPlatform = $this->platform->getName();
 
             array_unshift(
