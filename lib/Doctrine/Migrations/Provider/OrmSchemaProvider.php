@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
 use UnexpectedValueException;
+use function count;
 
 final class OrmSchemaProvider implements SchemaProviderInterface
 {
@@ -23,7 +24,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
     {
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
-        if (empty($metadata)) {
+        if (count($metadata) === 0) {
             throw new UnexpectedValueException('No mapping information to process');
         }
 

@@ -113,7 +113,7 @@ class Migration
          * means we are already at the destination return an empty array()
          * to signify that there is nothing left to do.
          */
-        if ($from === $to && empty($migrationsToExecute) && ! empty($versions)) {
+        if ($from === $to && count($migrationsToExecute) === 0 && count($versions) !== 0) {
             return $this->noMigrations();
         }
 
@@ -129,9 +129,9 @@ class Migration
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (empty($migrationsToExecute) && ! $this->noMigrationException) {
+        if (count($migrationsToExecute) === 0 && ! $this->noMigrationException) {
             throw NoMigrationsToExecute::new();
-        } elseif (empty($migrationsToExecute)) {
+        } elseif (count($migrationsToExecute) === 0) {
             return $this->noMigrations();
         }
 
