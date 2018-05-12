@@ -9,7 +9,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationDiffGenerator;
 use Doctrine\Migrations\MigrationGenerator;
 use Doctrine\Migrations\MigrationSqlGenerator;
@@ -18,9 +17,6 @@ use PHPUnit\Framework\TestCase;
 
 class MigrationDiffGeneratorTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
-
     /** @var DBALConfiguration */
     private $dbalConfiguration;
 
@@ -110,21 +106,16 @@ class MigrationDiffGeneratorTest extends TestCase
             ->with(['UPDATE table SET value = 1'], true, 80)
             ->willReturn('test2');
 
-        $this->configuration->expects($this->once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
-
         $this->migrationGenerator->expects($this->once())
             ->method('generateMigration')
             ->with('1234', 'test1', 'test2')
             ->willReturn('path');
 
-        self::assertEquals('path', $this->migrationDiffGenerator->generate('/table_name1/', true, 80));
+        self::assertEquals('path', $this->migrationDiffGenerator->generate('1234', '/table_name1/', true, 80));
     }
 
     protected function setUp() : void
     {
-        $this->configuration          = $this->createMock(Configuration::class);
         $this->dbalConfiguration      = $this->createMock(DBALConfiguration::class);
         $this->schemaManager          = $this->createMock(AbstractSchemaManager::class);
         $this->schemaProvider         = $this->createMock(SchemaProviderInterface::class);
@@ -134,7 +125,6 @@ class MigrationDiffGeneratorTest extends TestCase
         $this->migrationDiffGenerator = $this->createMock(MigrationDiffGenerator::class);
 
         $this->migrationDiffGenerator = new MigrationDiffGenerator(
-            $this->configuration,
             $this->dbalConfiguration,
             $this->schemaManager,
             $this->schemaProvider,

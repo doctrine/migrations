@@ -51,7 +51,13 @@ final class GenerateCommandTest extends TestCase
 
         $output->expects($this->once())
             ->method('writeln')
-            ->with('Generated new migration class to "<info>/path/to/migration.php</info>"');
+            ->with([
+                'Generated new migration class to "<info>/path/to/migration.php</info>"',
+                '',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up 1234</info>',
+                '',
+                'To revert the migration you can use <info>migrations:execute --down 1234</info>',
+            ]);
 
         $this->generateCommand->execute($input, $output);
     }

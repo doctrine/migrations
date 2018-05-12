@@ -89,7 +89,10 @@ EOT
             }
         }
 
+        $versionNumber = $this->configuration->generateVersionNumber();
+
         $path = $this->createMigrationDiffGenerator()->generate(
+            $versionNumber,
             $filterExpression,
             $formatted,
             $lineLength
@@ -101,13 +104,24 @@ EOT
             $this->procOpen($editorCommand, $path);
         }
 
-        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
+        $output->writeln([
+            sprintf('Generated new migration class to "<info>%s</info>"', $path),
+            '',
+            sprintf(
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
+                $versionNumber
+            ),
+            '',
+            sprintf(
+                'To revert the migration you can use <info>migrations:execute --down %s</info>',
+                $versionNumber
+            ),
+        ]);
     }
 
     protected function createMigrationDiffGenerator() : MigrationDiffGenerator
     {
         return new MigrationDiffGenerator(
-            $this->configuration,
             $this->connection->getConfiguration(),
             $this->connection->getSchemaManager(),
             $this->getSchemaProvider(),
