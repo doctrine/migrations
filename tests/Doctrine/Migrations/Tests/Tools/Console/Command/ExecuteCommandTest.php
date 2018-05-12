@@ -10,6 +10,7 @@ use Doctrine\Migrations\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function getcwd;
 
 class ExecuteCommandTest extends TestCase
 {
@@ -19,7 +20,7 @@ class ExecuteCommandTest extends TestCase
     /** @var ExecuteCommand */
     private $executeCommand;
 
-    public function testWriteSql() : void
+    public function testWriteSqlCustomPath() : void
     {
         $versionName = '1';
 
@@ -50,6 +51,41 @@ class ExecuteCommandTest extends TestCase
         $version->expects($this->once())
             ->method('writeSqlFile')
             ->with('/path', 'down');
+
+        self::assertEquals(0, $this->executeCommand->execute($input, $output));
+    }
+
+    public function testWriteSqlCurrentWorkingDirectory() : void
+    {
+        $versionName = '1';
+
+        $input   = $this->createMock(InputInterface::class);
+        $output  = $this->createMock(OutputInterface::class);
+        $version = $this->createMock(Version::class);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn($versionName);
+
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(null);
+
+        $input->expects($this->at(4))
+            ->method('getOption')
+            ->with('down')
+            ->willReturn(true);
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getVersion')
+            ->with($versionName)
+            ->willReturn($version);
+
+        $version->expects($this->once())
+            ->method('writeSqlFile')
+            ->with(getcwd(), 'down');
 
         self::assertEquals(0, $this->executeCommand->execute($input, $output));
     }

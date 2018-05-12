@@ -34,7 +34,8 @@ class MigrateCommand extends AbstractCommand
                 'write-sql',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'The path to output the migration SQL file instead of executing it. Default to current working directory.'
+                'The path to output the migration SQL file instead of executing it. Defaults to current working directory.',
+                false
             )
             ->addOption(
                 'dry-run',
@@ -120,8 +121,9 @@ EOT
             return 1;
         }
 
-        if ($path !== null) {
-            $path = $path === true ? getcwd() : $path;
+        if ($path !== false) {
+            $path = $path === null ? getcwd() : $path;
+
             $migrator->writeSqlFile($path, $version);
 
             return 0;
