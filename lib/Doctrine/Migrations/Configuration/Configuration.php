@@ -39,6 +39,9 @@ class Configuration
     /** @var string */
     private $migrationsColumnName = 'version';
 
+    /** @var int */
+    private $migrationsColumnLength = 255;
+
     /** @var string|null */
     private $migrationsDirectory;
 
@@ -125,6 +128,16 @@ class Configuration
             ->getMigrationTableCreator()
             ->getMigrationsColumn()
             ->getQuotedName($this->connection->getDatabasePlatform());
+    }
+
+    public function setMigrationsColumnLength(int $columnLength) : void
+    {
+        $this->migrationsColumnLength = $columnLength;
+    }
+
+    public function getMigrationsColumnLength() : int
+    {
+        return $this->migrationsColumnLength;
     }
 
     public function setMigrationsDirectory(string $migrationsDirectory) : void
