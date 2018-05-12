@@ -8,7 +8,6 @@ use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use RuntimeException;
 use function preg_match;
@@ -17,9 +16,6 @@ use function substr;
 
 class MigrationDiffGenerator
 {
-    /** @var Configuration */
-    private $configuration;
-
     /** @var DBALConfiguration */
     private $dbalConfiguration;
 
@@ -39,7 +35,6 @@ class MigrationDiffGenerator
     private $migrationSqlGenerator;
 
     public function __construct(
-        Configuration $configuration,
         DBALConfiguration $dbalConfiguration,
         AbstractSchemaManager $schemaManager,
         SchemaProviderInterface $schemaProvider,
@@ -47,7 +42,6 @@ class MigrationDiffGenerator
         MigrationGenerator $migrationGenerator,
         MigrationSqlGenerator $migrationSqlGenerator
     ) {
-        $this->configuration         = $configuration;
         $this->dbalConfiguration     = $dbalConfiguration;
         $this->schemaManager         = $schemaManager;
         $this->schemaProvider        = $schemaProvider;
@@ -57,6 +51,7 @@ class MigrationDiffGenerator
     }
 
     public function generate(
+        string $versionNumber,
         ?string $filterExpression,
         bool $formatted = false,
         int $lineLength = 120
@@ -86,7 +81,7 @@ class MigrationDiffGenerator
         }
 
         return $this->migrationGenerator->generateMigration(
-            $this->configuration->generateVersionNumber(),
+            $versionNumber,
             $up,
             $down
         );

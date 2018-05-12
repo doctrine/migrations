@@ -52,7 +52,19 @@ EOT
             $this->procOpen($editorCommand, $path);
         }
 
-        $output->writeln(sprintf('Generated new migration class to "<info>%s</info>"', $path));
+        $output->writeln([
+            sprintf('Generated new migration class to "<info>%s</info>"', $path),
+            '',
+            sprintf(
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
+                $versionNumber
+            ),
+            '',
+            sprintf(
+                'To revert the migration you can use <info>migrations:execute --down %s</info>',
+                $versionNumber
+            ),
+        ]);
     }
 
     protected function procOpen(string $editorCommand, string $path) : void
