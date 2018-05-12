@@ -71,6 +71,17 @@ class ConfigurationTest extends MigrationTestCase
         self::assertEquals('doctrine_migration_versions', $config->getMigrationsTableName());
     }
 
+    public function testSetGetMigrationsColumnLength() : void
+    {
+        $config = new Configuration($this->getSqliteConnection());
+
+        self::assertEquals(255, $config->getMigrationsColumnLength());
+
+        $config->setMigrationsColumnLength(200);
+
+        self::assertEquals(200, $config->getMigrationsColumnLength());
+    }
+
     public function testEmptyProjectDefaults() : void
     {
         $config = $this->getSqliteConfiguration();

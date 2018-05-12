@@ -15,8 +15,7 @@ use Doctrine\Migrations\Configuration\Configuration;
  */
 final class MigrationTableCreator
 {
-    private const MIGRATION_COLUMN_TYPE   = 'string';
-    private const MIGRATION_COLUMN_LENGTH = 255;
+    private const MIGRATION_COLUMN_TYPE = 'string';
 
     /** @var Configuration */
     private $configuration;
@@ -84,7 +83,7 @@ final class MigrationTableCreator
         return new Column(
             $this->configuration->getMigrationsColumnName(),
             Type::getType(self::MIGRATION_COLUMN_TYPE),
-            ['length' => self::MIGRATION_COLUMN_LENGTH]
+            ['length' => $this->configuration->getMigrationsColumnLength()]
         );
     }
 }

@@ -86,6 +86,10 @@ class MigrationTableCreatorTest extends TestCase
             ->method('getMigrationsColumnName')
             ->willReturn('column_name');
 
+        $this->configuration->expects($this->once())
+            ->method('getMigrationsColumnLength')
+            ->willReturn(255);
+
         $this->schemaManager->expects($this->once())
             ->method('createTable');
 
