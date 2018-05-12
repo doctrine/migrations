@@ -12,7 +12,7 @@ use const COUNT_RECURSIVE;
 use function count;
 use function sprintf;
 
-class Migration
+class Migrator
 {
     /** @var Configuration */
     private $configuration;

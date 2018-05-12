@@ -10,6 +10,10 @@ deprecated in the `1.7.1` release to prepare for the BC break.
 
 The `Doctrine\DBAL\Migrations\MigrationsVersion` class is no longer available: please refrain from checking the Migrations version at runtime.
 
+## BC Break: Moved `Doctrine\Migrations\Migration` to `Doctrine\Migrations\Migrator`
+
+To make the name more clear and to differentiate from the `AbstractMigration` class, `Migration` was renamed to `Migrator`.
+
 # Upgrade from 1.0-alpha1 to 1.0.0-alpha3
 
 ## AbstractMigration

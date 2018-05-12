@@ -8,8 +8,8 @@ use Doctrine\DBAL\Driver\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
@@ -48,7 +48,7 @@ class MigrationTest extends MigrationTestCase
 
         $sql = ['SELECT 1'];
 
-        $migration = $this->getMockBuilder(Migration::class)
+        $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs([$configuration, $migrationRepository, $outputWriter])
             ->setMethods(['getSql'])
             ->getMock();
@@ -79,7 +79,7 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateToUnknownVersionThrowsException() : void
     {
-        $migration = $this->createTestMigration($this->config);
+        $migration = $this->createTestMigrator($this->config);
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Could not find migration version 1234');
@@ -89,7 +89,7 @@ class MigrationTest extends MigrationTestCase
 
     public function testMigrateWithNoMigrationsThrowsException() : void
     {
-        $migration = $this->createTestMigration($this->config);
+        $migration = $this->createTestMigrator($this->config);
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Could not find any migrations to execute.');
@@ -107,7 +107,7 @@ class MigrationTest extends MigrationTestCase
 
         $this->config->getOutputWriter()->setCallback($callback);
 
-        $migration = $this->createTestMigration($this->config);
+        $migration = $this->createTestMigrator($this->config);
 
         $migration->setNoMigrationException(true);
         $migration->migrate();
@@ -122,7 +122,7 @@ class MigrationTest extends MigrationTestCase
     public function testGetSql(?string $to) : void
     {
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
-        $migration = $this->getMockBuilder(Migration::class)
+        $migration = $this->getMockBuilder(Migrator::class)
           ->disableOriginalConstructor()
           ->setMethods(['migrate'])
           ->getMock();
@@ -198,7 +198,7 @@ class MigrationTest extends MigrationTestCase
         }
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
-        $migration = $this->getMockBuilder(Migration::class)
+        $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs($this->getMigrationConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
@@ -240,7 +240,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->createMigrationTable();
         $this->conn->insert($this->config->getMigrationsTableName(), ['version' => '20160707000000']);
 
-        $migration = $this->createTestMigration($this->config);
+        $migration = $this->createTestMigrator($this->config);
 
         $migration->migrate();
 
@@ -255,7 +255,7 @@ class MigrationTest extends MigrationTestCase
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
         $called    = false;
-        $migration = $this->createTestMigration($this->config);
+        $migration = $this->createTestMigrator($this->config);
 
         $result = $migration->migrate(null, false, false, function () use (&$called) {
             $called = true;
@@ -272,10 +272,10 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $called    = false;
-        $migration = $this->createTestMigration($this->config);
+        $called   = false;
+        $migrator = $this->createTestMigrator($this->config);
 
-        $result = $migration->migrate(null, true, false, function () use (&$called) {
+        $result = $migrator->migrate(null, true, false, function () use (&$called) {
             $called = true;
             return false;
         });

@@ -14,7 +14,7 @@ use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Migration;
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
@@ -134,12 +134,12 @@ class ConfigurationTest extends MigrationTestCase
 
         $dependencyFactory = $configuration->getDependencyFactory();
 
-        $migration = new Migration(
+        $migrator = new Migrator(
             $configuration,
             $dependencyFactory->getMigrationRepository(),
             $dependencyFactory->getOutputWriter()
         );
-        $migration->migrate('3Test');
+        $migrator->migrate('3Test');
 
         $result = call_user_func_array([$configuration, $method], $args);
 

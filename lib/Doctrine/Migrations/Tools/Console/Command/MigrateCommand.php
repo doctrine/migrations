@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Migration;
+use Doctrine\Migrations\Migrator;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -95,7 +95,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $migration = $this->createMigration();
+        $migrator = $this->createMigrator();
 
         $this->outputHeader($output);
 
@@ -122,16 +122,16 @@ EOT
 
         if ($path !== null) {
             $path = $path === true ? getcwd() : $path;
-            $migration->writeSqlFile($path, $version);
+            $migrator->writeSqlFile($path, $version);
 
             return 0;
         }
 
         $cancelled = false;
 
-        $migration->setNoMigrationException($allowNoMigration);
+        $migrator->setNoMigrationException($allowNoMigration);
 
-        $result = $migration->migrate(
+        $result = $migrator->migrate(
             $version,
             $dryRun,
             $timeAllqueries,
@@ -154,9 +154,9 @@ EOT
         return 0;
     }
 
-    protected function createMigration() : Migration
+    protected function createMigrator() : Migrator
     {
-        return $this->dependencyFactory->getMigration();
+        return $this->dependencyFactory->getMigrator();
     }
 
     private function checkExecutedUnavailableMigrations(
