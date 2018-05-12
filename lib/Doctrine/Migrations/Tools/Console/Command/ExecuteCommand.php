@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -90,8 +90,8 @@ EOT
         $dryRun         = $input->getOption('dry-run');
         $path           = $input->getOption('write-sql');
         $direction      = $input->getOption('down') !== false
-            ? Version::DIRECTION_DOWN
-            : Version::DIRECTION_UP;
+            ? VersionDirection::DOWN
+            : VersionDirection::UP;
 
         $version = $this->migrationRepository->getVersion($version);
 

@@ -25,8 +25,10 @@ use Doctrine\Migrations\Tests\Stub\VersionOutputSql;
 use Doctrine\Migrations\Tests\Stub\VersionOutputSqlWithParam;
 use Doctrine\Migrations\Tests\Stub\VersionOutputSqlWithParamAndType;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use Doctrine\Migrations\VersionExecutionResult;
 use Doctrine\Migrations\VersionExecutor;
+use Doctrine\Migrations\VersionState;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PDO;
@@ -58,8 +60,8 @@ class VersionTest extends MigrationTestCase
 
     public function testConstants() : void
     {
-        self::assertSame('up', Version::DIRECTION_UP);
-        self::assertSame('down', Version::DIRECTION_DOWN);
+        self::assertSame('up', VersionDirection::UP);
+        self::assertSame('down', VersionDirection::DOWN);
     }
 
     public function testCreateVersion() : void
@@ -90,7 +92,7 @@ class VersionTest extends MigrationTestCase
             2 => 456,
         ]);
 
-        $version->execute(Version::DIRECTION_UP);
+        $version->execute(VersionDirection::UP);
 
         self::assertContains('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
     }
@@ -114,7 +116,7 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
@@ -158,10 +160,10 @@ class VersionTest extends MigrationTestCase
     public function stateProvider() : array
     {
         return [
-            [Version::STATE_NONE],
-            [Version::STATE_EXEC],
-            [Version::STATE_POST],
-            [Version::STATE_PRE],
+            [VersionState::NONE],
+            [VersionState::EXEC],
+            [VersionState::POST],
+            [VersionState::PRE],
             [-1],
         ];
     }
@@ -357,7 +359,7 @@ class VersionTest extends MigrationTestCase
 
             self::assertNotEmpty($contents);
 
-            if ($direction === Version::DIRECTION_UP) {
+            if ($direction === VersionDirection::UP) {
                 $sql = sprintf(
                     "INSERT INTO %s (%s) VALUES ('%s');",
                     $tableName,
@@ -385,17 +387,17 @@ class VersionTest extends MigrationTestCase
     public function sqlWriteProvider() : array
     {
         return [
-            [Version::DIRECTION_UP, 'balalala', 'fkqsdmfjl'],
-            [Version::DIRECTION_UP, 'fkqsdmfjl', 'balalala'],
-            [Version::DIRECTION_DOWN, 'balalala', 'fkqsdmfjl'],
-            [Version::DIRECTION_DOWN, 'fkqsdmfjl', 'balalala'],
+            [VersionDirection::UP, 'balalala', 'fkqsdmfjl'],
+            [VersionDirection::UP, 'fkqsdmfjl', 'balalala'],
+            [VersionDirection::DOWN, 'balalala', 'fkqsdmfjl'],
+            [VersionDirection::DOWN, 'fkqsdmfjl', 'balalala'],
         ];
     }
 
     public function testWriteSqlFileShouldUseStandardCommentMarkerInSql() : void
     {
         $version   = '1';
-        $direction = Version::DIRECTION_UP;
+        $direction = VersionDirection::UP;
 
         $connection = $this->getSqliteConnection();
 
@@ -454,7 +456,7 @@ class VersionTest extends MigrationTestCase
             VersionDryRunWithoutParams::class
         );
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('SELECT 1 WHERE 1', $messages[1]);
@@ -476,7 +478,7 @@ class VersionTest extends MigrationTestCase
             VersionDryRunQuestionMarkParams::class
         );
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
@@ -499,7 +501,7 @@ class VersionTest extends MigrationTestCase
             VersionDryRunNamedParams::class
         );
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
@@ -545,7 +547,7 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setParam($value, $type);
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
@@ -570,7 +572,7 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setParam([null], []);
 
-        $version->execute(Version::DIRECTION_UP, true);
+        $version->execute(VersionDirection::UP, true);
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);

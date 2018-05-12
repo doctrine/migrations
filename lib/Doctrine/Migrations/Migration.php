@@ -58,8 +58,8 @@ class Migration
         }
 
         $direction = $from > $to
-            ? Version::DIRECTION_DOWN
-            : Version::DIRECTION_UP;
+            ? VersionDirection::DOWN
+            : VersionDirection::UP;
 
         $this->outputWriter->write(
             sprintf("-- Migrating from %s to %s\n", $from, $to)
@@ -98,8 +98,8 @@ class Migration
         }
 
         $direction = $from > $to
-            ? Version::DIRECTION_DOWN
-            : Version::DIRECTION_UP;
+            ? VersionDirection::DOWN
+            : VersionDirection::UP;
 
         $migrationsToExecute = $this->configuration
             ->getMigrationsToExecute($direction, $to);
