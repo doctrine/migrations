@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
 use function assert;
@@ -67,7 +68,7 @@ class Version implements VersionInterface
     public function getDateTime() : string
     {
         $datetime = str_replace('Version', '', $this->version);
-        $datetime = DateTime::createFromFormat('YmdHis', $datetime);
+        $datetime = DateTimeImmutable::createFromFormat('YmdHis', $datetime);
 
         if ($datetime === false) {
             return '';
@@ -89,6 +90,16 @@ class Version implements VersionInterface
     public function isMigrated() : bool
     {
         return $this->configuration->hasVersionMigrated($this);
+    }
+
+    public function getExecutedAt() : ?DateTimeImmutable
+    {
+        $versionData          = $this->configuration->getVersionData($this);
+        $executedAtColumnName = $this->configuration->getMigrationsExecutedAtColumnName();
+
+        return isset($versionData[$executedAtColumnName])
+            ? new DateTimeImmutable($versionData[$executedAtColumnName])
+            : null;
     }
 
     public function setState(int $state) : void
@@ -178,11 +189,15 @@ class Version implements VersionInterface
         $migrationsColumnName = $this->configuration
             ->getQuotedMigrationsColumnName();
 
+        $migrationsExecutedAtColumnName = $this->configuration
+            ->getQuotedMigrationsExecutedAtColumnName();
+
         if ($direction === VersionDirection::UP) {
             $this->connection->insert(
                 $this->configuration->getMigrationsTableName(),
                 [
                     $migrationsColumnName => $this->version,
+                    $migrationsExecutedAtColumnName => $this->getExecutedAtDatabaseValue(),
                 ]
             );
         } else {
@@ -193,5 +208,13 @@ class Version implements VersionInterface
                 ]
             );
         }
+    }
+
+    private function getExecutedAtDatabaseValue() : string
+    {
+        return Type::getType(MigrationTable::MIGRATION_EXECUTED_AT_COLUMN_TYPE)->convertToDatabaseValue(
+            new DateTimeImmutable(),
+            $this->connection->getDatabasePlatform()
+        );
     }
 }

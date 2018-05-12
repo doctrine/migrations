@@ -47,10 +47,16 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         self::assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
 
-    public function testMigrationColumnName() : void
+    public function testMigrationsColumnName() : void
     {
         $config = $this->loadConfiguration();
         self::assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
+    }
+
+    public function testMigrationsExecutedAtColumnName() : void
+    {
+        $config = $this->loadConfiguration();
+        self::assertEquals('doctrine_migration_executed_at_column_test', $config->getMigrationsExecutedAtColumnName());
     }
 
     public function testFinderIsIncompatibleWithConfiguration() : void

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
+use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use PHPUnit\Framework\TestCase;
 use function basename;
 use function chdir;
@@ -34,6 +35,86 @@ class AbstractFileConfigurationTest extends TestCase
         chdir($cwd);
     }
 
+    public function testSetConfiguration() : void
+    {
+        $fileConfiguration = $this->createPartialMock(TestAbstractFileConfiguration::class, [
+            'setMigrationsNamespace',
+            'setMigrationsTableName',
+            'setMigrationsColumnName',
+            'setMigrationsExecutedAtColumnName',
+            'setMigrationsAreOrganizedByYearAndMonth',
+            'setName',
+            'setMigrationsDirectory',
+            'registerMigrationsFromDirectory',
+            'registerMigration',
+            'setCustomTemplate',
+        ]);
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsNamespace')
+            ->with('Doctrine');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsTableName')
+            ->with('migration_version');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsColumnName')
+            ->with('version_number');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsExecutedAtColumnName')
+            ->with('executed_at');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsAreOrganizedByYearAndMonth');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setName')
+            ->with('Migrations Test');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsDirectory')
+            ->with('migrations_directory');
+
+        $fileConfiguration->expects($this->once())
+            ->method('registerMigrationsFromDirectory')
+            ->with('migrations_directory');
+
+        $fileConfiguration->expects($this->once())
+            ->method('registerMigration')
+            ->with('001', 'Test');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setCustomTemplate')
+            ->with('custom_template');
+
+        $fileConfiguration->setTestConfiguration([
+            'migrations_namespace' => 'Doctrine',
+            'table_name' => 'migration_version',
+            'column_name' => 'version_number',
+            'executed_at_column_name' => 'executed_at',
+            'organize_migrations' => 'year_and_month',
+            'name' => 'Migrations Test',
+            'migrations_directory' => 'migrations_directory',
+            'migrations' => [
+                [
+                    'version' => '001',
+                    'class' => 'Test',
+                ],
+            ],
+            'custom_template' => 'custom_template',
+        ]);
+    }
+
+    public function testSetConfigurationThrowsInvalidConfigurationKey() : void
+    {
+        $this->expectException(InvalidConfigurationKey::class);
+        $this->expectExceptionMessage('Migrations configuration key "unknown" does not exist.');
+
+        $this->fileConfiguration->setTestConfiguration(['unknown' => 'value']);
+    }
+
     protected function setUp() : void
     {
         $this->connection = $this->createMock(Connection::class);
@@ -44,6 +125,14 @@ class AbstractFileConfigurationTest extends TestCase
 
 class TestAbstractFileConfiguration extends AbstractFileConfiguration
 {
+    /**
+     * @param mixed[] $config
+     */
+    public function setTestConfiguration(array $config) : void
+    {
+        $this->setConfiguration($config);
+    }
+
     protected function doLoad(string $file) : void
     {
     }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -59,6 +60,10 @@ class VersionExecutorTest extends TestCase
             $this->parameterFormatter
         );
 
+        $this->configuration->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
         $this->version = new Version(
             $this->configuration,
             '001',
@@ -80,6 +85,12 @@ class VersionExecutorTest extends TestCase
 
     public function testExecuteUp() : void
     {
+        $platform = $this->createMock(AbstractPlatform::class);
+
+        $this->connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->willReturn($platform);
+
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,

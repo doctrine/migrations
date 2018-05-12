@@ -238,7 +238,10 @@ class MigrationTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
         $this->config->createMigrationTable();
-        $this->conn->insert($this->config->getMigrationsTableName(), ['version' => '20160707000000']);
+        $this->conn->insert($this->config->getMigrationsTableName(), [
+            'version' => '20160707000000',
+            'executed_at' => '2018-05-14 20:44:28',
+        ]);
 
         $migration = $this->createTestMigrator($this->config);
 

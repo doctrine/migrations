@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\MigrationFileBuilder;
 use Doctrine\Migrations\OutputWriter;
@@ -14,10 +15,11 @@ use function unlink;
 
 final class FileQueryWriterTest extends MigrationTestCase
 {
-    private const COLUMN_NAME = 'columnName';
-    private const TABLE_NAME  = 'tableName';
-    private const UP_QUERY    = 'INSERT INTO %s (%s) VALUES (\'1\')';
-    private const DOWN_QUERY  = 'DELETE FROM %s WHERE %s = \'1\'';
+    private const TABLE_NAME              = 'migration_versions';
+    private const COLUMN_NAME             = 'version';
+    private const EXECUTED_AT_COLUMN_NAME = 'executedAt';
+    private const UP_QUERY                = 'INSERT INTO %s (%s, %s) VALUES (\'1\', CURRENT_TIMESTAMP)';
+    private const DOWN_QUERY              = 'DELETE FROM %s WHERE %s = \'1\'';
 
     /**
      * @dataProvider writeProvider
@@ -30,15 +32,23 @@ final class FileQueryWriterTest extends MigrationTestCase
         array $queries,
         OutputWriter $outputWriter
     ) : void {
+        $platform = $this->createMock(AbstractPlatform::class);
+
         $migrationFileBuilder = new MigrationFileBuilder(
+            $platform,
             self::TABLE_NAME,
-            self::COLUMN_NAME
+            self::COLUMN_NAME,
+            self::EXECUTED_AT_COLUMN_NAME
         );
 
         $writer = new FileQueryWriter(
             $outputWriter,
             $migrationFileBuilder
         );
+
+        $platform->expects($this->any())
+            ->method('getCurrentTimestampSQL')
+            ->willReturn('CURRENT_TIMESTAMP');
 
         self::assertTrue($writer->write($path, $direction, $queries));
 
@@ -47,13 +57,31 @@ final class FileQueryWriterTest extends MigrationTestCase
         self::assertCount(1, $files);
 
         foreach ($files as $file) {
-            $contents      = file_get_contents($file);
-            $expectedQuery = $direction === VersionDirection::UP ? self::UP_QUERY : self::DOWN_QUERY;
-
-            self::assertNotEmpty($contents);
-            self::assertContains(sprintf($expectedQuery, self::TABLE_NAME, self::COLUMN_NAME), $contents);
+            $contents = file_get_contents($file);
 
             unlink($file);
+
+            if ($direction === VersionDirection::UP) {
+                $expectedQuery = self::UP_QUERY;
+
+                $expectedSql = sprintf(
+                    $expectedQuery,
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME,
+                    self::EXECUTED_AT_COLUMN_NAME
+                );
+            } else {
+                $expectedQuery = self::DOWN_QUERY;
+
+                $expectedSql = sprintf(
+                    $expectedQuery,
+                    self::TABLE_NAME,
+                    self::COLUMN_NAME
+                );
+            }
+
+            self::assertNotEmpty($contents);
+            self::assertContains($expectedSql, $contents);
         }
     }
 
@@ -63,8 +91,8 @@ final class FileQueryWriterTest extends MigrationTestCase
         $outputWriter = $this->createMock(OutputWriter::class);
 
         $outputWriter->expects($this->atLeastOnce())
-                     ->method('write')
-                     ->with($this->isType('string'));
+            ->method('write')
+            ->with($this->isType('string'));
 
         return [
             [__DIR__, VersionDirection::UP, ['1' => ['SHOW DATABASES']], $outputWriter],

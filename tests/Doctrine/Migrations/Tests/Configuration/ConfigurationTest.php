@@ -13,12 +13,15 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
+use Doctrine\Migrations\Version;
 use function array_keys;
 use function call_user_func_array;
 use function sprintf;
@@ -184,35 +187,18 @@ class ConfigurationTest extends MigrationTestCase
      */
     public function testMasterSlaveConnectionAlwaysConnectsToMaster() : void
     {
-        $sm = $this->getMockForAbstractClass(AbstractSchemaManager::class, [], '', false, true, true, ['tablesExist']);
-        $sm->expects($this->once())
-            ->method('tablesExist')
-            ->willReturn(true);
-        $dp = $this->getMockForAbstractClass(AbstractPlatform::class, [], '', false, true, true, ['getReservedKeywordsClass']);
-        $dp->method('getReservedKeywordsClass')
-            ->willReturn(EmptyKeywordList::class);
-        $conn = $this->getMockBuilder(MasterSlaveConnection::class)
-            ->disableOriginalConstructor()
-            ->getMock();
-        $conn->expects($this->atLeastOnce())
+        $connection = $this->createMock(MasterSlaveConnection::class);
+
+        $connection->expects($this->once())
             ->method('connect')
             ->with('master')
             ->willReturn(true);
-        $conn->method('getSchemaManager')
-            ->willReturn($sm);
-        $conn->method('getDatabasePlatform')
-            ->willReturn($dp);
-        $conn->expects($this->once())
-            ->method('fetchAll')
-            ->willReturn([
-                ['version' => '2016070600000'],
-            ]);
 
-        $config = new Configuration($conn);
-        $config->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
-        $config->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
+        $configuration = new Configuration($connection);
+        $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
+        $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
 
-        $config->getMigratedVersions();
+        self::assertTrue($configuration->connect());
     }
 
     /** @return mixed[] */
@@ -294,7 +280,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
 
-        $conn->expects($this->once())
+        $conn->expects($this->any())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
 
@@ -317,6 +303,31 @@ class ConfigurationTest extends MigrationTestCase
         $config = new Configuration(new Connection([], new DB2Driver()));
 
         self::assertEquals('"version"', $config->getQuotedMigrationsColumnName());
+    }
+
+    public function testGetVersionData() : void
+    {
+        $dependencyFactory   = $this->createMock(DependencyFactory::class);
+        $migrationRepository = $this->createMock(MigrationRepository::class);
+        $version             = $this->createMock(Version::class);
+
+        $versionData = [
+            'version' => '1234',
+            'executed_at' => '2018-05-16 11:14:40',
+        ];
+
+        $dependencyFactory->expects($this->once())
+            ->method('getMigrationRepository')
+            ->willReturn($migrationRepository);
+
+        $migrationRepository->expects($this->once())
+            ->method('getVersionData')
+            ->with($version)
+            ->willReturn($versionData);
+
+        $configuration = new Configuration($this->getConnectionMock(), null, null, null, $dependencyFactory);
+
+        self::assertEquals($versionData, $configuration->getVersionData($version));
     }
 
     /**

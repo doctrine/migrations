@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 /**
  * @var internal
  */
-final class VersionFactory
+class VersionFactory
 {
     /** @var Configuration */
     private $configuration;

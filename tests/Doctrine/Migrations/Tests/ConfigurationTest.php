@@ -82,6 +82,24 @@ class ConfigurationTest extends MigrationTestCase
         self::assertEquals(200, $config->getMigrationsColumnLength());
     }
 
+    public function testSetGetSetMigrationsExecutedAtColumnName() : void
+    {
+        $config = new Configuration($this->getSqliteConnection());
+
+        self::assertEquals('executed_at', $config->getMigrationsExecutedAtColumnName());
+
+        $config->setMigrationsExecutedAtColumnName('executedAt');
+
+        self::assertEquals('executedAt', $config->getMigrationsExecutedAtColumnName());
+    }
+
+    public function testGetQuotedMigrationsExecutedAtColumnName() : void
+    {
+        $config = new Configuration($this->getSqliteConnection());
+
+        self::assertEquals('executed_at', $config->getQuotedMigrationsExecutedAtColumnName());
+    }
+
     public function testEmptyProjectDefaults() : void
     {
         $config = $this->getSqliteConfiguration();

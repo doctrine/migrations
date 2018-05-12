@@ -11,10 +11,13 @@ code that would looks like the following:
     use Doctrine\DBAL\Migrations\Configuration\Configuration;
 
     $configuration = new Configuration();
-    $configuration->setMigrationsTableName(...);
-    $configuration->setMigrationsDirectory(...);
-    $configuration->setMigrationsNamespace(...);
-    $configuration->registerMigrationsFromDirectory(...);
+    $configuration->setMigrationsTableName('doctrine_migration_versions');
+    $configuration->setMigrationsColumnName('version');
+    $configuration->setMigrationsColumnLength(255);
+    $configuration->setMigrationsExecutedAtColumnName('executed_at');
+    $configuration->setMigrationsDirectory('/path/to/project/src/App/Migrations');
+    $configuration->setMigrationsNamespace('App/Migrations');
+    $configuration->registerMigrationsFromDirectory('/path/to/project/src/App/Migrations');
 
     // My command that extends Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand
     $command->setMigrationConfiguration($configuration);

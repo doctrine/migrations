@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use DateTimeInterface;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use function sprintf;
 
 /**
@@ -12,18 +13,28 @@ use function sprintf;
  */
 final class MigrationFileBuilder
 {
+    /** @var AbstractPlatform */
+    private $platform;
+
     /** @var string */
     private $tableName;
 
     /** @var string */
     private $columnName;
 
+    /** @var string */
+    private $executedAtColumnName;
+
     public function __construct(
+        AbstractPlatform $platform,
         string $tableName,
-        string $columnName
+        string $columnName,
+        string $executedAtColumnName
     ) {
-        $this->columnName = $columnName;
-        $this->tableName  = $tableName;
+        $this->platform             = $platform;
+        $this->tableName            = $tableName;
+        $this->columnName           = $columnName;
+        $this->executedAtColumnName = $executedAtColumnName;
     }
 
     /** @param string[][] $queriesByVersion */
@@ -52,16 +63,21 @@ final class MigrationFileBuilder
     private function getVersionUpdateQuery(string $version, string $direction) : string
     {
         if ($direction === VersionDirection::DOWN) {
-            $query = "DELETE FROM %s WHERE %s = '%s';\n";
-        } else {
-            $query = "INSERT INTO %s (%s) VALUES ('%s');\n";
+            return sprintf(
+                "DELETE FROM %s WHERE %s = '%s';\n",
+                $this->tableName,
+                $this->columnName,
+                $version
+            );
         }
 
         return sprintf(
-            $query,
+            "INSERT INTO %s (%s, %s) VALUES ('%s', %s);\n",
             $this->tableName,
             $this->columnName,
-            $version
+            $this->executedAtColumnName,
+            $version,
+            $this->platform->getCurrentTimestampSQL()
         );
     }
 }
