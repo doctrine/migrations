@@ -179,19 +179,19 @@ final class VersionExecutor implements VersionExecutorInterface
     ) : VersionExecutionResult {
         $migrationStart = microtime(true);
 
-        $version->setState(Version::STATE_PRE);
+        $version->setState(VersionState::PRE);
 
         $fromSchema = $this->schemaProvider->createFromSchema();
 
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-        if ($direction === Version::DIRECTION_UP) {
+        if ($direction === VersionDirection::UP) {
             $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $version) . "\n");
         } else {
             $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $version) . "\n");
         }
 
-        $version->setState(Version::STATE_EXEC);
+        $version->setState(VersionState::EXEC);
 
         $toSchema = $this->schemaProvider->createToSchema($fromSchema);
 
@@ -216,7 +216,7 @@ final class VersionExecutor implements VersionExecutorInterface
             ));
         }
 
-        $version->setState(Version::STATE_POST);
+        $version->setState(VersionState::POST);
 
         $migration->{'post' . ucfirst($direction)}($toSchema);
 
@@ -230,7 +230,7 @@ final class VersionExecutor implements VersionExecutorInterface
 
         $versionExecutionResult->setTime($time);
 
-        if ($direction === Version::DIRECTION_UP) {
+        if ($direction === VersionDirection::UP) {
             $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $time));
         } else {
             $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $time));
@@ -241,7 +241,7 @@ final class VersionExecutor implements VersionExecutorInterface
             $this->connection->commit();
         }
 
-        $version->setState(Version::STATE_NONE);
+        $version->setState(VersionState::NONE);
 
         $this->configuration->dispatchVersionEvent(
             $version,
@@ -271,7 +271,7 @@ final class VersionExecutor implements VersionExecutorInterface
 
         $this->outputWriter->write(sprintf("\n  <info>SS</info> skipped (Reason: %s)", $e->getMessage()));
 
-        $version->setState(Version::STATE_NONE);
+        $version->setState(VersionState::NONE);
 
         $this->configuration->dispatchVersionEvent(
             $version,
@@ -298,7 +298,7 @@ final class VersionExecutor implements VersionExecutorInterface
             $this->connection->rollBack();
         }
 
-        $version->setState(Version::STATE_NONE);
+        $version->setState(VersionState::NONE);
     }
 
     private function executeVersionExecutionResult(

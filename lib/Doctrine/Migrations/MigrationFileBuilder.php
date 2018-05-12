@@ -51,7 +51,7 @@ final class MigrationFileBuilder
 
     private function getVersionUpdateQuery(string $version, string $direction) : string
     {
-        if ($direction === Version::DIRECTION_DOWN) {
+        if ($direction === VersionDirection::DOWN) {
             $query = "DELETE FROM %s WHERE %s = '%s';\n";
         } else {
             $query = "INSERT INTO %s (%s) VALUES ('%s');\n";

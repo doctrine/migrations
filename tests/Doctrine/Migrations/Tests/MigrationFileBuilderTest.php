@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use DateTime;
 use Doctrine\Migrations\MigrationFileBuilder;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use PHPUnit\Framework\TestCase;
 
 class MigrationFileBuilderTest extends TestCase
@@ -31,7 +31,7 @@ class MigrationFileBuilderTest extends TestCase
             ],
         ];
 
-        $direction = Version::DIRECTION_UP;
+        $direction = VersionDirection::UP;
 
         $now = new DateTime('2018-09-01');
 

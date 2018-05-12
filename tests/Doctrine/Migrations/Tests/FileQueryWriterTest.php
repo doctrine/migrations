@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\MigrationFileBuilder;
 use Doctrine\Migrations\OutputWriter;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use function file_get_contents;
 use function sprintf;
 use function unlink;
@@ -48,7 +48,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents      = file_get_contents($file);
-            $expectedQuery = $direction === Version::DIRECTION_UP ? self::UP_QUERY : self::DOWN_QUERY;
+            $expectedQuery = $direction === VersionDirection::UP ? self::UP_QUERY : self::DOWN_QUERY;
 
             self::assertNotEmpty($contents);
             self::assertContains(sprintf($expectedQuery, self::TABLE_NAME, self::COLUMN_NAME), $contents);
@@ -67,8 +67,8 @@ final class FileQueryWriterTest extends MigrationTestCase
                      ->with($this->isType('string'));
 
         return [
-            [__DIR__, Version::DIRECTION_UP, ['1' => ['SHOW DATABASES']], $outputWriter],
-            [__DIR__, Version::DIRECTION_DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, VersionDirection::UP, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, VersionDirection::DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
         ];
     }
 }

@@ -13,7 +13,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use Symfony\Component\Console\Output\StreamOutput;
 use const DIRECTORY_SEPARATOR;
@@ -72,7 +72,7 @@ class MigrationTest extends MigrationTestCase
 
         $queryWriter->expects($this->once())
             ->method('write')
-            ->with('/path', Version::DIRECTION_DOWN, $sql);
+            ->with('/path', VersionDirection::DOWN, $sql);
 
         $migration->writeSqlFile('/path', '1');
     }

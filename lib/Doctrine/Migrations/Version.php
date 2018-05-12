@@ -15,21 +15,6 @@ use function str_replace;
 
 class Version implements VersionInterface
 {
-    public const STATE_NONE = 0;
-    public const STATE_PRE  = 1;
-    public const STATE_EXEC = 2;
-    public const STATE_POST = 3;
-
-    public const DIRECTION_UP   = 'up';
-    public const DIRECTION_DOWN = 'down';
-
-    private const STATES = [
-        self::STATE_NONE,
-        self::STATE_PRE,
-        self::STATE_EXEC,
-        self::STATE_POST,
-    ];
-
     /** @var Configuration */
     private $configuration;
 
@@ -49,7 +34,7 @@ class Version implements VersionInterface
     private $class;
 
     /** @var int */
-    private $state = self::STATE_NONE;
+    private $state = VersionState::NONE;
 
     /** @var VersionExecutorInterface */
     private $versionExecutor;
@@ -108,7 +93,7 @@ class Version implements VersionInterface
 
     public function setState(int $state) : void
     {
-        assert(in_array($state, self::STATES, true));
+        assert(in_array($state, VersionState::STATES, true));
 
         $this->state = $state;
     }
@@ -116,13 +101,13 @@ class Version implements VersionInterface
     public function getExecutionState() : string
     {
         switch ($this->state) {
-            case self::STATE_PRE:
+            case VersionState::PRE:
                 return 'Pre-Checks';
 
-            case self::STATE_POST:
+            case VersionState::POST:
                 return 'Post-Checks';
 
-            case self::STATE_EXEC:
+            case VersionState::EXEC:
                 return 'Execution';
 
             default:
@@ -141,7 +126,7 @@ class Version implements VersionInterface
 
     public function writeSqlFile(
         string $path,
-        string $direction = self::DIRECTION_UP
+        string $direction = VersionDirection::UP
     ) : bool {
         $versionExecutionResult = $this->execute($direction, true);
 
@@ -178,12 +163,12 @@ class Version implements VersionInterface
 
     public function markMigrated() : void
     {
-        $this->markVersion(self::DIRECTION_UP);
+        $this->markVersion(VersionDirection::UP);
     }
 
     public function markNotMigrated() : void
     {
-        $this->markVersion(self::DIRECTION_DOWN);
+        $this->markVersion(VersionDirection::DOWN);
     }
 
     public function markVersion(string $direction) : void
@@ -193,7 +178,7 @@ class Version implements VersionInterface
         $migrationsColumnName = $this->configuration
             ->getQuotedMigrationsColumnName();
 
-        if ($direction === self::DIRECTION_UP) {
+        if ($direction === VersionDirection::UP) {
             $this->connection->insert(
                 $this->configuration->getMigrationsTableName(),
                 [

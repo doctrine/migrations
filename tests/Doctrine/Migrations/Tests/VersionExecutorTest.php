@@ -12,6 +12,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Version;
+use Doctrine\Migrations\VersionDirection;
 use Doctrine\Migrations\VersionExecutionResult;
 use Doctrine\Migrations\VersionExecutor;
 use PHPUnit\Framework\TestCase;
@@ -82,7 +83,7 @@ class VersionExecutorTest extends TestCase
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,
-            Version::DIRECTION_UP,
+            VersionDirection::UP,
             false,
             true
         );
@@ -104,7 +105,7 @@ class VersionExecutorTest extends TestCase
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,
-            Version::DIRECTION_DOWN,
+            VersionDirection::DOWN,
             false,
             true
         );
