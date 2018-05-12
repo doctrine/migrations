@@ -169,10 +169,10 @@ class DependencyFactory
         });
     }
 
-    public function getMigration() : Migration
+    public function getMigrator() : Migrator
     {
-        return $this->getDependency(Migration::class, function () {
-            return new Migration(
+        return $this->getDependency(Migrator::class, function () {
+            return new Migrator(
                 $this->configuration,
                 $this->getMigrationRepository(),
                 $this->getOutputWriter()

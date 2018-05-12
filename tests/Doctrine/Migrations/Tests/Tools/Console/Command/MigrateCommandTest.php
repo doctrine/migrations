@@ -6,8 +6,8 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -186,10 +186,10 @@ class MigrateCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $migration = $this->createMock(Migration::class);
+        $migration = $this->createMock(Migrator::class);
 
         $this->dependencyFactory->expects($this->once())
-            ->method('getMigration')
+            ->method('getMigrator')
             ->willReturn($migration);
 
         $migration->expects($this->once())
@@ -231,10 +231,10 @@ class MigrateCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $migration = $this->createMock(Migration::class);
+        $migration = $this->createMock(Migrator::class);
 
         $this->dependencyFactory->expects($this->once())
-            ->method('getMigration')
+            ->method('getMigrator')
             ->willReturn($migration);
 
         $input->expects($this->once())
