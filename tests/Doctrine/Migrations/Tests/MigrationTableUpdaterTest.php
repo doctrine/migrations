@@ -46,10 +46,6 @@ class MigrationTableUpdaterTest extends TestCase
                 'executed_at',
             ]);
 
-        $this->migrationTable->expects($this->once())
-            ->method('getColumnName')
-            ->willReturn('version');
-
         $table = $this->createMock(Table::class);
 
         $this->schemaManager->expects($this->once())
@@ -67,7 +63,15 @@ class MigrationTableUpdaterTest extends TestCase
             Type::getType('datetime_immutable')
         );
 
-        $table->expects($this->once())
+        $this->migrationTable->expects($this->once())
+            ->method('createDBALTable')
+            ->with([
+                $versionColumn,
+                $executedAt,
+            ])
+            ->willReturn($table);
+
+        $table->expects($this->any())
             ->method('getColumns')
             ->willReturn([
                 $versionColumn,
@@ -119,10 +123,6 @@ class MigrationTableUpdaterTest extends TestCase
                 'executed_at',
             ]);
 
-        $this->migrationTable->expects($this->once())
-            ->method('getColumnName')
-            ->willReturn('version');
-
         $table = $this->createMock(Table::class);
 
         $this->schemaManager->expects($this->once())
@@ -140,7 +140,15 @@ class MigrationTableUpdaterTest extends TestCase
             Type::getType('datetime_immutable')
         );
 
-        $table->expects($this->once())
+        $this->migrationTable->expects($this->once())
+            ->method('createDBALTable')
+            ->with([
+                $versionColumn,
+                $executedAt,
+            ])
+            ->willReturn($table);
+
+        $table->expects($this->any())
             ->method('getColumns')
             ->willReturn([
                 $versionColumn,

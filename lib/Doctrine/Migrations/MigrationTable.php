@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
@@ -12,6 +13,9 @@ class MigrationTable
 {
     public const MIGRATION_COLUMN_TYPE             = 'string';
     public const MIGRATION_EXECUTED_AT_COLUMN_TYPE = 'datetime_immutable';
+
+    /** @var AbstractSchemaManager */
+    private $schemaManager;
 
     /** @var string */
     private $name;
@@ -26,11 +30,13 @@ class MigrationTable
     private $executedAtColumnName;
 
     public function __construct(
+        AbstractSchemaManager $schemaManager,
         string $name,
         string $columnName,
         int $columnLength,
         string $executedAtColumnName
     ) {
+        $this->schemaManager        = $schemaManager;
         $this->name                 = $name;
         $this->columnName           = $columnName;
         $this->columnLength         = $columnLength;
@@ -90,7 +96,12 @@ class MigrationTable
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(false);
 
-        return $this->createDBALTable($executedAtColumn);
+        $columns = [
+            $this->columnName           => $this->getMigrationsColumn(),
+            $this->executedAtColumnName => $executedAtColumn,
+        ];
+
+        return $this->createDBALTable($columns);
     }
 
     public function getNewDBALTable() : Table
@@ -98,18 +109,27 @@ class MigrationTable
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(true);
 
-        return $this->createDBALTable($executedAtColumn);
-    }
-
-    private function createDBALTable(Column $executedAtColumn) : Table
-    {
         $columns = [
             $this->columnName           => $this->getMigrationsColumn(),
             $this->executedAtColumnName => $executedAtColumn,
         ];
 
+        return $this->createDBALTable($columns);
+    }
+
+    /**
+     * @param Column[] $columns
+     */
+    public function createDBALTable(array $columns) : Table
+    {
+        $schemaConfig = $this->schemaManager->createSchemaConfig();
+
         $table = new Table($this->getName(), $columns);
         $table->setPrimaryKey([$this->getColumnName()]);
+
+        foreach ($schemaConfig->getDefaultTableOptions() as $name => $value) {
+            $table->addOption($name, $value);
+        }
 
         return $table;
     }

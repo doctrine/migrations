@@ -75,12 +75,10 @@ class MigrationTableUpdater
     {
         $tableName   = $this->migrationTable->getName();
         $columnNames = $this->migrationTable->getColumnNames();
-        $columnName  = $this->migrationTable->getColumnName();
 
         $currentTable = $this->schemaManager->listTableDetails($tableName);
 
-        $table = new Table($tableName, $currentTable->getColumns());
-        $table->setPrimaryKey([$columnName]);
+        $table = $this->migrationTable->createDBALTable($currentTable->getColumns());
 
         // remove columns from the table definition that we don't care about
         // so we don't try to drop those columns

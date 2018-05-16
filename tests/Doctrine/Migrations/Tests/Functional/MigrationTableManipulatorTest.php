@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Functional;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Schema\Index;
+use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationTableManipulator;
 use Doctrine\Migrations\MigrationTableStatus;
 use Doctrine\Migrations\Tests\MigrationTestCase;
@@ -38,6 +41,9 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
         self::assertTrue($table->hasColumn('executed_at'));
         self::assertTrue($table->getColumn('executed_at')->getNotnull());
+
+        self::assertTrue($table->hasIndex('unique_version'));
+        self::assertTrue($table->getIndex('unique_version')->isUnique());
     }
 
     public function testUpdateMigrationTable() : void
@@ -74,13 +80,31 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
     protected function setUp() : void
     {
-        $configuration = $this->getSqliteConfiguration();
+        $this->connection = $this->getTestConnection();
+
+        $configuration = new Configuration($this->connection);
+        $configuration->setMigrationsDirectory(__DIR__ . '/Stub/migration-empty-folder');
+        $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsColumnLength(200);
 
         $dependencyFactory = $configuration->getDependencyFactory();
 
         $this->migrationTableManipulator = $dependencyFactory->getMigrationTableManipulator();
         $this->migrationTableStatus      = $dependencyFactory->getMigrationTableStatus();
-        $this->connection                = $configuration->getConnection();
+    }
+
+    private function getTestConnection() : Connection
+    {
+        $params = [
+            'driver' => 'pdo_sqlite',
+            'memory' => true,
+            'defaultTableOptions' => [
+                'unique' => [
+                    new Index('unique_version', ['version'], true),
+                ],
+            ],
+        ];
+
+        return DriverManager::getConnection($params);
     }
 }
