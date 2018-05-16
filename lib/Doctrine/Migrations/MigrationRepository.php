@@ -22,6 +22,7 @@ use function count;
 use function end;
 use function get_class;
 use function implode;
+use function is_array;
 use function ksort;
 use function sprintf;
 use function substr;
@@ -171,19 +172,28 @@ class MigrationRepository
 
     public function hasVersionMigrated(Version $version) : bool
     {
+        return $this->getVersionData($version) !== null;
+    }
+
+    /**
+     * @return mixed[]|null
+     */
+    public function getVersionData(Version $version) : ?array
+    {
         $this->configuration->connect();
         $this->configuration->createMigrationTable();
 
         $sql = sprintf(
-            'SELECT %s FROM %s WHERE %s = ?',
+            'SELECT %s, %s FROM %s WHERE %s = ?',
             $this->configuration->getQuotedMigrationsColumnName(),
+            $this->configuration->getQuotedMigrationsExecutedAtColumnName(),
             $this->configuration->getMigrationsTableName(),
             $this->configuration->getQuotedMigrationsColumnName()
         );
 
-        $version = $this->connection->fetchColumn($sql, [$version->getVersion()]);
+        $data = $this->connection->fetchAssoc($sql, [$version->getVersion()]);
 
-        return $version !== false;
+        return is_array($data) ? $data : null;
     }
 
     /**

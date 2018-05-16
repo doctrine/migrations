@@ -331,14 +331,16 @@ class VersionTest extends MigrationTestCase
     /** @dataProvider sqlWriteProvider */
     public function testWriteSqlWriteToTheCorrectColumnName(
         string $direction,
+        string $tableName,
         string $columnName,
-        string $tableName
+        string $executedAtColumnName
     ) : void {
         $connection = $this->getSqliteConnection();
 
         $configuration = new Configuration($connection, $this->outputWriter);
-        $configuration->setMigrationsColumnName($columnName);
         $configuration->setMigrationsTableName($tableName);
+        $configuration->setMigrationsColumnName($columnName);
+        $configuration->setMigrationsExecutedAtColumnName($executedAtColumnName);
 
         $versionName = '005';
 
@@ -361,9 +363,10 @@ class VersionTest extends MigrationTestCase
 
             if ($direction === VersionDirection::UP) {
                 $sql = sprintf(
-                    "INSERT INTO %s (%s) VALUES ('%s');",
+                    "INSERT INTO %s (%s, %s) VALUES ('%s', CURRENT_TIMESTAMP);",
                     $tableName,
                     $columnName,
+                    $executedAtColumnName,
                     $versionName
                 );
 
@@ -387,10 +390,10 @@ class VersionTest extends MigrationTestCase
     public function sqlWriteProvider() : array
     {
         return [
-            [VersionDirection::UP, 'balalala', 'fkqsdmfjl'],
-            [VersionDirection::UP, 'fkqsdmfjl', 'balalala'],
-            [VersionDirection::DOWN, 'balalala', 'fkqsdmfjl'],
-            [VersionDirection::DOWN, 'fkqsdmfjl', 'balalala'],
+            [VersionDirection::UP, 'fkqsdmfjl', 'balalala', 'executed_at'],
+            [VersionDirection::UP, 'balalala', 'fkqsdmfjl', 'executedAt'],
+            [VersionDirection::DOWN, 'fkqsdmfjl', 'balalala', 'executed_at'],
+            [VersionDirection::DOWN, 'balalala', 'fkqsdmfjl', 'executedAt'],
         ];
     }
 
@@ -404,7 +407,12 @@ class VersionTest extends MigrationTestCase
         /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
-            ->setMethods(['getOutputWriter', 'getConnection', 'getQuotedMigrationsColumnName'])
+            ->setMethods([
+                'getOutputWriter',
+                'getConnection',
+                'getQuotedMigrationsColumnName',
+                'getQuotedMigrationsExecutedAtColumnName',
+            ])
             ->getMock();
 
         $config->method('getOutputWriter')
@@ -415,6 +423,9 @@ class VersionTest extends MigrationTestCase
 
         $config->method('getQuotedMigrationsColumnName')
             ->willReturn('version');
+
+        $config->method('getQuotedMigrationsExecutedAtColumnName')
+            ->willReturn('executed_at');
 
         /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Version::class)

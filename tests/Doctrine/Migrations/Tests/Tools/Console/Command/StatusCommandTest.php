@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use DateTimeImmutable;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
@@ -57,6 +58,16 @@ class StatusCommandTest extends TestCase
             ->method('getMigration')
             ->willReturn($migration1);
 
+        $version1->expects($this->once())
+            ->method('isMigrated')
+            ->willReturn(true);
+
+        $executedAt = new DateTimeImmutable('2018-05-16 11:14:40');
+
+        $version1->expects($this->once())
+            ->method('getExecutedAt')
+            ->willReturn($executedAt);
+
         $migration1->expects($this->once())
             ->method('getDescription')
             ->willReturn('Test description.');
@@ -72,6 +83,14 @@ class StatusCommandTest extends TestCase
             ->method('getMigration')
             ->willReturn($migration2);
 
+        $version2->expects($this->once())
+            ->method('isMigrated')
+            ->willReturn(false);
+
+        $version2->expects($this->once())
+            ->method('getExecutedAt')
+            ->willReturn(null);
+
         $migration2->expects($this->once())
             ->method('getDescription')
             ->willReturn('Test description.');
@@ -83,10 +102,6 @@ class StatusCommandTest extends TestCase
         $this->migrationRepository->expects($this->once())
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(['1234']);
-
-        $this->migrationRepository->expects($this->once())
-            ->method('getMigratedVersions')
-            ->willReturn(['1']);
 
         $this->configuration->expects($this->at(0))
             ->method('getDateTime')
@@ -107,7 +122,7 @@ class StatusCommandTest extends TestCase
 
         $output->expects($this->at(3))
             ->method('writeln')
-            ->with('    <comment>>></comment>  (<comment>1</comment>)                                                <info>migrated</info>     Test description.');
+            ->with('    <comment>>></comment>  (<comment>1</comment>)                                                <info>migrated</info> (executed at 2018-05-16 11:14:40)     Test description.');
 
         $output->expects($this->at(4))
             ->method('writeln')

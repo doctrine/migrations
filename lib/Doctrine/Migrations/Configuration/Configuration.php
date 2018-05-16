@@ -42,6 +42,9 @@ class Configuration
     /** @var int */
     private $migrationsColumnLength = 255;
 
+    /** @var string */
+    private $migrationsExecutedAtColumnName = 'executed_at';
+
     /** @var string|null */
     private $migrationsDirectory;
 
@@ -72,19 +75,21 @@ class Configuration
     /** @var QueryWriter|null */
     private $queryWriter;
 
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|null */
     private $dependencyFactory;
 
     public function __construct(
         Connection $connection,
         ?OutputWriter $outputWriter = null,
         ?MigrationFinder $migrationFinder = null,
-        ?QueryWriter $queryWriter = null
+        ?QueryWriter $queryWriter = null,
+        ?DependencyFactory $dependencyFactory = null
     ) {
-        $this->connection      = $connection;
-        $this->outputWriter    = $outputWriter;
-        $this->migrationFinder = $migrationFinder;
-        $this->queryWriter     = $queryWriter;
+        $this->connection        = $connection;
+        $this->outputWriter      = $outputWriter;
+        $this->migrationFinder   = $migrationFinder;
+        $this->queryWriter       = $queryWriter;
+        $this->dependencyFactory = $dependencyFactory;
     }
 
     public function setName(string $name) : void
@@ -125,7 +130,7 @@ class Configuration
     public function getQuotedMigrationsColumnName() : string
     {
         return $this->getDependencyFactory()
-            ->getMigrationTableCreator()
+            ->getMigrationTable()
             ->getMigrationsColumn()
             ->getQuotedName($this->connection->getDatabasePlatform());
     }
@@ -138,6 +143,24 @@ class Configuration
     public function getMigrationsColumnLength() : int
     {
         return $this->migrationsColumnLength;
+    }
+
+    public function setMigrationsExecutedAtColumnName(string $migrationsExecutedAtColumnName) : void
+    {
+        $this->migrationsExecutedAtColumnName = $migrationsExecutedAtColumnName;
+    }
+
+    public function getMigrationsExecutedAtColumnName() : string
+    {
+        return $this->migrationsExecutedAtColumnName;
+    }
+
+    public function getQuotedMigrationsExecutedAtColumnName() : string
+    {
+        return $this->getDependencyFactory()
+            ->getMigrationTable()
+            ->getExecutedAtColumn()
+            ->getQuotedName($this->connection->getDatabasePlatform());
     }
 
     public function setMigrationsDirectory(string $migrationsDirectory) : void
@@ -243,6 +266,14 @@ class Configuration
         return $this->getDependencyFactory()->getMigrationRepository()->hasVersionMigrated($version);
     }
 
+    /**
+     * @return mixed[]
+     */
+    public function getVersionData(Version $version) : ?array
+    {
+        return $this->getDependencyFactory()->getMigrationRepository()->getVersionData($version);
+    }
+
     public function resolveVersionAlias(string $alias) : ?string
     {
         return $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($alias);
@@ -260,12 +291,12 @@ class Configuration
 
     public function isMigrationTableCreated() : bool
     {
-        return $this->getDependencyFactory()->getMigrationTableCreator()->isMigrationTableCreated();
+        return $this->getDependencyFactory()->getMigrationTableStatus()->isCreated();
     }
 
     public function createMigrationTable() : bool
     {
-        return $this->getDependencyFactory()->getMigrationTableCreator()->createMigrationTable();
+        return $this->getDependencyFactory()->getMigrationTableManipulator()->createMigrationTable();
     }
 
     public function getDateTime(string $version) : string

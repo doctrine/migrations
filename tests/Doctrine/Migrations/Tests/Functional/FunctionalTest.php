@@ -32,6 +32,7 @@ use function file_exists;
 use function get_class_methods;
 use function in_array;
 use function sprintf;
+use function strtotime;
 use function unlink;
 
 class FunctionalTest extends MigrationTestCase
@@ -495,6 +496,20 @@ class FunctionalTest extends MigrationTestCase
         self::assertCount(3, $conn->fetchAll('SELECT * FROM test_data_migration'), 'migration did not execute');
         $conn->close();
         self::assertCount(3, $conn->fetchAll('SELECT * FROM test_data_migration'));
+    }
+
+    public function testMigrationExecutedAt() : void
+    {
+        $version = $this->createTestVersion($this->config, '1', MigrationMigrateUp::class);
+        $version->execute('up');
+
+        $row = $this->config->getConnection()
+            ->fetchAssoc('SELECT * FROM test_migrations_table');
+
+        self::assertEquals('1', $row['current_version']);
+        self::assertTrue(isset($row['executed_at']));
+        self::assertNotNull($row['executed_at']);
+        self::assertNotFalse(strtotime($row['executed_at']));
     }
 
     /**

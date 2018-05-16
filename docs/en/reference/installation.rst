@@ -15,7 +15,6 @@ Install it with composer:
 
     composer require doctrine/migrations
 
-
 PHP Binary / PHAR
 ~~~~~~~~~~~~~~~~~
 
@@ -67,7 +66,7 @@ file like the following:
 
         <migrations-namespace>DoctrineMigrations</migrations-namespace>
 
-        <table name="doctrine_migration_versions" />
+        <table name="doctrine_migration_versions" column="version" executed_at_column="executed_at" />
 
         <migrations-directory>/path/to/migrations/classes/DoctrineMigrations</migrations-directory>
 
@@ -80,6 +79,8 @@ Of course you could do the same thing with a *configuration.yml* file:
     name: Doctrine Sandbox Migrations
     migrations_namespace: DoctrineMigrations
     table_name: doctrine_migration_versions
+    column_name: version
+    executed_at_column_name: executed_at
     migrations_directory: /path/to/migrations/classes/DoctrineMigrations
 
 With the above example, the migrations tool will search the ``migrations_directory``
@@ -105,9 +106,9 @@ And if you want to specify each migration manually in YAML you can:
     table_name: doctrine_migration_versions
     migrations_directory: /path/to/migrations/classes/DoctrineMigrations
     migrations:
-      migration1:
-        version: 20100704000000
-        class: DoctrineMigrations\NewMigration
+        migration1:
+            version: 20100704000000
+            class: DoctrineMigrations\NewMigration
 
 If you specify your own migration classes (like `DoctrineMigrations\NewMigration` in the previous
 example) you will need an autoloader unless all those classes begin with the prefix Version*,

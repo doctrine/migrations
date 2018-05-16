@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use DateTimeImmutable;
 use Doctrine\Migrations\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function count;
-use function in_array;
 use function max;
 use function sprintf;
 use function str_repeat;
@@ -111,13 +111,14 @@ EOT
         array $versions,
         OutputInterface $output
     ) : void {
-        $migratedVersions = $this->migrationRepository->getMigratedVersions();
-
         foreach ($versions as $version) {
-            $versionName = $version->getVersion();
+            $executedAt = $version->getExecutedAt();
 
-            $isMigrated = in_array($versionName, $migratedVersions, true);
-            $status     = $isMigrated ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $status = $version->isMigrated() ? '<info>migrated</info>' : '<error>not migrated</error>';
+
+            $executedAtStatus = $executedAt instanceof DateTimeImmutable
+                ? sprintf(' (executed at %s)', $executedAt->format('Y-m-d H:i:s'))
+                : '';
 
             $migration   = $version->getMigration();
             $description = $migration->getDescription();
@@ -126,14 +127,16 @@ EOT
                 ? str_repeat(' ', 5) . $description
                 : '';
 
+            $versionName      = $version->getVersion();
             $formattedVersion = $version->getDateTime();
 
             $output->writeln(sprintf(
-                '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s',
+                '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s%s',
                 $formattedVersion,
                 $versionName,
                 str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($versionName))),
                 $status,
+                $executedAtStatus,
                 $migrationDescription
             ));
         }
