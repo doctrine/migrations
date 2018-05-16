@@ -137,7 +137,8 @@ class DependencyFactory
                 $this->getConnection(),
                 $this->getSchemaDiffProvider(),
                 $this->getOutputWriter(),
-                $this->getParameterFormatter()
+                $this->getParameterFormatter(),
+                $this->getStopwatch()
             );
         });
     }
@@ -215,8 +216,16 @@ class DependencyFactory
             return new Migrator(
                 $this->configuration,
                 $this->getMigrationRepository(),
-                $this->getOutputWriter()
+                $this->getOutputWriter(),
+                $this->getStopwatch()
             );
+        });
+    }
+
+    public function getStopwatch() : Stopwatch
+    {
+        return $this->getDependency(Stopwatch::class, function () : Stopwatch {
+            return new Stopwatch();
         });
     }
 

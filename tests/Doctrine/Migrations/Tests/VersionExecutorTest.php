@@ -12,11 +12,13 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Version;
 use Doctrine\Migrations\VersionDirection;
 use Doctrine\Migrations\VersionExecutionResult;
 use Doctrine\Migrations\VersionExecutor;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class VersionExecutorTest extends TestCase
 {
@@ -35,6 +37,9 @@ class VersionExecutorTest extends TestCase
     /** @var ParameterFormatter */
     private $parameterFormatter;
 
+    /** @var Stopwatch */
+    private $stopwatch;
+
     /** @var VersionExecutor */
     private $versionExecutor;
 
@@ -43,36 +48,6 @@ class VersionExecutorTest extends TestCase
 
     /** @var Migration */
     private $migration;
-
-    protected function setUp() : void
-    {
-        $this->configuration      = $this->createMock(Configuration::class);
-        $this->connection         = $this->createMock(Connection::class);
-        $this->schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
-        $this->outputWriter       = $this->createMock(OutputWriter::class);
-        $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
-
-        $this->versionExecutor = new VersionExecutor(
-            $this->configuration,
-            $this->connection,
-            $this->schemaDiffProvider,
-            $this->outputWriter,
-            $this->parameterFormatter
-        );
-
-        $this->configuration->expects($this->any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
-
-        $this->version = new Version(
-            $this->configuration,
-            '001',
-            VersionExecutorTestMigration::class,
-            $this->versionExecutor
-        );
-
-        $this->migration = new VersionExecutorTestMigration($this->version);
-    }
 
     public function testAddSql() : void
     {
@@ -90,6 +65,47 @@ class VersionExecutorTest extends TestCase
         $this->connection->expects($this->once())
             ->method('getDatabasePlatform')
             ->willReturn($platform);
+
+        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
+
+        $this->stopwatch->expects($this->any())
+            ->method('start')
+            ->willReturn($stopwatchEvent);
+
+        $stopwatchEvent->expects($this->any())
+            ->method('stop');
+
+        $stopwatchEvent->expects($this->any())
+            ->method('getDuration')
+            ->willReturn(100);
+
+        $stopwatchEvent->expects($this->any())
+            ->method('getMemory')
+            ->willReturn(100);
+
+        $this->outputWriter->expects($this->at(0))
+            ->method('write')
+            ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
+
+        $this->outputWriter->expects($this->at(1))
+            ->method('write')
+            ->with('     <comment>-></comment> SELECT 1');
+
+        $this->outputWriter->expects($this->at(2))
+            ->method('write')
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects($this->at(3))
+            ->method('write')
+            ->with('     <comment>-></comment> SELECT 2');
+
+        $this->outputWriter->expects($this->at(4))
+            ->method('write')
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects($this->at(5))
+            ->method('write')
+            ->with("\n  <info>++</info> migrated (took 100ms, used 100 memory)");
 
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
@@ -113,6 +129,47 @@ class VersionExecutorTest extends TestCase
 
     public function testExecuteDown() : void
     {
+        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
+
+        $this->stopwatch->expects($this->any())
+            ->method('start')
+            ->willReturn($stopwatchEvent);
+
+        $stopwatchEvent->expects($this->any())
+            ->method('stop');
+
+        $stopwatchEvent->expects($this->any())
+            ->method('getDuration')
+            ->willReturn(100);
+
+        $stopwatchEvent->expects($this->any())
+            ->method('getMemory')
+            ->willReturn(100);
+
+        $this->outputWriter->expects($this->at(0))
+            ->method('write')
+            ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
+
+        $this->outputWriter->expects($this->at(1))
+            ->method('write')
+            ->with('     <comment>-></comment> SELECT 3');
+
+        $this->outputWriter->expects($this->at(2))
+            ->method('write')
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects($this->at(3))
+            ->method('write')
+            ->with('     <comment>-></comment> SELECT 4');
+
+        $this->outputWriter->expects($this->at(4))
+            ->method('write')
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects($this->at(5))
+            ->method('write')
+            ->with("\n  <info>--</info> reverted (took 100ms, used 100 memory)");
+
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,
@@ -131,6 +188,38 @@ class VersionExecutorTest extends TestCase
         self::assertFalse($this->migration->postUpExecuted);
         self::assertTrue($this->migration->preDownExecuted);
         self::assertTrue($this->migration->postDownExecuted);
+    }
+
+    protected function setUp() : void
+    {
+        $this->configuration      = $this->createMock(Configuration::class);
+        $this->connection         = $this->createMock(Connection::class);
+        $this->schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
+        $this->outputWriter       = $this->createMock(OutputWriter::class);
+        $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
+        $this->stopwatch          = $this->createMock(Stopwatch::class);
+
+        $this->versionExecutor = new VersionExecutor(
+            $this->configuration,
+            $this->connection,
+            $this->schemaDiffProvider,
+            $this->outputWriter,
+            $this->parameterFormatter,
+            $this->stopwatch
+        );
+
+        $this->configuration->expects($this->any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->version = new Version(
+            $this->configuration,
+            '001',
+            VersionExecutorTestMigration::class,
+            $this->versionExecutor
+        );
+
+        $this->migration = new VersionExecutorTestMigration($this->version);
     }
 }
 

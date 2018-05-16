@@ -51,6 +51,15 @@ class VersionExecutionResultTest extends TestCase
         self::assertEquals(5.5, $this->versionExecutionResult->getTime());
     }
 
+    public function testGetSetMemory() : void
+    {
+        self::assertNull($this->versionExecutionResult->getMemory());
+
+        $this->versionExecutionResult->setMemory(555555);
+
+        self::assertEquals(555555, $this->versionExecutionResult->getMemory());
+    }
+
     public function testSkipped() : void
     {
         self::assertFalse($this->versionExecutionResult->isSkipped());

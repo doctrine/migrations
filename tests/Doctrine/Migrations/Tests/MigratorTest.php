@@ -12,6 +12,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\VersionDirection;
 use PHPUnit\Framework\Constraint\RegularExpression;
@@ -20,7 +21,7 @@ use const DIRECTORY_SEPARATOR;
 
 require_once __DIR__ . '/realpath.php';
 
-class MigrationTest extends MigrationTestCase
+class MigratorTest extends MigrationTestCase
 {
     /** @var Connection */
     private $conn;
@@ -44,12 +45,18 @@ class MigrationTest extends MigrationTestCase
         $configuration       = $this->createMock(Configuration::class);
         $migrationRepository = $this->createMock(MigrationRepository::class);
         $outputWriter        = $this->createMock(OutputWriter::class);
+        $stopwatch           = $this->createMock(Stopwatch::class);
         $queryWriter         = $this->createMock(QueryWriter::class);
 
         $sql = ['SELECT 1'];
 
         $migration = $this->getMockBuilder(Migrator::class)
-            ->setConstructorArgs([$configuration, $migrationRepository, $outputWriter])
+            ->setConstructorArgs([
+                $configuration,
+                $migrationRepository,
+                $outputWriter,
+                $stopwatch,
+            ])
             ->setMethods(['getSql'])
             ->getMock();
 
@@ -123,16 +130,16 @@ class MigrationTest extends MigrationTestCase
     {
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
-          ->disableOriginalConstructor()
-          ->setMethods(['migrate'])
-          ->getMock();
+            ->disableOriginalConstructor()
+            ->setMethods(['migrate'])
+            ->getMock();
 
         $expected = ['something'];
 
         $migration->expects($this->once())
-                  ->method('migrate')
-                  ->with($to, true)
-                  ->willReturn($expected);
+            ->method('migrate')
+            ->with($to, true)
+            ->willReturn($expected);
 
         $result = $migration->getSql($to);
 
@@ -199,7 +206,7 @@ class MigrationTest extends MigrationTestCase
 
         /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
-            ->setConstructorArgs($this->getMigrationConstructorArgs($config))
+            ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
 

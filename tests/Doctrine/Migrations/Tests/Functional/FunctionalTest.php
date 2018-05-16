@@ -15,6 +15,7 @@ use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest;
@@ -563,12 +564,15 @@ class FunctionalTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($this->connection);
 
+        $stopwatch = new Stopwatch();
+
         $versionExecutor = new VersionExecutor(
             $this->config,
             $this->connection,
             $schemaDiffProvider,
             $this->config->getOutputWriter(),
-            $parameterFormatter
+            $parameterFormatter,
+            $stopwatch
         );
 
         return new Version($configuration, $versionName, $className, $versionExecutor);

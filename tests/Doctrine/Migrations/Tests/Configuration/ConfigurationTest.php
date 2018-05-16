@@ -19,6 +19,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\Migrations\Version;
@@ -137,10 +138,13 @@ class ConfigurationTest extends MigrationTestCase
 
         $dependencyFactory = $configuration->getDependencyFactory();
 
+        $stopwatch = new Stopwatch();
+
         $migrator = new Migrator(
             $configuration,
             $dependencyFactory->getMigrationRepository(),
-            $dependencyFactory->getOutputWriter()
+            $dependencyFactory->getOutputWriter(),
+            $stopwatch
         );
         $migrator->migrate('3Test');
 
