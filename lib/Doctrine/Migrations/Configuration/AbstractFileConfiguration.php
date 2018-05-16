@@ -23,6 +23,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations_namespace',
         'table_name',
         'column_name',
+        'column_length',
         'executed_at_column_name',
         'organize_migrations',
         'name',
@@ -86,6 +87,10 @@ abstract class AbstractFileConfiguration extends Configuration
 
         if (isset($config['column_name'])) {
             $this->setMigrationsColumnName($config['column_name']);
+        }
+
+        if (isset($config['column_length'])) {
+            $this->setMigrationsColumnLength($config['column_length']);
         }
 
         if (isset($config['executed_at_column_name'])) {

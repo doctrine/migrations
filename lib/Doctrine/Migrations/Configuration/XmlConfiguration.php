@@ -45,6 +45,10 @@ class XmlConfiguration extends AbstractFileConfiguration
             $config['column_name'] = (string) $xml->table['column'];
         }
 
+        if (isset($xml->table['column_length'])) {
+            $config['column_length'] = (int) $xml->table['column_length'];
+        }
+
         if (isset($xml->table['executed_at_column'])) {
             $config['executed_at_column_name'] = (string) $xml->table['executed_at_column'];
         }

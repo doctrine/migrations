@@ -53,6 +53,12 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         self::assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
     }
 
+    public function testMigrationsColumnLength() : void
+    {
+        $config = $this->loadConfiguration();
+        self::assertEquals(200, $config->getMigrationsColumnLength());
+    }
+
     public function testMigrationsExecutedAtColumnName() : void
     {
         $config = $this->loadConfiguration();
