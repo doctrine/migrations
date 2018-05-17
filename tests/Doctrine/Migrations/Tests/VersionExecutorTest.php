@@ -9,6 +9,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\MigratorConfig;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -107,12 +108,15 @@ class VersionExecutorTest extends TestCase
             ->method('write')
             ->with("\n  <info>++</info> migrated (took 100ms, used 100 memory)");
 
+        $migratorConfig = (new MigratorConfig())
+            ->setTimeAllQueries(true)
+        ;
+
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,
             VersionDirection::UP,
-            false,
-            true
+            $migratorConfig
         );
 
         self::assertInstanceOf(VersionExecutionResult::class, $versionExecutionResult);
@@ -170,12 +174,15 @@ class VersionExecutorTest extends TestCase
             ->method('write')
             ->with("\n  <info>--</info> reverted (took 100ms, used 100 memory)");
 
+        $migratorConfig = (new MigratorConfig())
+            ->setTimeAllQueries(true)
+        ;
+
         $versionExecutionResult = $this->versionExecutor->execute(
             $this->version,
             $this->migration,
             VersionDirection::DOWN,
-            false,
-            true
+            $migratorConfig
         );
 
         self::assertInstanceOf(VersionExecutionResult::class, $versionExecutionResult);

@@ -63,6 +63,9 @@ class Configuration
     /** @var bool */
     private $isDryRun = false;
 
+    /** @var bool */
+    private $allOrNothing = false;
+
     /** @var Connection */
     private $connection;
 
@@ -287,6 +290,16 @@ class Configuration
     public function isDryRun() : bool
     {
         return $this->isDryRun;
+    }
+
+    public function setAllOrNothing(bool $allOrNothing) : void
+    {
+        $this->allOrNothing = $allOrNothing;
+    }
+
+    public function isAllOrNothing() : bool
+    {
+        return $this->allOrNothing;
     }
 
     public function isMigrationTableCreated() : bool

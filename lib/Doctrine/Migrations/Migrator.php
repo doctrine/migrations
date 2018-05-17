@@ -9,6 +9,8 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Symfony\Component\Stopwatch\StopwatchEvent;
+use Throwable;
 use const COUNT_RECURSIVE;
 use function count;
 use function sprintf;
@@ -27,9 +29,6 @@ class Migrator
     /** @var Stopwatch */
     private $stopwatch;
 
-    /** @var bool */
-    private $noMigrationException = false;
-
     public function __construct(
         Configuration $configuration,
         MigrationRepository $migrationRepository,
@@ -42,15 +41,13 @@ class Migrator
         $this->stopwatch           = $stopwatch;
     }
 
-    public function setNoMigrationException(bool $noMigrationException = false) : void
-    {
-        $this->noMigrationException = $noMigrationException;
-    }
-
     /** @return string[][] */
     public function getSql(?string $to = null) : array
     {
-        return $this->migrate($to, true);
+        $migratorConfig = (new MigratorConfig())
+            ->setDryRun(true);
+
+        return $this->migrate($to, $migratorConfig);
     }
 
     public function writeSqlFile(string $path, ?string $to = null) : bool
@@ -87,15 +84,14 @@ class Migrator
      */
     public function migrate(
         ?string $to = null,
-        bool $dryRun = false,
-        bool $timeAllQueries = false,
-        ?callable $confirm = null
+        ?MigratorConfig $migratorConfig = null
     ) : array {
+        $migratorConfig = $migratorConfig ?? new MigratorConfig();
+        $dryRun         = $migratorConfig->isDryRun();
+
         if ($to === null) {
             $to = $this->migrationRepository->getLatestVersion();
         }
-
-        $from = $this->migrationRepository->getCurrentVersion();
 
         $versions = $this->migrationRepository->getMigrations();
 
@@ -103,9 +99,9 @@ class Migrator
             throw UnknownMigrationVersion::new($to);
         }
 
-        $direction = $from > $to
-            ? VersionDirection::DOWN
-            : VersionDirection::UP;
+        $from = $this->migrationRepository->getCurrentVersion();
+
+        $direction = $this->calculateDirection($from, $to);
 
         $migrationsToExecute = $this->configuration
             ->getMigrationsToExecute($direction, $to);
@@ -122,10 +118,6 @@ class Migrator
             return $this->noMigrations();
         }
 
-        if (! $dryRun && $this->migrationsCanExecute($confirm) === false) {
-            return [];
-        }
-
         $output  = $dryRun ? 'Executing dry run of migration' : 'Migrating';
         $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
 
@@ -134,7 +126,7 @@ class Migrator
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (count($migrationsToExecute) === 0 && ! $this->noMigrationException) {
+        if (count($migrationsToExecute) === 0 && ! $migratorConfig->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
         } elseif (count($migrationsToExecute) === 0) {
             return $this->noMigrations();
@@ -142,18 +134,73 @@ class Migrator
 
         $stopwatchEvent = $this->stopwatch->start('migrate');
 
+        $sql = $this->executeMigration($migrationsToExecute, $direction, $migratorConfig);
+
+        $this->endMigration($stopwatchEvent, $migrationsToExecute, $sql);
+
+        return $sql;
+    }
+
+    /**
+     * @param Version[] $migrationsToExecute
+     *
+     * @return string[][]
+     */
+    private function executeMigration(
+        array $migrationsToExecute,
+        string $direction,
+        MigratorConfig $migratorConfig
+    ) : array {
+        $dryRun = $migratorConfig->isDryRun();
+
         $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
 
-        $sql = [];
+        $connection = $this->configuration->getConnection();
 
-        foreach ($migrationsToExecute as $version) {
-            $versionExecutionResult = $version->execute($direction, $dryRun, $timeAllQueries);
+        $allOrNothing = $migratorConfig->isAllOrNothing();
 
-            $sql[$version->getVersion()] = $versionExecutionResult->getSql();
+        if ($allOrNothing) {
+            $connection->beginTransaction();
         }
 
-        $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
+        try {
+            $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
 
+            $sql  = [];
+            $time = 0;
+
+            foreach ($migrationsToExecute as $version) {
+                $versionExecutionResult = $version->execute($direction, $migratorConfig);
+
+                $sql[$version->getVersion()] = $versionExecutionResult->getSql();
+                $time                       += $versionExecutionResult->getTime();
+            }
+
+            $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
+        } catch (Throwable $e) {
+            if ($allOrNothing) {
+                $connection->rollBack();
+            }
+
+            throw $e;
+        }
+
+        if ($allOrNothing) {
+            $connection->commit();
+        }
+
+        return $sql;
+    }
+
+    /**
+     * @param Version[]  $migrationsToExecute
+     * @param string[][] $sql
+     */
+    private function endMigration(
+        StopwatchEvent $stopwatchEvent,
+        array $migrationsToExecute,
+        array $sql
+    ) : void {
         $stopwatchEvent->stop();
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
@@ -177,8 +224,11 @@ class Migrator
             '  <info>++</info> %s sql queries',
             count($sql, COUNT_RECURSIVE) - count($sql)
         ));
+    }
 
-        return $sql;
+    private function calculateDirection(string $from, string $to) : string
+    {
+        return (int) $from > (int) $to ? VersionDirection::DOWN : VersionDirection::UP;
     }
 
     /** @return string[][] */
@@ -187,10 +237,5 @@ class Migrator
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
 
         return [];
-    }
-
-    private function migrationsCanExecute(?callable $confirm = null) : bool
-    {
-        return $confirm === null ? true : (bool) $confirm();
     }
 }

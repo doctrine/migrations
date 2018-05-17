@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationException;
+use Doctrine\Migrations\MigratorConfig;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -117,7 +118,8 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
@@ -226,7 +228,7 @@ class VersionTest extends MigrationTestCase
 
         $version->expects($this->once())
             ->method('execute')
-            ->with($direction, true)
+            ->with($direction)
             ->willReturn($versionExecutionResult);
 
         $queryWriter->method('write')
@@ -437,7 +439,7 @@ class VersionTest extends MigrationTestCase
         $versionExecutionResult = new VersionExecutionResult(['SHOW DATABASES;']);
 
         $migration->method('execute')
-            ->with($direction, true)
+            ->with($direction)
             ->willReturn($versionExecutionResult);
 
         $sqlFilesDir = vfsStream::setup('sql_files_dir');
@@ -468,7 +470,8 @@ class VersionTest extends MigrationTestCase
             VersionDryRunWithoutParams::class
         );
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('SELECT 1 WHERE 1', $messages[1]);
@@ -490,7 +493,8 @@ class VersionTest extends MigrationTestCase
             VersionDryRunQuestionMarkParams::class
         );
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
@@ -513,7 +517,8 @@ class VersionTest extends MigrationTestCase
             VersionDryRunNamedParams::class
         );
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
@@ -559,7 +564,8 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setParam($value, $type);
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
@@ -584,7 +590,8 @@ class VersionTest extends MigrationTestCase
 
         $version->getMigration()->setParam([null], []);
 
-        $version->execute(VersionDirection::UP, true);
+        $version->execute(VersionDirection::UP, (new MigratorConfig())
+            ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);

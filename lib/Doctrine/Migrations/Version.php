@@ -139,7 +139,10 @@ class Version implements VersionInterface
         string $path,
         string $direction = VersionDirection::UP
     ) : bool {
-        $versionExecutionResult = $this->execute($direction, true);
+        $versionExecutionResult = $this->execute(
+            $direction,
+            $this->getWriteSqlFileMigratorConfig()
+        );
 
         if (count($versionExecutionResult->getParams()) !== 0) {
             throw MigrationNotConvertibleToSql::new($this->class);
@@ -160,15 +163,13 @@ class Version implements VersionInterface
 
     public function execute(
         string $direction,
-        bool $dryRun = false,
-        bool $timeAllQueries = false
+        ?MigratorConfig $migratorConfig = null
     ) : VersionExecutionResult {
         return $this->versionExecutor->execute(
             $this,
             $this->migration,
             $direction,
-            $dryRun,
-            $timeAllQueries
+            $migratorConfig
         );
     }
 
@@ -200,14 +201,21 @@ class Version implements VersionInterface
                     $migrationsExecutedAtColumnName => $this->getExecutedAtDatabaseValue(),
                 ]
             );
-        } else {
-            $this->connection->delete(
-                $this->configuration->getMigrationsTableName(),
-                [
-                    $migrationsColumnName => $this->version,
-                ]
-            );
+
+            return;
         }
+
+        $this->connection->delete(
+            $this->configuration->getMigrationsTableName(),
+            [
+                $migrationsColumnName => $this->version,
+            ]
+        );
+    }
+
+    private function getWriteSqlFileMigratorConfig() : MigratorConfig
+    {
+        return (new MigratorConfig())->setDryRun(true);
     }
 
     private function getExecutedAtDatabaseValue() : string

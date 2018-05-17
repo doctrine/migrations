@@ -19,7 +19,6 @@ interface VersionExecutorInterface
         Version $version,
         AbstractMigration $migration,
         string $direction,
-        bool $dryRun = false,
-        bool $timeAllQueries = false
+        ?MigratorConfig $migratorConfig = null
     ) : VersionExecutionResult;
 }

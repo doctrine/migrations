@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Migrator;
+use Doctrine\Migrations\MigratorConfig;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -56,6 +57,13 @@ class MigrateCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Don\'t throw an exception if no migration is available (CI).'
             )
+            ->addOption(
+                'all-or-nothing',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Wrap the entire migration in a transaction.',
+                false
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
@@ -89,6 +97,8 @@ Or you can also execute the migration without a warning message which you need t
 You can also time all the different queries if you wanna know which one is taking so long:
 
     <info>%command.full_name% --query-time</info>
+
+Use the --all-or-nothing option to wrap the entire migration in a transaction.
 EOT
         );
 
@@ -97,15 +107,14 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $migrator = $this->createMigrator();
-
         $this->outputHeader($output);
 
         $version          = (string) $input->getArgument('version');
         $path             = $input->getOption('write-sql');
         $allowNoMigration = (bool) $input->getOption('allow-no-migration');
-        $timeAllqueries   = (bool) $input->getOption('query-time');
+        $timeAllQueries   = (bool) $input->getOption('query-time');
         $dryRun           = (bool) $input->getOption('dry-run');
+        $allOrNothing     = $this->getAllOrNothing($input->getOption('all-or-nothing'));
 
         $this->configuration->setIsDryRun($dryRun);
 
@@ -122,6 +131,8 @@ EOT
             return 1;
         }
 
+        $migrator = $this->createMigrator();
+
         if ($path !== false) {
             $path = $path === null ? getcwd() : $path;
 
@@ -130,29 +141,22 @@ EOT
             return 0;
         }
 
-        $cancelled = false;
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
 
-        $migrator->setNoMigrationException($allowNoMigration);
-
-        $result = $migrator->migrate(
-            $version,
-            $dryRun,
-            $timeAllqueries,
-            function () use ($input, $output, &$cancelled) {
-                $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
-
-                $canContinue = $this->canExecute($question, $input, $output);
-                $cancelled   = ! $canContinue;
-
-                return $canContinue;
-            }
-        );
-
-        if ($cancelled) {
+        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 1;
         }
+
+        $migratorConfig = (new MigratorConfig())
+            ->setDryRun($dryRun)
+            ->setTimeAllQueries($timeAllQueries)
+            ->setNoMigrationException($allowNoMigration)
+            ->setAllOrNothing($allOrNothing)
+        ;
+
+        $migrator->migrate($version, $migratorConfig);
 
         return 0;
     }
@@ -200,33 +204,48 @@ EOT
     ) : string {
         $version = $this->configuration->resolveVersionAlias($versionAlias);
 
-        if ($version === null) {
-            if ($versionAlias === 'prev') {
-                $output->writeln('<error>Already at first version.</error>');
+        if ($version !== null) {
+            return $version;
+        }
 
-                return '';
-            }
-
-            if ($versionAlias === 'next') {
-                $output->writeln('<error>Already at latest version.</error>');
-
-                return '';
-            }
-
-            if (substr($versionAlias, 0, 7) === 'current') {
-                $output->writeln('<error>The delta couldn\'t be reached.</error>');
-
-                return '';
-            }
-
-            $output->writeln(sprintf(
-                '<error>Unknown version: %s</error>',
-                OutputFormatter::escape($versionAlias)
-            ));
+        if ($versionAlias === 'prev') {
+            $output->writeln('<error>Already at first version.</error>');
 
             return '';
         }
 
-        return $version;
+        if ($versionAlias === 'next') {
+            $output->writeln('<error>Already at latest version.</error>');
+
+            return '';
+        }
+
+        if (substr($versionAlias, 0, 7) === 'current') {
+            $output->writeln('<error>The delta couldn\'t be reached.</error>');
+
+            return '';
+        }
+
+        $output->writeln(sprintf(
+            '<error>Unknown version: %s</error>',
+            OutputFormatter::escape($versionAlias)
+        ));
+
+        return '';
+    }
+
+    /**
+     * @param mixed $allOrNothing
+     */
+    private function getAllOrNothing($allOrNothing) : bool
+    {
+        if ($allOrNothing !== false) {
+            return $allOrNothing !== null
+                ? (bool) $allOrNothing
+                : true
+            ;
+        }
+
+        return $this->configuration->isAllOrNothing();
     }
 }

@@ -106,12 +106,13 @@ final class VersionExecutor implements VersionExecutorInterface
         Version $version,
         AbstractMigration $migration,
         string $direction,
-        bool $dryRun = false,
-        bool $timeAllQueries = false
+        ?MigratorConfig $migratorConfig = null
     ) : VersionExecutionResult {
+        $migratorConfig = $migratorConfig ?? new MigratorConfig();
+
         $versionExecutionResult = new VersionExecutionResult();
 
-        $this->startMigration($version, $migration, $direction, $dryRun);
+        $this->startMigration($version, $migration, $direction, $migratorConfig);
 
         try {
             $this->executeMigration(
@@ -119,8 +120,7 @@ final class VersionExecutor implements VersionExecutorInterface
                 $migration,
                 $versionExecutionResult,
                 $direction,
-                $dryRun,
-                $timeAllQueries
+                $migratorConfig
             );
 
             $versionExecutionResult->setSql($this->sql);
@@ -132,7 +132,7 @@ final class VersionExecutor implements VersionExecutorInterface
                 $version,
                 $migration,
                 $direction,
-                $dryRun
+                $migratorConfig
             );
 
             $versionExecutionResult->setSkipped(true);
@@ -152,7 +152,7 @@ final class VersionExecutor implements VersionExecutorInterface
         Version $version,
         AbstractMigration $migration,
         string $direction,
-        bool $dryRun
+        MigratorConfig $migratorConfig
     ) : void {
         $this->sql    = [];
         $this->params = [];
@@ -162,14 +162,14 @@ final class VersionExecutor implements VersionExecutorInterface
             $version,
             Events::onMigrationsVersionExecuting,
             $direction,
-            $dryRun
+            $migratorConfig->isDryRun()
         );
 
         if (! $migration->isTransactional()) {
             return;
         }
 
-        //only start transaction if in transactional mode
+        // only start transaction if in transactional mode
         $this->connection->beginTransaction();
     }
 
@@ -178,8 +178,7 @@ final class VersionExecutor implements VersionExecutorInterface
         AbstractMigration $migration,
         VersionExecutionResult $versionExecutionResult,
         string $direction,
-        bool $dryRun,
-        bool $timeAllQueries
+        MigratorConfig $migratorConfig
     ) : VersionExecutionResult {
         $stopwatchEvent = $this->stopwatch->start('execute');
 
@@ -206,8 +205,8 @@ final class VersionExecutor implements VersionExecutorInterface
         }
 
         if (count($this->sql) !== 0) {
-            if (! $dryRun) {
-                $this->executeVersionExecutionResult($version, $dryRun, $timeAllQueries);
+            if (! $migratorConfig->isDryRun()) {
+                $this->executeVersionExecutionResult($version, $migratorConfig);
             } else {
                 foreach ($this->sql as $idx => $query) {
                     $this->outputSqlQuery($idx, $query);
@@ -224,7 +223,7 @@ final class VersionExecutor implements VersionExecutorInterface
 
         $migration->{'post' . ucfirst($direction)}($toSchema);
 
-        if (! $dryRun) {
+        if (! $migratorConfig->isDryRun()) {
             $version->markVersion($direction);
         }
 
@@ -258,7 +257,7 @@ final class VersionExecutor implements VersionExecutorInterface
             $version,
             Events::onMigrationsVersionExecuted,
             $direction,
-            $dryRun
+            $migratorConfig->isDryRun()
         );
 
         return $versionExecutionResult;
@@ -269,14 +268,14 @@ final class VersionExecutor implements VersionExecutorInterface
         Version $version,
         AbstractMigration $migration,
         string $direction,
-        bool $dryRun
+        MigratorConfig $migratorConfig
     ) : void {
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode
             $this->connection->rollBack();
         }
 
-        if ($dryRun === false) {
+        if (! $migratorConfig->isDryRun()) {
             $version->markVersion($direction);
         }
 
@@ -288,7 +287,7 @@ final class VersionExecutor implements VersionExecutorInterface
             $version,
             Events::onMigrationsVersionSkipped,
             $direction,
-            $dryRun
+            $migratorConfig->isDryRun()
         );
     }
 
@@ -314,8 +313,7 @@ final class VersionExecutor implements VersionExecutorInterface
 
     private function executeVersionExecutionResult(
         Version $version,
-        bool $dryRun = false,
-        bool $timeAllQueries = false
+        MigratorConfig $migratorConfig
     ) : void {
         foreach ($this->sql as $key => $query) {
             $stopwatchEvent = $this->stopwatch->start('query');
@@ -330,7 +328,7 @@ final class VersionExecutor implements VersionExecutorInterface
 
             $stopwatchEvent->stop();
 
-            if (! $timeAllQueries) {
+            if (! $migratorConfig->getTimeAllQueries()) {
                 continue;
             }
 

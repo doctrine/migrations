@@ -24,6 +24,7 @@
                     </xs:simpleType>
                 </xs:element>
                 <xs:element type="xs:string" name="migrations-directory" minOccurs="0" maxOccurs="1"/>
+                <xs:element type="xs:boolean" name="all-or-nothing" minOccurs="0" maxOccurs="1"/>
                 <xs:element name="migrations" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence minOccurs="0" maxOccurs="unbounded">

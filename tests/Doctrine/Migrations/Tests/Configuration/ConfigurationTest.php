@@ -334,6 +334,17 @@ class ConfigurationTest extends MigrationTestCase
         self::assertEquals($versionData, $configuration->getVersionData($version));
     }
 
+    public function testGetSetAllOrNothing() : void
+    {
+        $configuration = $this->createPartialMock(Configuration::class, []);
+
+        self::assertFalse($configuration->isAllOrNothing());
+
+        $configuration->setAllOrNothing(true);
+
+        self::assertTrue($configuration->isAllOrNothing());
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|Connection
      */

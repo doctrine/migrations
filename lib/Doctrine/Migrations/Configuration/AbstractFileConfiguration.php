@@ -30,6 +30,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations_directory',
         'migrations',
         'custom_template',
+        'all_or_nothing',
     ];
 
     /** @var string */
@@ -113,11 +114,15 @@ abstract class AbstractFileConfiguration extends Configuration
             $this->loadMigrations($config['migrations']);
         }
 
-        if (! isset($config['custom_template'])) {
+        if (isset($config['custom_template'])) {
+            $this->setCustomTemplate($config['custom_template']);
+        }
+
+        if (! isset($config['all_or_nothing'])) {
             return;
         }
 
-        $this->setCustomTemplate($config['custom_template']);
+        $this->setAllOrNothing($config['all_or_nothing']);
     }
 
     protected function getDirectoryRelativeToFile(string $file, string $input) : string

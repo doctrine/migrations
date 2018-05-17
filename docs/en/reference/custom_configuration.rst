@@ -18,6 +18,7 @@ code that would looks like the following:
     $configuration->setMigrationsDirectory('/path/to/project/src/App/Migrations');
     $configuration->setMigrationsNamespace('App/Migrations');
     $configuration->registerMigrationsFromDirectory('/path/to/project/src/App/Migrations');
+    $configuration->setAllOrNothing(true);
 
     // My command that extends Doctrine\DBAL\Migrations\Tools\Console\Command\AbstractCommand
     $command->setMigrationConfiguration($configuration);

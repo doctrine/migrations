@@ -70,6 +70,8 @@ file like the following:
 
         <migrations-directory>/path/to/migrations/classes/DoctrineMigrations</migrations-directory>
 
+        <all-or-nothing>1</all-or-nothing>
+
     </doctrine-migrations>
 
 Of course you could do the same thing with a *configuration.yml* file:
@@ -82,6 +84,7 @@ Of course you could do the same thing with a *configuration.yml* file:
     column_name: version
     executed_at_column_name: executed_at
     migrations_directory: /path/to/migrations/classes/DoctrineMigrations
+    all_or_nothing: true
 
 With the above example, the migrations tool will search the ``migrations_directory``
 recursively for files that begin with ``Version`` followed one to 255 characters

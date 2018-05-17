@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Events;
+use Doctrine\Migrations\MigratorConfig;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
@@ -163,8 +164,12 @@ class FunctionalTest extends MigrationTestCase
         $this->config->registerMigration('2', MigrationSkipMigration::class);
         $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
+        $migratorConfig = (new MigratorConfig())
+            ->setDryRun(true)
+        ;
+
         $migrator = $this->createTestMigrator($this->config);
-        $migrator->migrate('3', true);
+        $migrator->migrate('3', $migratorConfig);
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
