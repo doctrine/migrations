@@ -11,6 +11,7 @@ use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 
 /**
  * @internal
@@ -225,7 +226,9 @@ class DependencyFactory
     public function getStopwatch() : Stopwatch
     {
         return $this->getDependency(Stopwatch::class, function () : Stopwatch {
-            return new Stopwatch();
+            $symfonyStopwatch = new SymfonyStopwatch(true);
+
+            return new Stopwatch($symfonyStopwatch);
         });
     }
 

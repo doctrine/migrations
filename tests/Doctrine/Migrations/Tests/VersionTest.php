@@ -37,6 +37,7 @@ use PDO;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
 use function current;
@@ -610,7 +611,8 @@ class VersionTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
 
-        $stopwatch = new Stopwatch();
+        $symfonyStopwatch = new SymfonyStopwatch();
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
 
         $versionExecutor = new VersionExecutor(
             $configuration,
@@ -633,7 +635,8 @@ class VersionTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
 
-        $stopwatch = new Stopwatch();
+        $symfonyStopwatch = new SymfonyStopwatch();
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
 
         $versionExecutor = new VersionExecutor(
             $configuration,

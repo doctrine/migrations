@@ -9,10 +9,16 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class Stopwatch
 {
+    /** @var SymfonyStopwatch */
+    private $symfonyStopwatch;
+
+    public function __construct(SymfonyStopwatch $symfonyStopwatch)
+    {
+        $this->symfonyStopwatch = $symfonyStopwatch;
+    }
+
     public function start(string $section) : StopwatchEvent
     {
-        $stopwatch = new SymfonyStopwatch(true);
-
-        return $stopwatch->start($section);
+        return $this->symfonyStopwatch->start($section);
     }
 }

@@ -30,6 +30,7 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
 use Doctrine\Migrations\Version;
 use Doctrine\Migrations\VersionExecutor;
 use Symfony\Component\Process\Process;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function file_exists;
 use function get_class_methods;
 use function in_array;
@@ -569,7 +570,8 @@ class FunctionalTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($this->connection);
 
-        $stopwatch = new Stopwatch();
+        $symfonyStopwatch = new SymfonyStopwatch();
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
 
         $versionExecutor = new VersionExecutor(
             $this->config,
