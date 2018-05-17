@@ -17,6 +17,7 @@ class ExecuteCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:execute')
+            ->setAliases(['execute'])
             ->setDescription(
                 'Execute a single migration version up or down manually.'
             )

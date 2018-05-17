@@ -21,6 +21,7 @@ class VersionCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:version')
+            ->setAliases(['version'])
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument(
                 'version',

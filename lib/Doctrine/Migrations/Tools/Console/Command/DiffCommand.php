@@ -34,6 +34,7 @@ class DiffCommand extends AbstractCommand
 
         $this
             ->setName('migrations:diff')
+            ->setAliases(['diff'])
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
