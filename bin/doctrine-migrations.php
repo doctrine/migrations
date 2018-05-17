@@ -69,14 +69,6 @@ if(class_exists('\Symfony\Component\Console\Helper\QuestionHelper')) {
     $helperSet->set(new DialogHelper(), 'dialog');
 }
 
-$input = file_exists('migrations-input.php')
-    ? include 'migrations-input.php'
-    : null;
-
-$output = file_exists('migrations-output.php')
-    ? include 'migrations-output.php'
-    : null;
-
 $commands = [];
 
 ConsoleRunner::run($helperSet, $commands);
