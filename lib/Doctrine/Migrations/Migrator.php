@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Tools\BytesFormatter;
 use const COUNT_RECURSIVE;
 use function count;
 use function sprintf;
@@ -23,17 +24,22 @@ class Migrator
     /** @var OutputWriter */
     private $outputWriter;
 
+    /** @var Stopwatch */
+    private $stopwatch;
+
     /** @var bool */
     private $noMigrationException = false;
 
     public function __construct(
         Configuration $configuration,
         MigrationRepository $migrationRepository,
-        OutputWriter $outputWriter
+        OutputWriter $outputWriter,
+        Stopwatch $stopwatch
     ) {
         $this->configuration       = $configuration;
         $this->migrationRepository = $migrationRepository;
         $this->outputWriter        = $outputWriter;
+        $this->stopwatch           = $stopwatch;
     }
 
     public function setNoMigrationException(bool $noMigrationException = false) : void
@@ -134,24 +140,43 @@ class Migrator
             return $this->noMigrations();
         }
 
+        $stopwatchEvent = $this->stopwatch->start('migrate');
+
         $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
 
-        $sql  = [];
-        $time = 0;
+        $sql = [];
 
         foreach ($migrationsToExecute as $version) {
             $versionExecutionResult = $version->execute($direction, $dryRun, $timeAllQueries);
 
             $sql[$version->getVersion()] = $versionExecutionResult->getSql();
-            $time                       += $versionExecutionResult->getTime();
         }
 
         $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
 
+        $stopwatchEvent->stop();
+
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
-        $this->outputWriter->write(sprintf('  <info>++</info> finished in %ss', $time));
-        $this->outputWriter->write(sprintf('  <info>++</info> %s migrations executed', count($migrationsToExecute)));
-        $this->outputWriter->write(sprintf('  <info>++</info> %s sql queries', count($sql, COUNT_RECURSIVE) - count($sql)));
+
+        $this->outputWriter->write(sprintf(
+            '  <info>++</info> finished in %sms',
+            $stopwatchEvent->getDuration()
+        ));
+
+        $this->outputWriter->write(sprintf(
+            '  <info>++</info> used %s memory',
+            BytesFormatter::formatBytes($stopwatchEvent->getMemory())
+        ));
+
+        $this->outputWriter->write(sprintf(
+            '  <info>++</info> %s migrations executed',
+            count($migrationsToExecute)
+        ));
+
+        $this->outputWriter->write(sprintf(
+            '  <info>++</info> %s sql queries',
+            count($sql, COUNT_RECURSIVE) - count($sql)
+        ));
 
         return $sql;
     }

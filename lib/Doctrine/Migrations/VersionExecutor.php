@@ -8,10 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\Migrations\Tools\BytesFormatter;
 use Throwable;
 use function count;
-use function microtime;
-use function round;
 use function rtrim;
 use function sprintf;
 use function ucfirst;
@@ -36,6 +35,9 @@ final class VersionExecutor implements VersionExecutorInterface
     /** @var ParameterFormatterInterface */
     private $parameterFormatter;
 
+    /** @var Stopwatch */
+    private $stopwatch;
+
     /** @var string[] */
     private $sql = [];
 
@@ -50,13 +52,15 @@ final class VersionExecutor implements VersionExecutorInterface
         Connection $connection,
         SchemaDiffProviderInterface $schemaProvider,
         OutputWriter $outputWriter,
-        ParameterFormatterInterface $parameterFormatter
+        ParameterFormatterInterface $parameterFormatter,
+        Stopwatch $stopwatch
     ) {
         $this->configuration      = $configuration;
         $this->connection         = $connection;
         $this->schemaProvider     = $schemaProvider;
         $this->outputWriter       = $outputWriter;
         $this->parameterFormatter = $parameterFormatter;
+        $this->stopwatch          = $stopwatch;
     }
 
     /**
@@ -177,7 +181,7 @@ final class VersionExecutor implements VersionExecutorInterface
         bool $dryRun,
         bool $timeAllQueries
     ) : VersionExecutionResult {
-        $migrationStart = microtime(true);
+        $stopwatchEvent = $this->stopwatch->start('execute');
 
         $version->setState(VersionState::PRE);
 
@@ -224,16 +228,23 @@ final class VersionExecutor implements VersionExecutorInterface
             $version->markVersion($direction);
         }
 
-        $migrationEnd = microtime(true);
+        $stopwatchEvent->stop();
 
-        $time = round($migrationEnd - $migrationStart, 2);
-
-        $versionExecutionResult->setTime($time);
+        $versionExecutionResult->setTime($stopwatchEvent->getDuration());
+        $versionExecutionResult->setMemory($stopwatchEvent->getMemory());
 
         if ($direction === VersionDirection::UP) {
-            $this->outputWriter->write(sprintf("\n  <info>++</info> migrated (%ss)", $time));
+            $this->outputWriter->write(sprintf(
+                "\n  <info>++</info> migrated (took %sms, used %s memory)",
+                $stopwatchEvent->getDuration(),
+                BytesFormatter::formatBytes($stopwatchEvent->getMemory())
+            ));
         } else {
-            $this->outputWriter->write(sprintf("\n  <info>--</info> reverted (%ss)", $time));
+            $this->outputWriter->write(sprintf(
+                "\n  <info>--</info> reverted (took %sms, used %s memory)",
+                $stopwatchEvent->getDuration(),
+                BytesFormatter::formatBytes($stopwatchEvent->getMemory())
+            ));
         }
 
         if ($migration->isTransactional()) {
@@ -307,7 +318,7 @@ final class VersionExecutor implements VersionExecutorInterface
         bool $timeAllQueries = false
     ) : void {
         foreach ($this->sql as $key => $query) {
-            $queryStart = microtime(true);
+            $stopwatchEvent = $this->stopwatch->start('query');
 
             $this->outputSqlQuery($key, $query);
 
@@ -317,7 +328,13 @@ final class VersionExecutor implements VersionExecutorInterface
                 $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
             }
 
-            $this->outputQueryTime($queryStart, $timeAllQueries);
+            $stopwatchEvent->stop();
+
+            if (! $timeAllQueries) {
+                continue;
+            }
+
+            $this->outputWriter->write(sprintf('  <info>%sms</info>', $stopwatchEvent->getDuration()));
         }
     }
 
@@ -330,18 +347,6 @@ final class VersionExecutor implements VersionExecutorInterface
         $index                = count($this->sql) - 1;
         $this->params[$index] = $params;
         $this->types[$index]  = $types;
-    }
-
-    private function outputQueryTime(float $queryStart, bool $timeAllQueries = false) : void
-    {
-        if ($timeAllQueries === false) {
-            return;
-        }
-
-        $queryEnd  = microtime(true);
-        $queryTime = round($queryEnd - $queryStart, 4);
-
-        $this->outputWriter->write(sprintf('  <info>%ss</info>', $queryTime));
     }
 
     private function outputSqlQuery(int $idx, string $query) : void

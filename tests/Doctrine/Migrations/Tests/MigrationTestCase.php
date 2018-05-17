@@ -9,6 +9,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
+use Doctrine\Migrations\Stopwatch;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
@@ -111,19 +112,21 @@ abstract class MigrationTestCase extends TestCase
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();
         $outputWriter        = $dependencyFactory->getOutputWriter();
+        $stopwatch           = new Stopwatch();
 
-        return new Migrator($config, $migrationRepository, $outputWriter);
+        return new Migrator($config, $migrationRepository, $outputWriter, $stopwatch);
     }
 
     /**
      * @return mixed[]
      */
-    protected function getMigrationConstructorArgs(Configuration $config) : array
+    protected function getMigratorConstructorArgs(Configuration $config) : array
     {
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();
         $outputWriter        = $dependencyFactory->getOutputWriter();
+        $stopwatch           = new Stopwatch();
 
-        return [$config, $migrationRepository, $outputWriter];
+        return [$config, $migrationRepository, $outputWriter, $stopwatch];
     }
 }

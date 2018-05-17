@@ -24,6 +24,9 @@ class VersionExecutionResult
     /** @var null|float */
     private $time;
 
+    /** @var null|float */
+    private $memory;
+
     /** @var bool */
     private $skipped = false;
 
@@ -106,6 +109,16 @@ class VersionExecutionResult
     public function setTime(float $time) : void
     {
         $this->time = $time;
+    }
+
+    public function getMemory() : ?float
+    {
+        return $this->memory;
+    }
+
+    public function setMemory(float $memory) : void
+    {
+        $this->memory = $memory;
     }
 
     public function setSkipped(bool $skipped) : void

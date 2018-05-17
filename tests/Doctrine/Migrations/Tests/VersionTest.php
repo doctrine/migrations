@@ -14,6 +14,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\ExceptionVersionDummy;
 use Doctrine\Migrations\Tests\Stub\VersionDryRunNamedParams;
 use Doctrine\Migrations\Tests\Stub\VersionDryRunQuestionMarkParams;
@@ -602,12 +603,15 @@ class VersionTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
 
+        $stopwatch = new Stopwatch();
+
         $versionExecutor = new VersionExecutor(
             $configuration,
             $configuration->getConnection(),
             $schemaDiffProvider,
             $configuration->getOutputWriter(),
-            $parameterFormatter
+            $parameterFormatter,
+            $stopwatch
         );
 
         return [$configuration, $versionName, $className, $versionExecutor];
@@ -622,12 +626,15 @@ class VersionTest extends MigrationTestCase
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
 
+        $stopwatch = new Stopwatch();
+
         $versionExecutor = new VersionExecutor(
             $configuration,
             $configuration->getConnection(),
             $schemaDiffProvider,
             $configuration->getOutputWriter(),
-            $parameterFormatter
+            $parameterFormatter,
+            $stopwatch
         );
 
         return new Version($configuration, $versionName, $className, $versionExecutor);
