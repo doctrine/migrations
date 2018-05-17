@@ -6,7 +6,7 @@
 
     <name>Doctrine Sandbox Migrations</name>
     <migrations-namespace>DoctrineMigrationsTest</migrations-namespace>
-    <table name="doctrine_migration_versions_test" column="doctrine_migration_column_test" executed_at_column="doctrine_migration_executed_at_column_test" />
+    <table name="doctrine_migration_versions_test" column="doctrine_migration_column_test" column_length="200" executed_at_column="doctrine_migration_executed_at_column_test" />
     <migrations-directory>.</migrations-directory>
 
 </doctrine-migrations>

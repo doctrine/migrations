@@ -41,6 +41,7 @@ class AbstractFileConfigurationTest extends TestCase
             'setMigrationsNamespace',
             'setMigrationsTableName',
             'setMigrationsColumnName',
+            'setMigrationsColumnLength',
             'setMigrationsExecutedAtColumnName',
             'setMigrationsAreOrganizedByYearAndMonth',
             'setName',
@@ -61,6 +62,10 @@ class AbstractFileConfigurationTest extends TestCase
         $fileConfiguration->expects($this->once())
             ->method('setMigrationsColumnName')
             ->with('version_number');
+
+        $fileConfiguration->expects($this->once())
+            ->method('setMigrationsColumnLength')
+            ->with(200);
 
         $fileConfiguration->expects($this->once())
             ->method('setMigrationsExecutedAtColumnName')
@@ -90,17 +95,18 @@ class AbstractFileConfigurationTest extends TestCase
             ->with('custom_template');
 
         $fileConfiguration->setTestConfiguration([
-            'migrations_namespace' => 'Doctrine',
-            'table_name' => 'migration_version',
-            'column_name' => 'version_number',
-            'executed_at_column_name' => 'executed_at',
-            'organize_migrations' => 'year_and_month',
-            'name' => 'Migrations Test',
-            'migrations_directory' => 'migrations_directory',
-            'migrations' => [
+            'migrations_namespace'      => 'Doctrine',
+            'table_name'                => 'migration_version',
+            'column_name'               => 'version_number',
+            'column_length'             => 200,
+            'executed_at_column_name'   => 'executed_at',
+            'organize_migrations'       => 'year_and_month',
+            'name'                      => 'Migrations Test',
+            'migrations_directory'      => 'migrations_directory',
+            'migrations'                => [
                 [
                     'version' => '001',
-                    'class' => 'Test',
+                    'class'   => 'Test',
                 ],
             ],
             'custom_template' => 'custom_template',

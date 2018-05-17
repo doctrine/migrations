@@ -34,6 +34,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
         self::assertTrue($table->hasColumn('version'));
         self::assertTrue($table->getColumn('version')->getNotnull());
+        self::assertEquals(200, $table->getColumn('version')->getLength());
 
         self::assertTrue($table->hasColumn('executed_at'));
         self::assertTrue($table->getColumn('executed_at')->getNotnull());
@@ -42,7 +43,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
     public function testUpdateMigrationTable() : void
     {
         $createTablesSql = [
-            'CREATE TABLE doctrine_migration_versions (version varchar(255) NOT NULL, test varchar(255) DEFAULT NULL, PRIMARY KEY (version))',
+            'CREATE TABLE doctrine_migration_versions (version varchar(200) NOT NULL, test varchar(255) DEFAULT NULL, PRIMARY KEY (version))',
             'CREATE TABLE test (test varchar(255) NOT NULL)',
         ];
 
@@ -73,7 +74,9 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
     protected function setUp() : void
     {
-        $configuration     = $this->getSqliteConfiguration();
+        $configuration = $this->getSqliteConfiguration();
+        $configuration->setMigrationsColumnLength(200);
+
         $dependencyFactory = $configuration->getDependencyFactory();
 
         $this->migrationTableManipulator = $dependencyFactory->getMigrationTableManipulator();
