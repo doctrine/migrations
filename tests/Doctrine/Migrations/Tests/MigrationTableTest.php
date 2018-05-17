@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Migrations\MigrationTable;
 use PHPUnit\Framework\TestCase;
 
 class MigrationTableTest extends TestCase
 {
+    /** @var AbstractSchemaManager */
+    private $schemaManager;
+
     /** @var MigrationTable */
     private $migrationTable;
 
@@ -55,9 +60,22 @@ class MigrationTableTest extends TestCase
 
     public function testGetDBALTable() : void
     {
+        $schemaConfig = $this->createMock(SchemaConfig::class);
+
+        $this->schemaManager->expects($this->once())
+            ->method('createSchemaConfig')
+            ->willReturn($schemaConfig);
+
+        $schemaConfig->expects($this->once())
+            ->method('getDefaultTableOptions')
+            ->willReturn(['test_option' => true]);
+
         $table = $this->migrationTable->getDBALTable();
 
         self::assertCount(2, $table->getColumns());
+
+        self::assertTrue($table->hasOption('test_option'));
+        self::assertEquals(true, $table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
@@ -68,9 +86,22 @@ class MigrationTableTest extends TestCase
 
     public function testGetNewDBALTable() : void
     {
+        $schemaConfig = $this->createMock(SchemaConfig::class);
+
+        $this->schemaManager->expects($this->once())
+            ->method('createSchemaConfig')
+            ->willReturn($schemaConfig);
+
+        $schemaConfig->expects($this->once())
+            ->method('getDefaultTableOptions')
+            ->willReturn(['test_option' => true]);
+
         $table = $this->migrationTable->getNewDBALTable();
 
         self::assertCount(2, $table->getColumns());
+
+        self::assertTrue($table->hasOption('test_option'));
+        self::assertEquals(true, $table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
@@ -81,7 +112,10 @@ class MigrationTableTest extends TestCase
 
     protected function setUp() : void
     {
+        $this->schemaManager = $this->createMock(AbstractSchemaManager::class);
+
         $this->migrationTable = new MigrationTable(
+            $this->schemaManager,
             'versions',
             'version_name',
             200,

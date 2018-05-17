@@ -98,6 +98,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigrationTable::class, function () : MigrationTable {
             return new MigrationTable(
+                $this->getConnection()->getSchemaManager(),
                 $this->configuration->getMigrationsTableName(),
                 $this->configuration->getMigrationsColumnName(),
                 $this->configuration->getMigrationsColumnLength(),
