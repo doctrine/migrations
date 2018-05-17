@@ -23,6 +23,7 @@ use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\Migrations\Version;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function array_keys;
 use function call_user_func_array;
 use function sprintf;
@@ -138,7 +139,8 @@ class ConfigurationTest extends MigrationTestCase
 
         $dependencyFactory = $configuration->getDependencyFactory();
 
-        $stopwatch = new Stopwatch();
+        $symfonyStopwatch = new SymfonyStopwatch(true);
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
 
         $migrator = new Migrator(
             $configuration,

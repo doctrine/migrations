@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\Stopwatch;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class StopwatchTest extends TestCase
@@ -27,6 +28,8 @@ class StopwatchTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->stopwatch = new Stopwatch();
+        $symfonyStopwatch = new SymfonyStopwatch();
+
+        $this->stopwatch = new Stopwatch($symfonyStopwatch);
     }
 }

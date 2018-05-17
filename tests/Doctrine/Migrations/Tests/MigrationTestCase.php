@@ -14,6 +14,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function fopen;
 use function fwrite;
 use function glob;
@@ -112,7 +113,8 @@ abstract class MigrationTestCase extends TestCase
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();
         $outputWriter        = $dependencyFactory->getOutputWriter();
-        $stopwatch           = new Stopwatch();
+        $symfonyStopwatch    = new SymfonyStopwatch();
+        $stopwatch           = new Stopwatch($symfonyStopwatch);
 
         return new Migrator($config, $migrationRepository, $outputWriter, $stopwatch);
     }
@@ -125,7 +127,8 @@ abstract class MigrationTestCase extends TestCase
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();
         $outputWriter        = $dependencyFactory->getOutputWriter();
-        $stopwatch           = new Stopwatch();
+        $symfonyStopwatch    = new SymfonyStopwatch();
+        $stopwatch           = new Stopwatch($symfonyStopwatch);
 
         return [$config, $migrationRepository, $outputWriter, $stopwatch];
     }
