@@ -305,19 +305,187 @@ class MigrateCommandTest extends TestCase
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(['1235']);
 
-        $this->migrateCommand->expects($this->once())
+        $this->migrateCommand->expects($this->at(0))
             ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(true);
+
+        $this->migrateCommand->expects($this->at(1))
+            ->method('canExecute')
+            ->with('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)')
             ->willReturn(true);
 
         $migrator->expects($this->once())
-            ->method('setNoMigrationException')
+            ->method('migrate')
+            ->with('1234');
+
+        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+    }
+
+    public function testExecuteMigrateAllOrNothing() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $migrator = $this->createMock(Migrator::class);
+
+        $this->dependencyFactory->expects($this->once())
+            ->method('getMigrator')
+            ->willReturn($migrator);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn('prev');
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $input->expects($this->at(2))
+            ->method('getOption')
+            ->with('allow-no-migration')
+            ->willReturn(false);
+
+        $input->expects($this->at(3))
+            ->method('getOption')
+            ->with('query-time')
+            ->willReturn(false);
+
+        $input->expects($this->at(4))
+            ->method('getOption')
+            ->with('dry-run')
+            ->willReturn(false);
+
+        $input->expects($this->at(5))
+            ->method('getOption')
+            ->with('all-or-nothing')
+            ->willReturn(true);
+
+        $this->configuration->expects($this->once())
+            ->method('setIsDryRun')
             ->with(false);
+
+        $this->configuration->expects($this->once())
+            ->method('resolveVersionAlias')
+            ->with('prev')
+            ->willReturn('1234');
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(['1235']);
+
+        $this->migrateCommand->expects($this->at(0))
+            ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(true);
+
+        $this->migrateCommand->expects($this->at(1))
+            ->method('canExecute')
+            ->with('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)')
+            ->willReturn(true);
 
         $migrator->expects($this->once())
             ->method('migrate')
-            ->with('1234', false, false);
+            ->with('1234');
 
         self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+    }
+
+    public function testExecuteMigrateCancelExecutedUnavailableMigrations() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $migrator = $this->createMock(Migrator::class);
+
+        $this->dependencyFactory->expects($this->never())
+            ->method('getMigrator')
+            ->willReturn($migrator);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn('prev');
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $this->configuration->expects($this->once())
+            ->method('setIsDryRun')
+            ->with(false);
+
+        $this->configuration->expects($this->once())
+            ->method('resolveVersionAlias')
+            ->with('prev')
+            ->willReturn('1234');
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(['1235']);
+
+        $this->migrateCommand->expects($this->once())
+            ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(false);
+
+        $migrator->expects($this->never())
+            ->method('migrate');
+
+        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+    }
+
+    public function testExecuteMigrateCancel() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $migrator = $this->createMock(Migrator::class);
+
+        $this->dependencyFactory->expects($this->once())
+            ->method('getMigrator')
+            ->willReturn($migrator);
+
+        $input->expects($this->once())
+            ->method('getArgument')
+            ->with('version')
+            ->willReturn('prev');
+
+        $input->expects($this->at(1))
+            ->method('getOption')
+            ->with('write-sql')
+            ->willReturn(false);
+
+        $this->configuration->expects($this->once())
+            ->method('setIsDryRun')
+            ->with(false);
+
+        $this->configuration->expects($this->once())
+            ->method('resolveVersionAlias')
+            ->with('prev')
+            ->willReturn('1234');
+
+        $this->migrationRepository->expects($this->once())
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(['1235']);
+
+        $this->migrateCommand->expects($this->at(0))
+            ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(true);
+
+        $this->migrateCommand->expects($this->at(1))
+            ->method('canExecute')
+            ->with('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)')
+            ->willReturn(false);
+
+        $migrator->expects($this->never())
+            ->method('migrate');
+
+        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
     }
 
     protected function setUp() : void

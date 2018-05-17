@@ -8,5 +8,6 @@
     <migrations-namespace>DoctrineMigrationsTest</migrations-namespace>
     <table name="doctrine_migration_versions_test" column="doctrine_migration_column_test" column_length="200" executed_at_column="doctrine_migration_executed_at_column_test" />
     <migrations-directory>.</migrations-directory>
+    <all-or-nothing>true</all-or-nothing>
 
 </doctrine-migrations>

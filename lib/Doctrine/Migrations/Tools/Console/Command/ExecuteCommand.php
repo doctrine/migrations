@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\MigratorConfig;
 use Doctrine\Migrations\VersionDirection;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -87,8 +88,8 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
         $version        = $input->getArgument('version');
-        $timeAllqueries = $input->getOption('query-time');
-        $dryRun         = $input->getOption('dry-run');
+        $timeAllQueries = (bool) $input->getOption('query-time');
+        $dryRun         = (bool) $input->getOption('dry-run');
         $path           = $input->getOption('write-sql');
         $direction      = $input->getOption('down') !== false
             ? VersionDirection::DOWN
@@ -106,13 +107,18 @@ EOT
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
 
-        if (! $this->canExecute($question, $input, $output)) {
+        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 1;
         }
 
-        $version->execute($direction, $dryRun, $timeAllqueries);
+        $migratorConfig = (new MigratorConfig())
+            ->setDryRun($dryRun)
+            ->setTimeAllQueries($timeAllQueries)
+        ;
+
+        $version->execute($direction, $migratorConfig);
 
         return 0;
     }

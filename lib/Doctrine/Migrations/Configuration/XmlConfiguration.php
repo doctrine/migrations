@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration;
 
 use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
+use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use const DIRECTORY_SEPARATOR;
 use const LIBXML_NOCDATA;
@@ -62,7 +63,17 @@ class XmlConfiguration extends AbstractFileConfiguration
         }
 
         if (isset($xml->{'migrations-directory'})) {
-            $config['migrations_directory'] = $this->getDirectoryRelativeToFile($file, (string) $xml->{'migrations-directory'});
+            $config['migrations_directory'] = $this->getDirectoryRelativeToFile(
+                $file,
+                (string) $xml->{'migrations-directory'}
+            );
+        }
+
+        if (isset($xml->{'all-or-nothing'})) {
+            $config['all_or_nothing'] = BooleanStringFormatter::toBoolean(
+                (string) $xml->{'all-or-nothing'},
+                false
+            );
         }
 
         if (isset($xml->migrations->migration)) {

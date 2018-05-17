@@ -11,4 +11,5 @@ return [
     'executed_at_column_name'   => 'doctrine_migration_executed_at_column_test',
     'migrations_directory'      => '.',
     'migrations'                => [],
+    'all_or_nothing'            => true,
 ];

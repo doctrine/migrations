@@ -128,18 +128,14 @@ class ExecuteCommandTest extends TestCase
             ->with($versionName)
             ->willReturn($version);
 
-        $this->executeCommand->expects($this->once())
-            ->method('canExecute')
-            ->willReturn(true);
-
         $version->expects($this->once())
             ->method('execute')
-            ->with('down', true, true);
+            ->with('down');
 
         self::assertEquals(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testExecuteCanExecuteFalse() : void
+    public function testExecuteCancel() : void
     {
         $versionName = '1';
 
@@ -160,7 +156,7 @@ class ExecuteCommandTest extends TestCase
         $input->expects($this->at(2))
             ->method('getOption')
             ->with('dry-run')
-            ->willReturn(true);
+            ->willReturn(false);
 
         $input->expects($this->at(3))
             ->method('getOption')

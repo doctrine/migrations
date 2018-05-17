@@ -10,10 +10,12 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
+use Doctrine\Migrations\MigratorConfig;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
+use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\VersionDirection;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -114,10 +116,12 @@ class MigratorTest extends MigrationTestCase
 
         $this->config->getOutputWriter()->setCallback($callback);
 
-        $migration = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator($this->config);
 
-        $migration->setNoMigrationException(true);
-        $migration->migrate();
+        $migratorConfig = (new MigratorConfig())
+            ->setNoMigrationException(true);
+
+        $migrator->migrate(null, $migratorConfig);
 
         self::assertCount(2, $messages, 'should output header and no migrations message');
         self::assertContains('No migrations', $messages[1]);
@@ -138,7 +142,7 @@ class MigratorTest extends MigrationTestCase
 
         $migration->expects($this->once())
             ->method('migrate')
-            ->with($to, true)
+            ->with($to)
             ->willReturn($expected);
 
         $result = $migration->getSql($to);
@@ -258,39 +262,32 @@ class MigratorTest extends MigrationTestCase
         self::assertContains('No migrations', $messages[0]);
     }
 
-    public function testMigrateReturnsFalseWhenTheConfirmationIsDeclined() : void
+    public function testMigrateAllOrNothing() : void
     {
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
         $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
-        $this->config->createMigrationTable();
-        $called    = false;
+
         $migration = $this->createTestMigrator($this->config);
 
-        $result = $migration->migrate(null, false, false, function () use (&$called) {
-            $called = true;
-            return false;
-        });
+        $sql = $migration->migrate(null, (new MigratorConfig())
+            ->setAllOrNothing(true));
 
-        self::assertEmpty($result);
-        self::assertTrue($called, 'should have called the confirmation callback');
+        self::assertCount(1, $sql);
     }
 
-    public function testMigrateWithDryRunDoesNotCallTheConfirmationCallback() : void
+    public function testMigrateAllOrNothingRollback() : void
     {
+        $this->expectException(\Throwable::class);
+        $this->expectExceptionMessage('Migration up throws exception.');
+
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
-        $this->config->createMigrationTable();
-        $called   = false;
-        $migrator = $this->createTestMigrator($this->config);
+        $this->config->registerMigration('20160707000000', MigrationThrowsError::class);
 
-        $result = $migrator->migrate(null, true, false, function () use (&$called) {
-            $called = true;
-            return false;
-        });
+        $migration = $this->createTestMigrator($this->config);
 
-        self::assertFalse($called);
-        self::assertEquals(['20160707000000' => ['SELECT 1']], $result);
+        $migration->migrate(null, (new MigratorConfig())
+            ->setAllOrNothing(true));
     }
 }

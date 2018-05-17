@@ -59,6 +59,13 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         self::assertEquals(200, $config->getMigrationsColumnLength());
     }
 
+    public function testAllOrNothing() : void
+    {
+        $config = $this->loadConfiguration();
+
+        self::assertTrue($config->isAllOrNothing());
+    }
+
     public function testMigrationsExecutedAtColumnName() : void
     {
         $config = $this->loadConfiguration();

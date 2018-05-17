@@ -63,7 +63,7 @@ commands to our `Doctrine Command Line Interface <http://doctrine-orm.readthedoc
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
     ));
 
-Additionally you have to make sure the 'db' and 'dialog' Helpers are added to your Symfony
+Additionally you have to make sure the ``db`` and ``dialog`` Helpers are added to your Symfony
 Console HelperSet.
 
 .. code-block:: php
@@ -185,7 +185,6 @@ the migrations are executed in the correct order.
 While you *can* use custom filenames, it's probably a good idea to let Doctrine
 :doc:`generate migration files </reference/generating_migrations>` for you.
 
-
 And if you want to specify each migration manually in YAML you can:
 
 .. code-block:: yaml
@@ -193,10 +192,80 @@ And if you want to specify each migration manually in YAML you can:
     table_name: doctrine_migration_versions
     migrations_directory: /path/to/migrations/classes/DoctrineMigrations
     migrations:
-      migration1:
-        version: 20100704000000
-        class: DoctrineMigrations\NewMigration
+        migration1:
+            version: 20100704000000
+            class: DoctrineMigrations\NewMigration
 
 If you specify your own migration classes (like `DoctrineMigrations\NewMigration` in the previous
 example) you will need an autoloader unless all those classes begin with the prefix Version*,
 for example path/to/migrations/classes/VersionNewMigration.php.
+
+All or Nothing Migrations
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you want your migrations to be all or nothing then you can configure your migrations behave that way.
+This means when you executed multiple migrations in a row, the whole migration will be wrapped
+in a single migration and if one of the migrations fails, the transaction will be rolled back.
+
+.. note::
+
+    This only works if the database connection you are using supports transactional DDL statements.
+
+.. configuration-block::
+
+    .. code-block:: php
+
+        $configuration = new Configuration($connection);
+        $configuration->setAllOrNothing(true);
+
+    .. code-block:: xml
+
+        <?xml version="1.0" encoding="UTF-8"?>
+        <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
+                            http://doctrine-project.org/schemas/migrations/configuration.xsd">
+
+            <name>Doctrine Sandbox Migrations</name>
+
+            <migrations-namespace>DoctrineMigrations</migrations-namespace>
+
+            <table name="doctrine_migration_versions" />
+
+            <migrations-directory>/path/to/migrations/classes/DoctrineMigrations</migrations-directory>
+
+            <all-or-nothing>true</all-or-nothing>
+
+        </doctrine-migrations>
+
+    .. code-block:: yaml
+
+        name: Doctrine Sandbox Migrations
+        migrations_namespace: DoctrineMigrations
+        table_name: doctrine_migration_versions
+        migrations_directory: /path/to/migrations/classes/DoctrineMigrations
+        all_or_nothing: true
+
+
+    .. code-block:: json
+
+        {
+            "name"                      : "Doctrine Sandbox Migrations",
+            "migrations_namespace"      : "DoctrineMigrations",
+            "table_name"                : "doctrine_migration_versions",
+            "migrations_directory"      : "/path/to/migrations/classes/DoctrineMigrations",
+            "all_or_nothing"            : true
+        }
+
+You can also optionally use the ``--all-or-nothing`` option from the command line to enable or disable
+the feature for a specific migration run:
+
+.. code-block:: bash
+
+    $ ./doctrine migrations:migrate --all-or-nothing
+
+Or if you have it enabled in your configuration setup and you want to disable it for a migration:
+
+.. code-block:: bash
+
+    $ ./doctrine migrations:migrate --all-or-nothing=0

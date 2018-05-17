@@ -49,6 +49,7 @@ class AbstractFileConfigurationTest extends TestCase
             'registerMigrationsFromDirectory',
             'registerMigration',
             'setCustomTemplate',
+            'setAllOrNothing',
         ]);
 
         $fileConfiguration->expects($this->once())
@@ -94,6 +95,10 @@ class AbstractFileConfigurationTest extends TestCase
             ->method('setCustomTemplate')
             ->with('custom_template');
 
+        $fileConfiguration->expects($this->once())
+            ->method('setAllOrNothing')
+            ->with(true);
+
         $fileConfiguration->setTestConfiguration([
             'migrations_namespace'      => 'Doctrine',
             'table_name'                => 'migration_version',
@@ -110,6 +115,7 @@ class AbstractFileConfigurationTest extends TestCase
                 ],
             ],
             'custom_template' => 'custom_template',
+            'all_or_nothing' => true,
         ]);
     }
 
