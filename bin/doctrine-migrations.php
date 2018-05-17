@@ -77,5 +77,6 @@ $output = file_exists('migrations-output.php')
     ? include 'migrations-output.php'
     : null;
 
-$cli = ConsoleRunner::createApplication($helperSet);
-$cli->run($input, $output);
+$commands = [];
+
+ConsoleRunner::run($helperSet, $commands);
