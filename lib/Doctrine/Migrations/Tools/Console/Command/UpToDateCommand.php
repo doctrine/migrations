@@ -15,6 +15,7 @@ class UpToDateCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:up-to-date')
+            ->setAliases(['up-to-date'])
             ->setDescription('Tells you if your schema is up-to-date.')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command tells you if your schema is up-to-date:

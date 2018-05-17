@@ -21,6 +21,7 @@ class StatusCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:status')
+            ->setAliases(['status'])
             ->setDescription('View the status of a set of migrations.')
             ->addOption(
                 'show-versions',

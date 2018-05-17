@@ -14,6 +14,7 @@ class LatestCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:latest')
+            ->setAliases(['latest'])
             ->setDescription('Outputs the latest version number')
         ;
 

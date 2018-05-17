@@ -17,6 +17,7 @@ class GenerateCommand extends AbstractCommand
     {
         $this
             ->setName('migrations:generate')
+            ->setAliases(['generate'])
             ->setDescription('Generate a blank migration class.')
             ->addOption(
                 'editor-cmd',
