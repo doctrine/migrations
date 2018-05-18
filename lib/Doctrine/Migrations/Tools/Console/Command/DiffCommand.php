@@ -12,8 +12,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function class_exists;
-use function escapeshellarg;
-use function proc_open;
 use function sprintf;
 
 class DiffCommand extends AbstractCommand
@@ -130,11 +128,6 @@ EOT
             $this->dependencyFactory->getMigrationGenerator(),
             $this->dependencyFactory->getMigrationSqlGenerator()
         );
-    }
-
-    protected function procOpen(string $editorCommand, string $path) : void
-    {
-        proc_open($editorCommand . ' ' . escapeshellarg($path), [], $pipes);
     }
 
     private function getSchemaProvider() : SchemaProviderInterface

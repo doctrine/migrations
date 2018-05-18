@@ -29,6 +29,38 @@ class MigrationRepositoryTest extends TestCase
     /** @var MigrationRepository */
     private $migrationRepository;
 
+    public function testGetDeltaVersionReturnsNull() : void
+    {
+        self::assertNull($this->migrationRepository->getDeltaVersion('00'));
+        self::assertNull($this->migrationRepository->getDeltaVersion('01'));
+    }
+
+    public function testGetVersions() : void
+    {
+        $version1 = $this->createMock(Version::class);
+        $version1->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('01');
+
+        $version2 = $this->createMock(Version::class);
+        $version2->expects($this->once())
+            ->method('getVersion')
+            ->willReturn('02');
+
+        $versions = [
+            '01' => $version1,
+            '02' => $version2,
+        ];
+
+        $this->migrationRepository->addVersions($versions);
+
+        self::assertEquals($versions, $this->migrationRepository->getVersions());
+
+        $this->migrationRepository->clearVersions();
+
+        self::assertEmpty($this->migrationRepository->getVersions());
+    }
+
     public function testGetVersionData() : void
     {
         $version = $this->createMock(Version::class);

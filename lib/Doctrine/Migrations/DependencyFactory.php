@@ -39,6 +39,18 @@ class DependencyFactory
         });
     }
 
+    public function getSchemaDumper() : SchemaDumper
+    {
+        return $this->getDependency(SchemaDumper::class, function () : SchemaDumper {
+            return new SchemaDumper(
+                $this->getConnection()->getDatabasePlatform(),
+                $this->getConnection()->getSchemaManager(),
+                $this->getMigrationGenerator(),
+                $this->getMigrationSqlGenerator()
+            );
+        });
+    }
+
     public function getSchemaDiffProvider() : SchemaDiffProviderInterface
     {
         return $this->getDependency(SchemaDiffProviderInterface::class, function () : LazySchemaDiffProvider {
@@ -229,6 +241,17 @@ class DependencyFactory
             $symfonyStopwatch = new SymfonyStopwatch(true);
 
             return new Stopwatch($symfonyStopwatch);
+        });
+    }
+
+    public function getRollup() : Rollup
+    {
+        return $this->getDependency(Rollup::class, function () : Rollup {
+            return new Rollup(
+                $this->configuration,
+                $this->getConnection(),
+                $this->getMigrationRepository()
+            );
         });
     }
 

@@ -6,10 +6,12 @@ namespace Doctrine\Migrations\Tools\Console;
 
 use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
@@ -22,7 +24,7 @@ class ConsoleRunner
     /** @param AbstractCommand[] $commands */
     public static function run(HelperSet $helperSet, array $commands = []) : void
     {
-        $cli = self::createApplication($helperSet, $commands);
+        $cli = static::createApplication($helperSet, $commands);
         $cli->run();
     }
 
@@ -41,10 +43,12 @@ class ConsoleRunner
     public static function addCommands(Application $cli) : void
     {
         $cli->addCommands([
+            new DumpSchemaCommand(),
             new ExecuteCommand(),
             new GenerateCommand(),
             new LatestCommand(),
             new MigrateCommand(),
+            new RollupCommand(),
             new StatusCommand(),
             new VersionCommand(),
             new UpToDateCommand(),

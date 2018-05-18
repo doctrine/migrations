@@ -53,10 +53,12 @@ commands to our `Doctrine Command Line Interface <http://doctrine-orm.readthedoc
 
     $cli->addCommands(array(
         // Migrations Commands
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\DumpSchemaCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\ExecuteCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\LatestCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\RollupCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
     ));
@@ -80,7 +82,7 @@ This file can be either in the directory you are calling the console tool from o
         'db' => new \Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper($db),
         'question' => new \Symfony\Component\Console\Helper\QuestionHelper(),
     ));
-    
+
     return $helperset;
 
 Note that the db helper is not required as you might want to pass the connection information
@@ -91,23 +93,31 @@ You will see that you have a few new commands when you execute the following com
 .. code-block:: bash
 
     $ ./doctrine list migrations
-    Doctrine Command Line Interface version 1.2.1
+    Doctrine Migrations 2.0.0
 
     Usage:
-      [options] command [arguments]
+      command [options] [arguments]
 
     Options:
-      --help           -h Display this help message.
-      --quiet          -q Do not output any message.
-      --verbose        -v Increase verbosity of messages.
-      --version        -V Display this program version.
-      --color          -c Force ANSI color output.
-      --no-interaction -n Do not ask any interactive question.
+      -h, --help            Display this help message
+      -q, --quiet           Do not output any message
+      -V, --version         Display this application version
+          --ansi            Force ANSI output
+          --no-ansi         Disable ANSI output
+      -n, --no-interaction  Do not ask any interactive question
+      -v|vv|vvv, --verbose  Increase the verbosity of messages: 1 for normal output, 2 for more verbose output and 3 for debug
 
-    Available commands for the "migrations" namespace:
-      :diff      Generate a migration by comparing your current database to your mapping information.
-      :execute   Execute a single migration version up or down manually.
-      :generate  Generate a blank migration class.
-      :migrate   Execute a migration to a specified version or the latest available version.
-      :status    View the status of a set of migrations.
-      :version   Manually add and delete migration versions from the version table.
+    Available commands:
+      help                    Displays help for a command
+      list                    Lists commands
+     migrations
+      migrations:diff         [diff] Generate a migration by comparing your current database to your mapping information.
+      migrations:dump-schema  [dump-schema] Dump the schema for your database to a migration.
+      migrations:execute      [execute] Execute a single migration version up or down manually.
+      migrations:generate     [generate] Generate a blank migration class.
+      migrations:latest       [latest] Outputs the latest version number
+      migrations:migrate      [migrate] Execute a migration to a specified version or the latest available version.
+      migrations:rollup       [rollup] Rollup migrations by deleting all tracked versions and insert the one version that exists.
+      migrations:status       [status] View the status of a set of migrations.
+      migrations:up-to-date   [up-to-date] Tells you if your schema is up-to-date.
+      migrations:version      [version] Manually add and delete migration versions from the version table.

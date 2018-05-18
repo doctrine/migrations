@@ -73,6 +73,23 @@ class MigrationRepository
         return $this->registerMigrations($this->findMigrations($path));
     }
 
+    public function addVersion(Version $version) : void
+    {
+        $this->versions[$version->getVersion()] = $version;
+
+        ksort($this->versions, SORT_STRING);
+    }
+
+    /**
+     * @param Version[] $versions
+     */
+    public function addVersions(array $versions) : void
+    {
+        foreach ($versions as $version) {
+            $this->addVersion($version);
+        }
+    }
+
     /** @throws MigrationException */
     public function registerMigration(string $version, string $migrationClassName) : Version
     {
@@ -87,9 +104,7 @@ class MigrationRepository
 
         $version = $this->versionFactory->createVersion($version, $migrationClassName);
 
-        $this->versions[$version->getVersion()] = $version;
-
-        ksort($this->versions, SORT_STRING);
+        $this->addVersion($version);
 
         return $version;
     }
@@ -150,6 +165,21 @@ class MigrationRepository
         $result = $this->connection->fetchColumn($sql);
 
         return $result !== false ? (string) $result : '0';
+    }
+
+    /**
+     * @return Version[]
+     */
+    public function getVersions() : array
+    {
+        $this->loadMigrationsFromDirectory();
+
+        return $this->versions;
+    }
+
+    public function clearVersions() : void
+    {
+        $this->versions = [];
     }
 
     public function getVersion(string $version) : Version

@@ -21,14 +21,18 @@ class ConsoleRunnerTest extends TestCase
     /** @var Application */
     private $application;
 
-    protected function setUp() : void
+    public function testRun() : void
     {
-        parent::setUp();
+        $helperSet = new HelperSet([]);
 
-        $this->application         = new Application();
-        $this->entityManagerHelper = $this->getMockBuilder(EntityManagerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $application = $this->createMock(Application::class);
+
+        ConsoleRunnerStub::$application = $application;
+
+        $application->expects($this->once())
+            ->method('run');
+
+        ConsoleRunnerStub::run($helperSet, []);
     }
 
     public function testHasExecuteCommand() : void
@@ -105,5 +109,27 @@ class ConsoleRunnerTest extends TestCase
         $actual = ConsoleRunner::createApplication(new HelperSet());
 
         self::assertInstanceOf(Application::class, $actual);
+    }
+
+    protected function setUp() : void
+    {
+        parent::setUp();
+
+        $this->application         = new Application();
+        $this->entityManagerHelper = $this->getMockBuilder(EntityManagerHelper::class)
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+}
+
+class ConsoleRunnerStub extends ConsoleRunner
+{
+    /** @var Application|null */
+    public static $application;
+
+    /** @param AbstractCommand[] $commands */
+    public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
+    {
+        return static::$application;
     }
 }

@@ -7,8 +7,6 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function escapeshellarg;
-use function proc_open;
 use function sprintf;
 
 class GenerateCommand extends AbstractCommand
@@ -66,10 +64,5 @@ EOT
                 $versionNumber
             ),
         ]);
-    }
-
-    protected function procOpen(string $editorCommand, string $path) : void
-    {
-        proc_open($editorCommand . ' ' . escapeshellarg($path), [], $pipes);
     }
 }
