@@ -203,9 +203,9 @@ for example path/to/migrations/classes/VersionNewMigration.php.
 All or Nothing Migrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-If you want your migrations to be all or nothing then you can configure your migrations behave that way.
-This means when you executed multiple migrations in a row, the whole migration will be wrapped
-in a single migration and if one of the migrations fails, the transaction will be rolled back.
+You can configure your migrations to be all or nothing. This means when you execute multiple
+migrations in a row, they will be wrapped in a single transaction. And if one of the migrations
+fails, the transaction will be rolled back.
 
 .. note::
 
