@@ -53,5 +53,8 @@
     },
     "bin": [
         "bin/doctrine-migrations"
-    ]
+    ],
+    "platform": {
+        "php": "7.1.x"
+    }
 }
