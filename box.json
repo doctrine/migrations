@@ -1,23 +1,15 @@
 {
     "alias": "doctrine-migrations.phar",
     "compactors": [
-        "Herrera\\Box\\Compactor\\Composer",
+        "Herrera\\Box\\Compactor\\Php",
         "Herrera\\Box\\Compactor\\Json"
     ],
     "compression": "GZ",
     "main": "bin/doctrine-migrations.php",
     "output": "build/doctrine-migrations.phar",
-    "finder": [
-        {
-            "exclude": ["Tests", "Test", "tests", "test", "box.phar"],
-            "in": ["lib", "vendor/composer", "vendor/doctrine", "vendor/symfony", "vendor/ocramius", "vendor/zendframework"]
-        }
-    ],
-    "files": [
-        "LICENSE",
-        "vendor/autoload.php"
+    "files-bin": [
+        "LICENSE"
     ],
     "chmod": "0755",
-    "git-version": "git-version",
-    "stub": true
+    "git-version": "git-version"
 }
