@@ -1343,16 +1343,16 @@
         },
         {
             "name": "nette/bootstrap",
-            "version": "v2.4.5",
+            "version": "v2.4.6",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/bootstrap.git",
-                "reference": "804925787764d708a7782ea0d9382a310bb21968"
+                "reference": "268816e3f1bb7426c3a4ceec2bd38a036b532543"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/bootstrap/zipball/804925787764d708a7782ea0d9382a310bb21968",
-                "reference": "804925787764d708a7782ea0d9382a310bb21968",
+                "url": "https://api.github.com/repos/nette/bootstrap/zipball/268816e3f1bb7426c3a4ceec2bd38a036b532543",
+                "reference": "268816e3f1bb7426c3a4ceec2bd38a036b532543",
                 "shasum": ""
             },
             "require": {
@@ -1415,20 +1415,20 @@
                 "configurator",
                 "nette"
             ],
-            "time": "2017-08-20T17:36:59+00:00"
+            "time": "2018-05-17T12:52:20+00:00"
         },
         {
             "name": "nette/di",
-            "version": "v2.4.11",
+            "version": "v2.4.12",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nette/di.git",
-                "reference": "a300c8b8e8549595ab90c04d8ee21b8b2a5a88f9"
+                "reference": "8e717aed2d182a26763be58c220eebaaa32917df"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nette/di/zipball/a300c8b8e8549595ab90c04d8ee21b8b2a5a88f9",
-                "reference": "a300c8b8e8549595ab90c04d8ee21b8b2a5a88f9",
+                "url": "https://api.github.com/repos/nette/di/zipball/8e717aed2d182a26763be58c220eebaaa32917df",
+                "reference": "8e717aed2d182a26763be58c220eebaaa32917df",
                 "shasum": ""
             },
             "require": {
@@ -1484,7 +1484,7 @@
                 "nette",
                 "static"
             ],
-            "time": "2018-03-28T23:53:36+00:00"
+            "time": "2018-04-26T09:18:42+00:00"
         },
         {
             "name": "nette/finder",
@@ -3275,16 +3275,16 @@
         },
         {
             "name": "slevomat/coding-standard",
-            "version": "4.5.2",
+            "version": "4.6.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/slevomat/coding-standard.git",
-                "reference": "1e609159241fa90d5a429f185b2ea9b881340a7c"
+                "reference": "95436f14d4a6fe8638bcba09d3a8e19266846ee4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/1e609159241fa90d5a429f185b2ea9b881340a7c",
-                "reference": "1e609159241fa90d5a429f185b2ea9b881340a7c",
+                "url": "https://api.github.com/repos/slevomat/coding-standard/zipball/95436f14d4a6fe8638bcba09d3a8e19266846ee4",
+                "reference": "95436f14d4a6fe8638bcba09d3a8e19266846ee4",
                 "shasum": ""
             },
             "require": {
@@ -3293,12 +3293,11 @@
             },
             "require-dev": {
                 "jakub-onderka/php-parallel-lint": "1.0.0",
-                "phing/phing": "2.16",
+                "phing/phing": "2.16.1",
                 "phpstan/phpstan": "0.9.2",
                 "phpstan/phpstan-phpunit": "0.9.4",
                 "phpstan/phpstan-strict-rules": "0.9",
-                "phpunit/php-code-coverage": "6.0.1",
-                "phpunit/phpunit": "7.0.2"
+                "phpunit/phpunit": "7.1.5"
             },
             "type": "phpcodesniffer-standard",
             "autoload": {
@@ -3311,7 +3310,7 @@
                 "MIT"
             ],
             "description": "Slevomat Coding Standard for PHP_CodeSniffer complements Consistence Coding Standard by providing sniffs with additional checks.",
-            "time": "2018-03-08T08:14:33+00:00"
+            "time": "2018-05-15T21:21:12+00:00"
         },
         {
             "name": "squizlabs/php_codesniffer",
