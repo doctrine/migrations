@@ -65,7 +65,7 @@ class MigrationRepositoryTest extends TestCase
         self::assertEquals($versionData, $this->migrationRepository->getVersionData($version));
     }
 
-    public function testRegisterMigrationWithNonExistentClassCausesError()
+    public function testRegisterMigrationWithNonExistentClassCausesError() : void
     {
         $this->expectException(MigrationClassNotFound::class);
 

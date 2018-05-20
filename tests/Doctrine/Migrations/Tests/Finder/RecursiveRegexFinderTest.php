@@ -43,8 +43,8 @@ class RecursiveRegexFinderTest extends FinderTestCase
             '20150502000003' => 'TestMigrations\\Version20150502000003',
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
-            '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
-            '1_symlinked_file' => 'TestMigrations\\Version1_symlinked_file',
+            '1ResetVersions' => 'TestMigrations\\Version1ResetVersions',
+            '1SymlinkedFile' => 'TestMigrations\\Version1SymlinkedFile',
         ];
         foreach ($tests as $version => $namespace) {
             self::assertArrayHasKey($version, $migrations);
@@ -63,9 +63,9 @@ class RecursiveRegexFinderTest extends FinderTestCase
         self::assertArrayNotHasKey('ARandomClass', $migrations);
     }
 
-    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories()
+    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories() : void
     {
-        $versions = $this->finder->findMigrations(__DIR__.'/_features/MultiNamespaceNested');
+        $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
         $this->assertEquals([
             '0001' => 'TestMigrations\\MultiNested\\Version0001',

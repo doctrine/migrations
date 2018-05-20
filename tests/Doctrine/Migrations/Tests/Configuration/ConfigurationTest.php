@@ -14,7 +14,6 @@ use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;

@@ -5,14 +5,16 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Finder;
 
 use InvalidArgumentException;
+use ReflectionClass;
 use const PHP_EOL;
 use const SORT_STRING;
-use function basename;
+use function get_declared_classes;
+use function in_array;
 use function is_dir;
+use function ksort;
 use function realpath;
 use function sprintf;
 use function substr;
-use function uasort;
 
 abstract class Finder implements MigrationFinder
 {
@@ -50,7 +52,7 @@ abstract class Finder implements MigrationFinder
             $includedFiles[] = realpath($file);
         }
 
-        $classes = $this->loadMigrationClasses($includedFiles);
+        $classes  = $this->loadMigrationClasses($includedFiles);
         $versions = [];
         foreach ($classes as $class) {
             $version = substr($class->getShortName(), 7);
@@ -69,11 +71,18 @@ abstract class Finder implements MigrationFinder
         return $versions;
     }
 
+    /**
+     * Look up all declared classes and find those classes contained
+     * in the give `$files` array.
+     *
+     * @param string[] $files The set of files that were `required`
+     * @return ReflectionClass[] the classes in `$files`
+     */
     protected function loadMigrationClasses(array $files) : array
     {
         $classes = [];
         foreach (get_declared_classes() as $class) {
-            $ref = new \ReflectionClass($class);
+            $ref = new ReflectionClass($class);
             if (in_array($ref->getFileName(), $files)) {
                 $classes[] = $ref;
             }
