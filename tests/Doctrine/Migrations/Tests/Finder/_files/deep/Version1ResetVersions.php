@@ -7,7 +7,7 @@ namespace TestMigrations;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-class Version1ResetVversions extends AbstractMigration
+class Version1ResetVersions extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
