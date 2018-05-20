@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\GlobFinder;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;
 
-class GlobFinderTest extends MigrationTestCase
+class GlobFinderTest extends finderTestCase
 {
-    /** @var GlobFinder */
-    private $finder;
-
     public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
         $this->expectException(InvalidArgumentException::class);

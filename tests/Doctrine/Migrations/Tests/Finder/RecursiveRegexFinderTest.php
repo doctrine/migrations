@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;
 use function asort;
 
-class RecursiveRegexFinderTest extends MigrationTestCase
+class RecursiveRegexFinderTest extends FinderTestCase
 {
-    /** @var RecursiveRegexFinder */
-    private $finder;
-
     public function testVersionNameCausesErrorWhen0() : void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -65,6 +61,16 @@ class RecursiveRegexFinderTest extends MigrationTestCase
         self::assertArrayNotHasKey('ADeeperRandomClass', $migrations);
         self::assertArrayNotHasKey('AnotherRandomClassNotStartingWithVersion', $migrations);
         self::assertArrayNotHasKey('ARandomClass', $migrations);
+    }
+
+    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories()
+    {
+        $versions = $this->finder->findMigrations(__DIR__.'/_features/MultiNamespaceNested');
+
+        $this->assertEquals([
+            '0001' => 'TestMigrations\\MultiNested\\Version0001',
+            '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
+        ], $versions);
     }
 
     protected function setUp() : void
