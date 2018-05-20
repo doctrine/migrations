@@ -25,7 +25,7 @@ class GlobFinderTest extends finderTestCase
 
     public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
     {
-        $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
+        $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         self::assertArrayHasKey('20150502000000', $migrations);
         self::assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);

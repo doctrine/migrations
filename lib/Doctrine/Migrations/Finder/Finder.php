@@ -40,7 +40,7 @@ abstract class Finder implements MigrationFinder
      *
      * @return string[]
      */
-    protected function loadMigrations(array $files, ?string $namespace) : array
+    protected function loadMigrations(array $files) : array
     {
         $migrations = [];
 

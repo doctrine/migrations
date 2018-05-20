@@ -12,12 +12,12 @@ final class GlobFinder extends Finder
     /**
      * @return string[]
      */
-    public function findMigrations(string $directory, ?string $namespace = null) : array
+    public function findMigrations(string $directory) : array
     {
         $dir = $this->getRealPath($directory);
 
         $files = glob(rtrim($dir, '/') . '/Version*.php');
 
-        return $this->loadMigrations($files, $namespace);
+        return $this->loadMigrations($files);
     }
 }

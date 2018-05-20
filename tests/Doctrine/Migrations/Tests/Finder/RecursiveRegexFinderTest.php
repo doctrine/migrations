@@ -33,7 +33,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
 
     public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
     {
-        $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
+        $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         self::assertCount(7, $migrations);
 

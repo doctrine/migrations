@@ -64,7 +64,7 @@ class MigrationRepository
      */
     public function findMigrations(string $path) : array
     {
-        return $this->migrationFinder->findMigrations($path, $this->configuration->getMigrationsNamespace());
+        return $this->migrationFinder->findMigrations($path);
     }
 
     /** @return Version[] */

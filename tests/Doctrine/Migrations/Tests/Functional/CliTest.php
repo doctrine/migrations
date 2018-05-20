@@ -281,13 +281,12 @@ class CliTest extends MigrationTestCase
     /**
      * @return array|\string[]
      */
-    private function findMigrations(string $namespace = 'TestMigrations') : array
+    private function findMigrations() : array
     {
         $finder = new RecursiveRegexFinder();
 
         return $finder->findMigrations(
-            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations',
-            $namespace
+            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
         );
     }
 
