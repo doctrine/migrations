@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version;
@@ -62,6 +63,13 @@ class MigrationRepositoryTest extends TestCase
             ->willReturn($versionData);
 
         self::assertEquals($versionData, $this->migrationRepository->getVersionData($version));
+    }
+
+    public function testRegisterMigrationWithNonExistentClassCausesError()
+    {
+        $this->expectException(MigrationClassNotFound::class);
+
+        $this->migrationRepository->registerMigration('123', DoesNotExistAtAll::class);
     }
 
     protected function setUp() : void
