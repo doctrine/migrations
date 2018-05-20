@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests\Finder;
 use Doctrine\Migrations\Finder\GlobFinder;
 use InvalidArgumentException;
 
-class GlobFinderTest extends finderTestCase
+class GlobFinderTest extends FinderTestCase
 {
     public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
