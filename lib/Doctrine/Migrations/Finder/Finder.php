@@ -44,8 +44,6 @@ abstract class Finder implements MigrationFinder
      */
     protected function loadMigrations(array $files) : array
     {
-        $migrations = [];
-
         $includedFiles = [];
         foreach ($files as $file) {
             static::requireOnce($file);
