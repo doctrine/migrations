@@ -18,6 +18,7 @@ use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Doctrine\ORM\Tools\Setup as OrmSetup;
 use PackageVersions\Versions;
 use ReflectionClass;
+use RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use const DIRECTORY_SEPARATOR;
@@ -41,6 +42,21 @@ class CliTest extends MigrationTestCase
 
     /** @var null|int */
     private $lastExit;
+
+    public function testDumpSchema() : void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Delete your old historical migrations before dumping your schema.');
+
+        $this->executeCommand('migrations:dump-schema');
+    }
+
+    public function testRollup() : void
+    {
+        $output = $this->executeCommand('migrations:rollup');
+
+        self::assertRegExp('/Rolled up migrations to version 20150426000000/', $output);
+    }
 
     public function testMigrationLifecycleFromCommandLine() : void
     {
@@ -216,10 +232,12 @@ class CliTest extends MigrationTestCase
             'connection'
         );
         $this->application->addCommands([
+            new MigrationCommands\DumpSchemaCommand(),
             new MigrationCommands\ExecuteCommand(),
             new MigrationCommands\GenerateCommand(),
             new MigrationCommands\LatestCommand(),
             new MigrationCommands\MigrateCommand(),
+            new MigrationCommands\RollupCommand(),
             new MigrationCommands\StatusCommand(),
             new MigrationCommands\VersionCommand(),
         ]);

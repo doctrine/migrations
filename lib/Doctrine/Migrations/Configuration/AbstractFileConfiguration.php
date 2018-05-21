@@ -33,6 +33,20 @@ abstract class AbstractFileConfiguration extends Configuration
         'all_or_nothing',
     ];
 
+    private const CONFIGURATION_METHOD_MAP = [
+        'migrations_namespace'      => 'setMigrationsNamespace',
+        'table_name'                => 'setMigrationsTableName',
+        'column_name'               => 'setMigrationsColumnName',
+        'column_length'             => 'setMigrationsColumnLength',
+        'executed_at_column_name'   => 'setMigrationsExecutedAtColumnName',
+        'organize_migrations'       => 'setMigrationOrganization',
+        'name'                      => 'setName',
+        'migrations_directory'      => 'loadMigrationsFromDirectory',
+        'migrations'                => 'loadMigrations',
+        'custom_template'           => 'setCustomTemplate',
+        'all_or_nothing'            => 'setAllOrNothing',
+    ];
+
     /** @var string */
     private $file;
 
@@ -78,51 +92,13 @@ abstract class AbstractFileConfiguration extends Configuration
             }
         }
 
-        if (isset($config['migrations_namespace'])) {
-            $this->setMigrationsNamespace($config['migrations_namespace']);
-        }
+        foreach (self::CONFIGURATION_METHOD_MAP as $key => $method) {
+            if (! isset($config[$key])) {
+                continue;
+            }
 
-        if (isset($config['table_name'])) {
-            $this->setMigrationsTableName($config['table_name']);
+            $this->$method($config[$key]);
         }
-
-        if (isset($config['column_name'])) {
-            $this->setMigrationsColumnName($config['column_name']);
-        }
-
-        if (isset($config['column_length'])) {
-            $this->setMigrationsColumnLength($config['column_length']);
-        }
-
-        if (isset($config['executed_at_column_name'])) {
-            $this->setMigrationsExecutedAtColumnName($config['executed_at_column_name']);
-        }
-
-        if (isset($config['organize_migrations'])) {
-            $this->setMigrationOrganization($config['organize_migrations']);
-        }
-
-        if (isset($config['name'])) {
-            $this->setName($config['name']);
-        }
-
-        if (isset($config['migrations_directory'])) {
-            $this->loadMigrationsFromDirectory($config['migrations_directory']);
-        }
-
-        if (isset($config['migrations'])) {
-            $this->loadMigrations($config['migrations']);
-        }
-
-        if (isset($config['custom_template'])) {
-            $this->setCustomTemplate($config['custom_template']);
-        }
-
-        if (! isset($config['all_or_nothing'])) {
-            return;
-        }
-
-        $this->setAllOrNothing($config['all_or_nothing']);
     }
 
     protected function getDirectoryRelativeToFile(string $file, string $input) : string

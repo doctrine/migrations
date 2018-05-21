@@ -17,6 +17,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use function escapeshellarg;
+use function proc_open;
 use function str_repeat;
 use function strlen;
 
@@ -66,6 +68,9 @@ abstract class AbstractCommand extends Command
         $this->configuration = $this->getMigrationConfiguration($input, $output);
 
         $this->initializeDependencies();
+
+        $this->configuration->validate();
+        $this->configuration->createMigrationTable();
     }
 
     protected function configure() : void
@@ -150,6 +155,11 @@ abstract class AbstractCommand extends Command
         }
 
         return true;
+    }
+
+    protected function procOpen(string $editorCommand, string $path) : void
+    {
+        proc_open($editorCommand . ' ' . escapeshellarg($path), [], $pipes);
     }
 
     private function initializeDependencies() : void
