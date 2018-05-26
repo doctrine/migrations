@@ -80,9 +80,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested'
         );
 
-        $this->assertEquals([
-            '0001' => 'TestMigrations\\MultiNested\\Version0001',
-        ], $versions);
+        $this->assertEquals(['0001' => 'TestMigrations\\MultiNested\\Version0001'], $versions);
     }
 
     protected function setUp() : void

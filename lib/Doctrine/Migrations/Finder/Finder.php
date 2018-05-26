@@ -73,7 +73,7 @@ abstract class Finder implements MigrationFinder
      * Look up all declared classes and find those classes contained
      * in the given `$files` array.
      *
-     * @param string[] $files The set of files that were `required`
+     * @param string[]    $files     The set of files that were `required`
      * @param string|null $namespace If not null only classes in this namespace will be returned
      * @return ReflectionClass[] the classes in `$files`
      */
@@ -86,7 +86,7 @@ abstract class Finder implements MigrationFinder
                 continue;
             }
 
-            if (null !== $namespace && $namespace !== $reflectionClass->getNamespaceName()) {
+            if ($namespace !== null && $namespace !== $reflectionClass->getNamespaceName()) {
                 continue;
             }
 

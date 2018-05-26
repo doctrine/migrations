@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Finder;
 interface MigrationFinder
 {
     /**
-     * @param string $directory The directory which the finder should search
+     * @param string      $directory The directory which the finder should search
      * @param string|null $namespace If not null only classes in this namespace will be returned
      * @return string[]
      */
