@@ -73,6 +73,18 @@ class RecursiveRegexFinderTest extends FinderTestCase
         ], $versions);
     }
 
+    public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided() : void
+    {
+        $versions = $this->finder->findMigrations(
+            __DIR__ . '/_features/MultiNamespaceNested',
+            'TestMigrations\\MultiNested'
+        );
+
+        $this->assertEquals([
+            '0001' => 'TestMigrations\\MultiNested\\Version0001',
+        ], $versions);
+    }
+
     protected function setUp() : void
     {
         $this->finder = new RecursiveRegexFinder();

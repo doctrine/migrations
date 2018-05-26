@@ -6,6 +6,10 @@ namespace Doctrine\Migrations\Finder;
 
 interface MigrationFinder
 {
-    /** @return string[] */
-    public function findMigrations(string $directory) : array;
+    /**
+     * @param string $directory The directory which the finder should search
+     * @param string|null $namespace If not null only classes in this namespace will be allowed
+     * @return string[]
+     */
+    public function findMigrations(string $directory, ?string $namespace = null) : array;
 }

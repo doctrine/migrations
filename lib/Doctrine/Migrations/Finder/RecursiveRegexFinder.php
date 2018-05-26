@@ -16,11 +16,14 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
     /**
      * @return string[]
      */
-    public function findMigrations(string $directory) : array
+    public function findMigrations(string $directory, ?string $namespace = null) : array
     {
         $dir = $this->getRealPath($directory);
 
-        return $this->loadMigrations($this->getMatches($this->createIterator($dir)));
+        return $this->loadMigrations(
+            $this->getMatches($this->createIterator($dir)),
+            $namespace
+        );
     }
 
     private function createIterator(string $dir) : RegexIterator

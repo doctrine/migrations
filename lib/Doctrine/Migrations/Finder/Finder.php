@@ -42,7 +42,7 @@ abstract class Finder implements MigrationFinder
      *
      * @return string[]
      */
-    protected function loadMigrations(array $files) : array
+    protected function loadMigrations(array $files, ?string $namespace) : array
     {
         $includedFiles = [];
         foreach ($files as $file) {
@@ -50,7 +50,7 @@ abstract class Finder implements MigrationFinder
             $includedFiles[] = realpath($file);
         }
 
-        $classes  = $this->loadMigrationClasses($includedFiles);
+        $classes  = $this->loadMigrationClasses($includedFiles, $namespace);
         $versions = [];
         foreach ($classes as $class) {
             $version = substr($class->getShortName(), 7);
@@ -74,14 +74,19 @@ abstract class Finder implements MigrationFinder
      * in the give `$files` array.
      *
      * @param string[] $files The set of files that were `required`
+     * @param string|null $namespace If not null only classes in this namespace will be returned
      * @return ReflectionClass[] the classes in `$files`
      */
-    protected function loadMigrationClasses(array $files) : array
+    protected function loadMigrationClasses(array $files, ?string $namespace) : array
     {
         $classes = [];
         foreach (get_declared_classes() as $class) {
             $ref = new ReflectionClass($class);
             if (! in_array($ref->getFileName(), $files, true)) {
+                continue;
+            }
+
+            if (null !== $namespace && $namespace !== $ref->getNamespaceName()) {
                 continue;
             }
 
