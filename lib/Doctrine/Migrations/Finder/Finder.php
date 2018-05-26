@@ -81,16 +81,16 @@ abstract class Finder implements MigrationFinder
     {
         $classes = [];
         foreach (get_declared_classes() as $class) {
-            $ref = new ReflectionClass($class);
-            if (! in_array($ref->getFileName(), $files, true)) {
+            $reflectionClass = new ReflectionClass($class);
+            if (! in_array($reflectionClass->getFileName(), $files, true)) {
                 continue;
             }
 
-            if (null !== $namespace && $namespace !== $ref->getNamespaceName()) {
+            if (null !== $namespace && $namespace !== $reflectionClass->getNamespaceName()) {
                 continue;
             }
 
-            $classes[] = $ref;
+            $classes[] = $reflectionClass;
         }
 
         return $classes;
