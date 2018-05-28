@@ -10,29 +10,31 @@
 
 ## Official Documentation
 
-All available documentation can be found [here](http://docs.doctrine-project.org/projects/doctrine-migrations/en/latest/).
+All available documentation can be found [here](https://www.doctrine-project.org/projects/doctrine-migrations/en/latest/index.html).
 
-The repository containing the documentation is [there](https://github.com/doctrine/migrations-documentation).
+The the documentation is located in [the docs directory](https://github.com/doctrine/migrations/tree/master/docs).
 
 ## Working with Doctrine Migrations
     
 ### Using the integration of your framework
 
-  * [Symfony](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
-  * [ZF2](https://packagist.org/packages/doctrine/doctrine-orm-module) 
-  * [laravel](https://packagist.org/packages/laravel-doctrine/migrations)
+  * [Symfony 2+](https://packagist.org/packages/doctrine/doctrine-migrations-bundle)
+  * [Zend Framework 2](https://packagist.org/packages/doctrine/doctrine-orm-module) 
+  * [Laravel](https://packagist.org/packages/laravel-doctrine/migrations)
   * [Silex](https://packagist.org/packages/kurl/silex-doctrine-migrations-provider)
   * [Silex](https://packagist.org/packages/dbtlr/silex-doctrine-migrations)
-  * [nette](https://packagist.org/packages/zenify/doctrine-migrations)
-  * others...
-        
-### Using composer
-            
-```composer require doctrine/migrations```
-        
-### Downloading the latest phar release
+  * [Nette](https://packagist.org/packages/zenify/doctrine-migrations)
+  * others…
 
-You can download the [doctrine migrations phar](https://github.com/doctrine/migrations/releases) directly on the release page
+### Using Composer
+            
+```bash
+composer require doctrine/migrations
+```
+
+### Downloading the latest PHAR release
+
+You can download the PHAR archive directly on [the release page](https://github.com/doctrine/migrations/releases).
 
 ### Building Your own Phar
 
@@ -43,67 +45,29 @@ curl -s https://getcomposer.org/installer | php
 php composer.phar install
 ```
 
-Make sure that the Box project is installed:
-
-```bash
-curl -LSs http://box-project.github.io/box2/installer.php | php
-```
-
 Build the PHAR archive:
 
 ```bash
-php box.phar build
+./build-phar.sh
 ```
 
-The `doctrine-migrations.phar` archive is built in the `build` directory.
+The `doctrine-migrations.phar` archive will now be present in the `build` directory.
 
-#### Creating archive disabled by INI setting
+## Installing dependencies
 
-If you receive an error that looks like:
+To install dependencies run a Composer update command:
 
-    creating archive "build/doctrine-migrations.phar" disabled by INI setting
-
-This can be fixed by setting the following in your php.ini:
-
-```ini
-; http://php.net/phar.readonly
-phar.readonly = Off
+```bash
+composer update
 ```
-
-## Installing Dependencies
-
-To install dependencies run a composer update:
-
-```composer update```
-
-## symfony 2.3 users
-
-Doctrine migration need the doctrine/orm 2.4, you need to [update your composer.json](https://github.com/symfony/symfony-standard/blob/v2.3.28/composer.json#L12) to the last version of it for symfony 2.3.
-
-That version is compatible with the doctrine/orm 2.4 and there are [very little upgrade needed](https://github.com/doctrine/doctrine2/blob/master/UPGRADE.md#upgrade-to-24).
 
 ## Running the unit tests
 
-To run the tests, you need the sqlite extension for php.
-On Unix-like systems, install:
-- php5-sqlite
-
-On Windows, enable the extension by uncommenting the following lines in php.ini
-```
-extension = php_pdo_sqlite.dll
-extension = php_sqlite3.dll
-extension_dir = ext
-```
+To run the tests, you need the PDO SQLite extension for PHP.
 
 Running the tests from the project root:
+```bash
+vendor/bin/phpunit
 ```
-./vendor/bin/phpunit
-```
-
-On Windows run phpunit from the full path
-```
-php vendor/phpunit/phpunit/phpunit
-```
-This appears to be some bug.
 
 Happy testing :-)
