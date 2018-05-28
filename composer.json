@@ -19,6 +19,7 @@
         "symfony/stopwatch": "^3.4||^4.0"
     },
     "require-dev": {
+        "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^4.0",
         "doctrine/orm": "^2.6",
         "jdorn/sql-formatter": "^1.1",
