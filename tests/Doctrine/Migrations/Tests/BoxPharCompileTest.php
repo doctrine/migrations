@@ -10,6 +10,9 @@ use function file_exists;
 use function realpath;
 use function sprintf;
 
+/**
+ * @requires OS Linux|Darwin
+ */
 class BoxPharCompileTest extends TestCase
 {
     public function testCompile() : void
