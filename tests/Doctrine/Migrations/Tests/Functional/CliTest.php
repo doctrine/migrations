@@ -259,6 +259,7 @@ class CliTest extends MigrationTestCase
         $input = new ArrayInput(array_merge(
             [
                 'command'         => $commandName,
+                '--no-ansi'       => null,
                 '--configuration' => __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile,
             ],
             $args
