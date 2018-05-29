@@ -8,3 +8,4 @@ vendor/
 phpunit.xml
 /phpcs.xml
 /.phpcs-cache
+/box.phar
