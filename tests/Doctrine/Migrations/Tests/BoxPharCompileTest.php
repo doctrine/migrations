@@ -17,7 +17,13 @@ class BoxPharCompileTest extends TestCase
 {
     public function testCompile() : void
     {
-        $boxPharPath = realpath(__DIR__ . '/../../../../box.phar');
+        $boxPharPath = __DIR__ . '/../../../../box.phar';
+
+        if (!file_exists($boxPharPath)) {
+            $this->markTestSkipped('Download box with the ./download-box.sh shell script.');
+        }
+
+        $boxPharPath = realpath($boxPharPath);
 
         $compilePharCommand = sprintf('php %s compile -vvv', $boxPharPath);
 
