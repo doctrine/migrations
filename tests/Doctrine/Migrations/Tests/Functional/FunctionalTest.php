@@ -52,6 +52,9 @@ class FunctionalTest extends MigrationTestCase
         $this->config     = self::createConfiguration($this->connection);
     }
 
+    /**
+     * @requires OS Linux|Darwin
+     */
     public function testDoctrineMigrationsBin() : void
     {
         $process = new Process(__DIR__ . '/../../../../../bin/doctrine-migrations');

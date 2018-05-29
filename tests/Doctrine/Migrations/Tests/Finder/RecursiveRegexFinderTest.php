@@ -6,7 +6,10 @@ namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use InvalidArgumentException;
+use const PHP_OS;
 use function asort;
+use function count;
+use function stripos;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {
@@ -35,8 +38,6 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
-        self::assertCount(7, $migrations);
-
         $tests = [
             '20150502000000' => 'TestMigrations\\Version20150502000000',
             '20150502000001' => 'TestMigrations\\Version20150502000001',
@@ -44,8 +45,13 @@ class RecursiveRegexFinderTest extends FinderTestCase
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
             '1ResetVersions' => 'TestMigrations\\Version1ResetVersions',
-            '1SymlinkedFile' => 'TestMigrations\\Version1SymlinkedFile',
         ];
+
+        if (stripos(PHP_OS, 'Win') === false) {
+            $tests['1SymlinkedFile'] = 'TestMigrations\\Version1SymlinkedFile';
+        }
+
+        self::assertCount(count($tests), $migrations); // Windows does not support symlinks
         foreach ($tests as $version => $namespace) {
             self::assertArrayHasKey($version, $migrations);
             self::assertEquals($namespace, $migrations[$version]);
