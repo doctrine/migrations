@@ -14,7 +14,6 @@ use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
@@ -58,34 +57,6 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->setOutputWriter($outputWriter);
 
         self::assertSame($outputWriter, $configuration->getOutputWriter());
-    }
-
-    public function testRegisterMigrationsClassExistCheck() : void
-    {
-        $migrationsDir = __DIR__ . '/ConfigurationTestSource/Migrations';
-
-        $connection = $this->getConnectionMock();
-
-        $platform      = $this->createMock(AbstractPlatform::class);
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-
-        $connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->willReturn($platform);
-
-        $connection->expects($this->once())
-            ->method('getSchemaManager')
-            ->willReturn($schemaManager);
-
-        $configuration = new Configuration($connection);
-        $configuration->setMigrationsNamespace('Migrations');
-        $configuration->setMigrationsDirectory($migrationsDir);
-
-        $this->expectException(
-            MigrationException::class,
-            'Migration class "Migrations\Version123" was not found. Is it placed in "Migrations" namespace?'
-        );
-        $configuration->registerMigrationsFromDirectory($migrationsDir);
     }
 
     public function testGetSetMigrationsColumnName() : void

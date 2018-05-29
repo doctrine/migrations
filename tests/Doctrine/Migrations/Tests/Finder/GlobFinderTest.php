@@ -5,14 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\GlobFinder;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;
 
-class GlobFinderTest extends MigrationTestCase
+class GlobFinderTest extends FinderTestCase
 {
-    /** @var GlobFinder */
-    private $finder;
-
     public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -29,7 +25,7 @@ class GlobFinderTest extends MigrationTestCase
 
     public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
     {
-        $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
+        $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         self::assertArrayHasKey('20150502000000', $migrations);
         self::assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);

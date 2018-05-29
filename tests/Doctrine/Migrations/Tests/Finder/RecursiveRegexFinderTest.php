@@ -5,15 +5,11 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;
 use function asort;
 
-class RecursiveRegexFinderTest extends MigrationTestCase
+class RecursiveRegexFinderTest extends FinderTestCase
 {
-    /** @var RecursiveRegexFinder */
-    private $finder;
-
     public function testVersionNameCausesErrorWhen0() : void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -37,7 +33,7 @@ class RecursiveRegexFinderTest extends MigrationTestCase
 
     public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
     {
-        $migrations = $this->finder->findMigrations(__DIR__ . '/_files', 'TestMigrations');
+        $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         self::assertCount(7, $migrations);
 
@@ -47,8 +43,8 @@ class RecursiveRegexFinderTest extends MigrationTestCase
             '20150502000003' => 'TestMigrations\\Version20150502000003',
             '20150502000004' => 'TestMigrations\\Version20150502000004',
             '20150502000005' => 'TestMigrations\\Version20150502000005',
-            '1_reset_versions' => 'TestMigrations\\Version1_reset_versions',
-            '1_symlinked_file' => 'TestMigrations\\Version1_symlinked_file',
+            '1ResetVersions' => 'TestMigrations\\Version1ResetVersions',
+            '1SymlinkedFile' => 'TestMigrations\\Version1SymlinkedFile',
         ];
         foreach ($tests as $version => $namespace) {
             self::assertArrayHasKey($version, $migrations);
@@ -65,6 +61,26 @@ class RecursiveRegexFinderTest extends MigrationTestCase
         self::assertArrayNotHasKey('ADeeperRandomClass', $migrations);
         self::assertArrayNotHasKey('AnotherRandomClassNotStartingWithVersion', $migrations);
         self::assertArrayNotHasKey('ARandomClass', $migrations);
+    }
+
+    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories() : void
+    {
+        $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
+
+        $this->assertEquals([
+            '0001' => 'TestMigrations\\MultiNested\\Version0001',
+            '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
+        ], $versions);
+    }
+
+    public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided() : void
+    {
+        $versions = $this->finder->findMigrations(
+            __DIR__ . '/_features/MultiNamespaceNested',
+            'TestMigrations\\MultiNested'
+        );
+
+        $this->assertEquals(['0001' => 'TestMigrations\\MultiNested\\Version0001'], $versions);
     }
 
     protected function setUp() : void

@@ -20,7 +20,10 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
     {
         $dir = $this->getRealPath($directory);
 
-        return $this->loadMigrations($this->getMatches($this->createIterator($dir)), $namespace);
+        return $this->loadMigrations(
+            $this->getMatches($this->createIterator($dir)),
+            $namespace
+        );
     }
 
     private function createIterator(string $dir) : RegexIterator
