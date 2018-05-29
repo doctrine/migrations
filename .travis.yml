@@ -33,6 +33,7 @@ jobs:
       install:
         - rm composer.lock
         - travis_retry composer update --prefer-dist --prefer-lowest
+        - ./download-box.sh
 
     - stage: Test
       env: COVERAGE
