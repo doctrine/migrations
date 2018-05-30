@@ -45,7 +45,10 @@
         }
     },
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "platform": {
+            "php": "7.1.0"
+        }
     },
     "extra": {
         "branch-alias": {
@@ -54,8 +57,5 @@
     },
     "bin": [
         "bin/doctrine-migrations"
-    ],
-    "platform": {
-        "php": "7.1.x"
-    }
+    ]
 }
