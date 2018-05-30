@@ -5,12 +5,14 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
 use function assert;
 use function count;
+use function date_default_timezone_get;
 use function in_array;
 use function str_replace;
 
@@ -97,9 +99,12 @@ class Version implements VersionInterface
         $versionData          = $this->configuration->getVersionData($this);
         $executedAtColumnName = $this->configuration->getMigrationsExecutedAtColumnName();
 
-        return isset($versionData[$executedAtColumnName])
-            ? new DateTimeImmutable($versionData[$executedAtColumnName])
-            : null;
+        if (! isset($versionData[$executedAtColumnName])) {
+            return null;
+        }
+
+        return (new DateTimeImmutable($versionData[$executedAtColumnName], new DateTimeZone('UTC')))
+            ->setTimezone(new DateTimeZone(date_default_timezone_get()));
     }
 
     public function setState(int $state) : void
@@ -221,7 +226,7 @@ class Version implements VersionInterface
     private function getExecutedAtDatabaseValue() : string
     {
         return Type::getType(MigrationTable::MIGRATION_EXECUTED_AT_COLUMN_TYPE)->convertToDatabaseValue(
-            new DateTimeImmutable(),
+            (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC')),
             $this->connection->getDatabasePlatform()
         );
     }

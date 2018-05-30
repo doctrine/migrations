@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use DateTime;
+use DateTimeImmutable;
+use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -36,14 +38,15 @@ use org\bovigo\vfs\vfsStreamFile;
 use PDO;
 use ReflectionClass;
 use stdClass;
-use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
 use function current;
+use function date;
 use function file_get_contents;
 use function serialize;
 use function sprintf;
+use function strtotime;
 use function sys_get_temp_dir;
 use function trim;
 use function unlink;
@@ -52,15 +55,6 @@ require_once __DIR__ . '/realpath.php';
 
 class VersionTest extends MigrationTestCase
 {
-    /** @var Configuration */
-    private $config;
-
-    /** @var OutputWriter */
-    protected $outputWriter;
-
-    /** @var StreamOutput */
-    protected $output;
-
     public function testConstants() : void
     {
         self::assertSame('up', VersionDirection::UP);
@@ -71,8 +65,10 @@ class VersionTest extends MigrationTestCase
     {
         $versionName = '003';
 
+        $configuration = $this->getSqliteConfiguration();
+
         $version = $this->createTestVersion(
-            new Configuration($this->getSqliteConnection()),
+            $configuration,
             $versionName,
             VersionDummy::class
         );
@@ -84,9 +80,8 @@ class VersionTest extends MigrationTestCase
     {
         $outputWriter = $this->getOutputWriter();
 
-        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
-        $configuration->setMigrationsNamespace('sdfq');
-        $configuration->setMigrationsDirectory('.');
+        $configuration = $this->getSqliteConfiguration();
+        $configuration->setOutputWriter($outputWriter);
 
         $version = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParam::class);
         $version->getMigration()->setParam([
@@ -104,9 +99,8 @@ class VersionTest extends MigrationTestCase
     {
         $outputWriter = $this->getOutputWriter();
 
-        $configuration = new Configuration($this->getSqliteConnection(), $outputWriter);
-        $configuration->setMigrationsNamespace('sdfq');
-        $configuration->setMigrationsDirectory('.');
+        $configuration = $this->getSqliteConfiguration();
+        $configuration->setOutputWriter($outputWriter);
 
         $version = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParamAndType::class);
         $version->getMigration()->setParam([
@@ -130,8 +124,10 @@ class VersionTest extends MigrationTestCase
         $versionName        = '003';
         $versionDescription = 'My super migration';
 
+        $configuration = $this->getSqliteConfiguration();
+
         $version = $this->createTestVersion(
-            new Configuration($this->getSqliteConnection()),
+            $configuration,
             $versionName,
             VersionDummyDescription::class
         );
@@ -143,7 +139,7 @@ class VersionTest extends MigrationTestCase
     /** @dataProvider stateProvider */
     public function testGetExecutionState(string $state) : void
     {
-        $configuration = new Configuration($this->getSqliteConnection());
+        $configuration = $this->getSqliteConfiguration();
 
         $version = $this->createTestVersion(
             $configuration,
@@ -174,7 +170,7 @@ class VersionTest extends MigrationTestCase
 
     public function testAddSql() : void
     {
-        $configuration = new Configuration($this->getSqliteConnection());
+        $configuration = $this->getSqliteConfiguration();
 
         $version = $this->createTestVersion(
             $configuration,
@@ -251,14 +247,13 @@ class VersionTest extends MigrationTestCase
 
     public function testWarningWhenNoSqlStatementIsOutputed() : void
     {
-        $this->outputWriter = $this->getOutputWriter();
+        $outputWriter = $this->getOutputWriter();
 
-        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(sys_get_temp_dir());
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($outputWriter);
 
         $version = $this->createTestVersion(
-            $this->config,
+            $config,
             '003',
             VersionDummy::class
         );
@@ -273,14 +268,13 @@ class VersionTest extends MigrationTestCase
 
     public function testCatchExceptionDuringMigration() : void
     {
-        $this->outputWriter = $this->getOutputWriter();
+        $outputWriter = $this->getOutputWriter();
 
-        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(sys_get_temp_dir());
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($outputWriter);
 
         $version = $this->createTestVersion(
-            $this->config,
+            $config,
             '004',
             ExceptionVersionDummy::class
         );
@@ -297,14 +291,10 @@ class VersionTest extends MigrationTestCase
 
     public function testReturnTheSql() : void
     {
-        $this->outputWriter = $this->getOutputWriter();
-
-        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(sys_get_temp_dir());
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $config = $this->getSqliteConfiguration();
 
         $version = $this->createTestVersion(
-            $this->config,
+            $config,
             '005',
             VersionOutputSql::class
         );
@@ -315,20 +305,17 @@ class VersionTest extends MigrationTestCase
 
     public function testReturnTheSqlWithParams() : void
     {
-        $this->outputWriter = $this->getOutputWriter();
-
-        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(sys_get_temp_dir());
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $config = $this->getSqliteConfiguration();
 
         $version = $this->createTestVersion(
-            $this->config,
+            $config,
             '006',
             VersionOutputSqlWithParam::class
         );
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('contains a prepared statement.');
+
         $version->writeSqlFile('tralala');
     }
 
@@ -339,9 +326,7 @@ class VersionTest extends MigrationTestCase
         string $columnName,
         string $executedAtColumnName
     ) : void {
-        $connection = $this->getSqliteConnection();
-
-        $configuration = new Configuration($connection, $this->outputWriter);
+        $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsTableName($tableName);
         $configuration->setMigrationsColumnName($columnName);
         $configuration->setMigrationsExecutedAtColumnName($executedAtColumnName);
@@ -463,7 +448,8 @@ class VersionTest extends MigrationTestCase
             $messages[] = trim($msg);
         });
 
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($ow);
 
         $version = $this->createTestVersion(
             $config,
@@ -486,7 +472,8 @@ class VersionTest extends MigrationTestCase
             $messages[] = trim($msg);
         });
 
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($ow);
 
         $version = $this->createTestVersion(
             $config,
@@ -510,7 +497,8 @@ class VersionTest extends MigrationTestCase
             $messages[] = trim($msg);
         });
 
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($ow);
 
         $version = $this->createTestVersion(
             $config,
@@ -555,7 +543,8 @@ class VersionTest extends MigrationTestCase
             $messages[] = trim($msg);
         });
 
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($ow);
 
         $version = $this->createTestVersion(
             $config,
@@ -581,7 +570,8 @@ class VersionTest extends MigrationTestCase
             $messages[] = trim($msg);
         });
 
-        $config = new Configuration($this->getSqliteConnection(), $ow);
+        $config = $this->getSqliteConfiguration();
+        $config->setOutputWriter($ow);
 
         $version = $this->createTestVersion(
             $config,
@@ -597,6 +587,43 @@ class VersionTest extends MigrationTestCase
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
         self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
         self::assertContains('with parameters ([])', $messages[1]);
+    }
+
+    /**
+     * @dataProvider getExecutedAtTimeZones
+     */
+    public function testExecutedAtTimeZone(string $timeZone) : void
+    {
+        $this->iniSet('date.timezone', $timeZone);
+
+        $config = $this->getSqliteConfiguration();
+
+        $version = $this->createTestVersion(
+            $config,
+            '001',
+            VersionDryRunTypes::class
+        );
+
+        $version->markVersion(VersionDirection::UP);
+
+        $versionData = $config->getVersionData($version);
+
+        $now = (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'));
+
+        self::assertEquals($now->format('Y-m-d H:i'), date('Y-m-d H:i', strtotime($versionData['executed_at'])));
+        self::assertEquals($timeZone, $version->getExecutedAt()->getTimeZone()->getName());
+    }
+
+    /**
+     * @return string[][]
+     */
+    public function getExecutedAtTimeZones() : array
+    {
+        return [
+            ['America/New_York'],
+            ['Indian/Chagos'],
+            ['UTC'],
+        ];
     }
 
     /**
