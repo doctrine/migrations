@@ -193,22 +193,15 @@ class Version implements VersionInterface
         $migrationsExecutedAtColumnName = $this->configuration
             ->getQuotedMigrationsExecutedAtColumnName();
 
-        if ($direction === VersionDirection::UP) {
-            $this->connection->insert(
-                $this->configuration->getMigrationsTableName(),
-                [
-                    $migrationsColumnName => $this->version,
-                    $migrationsExecutedAtColumnName => $this->getExecutedAtDatabaseValue(),
-                ]
-            );
+        $migrationsDirectionColumnName = $this->configuration
+            ->getQuotedMigrationsDirectionColumnName();
 
-            return;
-        }
-
-        $this->connection->delete(
+        $this->connection->insert(
             $this->configuration->getMigrationsTableName(),
             [
                 $migrationsColumnName => $this->version,
+                $migrationsExecutedAtColumnName => $this->getExecutedAtDatabaseValue(),
+                $migrationsDirectionColumnName => $direction,
             ]
         );
     }

@@ -115,7 +115,8 @@ class DependencyFactory
                 $this->configuration->getMigrationsTableName(),
                 $this->configuration->getMigrationsColumnName(),
                 $this->configuration->getMigrationsColumnLength(),
-                $this->configuration->getMigrationsExecutedAtColumnName()
+                $this->configuration->getMigrationsExecutedAtColumnName(),
+                $this->configuration->getMigrationsDirectionColumnName()
             );
         });
     }

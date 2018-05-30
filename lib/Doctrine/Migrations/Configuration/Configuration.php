@@ -45,6 +45,9 @@ class Configuration
     /** @var string */
     private $migrationsExecutedAtColumnName = 'executed_at';
 
+    /** @var string */
+    private $migrationsDirectionColumnName = 'direction';
+
     /** @var string|null */
     private $migrationsDirectory;
 
@@ -163,6 +166,24 @@ class Configuration
         return $this->getDependencyFactory()
             ->getMigrationTable()
             ->getExecutedAtColumn()
+            ->getQuotedName($this->connection->getDatabasePlatform());
+    }
+
+    public function setMigrationsDirectionColumnName(string $migrationsDirectionColumnName) : void
+    {
+        $this->migrationsDirectionColumnName = $migrationsDirectionColumnName;
+    }
+
+    public function getMigrationsDirectionColumnName() : string
+    {
+        return $this->migrationsDirectionColumnName;
+    }
+
+    public function getQuotedMigrationsDirectionColumnName() : string
+    {
+        return $this->getDependencyFactory()
+            ->getMigrationTable()
+            ->getDirectionColumn()
             ->getQuotedName($this->connection->getDatabasePlatform());
     }
 

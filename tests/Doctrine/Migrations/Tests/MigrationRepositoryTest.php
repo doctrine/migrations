@@ -76,25 +76,32 @@ class MigrationRepositoryTest extends TestCase
             ->method('getQuotedMigrationsColumnName')
             ->willReturn('version');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects($this->exactly(2))
             ->method('getQuotedMigrationsExecutedAtColumnName')
             ->willReturn('executed_at');
+
+        $this->configuration->expects($this->exactly(2))
+            ->method('getQuotedMigrationsDirectionColumnName')
+            ->willReturn('direction');
 
         $this->configuration->expects($this->once())
             ->method('getMigrationsTableName')
             ->willReturn('versions');
 
         $versionData = [
-            'version' => '1234',
-            'executed_at' => '2018-05-16 11:14:40',
+            [
+                'version' => '1234',
+                'executed_at' => '2018-05-16 11:14:40',
+                'direction' => 'up',
+            ],
         ];
 
         $this->connection->expects($this->once())
-            ->method('fetchAssoc')
-            ->with('SELECT version, executed_at FROM versions WHERE version = ?')
+            ->method('fetchAll')
+            ->with('SELECT version, executed_at, direction FROM versions WHERE version = ? ORDER BY executed_at ASC')
             ->willReturn($versionData);
 
-        self::assertEquals($versionData, $this->migrationRepository->getVersionData($version));
+        self::assertEquals($versionData[0], $this->migrationRepository->getVersionData($version));
     }
 
     public function testRegisterMigrationWithNonExistentClassCausesError() : void
