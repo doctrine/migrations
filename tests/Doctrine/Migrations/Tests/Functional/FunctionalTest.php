@@ -11,7 +11,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Events;
-use Doctrine\Migrations\MigratorConfig;
+use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
@@ -27,8 +27,8 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrationMigrateFurther;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationMigrateUp;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationModifySchemaInPreAndPost;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationSkipMigration;
-use Doctrine\Migrations\Version;
-use Doctrine\Migrations\VersionExecutor;
+use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function file_exists;
@@ -168,12 +168,12 @@ class FunctionalTest extends MigrationTestCase
         $this->config->registerMigration('2', MigrationSkipMigration::class);
         $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
-        $migratorConfig = (new MigratorConfig())
+        $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun(true)
         ;
 
         $migrator = $this->createTestMigrator($this->config);
-        $migrator->migrate('3', $migratorConfig);
+        $migrator->migrate('3', $migratorConfiguration);
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
@@ -576,7 +576,7 @@ class FunctionalTest extends MigrationTestCase
         $symfonyStopwatch = new SymfonyStopwatch();
         $stopwatch        = new Stopwatch($symfonyStopwatch);
 
-        $versionExecutor = new VersionExecutor(
+        $versionExecutor = new Executor(
             $this->config,
             $this->connection,
             $schemaDiffProvider,

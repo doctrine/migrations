@@ -8,7 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Rollup;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 

@@ -19,7 +19,7 @@ use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use function str_replace;
 
 class Configuration
@@ -133,7 +133,7 @@ class Configuration
     public function getQuotedMigrationsColumnName() : string
     {
         return $this->getDependencyFactory()
-            ->getMigrationTable()
+            ->getTrackingTableDefinition()
             ->getMigrationsColumn()
             ->getQuotedName($this->connection->getDatabasePlatform());
     }
@@ -161,7 +161,7 @@ class Configuration
     public function getQuotedMigrationsExecutedAtColumnName() : string
     {
         return $this->getDependencyFactory()
-            ->getMigrationTable()
+            ->getTrackingTableDefinition()
             ->getExecutedAtColumn()
             ->getQuotedName($this->connection->getDatabasePlatform());
     }
@@ -304,12 +304,12 @@ class Configuration
 
     public function isMigrationTableCreated() : bool
     {
-        return $this->getDependencyFactory()->getMigrationTableStatus()->isCreated();
+        return $this->getDependencyFactory()->getTrackingTableStatus()->isCreated();
     }
 
     public function createMigrationTable() : bool
     {
-        return $this->getDependencyFactory()->getMigrationTableManipulator()->createMigrationTable();
+        return $this->getDependencyFactory()->getTrackingTableManipulator()->createMigrationTable();
     }
 
     public function getDateTime(string $version) : string

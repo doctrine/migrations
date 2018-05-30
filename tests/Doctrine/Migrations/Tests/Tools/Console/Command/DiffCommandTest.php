@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\MigrationDiffGenerator;
+use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,7 +13,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class DiffCommandTest extends TestCase
 {
-    /** @var MigrationDiffGenerator */
+    /** @var DiffGenerator */
     private $migrationDiffGenerator;
 
     /** @var Configuration */
@@ -79,7 +79,7 @@ final class DiffCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->migrationDiffGenerator = $this->createMock(MigrationDiffGenerator::class);
+        $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
         $this->configuration          = $this->createMock(Configuration::class);
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)

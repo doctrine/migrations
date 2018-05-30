@@ -11,6 +11,8 @@ use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\MigrationFinder;
+use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\Version;
 use const SORT_STRING;
 use function array_diff;
 use function array_keys;
@@ -41,7 +43,7 @@ class MigrationRepository
     /** @var MigrationFinder */
     private $migrationFinder;
 
-    /** @var VersionFactory */
+    /** @var Factory */
     private $versionFactory;
 
     /** @var Version[] */
@@ -51,7 +53,7 @@ class MigrationRepository
         Configuration $configuration,
         Connection $connection,
         MigrationFinder $migrationFinder,
-        VersionFactory $versionFactory
+        Factory $versionFactory
     ) {
         $this->configuration   = $configuration;
         $this->connection      = $connection;

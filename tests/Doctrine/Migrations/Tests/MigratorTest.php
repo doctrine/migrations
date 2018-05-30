@@ -10,13 +10,13 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorConfig;
+use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
-use Doctrine\Migrations\VersionDirection;
+use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use Symfony\Component\Console\Output\StreamOutput;
 use const DIRECTORY_SEPARATOR;
@@ -81,7 +81,7 @@ class MigratorTest extends MigrationTestCase
 
         $queryWriter->expects($this->once())
             ->method('write')
-            ->with('/path', VersionDirection::DOWN, $sql);
+            ->with('/path', Direction::DOWN, $sql);
 
         $migration->writeSqlFile('/path', '1');
     }
@@ -118,10 +118,10 @@ class MigratorTest extends MigrationTestCase
 
         $migrator = $this->createTestMigrator($this->config);
 
-        $migratorConfig = (new MigratorConfig())
+        $migratorConfiguration = (new MigratorConfiguration())
             ->setNoMigrationException(true);
 
-        $migrator->migrate(null, $migratorConfig);
+        $migrator->migrate(null, $migratorConfiguration);
 
         self::assertCount(2, $messages, 'should output header and no migrations message');
         self::assertContains('No migrations', $messages[1]);
@@ -270,7 +270,7 @@ class MigratorTest extends MigrationTestCase
 
         $migration = $this->createTestMigrator($this->config);
 
-        $sql = $migration->migrate(null, (new MigratorConfig())
+        $sql = $migration->migrate(null, (new MigratorConfiguration())
             ->setAllOrNothing(true));
 
         self::assertCount(1, $sql);
@@ -287,7 +287,7 @@ class MigratorTest extends MigrationTestCase
 
         $migration = $this->createTestMigrator($this->config);
 
-        $migration->migrate(null, (new MigratorConfig())
+        $migration->migrate(null, (new MigratorConfiguration())
             ->setAllOrNothing(true));
     }
 }

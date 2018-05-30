@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\MigrationDiffGenerator;
+use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use InvalidArgumentException;
@@ -118,9 +118,9 @@ EOT
         ]);
     }
 
-    protected function createMigrationDiffGenerator() : MigrationDiffGenerator
+    protected function createMigrationDiffGenerator() : DiffGenerator
     {
-        return new MigrationDiffGenerator(
+        return new DiffGenerator(
             $this->connection->getConfiguration(),
             $this->connection->getSchemaManager(),
             $this->getSchemaProvider(),

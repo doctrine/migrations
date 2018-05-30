@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorConfig;
+use Doctrine\Migrations\MigratorConfiguration;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -149,14 +149,14 @@ EOT
             return 1;
         }
 
-        $migratorConfig = (new MigratorConfig())
+        $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun($dryRun)
             ->setTimeAllQueries($timeAllQueries)
             ->setNoMigrationException($allowNoMigration)
             ->setAllOrNothing($allOrNothing)
         ;
 
-        $migrator->migrate($version, $migratorConfig);
+        $migrator->migrate($version, $migratorConfiguration);
 
         return 0;
     }

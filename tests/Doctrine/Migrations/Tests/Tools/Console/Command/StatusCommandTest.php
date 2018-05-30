@@ -11,7 +11,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;

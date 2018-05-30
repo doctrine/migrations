@@ -9,7 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;

@@ -8,8 +8,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
-use Doctrine\Migrations\MigrationGenerator;
-use Doctrine\Migrations\MigrationSqlGenerator;
+use Doctrine\Migrations\Generator\Generator;
+use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\SchemaDumper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -22,10 +22,10 @@ class SchemaDumperTest extends TestCase
     /** @var AbstractSchemaManager */
     private $schemaManager;
 
-    /** @var MigrationGenerator */
+    /** @var Generator */
     private $migrationGenerator;
 
-    /** @var MigrationSqlGenerator */
+    /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
     /** @var SchemaDumper */
@@ -93,8 +93,8 @@ class SchemaDumperTest extends TestCase
     {
         $this->platform              = $this->createMock(AbstractPlatform::class);
         $this->schemaManager         = $this->createMock(AbstractSchemaManager::class);
-        $this->migrationGenerator    = $this->createMock(MigrationGenerator::class);
-        $this->migrationSqlGenerator = $this->createMock(MigrationSqlGenerator::class);
+        $this->migrationGenerator    = $this->createMock(Generator::class);
+        $this->migrationSqlGenerator = $this->createMock(SqlGenerator::class);
 
         $this->schemaDumper = new SchemaDumper(
             $this->platform,

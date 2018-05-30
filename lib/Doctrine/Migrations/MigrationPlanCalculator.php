@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Version;
+use Doctrine\Migrations\Version\VersionInterface;
 use function array_filter;
 use function array_reverse;
 use function count;
@@ -27,7 +30,7 @@ final class MigrationPlanCalculator
     {
         $allVersions = $this->migrationRepository->getMigrations();
 
-        if ($direction === VersionDirection::DOWN && count($allVersions) !== 0) {
+        if ($direction === Direction::DOWN && count($allVersions) !== 0) {
             $allVersions = array_reverse($allVersions);
         }
 
@@ -51,7 +54,7 @@ final class MigrationPlanCalculator
     ) : bool {
         $to = (int) $to;
 
-        if ($direction === VersionDirection::DOWN) {
+        if ($direction === Direction::DOWN) {
             if (! in_array($version->getVersion(), $migrated, true)) {
                 return false;
             }
@@ -59,7 +62,7 @@ final class MigrationPlanCalculator
             return (int) $version->getVersion() > $to;
         }
 
-        if ($direction === VersionDirection::UP) {
+        if ($direction === Direction::UP) {
             if (in_array($version->getVersion(), $migrated, true)) {
                 return false;
             }
