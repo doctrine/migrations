@@ -133,6 +133,12 @@ class VersionExecutorTest extends TestCase
 
     public function testExecuteDown() : void
     {
+        $platform = $this->createMock(AbstractPlatform::class);
+
+        $this->connection->expects($this->once())
+            ->method('getDatabasePlatform')
+            ->willReturn($platform);
+
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
         $this->stopwatch->expects($this->any())

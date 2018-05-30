@@ -55,7 +55,11 @@ class MigrationTableTest extends TestCase
 
     public function testGetColumnNames() : void
     {
-        self::assertEquals(['version_name', 'executed_datetime'], $this->migrationTable->getColumnNames());
+        self::assertEquals([
+            'version_name',
+            'executed_datetime',
+            'migration_direction'
+        ], $this->migrationTable->getColumnNames());
     }
 
     public function testGetDBALTable() : void
@@ -72,7 +76,7 @@ class MigrationTableTest extends TestCase
 
         $table = $this->migrationTable->getDBALTable();
 
-        self::assertCount(2, $table->getColumns());
+        self::assertCount(3, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
         self::assertEquals(true, $table->getOption('test_option'));
@@ -98,7 +102,7 @@ class MigrationTableTest extends TestCase
 
         $table = $this->migrationTable->getNewDBALTable();
 
-        self::assertCount(2, $table->getColumns());
+        self::assertCount(3, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
         self::assertEquals(true, $table->getOption('test_option'));
@@ -119,7 +123,8 @@ class MigrationTableTest extends TestCase
             'versions',
             'version_name',
             200,
-            'executed_datetime'
+            'executed_datetime',
+            'migration_direction'
         );
     }
 }

@@ -21,7 +21,6 @@ use function class_exists;
 use function count;
 use function end;
 use function get_class;
-use function implode;
 use function is_array;
 use function ksort;
 use function sprintf;
@@ -140,34 +139,19 @@ class MigrationRepository
 
         $this->loadMigrationsFromDirectory();
 
-        $where = null;
+        $versions = $this->getMigrations();
 
-        if (count($this->versions) !== 0) {
-            $migratedVersions = [];
+        $currentVersion = '0';
 
-            foreach ($this->versions as $migration) {
-                $migratedVersions[] = sprintf("'%s'", $migration->getVersion());
+        foreach ($versions as $version) {
+            if (! $this->hasVersionMigrated($version)) {
+                continue;
             }
 
-            $where = sprintf(
-                ' WHERE %s IN (%s)',
-                $this->configuration->getQuotedMigrationsColumnName(),
-                implode(', ', $migratedVersions)
-            );
+            $currentVersion = $version->getVersion();
         }
 
-        $sql = sprintf(
-            'SELECT %s FROM %s%s ORDER BY %s DESC',
-            $this->configuration->getQuotedMigrationsColumnName(),
-            $this->configuration->getMigrationsTableName(),
-            $where,
-            $this->configuration->getQuotedMigrationsColumnName()
-        );
-
-        $sql    = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
-        $result = $this->connection->fetchColumn($sql);
-
-        return $result !== false ? (string) $result : '0';
+        return $currentVersion;
     }
 
     /**
@@ -217,16 +201,26 @@ class MigrationRepository
         $this->configuration->createMigrationTable();
 
         $sql = sprintf(
-            'SELECT %s, %s FROM %s WHERE %s = ?',
+            'SELECT %s, %s, %s FROM %s WHERE %s = ? ORDER BY %s ASC',
             $this->configuration->getQuotedMigrationsColumnName(),
             $this->configuration->getQuotedMigrationsExecutedAtColumnName(),
+            $this->configuration->getQuotedMigrationsDirectionColumnName(),
             $this->configuration->getMigrationsTableName(),
-            $this->configuration->getQuotedMigrationsColumnName()
+            $this->configuration->getQuotedMigrationsColumnName(),
+            $this->configuration->getQuotedMigrationsExecutedAtColumnName()
         );
 
-        $data = $this->connection->fetchAssoc($sql, [$version->getVersion()]);
+        $executions = $this->connection->fetchAll($sql, [$version->getVersion()]);
 
-        return is_array($data) ? $data : null;
+        $lastExecution = end($executions);
+
+        $directionColumnName = $this->configuration->getQuotedMigrationsDirectionColumnName();
+
+        if (is_array($lastExecution) && $lastExecution[$directionColumnName] === VersionDirection::UP) {
+            return $lastExecution;
+        }
+
+        return null;
     }
 
     /**
@@ -273,15 +267,19 @@ class MigrationRepository
 
         $this->configuration->connect();
 
-        $sql = sprintf(
-            'SELECT %s FROM %s',
-            $this->configuration->getQuotedMigrationsColumnName(),
-            $this->configuration->getMigrationsTableName()
-        );
+        $versions = $this->getMigrations();
 
-        $result = $this->connection->fetchAll($sql);
+        $migratedVersions = [];
 
-        return array_map('current', $result);
+        foreach ($versions as $version) {
+            if (! $this->hasVersionMigrated($version)) {
+                continue;
+            }
+
+            $migratedVersions[] = $version->getVersion();
+        }
+
+        return $migratedVersions;
     }
 
     /**

@@ -13,6 +13,7 @@ class MigrationTable
 {
     public const MIGRATION_COLUMN_TYPE             = 'string';
     public const MIGRATION_EXECUTED_AT_COLUMN_TYPE = 'datetime_immutable';
+    public const MIGRATION_DIRECTION_COLUMN_TYPE   = 'string';
 
     /** @var AbstractSchemaManager */
     private $schemaManager;
@@ -29,18 +30,23 @@ class MigrationTable
     /** @var string */
     private $executedAtColumnName;
 
+    /** @var string */
+    private $directionColumnName;
+
     public function __construct(
         AbstractSchemaManager $schemaManager,
         string $name,
         string $columnName,
         int $columnLength,
-        string $executedAtColumnName
+        string $executedAtColumnName,
+        string $directionColumnName
     ) {
         $this->schemaManager        = $schemaManager;
         $this->name                 = $name;
         $this->columnName           = $columnName;
         $this->columnLength         = $columnLength;
         $this->executedAtColumnName = $executedAtColumnName;
+        $this->directionColumnName  = $directionColumnName;
     }
 
     public function getName() : string
@@ -80,6 +86,15 @@ class MigrationTable
         );
     }
 
+    public function getDirectionColumn() : Column
+    {
+        return new Column(
+            $this->directionColumnName,
+            Type::getType(self::MIGRATION_DIRECTION_COLUMN_TYPE),
+            ['length' => 4, 'default' => VersionDirection::UP]
+        );
+    }
+
     /**
      * @return string[]
      */
@@ -88,6 +103,7 @@ class MigrationTable
         return [
             $this->columnName,
             $this->executedAtColumnName,
+            $this->directionColumnName,
         ];
     }
 
@@ -96,9 +112,13 @@ class MigrationTable
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(false);
 
+        $directionColumn = $this->getDirectionColumn();
+        $directionColumn->setNotnull(false);
+
         $columns = [
             $this->columnName           => $this->getMigrationsColumn(),
             $this->executedAtColumnName => $executedAtColumn,
+            $this->directionColumnName  => $directionColumn,
         ];
 
         return $this->createDBALTable($columns);
@@ -109,9 +129,13 @@ class MigrationTable
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(true);
 
+        $directionColumn = $this->getDirectionColumn();
+        $directionColumn->setNotnull(true);
+
         $columns = [
             $this->columnName           => $this->getMigrationsColumn(),
             $this->executedAtColumnName => $executedAtColumn,
+            $this->directionColumnName  => $directionColumn,
         ];
 
         return $this->createDBALTable($columns);
@@ -125,7 +149,6 @@ class MigrationTable
         $schemaConfig = $this->schemaManager->createSchemaConfig();
 
         $table = new Table($this->getName(), $columns);
-        $table->setPrimaryKey([$this->getColumnName()]);
 
         foreach ($schemaConfig->getDefaultTableOptions() as $name => $value) {
             $table->addOption($name, $value);

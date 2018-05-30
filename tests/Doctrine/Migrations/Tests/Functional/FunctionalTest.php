@@ -195,14 +195,15 @@ class FunctionalTest extends MigrationTestCase
         $migrator = $this->createTestMigrator($this->config);
         $migrator->migrate('3');
 
-        self::assertEquals(3, $this->config->getCurrentVersion());
+        self::assertEquals('3', $this->config->getCurrentVersion());
+
         $migrator->migrate('0');
+        self::assertEquals('0', $this->config->getCurrentVersion());
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
         self::assertFalse($schema->hasTable('bar'));
 
-        self::assertEquals(0, $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
         self::assertFalse($migrations['1']->isMigrated());
         self::assertFalse($migrations['2']->isMigrated());
