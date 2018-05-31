@@ -6,6 +6,9 @@ namespace Doctrine\Migrations\Configuration\Connection;
 
 use Doctrine\DBAL\Connection;
 
+/**
+ * @internal
+ */
 interface ConnectionLoaderInterface
 {
     /**

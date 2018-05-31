@@ -9,6 +9,9 @@ use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 
+/**
+ * @internal
+ */
 class ConnectionHelperLoader implements ConnectionLoaderInterface
 {
     /** @var string */

@@ -15,6 +15,9 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 
+/**
+ * @internal
+ */
 class ConnectionLoader
 {
     /** @var Configuration|null */

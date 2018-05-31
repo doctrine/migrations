@@ -10,6 +10,9 @@ use ProxyManager\Factory\LazyLoadingValueHolderFactory;
 use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
+/**
+ * @internal
+ */
 class LazySchemaDiffProvider implements SchemaDiffProviderInterface
 {
     /** @var LazyLoadingValueHolderFactory */

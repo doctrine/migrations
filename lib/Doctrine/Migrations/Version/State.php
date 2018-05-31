@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+/**
+ * @internal
+ */
 final class State
 {
     public const NONE = 0;

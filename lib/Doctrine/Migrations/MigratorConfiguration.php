@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+/**
+ * @internal
+ */
 class MigratorConfiguration
 {
     /** @var bool */

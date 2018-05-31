@@ -6,6 +6,9 @@ namespace Doctrine\Migrations\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * @internal
+ */
 interface SchemaDiffProviderInterface
 {
     public function createFromSchema() : Schema;

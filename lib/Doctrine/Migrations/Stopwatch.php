@@ -7,6 +7,9 @@ namespace Doctrine\Migrations;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
+/**
+ * @internal
+ */
 class Stopwatch
 {
     /** @var SymfonyStopwatch */

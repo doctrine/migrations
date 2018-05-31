@@ -9,6 +9,9 @@ use function log;
 use function pow;
 use function round;
 
+/**
+ * @internal
+ */
 final class BytesFormatter
 {
     public static function formatBytes(int $size, int $precision = 2) : string

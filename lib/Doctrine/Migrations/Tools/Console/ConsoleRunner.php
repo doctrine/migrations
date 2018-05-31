@@ -19,6 +19,9 @@ use PackageVersions\Versions;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
+/**
+ * @internal
+ */
 class ConsoleRunner
 {
     /** @param AbstractCommand[] $commands */

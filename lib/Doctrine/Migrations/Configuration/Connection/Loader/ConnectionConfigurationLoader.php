@@ -8,6 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
+/**
+ * @internal
+ */
 class ConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
     /** @var null|Configuration */

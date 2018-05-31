@@ -12,6 +12,9 @@ use Doctrine\DBAL\Schema\Table;
 use Throwable;
 use function in_array;
 
+/**
+ * @internal
+ */
 class TableUpdater
 {
     /** @var Connection */

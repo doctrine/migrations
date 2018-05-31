@@ -11,6 +11,9 @@ use InvalidArgumentException;
 use function file_exists;
 use function is_array;
 
+/**
+ * @internal
+ */
 class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
     /** @var null|string */

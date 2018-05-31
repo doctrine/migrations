@@ -14,6 +14,9 @@ use function preg_match;
 use function strpos;
 use function substr;
 
+/**
+ * @internal
+ */
 class DiffGenerator
 {
     /** @var DBALConfiguration */

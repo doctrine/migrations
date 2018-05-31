@@ -12,6 +12,9 @@ use function count;
 use function current;
 use function sprintf;
 
+/**
+ * @internal
+ */
 class Rollup
 {
     /** @var Configuration */
