@@ -8,9 +8,9 @@ use DateTimeImmutable;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
+use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tracking\TableDefinition;
@@ -34,7 +34,7 @@ class Version implements VersionInterface
     /** @var string */
     private $version;
 
-    /** @var AbstractMigration */
+    /** @var Migration */
     private $migration;
 
     /** @var Connection */
@@ -91,7 +91,7 @@ class Version implements VersionInterface
         return $this->configuration;
     }
 
-    public function getMigration() : AbstractMigration
+    public function getMigration() : Migration
     {
         return $this->migration;
     }

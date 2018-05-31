@@ -14,7 +14,7 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Version\Version;
 use function sprintf;
 
-abstract class AbstractMigration
+abstract class AbstractMigration implements Migration
 {
     /** @var Version */
     protected $version;
@@ -119,7 +119,7 @@ abstract class AbstractMigration
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    protected function addSql(
+    public function addSql(
         string $sql,
         array $params = [],
         array $types = []
@@ -127,12 +127,12 @@ abstract class AbstractMigration
         $this->version->addSql($sql, $params, $types);
     }
 
-    protected function write(string $message) : void
+    public function write(string $message) : void
     {
         $this->outputWriter->write($message);
     }
 
-    protected function throwIrreversibleMigrationException(?string $message = null) : void
+    public function throwIrreversibleMigrationException(?string $message = null) : void
     {
         if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';

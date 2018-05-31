@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
-use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\MigratorConfiguration;
 
 /**
@@ -20,7 +20,7 @@ interface ExecutorInterface
 
     public function execute(
         Version $version,
-        AbstractMigration $migration,
+        Migration $migration,
         string $direction,
         ?MigratorConfiguration $migratorConfiguration = null
     ) : ExecutionResult;
