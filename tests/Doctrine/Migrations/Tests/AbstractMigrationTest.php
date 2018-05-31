@@ -11,8 +11,8 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\Migrations\Tests\Stub\VersionDummy;
-use Doctrine\Migrations\Version;
-use Doctrine\Migrations\VersionExecutorInterface;
+use Doctrine\Migrations\Version\ExecutorInterface;
+use Doctrine\Migrations\Version\Version;
 use function sys_get_temp_dir;
 
 class AbstractMigrationTest extends MigrationTestCase
@@ -37,7 +37,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->config->setMigrationsDirectory(sys_get_temp_dir());
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
 
-        $versionExecutor = $this->createMock(VersionExecutorInterface::class);
+        $versionExecutor = $this->createMock(ExecutorInterface::class);
 
         $this->version = new Version(
             $this->config,

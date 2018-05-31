@@ -6,8 +6,8 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
-use Doctrine\Migrations\VersionDirection;
-use Doctrine\Migrations\VersionInterface;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\VersionInterface;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationPlanCalculatorTest extends TestCase
@@ -62,7 +62,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
 
         $migrationsToExecute = $this->migrationPlanCalculator->getMigrationsToExecute(
-            VersionDirection::UP,
+            Direction::UP,
             '04'
         );
 
@@ -113,7 +113,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
 
         $migrationsToExecute = $this->migrationPlanCalculator->getMigrationsToExecute(
-            VersionDirection::DOWN,
+            Direction::DOWN,
             '01'
         );
 

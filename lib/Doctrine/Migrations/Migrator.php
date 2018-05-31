@@ -9,6 +9,8 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
 use const COUNT_RECURSIVE;
@@ -44,10 +46,10 @@ class Migrator
     /** @return string[][] */
     public function getSql(?string $to = null) : array
     {
-        $migratorConfig = (new MigratorConfig())
+        $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun(true);
 
-        return $this->migrate($to, $migratorConfig);
+        return $this->migrate($to, $migratorConfiguration);
     }
 
     public function writeSqlFile(string $path, ?string $to = null) : bool
@@ -61,8 +63,8 @@ class Migrator
         }
 
         $direction = $from > $to
-            ? VersionDirection::DOWN
-            : VersionDirection::UP;
+            ? Direction::DOWN
+            : Direction::UP;
 
         $this->outputWriter->write(
             sprintf("-- Migrating from %s to %s\n", $from, $to)
@@ -84,10 +86,10 @@ class Migrator
      */
     public function migrate(
         ?string $to = null,
-        ?MigratorConfig $migratorConfig = null
+        ?MigratorConfiguration $migratorConfiguration = null
     ) : array {
-        $migratorConfig = $migratorConfig ?? new MigratorConfig();
-        $dryRun         = $migratorConfig->isDryRun();
+        $migratorConfiguration = $migratorConfiguration ?? new MigratorConfiguration();
+        $dryRun                = $migratorConfiguration->isDryRun();
 
         if ($to === null) {
             $to = $this->migrationRepository->getLatestVersion();
@@ -126,7 +128,7 @@ class Migrator
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (count($migrationsToExecute) === 0 && ! $migratorConfig->getNoMigrationException()) {
+        if (count($migrationsToExecute) === 0 && ! $migratorConfiguration->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
         } elseif (count($migrationsToExecute) === 0) {
             return $this->noMigrations();
@@ -134,7 +136,7 @@ class Migrator
 
         $stopwatchEvent = $this->stopwatch->start('migrate');
 
-        $sql = $this->executeMigration($migrationsToExecute, $direction, $migratorConfig);
+        $sql = $this->executeMigration($migrationsToExecute, $direction, $migratorConfiguration);
 
         $this->endMigration($stopwatchEvent, $migrationsToExecute, $sql);
 
@@ -149,15 +151,15 @@ class Migrator
     private function executeMigration(
         array $migrationsToExecute,
         string $direction,
-        MigratorConfig $migratorConfig
+        MigratorConfiguration $migratorConfiguration
     ) : array {
-        $dryRun = $migratorConfig->isDryRun();
+        $dryRun = $migratorConfiguration->isDryRun();
 
         $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
 
         $connection = $this->configuration->getConnection();
 
-        $allOrNothing = $migratorConfig->isAllOrNothing();
+        $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
         if ($allOrNothing) {
             $connection->beginTransaction();
@@ -170,7 +172,7 @@ class Migrator
             $time = 0;
 
             foreach ($migrationsToExecute as $version) {
-                $versionExecutionResult = $version->execute($direction, $migratorConfig);
+                $versionExecutionResult = $version->execute($direction, $migratorConfiguration);
 
                 $sql[$version->getVersion()] = $versionExecutionResult->getSql();
                 $time                       += $versionExecutionResult->getTime();
@@ -228,7 +230,7 @@ class Migrator
 
     private function calculateDirection(string $from, string $to) : string
     {
-        return (int) $from > (int) $to ? VersionDirection::DOWN : VersionDirection::UP;
+        return (int) $from > (int) $to ? Direction::DOWN : Direction::UP;
     }
 
     /** @return string[][] */

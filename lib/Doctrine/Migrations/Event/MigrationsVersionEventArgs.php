@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Event;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 
 class MigrationsVersionEventArgs extends MigrationsEventArgs
 {

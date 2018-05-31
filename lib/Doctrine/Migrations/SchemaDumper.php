@@ -6,6 +6,8 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\Migrations\Generator\Generator;
+use Doctrine\Migrations\Generator\SqlGenerator;
 use RuntimeException;
 use function count;
 use function implode;
@@ -18,17 +20,17 @@ class SchemaDumper
     /** @var AbstractSchemaManager */
     private $schemaManager;
 
-    /** @var MigrationGenerator */
+    /** @var Generator */
     private $migrationGenerator;
 
-    /** @var MigrationSqlGenerator */
+    /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
     public function __construct(
         AbstractPlatform $platform,
         AbstractSchemaManager $schemaManager,
-        MigrationGenerator $migrationGenerator,
-        MigrationSqlGenerator $migrationSqlGenerator
+        Generator $migrationGenerator,
+        SqlGenerator $migrationSqlGenerator
     ) {
         $this->platform              = $platform;
         $this->schemaManager         = $schemaManager;

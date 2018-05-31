@@ -21,7 +21,7 @@ use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function array_keys;
 use function call_user_func_array;

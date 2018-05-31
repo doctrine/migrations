@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use DateTime;
 use DateTimeInterface;
+use Doctrine\Migrations\Generator\FileBuilder;
 use function file_put_contents;
 use function is_dir;
 use function sprintf;
@@ -15,12 +16,12 @@ final class FileQueryWriter implements QueryWriter
     /** @var null|OutputWriter */
     private $outputWriter;
 
-    /** @var MigrationFileBuilder */
+    /** @var FileBuilder */
     private $migrationFileBuilder;
 
     public function __construct(
         OutputWriter $outputWriter,
-        MigrationFileBuilder $migrationFileBuilder
+        FileBuilder $migrationFileBuilder
     ) {
         $this->outputWriter         = $outputWriter;
         $this->migrationFileBuilder = $migrationFileBuilder;

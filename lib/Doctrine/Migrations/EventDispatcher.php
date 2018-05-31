@@ -9,6 +9,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
+use Doctrine\Migrations\Version\Version;
 
 /**
  * @internal

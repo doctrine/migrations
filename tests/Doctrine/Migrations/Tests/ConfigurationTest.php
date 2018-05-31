@@ -12,7 +12,7 @@ use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tests\Stub\Version2Test;
 use Doctrine\Migrations\Tests\Stub\Version3Test;
-use Doctrine\Migrations\Version;
+use Doctrine\Migrations\Version\Version;
 use function sys_get_temp_dir;
 
 class ConfigurationTest extends MigrationTestCase

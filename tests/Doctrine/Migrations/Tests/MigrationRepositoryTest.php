@@ -9,8 +9,8 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\MigrationRepository;
-use Doctrine\Migrations\Version;
-use Doctrine\Migrations\VersionFactory;
+use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
 class MigrationRepositoryTest extends TestCase
@@ -24,7 +24,7 @@ class MigrationRepositoryTest extends TestCase
     /** @var MigrationFinder */
     private $migrationFinder;
 
-    /** @var VersionFactory */
+    /** @var Factory */
     private $versionFactory;
 
     /** @var MigrationRepository */
@@ -109,7 +109,7 @@ class MigrationRepositoryTest extends TestCase
         $this->configuration   = $this->createMock(Configuration::class);
         $this->connection      = $this->createMock(Connection::class);
         $this->migrationFinder = $this->createMock(MigrationFinder::class);
-        $this->versionFactory  = $this->createMock(VersionFactory::class);
+        $this->versionFactory  = $this->createMock(Factory::class);
 
         $this->migrationRepository = new MigrationRepository(
             $this->configuration,

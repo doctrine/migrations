@@ -6,9 +6,9 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\FileQueryWriter;
-use Doctrine\Migrations\MigrationFileBuilder;
+use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\OutputWriter;
-use Doctrine\Migrations\VersionDirection;
+use Doctrine\Migrations\Version\Direction;
 use function file_get_contents;
 use function sprintf;
 use function unlink;
@@ -34,7 +34,7 @@ final class FileQueryWriterTest extends MigrationTestCase
     ) : void {
         $platform = $this->createMock(AbstractPlatform::class);
 
-        $migrationFileBuilder = new MigrationFileBuilder(
+        $migrationFileBuilder = new FileBuilder(
             $platform,
             self::TABLE_NAME,
             self::COLUMN_NAME,
@@ -61,7 +61,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
             unlink($file);
 
-            if ($direction === VersionDirection::UP) {
+            if ($direction === Direction::UP) {
                 $expectedQuery = self::UP_QUERY;
 
                 $expectedSql = sprintf(
@@ -95,8 +95,8 @@ final class FileQueryWriterTest extends MigrationTestCase
             ->with($this->isType('string'));
 
         return [
-            [__DIR__, VersionDirection::UP, ['1' => ['SHOW DATABASES']], $outputWriter],
-            [__DIR__, VersionDirection::DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, Direction::UP, ['1' => ['SHOW DATABASES']], $outputWriter],
+            [__DIR__, Direction::DOWN, ['1' => ['SHOW DATABASES']], $outputWriter],
         ];
     }
 }

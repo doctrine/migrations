@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\MigrationGenerator;
+use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -20,7 +20,7 @@ final class GenerateCommandTest extends TestCase
     /** @var DependencyFactory */
     private $dependencyFactory;
 
-    /** @var MigrationGenerator */
+    /** @var Generator */
     private $migrationGenerator;
 
     /** @var GenerateCommand */
@@ -66,7 +66,7 @@ final class GenerateCommandTest extends TestCase
     {
         $this->configuration      = $this->createMock(Configuration::class);
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
-        $this->migrationGenerator = $this->createMock(MigrationGenerator::class);
+        $this->migrationGenerator = $this->createMock(Generator::class);
 
         $this->dependencyFactory->expects($this->once())
             ->method('getMigrationGenerator')
