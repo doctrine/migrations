@@ -20,6 +20,9 @@ use function date_default_timezone_get;
 use function in_array;
 use function str_replace;
 
+/**
+ * @internal
+ */
 class Version implements VersionInterface
 {
     /** @var Configuration */

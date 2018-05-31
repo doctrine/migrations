@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use InvalidArgumentException;
-use Symfony\Component\Console\Helper\Helper;
 use const DIRECTORY_SEPARATOR;
 use function date;
 use function file_exists;
@@ -15,7 +14,10 @@ use function mkdir;
 use function rtrim;
 use function sprintf;
 
-class MigrationDirectoryHelper extends Helper
+/**
+ * @internal
+ */
+class MigrationDirectoryHelper
 {
     /** @var Configuration */
     private $configuration;

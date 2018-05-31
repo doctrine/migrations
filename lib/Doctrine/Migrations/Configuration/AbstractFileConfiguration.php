@@ -16,6 +16,9 @@ use function in_array;
 use function realpath;
 use function strcasecmp;
 
+/**
+ * @internal
+ */
 abstract class AbstractFileConfiguration extends Configuration
 {
     /** @var array */

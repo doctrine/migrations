@@ -10,6 +10,9 @@ use Doctrine\Migrations\MigrationRepository;
 use function count;
 use function sprintf;
 
+/**
+ * @internal
+ */
 class MigrationStatusInfosHelper
 {
     /** @var Configuration  */

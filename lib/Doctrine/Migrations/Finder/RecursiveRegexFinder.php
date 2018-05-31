@@ -11,6 +11,9 @@ use RegexIterator;
 use const DIRECTORY_SEPARATOR;
 use function sprintf;
 
+/**
+ * @internal
+ */
 final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 {
     /**

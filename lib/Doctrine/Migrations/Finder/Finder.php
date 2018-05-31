@@ -16,6 +16,9 @@ use function realpath;
 use function sprintf;
 use function substr;
 
+/**
+ * @internal
+ */
 abstract class Finder implements MigrationFinder
 {
     protected static function requireOnce(string $path) : void

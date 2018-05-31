@@ -11,6 +11,9 @@ use function file_put_contents;
 use function is_dir;
 use function sprintf;
 
+/**
+ * @internal
+ */
 final class FileQueryWriter implements QueryWriter
 {
     /** @var null|OutputWriter */

@@ -6,6 +6,9 @@ namespace Doctrine\Migrations\Tracking;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 
+/**
+ * @internal
+ */
 class TableStatus
 {
     /** @var AbstractSchemaManager */

@@ -6,6 +6,9 @@ namespace Doctrine\Migrations\Tools;
 
 use function strtolower;
 
+/**
+ * @internal
+ */
 class BooleanStringFormatter
 {
     public static function toBoolean(string $value, bool $default) : bool

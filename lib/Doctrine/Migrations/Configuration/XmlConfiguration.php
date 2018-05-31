@@ -13,6 +13,9 @@ use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_file;
 
+/**
+ * @internal
+ */
 class XmlConfiguration extends AbstractFileConfiguration
 {
     /** @inheritdoc */

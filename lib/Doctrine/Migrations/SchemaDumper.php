@@ -12,6 +12,9 @@ use RuntimeException;
 use function count;
 use function implode;
 
+/**
+ * @internal
+ */
 class SchemaDumper
 {
     /** @var AbstractPlatform */

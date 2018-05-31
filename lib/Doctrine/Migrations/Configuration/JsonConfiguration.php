@@ -8,6 +8,9 @@ use Doctrine\Migrations\Configuration\Exception\JsonNotValid;
 use function file_get_contents;
 use function json_decode;
 
+/**
+ * @internal
+ */
 class JsonConfiguration extends AbstractFileConfiguration
 {
     /** @inheritdoc */

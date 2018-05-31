@@ -18,6 +18,9 @@ use function sprintf;
 use function str_replace;
 use function trim;
 
+/**
+ * @internal
+ */
 class Generator
 {
     private const MIGRATION_TEMPLATE = <<<'TEMPLATE'

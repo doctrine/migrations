@@ -11,6 +11,9 @@ use function class_exists;
 use function file_get_contents;
 use function is_array;
 
+/**
+ * @internal
+ */
 class YamlConfiguration extends AbstractFileConfiguration
 {
     /**

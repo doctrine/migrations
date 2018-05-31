@@ -17,6 +17,9 @@ use const COUNT_RECURSIVE;
 use function count;
 use function sprintf;
 
+/**
+ * @internal
+ */
 class Migrator
 {
     /** @var Configuration */

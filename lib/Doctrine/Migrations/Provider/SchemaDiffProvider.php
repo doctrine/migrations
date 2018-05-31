@@ -8,6 +8,9 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 
+/**
+ * @internal
+ */
 class SchemaDiffProvider implements SchemaDiffProviderInterface
 {
     /** @var AbstractPlatform */

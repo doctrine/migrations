@@ -7,6 +7,9 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
+/**
+ * @internal
+ */
 final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterface
 {
     /** @var ConnectionLoaderInterface[] */

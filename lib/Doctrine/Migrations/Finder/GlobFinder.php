@@ -7,6 +7,9 @@ namespace Doctrine\Migrations\Finder;
 use function glob;
 use function rtrim;
 
+/**
+ * @internal
+ */
 final class GlobFinder extends Finder
 {
     /**

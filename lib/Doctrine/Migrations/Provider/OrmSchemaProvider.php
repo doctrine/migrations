@@ -10,6 +10,9 @@ use Doctrine\ORM\Tools\SchemaTool;
 use UnexpectedValueException;
 use function count;
 
+/**
+ * @internal
+ */
 final class OrmSchemaProvider implements SchemaProviderInterface
 {
     /** @var EntityManagerInterface */
