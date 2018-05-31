@@ -17,6 +17,8 @@ use function realpath;
 use function strcasecmp;
 
 /**
+ * The AbstractFileConfiguration class is responsible for loading migration configuration information from a file.
+ *
  * @internal
  */
 abstract class AbstractFileConfiguration extends Configuration

@@ -11,6 +11,11 @@ use function count;
 use function sprintf;
 
 /**
+ * The MigrationStatusInfosHelper class is responsible for building the array of information used when displaying
+ * the status of your migrations.
+ *
+ * @see Doctrine\Migrations\Tools\Console\Command\StatusCommand
+ *
  * @internal
  */
 class MigrationStatusInfosHelper

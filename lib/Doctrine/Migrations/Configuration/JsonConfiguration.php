@@ -9,6 +9,8 @@ use function file_get_contents;
 use function json_decode;
 
 /**
+ * The YamlConfiguration class is responsible for loading migration configuration information from a JSON file.
+ *
  * @internal
  */
 class JsonConfiguration extends AbstractFileConfiguration

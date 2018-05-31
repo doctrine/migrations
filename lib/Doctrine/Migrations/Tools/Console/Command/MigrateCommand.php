@@ -16,6 +16,10 @@ use function getcwd;
 use function sprintf;
 use function substr;
 
+/**
+ * The MigrateCommand class is responsible for executing a migration from the current version to another
+ * version up or down. It will calculate all the migration versions that need to be executed and execute them.
+ */
 class MigrateCommand extends AbstractCommand
 {
     protected function configure() : void

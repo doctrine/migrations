@@ -8,6 +8,9 @@ use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 
+/**
+ * The MigrationEventsArgs class is passed to events not related to a single migration version.
+ */
 class MigrationsEventArgs extends EventArgs
 {
     /** @var Configuration */

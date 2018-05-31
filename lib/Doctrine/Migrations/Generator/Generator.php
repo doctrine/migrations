@@ -19,6 +19,8 @@ use function str_replace;
 use function trim;
 
 /**
+ * The Generator class is responsible for generating a migration class.
+ *
  * @internal
  */
 class Generator

@@ -15,6 +15,8 @@ use function rtrim;
 use function sprintf;
 
 /**
+ * The MigrationDirectoryHelper class is responsible for returning the directory that migrations are stored in.
+ *
  * @internal
  */
 class MigrationDirectoryHelper

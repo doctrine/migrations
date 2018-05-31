@@ -6,13 +6,15 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
-use Doctrine\Migrations\Version\VersionInterface;
 use function array_filter;
 use function array_reverse;
 use function count;
 use function in_array;
 
 /**
+ * The MigrationPlanCalculator is responsible for calculating the plan for migrating from the current
+ * version to another version.
+ *
  * @internal
  */
 final class MigrationPlanCalculator
@@ -36,7 +38,7 @@ final class MigrationPlanCalculator
 
         $migrated = $this->migrationRepository->getMigratedVersions();
 
-        return array_filter($allVersions, function (VersionInterface $version) use (
+        return array_filter($allVersions, function (Version $version) use (
             $migrated,
             $direction,
             $to
@@ -48,7 +50,7 @@ final class MigrationPlanCalculator
     /** @param string[] $migrated */
     private function shouldExecuteMigration(
         string $direction,
-        VersionInterface $version,
+        Version $version,
         string $to,
         array $migrated
     ) : bool {

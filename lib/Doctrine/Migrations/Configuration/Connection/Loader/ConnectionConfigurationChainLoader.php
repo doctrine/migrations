@@ -8,6 +8,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
 /**
+ * The ConnectionConfigurationChainLoader class is responsible for loading a Doctrine\DBAL\Connection from an array of
+ * loaders. The first one to return a Connection is used.
+ *
  * @internal
  */
 final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterface

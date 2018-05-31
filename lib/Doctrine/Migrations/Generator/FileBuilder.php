@@ -10,6 +10,8 @@ use Doctrine\Migrations\Version\Direction;
 use function sprintf;
 
 /**
+ * The FileBuilder class is responsible for building a migration SQL file from an array of queries per version.
+ *
  * @internal
  */
 final class FileBuilder

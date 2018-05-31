@@ -12,6 +12,8 @@ use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Version\Version;
 
 /**
+ * The EventDispatcher class is responsible for dispatching events internally that a user can listen for.
+ *
  * @internal
  */
 final class EventDispatcher

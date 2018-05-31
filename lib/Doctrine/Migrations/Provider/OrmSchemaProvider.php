@@ -11,6 +11,10 @@ use UnexpectedValueException;
 use function count;
 
 /**
+ * The OrmSchemaProvider class is responsible for creating a Doctrine\DBAL\Schema\Schema instance from the mapping
+ * information provided by the Doctrine ORM. This is then used to diff against your current database schema to produce
+ * a migration to bring your database in sync with the ORM mapping information.
+ *
  * @internal
  */
 final class OrmSchemaProvider implements SchemaProviderInterface

@@ -14,6 +14,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function class_exists;
 use function sprintf;
 
+/**
+ * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
+ * your mapping information.
+ */
 class DiffCommand extends AbstractCommand
 {
     /** @var null|SchemaProviderInterface */

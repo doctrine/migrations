@@ -8,6 +8,8 @@ use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 /**
+ * The Stopwatch class wraps the Symfony Stopwatch class so that we do not directly depend on it.
+ *
  * @internal
  */
 class Stopwatch

@@ -16,6 +16,8 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 
 /**
+ * The ConnectionLoader class is responsible for loading the Doctrine\DBAL\Connection instance to use for migrations.
+ *
  * @internal
  */
 class ConnectionLoader

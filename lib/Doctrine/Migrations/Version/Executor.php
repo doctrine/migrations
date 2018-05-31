@@ -22,6 +22,8 @@ use function sprintf;
 use function ucfirst;
 
 /**
+ * The Executor class is responsible for executing a single migration version.
+ *
  * @internal
  */
 final class Executor implements ExecutorInterface

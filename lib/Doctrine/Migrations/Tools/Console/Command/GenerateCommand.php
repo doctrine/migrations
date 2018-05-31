@@ -9,6 +9,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 
+/**
+ * The GenerateCommand class is responsible for generating a blank migration class for you to modify to your needs.
+ */
 class GenerateCommand extends AbstractCommand
 {
     protected function configure() : void

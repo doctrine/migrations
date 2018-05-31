@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\VersionInterface;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationPlanCalculatorTest extends TestCase
@@ -20,22 +20,22 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     public function testGetMigrationsToExecuteUp() : void
     {
-        $version1 = $this->createMock(VersionInterface::class);
+        $version1 = $this->createMock(Version::class);
         $version1->expects($this->any())
             ->method('getVersion')
             ->willReturn('01');
 
-        $version2 = $this->createMock(VersionInterface::class);
+        $version2 = $this->createMock(Version::class);
         $version2->expects($this->any())
             ->method('getVersion')
             ->willReturn('02');
 
-        $version3 = $this->createMock(VersionInterface::class);
+        $version3 = $this->createMock(Version::class);
         $version3->expects($this->any())
             ->method('getVersion')
             ->willReturn('03');
 
-        $version4 = $this->createMock(VersionInterface::class);
+        $version4 = $this->createMock(Version::class);
         $version4->expects($this->any())
             ->method('getVersion')
             ->willReturn('04');
@@ -71,22 +71,22 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     public function testGetMigrationsToExecuteDown() : void
     {
-        $version1 = $this->createMock(VersionInterface::class);
+        $version1 = $this->createMock(Version::class);
         $version1->expects($this->any())
             ->method('getVersion')
             ->willReturn('01');
 
-        $version2 = $this->createMock(VersionInterface::class);
+        $version2 = $this->createMock(Version::class);
         $version2->expects($this->any())
             ->method('getVersion')
             ->willReturn('02');
 
-        $version3 = $this->createMock(VersionInterface::class);
+        $version3 = $this->createMock(Version::class);
         $version3->expects($this->any())
             ->method('getVersion')
             ->willReturn('03');
 
-        $version4 = $this->createMock(VersionInterface::class);
+        $version4 = $this->createMock(Version::class);
         $version4->expects($this->any())
             ->method('getVersion')
             ->willReturn('04');

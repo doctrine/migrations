@@ -7,6 +7,8 @@ namespace Doctrine\Migrations\Tracking;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 
 /**
+ * The TableStatus class is responsible for checking if the tracking table needs to be created or updated.
+ *
  * @internal
  */
 class TableStatus

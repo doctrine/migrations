@@ -8,6 +8,8 @@ use Doctrine\Migrations\MigrationRepository;
 use function substr;
 
 /**
+ * The AliasResolver class is responsible for resolving aliases like first, current, etc. to the actual version number.
+ *
  * @internal
  */
 final class AliasResolver

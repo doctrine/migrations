@@ -14,6 +14,10 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Version\Version;
 use function sprintf;
 
+/**
+ * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
+ * and implement the required up() and down() methods.
+ */
 abstract class AbstractMigration
 {
     /** @var Version */

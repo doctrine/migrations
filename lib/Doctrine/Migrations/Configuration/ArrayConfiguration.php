@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration;
 
 /**
+ * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
+ *
  * @internal
  */
 class ArrayConfiguration extends AbstractFileConfiguration

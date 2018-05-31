@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 /**
- * @internal
+ * The OutputWriter class is responsible for writing output to the command line when executing migrations.
  */
 class OutputWriter
 {

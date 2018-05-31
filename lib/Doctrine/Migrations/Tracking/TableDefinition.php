@@ -10,6 +10,9 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
 /**
+ * The TableDefinition class is responsible for defining the schema of the table used to track the execution state of
+ * each migration version.
+ *
  * @internal
  */
 class TableDefinition

@@ -30,6 +30,9 @@ use function sprintf;
 use function substr;
 
 /**
+ * The MigrationRepository class is responsible for retrieving migrations, determing what the current migration
+ * version, etc.
+ *
  * @internal
  */
 class MigrationRepository

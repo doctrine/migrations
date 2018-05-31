@@ -15,6 +15,9 @@ use function strpos;
 use function substr;
 
 /**
+ * The DiffGenerator class is responsible for comparing two Doctrine\DBAL\Schema\Schema instances and generating a
+ * migration class with the SQL statements needed to migrate from one schema to the other.
+ *
  * @internal
  */
 class DiffGenerator

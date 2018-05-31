@@ -22,6 +22,9 @@ use function proc_open;
 use function str_repeat;
 use function strlen;
 
+/**
+ * The AbstractCommand class provides base functionality for the other migrations commands to extend from.
+ */
 abstract class AbstractCommand extends Command
 {
     /** @var Configuration */

@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 /**
+ * The Direction class contains constants for the directions a migration can be executed.
+ *
  * @internal
  */
 final class Direction

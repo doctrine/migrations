@@ -12,6 +12,9 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 
+/**
+ * The VersionCommand class is responsible for manually adding and deleting migration versions from the tracking table.
+ */
 class VersionCommand extends AbstractCommand
 {
     /** @var bool */

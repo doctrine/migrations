@@ -22,6 +22,9 @@ use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Version\Version;
 use function str_replace;
 
+/**
+ * The Configuration class is responsible for defining migration configuration information.
+ */
 class Configuration
 {
     public const VERSIONS_ORGANIZATION_BY_YEAR = 'year';

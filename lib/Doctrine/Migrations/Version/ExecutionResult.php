@@ -8,6 +8,8 @@ use Throwable;
 use function count;
 
 /**
+ * The ExecutionResult class is responsible for storing the result of a migration version after it executes.
+ *
  * @internal
  */
 class ExecutionResult

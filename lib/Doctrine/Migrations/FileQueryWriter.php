@@ -12,6 +12,8 @@ use function is_dir;
 use function sprintf;
 
 /**
+ * The FileQueryWriter class is responsible for writing migration SQL queries to a file on disk.
+ *
  * @internal
  */
 final class FileQueryWriter implements QueryWriter

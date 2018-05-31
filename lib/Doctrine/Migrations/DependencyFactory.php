@@ -24,6 +24,8 @@ use Doctrine\Migrations\Version\Factory;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 
 /**
+ * The DepenencyFactory is responsible for wiring up and managing internal class dependencies.
+ *
  * @internal
  */
 class DependencyFactory

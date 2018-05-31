@@ -21,9 +21,12 @@ use function in_array;
 use function str_replace;
 
 /**
+ * The Version class represents a single migration version. It wraps around your migration class
+ * that extends the AbstractMigration class.
+ *
  * @internal
  */
-class Version implements VersionInterface
+class Version
 {
     /** @var Configuration */
     private $configuration;
