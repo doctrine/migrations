@@ -5,10 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\Migrations\Migration;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatterInterface;
@@ -110,7 +110,7 @@ final class Executor implements ExecutorInterface
 
     public function execute(
         Version $version,
-        AbstractMigration $migration,
+        Migration $migration,
         string $direction,
         ?MigratorConfiguration $migratorConfiguration = null
     ) : ExecutionResult {
@@ -156,7 +156,7 @@ final class Executor implements ExecutorInterface
 
     private function startMigration(
         Version $version,
-        AbstractMigration $migration,
+        Migration $migration,
         string $direction,
         MigratorConfiguration $migratorConfiguration
     ) : void {
@@ -181,7 +181,7 @@ final class Executor implements ExecutorInterface
 
     private function executeMigration(
         Version $version,
-        AbstractMigration $migration,
+        Migration $migration,
         ExecutionResult $versionExecutionResult,
         string $direction,
         MigratorConfiguration $migratorConfiguration
@@ -272,7 +272,7 @@ final class Executor implements ExecutorInterface
     private function skipMigration(
         SkipMigration $e,
         Version $version,
-        AbstractMigration $migration,
+        Migration $migration,
         string $direction,
         MigratorConfiguration $migratorConfiguration
     ) : void {
@@ -300,7 +300,7 @@ final class Executor implements ExecutorInterface
     /**
      * @throws Throwable
      */
-    private function migrationError(Throwable $e, Version $version, AbstractMigration $migration) : void
+    private function migrationError(Throwable $e, Version $version, Migration $migration) : void
     {
         $this->outputWriter->write(sprintf(
             '<error>Migration %s failed during %s. Error %s</error>',
