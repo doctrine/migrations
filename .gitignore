@@ -9,5 +9,4 @@ phpunit.xml
 /phpcs.xml
 /.phpcs-cache
 /box.phar
-/.idea
 
