@@ -13,6 +13,8 @@ use Throwable;
 use function in_array;
 
 /**
+ * The TableUpdater class is responsible for updating the tracking table schema if it needs to be updated.
+ *
  * @internal
  */
 class TableUpdater

@@ -8,6 +8,8 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\MigratorConfiguration;
 
 /**
+ * The ExecutorInterface defines the interface used for adding sql for a migration and executing that sql.
+ *
  * @internal
  */
 interface ExecutorInterface

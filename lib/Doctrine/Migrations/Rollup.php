@@ -13,6 +13,11 @@ use function current;
 use function sprintf;
 
 /**
+ * The Rollup class is responsible for deleting all previously executed migrations from the versions table
+ * and marking the freshly dumped schema migration (that was created with SchemaDumper) as migrated.
+ *
+ * @see Doctrine\Migrations\SchemaDumper
+ *
  * @internal
  */
 class Rollup

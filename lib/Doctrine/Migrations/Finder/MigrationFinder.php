@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Finder;
 
+/**
+ * The MigrationFinder interface defines the interface used for finding migrations in a given directory and namespace.
+ */
 interface MigrationFinder
 {
     /**

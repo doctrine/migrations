@@ -18,6 +18,8 @@ use function count;
 use function sprintf;
 
 /**
+ * The Migrator class is responsible for generating and executing the SQL for a migration.
+ *
  * @internal
  */
 class Migrator

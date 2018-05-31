@@ -12,6 +12,8 @@ use function file_get_contents;
 use function is_array;
 
 /**
+ * The YamlConfiguration class is responsible for loading migration configuration information from a YAML file.
+ *
  * @internal
  */
 class YamlConfiguration extends AbstractFileConfiguration

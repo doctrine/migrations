@@ -8,7 +8,7 @@ use function glob;
 use function rtrim;
 
 /**
- * @internal
+ * The GlobFinder class finds migrations in a directory using the PHP glob() function.
  */
 final class GlobFinder extends Finder
 {

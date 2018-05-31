@@ -14,6 +14,8 @@ use function libxml_use_internal_errors;
 use function simplexml_load_file;
 
 /**
+ * The XmlConfiguration class is responsible for loading migration configuration information from a XML file.
+ *
  * @internal
  */
 class XmlConfiguration extends AbstractFileConfiguration

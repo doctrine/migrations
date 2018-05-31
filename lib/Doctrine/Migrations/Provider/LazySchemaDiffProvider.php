@@ -11,6 +11,9 @@ use ProxyManager\GeneratorStrategy\EvaluatingGeneratorStrategy;
 use ProxyManager\Proxy\LazyLoadingInterface;
 
 /**
+ * The LazySchemaDiffProvider is responsible for lazily generating the from schema when diffing two schemas
+ * to produce a migration.
+ *
  * @internal
  */
 class LazySchemaDiffProvider implements SchemaDiffProviderInterface

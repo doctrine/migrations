@@ -11,6 +11,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function sprintf;
 
+/**
+ * The DumpSchemaCommand class is responsible for dumping your current database schema to a migration class. This is
+ * intended to be used in conjuction with the RollupCommand.
+ *
+ * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
+ */
 class DumpSchemaCommand extends AbstractCommand
 {
     protected function configure() : void

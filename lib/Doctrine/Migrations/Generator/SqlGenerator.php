@@ -16,6 +16,9 @@ use function strlen;
 use function var_export;
 
 /**
+ * The SqlGenerator class is responsible for generating the body of the up() and down() methods for a migration
+ * from an array of SQL queries.
+ *
  * @internal
  */
 class SqlGenerator

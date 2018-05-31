@@ -8,6 +8,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 
+/**
+ * The RollupCommand class is responsible for deleting all previously executed migrations from the versions table
+ * and marking the freshly dumped schema migration (that was created with DumpSchemaCommand) as migrated.
+ */
 class RollupCommand extends AbstractCommand
 {
     protected function configure() : void

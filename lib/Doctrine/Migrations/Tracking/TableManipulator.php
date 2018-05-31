@@ -8,6 +8,9 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 
 /**
+ * The TableManipulator class is responsible for creating and updating the schema of the table used to track
+ * the execution state of each migration version.
+ *
  * @internal
  */
 class TableManipulator

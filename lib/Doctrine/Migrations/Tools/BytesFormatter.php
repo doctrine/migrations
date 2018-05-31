@@ -10,6 +10,9 @@ use function pow;
 use function round;
 
 /**
+ * The BytesFormatter class is responsible for converting a bytes integer to a more human readable string.
+ * This class is used to format the memory used for display purposes when executing migrations.
+ *
  * @internal
  */
 final class BytesFormatter

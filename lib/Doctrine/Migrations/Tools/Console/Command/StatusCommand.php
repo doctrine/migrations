@@ -15,6 +15,10 @@ use function sprintf;
 use function str_repeat;
 use function strlen;
 
+/**
+ * The StatusCommand class is responsible for outputting what the current state is of all your migrations. It shows
+ * what your current version is, how many new versions you have to execute, etc. and details about each of your migrations.
+ */
 class StatusCommand extends AbstractCommand
 {
     protected function configure() : void

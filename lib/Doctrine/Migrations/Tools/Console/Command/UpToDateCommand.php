@@ -9,6 +9,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function sprintf;
 
+/**
+ * The UpToDateCommand class outputs if your database is up to date or if there are new migrations
+ * that need to be executed.
+ */
 class UpToDateCommand extends AbstractCommand
 {
     protected function configure() : void

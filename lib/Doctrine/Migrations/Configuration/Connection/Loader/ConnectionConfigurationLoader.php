@@ -9,6 +9,9 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 
 /**
+ * The ConnectionConfigurationLoader class is responsible for loading a Doctrine\DBAL\Connection from the Migrations
+ * Doctrine\Migrations\Configuration\Configuration::getConnection() method.
+ *
  * @internal
  */
 class ConnectionConfigurationLoader implements ConnectionLoaderInterface

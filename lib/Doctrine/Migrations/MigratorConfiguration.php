@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 /**
+ * The MigratorConfiguration class is responsible for defining the configuration for a migration.
+ *
+ * @see Doctrine\Migrations\Migrator
+ * @see Doctrine\Migrations\Version\Executor
+ *
  * @internal
  */
 class MigratorConfiguration

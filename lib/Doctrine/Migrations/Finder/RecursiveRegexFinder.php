@@ -12,7 +12,7 @@ use const DIRECTORY_SEPARATOR;
 use function sprintf;
 
 /**
- * @internal
+ * The RecursiveRegexFinder class recursively searches the given directory for migrations.
  */
 final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 {

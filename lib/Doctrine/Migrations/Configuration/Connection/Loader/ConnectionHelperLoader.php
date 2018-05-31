@@ -10,6 +10,8 @@ use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
+ * The ConnectionHelperLoader is responsible for loading a Doctrine\DBAL\Connection from a Symfony Console HelperSet.
+ *
  * @internal
  */
 class ConnectionHelperLoader implements ConnectionLoaderInterface

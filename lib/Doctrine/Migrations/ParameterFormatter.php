@@ -15,6 +15,9 @@ use function is_string;
 use function sprintf;
 
 /**
+ * The ParameterFormatter class is responsible for formatting SQL query parameters to a string
+ * for display output.
+ *
  * @internal
  */
 final class ParameterFormatter implements ParameterFormatterInterface

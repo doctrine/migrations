@@ -7,6 +7,9 @@ namespace Doctrine\Migrations\Event;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Version\Version;
 
+/**
+ * The MigrationsVersionEventArgs class is passed to events related to a single migration version.
+ */
 class MigrationsVersionEventArgs extends MigrationsEventArgs
 {
     /** @var Version */

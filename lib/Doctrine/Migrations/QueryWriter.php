@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 /**
+ * The QueryWriter defines the interface used for writing migration SQL queries to a file on disk.
+ *
  * @internal
  */
 interface QueryWriter

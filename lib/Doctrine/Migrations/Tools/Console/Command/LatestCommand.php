@@ -8,6 +8,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
 
+/**
+ * The LatestCommand class is responsible for outputting what your latest version is.
+ */
 class LatestCommand extends AbstractCommand
 {
     protected function configure() : void

@@ -17,7 +17,7 @@ use function sprintf;
 use function substr;
 
 /**
- * @internal
+ * The Finder class is responsible for for finding migrations on disk at a given path.
  */
 abstract class Finder implements MigrationFinder
 {

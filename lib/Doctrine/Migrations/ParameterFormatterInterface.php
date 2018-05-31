@@ -5,6 +5,11 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 /**
+ * The ParameterFormatterInterface defines the interface for formatting SQL query parameters to a string
+ * for display output.
+ *
+ * @see Doctrine\Migrations\ParameterFormatter
+ *
  * @internal
  */
 interface ParameterFormatterInterface

@@ -12,6 +12,9 @@ use function file_exists;
 use function is_array;
 
 /**
+ * The ArrayConnectionConfigurationLoader class is responsible for loading a Doctrine\DBAL\Connection from a PHP file
+ * that returns an array of connection information which is used to instantiate a connection with DriverManager::getConnection()
+ *
  * @internal
  */
 class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
