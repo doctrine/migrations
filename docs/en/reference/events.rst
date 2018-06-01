@@ -1,29 +1,29 @@
 Migrations Events
 =================
 
-The migrations library emits a series of events during the migration process.
+The Doctrine Migrations library emits a series of events during the migration process.
 
-- ``onMigrationsMigrating``: fired immediately before starting to execute
-  versions. This does not fire if there are no versions to be executed.
-- ``onMigrationsVersionExecuting``: fired before a single version
-  executes.
-- ``onMigrationsVersionExecuted``: fired after a single version executes.
-- ``onMigrationsVersionSkipped``: fired when a single version is skipped.
-- ``onMigrationsMigrated``: fired when all versions have been executed.
+- ``onMigrationsMigrating``: dispatched immediately before starting to execute versions. This does not fire if
+there are no versions to be executed.
+- ``onMigrationsVersionExecuting``: dispatched before a single version executes.
+- ``onMigrationsVersionExecuted``: dispatched after a single version executes.
+- ``onMigrationsVersionSkipped``: dispatched when a single version is skipped.
+- ``onMigrationsMigrated``: dispatched when all versions have been executed.
 
-All of these events are emitted via the connection's event manager. Here's an
-example event subscriber that listens for all possible migrations events.
+All of these events are emitted via the DBAL connection's event manager. Here's an example event subscriber that
+listens for all possible migrations events.
 
 .. code-block:: php
 
     <?php
+
     use Doctrine\Common\EventSubscriber;
-    use Doctrine\DBAL\Migrations\Event\MigrationsEventArgs;
-    use Doctrine\DBAL\Migrations\Event\MigrationsVersionEventArgs;
+    use Doctrine\Migrations\Event\MigrationsEventArgs;
+    use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 
     class MigrationsListener implements EventSubscriber
     {
-        public function getSubscribedEvents()
+        public function getSubscribedEvents() : array
         {
             return [
                 Events::onMigrationsMigrating,
@@ -34,45 +34,49 @@ example event subscriber that listens for all possible migrations events.
             ];
         }
 
-        public function onMigrationsMigrating(MigrationsEventArgs $args)
+        public function onMigrationsMigrating(MigrationsEventArgs $args) : void
         {
             // ...
         }
 
-        public function onMigrationsMigrated(MigrationsEventArgs $args)
+        public function onMigrationsMigrated(MigrationsEventArgs $args) : void
         {
             // ...
         }
 
-        public function onMigrationsVersionExecuting(MigrationsVersionEventArgs $args)
+        public function onMigrationsVersionExecuting(MigrationsVersionEventArgs $args) : void
         {
             // ...
         }
 
-        public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args)
+        public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args) : void
         {
             // ...
         }
 
-        public function onMigrationsVersionSkipped(MigrationsVersionEventArgs $args)
+        public function onMigrationsVersionSkipped(MigrationsVersionEventArgs $args) : void
         {
             // ...
         }
     }
 
-To hook a migrations event subscriber into a connection, use its event manager.
-This might go in the ``cli-config.php`` file or somewhere in a frameworks
-container or dependency injection configuration.
+To add an event subscriber to a connections event manager, use the ``Connection::getEventManager()`` method
+and the ``EventManager::addEventSubscriber()`` method:
+
+This might go in the ``cli-config.php`` file or somewhere in a frameworks container or dependency injection configuration.
 
 .. code-block:: php
 
     <?php
+
     use Doctrine\DBAL\DriverManager;
 
-    $conn = DriverManager::getConnection([
-      // ...
+    $connection = DriverManager::getConnection([
+        // ...
     ]);
 
-    $conn->getEventManager()->addEventSubscriber(new MigrationsListener());
+    $connection->getEventManager()->addEventSubscriber(new MigrationsListener());
 
     // rest of the cli set up...
+
+:ref:`Next Chapter: Version Numbers <version-numbers>`

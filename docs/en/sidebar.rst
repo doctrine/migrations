@@ -2,13 +2,12 @@
    :depth: 3
 
    reference/introduction
-   reference/installation
-   reference/integration
-   reference/building_framework_specific_integration
-   reference/migration_classes
-   reference/managing_migrations
-   reference/generating_migrations
-   reference/custom_configuration
-   reference/input_output_customization
+   reference/configuration
+   reference/migration-classes
+   reference/managing-migrations
+   reference/generating-migrations
+   reference/custom-configuration
    reference/events
-   reference/version_numbers
+   reference/version-numbers
+   reference/integrations
+   reference/custom-integration
