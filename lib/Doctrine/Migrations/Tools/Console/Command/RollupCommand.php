@@ -37,7 +37,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : void {
+    ) : ?int {
         $version = $this->dependencyFactory
             ->getRollup()->rollup();
 
@@ -45,5 +45,7 @@ EOT
             'Rolled up migrations to version <info>%s</info>',
             $version->getVersion()
         ));
+
+        return 0;
     }
 }

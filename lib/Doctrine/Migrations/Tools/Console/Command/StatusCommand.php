@@ -47,7 +47,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : void
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $output->writeln("\n <info>==</info> Configuration\n");
 
@@ -68,7 +68,7 @@ EOT
         }
 
         if ($input->getOption('show-versions') === false) {
-            return;
+            return 0;
         }
 
         $versions                      = $this->migrationRepository->getMigrations();
@@ -81,7 +81,7 @@ EOT
         }
 
         if (count($executedUnavailableMigrations) === 0) {
-            return;
+            return 0;
         }
 
         $output->writeln(
@@ -97,6 +97,8 @@ EOT
                 )
             );
         }
+
+        return 0;
     }
 
     private function writeStatusInfosLineAligned(OutputInterface $output, string $title, ?string $value) : void
