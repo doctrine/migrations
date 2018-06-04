@@ -60,7 +60,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : void {
+    ) : ?int {
         $formatted  = (bool) $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 
@@ -100,5 +100,7 @@ EOT
             '',
             'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',
         ]);
+
+        return 0;
     }
 }

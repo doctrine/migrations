@@ -79,7 +79,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : void {
+    ) : ?int {
         $filterExpression = $input->getOption('filter-expression') ?? null;
         $formatted        = (bool) $input->getOption('formatted');
         $lineLength       = (int) $input->getOption('line-length');
@@ -120,6 +120,8 @@ EOT
                 $versionNumber
             ),
         ]);
+
+        return 0;
     }
 
     protected function createMigrationDiffGenerator() : DiffGenerator

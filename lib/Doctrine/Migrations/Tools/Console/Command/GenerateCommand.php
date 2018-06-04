@@ -40,7 +40,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : void
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $versionNumber = $this->configuration->generateVersionNumber();
 
@@ -67,5 +67,7 @@ EOT
                 $versionNumber
             ),
         ]);
+
+        return 0;
     }
 }

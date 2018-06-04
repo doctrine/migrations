@@ -24,7 +24,7 @@ class LatestCommand extends AbstractCommand
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : void
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $latestVersion = $this->migrationRepository->getLatestVersion();
         $version       = $this->migrationRepository->getVersion($latestVersion);
@@ -35,5 +35,7 @@ class LatestCommand extends AbstractCommand
             $latestVersion,
             $description !== '' ? ' - ' . $description : ''
         ));
+
+        return 0;
     }
 }

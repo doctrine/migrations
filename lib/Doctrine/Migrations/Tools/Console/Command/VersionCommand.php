@@ -90,7 +90,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : void
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw new InvalidArgumentException(
@@ -113,6 +113,8 @@ EOT
         } else {
             $this->markVersions($input, $output);
         }
+
+        return 0;
     }
 
     /**
