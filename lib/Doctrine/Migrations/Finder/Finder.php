@@ -14,6 +14,8 @@ use function is_dir;
 use function ksort;
 use function realpath;
 use function sprintf;
+use function strlen;
+use function strncmp;
 use function substr;
 
 /**
@@ -57,6 +59,7 @@ abstract class Finder implements MigrationFinder
         $versions = [];
         foreach ($classes as $class) {
             $version = substr($class->getShortName(), 7);
+
             if ($version === '0') {
                 throw new InvalidArgumentException(sprintf(
                     'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migrations' . PHP_EOL .
@@ -64,6 +67,7 @@ abstract class Finder implements MigrationFinder
                     $version
                 ));
             }
+
             $versions[$version] = $class->getName();
         }
 
@@ -85,11 +89,12 @@ abstract class Finder implements MigrationFinder
         $classes = [];
         foreach (get_declared_classes() as $class) {
             $reflectionClass = new ReflectionClass($class);
+
             if (! in_array($reflectionClass->getFileName(), $files, true)) {
                 continue;
             }
 
-            if ($namespace !== null && $namespace !== $reflectionClass->getNamespaceName()) {
+            if ($namespace !== null && ! $this->isReflectionClassInNamespace($reflectionClass, $namespace)) {
                 continue;
             }
 
@@ -97,5 +102,14 @@ abstract class Finder implements MigrationFinder
         }
 
         return $classes;
+    }
+
+    private function isReflectionClassInNamespace(ReflectionClass $reflectionClass, string $namespace) : bool
+    {
+        if (strncmp($reflectionClass->getName(), $namespace . '\\', strlen($namespace) + 1) === 0) {
+            return true;
+        }
+
+        return false;
     }
 }
