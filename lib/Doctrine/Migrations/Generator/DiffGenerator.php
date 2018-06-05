@@ -8,8 +8,8 @@ use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
-use RuntimeException;
 use function preg_match;
 use function strpos;
 use function substr;
@@ -56,6 +56,9 @@ class DiffGenerator
         $this->migrationSqlGenerator = $migrationSqlGenerator;
     }
 
+    /**
+     * @throws NoChangesDetected
+     */
     public function generate(
         string $versionNumber,
         ?string $filterExpression,
@@ -83,7 +86,7 @@ class DiffGenerator
         );
 
         if ($up === '' && $down === '') {
-            throw new RuntimeException('No changes detected in your mapping information.');
+            throw NoChangesDetected::new();
         }
 
         return $this->migrationGenerator->generateMigration(

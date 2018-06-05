@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
-use InvalidArgumentException;
+use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
+use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
+use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -90,12 +92,13 @@ EOT
         parent::configure();
     }
 
+    /**
+     * @throws InvalidOptionUsage
+     */
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
-            throw new InvalidArgumentException(
-                'You must specify whether you want to --add or --delete the specified version.'
-            );
+            throw InvalidOptionUsage::new('You must specify whether you want to --add or --delete the specified version.');
         }
 
         $this->markMigrated = (bool) $input->getOption('add');
@@ -118,8 +121,7 @@ EOT
     }
 
     /**
-     * @throws InvalidArgumentException
-     * @throws UnknownMigrationVersion
+     * @throws InvalidOptionUsage
      */
     private function markVersions(InputInterface $input, OutputInterface $output) : void
     {
@@ -129,13 +131,13 @@ EOT
         $rangeToOption   = $input->getOption('range-to');
 
         if ($allOption === true && ($rangeFromOption !== null || $rangeToOption !== null)) {
-            throw new InvalidArgumentException(
+            throw InvalidOptionUsage::new(
                 'Options --all and --range-to/--range-from both used. You should use only one of them.'
             );
         }
 
         if ($rangeFromOption !== null ^ $rangeToOption !== null) {
-            throw new InvalidArgumentException(
+            throw InvalidOptionUsage::new(
                 'Options --range-to and --range-from should be used together.'
             );
         }
@@ -162,7 +164,8 @@ EOT
     }
 
     /**
-     * @throws InvalidArgumentException
+     * @throws VersionAlreadyExists
+     * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
     private function mark(OutputInterface $output, string $version, bool $all = false) : void
@@ -177,9 +180,7 @@ EOT
 
         if ($this->markMigrated && $this->migrationRepository->hasVersionMigrated($version)) {
             if (! $all) {
-                throw new InvalidArgumentException(
-                    sprintf('The version "%s" already exists in the version table.', $version)
-                );
+                throw VersionAlreadyExists::new($version);
             }
 
             $marked = true;
@@ -187,9 +188,7 @@ EOT
 
         if (! $this->markMigrated && ! $this->migrationRepository->hasVersionMigrated($version)) {
             if (! $all) {
-                throw new InvalidArgumentException(
-                    sprintf('The version "%s" does not exist in the version table.', $version)
-                );
+                throw VersionDoesNotExist::new($version);
             }
 
             $marked = true;

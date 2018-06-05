@@ -5,8 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Generator;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
-use InvalidArgumentException;
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
@@ -14,7 +14,6 @@ use function implode;
 use function is_file;
 use function is_readable;
 use function preg_replace;
-use function sprintf;
 use function str_replace;
 use function trim;
 
@@ -115,6 +114,9 @@ TEMPLATE;
         return $this->template;
     }
 
+    /**
+     * @throws InvalidTemplateSpecified
+     */
     private function loadCustomTemplate() : ?string
     {
         $customTemplate = $this->configuration->getCustomTemplate();
@@ -124,32 +126,17 @@ TEMPLATE;
         }
 
         if (! is_file($customTemplate) || ! is_readable($customTemplate)) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The specified template "%s" cannot be found or is not readable.',
-                    $customTemplate
-                )
-            );
+            throw InvalidTemplateSpecified::notFoundOrNotReadable($customTemplate);
         }
 
         $content = file_get_contents($customTemplate);
 
         if ($content === false) {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The specified template "%s" could not be read.',
-                    $customTemplate
-                )
-            );
+            throw InvalidTemplateSpecified::notReadable($customTemplate);
         }
 
         if (trim($content) === '') {
-            throw new InvalidArgumentException(
-                sprintf(
-                    'The specified template "%s" is empty.',
-                    $customTemplate
-                )
-            );
+            throw InvalidTemplateSpecified::empty($customTemplate);
         }
 
         return $content;

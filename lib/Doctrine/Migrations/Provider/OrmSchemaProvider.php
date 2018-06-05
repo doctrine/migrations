@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Provider\Exception\NoMappingFound;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Tools\SchemaTool;
-use UnexpectedValueException;
 use function count;
 
 /**
@@ -27,12 +27,15 @@ final class OrmSchemaProvider implements SchemaProviderInterface
         $this->entityManager = $em;
     }
 
+    /**
+     * @throws NoMappingFound
+     */
     public function createSchema() : Schema
     {
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
         if (count($metadata) === 0) {
-            throw new UnexpectedValueException('No mapping information to process');
+            throw NoMappingFound::new();
         }
 
         $tool = new SchemaTool($this->entityManager);

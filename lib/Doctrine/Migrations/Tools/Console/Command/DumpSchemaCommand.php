@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use RuntimeException;
+use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -57,6 +57,9 @@ EOT
         ;
     }
 
+    /**
+     * @throws SchemaDumpRequiresNoMigrations
+     */
     public function execute(
         InputInterface $input,
         OutputInterface $output
@@ -68,7 +71,7 @@ EOT
         $versions     = $this->migrationRepository->getVersions();
 
         if (count($versions) > 0) {
-            throw new RuntimeException('Delete your old historical migrations before dumping your schema.');
+            throw SchemaDumpRequiresNoMigrations::new();
         }
 
         $versionNumber = $this->configuration->generateVersionNumber();

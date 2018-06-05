@@ -11,7 +11,7 @@ use Doctrine\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigura
 use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionConfigurationChainLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionConfigurationLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
-use InvalidArgumentException;
+use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 
@@ -39,9 +39,7 @@ class ConnectionLoader
             return $connection;
         }
 
-        throw new InvalidArgumentException(
-            'You have to specify a --db-configuration file or pass a Database Connection as a dependency to the Migrations.'
-        );
+        throw ConnectionNotSpecified::new();
     }
 
     protected function createConnectionConfigurationChainLoader(

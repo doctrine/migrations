@@ -5,10 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration;
 
 use Doctrine\Migrations\Configuration\Exception\FileAlreadyLoaded;
+use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
-use Doctrine\Migrations\Exception\MigrationException;
-use InvalidArgumentException;
 use function dirname;
 use function file_exists;
 use function getcwd;
@@ -58,7 +57,9 @@ abstract class AbstractFileConfiguration extends Configuration
     /** @var bool */
     private $loaded = false;
 
-    /** @throws MigrationException */
+    /**
+     * @throws FileNotFound
+     */
     public function load(string $file) : void
     {
         if ($this->loaded) {
@@ -74,7 +75,7 @@ abstract class AbstractFileConfiguration extends Configuration
         $this->file = $file;
 
         if (! file_exists($file)) {
-            throw new InvalidArgumentException('Given config file does not exist');
+            throw FileNotFound::new();
         }
 
         $this->doLoad($file);
