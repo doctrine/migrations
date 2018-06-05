@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use InvalidArgumentException;
+use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExist;
 use const DIRECTORY_SEPARATOR;
 use function date;
 use function file_exists;
 use function getcwd;
 use function mkdir;
 use function rtrim;
-use function sprintf;
 
 /**
  * The MigrationDirectoryHelper class is responsible for returning the directory that migrations are stored in.
@@ -29,7 +28,9 @@ class MigrationDirectoryHelper
         $this->configuration = $configuration;
     }
 
-    /** @throws InvalidArgumentException */
+    /**
+     * @throws DirectoryDoesNotExist
+     */
     public function getMigrationDirectory() : string
     {
         $dir = $this->configuration->getMigrationsDirectory();
@@ -37,7 +38,7 @@ class MigrationDirectoryHelper
         $dir = rtrim($dir, '/');
 
         if (! file_exists($dir)) {
-            throw new InvalidArgumentException(sprintf('Migrations directory "%s" does not exist.', $dir));
+            throw DirectoryDoesNotExist::new($dir);
         }
 
         if ($this->configuration->areMigrationsOrganizedByYear()) {

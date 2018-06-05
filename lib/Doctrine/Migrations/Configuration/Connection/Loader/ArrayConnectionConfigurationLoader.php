@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
-use InvalidArgumentException;
+use Doctrine\Migrations\Configuration\Connection\Loader\Exception\InvalidConfiguration;
 use function file_exists;
 use function is_array;
 
@@ -31,7 +31,7 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
      * Read the input and return a Configuration, returns null if the config
      * is not supported.
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidConfiguration
      */
     public function chosen() : ?Connection
     {
@@ -46,9 +46,7 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
         $params = include $this->filename;
 
         if (! is_array($params)) {
-            throw new InvalidArgumentException(
-                'The connection file has to return an array with database configuration parameters.'
-            );
+            throw InvalidConfiguration::invalidArrayConfiguration();
         }
 
         return DriverManager::getConnection($params);

@@ -4,16 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Finder;
 
-use InvalidArgumentException;
+use Doctrine\Migrations\Finder\Exception\InvalidDirectory;
+use Doctrine\Migrations\Finder\Exception\NameIsReserved;
 use ReflectionClass;
-use const PHP_EOL;
 use const SORT_STRING;
 use function get_declared_classes;
 use function in_array;
 use function is_dir;
 use function ksort;
 use function realpath;
-use function sprintf;
 use function strlen;
 use function strncmp;
 use function substr;
@@ -28,15 +27,15 @@ abstract class Finder implements MigrationFinder
         require_once $path;
     }
 
+    /**
+     * @throws InvalidDirectory
+     */
     protected function getRealPath(string $directory) : string
     {
         $dir = realpath($directory);
 
         if ($dir === false || ! is_dir($dir)) {
-            throw new InvalidArgumentException(sprintf(
-                'Cannot load migrations from "%s" because it is not a valid directory',
-                $directory
-            ));
+            throw InvalidDirectory::new($directory);
         }
 
         return $dir;
@@ -46,6 +45,8 @@ abstract class Finder implements MigrationFinder
      * @param string[] $files
      *
      * @return string[]
+     *
+     * @throws NameIsReserved
      */
     protected function loadMigrations(array $files, ?string $namespace) : array
     {
@@ -61,11 +62,7 @@ abstract class Finder implements MigrationFinder
             $version = substr($class->getShortName(), 7);
 
             if ($version === '0') {
-                throw new InvalidArgumentException(sprintf(
-                    'Cannot load a migrations with the name "%s" because it is a reserved number by doctrine migrations' . PHP_EOL .
-                    'It\'s used to revert all migrations including the first one.',
-                    $version
-                ));
+                throw NameIsReserved::new($version);
             }
 
             $versions[$version] = $class->getName();

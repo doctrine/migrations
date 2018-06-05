@@ -10,7 +10,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Configuration\XmlConfiguration;
 use Doctrine\Migrations\Configuration\YamlConfiguration;
-use InvalidArgumentException;
+use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
 use function file_exists;
@@ -81,7 +81,9 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         return file_exists($config);
     }
 
-    /** @throws InvalidArgumentException */
+    /**
+     * @throws FileTypeNotSupported
+     */
     private function loadConfig(string $config) : Configuration
     {
         $map = [
@@ -96,7 +98,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 
         // check we can support this file type
         if (! isset($map[$info['extension']])) {
-            throw new InvalidArgumentException('Given config file type is not supported');
+            throw FileTypeNotSupported::new();
         }
 
         $class         = $map[$info['extension']];

@@ -6,9 +6,9 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
-use RuntimeException;
 use function count;
 use function implode;
 
@@ -46,6 +46,9 @@ class SchemaDumper
         $this->migrationSqlGenerator = $migrationSqlGenerator;
     }
 
+    /**
+     * @throws NoTablesFound
+     */
     public function dump(
         string $versionNumber,
         bool $formatted = false,
@@ -85,7 +88,7 @@ class SchemaDumper
         }
 
         if (count($up) === 0) {
-            throw new RuntimeException('Your database schema does not contain any tables.');
+            throw NoTablesFound::new();
         }
 
         $up   = implode("\n", $up);

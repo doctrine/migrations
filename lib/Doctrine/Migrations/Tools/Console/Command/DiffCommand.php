@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
-use InvalidArgumentException;
+use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -76,6 +76,9 @@ EOT
         ;
     }
 
+    /**
+     * @throws InvalidOptionUsage
+     */
     public function execute(
         InputInterface $input,
         OutputInterface $output
@@ -86,7 +89,7 @@ EOT
 
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
-                throw new InvalidArgumentException(
+                throw InvalidOptionUsage::new(
                     'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require jdorn/sql-formatter".'
                 );
             }
