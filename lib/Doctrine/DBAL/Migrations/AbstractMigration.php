@@ -3,6 +3,7 @@
 namespace Doctrine\DBAL\Migrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\AbstractMigration as NewAbstractMigration;
 
 /**
  * Abstract class for individual migrations to extend from.
@@ -11,6 +12,7 @@ use Doctrine\DBAL\Schema\Schema;
  * @link        www.doctrine-project.org
  * @since       2.0
  * @author      Jonathan H. Wage <jonwage@gmail.com>
+ * @deprecated  Please use Doctrine\Migrations\AbstractMigration
  */
 abstract class AbstractMigration
 {
@@ -51,6 +53,10 @@ abstract class AbstractMigration
 
     public function __construct(Version $version)
     {
+        if ( ! $this instanceof NewAbstractMigration) {
+            @trigger_error(sprintf('The "%s" class is deprecated since Doctrine Migrations 2.0. Use %s instead.', AbstractMigration::class, NewAbstractMigration::class), E_USER_DEPRECATED);
+        }
+
         $config = $version->getConfiguration();
 
         $this->version      = $version;

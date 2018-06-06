@@ -31,7 +31,8 @@
     },
     "autoload": {
         "psr-4": {
-            "Doctrine\\DBAL\\Migrations\\": "lib/Doctrine/DBAL/Migrations"
+            "Doctrine\\DBAL\\Migrations\\": "lib/Doctrine/DBAL/Migrations",
+            "Doctrine\\Migrations\\": "lib/Doctrine/Migrations"
         }
     },
     "autoload-dev": {
@@ -41,7 +42,7 @@
     },
     "extra": {
         "branch-alias": {
-            "dev-master": "v1.7.x-dev"
+            "dev-master": "v1.8.x-dev"
         }
     },
     "bin": [
