@@ -4,7 +4,7 @@
 
 Your migration classes that previously used to extend `Doctrine\DBAL\Migrations\AbstractMigration` now need to extend
 `Doctrine\Migrations\AbstractMigration` instead. The `Doctrine\DBAL\Migrations\AbstractMigration` class will be
-deprecated in the `1.7.1` release to prepare for the BC break.
+deprecated in the `1.8.0` release to prepare for the BC break.
 
 ## BC Break: Removed `Doctrine\DBAL\Migrations\MigrationsVersion`
 
