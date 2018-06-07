@@ -168,6 +168,31 @@ classes using the ``migrations`` configuration setting:
             }
         }
 
+All or Nothing Transaction
+--------------------------
+
+.. note::
+
+    This is only works if your database supports transactions for DDL statements.
+
+When using the ``all_or_nothing`` option, multiple migrations ran at the same time will be wrapped in a single
+transaction. If one migration fails, all migrations will be rolled back
+
+From the Command Line
+~~~~~~~~~~~~~~~~~~~~~
+
+You can also set this option from the command line with the ``migrate`` command and the ``--all-or-nothing`` option:
+
+.. code-block:: sh
+
+    $ ./vendor/bin/doctrine-migrations migrate --all-or-nothing
+
+If you have it enabled at the configuration level and want to change it for an individual migration you can
+pass a value of ``0`` or ``1`` to ``--all-or-nothing``.
+
+.. code-block:: sh
+
+    $ ./vendor/bin/doctrine-migrations migrate --all-or-nothing=0
 
 Connection Configuration
 ------------------------
