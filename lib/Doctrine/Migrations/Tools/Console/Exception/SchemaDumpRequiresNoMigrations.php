@@ -10,6 +10,6 @@ final class SchemaDumpRequiresNoMigrations extends RuntimeException implements C
 {
     public static function new() : self
     {
-        return new self('Delete your old historical migrations before dumping your schema.');
+        return new self('Delete any previous migrations before dumping your schema.');
     }
 }

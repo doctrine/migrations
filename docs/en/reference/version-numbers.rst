@@ -40,7 +40,7 @@ is important as it allows the migrations to be correctly ordered.
 
 The custom version numbers above end up out of order which may cause damage to a database.
 
-It's **strongly recommended** that the ``Version{date}`` migration class name format is used and that the various
+It is **strongly recommended** that the ``Version{date}`` migration class name format is used and that the various
 :doc:`tools for generating migrations <generating-migrations>` are used.
 
 Should some custom migration numbers be necessary, keeping the version number the same length as the date format

@@ -46,7 +46,7 @@ class CliTest extends MigrationTestCase
     public function testDumpSchema() : void
     {
         $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Delete your old historical migrations before dumping your schema.');
+        $this->expectExceptionMessage('Delete any previous migrations before dumping your schema.');
 
         $this->executeCommand('migrations:dump-schema');
     }
