@@ -53,7 +53,7 @@ CODE;
 
         $code = $this->migrationSqlGenerator->generate($sql, true, 80);
 
-        self::assertEquals($expectedCode, $code);
+        self::assertSame($expectedCode, $code);
     }
 
     protected function setUp() : void

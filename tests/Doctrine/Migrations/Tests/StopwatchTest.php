@@ -19,7 +19,7 @@ class StopwatchTest extends TestCase
         $stopwatchEvent = $this->stopwatch->start('test');
 
         self::assertInstanceOf(StopwatchEvent::class, $stopwatchEvent);
-        self::assertEquals('default', $stopwatchEvent->getCategory());
+        self::assertSame('default', $stopwatchEvent->getCategory());
 
         $stopwatchEvent->stop();
 

@@ -16,7 +16,7 @@ abstract class FinderTestCase extends MigrationTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespace');
 
-        $this->assertEquals([
+        $this->assertSame([
             '0001' => 'TestMigrations\\Test\\Version0001',
             '0002' => 'TestMigrations\\TestOther\\Version0002',
         ], $versions);
@@ -29,6 +29,6 @@ abstract class FinderTestCase extends MigrationTestCase
             'TestMigrations\\Test'
         );
 
-        $this->assertEquals(['0001' => 'TestMigrations\\Test\\Version0001'], $versions);
+        $this->assertSame(['0001' => 'TestMigrations\\Test\\Version0001'], $versions);
     }
 }

@@ -37,7 +37,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
         self::assertTrue($table->hasColumn('version'));
         self::assertTrue($table->getColumn('version')->getNotnull());
-        self::assertEquals(200, $table->getColumn('version')->getLength());
+        self::assertSame(200, $table->getColumn('version')->getLength());
 
         self::assertTrue($table->hasColumn('executed_at'));
         self::assertTrue($table->getColumn('executed_at')->getNotnull());

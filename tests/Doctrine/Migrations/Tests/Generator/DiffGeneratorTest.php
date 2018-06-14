@@ -111,7 +111,7 @@ class DiffGeneratorTest extends TestCase
             ->with('1234', 'test1', 'test2')
             ->willReturn('path');
 
-        self::assertEquals('path', $this->migrationDiffGenerator->generate('1234', '/table_name1/', true, 80));
+        self::assertSame('path', $this->migrationDiffGenerator->generate('1234', '/table_name1/', true, 80));
     }
 
     protected function setUp() : void

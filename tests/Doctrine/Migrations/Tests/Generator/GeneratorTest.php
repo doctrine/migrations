@@ -63,7 +63,7 @@ final class GeneratorTest extends TestCase
 
         self::assertFileExists($path);
 
-        self::assertEquals('custom template test', file_get_contents($path));
+        self::assertSame('custom template test', file_get_contents($path));
 
         unlink($path);
     }

@@ -52,7 +52,7 @@ class ExecuteCommandTest extends TestCase
             ->method('writeSqlFile')
             ->with('/path', 'down');
 
-        self::assertEquals(0, $this->executeCommand->execute($input, $output));
+        self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
     public function testWriteSqlCurrentWorkingDirectory() : void
@@ -87,7 +87,7 @@ class ExecuteCommandTest extends TestCase
             ->method('writeSqlFile')
             ->with(getcwd(), 'down');
 
-        self::assertEquals(0, $this->executeCommand->execute($input, $output));
+        self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
     public function testExecute() : void
@@ -132,7 +132,7 @@ class ExecuteCommandTest extends TestCase
             ->method('execute')
             ->with('down');
 
-        self::assertEquals(0, $this->executeCommand->execute($input, $output));
+        self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
     public function testExecuteCancel() : void
@@ -180,7 +180,7 @@ class ExecuteCommandTest extends TestCase
         $version->expects($this->never())
             ->method('execute');
 
-        self::assertEquals(1, $this->executeCommand->execute($input, $output));
+        self::assertSame(1, $this->executeCommand->execute($input, $output));
     }
 
     protected function setUp() : void

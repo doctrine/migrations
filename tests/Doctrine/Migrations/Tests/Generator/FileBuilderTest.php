@@ -65,7 +65,7 @@ FILE;
 
         $migrationFile = $this->migrationFileBuilder->buildMigrationFile($queriesByVersion, $direction, $now);
 
-        self::assertEquals($expected, $migrationFile);
+        self::assertSame($expected, $migrationFile);
     }
 
     protected function setUp() : void

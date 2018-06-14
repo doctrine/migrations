@@ -26,7 +26,7 @@ final class OutputWriterTest extends TestCase
     {
         $this->outputWriter->write('test message');
 
-        self::assertEquals('test message', $this->lastMessage);
+        self::assertSame('test message', $this->lastMessage);
     }
 
     public function testSetCallback() : void
@@ -37,7 +37,7 @@ final class OutputWriterTest extends TestCase
 
         $this->outputWriter->write('test message');
 
-        self::assertEquals('[LOG] test message', $this->lastMessage);
+        self::assertSame('[LOG] test message', $this->lastMessage);
     }
 
     protected function setUp() : void

@@ -26,37 +26,37 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testMigrationDirectory() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
+        self::assertSame(__DIR__ . DIRECTORY_SEPARATOR . '_files', $config->getMigrationsDirectory());
     }
 
     public function testMigrationNamespace() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals('DoctrineMigrationsTest', $config->getMigrationsNamespace());
+        self::assertSame('DoctrineMigrationsTest', $config->getMigrationsNamespace());
     }
 
     public function testMigrationName() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals('Doctrine Sandbox Migrations', $config->getName());
+        self::assertSame('Doctrine Sandbox Migrations', $config->getName());
     }
 
     public function testMigrationsTable() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals('doctrine_migration_versions_test', $config->getMigrationsTableName());
+        self::assertSame('doctrine_migration_versions_test', $config->getMigrationsTableName());
     }
 
     public function testMigrationsColumnName() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals('doctrine_migration_column_test', $config->getMigrationsColumnName());
+        self::assertSame('doctrine_migration_column_test', $config->getMigrationsColumnName());
     }
 
     public function testMigrationsColumnLength() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals(200, $config->getMigrationsColumnLength());
+        self::assertSame(200, $config->getMigrationsColumnLength());
     }
 
     public function testAllOrNothing() : void
@@ -69,7 +69,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     public function testMigrationsExecutedAtColumnName() : void
     {
         $config = $this->loadConfiguration();
-        self::assertEquals('doctrine_migration_executed_at_column_test', $config->getMigrationsExecutedAtColumnName());
+        self::assertSame('doctrine_migration_executed_at_column_test', $config->getMigrationsExecutedAtColumnName());
     }
 
     public function testFinderIsIncompatibleWithConfiguration() : void

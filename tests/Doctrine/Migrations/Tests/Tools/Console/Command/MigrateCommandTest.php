@@ -44,7 +44,7 @@ class MigrateCommandTest extends TestCase
             ->with('1234')
             ->willReturn('');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteAlreadyAtFirstVersion() : void
@@ -70,7 +70,7 @@ class MigrateCommandTest extends TestCase
             ->method('writeln')
             ->with('<error>Already at first version.</error>');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteAlreadyAtLatestVersion() : void
@@ -96,7 +96,7 @@ class MigrateCommandTest extends TestCase
             ->method('writeln')
             ->with('<error>Already at latest version.</error>');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteTheDeltaCouldNotBeReached() : void
@@ -122,7 +122,7 @@ class MigrateCommandTest extends TestCase
             ->method('writeln')
             ->with('<error>The delta couldn\'t be reached.</error>');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteUnknownVersion() : void
@@ -148,7 +148,7 @@ class MigrateCommandTest extends TestCase
             ->method('writeln')
             ->with('<error>Unknown version: unknown</error>');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecutedUnavailableMigrationsCancel() : void
@@ -178,7 +178,7 @@ class MigrateCommandTest extends TestCase
             ->method('canExecute')
             ->willReturn(false);
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteWriteSqlCustomPath() : void
@@ -223,7 +223,7 @@ class MigrateCommandTest extends TestCase
             ->method('canExecute')
             ->willReturn(true);
 
-        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+        self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteWriteSqlCurrentWorkingDirectory() : void
@@ -268,7 +268,7 @@ class MigrateCommandTest extends TestCase
             ->method('canExecute')
             ->willReturn(true);
 
-        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+        self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteMigrate() : void
@@ -319,7 +319,7 @@ class MigrateCommandTest extends TestCase
             ->method('migrate')
             ->with('1234');
 
-        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+        self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteMigrateAllOrNothing() : void
@@ -390,7 +390,7 @@ class MigrateCommandTest extends TestCase
             ->method('migrate')
             ->with('1234');
 
-        self::assertEquals(0, $this->migrateCommand->execute($input, $output));
+        self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations() : void
@@ -435,7 +435,7 @@ class MigrateCommandTest extends TestCase
         $migrator->expects($this->never())
             ->method('migrate');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     public function testExecuteMigrateCancel() : void
@@ -485,7 +485,7 @@ class MigrateCommandTest extends TestCase
         $migrator->expects($this->never())
             ->method('migrate');
 
-        self::assertEquals(1, $this->migrateCommand->execute($input, $output));
+        self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
     protected function setUp() : void
