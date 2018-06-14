@@ -55,7 +55,7 @@ class MigrationRepositoryTest extends TestCase
 
         $this->migrationRepository->addVersions($versions);
 
-        self::assertEquals($versions, $this->migrationRepository->getVersions());
+        self::assertSame($versions, $this->migrationRepository->getVersions());
 
         $this->migrationRepository->clearVersions();
 
@@ -94,7 +94,7 @@ class MigrationRepositoryTest extends TestCase
             ->with('SELECT version, executed_at FROM versions WHERE version = ?')
             ->willReturn($versionData);
 
-        self::assertEquals($versionData, $this->migrationRepository->getVersionData($version));
+        self::assertSame($versionData, $this->migrationRepository->getVersionData($version));
     }
 
     public function testRegisterMigrationWithNonExistentClassCausesError() : void

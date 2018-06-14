@@ -86,7 +86,7 @@ class SchemaDumperTest extends TestCase
             ->with('1234', 'up', 'down')
             ->willReturn('/path/to/migration.php');
 
-        self::assertEquals('/path/to/migration.php', $this->schemaDumper->dump('1234'));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234'));
     }
 
     protected function setUp() : void

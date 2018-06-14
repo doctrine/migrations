@@ -147,7 +147,7 @@ class MigratorTest extends MigrationTestCase
 
         $result = $migration->getSql($to);
 
-        self::assertEquals($expected, $result);
+        self::assertSame($expected, $result);
     }
 
     /** @return string|null[] */

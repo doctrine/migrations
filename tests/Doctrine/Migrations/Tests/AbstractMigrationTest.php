@@ -69,7 +69,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWarnIfDontOutputMessageIfFalse() : void
     {
         $this->migration->warnIf(false, 'trallala');
-        self::assertEquals('', $this->getOutputStreamContent($this->output));
+        self::assertSame('', $this->getOutputStreamContent($this->output));
     }
 
     public function testWriteInvokesOutputWriter() : void

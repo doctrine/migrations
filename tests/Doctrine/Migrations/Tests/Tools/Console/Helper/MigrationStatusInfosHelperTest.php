@@ -85,7 +85,7 @@ class MigrationStatusInfosHelperTest extends TestCase
 
         $infos = $this->migrationStatusInfosHelper->getMigrationsInfos();
 
-        self::assertEquals($expected, $infos);
+        self::assertSame($expected, $infos);
     }
 
     protected function setUp() : void

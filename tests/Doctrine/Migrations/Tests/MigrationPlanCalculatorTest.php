@@ -66,7 +66,7 @@ final class MigrationPlanCalculatorTest extends TestCase
             '04'
         );
 
-        self::assertEquals($expected, $migrationsToExecute);
+        self::assertSame($expected, $migrationsToExecute);
     }
 
     public function testGetMigrationsToExecuteDown() : void
@@ -108,8 +108,8 @@ final class MigrationPlanCalculatorTest extends TestCase
             ]);
 
         $expected = [
-            '03' => $version1,
-            '02' => $version4,
+            '03' => $version3,
+            '02' => $version2,
         ];
 
         $migrationsToExecute = $this->migrationPlanCalculator->getMigrationsToExecute(
@@ -117,7 +117,7 @@ final class MigrationPlanCalculatorTest extends TestCase
             '01'
         );
 
-        self::assertEquals($expected, $migrationsToExecute);
+        self::assertSame($expected, $migrationsToExecute);
     }
 
 

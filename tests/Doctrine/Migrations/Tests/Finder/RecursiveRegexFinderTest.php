@@ -54,7 +54,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
         self::assertCount(count($tests), $migrations); // Windows does not support symlinks
         foreach ($tests as $version => $namespace) {
             self::assertArrayHasKey($version, $migrations);
-            self::assertEquals($namespace, $migrations[$version]);
+            self::assertSame($namespace, $migrations[$version]);
         }
         $migrationsForTestSort = (array) $migrations;
 
@@ -73,7 +73,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
-        $this->assertEquals([
+        $this->assertSame([
             '0001' => 'TestMigrations\\MultiNested\\Version0001',
             '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
         ], $versions);
@@ -86,7 +86,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested'
         );
 
-        $this->assertEquals([
+        $this->assertSame([
             '0001' => 'TestMigrations\MultiNested\Version0001',
             '0002' => 'TestMigrations\MultiNested\Deep\Version0002',
         ], $versions);
@@ -99,7 +99,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested\\Deep'
         );
 
-        $this->assertEquals(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
+        $this->assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
     }
 
     protected function setUp() : void

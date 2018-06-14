@@ -28,9 +28,9 @@ class GlobFinderTest extends FinderTestCase
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         self::assertArrayHasKey('20150502000000', $migrations);
-        self::assertEquals('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
+        self::assertSame('TestMigrations\\Version20150502000000', $migrations['20150502000000']);
         self::assertArrayHasKey('20150502000001', $migrations);
-        self::assertEquals('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
+        self::assertSame('TestMigrations\\Version20150502000001', $migrations['20150502000001']);
     }
 
     protected function setUp() : void

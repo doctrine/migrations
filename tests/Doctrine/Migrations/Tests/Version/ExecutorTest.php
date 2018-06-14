@@ -55,9 +55,9 @@ class ExecutorTest extends TestCase
     {
         $this->versionExecutor->addSql('SELECT 1', [1], [2]);
 
-        self::assertEquals(['SELECT 1'], $this->versionExecutor->getSql());
-        self::assertEquals([[1]], $this->versionExecutor->getParams());
-        self::assertEquals([[2]], $this->versionExecutor->getTypes());
+        self::assertSame(['SELECT 1'], $this->versionExecutor->getSql());
+        self::assertSame([[1]], $this->versionExecutor->getParams());
+        self::assertSame([[2]], $this->versionExecutor->getTypes());
     }
 
     public function testExecuteUp() : void
@@ -120,11 +120,11 @@ class ExecutorTest extends TestCase
         );
 
         self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
-        self::assertEquals(['SELECT 1', 'SELECT 2'], $versionExecutionResult->getSql());
-        self::assertEquals([[1], [2]], $versionExecutionResult->getParams());
-        self::assertEquals([[3], [4]], $versionExecutionResult->getTypes());
+        self::assertSame(['SELECT 1', 'SELECT 2'], $versionExecutionResult->getSql());
+        self::assertSame([[1], [2]], $versionExecutionResult->getParams());
+        self::assertSame([[3], [4]], $versionExecutionResult->getTypes());
         self::assertNotNull($versionExecutionResult->getTime());
-        self::assertEquals('No State', $this->version->getExecutionState());
+        self::assertSame('No State', $this->version->getExecutionState());
         self::assertTrue($this->migration->preUpExecuted);
         self::assertTrue($this->migration->postUpExecuted);
         self::assertFalse($this->migration->preDownExecuted);
@@ -185,11 +185,11 @@ class ExecutorTest extends TestCase
         );
 
         self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
-        self::assertEquals(['SELECT 3', 'SELECT 4'], $versionExecutionResult->getSql());
-        self::assertEquals([[5], [6]], $versionExecutionResult->getParams());
-        self::assertEquals([[7], [8]], $versionExecutionResult->getTypes());
+        self::assertSame(['SELECT 3', 'SELECT 4'], $versionExecutionResult->getSql());
+        self::assertSame([[5], [6]], $versionExecutionResult->getParams());
+        self::assertSame([[7], [8]], $versionExecutionResult->getTypes());
         self::assertNotNull($versionExecutionResult->getTime());
-        self::assertEquals('No State', $this->version->getExecutionState());
+        self::assertSame('No State', $this->version->getExecutionState());
         self::assertFalse($this->migration->preUpExecuted);
         self::assertFalse($this->migration->postUpExecuted);
         self::assertTrue($this->migration->preDownExecuted);

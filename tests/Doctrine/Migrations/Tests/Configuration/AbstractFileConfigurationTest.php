@@ -30,7 +30,7 @@ class AbstractFileConfigurationTest extends TestCase
 
         $this->fileConfiguration->load($file);
 
-        $this->assertEquals(__DIR__ . '/' . $file, $this->fileConfiguration->getFile());
+        $this->assertSame(__DIR__ . '/' . $file, $this->fileConfiguration->getFile());
 
         chdir($cwd);
     }

@@ -90,7 +90,7 @@ class ConfigurationTest extends MigrationTestCase
             $result = array_keys($result);
         }
 
-        self::assertEquals($expectedResult, $result);
+        self::assertSame($expectedResult, $result);
     }
 
     /**
@@ -127,7 +127,7 @@ class ConfigurationTest extends MigrationTestCase
             $result = array_keys($result);
         }
 
-        self::assertEquals($expectedResult, $result);
+        self::assertSame($expectedResult, $result);
     }
 
     public function testGenerateVersionNumberFormatsTheDatePassedIn() : void
@@ -137,7 +137,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $version = $configuration->generateVersionNumber($now);
 
-        self::assertEquals('20160705010000', $version);
+        self::assertSame('20160705010000', $version);
     }
 
     /**
@@ -279,7 +279,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration(new Connection([], new DB2Driver()));
 
-        self::assertEquals('"version"', $config->getQuotedMigrationsColumnName());
+        self::assertSame('"version"', $config->getQuotedMigrationsColumnName());
     }
 
     public function testGetVersionData() : void
@@ -304,7 +304,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $configuration = new Configuration($this->getConnectionMock(), null, null, null, $dependencyFactory);
 
-        self::assertEquals($versionData, $configuration->getVersionData($version));
+        self::assertSame($versionData, $configuration->getVersionData($version));
     }
 
     public function testGetSetAllOrNothing() : void

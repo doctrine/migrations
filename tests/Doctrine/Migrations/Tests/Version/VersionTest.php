@@ -72,7 +72,7 @@ class VersionTest extends MigrationTestCase
             VersionDummy::class
         );
 
-        self::assertEquals($versionName, $version->getVersion());
+        self::assertSame($versionName, $version->getVersion());
     }
 
     public function testShowSqlStatementsParameters() : void
@@ -131,8 +131,8 @@ class VersionTest extends MigrationTestCase
             VersionDummyDescription::class
         );
 
-        self::assertEquals($versionName, $version->getVersion());
-        self::assertEquals($versionDescription, $version->getMigration()->getDescription());
+        self::assertSame($versionName, $version->getVersion());
+        self::assertSame($versionDescription, $version->getMigration()->getDescription());
     }
 
     /** @dataProvider stateProvider */
@@ -609,8 +609,8 @@ class VersionTest extends MigrationTestCase
 
         $now = (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'));
 
-        self::assertEquals($now->format('Y-m-d H:i'), date('Y-m-d H:i', strtotime($versionData['executed_at'])));
-        self::assertEquals($timeZone, $version->getExecutedAt()->getTimeZone()->getName());
+        self::assertSame($now->format('Y-m-d H:i'), date('Y-m-d H:i', strtotime($versionData['executed_at'])));
+        self::assertSame($timeZone, $version->getExecutedAt()->getTimeZone()->getName());
     }
 
     /**

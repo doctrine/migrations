@@ -61,43 +61,43 @@ class ConfigurationTest extends MigrationTestCase
         $config = new Configuration($this->getSqliteConnection());
         $config->setName('Test');
 
-        self::assertEquals('Test', $config->getName());
+        self::assertSame('Test', $config->getName());
     }
 
     public function testMigrationsTable() : void
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertEquals('doctrine_migration_versions', $config->getMigrationsTableName());
+        self::assertSame('doctrine_migration_versions', $config->getMigrationsTableName());
     }
 
     public function testSetGetMigrationsColumnLength() : void
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertEquals(255, $config->getMigrationsColumnLength());
+        self::assertSame(255, $config->getMigrationsColumnLength());
 
         $config->setMigrationsColumnLength(200);
 
-        self::assertEquals(200, $config->getMigrationsColumnLength());
+        self::assertSame(200, $config->getMigrationsColumnLength());
     }
 
     public function testSetGetSetMigrationsExecutedAtColumnName() : void
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertEquals('executed_at', $config->getMigrationsExecutedAtColumnName());
+        self::assertSame('executed_at', $config->getMigrationsExecutedAtColumnName());
 
         $config->setMigrationsExecutedAtColumnName('executedAt');
 
-        self::assertEquals('executedAt', $config->getMigrationsExecutedAtColumnName());
+        self::assertSame('executedAt', $config->getMigrationsExecutedAtColumnName());
     }
 
     public function testGetQuotedMigrationsExecutedAtColumnName() : void
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertEquals('executed_at', $config->getQuotedMigrationsExecutedAtColumnName());
+        self::assertSame('executed_at', $config->getQuotedMigrationsExecutedAtColumnName());
     }
 
     public function testEmptyProjectDefaults() : void
@@ -107,9 +107,9 @@ class ConfigurationTest extends MigrationTestCase
         self::assertNull($config->getNextVersion(), 'no next version');
         self::assertSame('0', $config->getCurrentVersion(), 'current version 0');
         self::assertSame('0', $config->getLatestVersion(), 'latest version 0');
-        self::assertEquals(0, $config->getNumberOfAvailableMigrations(), 'number of available migrations 0');
-        self::assertEquals(0, $config->getNumberOfExecutedMigrations(), 'number of executed migrations 0');
-        self::assertEquals([], $config->getMigrations());
+        self::assertSame(0, $config->getNumberOfAvailableMigrations(), 'number of available migrations 0');
+        self::assertSame(0, $config->getNumberOfExecutedMigrations(), 'number of executed migrations 0');
+        self::assertSame([], $config->getMigrations());
     }
 
     public function testGetUnknownVersion() : void
@@ -132,7 +132,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $version = $config->getVersion('1234');
         self::assertInstanceOf(Version::class, $version);
-        self::assertEquals('1234', $version->getVersion());
+        self::assertSame('1234', $version->getVersion());
         self::assertFalse($version->isMigrated());
     }
 
@@ -318,7 +318,7 @@ class ConfigurationTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
 
         $config->registerMigration('1234', Version1Test::class);
-        self::assertEquals(['1234'], $config->getAvailableVersions());
+        self::assertSame(['1234'], $config->getAvailableVersions());
     }
 
     public function testDispatchEventProxiesToConnectionsEventManager() : void
@@ -367,7 +367,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = $this->getSqliteConfiguration();
 
-        self::assertEquals($return, $config->getDateTime($version));
+        self::assertSame($return, $config->getDateTime($version));
     }
 
     public function testDryRunMigratedAndCurrentVersions() : void
@@ -383,7 +383,7 @@ class ConfigurationTest extends MigrationTestCase
         $config2 = $this->getSqliteConfiguration();
         $config2->setIsDryRun(false);
 
-        self::assertEquals([], $config2->getMigratedVersions());
+        self::assertSame([], $config2->getMigratedVersions());
         self::assertTrue($config2->getConnection()->getSchemaManager()->tablesExist([$config2->getMigrationsTableName()]));
 
         // no migrations table created
@@ -393,7 +393,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('0', $config3->getCurrentVersion(), 'current version 0');
         self::assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
 
-        self::assertEquals([], $config3->getMigratedVersions());
+        self::assertSame([], $config3->getMigratedVersions());
         self::assertFalse($config3->getConnection()->getSchemaManager()->tablesExist([$config3->getMigrationsTableName()]));
 
         // gets the correct migration from the table, if the table exists
@@ -409,7 +409,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('1234', $config->getCurrentVersion(), 'current version 1234');
         self::assertSame('1235', $config->getNextVersion(), 'next version 1235');
 
-        self::assertEquals(['1234'], $config->getMigratedVersions());
+        self::assertSame(['1234'], $config->getMigratedVersions());
         self::assertTrue($config->getConnection()->getSchemaManager()->tablesExist([$config->getMigrationsTableName()]));
     }
 

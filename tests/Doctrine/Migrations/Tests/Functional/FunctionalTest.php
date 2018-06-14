@@ -125,7 +125,7 @@ class FunctionalTest extends MigrationTestCase
         $this->config->registerMigration('2', MigrationSkipMigration::class);
         $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
-        self::assertEquals(0, $this->config->getCurrentVersion());
+        self::assertSame('0', $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrationsToExecute('up', '3');
 
         self::assertCount(3, $migrations);
@@ -140,7 +140,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($schema->hasTable('foo'));
         self::assertTrue($schema->hasTable('bar'));
 
-        self::assertEquals(3, $this->config->getCurrentVersion());
+        self::assertSame('3', $this->config->getCurrentVersion());
         self::assertTrue($migrations['1']->isMigrated());
         self::assertTrue($migrations['2']->isMigrated());
         self::assertTrue($migrations['3']->isMigrated());
@@ -155,7 +155,7 @@ class FunctionalTest extends MigrationTestCase
         $migrator = $this->createTestMigrator($this->config);
         $migrator->migrate();
 
-        self::assertEquals(3, $this->config->getCurrentVersion());
+        self::assertSame('3', $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
         self::assertTrue($migrations['1']->isMigrated());
         self::assertTrue($migrations['2']->isMigrated());
@@ -179,7 +179,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertFalse($schema->hasTable('foo'));
         self::assertFalse($schema->hasTable('bar'));
 
-        self::assertEquals(0, $this->config->getCurrentVersion());
+        self::assertSame('0', $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
         self::assertFalse($migrations['1']->isMigrated());
         self::assertFalse($migrations['2']->isMigrated());
@@ -195,14 +195,14 @@ class FunctionalTest extends MigrationTestCase
         $migrator = $this->createTestMigrator($this->config);
         $migrator->migrate('3');
 
-        self::assertEquals(3, $this->config->getCurrentVersion());
+        self::assertSame('3', $this->config->getCurrentVersion());
         $migrator->migrate('0');
 
         $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'));
         self::assertFalse($schema->hasTable('bar'));
 
-        self::assertEquals(0, $this->config->getCurrentVersion());
+        self::assertSame('0', $this->config->getCurrentVersion());
         $migrations = $this->config->getMigrations();
         self::assertFalse($migrations['1']->isMigrated());
         self::assertFalse($migrations['2']->isMigrated());
@@ -223,7 +223,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($schema->hasTable('test_add_sql_table'));
         $check = $this->config->getConnection()->fetchAll('select * from test_add_sql_table');
         self::assertNotEmpty($check);
-        self::assertEquals('test', $check[0]['test']);
+        self::assertSame('test', $check[0]['test']);
 
         $migrator->migrate('0');
         self::assertFalse($migrations['1']->isMigrated());
@@ -249,7 +249,7 @@ class FunctionalTest extends MigrationTestCase
         );
 
         self::assertNotEmpty($check);
-        self::assertEquals(3, $check);
+        self::assertSame('3', $check);
 
         $migrator->migrate('0');
         self::assertFalse($migrations['1']->isMigrated());
@@ -259,7 +259,7 @@ class FunctionalTest extends MigrationTestCase
         );
 
         self::assertNotEmpty($check);
-        self::assertEquals(12, $check);
+        self::assertSame('12', $check);
 
         $this->config->getConnection()->executeQuery(sprintf('DROP TABLE %s ', $tableName));
     }
@@ -287,7 +287,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($migrations['1']->isMigrated());
         self::assertTrue($migrations['2']->isMigrated());
 
-        self::assertEquals(2, $config->getCurrentVersion());
+        self::assertSame('2', $config->getCurrentVersion());
     }
 
     public function testInterweavedMigrationsAreExecuted() : void
@@ -301,7 +301,7 @@ class FunctionalTest extends MigrationTestCase
         $migrations = $this->config->getMigrations();
         self::assertTrue($migrations['1']->isMigrated());
         self::assertTrue($migrations['3']->isMigrated());
-        self::assertEquals(3, $this->config->getCurrentVersion());
+        self::assertSame('3', $this->config->getCurrentVersion());
 
         $config = new Configuration($this->connection);
         $config->setMigrationsNamespace('Doctrine\Migrations\Tests\Functional');
@@ -315,7 +315,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertCount(1, $config->getMigrationsToExecute('up', '3'));
         $migrations = $config->getMigrationsToExecute('up', '3');
         self::assertArrayHasKey(2, $migrations);
-        self::assertEquals(2, $migrations['2']->getVersion());
+        self::assertSame('2', $migrations['2']->getVersion());
 
         $migrator = $this->createTestMigrator($config);
         $migrator->migrate();
@@ -325,7 +325,7 @@ class FunctionalTest extends MigrationTestCase
         self::assertTrue($migrations['2']->isMigrated());
         self::assertTrue($migrations['3']->isMigrated());
 
-        self::assertEquals(3, $config->getCurrentVersion());
+        self::assertSame('3', $config->getCurrentVersion());
     }
 
     public function testMigrateToCurrentVersionReturnsEmpty() : void
@@ -338,7 +338,7 @@ class FunctionalTest extends MigrationTestCase
 
         $sql = $migrator->migrate();
 
-        self::assertEquals([], $sql);
+        self::assertSame([], $sql);
     }
 
     /**
@@ -516,7 +516,7 @@ class FunctionalTest extends MigrationTestCase
         $row = $this->config->getConnection()
             ->fetchAssoc('SELECT * FROM test_migrations_table');
 
-        self::assertEquals('1', $row['current_version']);
+        self::assertSame('1', $row['current_version']);
         self::assertTrue(isset($row['executed_at']));
         self::assertNotNull($row['executed_at']);
         self::assertNotFalse(strtotime($row['executed_at']));

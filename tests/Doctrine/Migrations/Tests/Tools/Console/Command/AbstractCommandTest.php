@@ -108,7 +108,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $configuration = $this->createMock(Configuration::class);
 
-        self::assertEquals($configuration, $this->invokeMigrationConfigurationGetter($input, $configuration));
+        self::assertSame($configuration, $this->invokeMigrationConfigurationGetter($input, $configuration));
     }
 
     /**
@@ -128,7 +128,7 @@ class AbstractCommandTest extends MigrationTestCase
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
         self::assertInstanceOf(Configuration::class, $actualConfiguration);
-        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertSame('pdo_sqlite', $actualConfiguration->getConnection()->getDriver()->getName());
     }
 
     /**
@@ -149,7 +149,7 @@ class AbstractCommandTest extends MigrationTestCase
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
         self::assertInstanceOf(Configuration::class, $actualConfiguration);
-        self::assertEquals($this->getSqliteConnection(), $actualConfiguration->getConnection());
+        self::assertSame('pdo_sqlite', $actualConfiguration->getConnection()->getDriver()->getName());
     }
 
     /**
@@ -170,9 +170,9 @@ class AbstractCommandTest extends MigrationTestCase
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
         self::assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
-        self::assertEquals('name', $actualConfiguration->getName());
-        self::assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
-        self::assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+        self::assertSame('name', $actualConfiguration->getName());
+        self::assertSame('migrations_table_name', $actualConfiguration->getMigrationsTableName());
+        self::assertSame('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
     }
 
     /**
@@ -190,7 +190,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         self::assertInstanceOf(Configuration::class, $actualConfiguration);
         self::assertSame($connection, $actualConfiguration->getConnection());
-        self::assertEquals('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
+        self::assertSame('doctrine_migration_versions', $actualConfiguration->getMigrationsTableName());
         self::assertNull($actualConfiguration->getMigrationsNamespace());
     }
 
@@ -229,9 +229,9 @@ class AbstractCommandTest extends MigrationTestCase
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, $configuration);
 
         self::assertInstanceOf(YamlConfiguration::class, $actualConfiguration);
-        self::assertEquals('name', $actualConfiguration->getName());
-        self::assertEquals('migrations_table_name', $actualConfiguration->getMigrationsTableName());
-        self::assertEquals('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
+        self::assertSame('name', $actualConfiguration->getName());
+        self::assertSame('migrations_table_name', $actualConfiguration->getMigrationsTableName());
+        self::assertSame('migrations_namespace', $actualConfiguration->getMigrationsNamespace());
     }
 
     /**

@@ -274,7 +274,7 @@ class CliTest extends MigrationTestCase
 
     protected function assertSuccessfulExit(string $msg = '') : void
     {
-        self::assertEquals(0, $this->lastExit, $msg);
+        self::assertSame(0, $this->lastExit, $msg);
     }
 
     protected function assertVersionCount(int $count, string $msg = '') : void

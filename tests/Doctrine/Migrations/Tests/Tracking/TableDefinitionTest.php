@@ -19,43 +19,43 @@ class TableDefinitionTest extends TestCase
 
     public function testGetName() : void
     {
-        self::assertEquals('versions', $this->migrationTable->getName());
+        self::assertSame('versions', $this->migrationTable->getName());
     }
 
     public function testGetColumnName() : void
     {
-        self::assertEquals('version_name', $this->migrationTable->getColumnName());
+        self::assertSame('version_name', $this->migrationTable->getColumnName());
     }
 
     public function testGetColumnLength() : void
     {
-        self::assertEquals(200, $this->migrationTable->getColumnLength());
+        self::assertSame(200, $this->migrationTable->getColumnLength());
     }
 
     public function testGetExecutedAtColumnName() : void
     {
-        self::assertEquals('executed_datetime', $this->migrationTable->getExecutedAtColumnName());
+        self::assertSame('executed_datetime', $this->migrationTable->getExecutedAtColumnName());
     }
 
     public function testGetMigrationsColumn() : void
     {
         $column = $this->migrationTable->getMigrationsColumn();
 
-        self::assertEquals('version_name', $column->getName());
-        self::assertEquals(200, $column->getLength());
+        self::assertSame('version_name', $column->getName());
+        self::assertSame(200, $column->getLength());
     }
 
     public function testGetExecutedAtColumn() : void
     {
         $column = $this->migrationTable->getExecutedAtColumn();
 
-        self::assertEquals('executed_datetime', $column->getName());
+        self::assertSame('executed_datetime', $column->getName());
         self::assertTrue($column->getNotnull());
     }
 
     public function testGetColumnNames() : void
     {
-        self::assertEquals(['version_name', 'executed_datetime'], $this->migrationTable->getColumnNames());
+        self::assertSame(['version_name', 'executed_datetime'], $this->migrationTable->getColumnNames());
     }
 
     public function testGetDBALTable() : void
@@ -75,7 +75,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertEquals(true, $table->getOption('test_option'));
+        self::assertSame(true, $table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
@@ -101,7 +101,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertEquals(true, $table->getOption('test_option'));
+        self::assertSame(true, $table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
