@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use function assert;
 use function class_exists;
 use function file_get_contents;
 use function is_array;
@@ -28,8 +29,12 @@ class YamlConfiguration extends AbstractFileConfiguration
             throw YamlNotAvailable::new();
         }
 
+        $content = file_get_contents($file);
+
+        assert($content !== false);
+
         try {
-            $config = Yaml::parse(file_get_contents($file));
+            $config = Yaml::parse($content);
         } catch (ParseException $e) {
             throw YamlNotValid::malformed();
         }

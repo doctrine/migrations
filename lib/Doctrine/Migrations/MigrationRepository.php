@@ -19,12 +19,14 @@ use function array_keys;
 use function array_map;
 use function array_search;
 use function array_unshift;
+use function assert;
 use function class_exists;
 use function count;
 use function end;
 use function get_class;
 use function implode;
 use function is_array;
+use function is_int;
 use function ksort;
 use function sprintf;
 use function substr;
@@ -342,6 +344,8 @@ class MigrationRepository
         array_unshift($versions, '0');
 
         $offset = array_search($version, $versions, true);
+
+        assert($offset === false || is_int($offset));
 
         if ($offset === false || ! isset($versions[$offset + $delta])) {
             // Unknown version or delta out of bounds.

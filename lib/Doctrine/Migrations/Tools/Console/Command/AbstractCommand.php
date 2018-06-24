@@ -129,7 +129,7 @@ abstract class AbstractCommand extends Command
             );
         }
 
-        if ($this->migrationConfiguration === null && $this->configuration instanceof Configuration) {
+        if ($this->migrationConfiguration === null && $this->configuration !== null) {
             $this->migrationConfiguration = $this->configuration;
         }
 
@@ -174,9 +174,10 @@ abstract class AbstractCommand extends Command
 
     private function hasConfigurationHelper() : bool
     {
+        /** @var HelperSet|null $helperSet */
         $helperSet = $this->getHelperSet();
 
-        if (! $helperSet instanceof HelperSet) {
+        if ($helperSet === null) {
             return false;
         }
 

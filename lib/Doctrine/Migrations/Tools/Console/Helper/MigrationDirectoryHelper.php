@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExist;
 use const DIRECTORY_SEPARATOR;
+use function assert;
 use function date;
 use function file_exists;
 use function getcwd;
@@ -35,6 +36,9 @@ class MigrationDirectoryHelper
     {
         $dir = $this->configuration->getMigrationsDirectory();
         $dir = $dir ?? getcwd();
+
+        assert($dir !== false, 'Unable to determine current working directory.');
+
         $dir = rtrim($dir, '/');
 
         if (! file_exists($dir)) {

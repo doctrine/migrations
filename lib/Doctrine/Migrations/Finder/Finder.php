@@ -8,6 +8,7 @@ use Doctrine\Migrations\Finder\Exception\InvalidDirectory;
 use Doctrine\Migrations\Finder\Exception\NameIsReserved;
 use ReflectionClass;
 use const SORT_STRING;
+use function assert;
 use function get_declared_classes;
 use function in_array;
 use function is_dir;
@@ -53,7 +54,11 @@ abstract class Finder implements MigrationFinder
         $includedFiles = [];
         foreach ($files as $file) {
             static::requireOnce($file);
-            $includedFiles[] = realpath($file);
+
+            $realFile = realpath($file);
+            assert($realFile !== false);
+
+            $includedFiles[] = $realFile;
         }
 
         $classes  = $this->loadMigrationClasses($includedFiles, $namespace);
