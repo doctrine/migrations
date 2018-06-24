@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
+use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\XmlConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
@@ -26,5 +27,12 @@ class XmlConfigurationTest extends AbstractConfigurationTest
         $configFileSuffix->load(__DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . $configFile);
 
         return $configFileSuffix;
+    }
+
+    public function testInvalid() : void
+    {
+        $this->expectException(XmlNotValid::class);
+
+        $this->loadConfiguration('malformed');
     }
 }
