@@ -9,7 +9,9 @@ use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
 use function count;
+use function is_string;
 use function max;
 use function sprintf;
 use function str_repeat;
@@ -54,6 +56,8 @@ EOT
         $infos = $this->dependencyFactory->getMigrationStatusInfosHelper();
 
         foreach ($infos->getMigrationsInfos() as $name => $value) {
+            assert(is_string($name));
+
             $string = (string) $value;
 
             if ($name === 'New Migrations') {

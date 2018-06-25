@@ -7,8 +7,10 @@ namespace Doctrine\Migrations\Configuration;
 use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
+use SimpleXMLElement;
 use const DIRECTORY_SEPARATOR;
 use const LIBXML_NOCDATA;
+use function assert;
 use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_file;
@@ -26,17 +28,23 @@ class XmlConfiguration extends AbstractFileConfiguration
         libxml_use_internal_errors(true);
 
         $xml = new DOMDocument();
-        $xml->load($file);
+
+        if ($xml->load($file) === false) {
+            throw XmlNotValid::malformed();
+        }
 
         $xsdPath = __DIR__ . DIRECTORY_SEPARATOR . 'XML' . DIRECTORY_SEPARATOR . 'configuration.xsd';
 
         if (! $xml->schemaValidate($xsdPath)) {
             libxml_clear_errors();
 
-            throw XmlNotValid::new();
+            throw XmlNotValid::failedValidation();
         }
 
-        $xml    = simplexml_load_file($file, 'SimpleXMLElement', LIBXML_NOCDATA);
+        $xml = simplexml_load_file($file, SimpleXMLElement::class, LIBXML_NOCDATA);
+
+        assert($xml !== false);
+
         $config = [];
 
         if (isset($xml->name)) {

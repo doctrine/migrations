@@ -111,7 +111,7 @@ class DiffGenerator
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
 
-                if (preg_match($filterExpression, $this->resolveTableName($tableName))) {
+                if (preg_match($filterExpression, $this->resolveTableName($tableName)) === 1) {
                     continue;
                 }
 

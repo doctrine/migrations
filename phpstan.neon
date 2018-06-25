@@ -1,8 +1,0 @@
-parameters:
-    ignoreErrors:
-        # Ignore proxy manager magic
-        - '#ProxyManager\\Proxy\\VirtualProxyInterface#'
-
-includes:
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-strict-rules/rules.neon

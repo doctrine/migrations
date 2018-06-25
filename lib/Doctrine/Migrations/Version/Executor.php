@@ -197,9 +197,9 @@ final class Executor implements ExecutorInterface
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
         if ($direction === Direction::UP) {
-            $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $version) . "\n");
+            $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $version->getVersion()) . "\n");
         } else {
-            $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $version) . "\n");
+            $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $version->getVersion()) . "\n");
         }
 
         $version->setState(State::EXEC);
@@ -223,7 +223,7 @@ final class Executor implements ExecutorInterface
         } else {
             $this->outputWriter->write(sprintf(
                 '<error>Migration %s was executed but did not result in any SQL statements.</error>',
-                $version
+                $version->getVersion()
             ));
         }
 
@@ -306,7 +306,7 @@ final class Executor implements ExecutorInterface
     {
         $this->outputWriter->write(sprintf(
             '<error>Migration %s failed during %s. Error %s</error>',
-            $version,
+            $version->getVersion(),
             $version->getExecutionState(),
             $e->getMessage()
         ));

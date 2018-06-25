@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
+use Doctrine\Migrations\Configuration\Connection\Loader\Exception\InvalidConfiguration;
 
 /**
  * The ConnectionConfigurationChainLoader class is responsible for loading a Doctrine\DBAL\Connection from an array of
@@ -30,7 +31,7 @@ final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterf
      * Read the input and return a Configuration, returns null if the config
      * is not supported.
      *
-     * @throws InvalidArgumentException
+     * @throws InvalidConfiguration
      */
     public function chosen() : ?Connection
     {

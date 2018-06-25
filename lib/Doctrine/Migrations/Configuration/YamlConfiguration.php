@@ -6,7 +6,9 @@ namespace Doctrine\Migrations\Configuration;
 
 use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
+use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use function assert;
 use function class_exists;
 use function file_get_contents;
 use function is_array;
@@ -27,10 +29,18 @@ class YamlConfiguration extends AbstractFileConfiguration
             throw YamlNotAvailable::new();
         }
 
-        $config = Yaml::parse(file_get_contents($file));
+        $content = file_get_contents($file);
+
+        assert($content !== false);
+
+        try {
+            $config = Yaml::parse($content);
+        } catch (ParseException $e) {
+            throw YamlNotValid::malformed();
+        }
 
         if (! is_array($config)) {
-            throw YamlNotValid::new();
+            throw YamlNotValid::invalid();
         }
 
         if (isset($config['migrations_directory'])) {

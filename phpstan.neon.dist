@@ -1,0 +1,14 @@
+parameters:
+    level: 7
+    paths:
+        - %currentWorkingDirectory%/lib
+    ignoreErrors:
+        # Ignore proxy manager magic
+        - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
+        - '~Parameter #1 \$files of method Doctrine\\Migrations\\Finder\\Finder::loadMigrationClasses\(\) expects array<string>, array<int, string\|false> given~'
+#'
+
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - vendor/phpstan/phpstan-phpunit/extension.neon
+    - vendor/phpstan/phpstan-strict-rules/rules.neon

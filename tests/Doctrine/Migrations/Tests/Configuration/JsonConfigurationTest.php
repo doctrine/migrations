@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
+use Doctrine\Migrations\Configuration\Exception\JsonNotValid;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
@@ -41,5 +42,12 @@ class JsonConfigurationTest extends AbstractConfigurationTest
         $this->expectExceptionMessage('Given config file does not exist');
 
         $config->load(__DIR__ . '/_files/none.json');
+    }
+
+    public function testInvalid() : void
+    {
+        $this->expectException(JsonNotValid::class);
+
+        $this->loadConfiguration('malformed');
     }
 }

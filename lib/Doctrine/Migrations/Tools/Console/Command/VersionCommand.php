@@ -136,7 +136,7 @@ EOT
             );
         }
 
-        if ($rangeFromOption !== null ^ $rangeToOption !== null) {
+        if ($rangeFromOption !== null xor $rangeToOption !== null) {
             throw InvalidOptionUsage::new(
                 'Options --range-to and --range-from should be used together.'
             );
