@@ -42,13 +42,13 @@ class GenerateCommand extends AbstractCommand
 
 namespace <namespace>;
 
-use Doctrine\DBAL\Migrations\AbstractMigration;
+use <parent_class_full>;
 use Doctrine\DBAL\Schema\Schema;
 
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-class Version<version> extends AbstractMigration
+class Version<version> extends <parent_class>
 {
     /**
      * @param Schema $schema
@@ -107,17 +107,24 @@ EOT
 
     protected function generateMigration(Configuration $configuration, InputInterface $input, $version, $up = null, $down = null)
     {
+
+        $parentClass = $input->getOption('parent');
+
         $placeHolders = [
             '<namespace>',
             '<version>',
             '<up>',
             '<down>',
+            '<parent_class_full>',
+            '<parent_class>'
         ];
         $replacements = [
             $configuration->getMigrationsNamespace(),
             $version,
             $up ? "        " . implode("\n        ", explode("\n", $up)) : null,
-            $down ? "        " . implode("\n        ", explode("\n", $down)) : null
+            $down ? "        " . implode("\n        ", explode("\n", $down)) : null,
+            $parentClass,
+            end( explode('\\', $parentClass ) )
         ];
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
         $code = preg_replace('/^ +$/m', '', $code);

@@ -71,6 +71,7 @@ abstract class AbstractCommand extends Command
     {
         $this->addOption('configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a migrations configuration file.');
         $this->addOption('db-configuration', null, InputOption::VALUE_OPTIONAL, 'The path to a database connection configuration file.');
+        $this->addOption('parent', null, InputOption::VALUE_OPTIONAL, 'Full namespace path to the abstract migration class.', 'Doctrine\DBAL\Migrations\AbstractMigration');
     }
 
     protected function outputHeader(Configuration $configuration, OutputInterface $output)
