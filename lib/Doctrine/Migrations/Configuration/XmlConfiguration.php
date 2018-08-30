@@ -11,9 +11,10 @@ use SimpleXMLElement;
 use const DIRECTORY_SEPARATOR;
 use const LIBXML_NOCDATA;
 use function assert;
+use function file_get_contents;
 use function libxml_clear_errors;
 use function libxml_use_internal_errors;
-use function simplexml_load_file;
+use function simplexml_load_string;
 
 /**
  * The XmlConfiguration class is responsible for loading migration configuration information from a XML file.
@@ -41,8 +42,10 @@ class XmlConfiguration extends AbstractFileConfiguration
             throw XmlNotValid::failedValidation();
         }
 
-        $xml = simplexml_load_file($file, SimpleXMLElement::class, LIBXML_NOCDATA);
+        $rawXML = file_get_contents($file);
+        assert($rawXML !== false);
 
+        $xml = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
         assert($xml !== false);
 
         $config = [];
