@@ -1,8 +1,8 @@
 {
     "name": "doctrine/migrations",
     "type": "library",
-    "description": "Database Schema migrations using Doctrine DBAL",
-    "keywords": ["migrations", "database"],
+    "description": "PHP Doctrine Migrations project offer additional functionality on top of the database abstraction layer (DBAL) for versioning your database schema and easily deploying changes to it. It is a very easy to use and a powerful tool.",
+    "keywords": ["php", "database", "migrations", "dbal"],
     "homepage": "https://www.doctrine-project.org/projects/migrations.html",
     "license": "MIT",
     "authors": [

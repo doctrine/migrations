@@ -1,0 +1,25 @@
+{
+    "active": true,
+    "name": "Migrations",
+    "slug": "migrations",
+    "docsSlug": "doctrine-migrations",
+    "versions": [
+        {
+            "name": "2.0",
+            "branchName": "master",
+            "slug": "latest",
+            "upcoming": true
+        },
+        {
+            "name": "1.7",
+            "branchName": "1.7",
+            "slug": "1.7",
+            "aliases": [
+                "current",
+                "stable"
+            ],
+            "maintained": true,
+            "current": true
+        }
+    ]
+}
