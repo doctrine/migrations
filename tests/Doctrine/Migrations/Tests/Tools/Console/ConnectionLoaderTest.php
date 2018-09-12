@@ -30,7 +30,7 @@ class ConnectionLoaderTest extends TestCase
         $helperSet  = $this->createMock(HelperSet::class);
         $connection = $this->createMock(Connection::class);
 
-        $this->connectionConfigurationChainLoader->expects($this->once())
+        $this->connectionConfigurationChainLoader->expects(self::once())
             ->method('chosen')
             ->wilLReturn($connection);
 
@@ -50,7 +50,7 @@ class ConnectionLoaderTest extends TestCase
             ConnectionLoaderInterface::class
         );
 
-        $this->connectionLoader->expects($this->once())
+        $this->connectionLoader->expects(self::once())
             ->method('createConnectionConfigurationChainLoader')
             ->willReturn($this->connectionConfigurationChainLoader);
     }

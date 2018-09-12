@@ -25,13 +25,13 @@ final class AliasResolverTest extends TestCase
         ?string $expectedMethod,
         ?string $expectedArgument
     ) : void {
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('hasVersion')
             ->with($alias)
             ->willReturn(false);
 
         if ($expectedMethod !== null) {
-            $expectation = $this->migrationRepository->expects($this->once())
+            $expectation = $this->migrationRepository->expects(self::once())
                 ->method($expectedMethod)
                 ->willReturn($expectedVersion);
 
@@ -61,7 +61,7 @@ final class AliasResolverTest extends TestCase
 
     public function testResolveVersionAliasHasVersion() : void
     {
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('hasVersion')
             ->with('test')
             ->willReturn(true);

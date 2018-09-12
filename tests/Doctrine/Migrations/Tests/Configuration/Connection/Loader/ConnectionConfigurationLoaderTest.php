@@ -25,7 +25,7 @@ final class ConnectionConfigurationLoaderTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getConnection')
             ->willReturn($connection);
 

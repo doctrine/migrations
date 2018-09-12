@@ -72,7 +72,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
             $this->input->method('getOption')
                 ->with('configuration')
-                ->will($this->returnValue(null));
+                ->will(self::returnValue(null));
 
             $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
             $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input);
@@ -87,7 +87,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(__DIR__ . '/files/config.php'));
+            ->will(self::returnValue(__DIR__ . '/files/config.php'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
@@ -100,7 +100,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(__DIR__ . '/files/config.json'));
+            ->will(self::returnValue(__DIR__ . '/files/config.json'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
@@ -116,7 +116,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue('testconfig.wrong'));
+            ->will(self::returnValue('testconfig.wrong'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
 
@@ -130,7 +130,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(null));
+            ->will(self::returnValue(null));
 
         $configurationHelper = new ConfigurationHelper($this->connection, null);
 

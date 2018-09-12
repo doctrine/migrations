@@ -38,11 +38,11 @@ class StatusCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $this->migrationStatusInfosHelper->expects($this->once())
+        $this->migrationStatusInfosHelper->expects(self::once())
             ->method('getMigrationsInfos')
             ->willReturn(['name' => 'value']);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getOption')
             ->with('show-versions')
             ->willReturn(true);
@@ -50,89 +50,89 @@ class StatusCommandTest extends TestCase
         $version1   = $this->createMock(Version::class);
         $migration1 = $this->createMock(AbstractMigration::class);
 
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('getVersion')
             ->willReturn('1');
 
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('getMigration')
             ->willReturn($migration1);
 
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('isMigrated')
             ->willReturn(true);
 
         $executedAt = new DateTimeImmutable('2018-05-16 11:14:40');
 
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('getExecutedAt')
             ->willReturn($executedAt);
 
-        $migration1->expects($this->once())
+        $migration1->expects(self::once())
             ->method('getDescription')
             ->willReturn('Test description.');
 
         $version2   = $this->createMock(Version::class);
         $migration2 = $this->createMock(AbstractMigration::class);
 
-        $version2->expects($this->once())
+        $version2->expects(self::once())
             ->method('getVersion')
             ->willReturn('2');
 
-        $version2->expects($this->once())
+        $version2->expects(self::once())
             ->method('getMigration')
             ->willReturn($migration2);
 
-        $version2->expects($this->once())
+        $version2->expects(self::once())
             ->method('isMigrated')
             ->willReturn(false);
 
-        $version2->expects($this->once())
+        $version2->expects(self::once())
             ->method('getExecutedAt')
             ->willReturn(null);
 
-        $migration2->expects($this->once())
+        $migration2->expects(self::once())
             ->method('getDescription')
             ->willReturn('Test description.');
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
             ->willReturn([$version1, $version2]);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(['1234']);
 
-        $this->configuration->expects($this->at(0))
+        $this->configuration->expects(self::at(0))
             ->method('getDateTime')
             ->with('1234')
             ->willReturn('123456789');
 
-        $output->expects($this->at(0))
+        $output->expects(self::at(0))
             ->method('writeln')
             ->with("\n <info>==</info> Configuration\n");
 
-        $output->expects($this->at(1))
+        $output->expects(self::at(1))
             ->method('writeln')
             ->with('    <comment>>></comment> name:                                               value');
 
-        $output->expects($this->at(2))
+        $output->expects(self::at(2))
             ->method('writeln')
             ->with("\n <info>==</info> Available Migration Versions\n");
 
-        $output->expects($this->at(3))
+        $output->expects(self::at(3))
             ->method('writeln')
             ->with('    <comment>>></comment>  (<comment>1</comment>)                                                <info>migrated</info> (executed at 2018-05-16 11:14:40)     Test description.');
 
-        $output->expects($this->at(4))
+        $output->expects(self::at(4))
             ->method('writeln')
             ->with('    <comment>>></comment>  (<comment>2</comment>)                                                <error>not migrated</error>     Test description.');
 
-        $output->expects($this->at(5))
+        $output->expects(self::at(5))
             ->method('writeln')
             ->with("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
 
-        $output->expects($this->at(6))
+        $output->expects(self::at(6))
             ->method('writeln')
             ->with('    <comment>>></comment> 123456789 (<comment>1234</comment>)');
 
@@ -146,7 +146,7 @@ class StatusCommandTest extends TestCase
         $this->migrationRepository        = $this->createMock(MigrationRepository::class);
         $this->migrationStatusInfosHelper = $this->createMock(MigrationStatusInfosHelper::class);
 
-        $this->dependencyFactory->expects($this->once())
+        $this->dependencyFactory->expects(self::once())
             ->method('getMigrationStatusInfosHelper')
             ->willReturn($this->migrationStatusInfosHelper);
 

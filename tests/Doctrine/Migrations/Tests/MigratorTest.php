@@ -64,24 +64,24 @@ class MigratorTest extends MigrationTestCase
             ->setMethods(['getSql'])
             ->getMock();
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('getSql')
             ->with('1')
             ->willReturn($sql);
 
-        $migrationRepository->expects($this->once())
+        $migrationRepository->expects(self::once())
             ->method('getCurrentVersion')
             ->willReturn('5');
 
-        $outputWriter->expects($this->once())
+        $outputWriter->expects(self::once())
             ->method('write')
             ->with("-- Migrating from 5 to 1\n");
 
-        $configuration->expects($this->once())
+        $configuration->expects(self::once())
             ->method('getQueryWriter')
             ->willReturn($queryWriter);
 
-        $queryWriter->expects($this->once())
+        $queryWriter->expects(self::once())
             ->method('write')
             ->with('/path', Direction::DOWN, $sql);
 
@@ -142,7 +142,7 @@ class MigratorTest extends MigrationTestCase
 
         $expected = ['something'];
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('migrate')
             ->with($to)
             ->willReturn($expected);
@@ -175,7 +175,7 @@ class MigratorTest extends MigrationTestCase
             ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
             ->willReturn(true);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
         /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
@@ -184,15 +184,15 @@ class MigratorTest extends MigrationTestCase
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
         $migrationRepository = $this->createMock(MigrationRepository::class);
 
-        $config->expects($this->once())
+        $config->expects(self::once())
             ->method('getDependencyFactory')
             ->willReturn($dependencyFactory);
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getMigrationRepository')
             ->willReturn($migrationRepository);
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getOutputWriter')
             ->willReturn($outputWriter);
 
@@ -216,7 +216,7 @@ class MigratorTest extends MigrationTestCase
             ->setMethods(['getSql'])
             ->getMock();
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('getSql')
             ->with($to)
             ->willReturn($getSqlReturn);

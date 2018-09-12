@@ -39,12 +39,12 @@ class MigrationRepositoryTest extends TestCase
     public function testGetVersions() : void
     {
         $version1 = $this->createMock(Version::class);
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('getVersion')
             ->willReturn('01');
 
         $version2 = $this->createMock(Version::class);
-        $version2->expects($this->once())
+        $version2->expects(self::once())
             ->method('getVersion')
             ->willReturn('02');
 
@@ -66,21 +66,21 @@ class MigrationRepositoryTest extends TestCase
     {
         $version = $this->createMock(Version::class);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('connect');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('createMigrationTable');
 
-        $this->configuration->expects($this->exactly(2))
+        $this->configuration->expects(self::exactly(2))
             ->method('getQuotedMigrationsColumnName')
             ->willReturn('version');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getQuotedMigrationsExecutedAtColumnName')
             ->willReturn('executed_at');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsTableName')
             ->willReturn('versions');
 
@@ -89,7 +89,7 @@ class MigrationRepositoryTest extends TestCase
             'executed_at' => '2018-05-16 11:14:40',
         ];
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('fetchAssoc')
             ->with('SELECT version, executed_at FROM versions WHERE version = ?')
             ->willReturn($versionData);

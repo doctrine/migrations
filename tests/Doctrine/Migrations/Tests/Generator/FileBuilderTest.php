@@ -39,7 +39,7 @@ class FileBuilderTest extends TestCase
 
         $now = new DateTime('2018-09-01');
 
-        $this->platform->expects($this->any())
+        $this->platform->expects(self::any())
             ->method('getCurrentTimestampSQL')
             ->willReturn('CURRENT_TIMESTAMP');
 

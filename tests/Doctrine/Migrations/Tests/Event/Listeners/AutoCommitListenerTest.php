@@ -28,7 +28,7 @@ class AutoCommitListenerTest extends MigrationTestCase
     public function testListenerDoesNothingWhenConnecitonAutoCommitIsOn() : void
     {
         $this->willNotCommit();
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('isAutoCommit')
             ->willReturn(true);
 
@@ -37,10 +37,10 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     public function testListenerDoesFinalCommitWhenAutoCommitIsOff() : void
     {
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('isAutoCommit')
             ->willReturn(false);
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('commit');
 
         $this->listener->onMigrationsMigrated($this->createArgs(false));

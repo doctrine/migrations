@@ -64,27 +64,27 @@ class MigrationStatusTest extends MigrationTestCase
             ->getMock();
 
         $configuration
-            ->expects($this->exactly(4))
+            ->expects(self::exactly(4))
             ->method('resolveVersionAlias')
-            ->will($this->returnCallback(static function ($argAlias) use ($alias, $version) {
+            ->will(self::returnCallback(static function ($argAlias) use ($alias, $version) {
                 return $argAlias === $alias ? $version : '999';
             }));
 
         $configuration
             ->method('getDateTime')
-            ->will($this->returnValue('FORMATTED'));
+            ->will(self::returnValue('FORMATTED'));
 
         $configuration
             ->method('getAvailableVersions')
-            ->will($this->returnValue([]));
+            ->will(self::returnValue([]));
 
         $configuration->setMigrationsNamespace('DoctrineMigrations');
         $configuration->setMigrationsDirectory($this->migrationDirectory);
 
         $command
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMigrationConfiguration')
-            ->will($this->returnValue($configuration));
+            ->will(self::returnValue($configuration));
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(
@@ -121,9 +121,9 @@ class MigrationStatusTest extends MigrationTestCase
             ->getMock();
 
         $command
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMigrationConfiguration')
-            ->will($this->returnValue($configuration));
+            ->will(self::returnValue($configuration));
 
         $commandTester = new CommandTester($command);
         $commandTester->execute(

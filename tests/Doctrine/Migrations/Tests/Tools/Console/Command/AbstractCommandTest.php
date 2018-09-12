@@ -77,7 +77,7 @@ class AbstractCommandTest extends MigrationTestCase
 
         $command->setConnection($connection);
 
-        $this->assertSame($connection, $command->getConnection());
+        self::assertSame($connection, $command->getConnection());
     }
 
     public function testGetMigrationConfigurationDefaultsToConnection() : void
@@ -89,7 +89,7 @@ class AbstractCommandTest extends MigrationTestCase
         $command = new TestAbstractCommand();
         $command->setMigrationConfiguration($configuration);
 
-        $this->assertSame($configuration, $command->getConfiguration($input, $output));
+        self::assertSame($configuration, $command->getConfiguration($input, $output));
     }
 
     /**
@@ -103,8 +103,8 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
-            ->will($this->returnValue(null));
+            ->with(self::logicalOr(self::equalTo('db-configuration'), self::equalTo('configuration')))
+            ->will(self::returnValue(null));
 
         $configuration = $this->createMock(Configuration::class);
 
@@ -122,8 +122,8 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->with($this->logicalOr($this->equalTo('db-configuration'), $this->equalTo('configuration')))
-            ->will($this->returnValue(null));
+            ->with(self::logicalOr(self::equalTo('db-configuration'), self::equalTo('configuration')))
+            ->will(self::returnValue(null));
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input);
 
@@ -142,7 +142,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->will($this->returnValueMap([
+            ->will(self::returnValueMap([
                 ['db-configuration', __DIR__ . '/_files/db-config.php'],
             ]));
 
@@ -163,7 +163,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->will($this->returnValueMap([
+            ->will(self::returnValueMap([
                 ['configuration', __DIR__ . '/_files/config.yml'],
             ]));
 
@@ -217,7 +217,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->will($this->returnValueMap([
+            ->will(self::returnValueMap([
                 ['configuration', __DIR__ . '/_files/config.yml'],
             ]));
 
@@ -247,7 +247,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $input->method('getOption')
-            ->will($this->returnValueMap([
+            ->will(self::returnValueMap([
                 ['configuration', null],
             ]));
 

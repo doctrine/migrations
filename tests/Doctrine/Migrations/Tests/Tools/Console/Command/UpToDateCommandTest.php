@@ -45,7 +45,7 @@ class UpToDateCommandTest extends TestCase
 
         $output = $this->createMock(OutputInterface::class);
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln');
 
         $actual = $this->upToDateCommand->execute(new ArrayInput([]), $output);

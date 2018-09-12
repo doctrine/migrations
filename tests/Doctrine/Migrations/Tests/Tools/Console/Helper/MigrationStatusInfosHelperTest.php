@@ -27,39 +27,39 @@ class MigrationStatusInfosHelperTest extends TestCase
 
     public function testGetMigrationsInfos() : void
     {
-        $this->driver->expects($this->once())
+        $this->driver->expects(self::once())
             ->method('getName')
             ->willReturn('pdo_mysql');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getHost')
             ->willReturn('localhost');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getDatabase')
             ->willReturn('dbname');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsTableName')
             ->willReturn('table_name');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsColumnName')
             ->willReturn('column_name');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsNamespace')
             ->willReturn('Doctrine');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsDirectory')
             ->willReturn('/path/to/migrations');
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('resolveVersionAlias')
             ->willReturn('001');
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('getDateTime')
             ->willReturn('2017-09-01 01:01:01');
 
@@ -95,15 +95,15 @@ class MigrationStatusInfosHelperTest extends TestCase
         $this->connection          = $this->createMock(Connection::class);
         $this->driver              = $this->createMock(Driver::class);
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->connection->expects($this->any())
+        $this->connection->expects(self::any())
             ->method('getDriver')
             ->willReturn($this->driver);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getMigratedVersions')
             ->willReturn([
                 '001',
@@ -111,7 +111,7 @@ class MigrationStatusInfosHelperTest extends TestCase
                 '003',
             ]);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getAvailableVersions')
             ->willReturn([
                 '001',
@@ -119,11 +119,11 @@ class MigrationStatusInfosHelperTest extends TestCase
                 '004',
             ]);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getNewVersions')
             ->willReturn(['004']);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(['001']);
 

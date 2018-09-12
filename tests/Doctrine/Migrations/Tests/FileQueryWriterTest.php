@@ -46,7 +46,7 @@ final class FileQueryWriterTest extends MigrationTestCase
             $migrationFileBuilder
         );
 
-        $platform->expects($this->any())
+        $platform->expects(self::any())
             ->method('getCurrentTimestampSQL')
             ->willReturn('CURRENT_TIMESTAMP');
 
@@ -90,7 +90,7 @@ final class FileQueryWriterTest extends MigrationTestCase
     {
         $outputWriter = $this->createMock(OutputWriter::class);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write')
             ->with($this->isType('string'));
 

@@ -197,7 +197,7 @@ class VersionTest extends MigrationTestCase
         $outputWriter = $this->createMock(OutputWriter::class);
         $queryWriter  = $this->createMock(QueryWriter::class);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
         /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $config */
@@ -223,7 +223,7 @@ class VersionTest extends MigrationTestCase
 
         $versionExecutionResult = new ExecutionResult($getSqlReturn);
 
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('execute')
             ->with($direction)
             ->willReturn($versionExecutionResult);

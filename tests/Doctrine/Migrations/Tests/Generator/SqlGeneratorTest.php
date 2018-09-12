@@ -43,11 +43,11 @@ CODE;
 
         $expectedCode = sprintf($expectedCode, $formattedUpdate);
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('getMigrationsTableName')
             ->willReturn('migrations_table_name');
 
-        $this->platform->expects($this->once())
+        $this->platform->expects(self::once())
             ->method('getName')
             ->willReturn('mysql');
 

@@ -29,15 +29,15 @@ final class RollupCommandTest extends TestCase
         $output = $this->createMock(OutputInterface::class);
 
         $version = $this->createMock(Version::class);
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('getVersion')
             ->willReturn('1234');
 
-        $this->rollup->expects($this->once())
+        $this->rollup->expects(self::once())
             ->method('rollup')
             ->willReturn($version);
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln')
             ->with('Rolled up migrations to version <info>1234</info>');
 
@@ -49,7 +49,7 @@ final class RollupCommandTest extends TestCase
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 
-        $this->dependencyFactory->expects($this->any())
+        $this->dependencyFactory->expects(self::any())
             ->method('getRollup')
             ->willReturn($this->rollup);
 

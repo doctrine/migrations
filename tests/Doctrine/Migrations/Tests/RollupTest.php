@@ -31,7 +31,7 @@ class RollupTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No migrations found.');
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersions')
             ->willReturn([]);
 
@@ -51,7 +51,7 @@ class RollupTest extends TestCase
             '02' => $version2,
         ];
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersions')
             ->willReturn($versions);
 
@@ -64,19 +64,19 @@ class RollupTest extends TestCase
 
         $versions = ['01' => $version1];
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersions')
             ->willReturn($versions);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsTableName')
             ->willReturn('versions');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('executeQuery')
             ->with('DELETE FROM versions');
 
-        $version1->expects($this->once())
+        $version1->expects(self::once())
             ->method('markMigrated');
 
         $this->assertSame($version1, $this->rollup->rollup());
