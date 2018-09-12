@@ -44,7 +44,7 @@ final class DumpSchemaCommandTest extends TestCase
 
         $versions = [$version];
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersions')
             ->willReturn($versions);
 
@@ -56,36 +56,36 @@ final class DumpSchemaCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $input->expects($this->at(0))
+        $input->expects(self::at(0))
             ->method('getOption')
             ->with('formatted')
             ->willReturn(true);
 
-        $input->expects($this->at(1))
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('line-length')
             ->willReturn(80);
 
-        $input->expects($this->at(2))
+        $input->expects(self::at(2))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('test');
 
         $versions = [];
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersions')
             ->willReturn($versions);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $this->schemaDumper->expects($this->once())
+        $this->schemaDumper->expects(self::once())
             ->method('dump')
             ->with('1234', true, 80);
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln')
             ->with([
                 'Dumped your schema to a new migration class at "<info></info>"',
@@ -107,7 +107,7 @@ final class DumpSchemaCommandTest extends TestCase
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
 
-        $this->dependencyFactory->expects($this->any())
+        $this->dependencyFactory->expects(self::any())
             ->method('getSchemaDumper')
             ->willReturn($this->schemaDumper);
 

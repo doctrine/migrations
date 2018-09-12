@@ -27,44 +27,44 @@ final class DiffCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $input->expects($this->at(0))
+        $input->expects(self::at(0))
             ->method('getOption')
             ->with('filter-expression')
             ->willReturn('filter expression');
 
-        $input->expects($this->at(1))
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('formatted')
             ->willReturn(true);
 
-        $input->expects($this->at(2))
+        $input->expects(self::at(2))
             ->method('getOption')
             ->with('line-length')
             ->willReturn(80);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $this->migrationDiffGenerator->expects($this->once())
+        $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
-        $this->diffCommand->expects($this->once())
+        $this->diffCommand->expects(self::once())
             ->method('procOpen')
             ->with('mate', '/path/to/migration.php');
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln')
             ->with([
                 'Generated new migration class to "<info>/path/to/migration.php</info>"',
@@ -88,7 +88,7 @@ final class DiffCommandTest extends TestCase
 
         $this->diffCommand->setMigrationConfiguration($this->configuration);
 
-        $this->diffCommand->expects($this->once())
+        $this->diffCommand->expects(self::once())
             ->method('createMigrationDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
     }

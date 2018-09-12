@@ -62,11 +62,11 @@ class TableDefinitionTest extends TestCase
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchemaConfig')
             ->willReturn($schemaConfig);
 
-        $schemaConfig->expects($this->once())
+        $schemaConfig->expects(self::once())
             ->method('getDefaultTableOptions')
             ->willReturn(['test_option' => true]);
 
@@ -88,11 +88,11 @@ class TableDefinitionTest extends TestCase
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchemaConfig')
             ->willReturn($schemaConfig);
 
-        $schemaConfig->expects($this->once())
+        $schemaConfig->expects(self::once())
             ->method('getDefaultTableOptions')
             ->willReturn(['test_option' => true]);
 

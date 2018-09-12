@@ -167,7 +167,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $connection = $this->createMock(MasterSlaveConnection::class);
 
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('connect')
             ->with('master')
             ->willReturn(true);
@@ -258,7 +258,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
 
-        $conn->expects($this->any())
+        $conn->expects(self::any())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
 
@@ -294,11 +294,11 @@ class ConfigurationTest extends MigrationTestCase
             'executed_at' => '2018-05-16 11:14:40',
         ];
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getMigrationRepository')
             ->willReturn($migrationRepository);
 
-        $migrationRepository->expects($this->once())
+        $migrationRepository->expects(self::once())
             ->method('getVersionData')
             ->with($version)
             ->willReturn($versionData);

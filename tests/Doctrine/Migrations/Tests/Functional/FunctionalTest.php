@@ -436,7 +436,7 @@ class FunctionalTest extends MigrationTestCase
                 continue;
             }
 
-            $schema->expects($this->never())->method($method);
+            $schema->expects(self::never())->method($method);
         }
     }
 

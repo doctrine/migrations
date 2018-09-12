@@ -25,11 +25,11 @@ final class GeneratorTest extends TestCase
 
     public function testGenerateMigration() : void
     {
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsNamespace')
             ->willReturn('Test');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsDirectory')
             ->willReturn(sys_get_temp_dir());
 
@@ -55,7 +55,7 @@ final class GeneratorTest extends TestCase
 
         file_put_contents($customTemplate, 'custom template test');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn($customTemplate);
 
@@ -73,7 +73,7 @@ final class GeneratorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn('invalid');
 
@@ -92,7 +92,7 @@ final class GeneratorTest extends TestCase
             $customTemplate
         ));
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn($customTemplate);
 

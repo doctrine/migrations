@@ -38,11 +38,11 @@ class SchemaDumperTest extends TestCase
 
         $schema = $this->createMock(Schema::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchema')
             ->willReturn($schema);
 
-        $schema->expects($this->once())
+        $schema->expects(self::once())
             ->method('getTables')
             ->willReturn([]);
 
@@ -55,33 +55,33 @@ class SchemaDumperTest extends TestCase
 
         $schema = $this->createMock(Schema::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchema')
             ->willReturn($schema);
 
-        $schema->expects($this->once())
+        $schema->expects(self::once())
             ->method('getTables')
             ->willReturn([$table]);
 
-        $this->platform->expects($this->once())
+        $this->platform->expects(self::once())
             ->method('getCreateTableSQL')
             ->willReturn(['CREATE TABLE test']);
 
-        $this->platform->expects($this->once())
+        $this->platform->expects(self::once())
             ->method('getDropTableSQL')
             ->willReturn('DROP TABLE test');
 
-        $this->migrationSqlGenerator->expects($this->at(0))
+        $this->migrationSqlGenerator->expects(self::at(0))
             ->method('generate')
             ->with(['CREATE TABLE test'])
             ->willReturn('up');
 
-        $this->migrationSqlGenerator->expects($this->at(1))
+        $this->migrationSqlGenerator->expects(self::at(1))
             ->method('generate')
             ->with(['DROP TABLE test'])
             ->willReturn('down');
 
-        $this->migrationGenerator->expects($this->once())
+        $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
             ->with('1234', 'up', 'down')
             ->willReturn('/path/to/migration.php');

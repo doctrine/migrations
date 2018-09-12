@@ -30,7 +30,7 @@ class ConsoleRunnerTest extends TestCase
 
         ConsoleRunnerStub::$application = $application;
 
-        $application->expects($this->once())
+        $application->expects(self::once())
             ->method('run');
 
         ConsoleRunnerStub::run($helperSet, []);

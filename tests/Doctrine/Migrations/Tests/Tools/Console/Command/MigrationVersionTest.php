@@ -33,9 +33,9 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->setMigrationsDirectory(sys_get_temp_dir());
 
         $this->command
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMigrationConfiguration')
-            ->will($this->returnValue($this->configuration));
+            ->will(self::returnValue($this->configuration));
     }
 
     /**
