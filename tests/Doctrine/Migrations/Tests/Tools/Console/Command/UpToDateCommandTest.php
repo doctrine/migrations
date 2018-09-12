@@ -7,13 +7,14 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpToDateCommandTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
     /** @var UpToDateCommand */

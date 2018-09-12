@@ -9,6 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -16,13 +17,16 @@ use function getcwd;
 
 class MigrateCommandTest extends TestCase
 {
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
-    /** @var MigrateCommand */
+    /** @var Configuration|MockObject */
+    private $configuration;
+
+    /** @var MigrateCommand|MockObject */
     private $migrateCommand;
 
     public function testExecuteCouldNotResolveAlias() : void

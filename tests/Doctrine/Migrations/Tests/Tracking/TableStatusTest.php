@@ -8,14 +8,15 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableStatus;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableStatusTest extends TestCase
 {
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
     /** @var TableStatus */
@@ -58,7 +59,7 @@ class TableStatusTest extends TestCase
 
     public function testSetUpToDate() : void
     {
-        $this->migrationTableStatus->setUpTodate(true);
+        $this->migrationTableStatus->setUpToDate(true);
 
         self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
@@ -93,7 +94,7 @@ class TableStatusTest extends TestCase
             ->with('executed_at')
             ->willReturn(true);
 
-        self::assertTrue($this->migrationTableStatus->isUpTodate());
+        self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
 
     public function testIsUpToDateFalse() : void
@@ -126,7 +127,7 @@ class TableStatusTest extends TestCase
             ->with('executed_at')
             ->willReturn(false);
 
-        self::assertFalse($this->migrationTableStatus->isUpTodate());
+        self::assertFalse($this->migrationTableStatus->isUpToDate());
     }
 
     protected function setUp() : void

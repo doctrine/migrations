@@ -10,6 +10,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,19 +18,19 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class DumpSchemaCommandTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
-    /** @var SchemaDumper */
+    /** @var SchemaDumper|MockObject */
     private $schemaDumper;
 
-    /** @var GenerateCommand */
+    /** @var DumpSchemaCommand|MockObject */
     private $dumpSchemaCommand;
 
     public function testExecuteThrowsRuntimeException() : void

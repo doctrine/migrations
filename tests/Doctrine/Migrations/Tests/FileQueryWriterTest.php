@@ -92,7 +92,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
         $outputWriter->expects(self::atLeastOnce())
             ->method('write')
-            ->with($this->isType('string'));
+            ->with(self::isType('string'));
 
         return [
             [__DIR__, Direction::UP, ['1' => ['SHOW DATABASES']], $outputWriter],

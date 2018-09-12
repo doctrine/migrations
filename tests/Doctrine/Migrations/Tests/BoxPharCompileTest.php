@@ -20,7 +20,7 @@ class BoxPharCompileTest extends TestCase
         $boxPharPath = __DIR__ . '/../../../../box.phar';
 
         if (! file_exists($boxPharPath)) {
-            $this->markTestSkipped('Download box with the ./download-box.sh shell script.');
+            self::markTestSkipped('Download box with the ./download-box.sh shell script.');
         }
 
         $boxPharPath = realpath($boxPharPath);

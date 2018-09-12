@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Tests\Version;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Tests\VersionExecutor;
 use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
@@ -18,7 +17,7 @@ final class FactoryTest extends TestCase
     /** @var Configuration */
     private $configuration;
 
-    /** @var VersionExecutor */
+    /** @var ExecutorInterface */
     private $versionExecutor;
 
     /** @var Factory */

@@ -8,11 +8,12 @@ use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
     /** @var MigrationPlanCalculator */

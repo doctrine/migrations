@@ -11,21 +11,22 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\SchemaDumper;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class SchemaDumperTest extends TestCase
 {
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var Generator */
+    /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var SqlGenerator */
+    /** @var SqlGenerator|MockObject */
     private $migrationSqlGenerator;
 
     /** @var SchemaDumper */

@@ -17,7 +17,7 @@ class AbstractFileConfigurationTest extends TestCase
     /** @var Connection */
     private $connection;
 
-    /** @var AbstractFileConfiguration */
+    /** @var TestAbstractFileConfiguration */
     private $fileConfiguration;
 
     public function testLoadChecksCurrentWorkingDirectory() : void

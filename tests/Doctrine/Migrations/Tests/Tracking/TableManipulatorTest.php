@@ -11,23 +11,24 @@ use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableManipulator;
 use Doctrine\Migrations\Tracking\TableStatus;
 use Doctrine\Migrations\Tracking\TableUpdater;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableManipulatorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
-    /** @var TableStatus */
+    /** @var TableStatus|MockObject */
     private $migrationTableStatus;
 
-    /** @var TableUpdater */
+    /** @var TableUpdater|MockObject */
     private $migrationTableUpdater;
 
     /** @var TableManipulator */

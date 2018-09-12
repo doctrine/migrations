@@ -524,7 +524,7 @@ class FunctionalTest extends MigrationTestCase
     }
 
     /**
-     * @return Connection|Configuration[]
+     * @return object[] [Connection, Configuration]
      */
     private static function fileConnectionAndConfig() : array
     {

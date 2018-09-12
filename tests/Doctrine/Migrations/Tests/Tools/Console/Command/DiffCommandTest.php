@@ -7,19 +7,20 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class DiffCommandTest extends TestCase
 {
-    /** @var DiffGenerator */
+    /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
 
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DiffCommand */
+    /** @var DiffCommand|MockObject */
     private $diffCommand;
 
     public function testExecute() : void

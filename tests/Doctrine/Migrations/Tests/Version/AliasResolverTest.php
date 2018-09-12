@@ -6,11 +6,12 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class AliasResolverTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
     /** @var AliasResolver */
@@ -35,7 +36,7 @@ final class AliasResolverTest extends TestCase
                 ->method($expectedMethod)
                 ->willReturn($expectedVersion);
 
-            if ($expectedArgument) {
+            if ($expectedArgument !== null) {
                 $expectation->with($expectedArgument);
             }
         }

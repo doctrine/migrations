@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function class_exists;
 use function file_get_contents;
@@ -17,7 +18,7 @@ use function unlink;
 
 final class GeneratorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
     /** @var Generator */
@@ -98,7 +99,7 @@ final class GeneratorTest extends TestCase
 
         $this->migrationGenerator->generateMigration('1234');
 
-        unlink($path);
+        unlink($customTemplate);
     }
 
     protected function setUp() : void

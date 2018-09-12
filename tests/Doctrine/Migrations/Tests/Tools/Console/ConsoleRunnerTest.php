@@ -9,6 +9,7 @@ use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
@@ -128,7 +129,9 @@ class ConsoleRunnerStub extends ConsoleRunner
     /** @var Application|null */
     public static $application;
 
-    /** @param AbstractCommand[] $commands */
+    /**
+     * @param Command[] $commands
+     */
     public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
     {
         return static::$application;

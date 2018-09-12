@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -18,7 +18,7 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\Constraint\RegularExpression;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
@@ -134,7 +134,7 @@ class MigratorTest extends MigrationTestCase
      */
     public function testGetSql(?string $to) : void
     {
-        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->disableOriginalConstructor()
             ->setMethods(['migrate'])
@@ -152,7 +152,7 @@ class MigratorTest extends MigrationTestCase
         self::assertSame($expected, $result);
     }
 
-    /** @return string|null[] */
+    /** @return string[]|null[] */
     public function getSqlProvider() : array
     {
         return [
@@ -207,10 +207,10 @@ class MigratorTest extends MigrationTestCase
 
         if ($to === null) { // this will always just test the "up" direction
             $config->method('getLatestVersion')
-                ->willReturn($from + 1);
+                ->willReturn((int) $from + 1);
         }
 
-        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
