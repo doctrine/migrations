@@ -159,8 +159,8 @@ class ConfigurationTest extends MigrationTestCase
 
         $config->registerMigration('1234', Version1Test::class);
 
-        $this->expectException(
-            MigrationException::class,
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage(
             'Migration version 1234 already registered with class Doctrine\Migrations\Version'
         );
         $config->registerMigration('1234', Version1Test::class);
@@ -455,7 +455,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @return string|null[][]
+     * @return string[][]|null[][]
      */
     public function validCustomTemplates() : array
     {

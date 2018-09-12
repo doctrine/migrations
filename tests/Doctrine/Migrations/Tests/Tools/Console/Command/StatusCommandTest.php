@@ -12,22 +12,23 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class StatusCommandTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
-    /** @var MigrationStatusInfosHelper */
+    /** @var MigrationStatusInfosHelper|MockObject */
     private $migrationStatusInfosHelper;
 
     /** @var StatusCommand */

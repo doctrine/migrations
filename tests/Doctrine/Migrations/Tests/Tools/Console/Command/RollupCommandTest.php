@@ -8,19 +8,20 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Rollup;
 use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class RollupCommandTest extends TestCase
 {
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var Rollup */
+    /** @var Rollup|MockObject */
     private $rollup;
 
-    /** @var RollupCommand */
+    /** @var RollupCommand|MockObject */
     private $rollupCommand;
 
     public function testExecute() : void

@@ -9,18 +9,19 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Rollup;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
 class RollupTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
     /** @var Rollup */
@@ -79,7 +80,7 @@ class RollupTest extends TestCase
         $version1->expects(self::once())
             ->method('markMigrated');
 
-        $this->assertSame($version1, $this->rollup->rollup());
+        self::assertSame($version1, $this->rollup->rollup());
     }
 
     protected function setUp() : void

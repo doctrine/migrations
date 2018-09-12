@@ -11,20 +11,21 @@ use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MigrationRepositoryTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var MigrationFinder */
+    /** @var MigrationFinder|MockObject */
     private $migrationFinder;
 
-    /** @var Factory */
+    /** @var Factory|MockObject */
     private $versionFactory;
 
     /** @var MigrationRepository */

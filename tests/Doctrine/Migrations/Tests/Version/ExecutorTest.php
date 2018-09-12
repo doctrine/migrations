@@ -19,27 +19,28 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class ExecutorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var SchemaDiffProviderInterface */
+    /** @var SchemaDiffProviderInterface|MockObject */
     private $schemaDiffProvider;
 
-    /** @var OutputWriter */
+    /** @var OutputWriter|MockObject */
     private $outputWriter;
 
-    /** @var ParameterFormatter */
+    /** @var ParameterFormatter|MockObject */
     private $parameterFormatter;
 
-    /** @var Stopwatch */
+    /** @var Stopwatch|MockObject */
     private $stopwatch;
 
     /** @var Executor */
@@ -48,7 +49,7 @@ class ExecutorTest extends TestCase
     /** @var Version */
     private $version;
 
-    /** @var AbstractMigration */
+    /** @var VersionExecutorTestMigration */
     private $migration;
 
     public function testAddSql() : void

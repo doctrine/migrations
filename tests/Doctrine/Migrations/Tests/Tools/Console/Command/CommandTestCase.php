@@ -54,7 +54,7 @@ abstract class CommandTestCase extends MigrationTestCase
      * @param mixed[] $args
      * @param mixed[] $options
      *
-     * @return CommandTester|int[]
+     * @return mixed[] [CommandTester, int]
      */
     protected function executeCommand(array $args, array $options = []) : array
     {

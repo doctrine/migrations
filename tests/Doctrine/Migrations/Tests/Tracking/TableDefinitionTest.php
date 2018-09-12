@@ -7,11 +7,12 @@ namespace Doctrine\Migrations\Tests\Tracking;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Migrations\Tracking\TableDefinition;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableDefinitionTest extends TestCase
 {
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
     /** @var TableDefinition */

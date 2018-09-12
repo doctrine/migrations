@@ -9,10 +9,11 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Tests\MigrationTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $conn;
 
     /** @var AutoCommitListener */

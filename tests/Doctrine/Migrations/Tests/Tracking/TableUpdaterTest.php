@@ -14,24 +14,25 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableUpdater;
 use Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class TableUpdaterTest extends TestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var TableUpdater */
+    /** @var TableUpdater|MockObject */
     private $migrationTableUpdater;
 
     public function testUpdateMigrationTable() : void

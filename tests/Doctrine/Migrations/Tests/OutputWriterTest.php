@@ -19,7 +19,9 @@ final class OutputWriterTest extends TestCase
     {
         $outputWriter = new OutputWriter();
 
-        self::assertNull($outputWriter->write('test message'));
+        $outputWriter->write('test message');
+
+        self::markTestIncomplete('Does not perform any real assertion.');
     }
 
     public function testWrite() : void

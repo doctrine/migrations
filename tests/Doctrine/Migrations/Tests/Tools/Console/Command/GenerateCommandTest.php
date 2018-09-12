@@ -8,22 +8,23 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class GenerateCommandTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var Generator */
+    /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var GenerateCommand */
+    /** @var GenerateCommand|MockObject */
     private $generateCommand;
 
     public function testExecute() : void

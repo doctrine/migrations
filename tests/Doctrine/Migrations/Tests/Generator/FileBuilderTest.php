@@ -8,11 +8,12 @@ use DateTime;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Version\Direction;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FileBuilderTest extends TestCase
 {
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
     /** @var FileBuilder */

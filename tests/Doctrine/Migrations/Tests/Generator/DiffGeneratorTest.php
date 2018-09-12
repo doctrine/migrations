@@ -13,26 +13,27 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class DiffGeneratorTest extends TestCase
 {
-    /** @var DBALConfiguration */
+    /** @var DBALConfiguration|MockObject */
     private $dbalConfiguration;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var SchemaProviderInterface */
+    /** @var SchemaProviderInterface|MockObject */
     private $schemaProvider;
 
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var Generator */
+    /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var SqlGenerator */
+    /** @var SqlGenerator|MockObject */
     private $migrationSqlGenerator;
 
     /** @var DiffGenerator */
@@ -122,16 +123,13 @@ class DiffGeneratorTest extends TestCase
         $this->platform               = $this->createMock(AbstractPlatform::class);
         $this->migrationGenerator     = $this->createMock(Generator::class);
         $this->migrationSqlGenerator  = $this->createMock(SqlGenerator::class);
-        $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
-
         $this->migrationDiffGenerator = new DiffGenerator(
             $this->dbalConfiguration,
             $this->schemaManager,
             $this->schemaProvider,
             $this->platform,
             $this->migrationGenerator,
-            $this->migrationSqlGenerator,
-            $this->migrationDiffGenerator
+            $this->migrationSqlGenerator
         );
     }
 }

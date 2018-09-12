@@ -76,7 +76,7 @@ abstract class MigrationTestCase extends TestCase
 
     protected function getOutputWriter() : OutputWriter
     {
-        if (! $this->outputWriter) {
+        if ($this->outputWriter === null) {
             $this->output       = $this->getOutputStream();
             $output             = $this->output;
             $this->outputWriter = new OutputWriter(static function ($message) use ($output) {

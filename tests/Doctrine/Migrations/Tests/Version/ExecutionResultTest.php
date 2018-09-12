@@ -10,6 +10,9 @@ use PHPUnit\Framework\TestCase;
 
 class ExecutionResultTest extends TestCase
 {
+    /** @var ExecutionResult */
+    private $versionExecutionResult;
+
     public function testHasSql() : void
     {
         self::assertTrue($this->versionExecutionResult->hasSql());

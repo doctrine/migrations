@@ -9,18 +9,22 @@ use Doctrine\DBAL\Driver;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class MigrationStatusInfosHelperTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var Driver */
+    /** @var Driver|MockObject */
     private $driver;
+
+    /** @var MigrationRepository|MockObject */
+    private $migrationRepository;
 
     /** @var MigrationStatusInfosHelper */
     private $migrationStatusInfosHelper;
