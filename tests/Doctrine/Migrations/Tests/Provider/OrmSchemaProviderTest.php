@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Provider;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\ORM\Configuration;
@@ -35,7 +34,6 @@ class OrmSchemaProviderTest extends MigrationTestCase
     public function testCreateSchemaFetchesMetadataFromEntityManager() : void
     {
         $schema = $this->ormProvider->createSchema();
-        self::assertInstanceOf(Schema::class, $schema);
         self::assertTrue($schema->hasTable('sample_entity'));
         $table = $schema->getTable('sample_entity');
         self::assertTrue($table->hasColumn('id'));

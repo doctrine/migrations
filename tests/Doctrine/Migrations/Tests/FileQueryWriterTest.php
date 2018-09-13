@@ -85,7 +85,7 @@ final class FileQueryWriterTest extends MigrationTestCase
         }
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function writeProvider() : array
     {
         $outputWriter = $this->createMock(OutputWriter::class);

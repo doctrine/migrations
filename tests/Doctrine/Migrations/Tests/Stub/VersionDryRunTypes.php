@@ -9,15 +9,15 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionDryRunTypes extends AbstractMigration
 {
-    /** @var int[] */
+    /** @var mixed[] */
     private $value;
 
     /** @var int[] */
     private $type;
 
     /**
-     * @param int[] $value
-     * @param int[] $type
+     * @param mixed[] $value
+     * @param int[]   $type
      */
     public function setParam(array $value, array $type) : void
     {

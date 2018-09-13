@@ -140,7 +140,7 @@ class MigratorTest extends MigrationTestCase
             ->setMethods(['migrate'])
             ->getMock();
 
-        $expected = ['something'];
+        $expected = [['something']];
 
         $migration->expects(self::once())
             ->method('migrate')
@@ -152,7 +152,7 @@ class MigratorTest extends MigrationTestCase
         self::assertSame($expected, $result);
     }
 
-    /** @return string[]|null[] */
+    /** @return mixed[][] */
     public function getSqlProvider() : array
     {
         return [
@@ -225,7 +225,7 @@ class MigratorTest extends MigrationTestCase
     }
 
     /**
-     * @return string[][]
+     * @return mixed[][]
      */
     public function writeSqlFileProvider() : array
     {

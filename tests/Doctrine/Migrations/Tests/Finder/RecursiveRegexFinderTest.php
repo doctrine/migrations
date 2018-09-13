@@ -56,7 +56,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             self::assertArrayHasKey($version, $migrations);
             self::assertSame($namespace, $migrations[$version]);
         }
-        $migrationsForTestSort = (array) $migrations;
+        $migrationsForTestSort = $migrations;
 
         asort($migrationsForTestSort);
 

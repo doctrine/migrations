@@ -71,9 +71,4 @@ class MigrationDirectoryHelper
 
         mkdir($dir, 0755, true);
     }
-
-    public function getName() : string
-    {
-        return 'MigrationDirectory';
-    }
 }

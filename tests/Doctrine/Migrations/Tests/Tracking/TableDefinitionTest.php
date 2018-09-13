@@ -76,7 +76,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertSame(true, $table->getOption('test_option'));
+        self::assertTrue($table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
@@ -102,7 +102,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertSame(true, $table->getOption('test_option'));
+        self::assertTrue($table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());

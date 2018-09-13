@@ -16,9 +16,8 @@ class MigrationStatusTest extends MigrationTestCase
     /** @var string */
     private $migrationDirectory;
 
-    public function __construct()
+    protected function setUp() : void
     {
-        parent::__construct(null, [], null);
         $this->migrationDirectory = __DIR__ . '/../../../Stub/migration-empty-folder';
     }
 

@@ -10,7 +10,7 @@ use Doctrine\Migrations\Events;
 
 final class EventVerificationListener implements EventSubscriber
 {
-    /** @var EventArgs[] */
+    /** @var EventArgs[][] */
     public $events = [];
 
     /** @return string[] */

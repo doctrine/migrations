@@ -9,7 +9,6 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Factory;
-use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
 final class FactoryTest extends TestCase
@@ -30,7 +29,6 @@ final class FactoryTest extends TestCase
             VersionFactoryTestMigration::class
         );
 
-        self::assertInstanceOf(Version::class, $version);
         self::assertSame($this->configuration, $version->getConfiguration());
         self::assertInstanceOf(VersionFactoryTestMigration::class, $version->getMigration());
     }

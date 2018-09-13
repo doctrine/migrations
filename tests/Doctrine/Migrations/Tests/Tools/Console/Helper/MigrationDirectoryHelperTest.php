@@ -12,13 +12,6 @@ use function date;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-    public function testMigrationDirectoryHelper() : void
-    {
-        $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
-
-        self::assertInstanceOf(MigrationDirectoryHelper::class, $mirationDirectoryHelper);
-    }
-
     public function testMigrationDirectoryHelperReturnConfiguredDir() : void
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());

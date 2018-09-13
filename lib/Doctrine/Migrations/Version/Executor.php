@@ -26,7 +26,7 @@ use function ucfirst;
  *
  * @internal
  */
-class Executor implements ExecutorInterface
+final class Executor implements ExecutorInterface
 {
     /** @var Configuration */
     private $configuration;

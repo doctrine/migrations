@@ -10,6 +10,7 @@ parameters:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Functional/_files
     autoload_files:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
+        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/realpath.php
     ignoreErrors:
         # Ignore proxy manager magic
         - '~ProxyManager\\Proxy\\VirtualProxyInterface~'

@@ -10,13 +10,13 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionOutputSqlWithParamAndType extends AbstractMigration
 {
-    /** @var int[] */
+    /** @var mixed[] */
     private $param = ['param1' => 1];
 
     /** @var int[] */
     private $type = [Connection::PARAM_STR_ARRAY];
 
-    /** @param int[] $param */
+    /** @param mixed[] $param */
     public function setParam(array $param) : void
     {
         $this->param = $param;

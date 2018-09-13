@@ -156,8 +156,13 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
 
     public function testLoadMigrationsList() : void
     {
-        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list'));
-        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration('migrations_list2'));
+        $configuration1 = $this->loadConfiguration('migrations_list');
+
+        self::assertContains('migrations_list', $configuration1->getFile());
+
+        $configuration2 = $this->loadConfiguration('migrations_list2');
+
+        self::assertContains('migrations_list2', $configuration2->getFile());
     }
 
     /**
@@ -165,10 +170,12 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
      */
     public function testThatTheOrderOfConfigKeysDoesNotMatter(string $file) : void
     {
-        self::assertInstanceOf(AbstractFileConfiguration::class, $this->loadConfiguration($file));
+        $configuration = $this->loadConfiguration($file);
+
+        self::assertContains($file, $configuration->getFile());
     }
 
-    /** @return string[] */
+    /** @return string[][] */
     public function getConfigWithKeysInVariousOrder() : array
     {
         return [
