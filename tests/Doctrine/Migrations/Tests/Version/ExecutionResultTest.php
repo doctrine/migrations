@@ -81,10 +81,13 @@ class ExecutionResultTest extends TestCase
         self::assertTrue($this->versionExecutionResult->hasError());
     }
 
-    public function testException() : void
+    public function testExceptionNull() : void
     {
         self::assertNull($this->versionExecutionResult->getException());
+    }
 
+    public function testException() : void
+    {
         $exception = new InvalidArgumentException();
 
         $this->versionExecutionResult->setException($exception);

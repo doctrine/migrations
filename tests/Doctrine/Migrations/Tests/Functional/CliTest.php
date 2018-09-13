@@ -24,6 +24,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use const DIRECTORY_SEPARATOR;
 use function array_merge;
+use function assert;
 use function count;
 use function file_exists;
 use function file_get_contents;
@@ -326,7 +327,15 @@ class CliTest extends MigrationTestCase
         $versionClassName      = reset($versions);
         $versionClassReflected = new ReflectionClass($versionClassName);
 
-        return file_get_contents($versionClassReflected->getFileName());
+        $fileName = $versionClassReflected->getFileName();
+
+        assert($fileName !== false);
+
+        $contents = file_get_contents($fileName);
+
+        assert($contents !== false);
+
+        return $contents;
     }
 }
 

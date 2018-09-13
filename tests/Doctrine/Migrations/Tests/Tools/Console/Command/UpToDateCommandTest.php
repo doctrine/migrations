@@ -55,7 +55,7 @@ class UpToDateCommandTest extends TestCase
     }
 
     /**
-     * @return string[][]
+     * @return mixed[][]
      */
     public function dataIsUpToDate() : array
     {

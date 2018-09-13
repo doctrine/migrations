@@ -19,14 +19,12 @@ use function array_keys;
 use function array_map;
 use function array_search;
 use function array_unshift;
-use function assert;
 use function class_exists;
 use function count;
 use function end;
 use function get_class;
 use function implode;
 use function is_array;
-use function is_int;
 use function ksort;
 use function sprintf;
 use function substr;
@@ -345,14 +343,18 @@ class MigrationRepository
 
         $offset = array_search($version, $versions, true);
 
-        assert($offset === false || is_int($offset));
+        if ($offset === false) {
+            return null;
+        }
 
-        if ($offset === false || ! isset($versions[$offset + $delta])) {
+        $relativeVersion = ((int) $offset) + $delta;
+
+        if (! isset($versions[$relativeVersion])) {
             // Unknown version or delta out of bounds.
             return null;
         }
 
-        return $versions[$offset + $delta];
+        return $versions[$relativeVersion];
     }
 
     public function getDeltaVersion(string $delta) : ?string

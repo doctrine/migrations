@@ -16,7 +16,6 @@ use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -120,7 +119,6 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
         self::assertSame(['SELECT 1', 'SELECT 2'], $versionExecutionResult->getSql());
         self::assertSame([[1], [2]], $versionExecutionResult->getParams());
         self::assertSame([[3], [4]], $versionExecutionResult->getTypes());
@@ -185,7 +183,6 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
         self::assertSame(['SELECT 3', 'SELECT 4'], $versionExecutionResult->getSql());
         self::assertSame([[5], [6]], $versionExecutionResult->getParams());
         self::assertSame([[7], [8]], $versionExecutionResult->getTypes());

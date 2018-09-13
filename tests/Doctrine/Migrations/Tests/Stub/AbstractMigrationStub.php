@@ -18,7 +18,7 @@ class AbstractMigrationStub extends AbstractMigration
     {
     }
 
-    public function exposedWrite(?string $message = null) : void
+    public function exposedWrite(string $message) : void
     {
         $this->write($message);
     }

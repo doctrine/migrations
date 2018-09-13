@@ -31,9 +31,11 @@ use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use function assert;
 use function file_exists;
 use function get_class_methods;
 use function in_array;
+use function is_array;
 use function sprintf;
 use function strtotime;
 use function unlink;
@@ -363,7 +365,7 @@ class FunctionalTest extends MigrationTestCase
         $version = $this->createTestVersion($this->config, '1', MigrationModifySchemaInPreAndPost::class);
 
         self::assertFalse($this->config->hasVersionMigrated($version));
-        $queries = $version->execute('up');
+        $queries = $version->execute('up')->getSql();
 
         $schema = $this->connection->getSchemaManager()->createSchema();
         self::assertTrue($schema->hasTable('foo'), 'The table foo is not present');
@@ -375,7 +377,7 @@ class FunctionalTest extends MigrationTestCase
             self::assertNotContains('bar2', $query);
         }
 
-        $queries = $version->execute('down');
+        $queries = $version->execute('down')->getSql();
 
         $schema = $this->connection->getSchemaManager()->createSchema();
         self::assertFalse($schema->hasTable('foo'), 'The table foo is present');
@@ -389,7 +391,7 @@ class FunctionalTest extends MigrationTestCase
     }
 
     /**
-     * @return string[][]
+     * @return mixed[][]
      */
     public function provideTestMigrationNames() : array
     {
@@ -516,6 +518,8 @@ class FunctionalTest extends MigrationTestCase
 
         $row = $this->config->getConnection()
             ->fetchAssoc('SELECT * FROM test_migrations_table');
+
+        assert(is_array($row));
 
         self::assertSame('1', $row['current_version']);
         self::assertTrue(isset($row['executed_at']));

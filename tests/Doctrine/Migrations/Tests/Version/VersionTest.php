@@ -164,7 +164,7 @@ class VersionTest extends MigrationTestCase
         self::assertNotEmpty($version->getExecutionState());
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function stateProvider() : array
     {
         return [
@@ -242,7 +242,7 @@ class VersionTest extends MigrationTestCase
         self::assertTrue($version->writeSqlFile($path, $direction));
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function writeSqlFileProvider() : array
     {
         return [
@@ -382,7 +382,7 @@ class VersionTest extends MigrationTestCase
         }
     }
 
-    /** @return string[] */
+    /** @return string[][] */
     public function sqlWriteProvider() : array
     {
         return [
@@ -443,7 +443,6 @@ class VersionTest extends MigrationTestCase
         /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
 
-        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
         self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
@@ -626,7 +625,12 @@ class VersionTest extends MigrationTestCase
         $now = (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'));
 
         self::assertSame($now->format('Y-m-d H:i'), date('Y-m-d H:i', strtotime($versionData['executed_at'])));
-        self::assertSame($timeZone, $version->getExecutedAt()->getTimezone()->getName());
+
+        $executedAt = $version->getExecutedAt();
+
+        self::assertNotNull($executedAt);
+
+        self::assertSame($timeZone, $executedAt->getTimezone()->getName());
     }
 
     /**

@@ -9,14 +9,14 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionOutputSqlWithParam extends AbstractMigration
 {
-    /** @var int[] */
+    /** @var mixed[] */
     private $param = [
         'param1' => 1,
         'param2' => 2,
         'param3' => 3,
     ];
 
-    /** @param int[] $param */
+    /** @param mixed[] $param */
     public function setParam(array $param) : void
     {
         $this->param = $param;

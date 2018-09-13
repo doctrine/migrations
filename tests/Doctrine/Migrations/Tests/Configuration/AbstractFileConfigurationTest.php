@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use PHPUnit\Framework\TestCase;
+use function assert;
 use function basename;
 use function chdir;
 use function getcwd;
@@ -23,6 +24,8 @@ class AbstractFileConfigurationTest extends TestCase
     public function testLoadChecksCurrentWorkingDirectory() : void
     {
         $cwd = getcwd();
+
+        assert($cwd !== false);
 
         chdir(__DIR__);
 
