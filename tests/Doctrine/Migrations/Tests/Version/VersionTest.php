@@ -180,18 +180,15 @@ class VersionTest extends MigrationTestCase
     {
         $configuration = $this->getSqliteConfiguration();
 
-        $version = $this->createTestVersion(
-            $configuration,
-            '003',
-            VersionDummy::class
-        );
+        $versionExecutor = $this->createMock(Executor::class);
 
-        $version->addSql('SELECT * FROM foo');
-        $version->addSql('SELECT * FROM foo');
-        $version->addSql('SELECT * FROM foo WHERE id = ?', [1]);
+        $versionExecutor->expects(self::once())
+            ->method('addSql')
+            ->with('SELECT * FROM foo WHERE id = ?', [1], [PDO::PARAM_INT]);
+
+        $version = new Version($configuration, '003', VersionDummy::class, $versionExecutor);
+
         $version->addSql('SELECT * FROM foo WHERE id = ?', [1], [PDO::PARAM_INT]);
-
-        self::markTestIncomplete('Does not perform any real assertion.');
     }
 
     /**
