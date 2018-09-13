@@ -21,7 +21,7 @@ final class OutputWriterTest extends TestCase
 
         $outputWriter->write('test message');
 
-        self::markTestIncomplete('Does not perform any real assertion.');
+        self::assertSame('test message', $outputWriter->getLastMessage());
     }
 
     public function testWrite() : void
