@@ -37,6 +37,7 @@ use Doctrine\Migrations\Version\Version;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PDO;
+use PHPUnit_Framework_MockObject_MockObject;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -184,9 +185,9 @@ class VersionTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider writeSqlFileProvider
-     *
      * @param string[] $getSqlReturn
+     *
+     * @dataProvider writeSqlFileProvider
      */
     public function testWriteSqlFile(string $path, string $direction, array $getSqlReturn) : void
     {
@@ -199,7 +200,7 @@ class VersionTest extends MigrationTestCase
         $outputWriter->expects($this->atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $config */
+        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $config */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods(['getConnection', 'getOutputWriter', 'getQueryWriter'])
@@ -214,7 +215,7 @@ class VersionTest extends MigrationTestCase
         $config->method('getQueryWriter')
             ->willReturn($queryWriter);
 
-        /** @var Version|\PHPUnit_Framework_MockObject_MockObject $version */
+        /** @var Version|PHPUnit_Framework_MockObject_MockObject $version */
         $version = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
@@ -392,7 +393,7 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods([
@@ -415,7 +416,7 @@ class VersionTest extends MigrationTestCase
         $config->method('getQuotedMigrationsExecutedAtColumnName')
             ->willReturn('executed_at');
 
-        /** @var Version|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Version|PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
@@ -443,7 +444,7 @@ class VersionTest extends MigrationTestCase
     {
         $messages = [];
 
-        $ow = new OutputWriter(function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
 
@@ -467,7 +468,7 @@ class VersionTest extends MigrationTestCase
     {
         $messages = [];
 
-        $ow = new OutputWriter(function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
 
@@ -492,7 +493,7 @@ class VersionTest extends MigrationTestCase
     {
         $messages = [];
 
-        $ow = new OutputWriter(function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
 
@@ -527,9 +528,10 @@ class VersionTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider dryRunTypes
      * @param mixed[] $value
      * @param mixed[] $type
+     *
+     * @dataProvider dryRunTypes
      */
     public function testDryRunWithParametersOfComplexTypesCorrectFormatsParameters(
         array $value,
@@ -538,7 +540,7 @@ class VersionTest extends MigrationTestCase
     ) : void {
         $messages = [];
 
-        $ow = new OutputWriter(function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
 
@@ -565,7 +567,7 @@ class VersionTest extends MigrationTestCase
     {
         $messages = [];
 
-        $ow = new OutputWriter(function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
             $messages[] = trim($msg);
         });
 

@@ -14,9 +14,9 @@ use Doctrine\DBAL\Schema\Schema;
  * so that you can manipulate the Schema object. Your manipulated Schema object is then compared to the original Schema
  * object to produce the SQL statements that need to be executed.
  *
- * @see Doctrine\Migrations\Version\Executor
- *
  * @internal
+ *
+ * @see Doctrine\Migrations\Version\Executor
  */
 class SchemaDiffProvider implements SchemaDiffProviderInterface
 {

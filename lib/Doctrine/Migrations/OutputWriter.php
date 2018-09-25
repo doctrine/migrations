@@ -15,7 +15,7 @@ class OutputWriter
     public function __construct(?callable $callback = null)
     {
         if ($callback === null) {
-            $callback = function ($message) : void {
+            $callback = static function ($message) : void {
             };
         }
 

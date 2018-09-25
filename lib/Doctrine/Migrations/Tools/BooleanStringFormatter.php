@@ -10,9 +10,9 @@ use function strtolower;
  * The BooleanStringFormatter class is responsible for formatting a string boolean representation to a PHP boolean value.
  * It is used in the XmlConfiguration class to convert the string XML boolean value to a PHP boolean value.
  *
- * @see Doctrine\Migrations\Configuration\XmlConfiguration
- *
  * @internal
+ *
+ * @see Doctrine\Migrations\Configuration\XmlConfiguration
  */
 class BooleanStringFormatter
 {

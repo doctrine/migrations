@@ -22,7 +22,6 @@ use function strcasecmp;
  */
 abstract class AbstractFileConfiguration extends Configuration
 {
-    /** @var array */
     private const ALLOWED_CONFIGURATION_KEYS = [
         'migrations_namespace',
         'table_name',
@@ -111,7 +110,7 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         $path = realpath(dirname($file) . '/' . $input);
 
-        return ($path !== false) ? $path : $input;
+        return $path !== false ? $path : $input;
     }
 
     /**

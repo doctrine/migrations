@@ -25,7 +25,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     /** @var Connection */
     private $connection;
 
-    /** @var null|Configuration */
+    /** @var Configuration|null */
     private $configuration;
 
     public function __construct(

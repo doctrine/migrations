@@ -20,7 +20,7 @@ use function sprintf;
  */
 class DiffCommand extends AbstractCommand
 {
-    /** @var null|SchemaProviderInterface */
+    /** @var SchemaProviderInterface|null */
     protected $schemaProvider;
 
     public function __construct(?SchemaProviderInterface $schemaProvider = null)
@@ -72,8 +72,7 @@ EOT
                 InputOption::VALUE_OPTIONAL,
                 'Max line length of unformatted lines.',
                 120
-            )
-        ;
+            );
     }
 
     /**

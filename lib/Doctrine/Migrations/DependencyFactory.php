@@ -180,7 +180,7 @@ class DependencyFactory
 
     public function getOutputWriter() : OutputWriter
     {
-        return $this->getDependency(OutputWriter::class, function () : OutputWriter {
+        return $this->getDependency(OutputWriter::class, static function () : OutputWriter {
             return new OutputWriter();
         });
     }
@@ -203,7 +203,7 @@ class DependencyFactory
 
     public function getRecursiveRegexFinder() : RecursiveRegexFinder
     {
-        return $this->getDependency(RecursiveRegexFinder::class, function () : RecursiveRegexFinder {
+        return $this->getDependency(RecursiveRegexFinder::class, static function () : RecursiveRegexFinder {
             return new RecursiveRegexFinder();
         });
     }
@@ -249,7 +249,7 @@ class DependencyFactory
 
     public function getStopwatch() : Stopwatch
     {
-        return $this->getDependency(Stopwatch::class, function () : Stopwatch {
+        return $this->getDependency(Stopwatch::class, static function () : Stopwatch {
             $symfonyStopwatch = new SymfonyStopwatch(true);
 
             return new Stopwatch($symfonyStopwatch);

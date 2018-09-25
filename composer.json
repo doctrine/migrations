@@ -20,7 +20,7 @@
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "doctrine/coding-standard": "^4.0",
+        "doctrine/coding-standard": "^5.0",
         "doctrine/orm": "^2.6",
         "jdorn/sql-formatter": "^1.1",
         "mikey179/vfsStream": "^1.6",

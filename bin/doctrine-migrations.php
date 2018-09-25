@@ -17,7 +17,7 @@ use function getcwd;
 use function is_readable;
 use function trigger_error;
 
-(function () : void {
+(static function () : void {
     $autoloadFiles = [
         __DIR__ . '/../vendor/autoload.php',
         __DIR__ . '/../../../autoload.php',

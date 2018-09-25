@@ -101,7 +101,7 @@ EOT
         $version = $this->migrationRepository->getVersion($version);
 
         if ($path !== false) {
-            $path = $path === null ? getcwd() : $path;
+            $path = $path ?? getcwd();
 
             $version->writeSqlFile($path, $direction);
 
@@ -118,8 +118,7 @@ EOT
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries)
-        ;
+            ->setTimeAllQueries($timeAllQueries);
 
         $version->execute($direction, $migratorConfiguration);
 

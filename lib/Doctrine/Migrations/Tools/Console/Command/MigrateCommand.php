@@ -138,7 +138,7 @@ EOT
         $migrator = $this->createMigrator();
 
         if ($path !== false) {
-            $path = $path === null ? getcwd() : $path;
+            $path = $path ?? getcwd();
 
             $migrator->writeSqlFile($path, $version);
 
@@ -157,8 +157,7 @@ EOT
             ->setDryRun($dryRun)
             ->setTimeAllQueries($timeAllQueries)
             ->setNoMigrationException($allowNoMigration)
-            ->setAllOrNothing($allOrNothing)
-        ;
+            ->setAllOrNothing($allOrNothing);
 
         $migrator->migrate($version, $migratorConfiguration);
 
@@ -246,8 +245,7 @@ EOT
         if ($allOrNothing !== false) {
             return $allOrNothing !== null
                 ? (bool) $allOrNothing
-                : true
-            ;
+                : true;
         }
 
         return $this->configuration->isAllOrNothing();

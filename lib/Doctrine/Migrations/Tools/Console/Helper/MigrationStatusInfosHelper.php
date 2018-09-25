@@ -14,9 +14,9 @@ use function sprintf;
  * The MigrationStatusInfosHelper class is responsible for building the array of information used when displaying
  * the status of your migrations.
  *
- * @see Doctrine\Migrations\Tools\Console\Command\StatusCommand
- *
  * @internal
+ *
+ * @see Doctrine\Migrations\Tools\Console\Command\StatusCommand
  */
 class MigrationStatusInfosHelper
 {
@@ -42,7 +42,7 @@ class MigrationStatusInfosHelper
         $newMigrations                 = $this->migrationRepository->getNewVersions();
         $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
 
-        $infos = [
+        return [
             'Name'                              => $this->configuration->getName() ?? 'Doctrine Database Migrations',
             'Database Driver'                   => $this->configuration->getConnection()->getDriver()->getName(),
             'Database Host'                     => $this->configuration->getConnection()->getHost(),
@@ -61,8 +61,6 @@ class MigrationStatusInfosHelper
             'Available Migrations'              => count($availableMigrations),
             'New Migrations'                    => count($newMigrations),
         ];
-
-        return $infos;
     }
 
     private function getFormattedVersionAlias(string $alias) : string

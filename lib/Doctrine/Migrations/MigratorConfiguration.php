@@ -7,10 +7,10 @@ namespace Doctrine\Migrations;
 /**
  * The MigratorConfiguration class is responsible for defining the configuration for a migration.
  *
+ * @internal
+ *
  * @see Doctrine\Migrations\Migrator
  * @see Doctrine\Migrations\Version\Executor
- *
- * @internal
  */
 class MigratorConfiguration
 {

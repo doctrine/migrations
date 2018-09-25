@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tests\Provider;
 
 class SampleEntity
 {
-    /** @var null|int */
+    /** @var int|null */
     private $id;
 
     public function getId() : ?int

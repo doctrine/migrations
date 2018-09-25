@@ -53,8 +53,7 @@ EOT
                 InputOption::VALUE_OPTIONAL,
                 'Max line length of unformatted lines.',
                 120
-            )
-        ;
+            );
     }
 
     /**

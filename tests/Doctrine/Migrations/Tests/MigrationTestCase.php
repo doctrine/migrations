@@ -79,7 +79,7 @@ abstract class MigrationTestCase extends TestCase
         if (! $this->outputWriter) {
             $this->output       = $this->getOutputStream();
             $output             = $this->output;
-            $this->outputWriter = new OutputWriter(function ($message) use ($output) {
+            $this->outputWriter = new OutputWriter(static function ($message) use ($output) {
                 return $output->writeln($message);
             });
         }

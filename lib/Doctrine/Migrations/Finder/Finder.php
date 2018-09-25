@@ -84,6 +84,7 @@ abstract class Finder implements MigrationFinder
      *
      * @param string[]    $files     The set of files that were `required`
      * @param string|null $namespace If not null only classes in this namespace will be returned
+     *
      * @return ReflectionClass[] the classes in `$files`
      */
     protected function loadMigrationClasses(array $files, ?string $namespace) : array

@@ -28,10 +28,10 @@ class UpToDateCommandTest extends TestCase
     }
 
     /**
-     * @dataProvider dataIsUpToDate
-     *
      * @param Version[] $migrations
      * @param string[]  $migratedVersions
+     *
+     * @dataProvider dataIsUpToDate
      */
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode) : void
     {

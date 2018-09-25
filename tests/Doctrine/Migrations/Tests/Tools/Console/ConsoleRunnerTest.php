@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use PHPUnit\Framework\TestCase;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
 
@@ -15,7 +16,7 @@ use Symfony\Component\Console\Helper\HelperSet;
  */
 class ConsoleRunnerTest extends TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
+    /** @var PHPUnit_Framework_MockObject_MockObject|EntityManagerHelper */
     private $entityManagerHelper;
 
     /** @var Application */

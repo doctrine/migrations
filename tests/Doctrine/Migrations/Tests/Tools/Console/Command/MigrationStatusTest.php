@@ -42,6 +42,7 @@ class MigrationStatusTest extends MigrationTestCase
 
     /**
      * Asserts that one version is displayed correctly.
+     *
      * @param  string      $alias   "prev", "current", "next", "latest".
      * @param  string|null $version The version corresponding to the $alias.
      * @param  string      $label   The expected row label.
@@ -65,7 +66,7 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects($this->exactly(4))
             ->method('resolveVersionAlias')
-            ->will($this->returnCallback(function ($argAlias) use ($alias, $version) {
+            ->will($this->returnCallback(static function ($argAlias) use ($alias, $version) {
                 return $argAlias === $alias ? $version : '999';
             }));
 
