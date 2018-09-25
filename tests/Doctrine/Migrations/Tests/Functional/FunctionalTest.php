@@ -169,8 +169,7 @@ class FunctionalTest extends MigrationTestCase
         $this->config->registerMigration('3', MigrationMigrateFurther::class);
 
         $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun(true)
-        ;
+            ->setDryRun(true);
 
         $migrator = $this->createTestMigrator($this->config);
         $migrator->migrate('3', $migratorConfiguration);
@@ -342,9 +341,10 @@ class FunctionalTest extends MigrationTestCase
     }
 
     /**
+     * @see https://github.com/doctrine/migrations/issues/61
+     *
      * @param string[] $migrations
      *
-     * @see https://github.com/doctrine/migrations/issues/61
      * @group regression
      * @dataProvider provideTestMigrationNames
      */
@@ -373,7 +373,7 @@ class FunctionalTest extends MigrationTestCase
         foreach ($queries as $query) {
             self::assertNotContains('bar', $query);
             self::assertNotContains('bar2', $query);
-        };
+        }
 
         $queries = $version->execute('down');
 
@@ -385,7 +385,7 @@ class FunctionalTest extends MigrationTestCase
         foreach ($queries as $query) {
             self::assertNotContains('bar', $query);
             self::assertNotContains('bar2', $query);
-        };
+        }
     }
 
     /**
@@ -418,7 +418,7 @@ class FunctionalTest extends MigrationTestCase
         $schemaDiffProvider->method('getSqlDiffToMigrate')->willReturn([]);
         $schemaDiffProvider
             ->method('createToSchema')
-            ->willReturnCallback(function () use ($schema) {
+            ->willReturnCallback(static function () use ($schema) {
                 return $schema;
             });
 
@@ -489,12 +489,13 @@ class FunctionalTest extends MigrationTestCase
     /**
      * This uses a file path based SQL database to actually test the closing
      * of a connection with autocommit mode and re-opening it.
+     *
      * @group https://github.com/doctrine/migrations/issues/496
      */
     public function testMigrateWithConnectionWithAutoCommitOffStillPersistsChanges() : void
     {
-        $listener            = new AutoCommitListener();
-        list($conn, $config) = self::fileConnectionAndConfig();
+        $listener        = new AutoCommitListener();
+        [$conn, $config] = self::fileConnectionAndConfig();
         $config->registerMigration('1', MigrateWithDataModification::class);
         $migrator = $this->createTestMigrator($config);
         $conn->getEventManager()->addEventSubscriber($listener);

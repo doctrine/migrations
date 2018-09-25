@@ -16,7 +16,7 @@ use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
  */
 class ConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
-    /** @var null|Configuration */
+    /** @var Configuration|null */
     private $configuration;
 
     public function __construct(?Configuration $configuration = null)

@@ -85,9 +85,9 @@ class Migrator
     }
 
     /**
-     * @throws MigrationException
-     *
      * @return string[][]
+     *
+     * @throws MigrationException
      */
     public function migrate(
         ?string $to = null,

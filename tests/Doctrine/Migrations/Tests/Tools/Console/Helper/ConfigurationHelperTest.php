@@ -13,6 +13,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\ORM\Configuration as ORMConfiguration;
 use InvalidArgumentException;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -34,7 +35,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     /** @var OutputInterface */
     protected $output;
 
-    /** @var InputInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|PHPUnit_Framework_MockObject_MockObject */
     private $input;
 
     protected function setUp() : void

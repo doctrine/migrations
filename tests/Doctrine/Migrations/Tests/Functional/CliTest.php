@@ -40,7 +40,7 @@ class CliTest extends MigrationTestCase
     /** @var Application */
     private $application;
 
-    /** @var null|int */
+    /** @var int|null */
     private $lastExit;
 
     public function testDumpSchema() : void
@@ -190,6 +190,7 @@ class CliTest extends MigrationTestCase
 
     /**
      * @see https://github.com/doctrine/migrations/issues/179
+     *
      * @group regression
      */
     public function testDiffCommandSchemaFilterAreCaseSensitive() : void
@@ -298,7 +299,7 @@ class CliTest extends MigrationTestCase
     }
 
     /**
-     * @return array|\string[]
+     * @return array|string[]
      */
     private function findMigrations() : array
     {
@@ -343,7 +344,7 @@ class FirstMigration extends AbstractMigration
 
 class SampleEntity
 {
-    /** @var null|int */
+    /** @var int|null */
     private $id;
 
     public function getId() : ?int

@@ -41,7 +41,7 @@ class BoxPharCompileTest extends TestCase
 
         $process = new Process($runDoctrinePharCommand);
 
-        $process->start(function ($type, $buffer) use (&$output, &$successful) : void {
+        $process->start(static function ($type) use (&$successful) : void {
             if ($type !== 'err') {
                 return;
             }

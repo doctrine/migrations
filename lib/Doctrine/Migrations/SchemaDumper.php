@@ -16,9 +16,9 @@ use function implode;
  * The SchemaDumper class is responsible for dumping the current state of your database schema to a migration. This
  * is to be used in conjunction with the Rollup class.
  *
- * @see Doctrine\Migrations\Rollup
- *
  * @internal
+ *
+ * @see Doctrine\Migrations\Rollup
  */
 class SchemaDumper
 {

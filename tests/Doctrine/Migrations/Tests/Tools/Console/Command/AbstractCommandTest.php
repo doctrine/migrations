@@ -236,6 +236,7 @@ class AbstractCommandTest extends MigrationTestCase
 
     /**
      * @see https://github.com/doctrine/migrations/issues/228
+     *
      * @group regression
      */
     public function testInjectedConfigurationIsPreferedOverConfigFileIsCurrentWorkingDirectory() : void

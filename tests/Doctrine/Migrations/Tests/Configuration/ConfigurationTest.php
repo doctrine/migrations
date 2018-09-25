@@ -22,6 +22,7 @@ use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function array_keys;
 use function call_user_func_array;
@@ -70,10 +71,10 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider methodsThatNeedsVersionsLoaded
-     *
      * @param mixed[] $args
      * @param mixed   $expectedResult
+     *
+     * @dataProvider methodsThatNeedsVersionsLoaded
      */
     public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThem(
         string $method,
@@ -94,10 +95,10 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations
-     *
      * @param mixed[] $args
      * @param mixed   $expectedResult
+     *
+     * @dataProvider methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations
      */
     public function testVersionsTryToGetLoadedIfNotAlreadyLoadedWhenAccessingMethodThatNeedThemEvenIfSomeMigrationsAreAlreadyMigrated(
         string $method,
@@ -319,7 +320,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Connection
+     * @return PHPUnit_Framework_MockObject_MockObject|Connection
      */
     private function getConnectionMock()
     {
@@ -327,7 +328,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OutputWriter
+     * @return PHPUnit_Framework_MockObject_MockObject|OutputWriter
      */
     private function getOutputWriterMock()
     {

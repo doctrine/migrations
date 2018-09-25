@@ -22,9 +22,9 @@ use Symfony\Component\Console\Helper\HelperSet;
 /**
  * The ConsoleRunner class is used to create the Symfony Console application for the Doctrine Migrations console.
  *
- * @see bin/doctrine-migrations.php
- *
  * @internal
+ *
+ * @see bin/doctrine-migrations.php
  */
 class ConsoleRunner
 {

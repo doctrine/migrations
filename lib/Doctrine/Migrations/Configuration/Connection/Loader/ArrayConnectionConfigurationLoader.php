@@ -19,7 +19,7 @@ use function is_array;
  */
 class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
-    /** @var null|string */
+    /** @var string|null */
     private $filename;
 
     public function __construct(?string $filename)

@@ -22,9 +22,9 @@ final class FileQueryWriterTest extends MigrationTestCase
     private const DOWN_QUERY              = 'DELETE FROM %s WHERE %s = \'1\'';
 
     /**
-     * @dataProvider writeProvider
-     *
      * @param string[][] $queries
+     *
+     * @dataProvider writeProvider
      */
     public function testWrite(
         string $path,

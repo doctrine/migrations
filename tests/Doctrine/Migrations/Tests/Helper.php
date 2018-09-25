@@ -16,14 +16,13 @@ class Helper
      * Delete a directory.
      *
      * @see http://stackoverflow.com/a/8688278/1645517
-     *
      */
     public static function deleteDir(string $path) : bool
     {
         if ($path === '') {
             return false;
         }
-        $class_func = [__CLASS__, __FUNCTION__];
+        $class_func = [self::class, __FUNCTION__];
 
         return is_file($path) ?
             @unlink($path) :

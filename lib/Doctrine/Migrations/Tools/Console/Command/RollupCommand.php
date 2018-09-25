@@ -30,8 +30,7 @@ inserts the one version that exists that was created with the <info>migrations:d
 
 To dump your schema to a migration version you can use the <info>migrations:dump-schema</info> command.
 EOT
-            )
-        ;
+            );
     }
 
     public function execute(

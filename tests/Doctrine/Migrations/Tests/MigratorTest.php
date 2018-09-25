@@ -18,7 +18,9 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\Constraint\RegularExpression;
+use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
+use Throwable;
 use const DIRECTORY_SEPARATOR;
 
 require_once __DIR__ . '/realpath.php';
@@ -110,7 +112,7 @@ class MigratorTest extends MigrationTestCase
     {
         $messages = [];
 
-        $callback = function ($msg) use (&$messages) : void {
+        $callback = static function ($msg) use (&$messages) : void {
             $messages[] = $msg;
         };
 
@@ -132,7 +134,7 @@ class MigratorTest extends MigrationTestCase
      */
     public function testGetSql(?string $to) : void
     {
-        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->disableOriginalConstructor()
             ->setMethods(['migrate'])
@@ -160,9 +162,9 @@ class MigratorTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider writeSqlFileProvider
-     *
      * @param string[] $getSqlReturn
+     *
+     * @dataProvider writeSqlFileProvider
      */
     public function testWriteSqlFile(string $path, string $from, ?string $to, array $getSqlReturn) : void
     {
@@ -176,7 +178,7 @@ class MigratorTest extends MigrationTestCase
         $outputWriter->expects($this->atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
         $config = $this->createMock(Configuration::class);
 
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
@@ -208,7 +210,7 @@ class MigratorTest extends MigrationTestCase
                 ->willReturn($from + 1);
         }
 
-        /** @var Migration|\PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
@@ -240,7 +242,7 @@ class MigratorTest extends MigrationTestCase
     {
         $messages = [];
 
-        $callback = function ($msg) use (&$messages) : void {
+        $callback = static function ($msg) use (&$messages) : void {
             $messages[] = $msg;
         };
 
@@ -278,7 +280,7 @@ class MigratorTest extends MigrationTestCase
 
     public function testMigrateAllOrNothingRollback() : void
     {
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Migration up throws exception.');
 
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');

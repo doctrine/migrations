@@ -23,10 +23,10 @@ class ExecutionResult
     /** @var mixed[] */
     private $types = [];
 
-    /** @var null|float */
+    /** @var float|null */
     private $time;
 
-    /** @var null|float */
+    /** @var float|null */
     private $memory;
 
     /** @var bool */
@@ -35,7 +35,7 @@ class ExecutionResult
     /** @var bool */
     private $error = false;
 
-    /** @var null|Throwable */
+    /** @var Throwable|null */
     private $exception;
 
     /**

@@ -18,7 +18,7 @@ use function sprintf;
  */
 final class FileQueryWriter implements QueryWriter
 {
-    /** @var null|OutputWriter */
+    /** @var OutputWriter|null */
     private $outputWriter;
 
     /** @var FileBuilder */
@@ -60,8 +60,8 @@ final class FileQueryWriter implements QueryWriter
     private function buildMigrationFilePath(string $path, DateTimeInterface $now) : string
     {
         if (is_dir($path)) {
-            $path = realpath($path);
-            $path = $path . '/doctrine_migration_' . $now->format('YmdHis') . '.sql';
+            $path  = realpath($path);
+            $path .= '/doctrine_migration_' . $now->format('YmdHis') . '.sql';
         }
 
         return $path;

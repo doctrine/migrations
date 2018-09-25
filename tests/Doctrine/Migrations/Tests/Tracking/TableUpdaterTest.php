@@ -15,6 +15,7 @@ use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableUpdater;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 
 class TableUpdaterTest extends TestCase
 {
@@ -109,7 +110,7 @@ class TableUpdaterTest extends TestCase
 
     public function testUpdateMigrationTableRollback() : void
     {
-        $this->expectException(\Throwable::class);
+        $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Rolling back.');
 
         $this->migrationTable->expects($this->once())
@@ -200,7 +201,6 @@ class TableUpdaterTest extends TestCase
                 $this->platform,
             ])
             ->setMethods(['createSchema'])
-            ->getMock()
-        ;
+            ->getMock();
     }
 }

@@ -48,7 +48,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
 
         return $this->proxyFactory->createProxy(
             Schema::class,
-            function (&$wrappedObject, $proxy, $method, array $parameters, &$initializer) use ($originalSchemaManipulator) {
+            static function (&$wrappedObject, $proxy, $method, array $parameters, &$initializer) use ($originalSchemaManipulator) {
                 $initializer   = null;
                 $wrappedObject = $originalSchemaManipulator->createFromSchema();
 
@@ -64,7 +64,7 @@ class LazySchemaDiffProvider implements SchemaDiffProviderInterface
         if ($fromSchema instanceof LazyLoadingInterface && ! $fromSchema->isProxyInitialized()) {
             return $this->proxyFactory->createProxy(
                 Schema::class,
-                function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
+                static function (& $wrappedObject, $proxy, $method, array $parameters, & $initializer) use ($originalSchemaManipulator, $fromSchema) {
                     $initializer   = null;
                     $wrappedObject = $originalSchemaManipulator->createToSchema($fromSchema);
 
