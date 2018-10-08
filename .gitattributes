@@ -1,7 +1,7 @@
 build/*                 export-ignore
 /tests                  export-ignore
 /.*                     export-ignore
-box.json                export-ignore
+box.json.dist           export-ignore
 build.properties.dev    export-ignore
 build.xml               export-ignore
 /phpunit.xml.dist       export-ignore
