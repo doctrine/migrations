@@ -10,4 +10,4 @@ phpunit.xml
 /phpstan.neon
 /.phpcs-cache
 /box.phar
-
+/box.json
