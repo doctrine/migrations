@@ -57,6 +57,8 @@ commands to our `Doctrine Command Line Interface <http://doctrine-orm.readthedoc
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\GenerateCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\LatestCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\MigrateCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\DiffCommand(),
+        new \Doctrine\DBAL\Migrations\Tools\Console\Command\UpToDateCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\StatusCommand(),
         new \Doctrine\DBAL\Migrations\Tools\Console\Command\VersionCommand()
     ));
