@@ -3,7 +3,7 @@ Integrations
 
 If you want to start quickly, there are integrations for a lot of frameworks already:
 
-  * `symfony 2 <https://packagist.org/packages/doctrine/doctrine-migrations-bundle>`_
+  * `symfony ~3.4|~4.0 and older <https://packagist.org/packages/doctrine/doctrine-migrations-bundle>`_
   * `ZF2 <https://packagist.org/packages/doctrine/doctrine-orm-module>`_
   * `laravel <https://packagist.org/packages/laravel-doctrine/migrations>`_
   * `Silex <https://packagist.org/packages/kurl/silex-doctrine-migrations-provider>`_
