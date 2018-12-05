@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Generator;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function class_exists;
 use function file_get_contents;
@@ -17,7 +18,7 @@ use function unlink;
 
 final class GeneratorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
     /** @var Generator */
@@ -25,11 +26,11 @@ final class GeneratorTest extends TestCase
 
     public function testGenerateMigration() : void
     {
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsNamespace')
             ->willReturn('Test');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getMigrationsDirectory')
             ->willReturn(sys_get_temp_dir());
 
@@ -55,7 +56,7 @@ final class GeneratorTest extends TestCase
 
         file_put_contents($customTemplate, 'custom template test');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn($customTemplate);
 
@@ -73,7 +74,7 @@ final class GeneratorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn('invalid');
 
@@ -92,13 +93,13 @@ final class GeneratorTest extends TestCase
             $customTemplate
         ));
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('getCustomTemplate')
             ->willReturn($customTemplate);
 
         $this->migrationGenerator->generateMigration('1234');
 
-        unlink($path);
+        unlink($customTemplate);
     }
 
     protected function setUp() : void

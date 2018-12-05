@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use function assert;
 use function file_exists;
 use function realpath;
 use function sprintf;
@@ -20,10 +21,12 @@ class BoxPharCompileTest extends TestCase
         $boxPharPath = __DIR__ . '/../../../../box.phar';
 
         if (! file_exists($boxPharPath)) {
-            $this->markTestSkipped('Download box with the ./download-box.sh shell script.');
+            self::markTestSkipped('Download box with the ./download-box.sh shell script.');
         }
 
         $boxPharPath = realpath($boxPharPath);
+
+        assert($boxPharPath !== false);
 
         $compilePharCommand = sprintf('php %s compile -vvv', $boxPharPath);
 
@@ -31,6 +34,8 @@ class BoxPharCompileTest extends TestCase
         $process->run();
 
         $doctrinePharPath = realpath(__DIR__ . '/../../../../build/doctrine-migrations.phar');
+
+        assert($doctrinePharPath !== false);
 
         self::assertTrue($process->isSuccessful());
         self::assertTrue(file_exists($doctrinePharPath));

@@ -8,14 +8,15 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableStatus;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableStatusTest extends TestCase
 {
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
     /** @var TableStatus */
@@ -30,11 +31,11 @@ class TableStatusTest extends TestCase
 
     public function testIsCreatedTrue() : void
     {
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('tablesExist')
             ->with(['table_name'])
             ->willReturn(true);
@@ -44,11 +45,11 @@ class TableStatusTest extends TestCase
 
     public function testIsCreatedFalse() : void
     {
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('tablesExist')
             ->with(['table_name'])
             ->willReturn(false);
@@ -58,75 +59,75 @@ class TableStatusTest extends TestCase
 
     public function testSetUpToDate() : void
     {
-        $this->migrationTableStatus->setUpTodate(true);
+        $this->migrationTableStatus->setUpToDate(true);
 
         self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
 
     public function testIsUpToDateTrue() : void
     {
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
         $table = $this->createMock(Table::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('listTableDetails')
             ->with('table_name')
             ->willReturn($table);
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getColumnNames')
             ->willReturn([
                 'version',
                 'executed_at',
             ]);
 
-        $table->expects($this->at(0))
+        $table->expects(self::at(0))
             ->method('hasColumn')
             ->with('version')
             ->willReturn(true);
 
-        $table->expects($this->at(1))
+        $table->expects(self::at(1))
             ->method('hasColumn')
             ->with('executed_at')
             ->willReturn(true);
 
-        self::assertTrue($this->migrationTableStatus->isUpTodate());
+        self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
 
     public function testIsUpToDateFalse() : void
     {
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
         $table = $this->createMock(Table::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('listTableDetails')
             ->with('table_name')
             ->willReturn($table);
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getColumnNames')
             ->willReturn([
                 'version',
                 'executed_at',
             ]);
 
-        $table->expects($this->at(0))
+        $table->expects(self::at(0))
             ->method('hasColumn')
             ->with('version')
             ->willReturn(true);
 
-        $table->expects($this->at(1))
+        $table->expects(self::at(1))
             ->method('hasColumn')
             ->with('executed_at')
             ->willReturn(false);
 
-        self::assertFalse($this->migrationTableStatus->isUpTodate());
+        self::assertFalse($this->migrationTableStatus->isUpToDate());
     }
 
     protected function setUp() : void

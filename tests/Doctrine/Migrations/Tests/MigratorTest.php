@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\DBAL\Driver\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -18,7 +18,7 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\Constraint\RegularExpression;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
@@ -64,24 +64,24 @@ class MigratorTest extends MigrationTestCase
             ->setMethods(['getSql'])
             ->getMock();
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('getSql')
             ->with('1')
             ->willReturn($sql);
 
-        $migrationRepository->expects($this->once())
+        $migrationRepository->expects(self::once())
             ->method('getCurrentVersion')
             ->willReturn('5');
 
-        $outputWriter->expects($this->once())
+        $outputWriter->expects(self::once())
             ->method('write')
             ->with("-- Migrating from 5 to 1\n");
 
-        $configuration->expects($this->once())
+        $configuration->expects(self::once())
             ->method('getQueryWriter')
             ->willReturn($queryWriter);
 
-        $queryWriter->expects($this->once())
+        $queryWriter->expects(self::once())
             ->method('write')
             ->with('/path', Direction::DOWN, $sql);
 
@@ -134,15 +134,15 @@ class MigratorTest extends MigrationTestCase
      */
     public function testGetSql(?string $to) : void
     {
-        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->disableOriginalConstructor()
             ->setMethods(['migrate'])
             ->getMock();
 
-        $expected = ['something'];
+        $expected = [['something']];
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('migrate')
             ->with($to)
             ->willReturn($expected);
@@ -152,7 +152,7 @@ class MigratorTest extends MigrationTestCase
         self::assertSame($expected, $result);
     }
 
-    /** @return string|null[] */
+    /** @return mixed[][] */
     public function getSqlProvider() : array
     {
         return [
@@ -175,7 +175,7 @@ class MigratorTest extends MigrationTestCase
             ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
             ->willReturn(true);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
         /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
@@ -184,15 +184,15 @@ class MigratorTest extends MigrationTestCase
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
         $migrationRepository = $this->createMock(MigrationRepository::class);
 
-        $config->expects($this->once())
+        $config->expects(self::once())
             ->method('getDependencyFactory')
             ->willReturn($dependencyFactory);
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getMigrationRepository')
             ->willReturn($migrationRepository);
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getOutputWriter')
             ->willReturn($outputWriter);
 
@@ -207,16 +207,16 @@ class MigratorTest extends MigrationTestCase
 
         if ($to === null) { // this will always just test the "up" direction
             $config->method('getLatestVersion')
-                ->willReturn($from + 1);
+                ->willReturn((int) $from + 1);
         }
 
-        /** @var Migration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
 
-        $migration->expects($this->once())
+        $migration->expects(self::once())
             ->method('getSql')
             ->with($to)
             ->willReturn($getSqlReturn);
@@ -225,7 +225,7 @@ class MigratorTest extends MigrationTestCase
     }
 
     /**
-     * @return string[][]
+     * @return mixed[][]
      */
     public function writeSqlFileProvider() : array
     {

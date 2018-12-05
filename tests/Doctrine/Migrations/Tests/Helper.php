@@ -22,10 +22,25 @@ class Helper
         if ($path === '') {
             return false;
         }
-        $class_func = [self::class, __FUNCTION__];
 
-        return is_file($path) ?
-            @unlink($path) :
-            array_map($class_func, glob($path . '/*')) === @rmdir($path);
+        $classFunction = [self::class, __FUNCTION__];
+
+        if (is_file($path)) {
+            @unlink($path);
+
+            return true;
+        }
+
+        $files = glob($path . '/*');
+
+        if ($files !== []) {
+            array_map($classFunction, $files);
+
+            @rmdir($path);
+
+            return true;
+        }
+
+        return false;
     }
 }

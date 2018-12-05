@@ -12,14 +12,15 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Stopwatch;
 use Exception;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use function assert;
 use function fopen;
 use function fwrite;
 use function glob;
 use function is_dir;
 use function is_file;
+use function is_resource;
 use function mkdir;
 use function realpath;
 use function rewind;
@@ -30,7 +31,7 @@ abstract class MigrationTestCase extends TestCase
     /** @var OutputWriter */
     private $outputWriter;
 
-    /** @var  Output */
+    /** @var  StreamOutput */
     protected $output;
 
     public function getSqliteConnection() : Connection
@@ -53,6 +54,8 @@ abstract class MigrationTestCase extends TestCase
     {
         $stream = fopen('php://memory', 'r+', false);
 
+        assert(is_resource($stream));
+
         return new StreamOutput($stream);
     }
 
@@ -68,6 +71,9 @@ abstract class MigrationTestCase extends TestCase
     public function getInputStream(string $input)
     {
         $stream = fopen('php://memory', 'r+', false);
+
+        assert(is_resource($stream));
+
         fwrite($stream, $input);
         rewind($stream);
 
@@ -76,7 +82,7 @@ abstract class MigrationTestCase extends TestCase
 
     protected function getOutputWriter() : OutputWriter
     {
-        if (! $this->outputWriter) {
+        if ($this->outputWriter === null) {
             $this->output       = $this->getOutputStream();
             $output             = $this->output;
             $this->outputWriter = new OutputWriter(static function ($message) use ($output) {

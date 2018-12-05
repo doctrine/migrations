@@ -14,33 +14,34 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableUpdater;
 use Exception;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
 class TableUpdaterTest extends TestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var TableUpdater */
+    /** @var TableUpdater|MockObject */
     private $migrationTableUpdater;
 
     public function testUpdateMigrationTable() : void
     {
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getColumnNames')
             ->willReturn([
                 'version',
@@ -49,7 +50,7 @@ class TableUpdaterTest extends TestCase
 
         $table = $this->createMock(Table::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('listTableDetails')
             ->willReturn($table);
 
@@ -64,7 +65,7 @@ class TableUpdaterTest extends TestCase
             Type::getType('datetime_immutable')
         );
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('createDBALTable')
             ->with([
                 $versionColumn,
@@ -72,7 +73,7 @@ class TableUpdaterTest extends TestCase
             ])
             ->willReturn($table);
 
-        $table->expects($this->any())
+        $table->expects(self::any())
             ->method('getColumns')
             ->willReturn([
                 $versionColumn,
@@ -82,27 +83,27 @@ class TableUpdaterTest extends TestCase
         $fromSchema = $this->createMock(Schema::class);
         $toSchema   = $this->createMock(Schema::class);
 
-        $this->migrationTableUpdater->expects($this->at(0))
+        $this->migrationTableUpdater->expects(self::at(0))
             ->method('createSchema')
             ->willReturn($fromSchema);
 
-        $this->migrationTableUpdater->expects($this->at(1))
+        $this->migrationTableUpdater->expects(self::at(1))
             ->method('createSchema')
             ->willReturn($toSchema);
 
-        $fromSchema->expects($this->once())
+        $fromSchema->expects(self::once())
             ->method('getMigrateToSql')
             ->with($toSchema, $this->platform)
             ->willReturn(['ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL']);
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('beginTransaction');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('executeQuery')
             ->with('ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('commit');
 
         $this->migrationTableUpdater->updateMigrationTable();
@@ -113,11 +114,11 @@ class TableUpdaterTest extends TestCase
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Rolling back.');
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getName')
             ->willReturn('table_name');
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getColumnNames')
             ->willReturn([
                 'version',
@@ -126,7 +127,7 @@ class TableUpdaterTest extends TestCase
 
         $table = $this->createMock(Table::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('listTableDetails')
             ->willReturn($table);
 
@@ -141,7 +142,7 @@ class TableUpdaterTest extends TestCase
             Type::getType('datetime_immutable')
         );
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('createDBALTable')
             ->with([
                 $versionColumn,
@@ -149,7 +150,7 @@ class TableUpdaterTest extends TestCase
             ])
             ->willReturn($table);
 
-        $table->expects($this->any())
+        $table->expects(self::any())
             ->method('getColumns')
             ->willReturn([
                 $versionColumn,
@@ -159,28 +160,28 @@ class TableUpdaterTest extends TestCase
         $fromSchema = $this->createMock(Schema::class);
         $toSchema   = $this->createMock(Schema::class);
 
-        $this->migrationTableUpdater->expects($this->at(0))
+        $this->migrationTableUpdater->expects(self::at(0))
             ->method('createSchema')
             ->willReturn($fromSchema);
 
-        $this->migrationTableUpdater->expects($this->at(1))
+        $this->migrationTableUpdater->expects(self::at(1))
             ->method('createSchema')
             ->willReturn($toSchema);
 
-        $fromSchema->expects($this->once())
+        $fromSchema->expects(self::once())
             ->method('getMigrateToSql')
             ->with($toSchema, $this->platform)
             ->willReturn(['ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL']);
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('beginTransaction');
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('executeQuery')
             ->with('ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL')
             ->willThrowException(new Exception('Rolling back.'));
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('rollback');
 
         $this->migrationTableUpdater->updateMigrationTable();

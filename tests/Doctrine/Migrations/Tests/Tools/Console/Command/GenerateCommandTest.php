@@ -8,22 +8,23 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class GenerateCommandTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var Generator */
+    /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var GenerateCommand */
+    /** @var GenerateCommand|MockObject */
     private $generateCommand;
 
     public function testExecute() : void
@@ -31,25 +32,25 @@ final class GenerateCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $this->migrationGenerator->expects($this->once())
+        $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
             ->with('1234')
             ->willReturn('/path/to/migration.php');
 
-        $this->generateCommand->expects($this->once())
+        $this->generateCommand->expects(self::once())
             ->method('procOpen')
             ->with('mate', '/path/to/migration.php');
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln')
             ->with([
                 'Generated new migration class to "<info>/path/to/migration.php</info>"',
@@ -68,7 +69,7 @@ final class GenerateCommandTest extends TestCase
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
 
-        $this->dependencyFactory->expects($this->once())
+        $this->dependencyFactory->expects(self::once())
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
 

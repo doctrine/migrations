@@ -7,11 +7,12 @@ namespace Doctrine\Migrations\Tests\Tracking;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Migrations\Tracking\TableDefinition;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableDefinitionTest extends TestCase
 {
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
     /** @var TableDefinition */
@@ -62,11 +63,11 @@ class TableDefinitionTest extends TestCase
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchemaConfig')
             ->willReturn($schemaConfig);
 
-        $schemaConfig->expects($this->once())
+        $schemaConfig->expects(self::once())
             ->method('getDefaultTableOptions')
             ->willReturn(['test_option' => true]);
 
@@ -75,7 +76,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertSame(true, $table->getOption('test_option'));
+        self::assertTrue($table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());
@@ -88,11 +89,11 @@ class TableDefinitionTest extends TestCase
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createSchemaConfig')
             ->willReturn($schemaConfig);
 
-        $schemaConfig->expects($this->once())
+        $schemaConfig->expects(self::once())
             ->method('getDefaultTableOptions')
             ->willReturn(['test_option' => true]);
 
@@ -101,7 +102,7 @@ class TableDefinitionTest extends TestCase
         self::assertCount(2, $table->getColumns());
 
         self::assertTrue($table->hasOption('test_option'));
-        self::assertSame(true, $table->getOption('test_option'));
+        self::assertTrue($table->getOption('test_option'));
 
         self::assertTrue($table->hasColumn('version_name'));
         self::assertTrue($table->getColumn('version_name')->getNotnull());

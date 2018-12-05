@@ -11,23 +11,24 @@ use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableManipulator;
 use Doctrine\Migrations\Tracking\TableStatus;
 use Doctrine\Migrations\Tracking\TableUpdater;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class TableManipulatorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var TableDefinition */
+    /** @var TableDefinition|MockObject */
     private $migrationTable;
 
-    /** @var TableStatus */
+    /** @var TableStatus|MockObject */
     private $migrationTableStatus;
 
-    /** @var TableUpdater */
+    /** @var TableUpdater|MockObject */
     private $migrationTableUpdater;
 
     /** @var TableManipulator */
@@ -35,18 +36,18 @@ class TableManipulatorTest extends TestCase
 
     public function testCreateMigrationTableAlreadyCreated() : void
     {
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('validate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('isDryRun')
             ->willReturn(false);
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('isCreated')
             ->willReturn(true);
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('isUpToDate')
             ->willReturn(true);
 
@@ -66,25 +67,25 @@ class TableManipulatorTest extends TestCase
             ->setMethods(['createSchema'])
             ->getMock();
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('validate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('isDryRun')
             ->willReturn(false);
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('isCreated')
             ->willReturn(true);
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('isUpToDate')
             ->willReturn(false);
 
-        $this->migrationTableUpdater->expects($this->once())
+        $this->migrationTableUpdater->expects(self::once())
             ->method('updateMigrationTable');
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('setUpToDate')
             ->with(true);
 
@@ -93,24 +94,24 @@ class TableManipulatorTest extends TestCase
 
     public function testCreateMigrationTable() : void
     {
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('validate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('isDryRun')
             ->willReturn(false);
 
-        $this->migrationTableStatus->expects($this->once())
+        $this->migrationTableStatus->expects(self::once())
             ->method('isCreated')
             ->willReturn(false);
 
         $table = $this->createMock(Table::class);
 
-        $this->migrationTable->expects($this->once())
+        $this->migrationTable->expects(self::once())
             ->method('getNewDBALTable')
             ->willReturn($table);
 
-        $this->schemaManager->expects($this->once())
+        $this->schemaManager->expects(self::once())
             ->method('createTable')
             ->with($table);
 

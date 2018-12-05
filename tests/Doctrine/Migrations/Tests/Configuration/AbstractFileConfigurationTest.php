@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use PHPUnit\Framework\TestCase;
+use function assert;
 use function basename;
 use function chdir;
 use function getcwd;
@@ -17,12 +18,14 @@ class AbstractFileConfigurationTest extends TestCase
     /** @var Connection */
     private $connection;
 
-    /** @var AbstractFileConfiguration */
+    /** @var TestAbstractFileConfiguration */
     private $fileConfiguration;
 
     public function testLoadChecksCurrentWorkingDirectory() : void
     {
         $cwd = getcwd();
+
+        assert($cwd !== false);
 
         chdir(__DIR__);
 
@@ -30,7 +33,7 @@ class AbstractFileConfigurationTest extends TestCase
 
         $this->fileConfiguration->load($file);
 
-        $this->assertSame(__DIR__ . '/' . $file, $this->fileConfiguration->getFile());
+        self::assertSame(__DIR__ . '/' . $file, $this->fileConfiguration->getFile());
 
         chdir($cwd);
     }
@@ -52,50 +55,50 @@ class AbstractFileConfigurationTest extends TestCase
             'setAllOrNothing',
         ]);
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsNamespace')
             ->with('Doctrine');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsTableName')
             ->with('migration_version');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsColumnName')
             ->with('version_number');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsColumnLength')
             ->with(200);
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsExecutedAtColumnName')
             ->with('executed_at');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsAreOrganizedByYearAndMonth');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setName')
             ->with('Migrations Test');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setMigrationsDirectory')
             ->with('migrations_directory');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('registerMigrationsFromDirectory')
             ->with('migrations_directory');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('registerMigration')
             ->with('001', 'Test');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setCustomTemplate')
             ->with('custom_template');
 
-        $fileConfiguration->expects($this->once())
+        $fileConfiguration->expects(self::once())
             ->method('setAllOrNothing')
             ->with(true);
 

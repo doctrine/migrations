@@ -22,7 +22,7 @@ trait DialogSupport
 
     protected function willAskConfirmationAndReturn(bool $bool) : void
     {
-        $this->questions->expects($this->once())
+        $this->questions->expects(self::once())
             ->method('ask')
             ->willReturn($bool);
     }

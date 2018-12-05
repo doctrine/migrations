@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -14,10 +15,10 @@ use function getcwd;
 
 class ExecuteCommandTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
-    /** @var ExecuteCommand */
+    /** @var ExecuteCommand|MockObject */
     private $executeCommand;
 
     public function testWriteSqlCustomPath() : void
@@ -28,27 +29,27 @@ class ExecuteCommandTest extends TestCase
         $output  = $this->createMock(OutputInterface::class);
         $version = $this->createMock(Version::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getArgument')
             ->with('version')
             ->willReturn($versionName);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('write-sql')
             ->willReturn('/path');
 
-        $input->expects($this->at(4))
+        $input->expects(self::at(4))
             ->method('getOption')
             ->with('down')
             ->willReturn(true);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersion')
             ->with($versionName)
             ->willReturn($version);
 
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('writeSqlFile')
             ->with('/path', 'down');
 
@@ -63,27 +64,27 @@ class ExecuteCommandTest extends TestCase
         $output  = $this->createMock(OutputInterface::class);
         $version = $this->createMock(Version::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getArgument')
             ->with('version')
             ->willReturn($versionName);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('write-sql')
             ->willReturn(null);
 
-        $input->expects($this->at(4))
+        $input->expects(self::at(4))
             ->method('getOption')
             ->with('down')
             ->willReturn(true);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersion')
             ->with($versionName)
             ->willReturn($version);
 
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('writeSqlFile')
             ->with(getcwd(), 'down');
 
@@ -98,37 +99,37 @@ class ExecuteCommandTest extends TestCase
         $output  = $this->createMock(OutputInterface::class);
         $version = $this->createMock(Version::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getArgument')
             ->with('version')
             ->willReturn($versionName);
 
-        $input->expects($this->at(1))
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('query-time')
             ->willReturn(true);
 
-        $input->expects($this->at(2))
+        $input->expects(self::at(2))
             ->method('getOption')
             ->with('dry-run')
             ->willReturn(true);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('write-sql')
             ->willReturn(false);
 
-        $input->expects($this->at(4))
+        $input->expects(self::at(4))
             ->method('getOption')
             ->with('down')
             ->willReturn(true);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersion')
             ->with($versionName)
             ->willReturn($version);
 
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('execute')
             ->with('down');
 
@@ -143,41 +144,41 @@ class ExecuteCommandTest extends TestCase
         $output  = $this->createMock(OutputInterface::class);
         $version = $this->createMock(Version::class);
 
-        $input->expects($this->once())
+        $input->expects(self::once())
             ->method('getArgument')
             ->with('version')
             ->willReturn($versionName);
 
-        $input->expects($this->at(1))
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('query-time')
             ->willReturn(true);
 
-        $input->expects($this->at(2))
+        $input->expects(self::at(2))
             ->method('getOption')
             ->with('dry-run')
             ->willReturn(false);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('write-sql')
             ->willReturn(false);
 
-        $input->expects($this->at(4))
+        $input->expects(self::at(4))
             ->method('getOption')
             ->with('down')
             ->willReturn(true);
 
-        $this->migrationRepository->expects($this->once())
+        $this->migrationRepository->expects(self::once())
             ->method('getVersion')
             ->with($versionName)
             ->willReturn($version);
 
-        $this->executeCommand->expects($this->once())
+        $this->executeCommand->expects(self::once())
             ->method('canExecute')
             ->willReturn(false);
 
-        $version->expects($this->never())
+        $version->expects(self::never())
             ->method('execute');
 
         self::assertSame(1, $this->executeCommand->execute($input, $output));

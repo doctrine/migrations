@@ -45,9 +45,17 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testOutputWriterIsCreatedIfNotInjected() : void
     {
-        $configuration = new Configuration($this->getConnectionMock());
+        $dependencyFactory = $this->createMock(DependencyFactory::class);
 
-        self::assertInstanceOf(OutputWriter::class, $configuration->getOutputWriter());
+        $outputWriter = $this->getOutputWriterMock();
+
+        $dependencyFactory->expects(self::once())
+            ->method('getOutputWriter')
+            ->willReturn($outputWriter);
+
+        $configuration = new Configuration($this->getConnectionMock(), null, null, null, $dependencyFactory);
+
+        self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
     public function testOutputWriterCanBeSet() : void
@@ -85,7 +93,7 @@ class ConfigurationTest extends MigrationTestCase
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
 
-        $result = call_user_func_array([$configuration, $method], $args);
+        $result = $configuration->$method(...$args);
 
         if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
@@ -122,7 +130,10 @@ class ConfigurationTest extends MigrationTestCase
         );
         $migrator->migrate('3Test');
 
-        $result = call_user_func_array([$configuration, $method], $args);
+        /** @var callable $callable */
+        $callable = [$configuration, $method];
+
+        $result = call_user_func_array($callable, $args);
 
         if ($method === 'getMigrationsToExecute') {
             $result = array_keys($result);
@@ -167,7 +178,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $connection = $this->createMock(MasterSlaveConnection::class);
 
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('connect')
             ->with('master')
             ->willReturn(true);
@@ -258,7 +269,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $schemaManager = $this->createMock(AbstractSchemaManager::class);
 
-        $conn->expects($this->any())
+        $conn->expects(self::any())
             ->method('getSchemaManager')
             ->willReturn($schemaManager);
 
@@ -294,11 +305,11 @@ class ConfigurationTest extends MigrationTestCase
             'executed_at' => '2018-05-16 11:14:40',
         ];
 
-        $dependencyFactory->expects($this->once())
+        $dependencyFactory->expects(self::once())
             ->method('getMigrationRepository')
             ->willReturn($migrationRepository);
 
-        $migrationRepository->expects($this->once())
+        $migrationRepository->expects(self::once())
             ->method('getVersionData')
             ->with($version)
             ->willReturn($versionData);

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Functional;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\AbstractMigration;
@@ -23,6 +24,7 @@ use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
 use const DIRECTORY_SEPARATOR;
 use function array_merge;
+use function assert;
 use function count;
 use function file_exists;
 use function file_get_contents;
@@ -299,7 +301,7 @@ class CliTest extends MigrationTestCase
     }
 
     /**
-     * @return array|string[]
+     * @return string[]
      */
     private function findMigrations() : array
     {
@@ -325,7 +327,15 @@ class CliTest extends MigrationTestCase
         $versionClassName      = reset($versions);
         $versionClassReflected = new ReflectionClass($versionClassName);
 
-        return file_get_contents($versionClassReflected->getFileName());
+        $fileName = $versionClassReflected->getFileName();
+
+        assert($fileName !== false);
+
+        $contents = file_get_contents($fileName);
+
+        assert($contents !== false);
+
+        return $contents;
     }
 }
 

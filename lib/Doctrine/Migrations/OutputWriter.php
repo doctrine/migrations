@@ -12,10 +12,14 @@ class OutputWriter
     /** @var callable */
     private $callback;
 
+    /** @var string */
+    private $lastMessage = '';
+
     public function __construct(?callable $callback = null)
     {
         if ($callback === null) {
-            $callback = static function ($message) : void {
+            $callback = function (string $message) : void {
+                $this->lastMessage = $message;
             };
         }
 
@@ -30,5 +34,10 @@ class OutputWriter
     public function write(string $message) : void
     {
         ($this->callback)($message);
+    }
+
+    public function getLastMessage() : string
+    {
+        return $this->lastMessage;
     }
 }

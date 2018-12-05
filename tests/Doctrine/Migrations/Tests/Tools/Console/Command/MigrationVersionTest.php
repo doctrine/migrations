@@ -9,12 +9,13 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
 use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
 {
-    /** @var VersionCommand */
+    /** @var VersionCommand|MockObject */
     private $command;
 
     /** @var Configuration */
@@ -33,9 +34,9 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->setMigrationsDirectory(sys_get_temp_dir());
 
         $this->command
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getMigrationConfiguration')
-            ->will($this->returnValue($this->configuration));
+            ->will(self::returnValue($this->configuration));
     }
 
     /**

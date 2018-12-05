@@ -7,16 +7,17 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SqlFormatter;
 use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
     /** @var SqlGenerator */
@@ -43,11 +44,11 @@ CODE;
 
         $expectedCode = sprintf($expectedCode, $formattedUpdate);
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('getMigrationsTableName')
             ->willReturn('migrations_table_name');
 
-        $this->platform->expects($this->once())
+        $this->platform->expects(self::once())
             ->method('getName')
             ->willReturn('mysql');
 

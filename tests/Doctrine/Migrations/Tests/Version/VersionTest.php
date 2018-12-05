@@ -32,6 +32,7 @@ use Doctrine\Migrations\Tests\Stub\VersionOutputSqlWithParamAndType;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
 use org\bovigo\vfs\vfsStream;
@@ -83,8 +84,12 @@ class VersionTest extends MigrationTestCase
         $configuration = $this->getSqliteConfiguration();
         $configuration->setOutputWriter($outputWriter);
 
-        $version = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParam::class);
-        $version->getMigration()->setParam([
+        $version   = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParam::class);
+        $migration = $version->getMigration();
+
+        self::assertInstanceOf(VersionOutputSqlWithParam::class, $migration);
+
+        $migration->setParam([
             0 => 456,
             1 => 'tralala',
             2 => 456,
@@ -102,8 +107,12 @@ class VersionTest extends MigrationTestCase
         $configuration = $this->getSqliteConfiguration();
         $configuration->setOutputWriter($outputWriter);
 
-        $version = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParamAndType::class);
-        $version->getMigration()->setParam([
+        $version   = $this->createTestVersion($configuration, '0004', VersionOutputSqlWithParamAndType::class);
+        $migration = $version->getMigration();
+
+        self::assertInstanceOf(VersionOutputSqlWithParamAndType::class, $migration);
+
+        $migration->setParam([
             0 => [
                 456,
                 3,
@@ -111,7 +120,7 @@ class VersionTest extends MigrationTestCase
             ],
         ]);
 
-        $version->getMigration()->setType([Connection::PARAM_INT_ARRAY]);
+        $migration->setType([Connection::PARAM_INT_ARRAY]);
 
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
@@ -156,7 +165,7 @@ class VersionTest extends MigrationTestCase
         self::assertNotEmpty($version->getExecutionState());
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function stateProvider() : array
     {
         return [
@@ -172,16 +181,15 @@ class VersionTest extends MigrationTestCase
     {
         $configuration = $this->getSqliteConfiguration();
 
-        $version = $this->createTestVersion(
-            $configuration,
-            '003',
-            VersionDummy::class
-        );
+        $versionExecutor = $this->createMock(ExecutorInterface::class);
 
-        self::assertNull($version->addSql('SELECT * FROM foo'));
-        self::assertNull($version->addSql('SELECT * FROM foo'));
-        self::assertNull($version->addSql('SELECT * FROM foo WHERE id = ?', [1]));
-        self::assertNull($version->addSql('SELECT * FROM foo WHERE id = ?', [1], [PDO::PARAM_INT]));
+        $versionExecutor->expects(self::once())
+            ->method('addSql')
+            ->with('SELECT * FROM foo WHERE id = ?', [1], [PDO::PARAM_INT]);
+
+        $version = new Version($configuration, '003', VersionDummy::class, $versionExecutor);
+
+        $version->addSql('SELECT * FROM foo WHERE id = ?', [1], [PDO::PARAM_INT]);
     }
 
     /**
@@ -197,7 +205,7 @@ class VersionTest extends MigrationTestCase
         $outputWriter = $this->createMock(OutputWriter::class);
         $queryWriter  = $this->createMock(QueryWriter::class);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
         /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $config */
@@ -223,7 +231,7 @@ class VersionTest extends MigrationTestCase
 
         $versionExecutionResult = new ExecutionResult($getSqlReturn);
 
-        $version->expects($this->once())
+        $version->expects(self::once())
             ->method('execute')
             ->with($direction)
             ->willReturn($versionExecutionResult);
@@ -235,7 +243,7 @@ class VersionTest extends MigrationTestCase
         self::assertTrue($version->writeSqlFile($path, $direction));
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function writeSqlFileProvider() : array
     {
         return [
@@ -375,7 +383,7 @@ class VersionTest extends MigrationTestCase
         }
     }
 
-    /** @return string[] */
+    /** @return string[][] */
     public function sqlWriteProvider() : array
     {
         return [
@@ -436,7 +444,6 @@ class VersionTest extends MigrationTestCase
         /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
 
-        self::assertInstanceOf(vfsStreamFile::class, $sqlMigrationFile);
         self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
@@ -523,7 +530,7 @@ class VersionTest extends MigrationTestCase
             'doctrine_param' => [[[1, 2, 3, 4, 5]], [Connection::PARAM_INT_ARRAY], '[1, 2, 3, 4, 5]'],
             'doctrine_param_grouped' => [[[1, 2], [3, 4, 5]], [Connection::PARAM_INT_ARRAY, Connection::PARAM_INT_ARRAY], '[1, 2], [3, 4, 5]'],
             'boolean' => [[true], [''], '[true]'],
-            'object' => [[new stdClass('test')], [''], '[?]'],
+            'object' => [[new stdClass()], [''], '[?]'],
         ];
     }
 
@@ -547,13 +554,16 @@ class VersionTest extends MigrationTestCase
         $config = $this->getSqliteConfiguration();
         $config->setOutputWriter($ow);
 
-        $version = $this->createTestVersion(
+        $version   = $this->createTestVersion(
             $config,
             '006',
             VersionDryRunTypes::class
         );
+        $migration = $version->getMigration();
 
-        $version->getMigration()->setParam($value, $type);
+        self::assertInstanceOf(VersionDryRunTypes::class, $migration);
+
+        $migration->setParam($value, $type);
 
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
@@ -580,7 +590,11 @@ class VersionTest extends MigrationTestCase
             VersionDryRunTypes::class
         );
 
-        $version->getMigration()->setParam([null], []);
+        $migration = $version->getMigration();
+
+        self::assertInstanceOf(VersionDryRunTypes::class, $migration);
+
+        $migration->setParam([null], []);
 
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
@@ -612,7 +626,12 @@ class VersionTest extends MigrationTestCase
         $now = (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC'));
 
         self::assertSame($now->format('Y-m-d H:i'), date('Y-m-d H:i', strtotime($versionData['executed_at'])));
-        self::assertSame($timeZone, $version->getExecutedAt()->getTimeZone()->getName());
+
+        $executedAt = $version->getExecutedAt();
+
+        self::assertNotNull($executedAt);
+
+        self::assertSame($timeZone, $executedAt->getTimezone()->getName());
     }
 
     /**

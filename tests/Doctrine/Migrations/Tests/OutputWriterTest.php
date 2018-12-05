@@ -19,7 +19,9 @@ final class OutputWriterTest extends TestCase
     {
         $outputWriter = new OutputWriter();
 
-        self::assertNull($outputWriter->write('test message'));
+        $outputWriter->write('test message');
+
+        self::assertSame('test message', $outputWriter->getLastMessage());
     }
 
     public function testWrite() : void

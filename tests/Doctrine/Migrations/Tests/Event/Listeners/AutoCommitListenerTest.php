@@ -9,10 +9,11 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Tests\MigrationTestCase;
+use PHPUnit\Framework\MockObject\MockObject;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $conn;
 
     /** @var AutoCommitListener */
@@ -28,7 +29,7 @@ class AutoCommitListenerTest extends MigrationTestCase
     public function testListenerDoesNothingWhenConnecitonAutoCommitIsOn() : void
     {
         $this->willNotCommit();
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('isAutoCommit')
             ->willReturn(true);
 
@@ -37,10 +38,10 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     public function testListenerDoesFinalCommitWhenAutoCommitIsOff() : void
     {
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('isAutoCommit')
             ->willReturn(false);
-        $this->conn->expects($this->once())
+        $this->conn->expects(self::once())
             ->method('commit');
 
         $this->listener->onMigrationsMigrated($this->createArgs(false));

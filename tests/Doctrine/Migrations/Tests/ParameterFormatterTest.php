@@ -64,7 +64,7 @@ class ParameterFormatterTest extends TestCase
 
         $this->platform = $this->createMock(AbstractPlatform::class);
 
-        $this->connection->expects($this->any())
+        $this->connection->expects(self::any())
             ->method('getDatabasePlatform')
             ->willReturn($this->platform);
 

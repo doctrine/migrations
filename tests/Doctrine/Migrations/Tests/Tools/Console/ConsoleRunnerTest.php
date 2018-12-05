@@ -9,6 +9,7 @@ use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use PHPUnit\Framework\TestCase;
 use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
@@ -30,7 +31,7 @@ class ConsoleRunnerTest extends TestCase
 
         ConsoleRunnerStub::$application = $application;
 
-        $application->expects($this->once())
+        $application->expects(self::once())
             ->method('run');
 
         ConsoleRunnerStub::run($helperSet, []);
@@ -107,9 +108,11 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateApplication() : void
     {
-        $actual = ConsoleRunner::createApplication(new HelperSet());
+        $helperSet = new HelperSet();
 
-        self::assertInstanceOf(Application::class, $actual);
+        $application = ConsoleRunner::createApplication($helperSet);
+
+        self::assertSame($helperSet, $application->getHelperSet());
     }
 
     protected function setUp() : void
@@ -125,10 +128,12 @@ class ConsoleRunnerTest extends TestCase
 
 class ConsoleRunnerStub extends ConsoleRunner
 {
-    /** @var Application|null */
+    /** @var Application */
     public static $application;
 
-    /** @param AbstractCommand[] $commands */
+    /**
+     * @param Command[] $commands
+     */
     public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
     {
         return static::$application;

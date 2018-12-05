@@ -6,17 +6,14 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\ArrayConfiguration;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
-use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
-use Doctrine\ORM\Configuration as ORMConfiguration;
 use InvalidArgumentException;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Output\StreamOutput;
 use function copy;
 use function trim;
 use function unlink;
@@ -26,22 +23,14 @@ class ConfigurationHelperTest extends MigrationTestCase
     /** @var Connection */
     private $connection;
 
-    /** @var ORMConfiguration */
-    private $configuration;
-
-    /** @var OutputWriter */
-    protected $outputWriter;
-
-    /** @var OutputInterface */
+    /** @var StreamOutput */
     protected $output;
 
-    /** @var InputInterface|PHPUnit_Framework_MockObject_MockObject */
+    /** @var InputInterface|MockObject */
     private $input;
 
     protected function setUp() : void
     {
-        $this->configuration = $this->getSqliteConfiguration();
-
         $this->connection = $this->getSqliteConnection();
 
         $this->output = $this->getOutputStream();
@@ -50,13 +39,6 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->setConstructorArgs([[]])
             ->setMethods(['getOption'])
             ->getMock();
-    }
-
-    public function testConfigurationHelper() : void
-    {
-        $configurationHelper = new ConfigurationHelper($this->connection, $this->configuration);
-
-        self::assertInstanceOf(ConfigurationHelper::class, $configurationHelper);
     }
 
     /**
@@ -72,7 +54,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
             $this->input->method('getOption')
                 ->with('configuration')
-                ->will($this->returnValue(null));
+                ->will(self::returnValue(null));
 
             $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
             $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input);
@@ -87,7 +69,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(__DIR__ . '/files/config.php'));
+            ->will(self::returnValue(__DIR__ . '/files/config.php'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
@@ -100,7 +82,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(__DIR__ . '/files/config.json'));
+            ->will(self::returnValue(__DIR__ . '/files/config.json'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
@@ -116,7 +98,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue('testconfig.wrong'));
+            ->will(self::returnValue('testconfig.wrong'));
 
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
 
@@ -130,13 +112,12 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input->method('getOption')
             ->with('configuration')
-            ->will($this->returnValue(null));
+            ->will(self::returnValue(null));
 
         $configurationHelper = new ConfigurationHelper($this->connection, null);
 
         $migrationConfig = $configurationHelper->getMigrationConfig($this->input);
 
-        self::assertInstanceOf(Configuration::class, $migrationConfig);
         self::assertStringMatchesFormat('', $this->getOutputStreamContent($this->output));
     }
 }

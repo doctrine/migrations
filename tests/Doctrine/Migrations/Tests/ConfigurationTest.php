@@ -12,7 +12,6 @@ use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tests\Stub\Version2Test;
 use Doctrine\Migrations\Tests\Stub\Version3Test;
-use Doctrine\Migrations\Version\Version;
 use function sys_get_temp_dir;
 
 class ConfigurationTest extends MigrationTestCase
@@ -131,7 +130,6 @@ class ConfigurationTest extends MigrationTestCase
         self::assertTrue($config->hasVersion('1234'));
 
         $version = $config->getVersion('1234');
-        self::assertInstanceOf(Version::class, $version);
         self::assertSame('1234', $version->getVersion());
         self::assertFalse($version->isMigrated());
     }
@@ -147,10 +145,10 @@ class ConfigurationTest extends MigrationTestCase
         self::assertCount(2, $config->getMigrations(), 'Two Migration registered.');
 
         $version = $config->getVersion('1234');
-        self::assertInstanceOf(Version::class, $version);
+        self::assertSame('1234', $version->getVersion());
 
         $version = $config->getVersion('1235');
-        self::assertInstanceOf(Version::class, $version);
+        self::assertSame('1235', $version->getVersion());
     }
 
     public function testRegisterDuplicateVersion() : void
@@ -159,8 +157,8 @@ class ConfigurationTest extends MigrationTestCase
 
         $config->registerMigration('1234', Version1Test::class);
 
-        $this->expectException(
-            MigrationException::class,
+        $this->expectException(MigrationException::class);
+        $this->expectExceptionMessage(
             'Migration version 1234 already registered with class Doctrine\Migrations\Version'
         );
         $config->registerMigration('1234', Version1Test::class);
@@ -348,7 +346,7 @@ class ConfigurationTest extends MigrationTestCase
 
         $result = $config->getVersion($version);
 
-        self::assertNotNull($result);
+        self::assertSame($version, $result->getVersion());
     }
 
     public function testGetVersionNotFound() : void
@@ -455,7 +453,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /**
-     * @return string|null[][]
+     * @return string[][]|null[][]
      */
     public function validCustomTemplates() : array
     {

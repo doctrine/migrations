@@ -7,13 +7,14 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpToDateCommandTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var MigrationRepository|MockObject */
     private $migrationRepository;
 
     /** @var UpToDateCommand */
@@ -45,7 +46,7 @@ class UpToDateCommandTest extends TestCase
 
         $output = $this->createMock(OutputInterface::class);
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln');
 
         $actual = $this->upToDateCommand->execute(new ArrayInput([]), $output);
@@ -54,7 +55,7 @@ class UpToDateCommandTest extends TestCase
     }
 
     /**
-     * @return string[][]
+     * @return mixed[][]
      */
     public function dataIsUpToDate() : array
     {

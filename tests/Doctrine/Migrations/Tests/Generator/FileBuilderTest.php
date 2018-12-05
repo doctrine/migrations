@@ -8,11 +8,12 @@ use DateTime;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Version\Direction;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 class FileBuilderTest extends TestCase
 {
-    /** @var AbstractPlatform */
+    /** @var AbstractPlatform|MockObject */
     private $platform;
 
     /** @var FileBuilder */
@@ -39,7 +40,7 @@ class FileBuilderTest extends TestCase
 
         $now = new DateTime('2018-09-01');
 
-        $this->platform->expects($this->any())
+        $this->platform->expects(self::any())
             ->method('getCurrentTimestampSQL')
             ->willReturn('CURRENT_TIMESTAMP');
 

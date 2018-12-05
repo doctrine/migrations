@@ -7,19 +7,20 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 final class DiffCommandTest extends TestCase
 {
-    /** @var DiffGenerator */
+    /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
 
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var DiffCommand */
+    /** @var DiffCommand|MockObject */
     private $diffCommand;
 
     public function testExecute() : void
@@ -27,44 +28,44 @@ final class DiffCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $input->expects($this->at(0))
+        $input->expects(self::at(0))
             ->method('getOption')
             ->with('filter-expression')
             ->willReturn('filter expression');
 
-        $input->expects($this->at(1))
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('formatted')
             ->willReturn(true);
 
-        $input->expects($this->at(2))
+        $input->expects(self::at(2))
             ->method('getOption')
             ->with('line-length')
             ->willReturn(80);
 
-        $input->expects($this->at(3))
+        $input->expects(self::at(3))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects($this->once())
+        $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
             ->willReturn('1234');
 
-        $this->migrationDiffGenerator->expects($this->once())
+        $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
-        $this->diffCommand->expects($this->once())
+        $this->diffCommand->expects(self::once())
             ->method('procOpen')
             ->with('mate', '/path/to/migration.php');
 
-        $output->expects($this->once())
+        $output->expects(self::once())
             ->method('writeln')
             ->with([
                 'Generated new migration class to "<info>/path/to/migration.php</info>"',
@@ -88,7 +89,7 @@ final class DiffCommandTest extends TestCase
 
         $this->diffCommand->setMigrationConfiguration($this->configuration);
 
-        $this->diffCommand->expects($this->once())
+        $this->diffCommand->expects(self::once())
             ->method('createMigrationDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
     }

@@ -16,30 +16,30 @@ use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class ExecutorTest extends TestCase
 {
-    /** @var Configuration */
+    /** @var Configuration|MockObject */
     private $configuration;
 
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $connection;
 
-    /** @var SchemaDiffProviderInterface */
+    /** @var SchemaDiffProviderInterface|MockObject */
     private $schemaDiffProvider;
 
-    /** @var OutputWriter */
+    /** @var OutputWriter|MockObject */
     private $outputWriter;
 
-    /** @var ParameterFormatter */
+    /** @var ParameterFormatter|MockObject */
     private $parameterFormatter;
 
-    /** @var Stopwatch */
+    /** @var Stopwatch|MockObject */
     private $stopwatch;
 
     /** @var Executor */
@@ -48,7 +48,7 @@ class ExecutorTest extends TestCase
     /** @var Version */
     private $version;
 
-    /** @var AbstractMigration */
+    /** @var VersionExecutorTestMigration */
     private $migration;
 
     public function testAddSql() : void
@@ -64,48 +64,48 @@ class ExecutorTest extends TestCase
     {
         $platform = $this->createMock(AbstractPlatform::class);
 
-        $this->connection->expects($this->once())
+        $this->connection->expects(self::once())
             ->method('getDatabasePlatform')
             ->willReturn($platform);
 
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
-        $this->stopwatch->expects($this->any())
+        $this->stopwatch->expects(self::any())
             ->method('start')
             ->willReturn($stopwatchEvent);
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('stop');
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('getDuration')
             ->willReturn(100);
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('getMemory')
             ->willReturn(100);
 
-        $this->outputWriter->expects($this->at(0))
+        $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
 
-        $this->outputWriter->expects($this->at(1))
+        $this->outputWriter->expects(self::at(1))
             ->method('write')
             ->with('     <comment>-></comment> SELECT 1');
 
-        $this->outputWriter->expects($this->at(2))
+        $this->outputWriter->expects(self::at(2))
             ->method('write')
             ->with('  <info>100ms</info>');
 
-        $this->outputWriter->expects($this->at(3))
+        $this->outputWriter->expects(self::at(3))
             ->method('write')
             ->with('     <comment>-></comment> SELECT 2');
 
-        $this->outputWriter->expects($this->at(4))
+        $this->outputWriter->expects(self::at(4))
             ->method('write')
             ->with('  <info>100ms</info>');
 
-        $this->outputWriter->expects($this->at(5))
+        $this->outputWriter->expects(self::at(5))
             ->method('write')
             ->with("\n  <info>++</info> migrated (took 100ms, used 100 memory)");
 
@@ -119,7 +119,6 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
         self::assertSame(['SELECT 1', 'SELECT 2'], $versionExecutionResult->getSql());
         self::assertSame([[1], [2]], $versionExecutionResult->getParams());
         self::assertSame([[3], [4]], $versionExecutionResult->getTypes());
@@ -135,42 +134,42 @@ class ExecutorTest extends TestCase
     {
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
-        $this->stopwatch->expects($this->any())
+        $this->stopwatch->expects(self::any())
             ->method('start')
             ->willReturn($stopwatchEvent);
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('stop');
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('getDuration')
             ->willReturn(100);
 
-        $stopwatchEvent->expects($this->any())
+        $stopwatchEvent->expects(self::any())
             ->method('getMemory')
             ->willReturn(100);
 
-        $this->outputWriter->expects($this->at(0))
+        $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
 
-        $this->outputWriter->expects($this->at(1))
+        $this->outputWriter->expects(self::at(1))
             ->method('write')
             ->with('     <comment>-></comment> SELECT 3');
 
-        $this->outputWriter->expects($this->at(2))
+        $this->outputWriter->expects(self::at(2))
             ->method('write')
             ->with('  <info>100ms</info>');
 
-        $this->outputWriter->expects($this->at(3))
+        $this->outputWriter->expects(self::at(3))
             ->method('write')
             ->with('     <comment>-></comment> SELECT 4');
 
-        $this->outputWriter->expects($this->at(4))
+        $this->outputWriter->expects(self::at(4))
             ->method('write')
             ->with('  <info>100ms</info>');
 
-        $this->outputWriter->expects($this->at(5))
+        $this->outputWriter->expects(self::at(5))
             ->method('write')
             ->with("\n  <info>--</info> reverted (took 100ms, used 100 memory)");
 
@@ -184,7 +183,6 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertInstanceOf(ExecutionResult::class, $versionExecutionResult);
         self::assertSame(['SELECT 3', 'SELECT 4'], $versionExecutionResult->getSql());
         self::assertSame([[5], [6]], $versionExecutionResult->getParams());
         self::assertSame([[7], [8]], $versionExecutionResult->getTypes());
@@ -214,7 +212,7 @@ class ExecutorTest extends TestCase
             $this->stopwatch
         );
 
-        $this->configuration->expects($this->any())
+        $this->configuration->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection);
 

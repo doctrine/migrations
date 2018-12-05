@@ -56,7 +56,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             self::assertArrayHasKey($version, $migrations);
             self::assertSame($namespace, $migrations[$version]);
         }
-        $migrationsForTestSort = (array) $migrations;
+        $migrationsForTestSort = $migrations;
 
         asort($migrationsForTestSort);
 
@@ -73,7 +73,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
-        $this->assertSame([
+        self::assertSame([
             '0001' => 'TestMigrations\\MultiNested\\Version0001',
             '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
         ], $versions);
@@ -86,7 +86,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested'
         );
 
-        $this->assertSame([
+        self::assertSame([
             '0001' => 'TestMigrations\MultiNested\Version0001',
             '0002' => 'TestMigrations\MultiNested\Deep\Version0002',
         ], $versions);
@@ -99,7 +99,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested\\Deep'
         );
 
-        $this->assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
+        self::assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
     }
 
     protected function setUp() : void

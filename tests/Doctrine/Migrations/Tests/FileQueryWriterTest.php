@@ -46,7 +46,7 @@ final class FileQueryWriterTest extends MigrationTestCase
             $migrationFileBuilder
         );
 
-        $platform->expects($this->any())
+        $platform->expects(self::any())
             ->method('getCurrentTimestampSQL')
             ->willReturn('CURRENT_TIMESTAMP');
 
@@ -85,14 +85,14 @@ final class FileQueryWriterTest extends MigrationTestCase
         }
     }
 
-    /** @return string[][] */
+    /** @return mixed[][] */
     public function writeProvider() : array
     {
         $outputWriter = $this->createMock(OutputWriter::class);
 
-        $outputWriter->expects($this->atLeastOnce())
+        $outputWriter->expects(self::atLeastOnce())
             ->method('write')
-            ->with($this->isType('string'));
+            ->with(self::isType('string'));
 
         return [
             [__DIR__, Direction::UP, ['1' => ['SHOW DATABASES']], $outputWriter],
