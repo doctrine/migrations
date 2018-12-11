@@ -11,7 +11,7 @@ If this documentation is not helping to answer questions you have about
 Doctrine Migrations don't panic. You can get help from different sources:
 
 -  The `Doctrine Mailing List <https://groups.google.com/group/doctrine-user>`_
--  Gitter chat room `#doctrine/migrations <https://gitter.im/doctrine/migrations>`_
+-  Slack chat room `#migrations <https://www.doctrine-project.org/slack>`_
 -  Report a bug on `GitHub <https://github.com/doctrine/migrations/issues>`_.
 -  On `StackOverflow <https://stackoverflow.com/questions/tagged/doctrine-migrations>`_
 
