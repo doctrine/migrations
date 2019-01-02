@@ -21,6 +21,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Version\Version;
 use function str_replace;
+use function strlen;
 
 /**
  * The Configuration class is responsible for defining migration configuration information.
@@ -43,7 +44,7 @@ class Configuration
     private $migrationsColumnName = 'version';
 
     /** @var int */
-    private $migrationsColumnLength = 255;
+    private $migrationsColumnLength;
 
     /** @var string */
     private $migrationsExecutedAtColumnName = 'executed_at';
@@ -91,11 +92,12 @@ class Configuration
         ?QueryWriter $queryWriter = null,
         ?DependencyFactory $dependencyFactory = null
     ) {
-        $this->connection        = $connection;
-        $this->outputWriter      = $outputWriter;
-        $this->migrationFinder   = $migrationFinder;
-        $this->queryWriter       = $queryWriter;
-        $this->dependencyFactory = $dependencyFactory;
+        $this->connection             = $connection;
+        $this->outputWriter           = $outputWriter;
+        $this->migrationFinder        = $migrationFinder;
+        $this->queryWriter            = $queryWriter;
+        $this->dependencyFactory      = $dependencyFactory;
+        $this->migrationsColumnLength = strlen((new DateTime())->format(self::VERSION_FORMAT));
     }
 
     public function setName(string $name) : void
@@ -318,7 +320,7 @@ class Configuration
     public function getDateTime(string $version) : string
     {
         $datetime = str_replace('Version', '', $version);
-        $datetime = DateTime::createFromFormat('YmdHis', $datetime);
+        $datetime = DateTime::createFromFormat(self::VERSION_FORMAT, $datetime);
 
         if ($datetime === false) {
             return '';
