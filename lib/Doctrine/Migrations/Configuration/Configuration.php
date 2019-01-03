@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Common\EventArgs;
@@ -97,7 +97,7 @@ class Configuration
         $this->migrationFinder        = $migrationFinder;
         $this->queryWriter            = $queryWriter;
         $this->dependencyFactory      = $dependencyFactory;
-        $this->migrationsColumnLength = strlen((new DateTime())->format(self::VERSION_FORMAT));
+        $this->migrationsColumnLength = strlen((new DateTimeImmutable())->format(self::VERSION_FORMAT));
     }
 
     public function setName(string $name) : void
@@ -320,7 +320,7 @@ class Configuration
     public function getDateTime(string $version) : string
     {
         $datetime = str_replace('Version', '', $version);
-        $datetime = DateTime::createFromFormat(self::VERSION_FORMAT, $datetime);
+        $datetime = DateTimeImmutable::createFromFormat(self::VERSION_FORMAT, $datetime);
 
         if ($datetime === false) {
             return '';
@@ -331,7 +331,7 @@ class Configuration
 
     public function generateVersionNumber(?DateTimeInterface $now = null) : string
     {
-        $now = $now ?: new DateTime('now', new DateTimeZone('UTC'));
+        $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
 
         return $now->format(self::VERSION_FORMAT);
     }
