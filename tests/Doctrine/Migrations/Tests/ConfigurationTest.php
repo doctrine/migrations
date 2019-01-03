@@ -74,7 +74,7 @@ class ConfigurationTest extends MigrationTestCase
     {
         $config = new Configuration($this->getSqliteConnection());
 
-        self::assertSame(255, $config->getMigrationsColumnLength());
+        self::assertSame(14, $config->getMigrationsColumnLength());
 
         $config->setMigrationsColumnLength(200);
 
