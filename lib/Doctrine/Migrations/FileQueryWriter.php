@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
-use DateTime;
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Migrations\Generator\FileBuilder;
 use function file_put_contents;
@@ -41,7 +41,7 @@ final class FileQueryWriter implements QueryWriter
         array $queriesByVersion,
         ?DateTimeInterface $now = null
     ) : bool {
-        $now = $now ?? new DateTime();
+        $now = $now ?? new DateTimeImmutable();
 
         $string = $this->migrationFileBuilder
             ->buildMigrationFile($queriesByVersion, $direction, $now);
