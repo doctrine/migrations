@@ -97,7 +97,7 @@ class Configuration
         $this->migrationFinder        = $migrationFinder;
         $this->queryWriter            = $queryWriter;
         $this->dependencyFactory      = $dependencyFactory;
-        $this->migrationsColumnLength = strlen((new DateTimeImmutable())->format(self::VERSION_FORMAT));
+        $this->migrationsColumnLength = strlen($this->createDateTime()->format(self::VERSION_FORMAT));
     }
 
     public function setName(string $name) : void
@@ -331,7 +331,7 @@ class Configuration
 
     public function generateVersionNumber(?DateTimeInterface $now = null) : string
     {
-        $now = $now ?: new DateTimeImmutable('now', new DateTimeZone('UTC'));
+        $now = $now ?: $this->createDateTime();
 
         return $now->format(self::VERSION_FORMAT);
     }
@@ -526,5 +526,10 @@ class Configuration
                 $this->getMigrationsFinder()
             );
         }
+    }
+
+    private function createDateTime() : DateTimeImmutable
+    {
+        return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 }
