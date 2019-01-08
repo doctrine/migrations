@@ -73,7 +73,7 @@ file like the following:
 
     </doctrine-migrations>
 
-Of course you could do the same thing with a *configuration.yml* file:
+Of course you could do the same thing with a *migrations.yml* file:
 
 .. code-block:: yaml
 
