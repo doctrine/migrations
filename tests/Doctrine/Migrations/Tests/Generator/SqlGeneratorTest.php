@@ -23,36 +23,41 @@ final class SqlGeneratorTest extends TestCase
     /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
+    /** @var string[] */
+    private $sql;
+
     public function testGenerate() : void
     {
-        $sql = [
-            'SELECT 1',
-            'SELECT 2',
-            'UPDATE table SET value = 1 WHERE name = 2 and value = 1 and field = 2 and active = 1',
-            'SELECT * FROM migrations_table_name',
-        ];
-
-        $formattedUpdate = SqlFormatter::format($sql[2], false);
-
-        $expectedCode = <<<'CODE'
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
 $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
 
 $this->addSql('SELECT 1');
 $this->addSql('SELECT 2');
 $this->addSql('%s');
-CODE;
-
-        $expectedCode = sprintf($expectedCode, $formattedUpdate);
-
-        $this->configuration->expects(self::any())
-            ->method('getMigrationsTableName')
-            ->willReturn('migrations_table_name');
+CODE
+        );
 
         $this->platform->expects(self::once())
             ->method('getName')
             ->willReturn('mysql');
 
-        $code = $this->migrationSqlGenerator->generate($sql, true, 80);
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
+
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithoutCheckingDatabasePlatform() : void
+    {
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+$this->addSql('SELECT 1');
+$this->addSql('SELECT 2');
+$this->addSql('%s');
+CODE
+        );
+
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
 
         self::assertSame($expectedCode, $code);
     }
@@ -66,5 +71,25 @@ CODE;
             $this->configuration,
             $this->platform
         );
+    }
+
+    private function prepareGeneratedCode(string $expectedCode) : string
+    {
+        $this->sql = [
+            'SELECT 1',
+            'SELECT 2',
+            'UPDATE table SET value = 1 WHERE name = 2 and value = 1 and field = 2 and active = 1',
+            'SELECT * FROM migrations_table_name',
+        ];
+
+        $formattedUpdate = SqlFormatter::format($this->sql[2], false);
+
+        $expectedCode = sprintf($expectedCode, $formattedUpdate);
+
+        $this->configuration->expects(self::any())
+            ->method('getMigrationsTableName')
+            ->willReturn('migrations_table_name');
+
+        return $expectedCode;
     }
 }
