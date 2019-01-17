@@ -49,6 +49,11 @@ final class DiffCommandTest extends TestCase
 
         $input->expects(self::at(3))
             ->method('getOption')
+            ->with('check-database-platform')
+            ->willReturn(true);
+
+        $input->expects(self::at(4))
+            ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 
