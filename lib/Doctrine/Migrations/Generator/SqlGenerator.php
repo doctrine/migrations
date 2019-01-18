@@ -60,7 +60,7 @@ class SqlGenerator
             $code[] = sprintf('$this->addSql(%s);', var_export($query, true));
         }
 
-        if (count($code) !== 0 && $checkDbPlatform) {
+        if (count($code) !== 0 && $checkDbPlatform && $this->configuration->isDatabasePlatformChecked()) {
             $currentPlatform = $this->platform->getName();
 
             array_unshift(

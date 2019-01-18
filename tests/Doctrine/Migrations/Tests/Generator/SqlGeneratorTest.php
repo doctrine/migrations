@@ -28,6 +28,8 @@ final class SqlGeneratorTest extends TestCase
 
     public function testGenerate() : void
     {
+        $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
+
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
 $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
@@ -49,6 +51,8 @@ CODE
 
     public function testGenerationWithoutCheckingDatabasePlatform() : void
     {
+        $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
+
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
 $this->addSql('SELECT 1');
@@ -58,6 +62,23 @@ CODE
         );
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
+
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration() : void
+    {
+        $this->configuration->method('isDatabasePlatformChecked')->willReturn(false);
+
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+$this->addSql('SELECT 1');
+$this->addSql('SELECT 2');
+$this->addSql('%s');
+CODE
+        );
+
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
 
         self::assertSame($expectedCode, $code);
     }
