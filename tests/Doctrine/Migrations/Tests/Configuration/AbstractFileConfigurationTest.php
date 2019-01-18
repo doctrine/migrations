@@ -117,8 +117,8 @@ class AbstractFileConfigurationTest extends TestCase
                     'class'   => 'Test',
                 ],
             ],
-            'custom_template' => 'custom_template',
-            'all_or_nothing' => true,
+            'custom_template'           => 'custom_template',
+            'all_or_nothing'            => true,
         ]);
     }
 
