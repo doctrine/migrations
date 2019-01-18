@@ -34,6 +34,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations',
         'custom_template',
         'all_or_nothing',
+        'check_database_platform',
     ];
 
     private const CONFIGURATION_METHOD_MAP = [
@@ -48,6 +49,7 @@ abstract class AbstractFileConfiguration extends Configuration
         'migrations'                => 'loadMigrations',
         'custom_template'           => 'setCustomTemplate',
         'all_or_nothing'            => 'setAllOrNothing',
+        'check_database_platform'   => 'setCheckDatabasePlatform',
     ];
 
     /** @var string */

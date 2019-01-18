@@ -12,4 +12,5 @@ return [
     'migrations_directory'      => '.',
     'migrations'                => [],
     'all_or_nothing'            => true,
+    'check_database_platform'   => false,
 ];
