@@ -26,7 +26,7 @@ Now to install with Composer it is as simple as running the following command in
 
 .. code-block:: sh
 
-    composer require doctrine/migrations:2.0.x-dev
+    composer require doctrine/migrations:2.0
 
 Now you will have a file in ``vendor/bin`` available to run the migrations console application:
 
@@ -40,11 +40,11 @@ PHAR
 To install by downloading the PHAR, you just need to download the latest PHAR file from the
 releases_ page on GitHub.
 
-Here is an example using the ``1.7.2`` release:
+Here is an example using the ``2.0.0`` release:
 
 .. code-block:: sh
 
-    wget https://github.com/doctrine/migrations/releases/download/v1.7.2/doctrine-migrations.phar
+    wget https://github.com/doctrine/migrations/releases/download/v2.0.0/doctrine-migrations.phar
 
 Now you can execute the PHAR like this:
 
