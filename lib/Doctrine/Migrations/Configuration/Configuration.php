@@ -85,6 +85,9 @@ class Configuration
     /** @var DependencyFactory|null */
     private $dependencyFactory;
 
+    /** @var bool */
+    private $checkDbPlatform = true;
+
     public function __construct(
         Connection $connection,
         ?OutputWriter $outputWriter = null,
@@ -305,6 +308,16 @@ class Configuration
     public function isAllOrNothing() : bool
     {
         return $this->allOrNothing;
+    }
+
+    public function setCheckDatabasePlatform(bool $checkDbPlatform) : void
+    {
+        $this->checkDbPlatform = $checkDbPlatform;
+    }
+
+    public function isDatabasePlatformChecked() : bool
+    {
+        return $this->checkDbPlatform;
     }
 
     public function isMigrationTableCreated() : bool

@@ -41,6 +41,7 @@ Once you have your custom integration setup, you can modify it to look like the 
     $configuration->setMigrationsExecutedAtColumnName('executed_at');
     $configuration->setMigrationsDirectory('/data/doctrine/migrations-docs-example/lib/MyProject/Migrations');
     $configuration->setAllOrNothing(true);
+    $configuration->setCheckDatabasePlatform(false);
 
     $helperSet = new HelperSet();
     $helperSet->set(new QuestionHelper(), 'question');

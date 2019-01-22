@@ -63,7 +63,8 @@ class DiffGenerator
         string $versionNumber,
         ?string $filterExpression,
         bool $formatted = false,
-        int $lineLength = 120
+        int $lineLength = 120,
+        bool $checkDbPlatform = true
     ) : string {
         if ($filterExpression !== null) {
             $this->dbalConfiguration->setFilterSchemaAssetsExpression($filterExpression);
@@ -76,13 +77,15 @@ class DiffGenerator
         $up = $this->migrationSqlGenerator->generate(
             $fromSchema->getMigrateToSql($toSchema, $this->platform),
             $formatted,
-            $lineLength
+            $lineLength,
+            $checkDbPlatform
         );
 
         $down = $this->migrationSqlGenerator->generate(
             $fromSchema->getMigrateFromSql($toSchema, $this->platform),
             $formatted,
-            $lineLength
+            $lineLength,
+            $checkDbPlatform
         );
 
         if ($up === '' && $down === '') {

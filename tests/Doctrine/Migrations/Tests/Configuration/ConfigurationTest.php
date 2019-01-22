@@ -330,6 +330,17 @@ class ConfigurationTest extends MigrationTestCase
         self::assertTrue($configuration->isAllOrNothing());
     }
 
+    public function testGetSetCheckDatabasePlatform() : void
+    {
+        $configuration = $this->createPartialMock(Configuration::class, []);
+
+        self::assertTrue($configuration->isDatabasePlatformChecked());
+
+        $configuration->setCheckDatabasePlatform(false);
+
+        self::assertFalse($configuration->isDatabasePlatformChecked());
+    }
+
     /**
      * @return PHPUnit_Framework_MockObject_MockObject|Connection
      */

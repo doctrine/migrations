@@ -11,7 +11,9 @@ use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use const FILTER_VALIDATE_BOOLEAN;
 use function class_exists;
+use function filter_var;
 use function sprintf;
 
 /**
@@ -72,6 +74,13 @@ EOT
                 InputOption::VALUE_OPTIONAL,
                 'Max line length of unformatted lines.',
                 120
+            )
+            ->addOption(
+                'check-database-platform',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Check Database Platform to the generated code.',
+                true
             );
     }
 
@@ -85,6 +94,7 @@ EOT
         $filterExpression = $input->getOption('filter-expression') ?? null;
         $formatted        = (bool) $input->getOption('formatted');
         $lineLength       = (int) $input->getOption('line-length');
+        $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
 
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
@@ -100,7 +110,8 @@ EOT
             $versionNumber,
             $filterExpression,
             $formatted,
-            $lineLength
+            $lineLength,
+            $checkDbPlatform
         );
 
         $editorCommand = $input->getOption('editor-cmd');

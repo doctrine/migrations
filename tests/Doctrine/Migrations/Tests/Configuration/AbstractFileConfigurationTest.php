@@ -53,6 +53,7 @@ class AbstractFileConfigurationTest extends TestCase
             'registerMigration',
             'setCustomTemplate',
             'setAllOrNothing',
+            'setCheckDatabasePlatform',
         ]);
 
         $fileConfiguration->expects(self::once())
@@ -102,6 +103,10 @@ class AbstractFileConfigurationTest extends TestCase
             ->method('setAllOrNothing')
             ->with(true);
 
+        $fileConfiguration->expects(self::once())
+            ->method('setCheckDatabasePlatform')
+            ->with(false);
+
         $fileConfiguration->setTestConfiguration([
             'migrations_namespace'      => 'Doctrine',
             'table_name'                => 'migration_version',
@@ -117,8 +122,9 @@ class AbstractFileConfigurationTest extends TestCase
                     'class'   => 'Test',
                 ],
             ],
-            'custom_template' => 'custom_template',
-            'all_or_nothing' => true,
+            'custom_template'           => 'custom_template',
+            'all_or_nothing'            => true,
+            'check_database_platform'   => false,
         ]);
     }
 
