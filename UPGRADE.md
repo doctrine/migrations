@@ -14,6 +14,10 @@ The `Doctrine\DBAL\Migrations\MigrationsVersion` class is no longer available: p
 
 To make the name more clear and to differentiate from the `AbstractMigration` class, `Migration` was renamed to `Migrator`.
 
+## BC Break: Moved exception classes from `Doctrine\Migrations\%name%Exception` to `Doctrine\Migrations\Exception\%name%`
+doctrine/migrations#636
+Follows concept introduced in ORM (doctrine/orm#6743 + doctrine/orm#7210) and naming follows pattern accepted in Doctrine CS.
+
 # Upgrade from 1.0-alpha1 to 1.0.0-alpha3
 
 ## AbstractMigration
