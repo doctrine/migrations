@@ -31,7 +31,7 @@ class ExecuteCommandTest extends TestCase
 
         $input->expects(self::once())
             ->method('getArgument')
-            ->with('version')
+            ->with('versions')
             ->willReturn($versionName);
 
         $input->expects(self::at(3))
@@ -66,7 +66,7 @@ class ExecuteCommandTest extends TestCase
 
         $input->expects(self::once())
             ->method('getArgument')
-            ->with('version')
+            ->with('versions')
             ->willReturn($versionName);
 
         $input->expects(self::at(3))
@@ -101,7 +101,7 @@ class ExecuteCommandTest extends TestCase
 
         $input->expects(self::once())
             ->method('getArgument')
-            ->with('version')
+            ->with('versions')
             ->willReturn($versionName);
 
         $input->expects(self::at(1))
@@ -146,7 +146,7 @@ class ExecuteCommandTest extends TestCase
 
         $input->expects(self::once())
             ->method('getArgument')
-            ->with('version')
+            ->with('versions')
             ->willReturn($versionName);
 
         $input->expects(self::at(1))
