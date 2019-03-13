@@ -23,12 +23,12 @@ class ExecuteCommand extends AbstractCommand
             ->setName('migrations:execute')
             ->setAliases(['execute'])
             ->setDescription(
-                'Execute a single migration version up or down manually.'
+                'Execute given migration versions up or down manually.'
             )
             ->addArgument(
-                'version',
-                InputArgument::REQUIRED,
-                'The version to execute.',
+                'versions',
+                InputArgument::IS_ARRAY,
+                'The versions to execute.',
                 null
             )
             ->addOption(
@@ -63,9 +63,13 @@ class ExecuteCommand extends AbstractCommand
                 'Time all the queries individually.'
             )
             ->setHelp(<<<EOT
-The <info>%command.name%</info> command executes a single migration version up or down manually:
+The <info>%command.name%</info> command executes given migration versions up or down manually:
 
     <info>%command.full_name% YYYYMMDDHHMMSS</info>
+    
+You can execute multiple versions at once:
+
+    <info>%command.full_name% YYYYMMDDHHMMSS YYYYMMDDHHMMSS YYYYMMDDHHMMSS ...</info>
 
 If no <comment>--up</comment> or <comment>--down</comment> option is specified it defaults to up:
 
@@ -90,7 +94,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version        = $input->getArgument('version');
+        $versions       = $input->getArgument('versions');
         $timeAllQueries = (bool) $input->getOption('query-time');
         $dryRun         = (bool) $input->getOption('dry-run');
         $path           = $input->getOption('write-sql');
@@ -98,12 +102,19 @@ EOT
             ? Direction::DOWN
             : Direction::UP;
 
-        $version = $this->migrationRepository->getVersion($version);
+        $versions = array_map(
+            function (string $version) {
+                return $this->migrationRepository-->getVersion($version);
+            },
+            $versions
+        );
 
         if ($path !== false) {
             $path = $path ?? getcwd();
 
-            $version->writeSqlFile($path, $direction);
+            foreach ($versions as $version) {
+                $version->writeSqlFile($path, $direction);
+            }
 
             return 0;
         }
@@ -120,7 +131,9 @@ EOT
             ->setDryRun($dryRun)
             ->setTimeAllQueries($timeAllQueries);
 
-        $version->execute($direction, $migratorConfiguration);
+        foreach ($versions as $version) {
+            $version->execute($direction, $migratorConfiguration);
+        }
 
         return 0;
     }
