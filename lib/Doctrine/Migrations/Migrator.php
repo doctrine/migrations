@@ -135,7 +135,9 @@ class Migrator
          */
         if (count($migrationsToExecute) === 0 && ! $migratorConfiguration->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
-        } elseif (count($migrationsToExecute) === 0) {
+        }
+
+        if (count($migrationsToExecute) === 0) {
             return $this->noMigrations();
         }
 

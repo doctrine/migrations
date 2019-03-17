@@ -153,11 +153,7 @@ abstract class AbstractCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) : bool {
-        if ($input->isInteractive() && ! $this->askConfirmation($question, $input, $output)) {
-            return false;
-        }
-
-        return true;
+        return ! $input->isInteractive() || $this->askConfirmation($question, $input, $output);
     }
 
     protected function procOpen(string $editorCommand, string $path) : void

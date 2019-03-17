@@ -121,7 +121,6 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertSame($expected, $migrationsToExecute);
     }
 
-
     protected function setUp() : void
     {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);

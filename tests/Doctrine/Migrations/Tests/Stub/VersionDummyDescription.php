@@ -7,9 +7,6 @@ namespace Doctrine\Migrations\Tests\Stub;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
-/**
- * Class DummyMigration
- */
 class VersionDummyDescription extends AbstractMigration
 {
     public function getDescription() : string
