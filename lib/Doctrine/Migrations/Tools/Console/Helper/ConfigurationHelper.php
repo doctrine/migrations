@@ -75,7 +75,6 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         return new Configuration($this->connection);
     }
 
-
     private function configExists(string $config) : bool
     {
         return file_exists($config);
