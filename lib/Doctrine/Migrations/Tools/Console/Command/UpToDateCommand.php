@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function sprintf;
@@ -21,12 +22,13 @@ class UpToDateCommand extends AbstractCommand
             ->setName('migrations:up-to-date')
             ->setAliases(['up-to-date'])
             ->setDescription('Tells you if your schema is up-to-date.')
+            ->addOption('fail-on-unregistered', 'u', InputOption::VALUE_NONE, 'Whether to fail when there are unregistered extra migrations found')
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command tells you if your schema is up-to-date:
 
     <info>%command.full_name%</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -43,12 +45,26 @@ EOT
             return 0;
         }
 
+        if ($availableMigrations > 0) {
+            $output->writeln(sprintf(
+                '<error>Out-of-date! %u migration%s available to execute.</error>',
+                $availableMigrations,
+                $availableMigrations > 1 ? 's are' : ' is'
+            ));
+
+            return 1;
+        }
+
+        // negative number means that there are unregistered migrations in the database
+
+        $extraMigrations = -$availableMigrations;
         $output->writeln(sprintf(
-            '<comment>Out-of-date! %u migration%s available to execute.</comment>',
-            $availableMigrations,
-            $availableMigrations > 1 ? 's are' : ' is'
+            '<error>You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.</error>',
+            $extraMigrations,
+            $extraMigrations > 1 ? 'are not' : 'is not a',
+            $extraMigrations > 1 ? 's' : ''
         ));
 
-        return 1;
+        return $input->getOption('fail-on-unregistered') === true ? 2 : 0;
     }
 }
