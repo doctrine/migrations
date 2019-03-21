@@ -9,7 +9,7 @@ use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\ArrayInput;
+use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class UpToDateCommandTest extends TestCase
@@ -34,7 +34,7 @@ class UpToDateCommandTest extends TestCase
      *
      * @dataProvider dataIsUpToDate
      */
-    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode) : void
+    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false) : void
     {
         $this->migrationRepository
             ->method('getMigrations')
@@ -44,12 +44,17 @@ class UpToDateCommandTest extends TestCase
             ->method('getMigratedVersions')
             ->willReturn($migratedVersions);
 
-        $output = $this->createMock(OutputInterface::class);
+        $input = $this->createMock(InputInterface::class);
+        $input->expects(self::any())
+            ->method('getOption')
+            ->with('fail-on-unregistered')
+            ->willReturn($failOnUnregistered);
 
+        $output = $this->createMock(OutputInterface::class);
         $output->expects(self::once())
             ->method('writeln');
 
-        $actual = $this->upToDateCommand->execute(new ArrayInput([]), $output);
+        $actual = $this->upToDateCommand->execute($input, $output);
 
         self::assertSame($exitCode, $actual);
     }
@@ -88,6 +93,17 @@ class UpToDateCommandTest extends TestCase
                 ],
                 ['20110614015627'],
                 1,
+            ],
+            'unregistered-migrations' => [
+                [],
+                ['20160614015627', '20120614015627'],
+                0,
+            ],
+            'unregistered-migrations-fail' => [
+                [],
+                ['20160614015627', '20120614015627'],
+                2,
+                true,
             ],
         ];
     }
