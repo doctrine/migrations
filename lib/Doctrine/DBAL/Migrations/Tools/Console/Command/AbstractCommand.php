@@ -37,7 +37,7 @@ abstract class AbstractCommand extends Command
      * The migrationConfiguration property contains the configuration
      * created taking into account the command line options.
      *
-     * @var Configuration
+     * @var Configuration|null
      */
     private $migrationConfiguration;
 
@@ -71,6 +71,9 @@ abstract class AbstractCommand extends Command
     public function setMigrationConfiguration(Configuration $config)
     {
         $this->configuration = $config;
+
+        // Drop to allow reconfiguring
+        $this->migrationConfiguration = null;
     }
 
     /**
