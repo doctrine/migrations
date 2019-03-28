@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\internal;
 
 /**
  * The Factory class is responsible for creating instances of the Version class for a version number
