@@ -146,7 +146,7 @@ EOT
             $availableVersions = $this->migrationRepository->getAvailableVersions();
 
             foreach ($availableVersions as $version) {
-                $this->mark($output, $version, true);
+                $this->mark($input, $output, $version, true);
             }
         } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
             $availableVersions = $this->migrationRepository->getAvailableVersions();
@@ -156,10 +156,10 @@ EOT
                     continue;
                 }
 
-                $this->mark($output, $version, true);
+                $this->mark($input, $output, $version, true);
             }
         } else {
-            $this->mark($output, $affectedVersion);
+            $this->mark($input, $output, $affectedVersion);
         }
     }
 
@@ -168,14 +168,46 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(OutputInterface $output, string $version, bool $all = false) : void
+    private function mark(InputInterface $input, OutputInterface $output, string $version, bool $all = false) : void
     {
         if (! $this->migrationRepository->hasVersion($version)) {
-            throw UnknownMigrationVersion::new($version);
+            if ((bool) $input->getOption('delete') === false) {
+                throw UnknownMigrationVersion::new($version);
+            }
+
+            $question =
+                'WARNING! You are about to delete a migration version from the version table that has no corresponding migration file.' .
+                'To delete a migration version from the migration table you need a migration file (which can be empty).' .
+                'Do you want to create an empty one now? (y/n)';
+
+            $confirmation = $this->askConfirmation($question, $input, $output);
+
+            if ($confirmation) {
+                $path = $this->dependencyFactory->getMigrationGenerator()->generateMigration($version);
+
+                $output->writeln([
+                    sprintf(
+                        'Generated new empty migration class to "<info>%s</info>"',
+                        $path
+                    ),
+                    '',
+                    sprintf(
+                        'Now you can delete the migration from the migration table with <info>migrations:version --delete %s</info>',
+                        $version
+                    ),
+                    '',
+                    sprintf(
+                        'Do not forget to delete the empty migration file with <info>rm %s</info>',
+                        $path
+                    )
+                ]);
+
+                return;
+            }
         }
 
         $version = $this->migrationRepository->getVersion($version);
-
+        
         $marked = false;
 
         if ($this->markMigrated && $this->migrationRepository->hasVersionMigrated($version)) {
