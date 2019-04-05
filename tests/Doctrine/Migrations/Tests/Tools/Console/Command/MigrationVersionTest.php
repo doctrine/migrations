@@ -10,6 +10,8 @@ use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function sys_get_temp_dir;
 
@@ -326,5 +328,30 @@ class MigrationVersionTest extends MigrationTestCase
             ],
             ['interactive' => false]
         );
+    }
+
+    /**
+     * Test "--delete" option on migrated version without existing version file.
+     */
+    public function testDeleteOptionIfVersionFileDoesNotExist() : void
+    {
+        $this->configuration->registerMigration('1233', Version1Test::class);
+        $this->configuration->getVersion('1233')->markMigrated();
+
+        $this->configuration->getDependencyFactory()->getMigrationRepository()->clearVersions();
+
+        $this->command->setHelperSet(new HelperSet([new QuestionHelper()]));
+
+        $commandTester = new CommandTester($this->command);
+
+        $commandTester->execute(
+            [
+                '--delete' => true,
+                'version'  => '1233',
+            ],
+            ['interactive' => false]
+        );
+
+        self::assertContains('1233 deleted from the version table.', $commandTester->getDisplay());
     }
 }
