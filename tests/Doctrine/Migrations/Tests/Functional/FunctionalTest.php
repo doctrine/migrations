@@ -200,7 +200,13 @@ class FunctionalTest extends MigrationTestCase
         $migrator = $this->createTestMigrator($this->config);
         $migrator->migrate('2', $migratorConfiguration);
 
-        $schema = $this->config->getConnection()->getSchemaManager()->createSchema();
+        $schema = $migratorConfiguration->getFromSchema();
+
+        self::assertInstanceOf(Schema::class, $schema);
+        self::assertTrue($schema->hasTable('foo'));
+
+        $table = $schema->getTable('foo');
+        self::assertTrue($table->hasColumn('bar'));
     }
 
     public function testMigrateDownSeveralSteps() : void

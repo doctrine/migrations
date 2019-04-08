@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\DBAL\Schema\Schema;
+use RuntimeException;
 use Throwable;
 use function count;
 
@@ -37,6 +39,9 @@ class ExecutionResult
 
     /** @var Throwable|null */
     private $exception;
+
+    /** @var Schema|null */
+    private $toSchema;
 
     /**
      * @param string[] $sql
@@ -151,5 +156,19 @@ class ExecutionResult
     public function getException() : ?Throwable
     {
         return $this->exception;
+    }
+
+    public function setToSchema(Schema $toSchema) : void
+    {
+        $this->toSchema = $toSchema;
+    }
+
+    public function getToSchema() : Schema
+    {
+        if ($this->toSchema === null) {
+            throw new RuntimeException('Cannot call getToSchema() when toSchema is null.');
+        }
+
+        return $this->toSchema;
     }
 }
