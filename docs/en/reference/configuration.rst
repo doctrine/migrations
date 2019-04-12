@@ -96,7 +96,7 @@ Here are details about what each configuration option does:
 +----------------------------+------------+----------------------------+----------------------------------------------------------------------------------+
 | column_name                | no         | version                    | The name of the column which stores the version name.                            |
 +----------------------------+------------+----------------------------+----------------------------------------------------------------------------------+
-| column_length              | no         | 14                         | The lenth of the column which stores the version name.                           |
+| column_length              | no         | 14                         | The length of the column which stores the version name.                           |
 +----------------------------+------------+----------------------------+----------------------------------------------------------------------------------+
 | executed_at_column_name    | no         | executed_at                | The name of the column which stores the date that a migration was executed.      |
 +----------------------------+------------+----------------------------+----------------------------------------------------------------------------------+
