@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Version\ExecutionResult;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use RuntimeException;
 
 class ExecutionResultTest extends TestCase
 {
@@ -93,6 +95,23 @@ class ExecutionResultTest extends TestCase
         $this->versionExecutionResult->setException($exception);
 
         self::assertSame($exception, $this->versionExecutionResult->getException());
+    }
+
+    public function testToSchema() : void
+    {
+        $toSchema = $this->createMock(Schema::class);
+
+        $this->versionExecutionResult->setToSchema($toSchema);
+
+        self::assertSame($toSchema, $this->versionExecutionResult->getToSchema());
+    }
+
+    public function testToSchemaThrowsRuntimExceptionWhenToSchemaIsNull() : void
+    {
+        self::expectException(RuntimeException::class);
+        self::expectExceptionMessage('Cannot call getToSchema() when toSchema is null.');
+
+        $this->versionExecutionResult->getToSchema();
     }
 
     protected function setUp() : void

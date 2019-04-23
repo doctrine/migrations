@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Events;
@@ -192,7 +193,7 @@ final class Executor implements ExecutorInterface
 
         $version->setState(State::PRE);
 
-        $fromSchema = $this->schemaProvider->createFromSchema();
+        $fromSchema = $this->getFromSchema($migratorConfiguration);
 
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
@@ -205,6 +206,8 @@ final class Executor implements ExecutorInterface
         $version->setState(State::EXEC);
 
         $toSchema = $this->schemaProvider->createToSchema($fromSchema);
+
+        $versionExecutionResult->setToSchema($toSchema);
 
         $migration->$direction($toSchema);
 
@@ -367,5 +370,15 @@ final class Executor implements ExecutorInterface
             $query,
             $params
         )));
+    }
+
+    private function getFromSchema(MigratorConfiguration $migratorConfiguration) : Schema
+    {
+        // if we're in a dry run, use the from Schema instead of reading the schema from the database
+        if ($migratorConfiguration->isDryRun() && $migratorConfiguration->getFromSchema() !== null) {
+            return $migratorConfiguration->getFromSchema();
+        }
+
+        return $this->schemaProvider->createFromSchema();
     }
 }
