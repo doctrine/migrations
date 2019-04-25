@@ -483,6 +483,7 @@ class FunctionalTest extends MigrationTestCase
             Events::onMigrationsVersionExecuting,
             Events::onMigrationsVersionExecuted,
         ] as $eventName) {
+            self::assertCount(1, $listener->events[$eventName]);
             self::assertArrayHasKey($eventName, $listener->events);
         }
     }
