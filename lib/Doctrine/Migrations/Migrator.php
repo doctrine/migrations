@@ -160,8 +160,6 @@ class Migrator
     ) : array {
         $dryRun = $migratorConfiguration->isDryRun();
 
-        $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
-
         $connection = $this->configuration->getConnection();
 
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
