@@ -39,6 +39,8 @@ use Doctrine\Migrations\AbstractMigration;
  */
 final class Version<version> extends AbstractMigration
 {
+<properties>
+
     public function getDescription() : string
     {
         return '';
@@ -73,13 +75,15 @@ TEMPLATE;
     public function generateMigration(
         string $version,
         ?string $up = null,
-        ?string $down = null
+        ?string $down = null,
+        ?string $properties = null
     ) : string {
         $placeHolders = [
             '<namespace>',
             '<version>',
             '<up>',
             '<down>',
+            '<properties>',
         ];
 
         $replacements = [
@@ -87,6 +91,7 @@ TEMPLATE;
             $version,
             $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
             $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
+            $properties !== null ? '    ' . implode("\n    ", explode("\n", $properties)) : null,
         ];
 
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
