@@ -28,7 +28,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             'migrations_namespace' => 'MyProject\Migrations',
             'table_name' => 'doctrine_migration_versions',
             'column_name' => 'version',
-            'column_length' => 255,
+            'column_length' => 14,
             'executed_at_column_name' => 'executed_at',
             'migrations_directory' => '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations',
             'all_or_nothing' => true,
@@ -41,7 +41,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
         migrations_namespace: "MyProject\Migrations"
         table_name: "doctrine_migration_versions"
         column_name: "version"
-        column_length: 255
+        column_length: 14
         executed_at_column_name: "executed_at"
         migrations_directory: "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations"
         all_or_nothing: true
@@ -59,7 +59,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             <migrations-namespace>MyProject\Migrations</migrations-namespace>
 
-            <table name="doctrine_migration_versions" column="version" column_length="255" executed_at_column="executed_at" />
+            <table name="doctrine_migration_versions" column="version" column_length="14" executed_at_column="executed_at" />
 
             <migrations-directory>/data/doctrine/migrations-docs-example/lib/MyProject/Migrations</migrations-directory>
 
@@ -75,7 +75,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             "migrations_namespace": "MyProject\Migrations",
             "table_name": "doctrine_migration_versions",
             "column_name": "version",
-            "column_length": 255,
+            "column_length": 14,
             "executed_at_column_name": "executed_at",
             "migrations_directory": "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations",
             "all_or_nothing": true,

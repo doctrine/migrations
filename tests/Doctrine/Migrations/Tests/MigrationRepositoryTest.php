@@ -105,6 +105,28 @@ class MigrationRepositoryTest extends TestCase
         $this->migrationRepository->registerMigration('123', DoesNotExistAtAll::class);
     }
 
+    public function testRemoveMigrationVersionFromDatabase() : void
+    {
+        $migrationsTableName  = 'migration_versions';
+        $migrationsColumnName = 'version';
+        $version              = '123';
+
+        $this->configuration->expects(self::once())
+            ->method('getMigrationsTableName')
+            ->willReturn($migrationsTableName);
+
+        $this->configuration->expects(self::once())
+            ->method('getMigrationsColumnName')
+            ->willReturn($migrationsColumnName);
+
+        $this->connection->expects(self::once())
+            ->method('delete')
+            ->with($migrationsTableName, [$migrationsColumnName => $version])
+            ->willReturn(1);
+
+        $this->migrationRepository->removeMigrationVersionFromDatabase($version);
+    }
+
     protected function setUp() : void
     {
         $this->configuration   = $this->createMock(Configuration::class);

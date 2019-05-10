@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\DBAL\Schema\Schema;
+
 /**
  * The MigratorConfiguration class is responsible for defining the configuration for a migration.
  *
@@ -25,6 +27,9 @@ class MigratorConfiguration
 
     /** @var bool */
     private $allOrNothing = false;
+
+    /** @var Schema|null */
+    private $fromSchema;
 
     public function isDryRun() : bool
     {
@@ -70,6 +75,18 @@ class MigratorConfiguration
     public function setAllOrNothing(bool $allOrNothing) : self
     {
         $this->allOrNothing = $allOrNothing;
+
+        return $this;
+    }
+
+    public function getFromSchema() : ?Schema
+    {
+        return $this->fromSchema;
+    }
+
+    public function setFromSchema(Schema $fromSchema) : self
+    {
+        $this->fromSchema = $fromSchema;
 
         return $this;
     }

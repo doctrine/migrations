@@ -19,6 +19,8 @@ use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
+use Doctrine\Migrations\Tests\Stub\Functional\DryRun\DryRun1;
+use Doctrine\Migrations\Tests\Stub\Functional\DryRun\DryRun2;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateAddSqlPostAndPreUpAndDownTest;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateAddSqlTest;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
@@ -185,6 +187,26 @@ class FunctionalTest extends MigrationTestCase
         self::assertFalse($migrations['1']->isMigrated());
         self::assertFalse($migrations['2']->isMigrated());
         self::assertFalse($migrations['3']->isMigrated());
+    }
+
+    public function testDryRunWithTableCreatedWithSchemaInFirstMigration() : void
+    {
+        $this->config->registerMigration('1', DryRun1::class);
+        $this->config->registerMigration('2', DryRun2::class);
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setDryRun(true);
+
+        $migrator = $this->createTestMigrator($this->config);
+        $migrator->migrate('2', $migratorConfiguration);
+
+        $schema = $migratorConfiguration->getFromSchema();
+
+        self::assertInstanceOf(Schema::class, $schema);
+        self::assertTrue($schema->hasTable('foo'));
+
+        $table = $schema->getTable('foo');
+        self::assertTrue($table->hasColumn('bar'));
     }
 
     public function testMigrateDownSeveralSteps() : void
@@ -461,6 +483,7 @@ class FunctionalTest extends MigrationTestCase
             Events::onMigrationsVersionExecuting,
             Events::onMigrationsVersionExecuted,
         ] as $eventName) {
+            self::assertCount(1, $listener->events[$eventName]);
             self::assertArrayHasKey($eventName, $listener->events);
         }
     }

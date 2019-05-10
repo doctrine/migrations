@@ -89,6 +89,7 @@ abstract class MigrationTestCase extends TestCase
                 return $output->writeln($message);
             });
         }
+
         return $this->outputWriter;
     }
 

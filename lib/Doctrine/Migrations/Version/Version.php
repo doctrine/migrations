@@ -129,13 +129,10 @@ class Version
         switch ($this->state) {
             case State::PRE:
                 return 'Pre-Checks';
-
             case State::POST:
                 return 'Post-Checks';
-
             case State::EXEC:
                 return 'Execution';
-
             default:
                 return 'No State';
         }

@@ -146,7 +146,7 @@ EOT
             $availableVersions = $this->migrationRepository->getAvailableVersions();
 
             foreach ($availableVersions as $version) {
-                $this->mark($output, $version, true);
+                $this->mark($input, $output, $version, true);
             }
         } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
             $availableVersions = $this->migrationRepository->getAvailableVersions();
@@ -156,10 +156,10 @@ EOT
                     continue;
                 }
 
-                $this->mark($output, $version, true);
+                $this->mark($input, $output, $version, true);
             }
         } else {
-            $this->mark($output, $affectedVersion);
+            $this->mark($input, $output, $affectedVersion);
         }
     }
 
@@ -168,10 +168,29 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(OutputInterface $output, string $version, bool $all = false) : void
+    private function mark(InputInterface $input, OutputInterface $output, string $version, bool $all = false) : void
     {
         if (! $this->migrationRepository->hasVersion($version)) {
-            throw UnknownMigrationVersion::new($version);
+            if ((bool) $input->getOption('delete') === false) {
+                throw UnknownMigrationVersion::new($version);
+            }
+
+            $question =
+                'WARNING! You are about to delete a migration version from the version table that has no corresponding migration file.' .
+                'Do you want to delete this migration from the migrations table? (y/n)';
+
+            $confirmation = $this->askConfirmation($question, $input, $output);
+
+            if ($confirmation) {
+                $this->migrationRepository->removeMigrationVersionFromDatabase($version);
+
+                $output->writeln(sprintf(
+                    '<info>%s</info> deleted from the version table.',
+                    $version
+                ));
+
+                return;
+            }
         }
 
         $version = $this->migrationRepository->getVersion($version);
