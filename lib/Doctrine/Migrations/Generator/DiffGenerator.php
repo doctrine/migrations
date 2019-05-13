@@ -108,13 +108,24 @@ class DiffGenerator
     {
         $toSchema = $this->schemaProvider->createSchema();
 
-        $filterExpression = $this->dbalConfiguration->getFilterSchemaAssetsExpression();
+        if (method_exists(DBALConfiguration::class, 'getSchemaAssetsFilter')) {
+            $filterCallback = $this->dbalConfiguration->getSchemaAssetsFilter();
+        } else {
+            // backwards compatibility with dbal < 2.9
+            $filterExpression = $this->dbalConfiguration->getFilterSchemaAssetsExpression();
+            $filterCallback = null;
 
-        if ($filterExpression !== null) {
+            if ($filterExpression !== null) {
+                $filterCallback = function (string $tableName) use ($filterExpression) {
+                    return preg_match($filterExpression, $tableName) === 1;
+                };
+            }
+        }
+
+        if ($filterCallback !== null) {
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
-
-                if (preg_match($filterExpression, $this->resolveTableName($tableName)) === 1) {
+                if ($filterCallback($this->resolveTableName($tableName))) {
                     continue;
                 }
 
