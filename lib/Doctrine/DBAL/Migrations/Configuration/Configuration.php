@@ -544,7 +544,7 @@ class Configuration
     /**
      * Returns all migrated versions from the versions table, in an array.
      *
-     * @return Version[]
+     * @return string[]
      */
     public function getMigratedVersions()
     {
