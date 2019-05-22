@@ -164,10 +164,10 @@ class VersionTest extends MigrationTestCase
      */
     public function testGetExecutionState($state)
     {
-        $configuration     = new Configuration($this->getSqliteConnection());
-        $version           = new Version(
+        $configuration   = new Configuration($this->getSqliteConnection());
+        $version         = new Version(
             $configuration,
-            $versionName   = '003',
+            $versionName = '003',
             VersionDummy::class
         );
         $reflectionVersion = new \ReflectionClass(Version::class);
@@ -370,7 +370,7 @@ class VersionTest extends MigrationTestCase
             $versionName = '005',
             VersionOutputSql::class
         );
-        $path            = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
+        $path = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'migrations';
 
         $version->writeSqlFile($path, $direction);
 
