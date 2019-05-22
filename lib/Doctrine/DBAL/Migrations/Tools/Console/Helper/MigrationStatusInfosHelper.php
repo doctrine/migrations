@@ -8,7 +8,7 @@ use Doctrine\DBAL\Migrations\Version;
 
 class MigrationStatusInfosHelper
 {
-    /** @var Version[] */
+    /** @var string[] */
     private $executedMigrations;
 
     /** @var Version[] */
