@@ -4,7 +4,7 @@ Introduction
 The Doctrine Migrations project offers additional functionality on top of the
 DBAL_ and ORM_ for versioning your database schema. It makes it easy and safe
 to deploy changes to it in a way that can be reviewed and tested before being
-deploying to production.
+deployed to production.
 
 Installation
 ------------
