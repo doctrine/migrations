@@ -45,12 +45,15 @@ class DiffGeneratorTest extends TestCase
         $toSchema   = $this->createMock(Schema::class);
 
         $this->dbalConfiguration->expects(self::once())
-            ->method('setFilterSchemaAssetsExpression')
-            ->with('/table_name1/');
+            ->method('setSchemaAssetsFilter');
 
         $this->dbalConfiguration->expects(self::once())
-            ->method('getFilterSchemaAssetsExpression')
-            ->willReturn('/table_name1/');
+            ->method('getSchemaAssetsFilter')
+            ->willReturn(
+                static function ($name) {
+                    return $name === 'table_name1';
+                }
+            );
 
         $table1 = $this->createMock(Table::class);
         $table1->expects(self::once())

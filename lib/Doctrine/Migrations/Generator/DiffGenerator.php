@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Generator;
 
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
@@ -67,7 +68,15 @@ class DiffGenerator
         bool $checkDbPlatform = true
     ) : string {
         if ($filterExpression !== null) {
-            $this->dbalConfiguration->setFilterSchemaAssetsExpression($filterExpression);
+            $this->dbalConfiguration->setSchemaAssetsFilter(
+                static function ($assetName) use ($filterExpression) {
+                    if ($assetName instanceof AbstractAsset) {
+                        $assetName = $assetName->getName();
+                    }
+
+                    return preg_match($filterExpression, $assetName);
+                }
+            );
         }
 
         $fromSchema = $this->createFromSchema();
@@ -108,13 +117,13 @@ class DiffGenerator
     {
         $toSchema = $this->schemaProvider->createSchema();
 
-        $filterExpression = $this->dbalConfiguration->getFilterSchemaAssetsExpression();
+        $schemaAssetsFilter = $this->dbalConfiguration->getSchemaAssetsFilter();
 
-        if ($filterExpression !== null) {
+        if ($schemaAssetsFilter !== null) {
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
 
-                if (preg_match($filterExpression, $this->resolveTableName($tableName)) === 1) {
+                if ($schemaAssetsFilter($this->resolveTableName($tableName))) {
                     continue;
                 }
 

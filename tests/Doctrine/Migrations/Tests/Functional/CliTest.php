@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Functional;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\AbstractMigration;
@@ -28,6 +29,7 @@ use function assert;
 use function count;
 use function file_exists;
 use function file_get_contents;
+use function preg_match;
 use function reset;
 use function unlink;
 
@@ -172,7 +174,15 @@ class CliTest extends MigrationTestCase
 
     public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter() : void
     {
-        $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^bar$/');
+        $this->conn->getConfiguration()->setSchemaAssetsFilter(
+            static function ($assetName) {
+                if ($assetName instanceof AbstractAsset) {
+                    $assetName = $assetName->getName();
+                }
+
+                return preg_match('/^bar$/', $assetName);
+            }
+        );
 
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         self::assertVersionCount(0, 'should start with no versions');
@@ -197,7 +207,15 @@ class CliTest extends MigrationTestCase
      */
     public function testDiffCommandSchemaFilterAreCaseSensitive() : void
     {
-        $this->conn->getConfiguration()->setFilterSchemaAssetsExpression('/^FOO$/');
+        $this->conn->getConfiguration()->setSchemaAssetsFilter(
+            static function ($assetName) {
+                if ($assetName instanceof AbstractAsset) {
+                    $assetName = $assetName->getName();
+                }
+
+                return preg_match('/^FOO$/', $assetName);
+            }
+        );
 
         $schema = new Schema();
         $t      = $schema->createTable('FOO');
