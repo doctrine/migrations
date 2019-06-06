@@ -131,6 +131,13 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $this->loadConfiguration('organize_invalid');
     }
 
+    public function testCustomTemplate() : void
+    {
+        $config = $this->loadConfiguration('custom_template');
+
+        self::assertSame('template.tpl', $config->getCustomTemplate());
+    }
+
     public function testVersionsOrganizationIncompatibleFinder() : void
     {
         $this->expectException(MigrationException::class);

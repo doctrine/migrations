@@ -7,6 +7,7 @@
         <xs:complexType>
             <xs:all minOccurs="0">
                 <xs:element type="xs:string" name="name" minOccurs="0" maxOccurs="1"/>
+                <xs:element type="xs:string" name="custom-template" minOccurs="0" maxOccurs="1"/>
                 <xs:element type="xs:string" name="migrations-namespace" minOccurs="0" maxOccurs="1"/>
                 <xs:element name="table" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
