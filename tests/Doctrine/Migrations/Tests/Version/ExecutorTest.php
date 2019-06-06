@@ -62,29 +62,6 @@ class ExecutorTest extends TestCase
 
     public function testExecuteUp() : void
     {
-        $platform = $this->createMock(AbstractPlatform::class);
-
-        $this->connection->expects(self::once())
-            ->method('getDatabasePlatform')
-            ->willReturn($platform);
-
-        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
-
-        $this->stopwatch->expects(self::any())
-            ->method('start')
-            ->willReturn($stopwatchEvent);
-
-        $stopwatchEvent->expects(self::any())
-            ->method('stop');
-
-        $stopwatchEvent->expects(self::any())
-            ->method('getDuration')
-            ->willReturn(100);
-
-        $stopwatchEvent->expects(self::any())
-            ->method('getMemory')
-            ->willReturn(100);
-
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
@@ -130,25 +107,28 @@ class ExecutorTest extends TestCase
         self::assertFalse($this->migration->postDownExecuted);
     }
 
+    /**
+     * @test
+     */
+    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty() : void
+    {
+        $this->outputWriter->expects(self::at(0))
+            ->method('write')
+            ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>\n");
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $this->versionExecutor->execute(
+            $this->version,
+            new VersionExecutorTestMigration($this->version, 'testing'),
+            Direction::UP,
+            $migratorConfiguration
+        );
+    }
+
     public function testExecuteDown() : void
     {
-        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
-
-        $this->stopwatch->expects(self::any())
-            ->method('start')
-            ->willReturn($stopwatchEvent);
-
-        $stopwatchEvent->expects(self::any())
-            ->method('stop');
-
-        $stopwatchEvent->expects(self::any())
-            ->method('getDuration')
-            ->willReturn(100);
-
-        $stopwatchEvent->expects(self::any())
-            ->method('getMemory')
-            ->willReturn(100);
-
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
@@ -194,6 +174,26 @@ class ExecutorTest extends TestCase
         self::assertTrue($this->migration->postDownExecuted);
     }
 
+    /**
+     * @test
+     */
+    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty() : void
+    {
+        $this->outputWriter->expects(self::at(0))
+            ->method('write')
+            ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>\n");
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $this->versionExecutor->execute(
+            $this->version,
+            new VersionExecutorTestMigration($this->version, 'testing'),
+            Direction::DOWN,
+            $migratorConfiguration
+        );
+    }
+
     protected function setUp() : void
     {
         $this->configuration      = $this->createMock(Configuration::class);
@@ -216,6 +216,10 @@ class ExecutorTest extends TestCase
             ->method('getConnection')
             ->willReturn($this->connection);
 
+        $this->connection->expects(self::any())
+            ->method('getDatabasePlatform')
+            ->willReturn($this->createMock(AbstractPlatform::class));
+
         $this->version = new Version(
             $this->configuration,
             '001',
@@ -224,6 +228,23 @@ class ExecutorTest extends TestCase
         );
 
         $this->migration = new VersionExecutorTestMigration($this->version);
+
+        $stopwatchEvent = $this->createMock(StopwatchEvent::class);
+
+        $this->stopwatch->expects(self::any())
+            ->method('start')
+            ->willReturn($stopwatchEvent);
+
+        $stopwatchEvent->expects(self::any())
+            ->method('stop');
+
+        $stopwatchEvent->expects(self::any())
+            ->method('getDuration')
+            ->willReturn(100);
+
+        $stopwatchEvent->expects(self::any())
+            ->method('getMemory')
+            ->willReturn(100);
     }
 }
 
@@ -240,6 +261,21 @@ class VersionExecutorTestMigration extends AbstractMigration
 
     /** @var bool */
     public $postDownExecuted = false;
+
+    /** @var string */
+    private $description;
+
+    public function __construct(Version $version, string $description = '')
+    {
+        parent::__construct($version);
+
+        $this->description = $description;
+    }
+
+    public function getDescription() : string
+    {
+        return $this->description;
+    }
 
     public function preUp(Schema $fromSchema) : void
     {
