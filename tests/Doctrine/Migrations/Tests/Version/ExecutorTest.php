@@ -107,6 +107,26 @@ class ExecutorTest extends TestCase
         self::assertFalse($this->migration->postDownExecuted);
     }
 
+    /**
+     * @test
+     */
+    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty() : void
+    {
+        $this->outputWriter->expects(self::at(0))
+            ->method('write')
+            ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>\n");
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $this->versionExecutor->execute(
+            $this->version,
+            new VersionExecutorTestMigration($this->version, 'testing'),
+            Direction::UP,
+            $migratorConfiguration
+        );
+    }
+
     public function testExecuteDown() : void
     {
         $this->outputWriter->expects(self::at(0))
@@ -152,6 +172,26 @@ class ExecutorTest extends TestCase
         self::assertFalse($this->migration->postUpExecuted);
         self::assertTrue($this->migration->preDownExecuted);
         self::assertTrue($this->migration->postDownExecuted);
+    }
+
+    /**
+     * @test
+     */
+    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty() : void
+    {
+        $this->outputWriter->expects(self::at(0))
+            ->method('write')
+            ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>\n");
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $this->versionExecutor->execute(
+            $this->version,
+            new VersionExecutorTestMigration($this->version, 'testing'),
+            Direction::DOWN,
+            $migratorConfiguration
+        );
     }
 
     protected function setUp() : void

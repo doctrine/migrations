@@ -197,11 +197,7 @@ final class Executor implements ExecutorInterface
 
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-        if ($direction === Direction::UP) {
-            $this->outputWriter->write("\n" . sprintf('  <info>++</info> migrating <comment>%s</comment>', $version->getVersion()) . "\n");
-        } else {
-            $this->outputWriter->write("\n" . sprintf('  <info>--</info> reverting <comment>%s</comment>', $version->getVersion()) . "\n");
-        }
+        $this->outputWriter->write("\n" . $this->getMigrationHeader($version, $migration, $direction) . "\n");
 
         $version->setState(State::EXEC);
 
@@ -272,6 +268,22 @@ final class Executor implements ExecutorInterface
         );
 
         return $versionExecutionResult;
+    }
+
+    private function getMigrationHeader(Version $version, AbstractMigration $migration, string $direction) : string
+    {
+        $versionInfo = $version->getVersion();
+        $description = $migration->getDescription();
+
+        if ($description !== '') {
+            $versionInfo .= ' (' . $description . ')';
+        }
+
+        if ($direction === Direction::UP) {
+            return sprintf('  <info>++</info> migrating <comment>%s</comment>', $versionInfo);
+        }
+
+        return sprintf('  <info>--</info> reverting <comment>%s</comment>', $versionInfo);
     }
 
     private function skipMigration(
