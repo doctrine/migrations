@@ -15,6 +15,11 @@
             "branchName": "2.1",
             "slug": "2.1",
             "current": true
+        },
+        {
+            "name": "2.0",
+            "branchName": "2.0",
+            "slug": "2.0"
         }
     ]
 }
