@@ -54,6 +54,10 @@ class XmlConfiguration extends AbstractFileConfiguration
             $config['name'] = (string) $xml->name;
         }
 
+        if (isset($xml->{'custom-template'})) {
+            $config['custom_template'] = (string) $xml->{'custom-template'};
+        }
+
         if (isset($xml->table['name'])) {
             $config['table_name'] = (string) $xml->table['name'];
         }
