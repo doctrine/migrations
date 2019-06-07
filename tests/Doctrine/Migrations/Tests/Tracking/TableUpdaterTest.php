@@ -55,7 +55,7 @@ class TableUpdaterTest extends TestCase
             ->willReturn($table);
 
         $versionColumn = new Column(
-            'version',
+            'VERSION',
             Type::getType('string'),
             ['length' => 255]
         );
@@ -79,6 +79,9 @@ class TableUpdaterTest extends TestCase
                 $versionColumn,
                 $executedAt,
             ]);
+
+        $table->expects(self::never())
+            ->method('dropColumn');
 
         $fromSchema = $this->createMock(Schema::class);
         $toSchema   = $this->createMock(Schema::class);

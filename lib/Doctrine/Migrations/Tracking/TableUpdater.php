@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Throwable;
 use function in_array;
+use function strtolower;
 
 /**
  * The TableUpdater class is responsible for updating the tracking table schema if it needs to be updated.
@@ -88,7 +89,7 @@ class TableUpdater
         // remove columns from the table definition that we don't care about
         // so we don't try to drop those columns
         foreach ($table->getColumns() as $column) {
-            if (in_array($column->getName(), $columnNames, true)) {
+            if (in_array(strtolower($column->getName()), $columnNames, true)) {
                 continue;
             }
 
