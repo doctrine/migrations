@@ -20,6 +20,7 @@ listens for all possible migrations events.
     use Doctrine\Common\EventSubscriber;
     use Doctrine\Migrations\Event\MigrationsEventArgs;
     use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
+    use Doctrine\Migrations\Events;
 
     class MigrationsListener implements EventSubscriber
     {
