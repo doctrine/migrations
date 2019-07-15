@@ -22,6 +22,9 @@ use function sprintf;
  */
 class DiffCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:diff';
+
     /** @var SchemaProviderInterface|null */
     protected $schemaProvider;
 
@@ -37,7 +40,6 @@ class DiffCommand extends AbstractCommand
         parent::configure();
 
         $this
-            ->setName('migrations:diff')
             ->setAliases(['diff'])
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
             ->setHelp(<<<EOT

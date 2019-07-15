@@ -23,10 +23,12 @@ use function strlen;
  */
 class StatusCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:status';
+
     protected function configure() : void
     {
         $this
-            ->setName('migrations:status')
             ->setAliases(['status'])
             ->setDescription('View the status of a set of migrations.')
             ->addOption(

@@ -19,12 +19,14 @@ use function sprintf;
  */
 class DumpSchemaCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:dump-schema';
+
     protected function configure() : void
     {
         parent::configure();
 
         $this
-            ->setName('migrations:dump-schema')
             ->setAliases(['dump-schema'])
             ->setDescription('Dump the schema for your database to a migration.')
             ->setHelp(<<<EOT

@@ -22,10 +22,12 @@ use function substr;
  */
 class MigrateCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:migrate';
+
     protected function configure() : void
     {
         $this
-            ->setName('migrations:migrate')
             ->setAliases(['migrate'])
             ->setDescription(
                 'Execute a migration to a specified version or the latest available version.'

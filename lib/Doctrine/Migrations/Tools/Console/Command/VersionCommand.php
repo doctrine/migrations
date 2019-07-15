@@ -19,13 +19,15 @@ use function sprintf;
  */
 class VersionCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:version';
+
     /** @var bool */
     private $markMigrated;
 
     protected function configure() : void
     {
         $this
-            ->setName('migrations:version')
             ->setAliases(['version'])
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument(
