@@ -14,12 +14,14 @@ use function sprintf;
  */
 class RollupCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:rollup';
+
     protected function configure() : void
     {
         parent::configure();
 
         $this
-            ->setName('migrations:rollup')
             ->setAliases(['rollup'])
             ->setDescription('Rollup migrations by deleting all tracked versions and insert the one version that exists.')
             ->setHelp(<<<EOT

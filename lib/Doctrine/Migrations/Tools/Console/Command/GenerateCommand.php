@@ -14,10 +14,12 @@ use function sprintf;
  */
 class GenerateCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:generate';
+
     protected function configure() : void
     {
         $this
-            ->setName('migrations:generate')
             ->setAliases(['generate'])
             ->setDescription('Generate a blank migration class.')
             ->addOption(
