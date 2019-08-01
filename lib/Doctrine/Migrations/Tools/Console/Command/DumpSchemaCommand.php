@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function class_exists;
 use function count;
 use function sprintf;
 
@@ -19,12 +21,14 @@ use function sprintf;
  */
 class DumpSchemaCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:dump-schema';
+
     protected function configure() : void
     {
         parent::configure();
 
         $this
-            ->setName('migrations:dump-schema')
             ->setAliases(['dump-schema'])
             ->setDescription('Dump the schema for your database to a migration.')
             ->setHelp(<<<EOT
@@ -71,6 +75,14 @@ EOT
 
         if (count($versions) > 0) {
             throw SchemaDumpRequiresNoMigrations::new();
+        }
+
+        if ($formatted) {
+            if (! class_exists('SqlFormatter')) {
+                throw InvalidOptionUsage::new(
+                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require jdorn/sql-formatter".'
+                );
+            }
         }
 
         $versionNumber = $this->configuration->generateVersionNumber();

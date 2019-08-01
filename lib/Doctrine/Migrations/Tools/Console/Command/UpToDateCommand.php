@@ -16,10 +16,12 @@ use function sprintf;
  */
 class UpToDateCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:up-to-date';
+
     protected function configure() : void
     {
         $this
-            ->setName('migrations:up-to-date')
             ->setAliases(['up-to-date'])
             ->setDescription('Tells you if your schema is up-to-date.')
             ->addOption('fail-on-unregistered', 'u', InputOption::VALUE_NONE, 'Whether to fail when there are unregistered extra migrations found')

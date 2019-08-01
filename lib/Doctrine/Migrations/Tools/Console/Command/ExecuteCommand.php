@@ -17,10 +17,12 @@ use function getcwd;
  */
 class ExecuteCommand extends AbstractCommand
 {
+    /** @var string */
+    protected static $defaultName = 'migrations:execute';
+
     protected function configure() : void
     {
         $this
-            ->setName('migrations:execute')
             ->setAliases(['execute'])
             ->setDescription(
                 'Execute a single migration version up or down manually.'
