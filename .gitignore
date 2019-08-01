@@ -11,3 +11,5 @@ phpunit.xml
 /.phpcs-cache
 /box.phar
 /box.json
+
+# Please don't add your IDE's files here, use global gitignore instead.

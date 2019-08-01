@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\DiffGenerator;
+use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
@@ -81,6 +82,12 @@ EOT
                 InputOption::VALUE_OPTIONAL,
                 'Check Database Platform to the generated code.',
                 true
+            )
+            ->addOption(
+                'allow-empty-diff',
+                null,
+                InputOption::VALUE_NONE,
+                'Do not throw an exception when no changes are detected.'
             );
     }
 
@@ -94,6 +101,7 @@ EOT
         $filterExpression = $input->getOption('filter-expression') ?? null;
         $formatted        = (bool) $input->getOption('formatted');
         $lineLength       = (int) $input->getOption('line-length');
+        $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
         $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
 
         if ($formatted) {
@@ -106,13 +114,22 @@ EOT
 
         $versionNumber = $this->configuration->generateVersionNumber();
 
-        $path = $this->createMigrationDiffGenerator()->generate(
-            $versionNumber,
-            $filterExpression,
-            $formatted,
-            $lineLength,
-            $checkDbPlatform
-        );
+        try {
+            $path = $this->createMigrationDiffGenerator()->generate(
+                $versionNumber,
+                $filterExpression,
+                $formatted,
+                $lineLength,
+                $checkDbPlatform
+            );
+        } catch (NoChangesDetected $exception) {
+            if ($allowEmptyDiff) {
+                $output->writeln($exception->getMessage());
+
+                return 0;
+            }
+            throw $exception;
+        }
 
         $editorCommand = $input->getOption('editor-cmd');
 
