@@ -13,7 +13,6 @@ use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
-use const SORT_STRING;
 use function array_diff;
 use function array_keys;
 use function array_map;
@@ -25,9 +24,9 @@ use function end;
 use function get_class;
 use function implode;
 use function is_array;
-use function ksort;
 use function sprintf;
 use function substr;
+use function uasort;
 
 /**
  * The MigrationRepository class is responsible for retrieving migrations, determing what the current migration
@@ -85,7 +84,7 @@ class MigrationRepository
     {
         $this->versions[$version->getVersion()] = $version;
 
-        ksort($this->versions, SORT_STRING);
+        uasort($this->versions, $this->configuration->getSortingStrategy());
     }
 
     /**

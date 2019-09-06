@@ -21,6 +21,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Version\Version;
 use function str_replace;
+use function strcmp;
 use function strlen;
 
 /**
@@ -88,6 +89,9 @@ class Configuration
     /** @var bool */
     private $checkDbPlatform = true;
 
+    /** @var callable */
+    private $sortingStrategy;
+
     public function __construct(
         Connection $connection,
         ?OutputWriter $outputWriter = null,
@@ -126,6 +130,22 @@ class Configuration
     public function getMigrationsTableName() : string
     {
         return $this->migrationsTableName;
+    }
+
+    public function setSortingStrategy(callable $sortingStrategy) : void
+    {
+        $this->sortingStrategy = $sortingStrategy;
+    }
+
+    public function getSortingStrategy() : callable
+    {
+        if ($this->sortingStrategy === null) {
+            $this->sortingStrategy = static function (Version $a, Version $b) : int {
+                return strcmp($a->getVersion(), $b->getVersion());
+            };
+        }
+
+        return $this->sortingStrategy;
     }
 
     public function setMigrationsColumnName(string $columnName) : void
