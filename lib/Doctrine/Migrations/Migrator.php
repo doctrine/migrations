@@ -242,7 +242,7 @@ class Migrator
 
     private function calculateDirection(string $from, string $to) : string
     {
-        return (int) $from > (int) $to ? Direction::DOWN : Direction::UP;
+        return $from > $to ? Direction::DOWN : Direction::UP;
     }
 
     /** @return string[][] */

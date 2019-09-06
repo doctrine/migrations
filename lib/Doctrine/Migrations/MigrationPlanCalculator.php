@@ -54,14 +54,12 @@ final class MigrationPlanCalculator
         string $to,
         array $migrated
     ) : bool {
-        $to = (int) $to;
-
         if ($direction === Direction::DOWN) {
             if (! in_array($version->getVersion(), $migrated, true)) {
                 return false;
             }
 
-            return (int) $version->getVersion() > $to;
+            return $version->getVersion() > $to;
         }
 
         if ($direction === Direction::UP) {
