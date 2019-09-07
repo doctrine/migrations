@@ -49,6 +49,9 @@ class Configuration
     /** @var string */
     private $migrationsExecutedAtColumnName = 'executed_at';
 
+    /** @var string[][] */
+    private $migrationsDirectories = [];
+
     /** @var string|null */
     private $migrationsDirectory;
 
@@ -101,6 +104,19 @@ class Configuration
         $this->queryWriter            = $queryWriter;
         $this->dependencyFactory      = $dependencyFactory;
         $this->migrationsColumnLength = strlen($this->createDateTime()->format(self::VERSION_FORMAT));
+    }
+
+    public function addMigrationsPath(string $path, ?string $namespace = null)
+    {
+        $this->migrationsDirectories[(string)$namespace][$path] = $path;
+    }
+
+    public function getMigrationDirectories() : array
+    {
+        if ($this->migrationsDirectory) {
+            $this->migrationsDirectories[(string)$this->migrationsNamespace][$this->migrationsDirectory] = $this->migrationsDirectory;
+        }
+        return $this->migrationsDirectories;
     }
 
     public function setName(string $name) : void
@@ -174,23 +190,45 @@ class Configuration
             ->getQuotedName($this->connection->getDatabasePlatform());
     }
 
+    /**
+     * @deprecated Use addMigrationsPath()
+     */
     public function setMigrationsDirectory(string $migrationsDirectory) : void
     {
         $this->migrationsDirectory = $migrationsDirectory;
     }
 
+    /**
+     * @deprecated Use getMigrationsDirectory()
+     */
     public function getMigrationsDirectory() : ?string
     {
+        // backward compatibility, return the first registered directory
+        if ($this->migrationsDirectory === null) {
+            $paths = reset($this->migrationsDirectories);
+            return $paths ? reset($paths) : null;
+        }
         return $this->migrationsDirectory;
     }
 
+    /**
+     * @deprecated Use addMigrationsPath()
+     */
     public function setMigrationsNamespace(string $migrationsNamespace) : void
     {
         $this->migrationsNamespace = $migrationsNamespace;
     }
 
+    /**
+     * @deprecated Use getMigrationsDirectory()
+     */
     public function getMigrationsNamespace() : ?string
     {
+        // backward compatibility, return the first registered namespace
+        if ($this->migrationsNamespace === null) {
+            reset($this->migrationsDirectories);
+            return key($this->migrationsDirectories) ?: null;
+        }
         return $this->migrationsNamespace;
     }
 
