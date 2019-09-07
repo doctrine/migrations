@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Event;
 
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Version\Version;
 
 /**
@@ -17,11 +16,10 @@ class MigrationsVersionEventArgs extends MigrationsEventArgs
 
     public function __construct(
         Version $version,
-        Configuration $config,
-        string $direction,
+        string $payload,
         bool $dryRun
     ) {
-        parent::__construct($config, $direction, $dryRun);
+        parent::__construct($config, $payload, $dryRun);
 
         $this->version = $version;
     }

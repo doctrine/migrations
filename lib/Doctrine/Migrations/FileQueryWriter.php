@@ -18,17 +18,12 @@ use function sprintf;
  */
 final class FileQueryWriter implements QueryWriter
 {
-    /** @var OutputWriter|null */
-    private $outputWriter;
-
     /** @var FileBuilder */
     private $migrationFileBuilder;
 
     public function __construct(
-        OutputWriter $outputWriter,
         FileBuilder $migrationFileBuilder
     ) {
-        $this->outputWriter         = $outputWriter;
         $this->migrationFileBuilder = $migrationFileBuilder;
     }
 

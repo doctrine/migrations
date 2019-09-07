@@ -9,6 +9,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
+use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Version\Version;
 
 /**
@@ -30,26 +31,26 @@ final class EventDispatcher
         $this->eventManager  = $eventManager;
     }
 
-    public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun) : void
+    public function dispatchMigrationEvent(string $eventName, MigrationPlan $migrationsPlan, bool $dryRun) : void
     {
-        $event = $this->createMigrationEventArgs($direction, $dryRun);
-
-        $this->dispatchEvent($eventName, $event);
+//        $event = $this->createMigrationEventArgs($direction, $dryRun);
+//
+//        $this->dispatchEvent($eventName, $event);
     }
 
     public function dispatchVersionEvent(
         Version $version,
         string $eventName,
-        string $direction,
+        $payload,
         bool $dryRun
     ) : void {
-        $event = $this->createMigrationsVersionEventArgs(
-            $version,
-            $direction,
-            $dryRun
-        );
-
-        $this->dispatchEvent($eventName, $event);
+//        $event = $this->createMigrationsVersionEventArgs(
+//            $version,
+//            $payload,
+//            $dryRun
+//        );
+//
+//        $this->dispatchEvent($eventName, $event);
     }
 
     public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
@@ -64,13 +65,12 @@ final class EventDispatcher
 
     private function createMigrationsVersionEventArgs(
         Version $version,
-        string $direction,
+        string $payload,
         bool $dryRun
     ) : MigrationsVersionEventArgs {
         return new MigrationsVersionEventArgs(
             $version,
-            $this->configuration,
-            $direction,
+            $payload,
             $dryRun
         );
     }

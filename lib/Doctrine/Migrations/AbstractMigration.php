@@ -11,8 +11,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\Version\Version;
-use function sprintf;
+use Doctrine\Migrations\Version\ExecutorInterface;
+use Psr\Log\LoggerInterface;
 
 /**
  * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
@@ -20,9 +20,6 @@ use function sprintf;
  */
 abstract class AbstractMigration
 {
-    /** @var Version */
-    protected $version;
-
     /** @var Connection */
     protected $connection;
 
@@ -32,18 +29,19 @@ abstract class AbstractMigration
     /** @var AbstractPlatform */
     protected $platform;
 
-    /** @var OutputWriter */
-    private $outputWriter;
+    /** @var LoggerInterface */
+    private $logger;
 
-    public function __construct(Version $version)
+    /** @var ExecutorInterface */
+    private $executor;
+
+    public function __construct(ExecutorInterface $executor, Connection $connection, LoggerInterface $logger)
     {
-        $config = $version->getConfiguration();
-
-        $this->version      = $version;
-        $this->connection   = $config->getConnection();
-        $this->sm           = $this->connection->getSchemaManager();
-        $this->platform     = $this->connection->getDatabasePlatform();
-        $this->outputWriter = $config->getOutputWriter();
+        $this->connection = $connection;
+        $this->sm         = $this->connection->getSchemaManager();
+        $this->platform   = $this->connection->getDatabasePlatform();
+        $this->logger     = $logger;
+        $this->executor   = $executor;
     }
 
     /**
@@ -73,11 +71,7 @@ abstract class AbstractMigration
 
         $message = $message ?: 'Unknown Reason';
 
-        $this->outputWriter->write(sprintf(
-            '    <comment>Warning during %s: %s</comment>',
-            $this->version->getExecutionState(),
-            $message
-        ));
+        $this->logger->warning($message, ['migration' => $this]);
     }
 
     /**
@@ -118,7 +112,9 @@ abstract class AbstractMigration
 
     abstract public function up(Schema $schema) : void;
 
-    abstract public function down(Schema $schema) : void;
+    public function down(Schema $schema) : void
+    {
+    }
 
     /**
      * @param mixed[] $params
@@ -129,12 +125,12 @@ abstract class AbstractMigration
         array $params = [],
         array $types = []
     ) : void {
-        $this->version->addSql($sql, $params, $types);
+        $this->executor->addSql($sql, $params, $types);
     }
 
     protected function write(string $message) : void
     {
-        $this->outputWriter->write($message);
+        $this->logger->info($message, ['migration' => $this]);
     }
 
     protected function throwIrreversibleMigrationException(?string $message = null) : void

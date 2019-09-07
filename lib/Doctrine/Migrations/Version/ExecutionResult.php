@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use RuntimeException;
 use Throwable;
 use function count;
@@ -40,19 +41,31 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
+    /** @var string */
+    private $state;
+
     /** @var Schema|null */
     private $toSchema;
+
+    /** @var MigrationPlanItem */
+    private $plan;
 
     /**
      * @param string[] $sql
      * @param mixed[]  $params
      * @param mixed[]  $types
      */
-    public function __construct(array $sql = [], array $params = [], array $types = [])
+    public function __construct(MigrationPlanItem $plan, array $sql = [], array $params = [], array $types = [])
     {
         $this->sql    = $sql;
         $this->params = $params;
         $this->types  = $types;
+        $this->plan   = $plan;
+    }
+
+    public function getPlan() : MigrationPlanItem
+    {
+        return $this->plan;
     }
 
     public function hasSql() : bool
@@ -170,5 +183,18 @@ class ExecutionResult
         }
 
         return $this->toSchema;
+    }
+
+    public function getState()
+    {
+        return $this->state;
+    }
+
+    /**
+     * @param string $state
+     */
+    public function setState($state) : void
+    {
+        $this->state = $state;
     }
 }

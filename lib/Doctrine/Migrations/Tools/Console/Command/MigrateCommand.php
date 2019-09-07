@@ -175,7 +175,7 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : int {
-        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
+        $executedUnavailableMigrations = []; // @todo $this->migrationRepository->getExecutedUnavailableMigrations();
 
         if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
@@ -207,10 +207,10 @@ EOT
         string $versionAlias,
         OutputInterface $output
     ) : string {
-        $version = $this->configuration->resolveVersionAlias($versionAlias);
+        $version = $this->dependencyFactory->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
 
         if ($version !== null) {
-            return $version;
+            return (string)$version;
         }
 
         if ($versionAlias === 'prev') {
