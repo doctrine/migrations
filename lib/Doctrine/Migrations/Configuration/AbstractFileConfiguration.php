@@ -23,14 +23,13 @@ use function strcasecmp;
 abstract class AbstractFileConfiguration extends Configuration
 {
     private const ALLOWED_CONFIGURATION_KEYS = [
-        'migrations_namespace',
+        'migrations_paths',
         'table_name',
         'column_name',
         'column_length',
         'executed_at_column_name',
         'organize_migrations',
         'name',
-        'migrations_directory',
         'migrations',
         'custom_template',
         'all_or_nothing',
@@ -38,7 +37,7 @@ abstract class AbstractFileConfiguration extends Configuration
     ];
 
     private const CONFIGURATION_METHOD_MAP = [
-        'migrations_namespace'      => 'setMigrationsNamespace',
+        'migrations_paths'      => 'setMigrationsNamespace',
         'table_name'                => 'setMigrationsTableName',
         'column_name'               => 'setMigrationsColumnName',
         'column_length'             => 'setMigrationsColumnLength',
@@ -99,13 +98,18 @@ abstract class AbstractFileConfiguration extends Configuration
             }
         }
 
-        foreach (self::CONFIGURATION_METHOD_MAP as $key => $method) {
-            if (! isset($config[$key])) {
-                continue;
+        if (isset($config['migrations_paths'])){
+            foreach ($config['migrations_paths'] ?? [] as $namespace => $path) {
+                $this->addMigrationsDirectory($namespace, $path);
             }
-
-            $this->$method($config[$key]);
         }
+//        foreach (self::CONFIGURATION_METHOD_MAP as $key => $method) {
+//            if (! isset($config[$key])) {
+//                continue;
+//            }
+//
+//            $this->$method($config[$key]);
+//        }
     }
 
     protected function getDirectoryRelativeToFile(string $file, string $input) : string

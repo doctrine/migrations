@@ -22,17 +22,12 @@ use function pathinfo;
  */
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
-    /** @var Connection */
-    private $connection;
-
     /** @var Configuration|null */
     private $configuration;
 
     public function __construct(
-        Connection $connection,
         ?Configuration $configuration = null
     ) {
-        $this->connection    = $connection;
         $this->configuration = $configuration;
     }
 
@@ -72,7 +67,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
             }
         }
 
-        return new Configuration($this->connection);
+        return new Configuration();
     }
 
     private function configExists(string $config) : bool
@@ -101,7 +96,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         }
 
         $class         = $map[$info['extension']];
-        $configuration = new $class($this->connection);
+        $configuration = new $class();
         $configuration->load($config);
 
         return $configuration;

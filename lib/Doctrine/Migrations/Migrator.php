@@ -4,18 +4,24 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
-use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
-use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Metadata\MetadataStorage;
+use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Version;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
 use const COUNT_RECURSIVE;
 use function count;
-use function sprintf;
+use function end;
+use function key;
+use function reset;
 
 /**
  * The Migrator class is responsible for generating and executing the SQL for a migration.
@@ -24,28 +30,48 @@ use function sprintf;
  */
 class Migrator
 {
-    /** @var Configuration */
-    private $configuration;
-
     /** @var MigrationRepository */
     private $migrationRepository;
-
-    /** @var OutputWriter */
-    private $outputWriter;
 
     /** @var Stopwatch */
     private $stopwatch;
 
+    /** @var MetadataStorage */
+    private $metadataStorage;
+
+    /** @var MigrationPlanCalculator */
+    private $migrationPlanCalculator;
+
+    /** @var LoggerInterface */
+    private $logger;
+
+    /** @var ExecutorInterface */
+    private $executor;
+
+    /** @var Connection */
+    private $connection;
+
+    /** @var EventDispatcher */
+    private $dispatcher;
+
     public function __construct(
-        Configuration $configuration,
+        Connection $connection,
+        EventDispatcher $dispatcher,
+        MigrationPlanCalculator $migrationPlanCalculator,
+        ExecutorInterface $executor,
+        MetadataStorage $metadataStorage,
         MigrationRepository $migrationRepository,
-        OutputWriter $outputWriter,
+        LoggerInterface $logger,
         Stopwatch $stopwatch
     ) {
-        $this->configuration       = $configuration;
-        $this->migrationRepository = $migrationRepository;
-        $this->outputWriter        = $outputWriter;
-        $this->stopwatch           = $stopwatch;
+        $this->migrationRepository     = $migrationRepository;
+        $this->stopwatch               = $stopwatch;
+        $this->metadataStorage         = $metadataStorage;
+        $this->migrationPlanCalculator = $migrationPlanCalculator;
+        $this->logger                  = $logger;
+        $this->executor                = $executor;
+        $this->connection              = $connection;
+        $this->dispatcher              = $dispatcher;
     }
 
     /** @return string[][] */
@@ -55,33 +81,6 @@ class Migrator
             ->setDryRun(true);
 
         return $this->migrate($to, $migratorConfiguration);
-    }
-
-    public function writeSqlFile(string $path, ?string $to = null) : bool
-    {
-        $sql = $this->getSql($to);
-
-        $from = $this->migrationRepository->getCurrentVersion();
-
-        if ($to === null) {
-            $to = $this->migrationRepository->getLatestVersion();
-        }
-
-        $direction = $from > $to
-            ? Direction::DOWN
-            : Direction::UP;
-
-        $this->outputWriter->write(
-            sprintf("-- Migrating from %s to %s\n", $from, $to)
-        );
-
-        /**
-         * Since the configuration object changes during the creation we cannot inject things
-         * properly, so I had to violate LoD here (so please, let's find a way to solve it on v2).
-         */
-        return $this->configuration
-            ->getQueryWriter()
-            ->write($path, $direction, $sql);
     }
 
     /**
@@ -96,22 +95,11 @@ class Migrator
         $migratorConfiguration = $migratorConfiguration ?? new MigratorConfiguration();
         $dryRun                = $migratorConfiguration->isDryRun();
 
-        if ($to === null) {
-            $to = $this->migrationRepository->getLatestVersion();
-        }
+        $availableMigrations = $this->migrationRepository->getMigrations();
+        $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
-        $versions = $this->migrationRepository->getMigrations();
 
-        if (! isset($versions[$to]) && $to > 0) {
-            throw UnknownMigrationVersion::new($to);
-        }
-
-        $from = $this->migrationRepository->getCurrentVersion();
-
-        $direction = $this->calculateDirection($from, $to);
-
-        $migrationsToExecute = $this->configuration
-            ->getMigrationsToExecute($direction, $to);
+        $migrationsPlan = $this->migrationPlanCalculator->getMigrationsToExecute($availableMigrations, $executedMigrations, $to);
 
         /**
          * If
@@ -121,63 +109,64 @@ class Migrator
          * means we are already at the destination return an empty array()
          * to signify that there is nothing left to do.
          */
-        if ($from === $to && count($migrationsToExecute) === 0 && count($versions) !== 0) {
+        if (count($migrationsPlan->getItems()) === 0) {
             return $this->noMigrations();
         }
 
-        $output  = $dryRun ? 'Executing dry run of migration' : 'Migrating';
-        $output .= ' <info>%s</info> to <comment>%s</comment> from <comment>%s</comment>';
-
-        $this->outputWriter->write(sprintf($output, $direction, $to, $from));
+        $this->logger->info(
+            ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to} from {from}',
+            [
+                'direction' => $migrationsPlan->getDirection(),
+                'to' => 1,//@todo  $migrationsPlan->getTo(),
+                'from' => 2,// @todo $migrationsPlan->getFrom(),
+            ]
+        );
 
         /**
          * If there are no migrations to execute throw an exception.
          */
-        if (count($migrationsToExecute) === 0 && ! $migratorConfiguration->getNoMigrationException()) {
+        if (count($migrationsPlan->getItems()) === 0 && ! $migratorConfiguration->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
         }
 
-        if (count($migrationsToExecute) === 0) {
+        if (count($migrationsPlan->getItems()) === 0) {
             return $this->noMigrations();
         }
 
         $stopwatchEvent = $this->stopwatch->start('migrate');
 
-        $sql = $this->executeMigration($migrationsToExecute, $direction, $migratorConfiguration);
+        $sql = $this->executeMigrations($migrationsPlan, $migratorConfiguration);
 
-        $this->endMigration($stopwatchEvent, $migrationsToExecute, $sql);
+        $this->endMigrations($stopwatchEvent, $migrationsPlan, $sql);
 
         return $sql;
     }
 
     /**
-     * @param Version[] $migrationsToExecute
+     * @param MigrationPlanItem[] $migrationsToExecute
      *
      * @return string[][]
      */
-    private function executeMigration(
-        array $migrationsToExecute,
-        string $direction,
+    private function executeMigrations(
+        MigrationPlan $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
     ) : array {
         $dryRun = $migratorConfiguration->isDryRun();
 
-        $connection = $this->configuration->getConnection();
-
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
         if ($allOrNothing) {
-            $connection->beginTransaction();
+            $this->connection->beginTransaction();
         }
 
         try {
-            $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrating, $direction, $dryRun);
+            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $dryRun);
 
             $sql  = [];
             $time = 0;
 
-            foreach ($migrationsToExecute as $version) {
-                $versionExecutionResult = $version->execute($direction, $migratorConfiguration);
+            foreach ($migrationsPlan->getItems() as $plan) {
+                $versionExecutionResult = $this->executor->execute($plan, $migratorConfiguration);
 
                 // capture the to Schema for the migration so we have the ability to use
                 // it as the from Schema for the next migration when we are running a dry run
@@ -186,21 +175,21 @@ class Migrator
                     $migratorConfiguration->setFromSchema($versionExecutionResult->getToSchema());
                 }
 
-                $sql[$version->getVersion()] = $versionExecutionResult->getSql();
-                $time                       += $versionExecutionResult->getTime();
+                $sql[(string) $plan->getInfo()->getVersion()] = $versionExecutionResult->getSql();
+                $time                                        += $versionExecutionResult->getTime();
             }
 
-            $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
+            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $dryRun);
         } catch (Throwable $e) {
             if ($allOrNothing) {
-                $connection->rollBack();
+                $this->connection->rollBack();
             }
 
             throw $e;
         }
 
         if ($allOrNothing) {
-            $connection->commit();
+            $this->connection->commit();
         }
 
         return $sql;
@@ -210,45 +199,28 @@ class Migrator
      * @param Version[]  $migrationsToExecute
      * @param string[][] $sql
      */
-    private function endMigration(
+    private function endMigrations(
         StopwatchEvent $stopwatchEvent,
-        array $migrationsToExecute,
+        MigrationPlan $migrationsPlan,
         array $sql
     ) : void {
         $stopwatchEvent->stop();
 
-        $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
-
-        $this->outputWriter->write(sprintf(
-            '  <info>++</info> finished in %sms',
-            $stopwatchEvent->getDuration()
-        ));
-
-        $this->outputWriter->write(sprintf(
-            '  <info>++</info> used %s memory',
-            BytesFormatter::formatBytes($stopwatchEvent->getMemory())
-        ));
-
-        $this->outputWriter->write(sprintf(
-            '  <info>++</info> %s migrations executed',
-            count($migrationsToExecute)
-        ));
-
-        $this->outputWriter->write(sprintf(
-            '  <info>++</info> %s sql queries',
-            count($sql, COUNT_RECURSIVE) - count($sql)
-        ));
-    }
-
-    private function calculateDirection(string $from, string $to) : string
-    {
-        return (int) $from > (int) $to ? Direction::DOWN : Direction::UP;
+        $this->logger->info(
+            'finished in {duration}ms, used {memory} memory, {migrations_count} migrations executed, {queries_count} sql queries',
+            [
+                'duration' => $stopwatchEvent->getDuration(),
+                'memory' => BytesFormatter::formatBytes($stopwatchEvent->getMemory()),
+                'migrations_count' => count($migrationsPlan->getItems()),
+                'queries_count' => count($sql, COUNT_RECURSIVE) - count($sql),
+            ]
+        );
     }
 
     /** @return string[][] */
     private function noMigrations() : array
     {
-        $this->outputWriter->write('<comment>No migrations to execute.</comment>');
+        $this->logger->info('No migrations to execute.');
 
         return [];
     }

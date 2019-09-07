@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\Migrations\Metadata\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use function substr;
 
@@ -23,9 +24,15 @@ final class AliasResolver
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    public function __construct(MigrationRepository $migrationRepository)
+    /**
+     * @var MetadataStorage
+     */
+    private $metadataStorage;
+
+    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
+        $this->metadataStorage = $metadataStorage;
     }
 
     /**
@@ -41,26 +48,40 @@ final class AliasResolver
      *
      * If an existing version number is specified, it is returned verbatimly.
      */
-    public function resolveVersionAlias(string $alias) : ?string
+    public function resolveVersionAlias(string $alias) : ?Version
     {
-        if ($this->migrationRepository->hasVersion($alias)) {
-            return $alias;
+        $availableMigrations = $this->migrationRepository->getMigrations();
+
+        if ($availableMigration = $availableMigrations->getMigration($alias)) {
+            return $availableMigration->getVersion();
         }
+
+        $executedMigrations = $this->metadataStorage->getExecutedMigrations();
 
         switch ($alias) {
             case self::ALIAS_FIRST:
-                return '0';
+                $info = $executedMigrations->getFirst();
+                return $info ? $info->getVersion() : null;
+
             case self::ALIAS_CURRENT:
-                return $this->migrationRepository->getCurrentVersion();
+                $info = $executedMigrations->getLast();
+                return $info ? $info->getVersion() : null;
+
             case self::ALIAS_PREV:
-                return $this->migrationRepository->getPrevVersion();
+                $info = $executedMigrations->getLast(-1);
+                return $info ? $info->getVersion() : null;
+
             case self::ALIAS_NEXT:
-                return $this->migrationRepository->getNextVersion();
+                $availableMigration = $availableMigrations->getFirst();
+                return $availableMigration ? $availableMigration->getVersion() : null;
+
             case self::ALIAS_LATEST:
-                return $this->migrationRepository->getLatestVersion();
+                $availableMigration = $availableMigrations->getLast();
+                return $availableMigration ? $availableMigration->getVersion() : null;
             default:
                 if (substr($alias, 0, 7) === self::ALIAS_CURRENT) {
-                    return $this->migrationRepository->getDeltaVersion(substr($alias, 7));
+                    $availableMigration = $availableMigrations->getFirst((int)substr($alias, 7));
+                    return $availableMigration ? $availableMigration->getVersion() : null;
                 }
 
                 return null;

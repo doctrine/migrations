@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
-use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\DBAL\Connection;
+use Doctrine\Migrations\AbstractMigration;
+use Psr\Log\LoggerInterface;
 
 /**
  * The Factory class is responsible for creating instances of the Version class for a version number
@@ -14,25 +16,35 @@ use Doctrine\Migrations\Configuration\Configuration;
  */
 class Factory
 {
-    /** @var Configuration */
-    private $configuration;
+    /**
+     * @var Connection
+     */
+    private $connection;
 
-    /** @var ExecutorInterface */
+    /**
+     * @var ExecutorInterface
+     */
     private $versionExecutor;
 
-    public function __construct(Configuration $configuration, ExecutorInterface $versionExecutor)
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
+    public function __construct(Connection $connection, ExecutorInterface $versionExecutor, LoggerInterface $logger)
     {
-        $this->configuration   = $configuration;
+
+        $this->connection = $connection;
         $this->versionExecutor = $versionExecutor;
+        $this->logger = $logger;
     }
 
-    public function createVersion(string $version, string $migrationClassName) : Version
+    public function createVersion(string $migrationClassName) : AbstractMigration
     {
-        return new Version(
-            $this->configuration,
-            $version,
-            $migrationClassName,
-            $this->versionExecutor
+        return new $migrationClassName(
+            $this->versionExecutor,
+            $this->connection,
+            $this->logger
         );
     }
 }
