@@ -80,7 +80,7 @@ abstract class Finder implements MigrationFinder
      *
      * @return ReflectionClass[] the classes in `$files`
      */
-    protected function loadMigrationClasses(array $files, string $namespace) : array
+    protected function loadMigrationClasses(array $files, ?string $namespace = null) : array
     {
         $classes = [];
         foreach (get_declared_classes() as $class) {
