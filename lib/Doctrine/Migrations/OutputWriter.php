@@ -31,9 +31,9 @@ class OutputWriter
         $this->callback = $callback;
     }
 
-    public function write(string $message) : void
+    public function write(string $message, int $option = 0) : void
     {
-        ($this->callback)($message);
+        ($this->callback)($message, $option);
     }
 
     public function getLastMessage() : string

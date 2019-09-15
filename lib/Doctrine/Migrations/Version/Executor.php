@@ -16,6 +16,7 @@ use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use function count;
 use function rtrim;
@@ -197,7 +198,8 @@ final class Executor implements ExecutorInterface
 
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-        $this->outputWriter->write("\n" . $this->getMigrationHeader($version, $migration, $direction) . "\n");
+        $this->outputWriter->write("\n" . $this->getMigrationHeader($version, $migration, $direction));
+        $this->outputWriter->write("\n", OutputInterface::VERBOSITY_VERBOSE);
 
         $version->setState(State::EXEC);
 
@@ -239,15 +241,17 @@ final class Executor implements ExecutorInterface
         $versionExecutionResult->setTime($stopwatchEvent->getDuration());
         $versionExecutionResult->setMemory($stopwatchEvent->getMemory());
 
+        $this->outputWriter->write("\n", OutputInterface::VERBOSITY_VERBOSE);
+
         if ($direction === Direction::UP) {
             $this->outputWriter->write(sprintf(
-                "\n  <info>++</info> migrated (took %sms, used %s memory)",
+                '  <info>++</info> migrated (took %sms, used %s memory)',
                 $stopwatchEvent->getDuration(),
                 BytesFormatter::formatBytes($stopwatchEvent->getMemory())
             ));
         } else {
             $this->outputWriter->write(sprintf(
-                "\n  <info>--</info> reverted (took %sms, used %s memory)",
+                '  <info>--</info> reverted (took %sms, used %s memory)',
                 $stopwatchEvent->getDuration(),
                 BytesFormatter::formatBytes($stopwatchEvent->getMemory())
             ));
@@ -377,11 +381,14 @@ final class Executor implements ExecutorInterface
             $this->types[$idx] ?? []
         );
 
-        $this->outputWriter->write(rtrim(sprintf(
-            '     <comment>-></comment> %s %s',
-            $query,
-            $params
-        )));
+        $this->outputWriter->write(
+            rtrim(sprintf(
+                '     <comment>-></comment> %s %s',
+                $query,
+                $params
+            )),
+            OutputInterface::VERBOSITY_VERBOSE
+        );
     }
 
     private function getFromSchema(MigratorConfiguration $migratorConfiguration) : Schema

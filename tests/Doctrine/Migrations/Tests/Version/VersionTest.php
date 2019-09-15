@@ -467,8 +467,8 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('SELECT 1 WHERE 1', $messages[1]);
+        self::assertCount(5, $messages, 'should have written three messages (header, footer, 1 SQL statement, 2x new line)');
+        self::assertContains('SELECT 1 WHERE 1', $messages[2]);
     }
 
     public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement() : void
@@ -491,9 +491,9 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
-        self::assertContains('with parameters ([one], [two])', $messages[1]);
+        self::assertCount(5, $messages, 'should have written three messages (header, footer, 1 SQL statement, 2x new line)');
+        self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[2]);
+        self::assertContains('with parameters ([one], [two])', $messages[2]);
     }
 
     public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement() : void
@@ -516,9 +516,9 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
-        self::assertContains('with parameters (:one => [one], :two => [two])', $messages[1]);
+        self::assertCount(5, $messages, 'should have written three messages (header, footer, 1 SQL statement, 2x new line)');
+        self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[2]);
+        self::assertContains('with parameters (:one => [one], :two => [two])', $messages[2]);
     }
 
     /** @return mixed[][] */
@@ -568,9 +568,9 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
+        self::assertCount(5, $messages, 'should have written three messages (header, footer, 1 SQL statement, 2x new line)');
+        self::assertContains('INSERT INTO test VALUES (?)', $messages[2]);
+        self::assertContains(sprintf('with parameters (%s)', $output), $messages[2]);
     }
 
     public function testRunWithInsertNullValue() : void
@@ -599,9 +599,9 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        self::assertContains('with parameters ([])', $messages[1]);
+        self::assertCount(5, $messages, 'should have written three messages (header, footer, 1 SQL statement, 2x new line)');
+        self::assertContains('INSERT INTO test VALUES (?)', $messages[2]);
+        self::assertContains('with parameters ([])', $messages[2]);
     }
 
     /**

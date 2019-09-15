@@ -64,27 +64,35 @@ class ExecutorTest extends TestCase
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
-            ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
+            ->with("\n  <info>++</info> migrating <comment>001</comment>");
 
         $this->outputWriter->expects(self::at(1))
             ->method('write')
-            ->with('     <comment>-></comment> SELECT 1');
+            ->with("\n");
 
         $this->outputWriter->expects(self::at(2))
             ->method('write')
-            ->with('  <info>100ms</info>');
+            ->with('     <comment>-></comment> SELECT 1');
 
         $this->outputWriter->expects(self::at(3))
             ->method('write')
-            ->with('     <comment>-></comment> SELECT 2');
+            ->with('  <info>100ms</info>');
 
         $this->outputWriter->expects(self::at(4))
             ->method('write')
-            ->with('  <info>100ms</info>');
+            ->with('     <comment>-></comment> SELECT 2');
 
         $this->outputWriter->expects(self::at(5))
             ->method('write')
-            ->with("\n  <info>++</info> migrated (took 100ms, used 100 memory)");
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects(self::at(6))
+            ->method('write')
+            ->with("\n");
+
+        $this->outputWriter->expects(self::at(7))
+            ->method('write')
+            ->with('  <info>++</info> migrated (took 100ms, used 100 memory)');
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -114,7 +122,11 @@ class ExecutorTest extends TestCase
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
-            ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>\n");
+            ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>");
+
+        $this->outputWriter->expects(self::at(1))
+            ->method('write')
+            ->with("\n");
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -131,27 +143,35 @@ class ExecutorTest extends TestCase
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
-            ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
+            ->with("\n  <info>--</info> reverting <comment>001</comment>");
 
         $this->outputWriter->expects(self::at(1))
             ->method('write')
-            ->with('     <comment>-></comment> SELECT 3');
+            ->with("\n");
 
         $this->outputWriter->expects(self::at(2))
             ->method('write')
-            ->with('  <info>100ms</info>');
+            ->with('     <comment>-></comment> SELECT 3');
 
         $this->outputWriter->expects(self::at(3))
             ->method('write')
-            ->with('     <comment>-></comment> SELECT 4');
+            ->with('  <info>100ms</info>');
 
         $this->outputWriter->expects(self::at(4))
             ->method('write')
-            ->with('  <info>100ms</info>');
+            ->with('     <comment>-></comment> SELECT 4');
 
         $this->outputWriter->expects(self::at(5))
             ->method('write')
-            ->with("\n  <info>--</info> reverted (took 100ms, used 100 memory)");
+            ->with('  <info>100ms</info>');
+
+        $this->outputWriter->expects(self::at(6))
+            ->method('write')
+            ->with("\n");
+
+        $this->outputWriter->expects(self::at(7))
+            ->method('write')
+            ->with('  <info>--</info> reverted (took 100ms, used 100 memory)');
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -181,7 +201,11 @@ class ExecutorTest extends TestCase
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
-            ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>\n");
+            ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>");
+
+        $this->outputWriter->expects(self::at(1))
+            ->method('write')
+            ->with("\n");
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);

@@ -123,8 +123,8 @@ abstract class AbstractCommand extends Command
             $this->migrationConfiguration = $configHelper->getMigrationConfig($input);
 
             $this->migrationConfiguration->getOutputWriter()->setCallback(
-                static function (string $message) use ($output) : void {
-                    $output->writeln($message);
+                static function (string $message, int $options) use ($output) : void {
+                    $output->writeln($message, $options);
                 }
             );
         }
