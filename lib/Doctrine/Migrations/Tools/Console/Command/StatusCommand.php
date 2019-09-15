@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use DateTimeImmutable;
-use Doctrine\Migrations\Version\Version;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -55,9 +57,15 @@ EOT
     {
         $output->writeln("\n <info>==</info> Configuration\n");
 
+        $storage       = $this->dependencyFactory->getMetadataStorage();
+        $migrationRepo = $this->dependencyFactory->getMigrationRepository();
+
+        $availableMigrations = $migrationRepo->getMigrations();
+        $executedMigrations  = $storage->getExecutedMigrations();
+
         $infos = $this->dependencyFactory->getMigrationStatusInfosHelper();
 
-        foreach ($infos->getMigrationsInfos() as $name => $value) {
+        foreach ($infos->getMigrationsInfos($executedMigrations, $availableMigrations) as $name => $value) {
             assert(is_string($name));
 
             $string = (string) $value;
@@ -77,16 +85,15 @@ EOT
             return 0;
         }
 
-        $versions                      = $this->migrationRepository->getMigrations();
-        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
+        $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
-        if (count($versions) !== 0) {
+        if (count($availableMigrations->getItems()) !== 0) {
             $output->writeln("\n <info>==</info> Available Migration Versions\n");
 
-            $this->showVersions($versions, $output);
+            $this->showVersions($availableMigrations, $executedMigrations, $output);
         }
 
-        if (count($executedUnavailableMigrations) === 0) {
+        if (count($executedUnavailableMigrations->getItems()) === 0) {
             return 0;
         }
 
@@ -94,12 +101,11 @@ EOT
             "\n <info>==</info> Previously Executed Unavailable Migration Versions\n"
         );
 
-        foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+        foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
             $output->writeln(
                 sprintf(
-                    '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $this->configuration->getDateTime($executedUnavailableMigration),
-                    $executedUnavailableMigration
+                    '    <comment>>></comment> <comment>%s</comment>',
+                    (string) $executedUnavailableMigration->getVersion()
                 )
             );
         }
@@ -118,36 +124,34 @@ EOT
     }
 
     /**
-     * @param Version[] $versions
+     * @param AvailableMigration[] $versions
      */
     private function showVersions(
-        array $versions,
+        AvailableMigrationsSet $availableMigrationsSet,
+        ExecutedMigrationsSet $executedMigrationsSet,
         OutputInterface $output
     ) : void {
-        foreach ($versions as $version) {
-            $executedAt = $version->getExecutedAt();
+        foreach ($availableMigrationsSet->getItems() as $availableMigration) {
+            $executedMigration =  $executedMigrationsSet->getMigration((string) $availableMigration->getVersion());
 
-            $status = $version->isMigrated() ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $status = $executedMigration ? '<info>migrated</info>' : '<error>not migrated</error>';
 
-            $executedAtStatus = $executedAt instanceof DateTimeImmutable
-                ? sprintf(' (executed at %s)', $executedAt->format('Y-m-d H:i:s'))
+            $executedAtStatus = $executedMigration && $executedMigration->getExecutedOn() instanceof DateTimeImmutable
+                ? sprintf(' (executed at %s)', $executedMigration->getExecutedOn()->format('Y-m-d H:i:s'))
                 : '';
 
-            $migration   = $version->getMigration();
-            $description = $migration->getDescription();
+            $description = $availableMigration->getMigration()->getDescription();
 
             $migrationDescription = $description !== ''
                 ? str_repeat(' ', 5) . $description
                 : '';
 
-            $versionName      = $version->getVersion();
-            $formattedVersion = $version->getDateTime();
+            $versionName = (string) $availableMigration->getVersion();
 
             $output->writeln(sprintf(
-                '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s%s',
-                $formattedVersion,
+                '    <comment>>></comment> <comment>%s</comment>%s%s%s%s',
                 $versionName,
-                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($versionName))),
+                str_repeat(' ', max(1, 49 - strlen($versionName))),
                 $status,
                 $executedAtStatus,
                 $migrationDescription

@@ -51,6 +51,7 @@ class SchemaDumper
      */
     public function dump(
         string $versionNumber,
+        string $namespace,
         bool $formatted = false,
         int $lineLength = 120
     ) : string {
@@ -96,6 +97,7 @@ class SchemaDumper
 
         return $this->migrationGenerator->generateMigration(
             $versionNumber,
+            $namespace,
             $up,
             $down
         );

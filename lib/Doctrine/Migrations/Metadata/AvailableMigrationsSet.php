@@ -4,11 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
-use Doctrine\Migrations\AbstractMigration;
+use function array_filter;
+use function array_values;
+use function count;
 
 class AvailableMigrationsSet
 {
-
     /** @var AvailableMigration[] */
     private $items = [];
 
@@ -18,31 +19,38 @@ class AvailableMigrationsSet
     }
 
     /**
-     * @return MigrationPlanItem[]
+     * @return AvailableMigration[]
      */
     public function getItems() : array
     {
         return $this->items;
     }
 
-    public function getFirst(int $offset = 0):?AvailableMigration
+    public function getFirst(int $offset = 0) : ?AvailableMigration
     {
         return $this->items[$offset] ?? null;
     }
 
-    public function getLast(int $offset = 0):?AvailableMigration
+    public function getLast(int $offset = 0) : ?AvailableMigration
     {
         return $this->items[count($this->items)-1-$offset] ?? null;
     }
 
-    public function getMigration(string $version): ?AvailableMigration
+    public function getMigration(string $version) : ?AvailableMigration
     {
-        foreach ($this->items as $migration){
-            if ((string)$migration->getVersion() === $version) {
+        foreach ($this->items as $migration) {
+            if ((string) $migration->getVersion() === $version) {
                 return $migration;
             }
         }
+
         return null;
     }
 
+    public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsSet
+    {
+        return new AvailableMigrationsSet(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
+            return $executedMigrationsSet->getMigration((string) $migrationInfo->getVersion());
+        }));
+    }
 }

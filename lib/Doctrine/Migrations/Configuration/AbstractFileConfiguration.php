@@ -98,7 +98,7 @@ abstract class AbstractFileConfiguration extends Configuration
             }
         }
 
-        if (isset($config['migrations_paths'])){
+        if (isset($config['migrations_paths'])) {
             foreach ($config['migrations_paths'] ?? [] as $namespace => $path) {
                 $this->addMigrationsDirectory($namespace, $path);
             }

@@ -7,13 +7,17 @@ namespace Doctrine\Migrations\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
+use Exception;
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function is_file;
 use function is_readable;
+use function key;
 use function preg_replace;
+use function reset;
+use function sprintf;
 use function str_replace;
 use function trim;
 
@@ -49,12 +53,6 @@ final class Version<version> extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
 <up>
     }
-
-    public function down(Schema $schema) : void
-    {
-        // this down() migration is auto-generated, please modify it to your needs
-<down>
-    }
 }
 
 TEMPLATE;
@@ -72,6 +70,7 @@ TEMPLATE;
 
     public function generateMigration(
         string $version,
+        ?string $namespace = null,
         ?string $up = null,
         ?string $down = null
     ) : string {
@@ -82,8 +81,17 @@ TEMPLATE;
             '<down>',
         ];
 
+        $dirs = $this->configuration->getMigrationDirectories();
+        if (isset($dirs[$namespace])) {
+            $dir = $dirs[$namespace];
+        } elseif ($namespace === null) {
+            $dir       = reset($dirs);
+            $namespace = key($dirs);
+        } else {
+            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
+        }
         $replacements = [
-            $this->configuration->getMigrationsNamespace(),
+            $namespace,
             $version,
             $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
             $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
@@ -92,8 +100,8 @@ TEMPLATE;
         $code = str_replace($placeHolders, $replacements, $this->getTemplate());
         $code = preg_replace('/^ +$/m', '', $code);
 
-        $directoryHelper = new MigrationDirectoryHelper($this->configuration);
-        $dir             = $directoryHelper->getMigrationDirectory();
+        $directoryHelper = new MigrationDirectoryHelper();
+        $dir             = $directoryHelper->getMigrationDirectory($this->configuration, $dir);
         $path            = $dir . '/Version' . $version . '.php';
 
         file_put_contents($path, $code);

@@ -131,7 +131,6 @@ final class Executor implements ExecutorInterface
                 $configuration
             );
 
-
             $result->setSql($this->sql);
             $result->setParams($this->params);
             $result->setTypes($this->types);
@@ -319,7 +318,7 @@ final class Executor implements ExecutorInterface
             $this->connection->rollBack();
         }
 
-        if ($configuration->isDryRun()) {
+        if ($configuration->isDryRun() || $result->isSkipped()) {
             return;
         }
 

@@ -14,6 +14,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
 use const SORT_STRING;
+use function class_exists;
 use function count;
 use function get_class;
 use function ksort;
@@ -48,9 +49,9 @@ class MigrationRepository
         Factory $versionFactory
     ) {
         $this->migrationDirectories = $migrationDirectories;
-        $this->connection      = $connection;
-        $this->migrationFinder = $migrationFinder;
-        $this->versionFactory  = $versionFactory;
+        $this->connection           = $connection;
+        $this->migrationFinder      = $migrationFinder;
+        $this->versionFactory       = $versionFactory;
     }
 
     /** @throws MigrationException */
@@ -90,16 +91,6 @@ class MigrationRepository
         return $versions;
     }
 
-    /**
-     * @return AvailableMigration[]
-     */
-    public function getVersions() : array
-    {
-        $this->loadMigrationsFromDirectories();
-
-        return $this->migrations;
-    }
-
     public function clearVersions() : void
     {
         $this->migrations = [];
@@ -111,7 +102,6 @@ class MigrationRepository
 
         return isset($this->migrations[$version]);
     }
-
 
     public function getMigrations() : AvailableMigrationsSet
     {
@@ -130,8 +120,6 @@ class MigrationRepository
 //
 //        return array_diff($executedMigrations, $availableMigrations);
 //    }
-
-
 
     /** @throws MigrationException */
     private function ensureMigrationClassExists(string $class) : void

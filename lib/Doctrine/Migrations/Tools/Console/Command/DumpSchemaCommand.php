@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function class_exists;
 use function count;
+use function key;
 use function sprintf;
 
 /**
@@ -71,9 +72,9 @@ EOT
         $lineLength = (int) $input->getOption('line-length');
 
         $schemaDumper = $this->dependencyFactory->getSchemaDumper();
-        $versions     = $this->migrationRepository->getVersions();
+        $versions     = $this->dependencyFactory->getMigrationRepository()->getMigrations();
 
-        if (count($versions) > 0) {
+        if (count($versions->getItems()) > 0) {
             throw SchemaDumpRequiresNoMigrations::new();
         }
 
@@ -87,8 +88,11 @@ EOT
 
         $versionNumber = $this->configuration->generateVersionNumber();
 
-        $path = $schemaDumper->dump(
+        $dirs      = $this->configuration->getMigrationDirectories();
+        $namespace = key($dirs);
+        $path      = $schemaDumper->dump(
             $versionNumber,
+            $namespace,
             $formatted,
             $lineLength
         );

@@ -7,18 +7,12 @@ namespace Doctrine\Migrations\Configuration;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use Doctrine\Common\EventArgs;
 use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Exception\MigrationsDirectoryRequired;
 use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
-use function key;
-use function reset;
-use function str_replace;
-use function strlen;
 
 /**
  * The Configuration class is responsible for defining migration configuration information.
@@ -69,7 +63,6 @@ class Configuration
 
     /** @var bool */
     private $checkDbPlatform = true;
-
 
     public function addMigrationsDirectory(string $namespace, string $path) : void
     {
@@ -131,7 +124,6 @@ class Configuration
         return $this->migrationsExecutedAtColumnName;
     }
 
-
     public function setCustomTemplate(?string $customTemplate) : void
     {
         $this->customTemplate = $customTemplate;
@@ -189,7 +181,6 @@ class Configuration
         $this->migrationFinder = $migrationFinder;
     }
 
-
     /** @throws MigrationException */
     public function validate() : void
     {
@@ -197,7 +188,6 @@ class Configuration
             throw MigrationsNamespaceRequired::new();
         }
     }
-
 
 //    public function resolveVersionAlias(string $alias) : ?string
 //    {
@@ -234,25 +224,13 @@ class Configuration
         return $this->checkDbPlatform;
     }
 
-    public function getDateTime(string $version) : string
-    {
-        $datetime = str_replace('Version', '', $version);
-        $datetime = DateTimeImmutable::createFromFormat(self::VERSION_FORMAT, $datetime);
-
-        if ($datetime === false) {
-            return '';
-        }
-
-        return $datetime->format('Y-m-d H:i:s');
-    }
-
     public function generateVersionNumber(?DateTimeInterface $now = null) : string
     {
         $now = $now ?: $this->createDateTime();
 
         return $now->format(self::VERSION_FORMAT);
     }
-//
+
 //    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
 //    {
 //        $this->getDependencyFactory()->getEventDispatcher()->dispatchEvent(
