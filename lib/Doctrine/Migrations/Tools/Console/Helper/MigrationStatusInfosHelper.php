@@ -4,9 +4,14 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Version\AliasResolver;
 use function count;
 use function sprintf;
 
@@ -26,46 +31,55 @@ class MigrationStatusInfosHelper
     /** @var MigrationRepository  */
     private $migrationRepository;
 
+    /** @var MetadataStorage */
+    private $metadataStorage;
+
+    /** @var Connection */
+    private $connection;
+
+    /** @var AliasResolver */
+    private $aliasResolver;
+
     public function __construct(
         Configuration $configuration,
-        MigrationRepository $migrationRepository
+        Connection $connection,
+        AliasResolver $aliasResolver
     ) {
-        $this->configuration       = $configuration;
-        $this->migrationRepository = $migrationRepository;
+        $this->configuration = $configuration;
+        $this->connection    = $connection;
+        $this->aliasResolver = $aliasResolver;
     }
 
     /** @return string[]|int[]|null[] */
-    public function getMigrationsInfos() : array
+    public function getMigrationsInfos(ExecutedMigrationsSet $executedMigrations, AvailableMigrationsSet $availableMigrations) : array
     {
-        $executedMigrations            = $this->migrationRepository->getMigratedVersions();
-        $availableMigrations           = $this->migrationRepository->getAvailableVersions();
-        $newMigrations                 = $this->migrationRepository->getNewVersions();
-        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
+        $newMigrations                 = $availableMigrations->getNewMigrations($executedMigrations);
+        $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
         return [
             'Name'                              => $this->configuration->getName() ?? 'Doctrine Database Migrations',
-            'Database Driver'                   => $this->configuration->getConnection()->getDriver()->getName(),
-            'Database Host'                     => $this->configuration->getConnection()->getHost(),
-            'Database Name'                     => $this->configuration->getConnection()->getDatabase(),
+            'Database Driver'                   => $this->connection->getDriver()->getName(),
+            'Database Host'                     => $this->connection->getHost(),
+            'Database Name'                     => $this->connection->getDatabase(),
             'Configuration Source'              => $this->configuration instanceof AbstractFileConfiguration ? $this->configuration->getFile() : 'manually configured',
             'Version Table Name'                => $this->configuration->getMigrationsTableName(),
             'Version Column Name'               => $this->configuration->getMigrationsColumnName(),
-            'Migrations Namespace'              => $this->configuration->getMigrationsNamespace(),
-            'Migrations Directory'              => $this->configuration->getMigrationsDirectory(),
+//            'Migrations Namespace'              => $this->configuration->getMigrationsNamespace(),
+//            'Migrations Directory'              => $this->configuration->getMigrationsDirectory(),
             'Previous Version'                  => $this->getFormattedVersionAlias('prev'),
             'Current Version'                   => $this->getFormattedVersionAlias('current'),
             'Next Version'                      => $this->getFormattedVersionAlias('next'),
             'Latest Version'                    => $this->getFormattedVersionAlias('latest'),
-            'Executed Migrations'               => count($executedMigrations),
-            'Executed Unavailable Migrations'   => count($executedUnavailableMigrations),
-            'Available Migrations'              => count($availableMigrations),
-            'New Migrations'                    => count($newMigrations),
+            'Executed Migrations'               => count($executedMigrations->getItems()),
+            'Executed Unavailable Migrations'   => count($executedUnavailableMigrations->getItems()),
+            'Available Migrations'              => count($availableMigrations->getItems()),
+            'New Migrations'                    => count($newMigrations->getItems()),
         ];
     }
 
     private function getFormattedVersionAlias(string $alias) : string
     {
-        $version = $this->configuration->resolveVersionAlias($alias);
+        $version = $this->aliasResolver->resolveVersionAlias($alias);
 
         // No version found
         if ($version === null) {
@@ -85,8 +99,7 @@ class MigrationStatusInfosHelper
 
         // Show normal version number
         return sprintf(
-            '%s (<comment>%s</comment>)',
-            $this->configuration->getDateTime((string) $version),
+            '<comment>%s</comment>',
             $version
         );
     }

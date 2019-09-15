@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
+use function end;
+use function reset;
+
 class MigrationPlan
 {
     /** @var string */
@@ -31,12 +34,12 @@ class MigrationPlan
         return $this->direction;
     }
 
-    public function getFirst():?MigrationPlanItem
+    public function getFirst() : ?MigrationPlanItem
     {
         return reset($this->items) ?: null;
     }
 
-    public function getLast():?MigrationPlanItem
+    public function getLast() : ?MigrationPlanItem
     {
         return end($this->items) ?: null;
     }

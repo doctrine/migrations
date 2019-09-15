@@ -61,7 +61,7 @@ class TableMetadataStorage implements MetadataStorage
      */
     public function getExecutedMigrations() : ExecutedMigrationsSet
     {
-        if (!$this->isInitialized()) {
+        if (! $this->isInitialized()) {
             $this->initialize();
         }
 
@@ -69,7 +69,6 @@ class TableMetadataStorage implements MetadataStorage
 
         $migrations = [];
         foreach ($rows as $row) {
-
             $row = array_change_key_case($row, CASE_LOWER);
 
             $version   = new Version($row['version']);

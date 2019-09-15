@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\ArrayConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\JsonConfiguration;

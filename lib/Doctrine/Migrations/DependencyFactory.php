@@ -37,35 +37,25 @@ class DependencyFactory
     /** @var object[] */
     private $dependencies = [];
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $connection;
 
     public function __construct(Configuration $configuration, Connection $connection, LoggerInterface $logger)
     {
         $this->configuration = $configuration;
-        $this->logger = $logger;
-        $this->connection = $connection;
+        $this->logger        = $logger;
+        $this->connection    = $connection;
     }
 
-    /**
-     * @return Configuration
-     */
-    public function getConfiguration(): Configuration
+    public function getConfiguration() : Configuration
     {
         return $this->configuration;
     }
 
-    /**
-     * @return Connection
-     */
-    public function getConnection(): Connection
+    public function getConnection() : Connection
     {
         return $this->connection;
     }
@@ -123,9 +113,9 @@ class DependencyFactory
         });
     }
 
-    public function getMigrationsFinder(): MigrationFinder
+    public function getMigrationsFinder() : MigrationFinder
     {
-        return $this->getDependency(GlobFinder::class, function () : MigrationFinder {
+        return $this->getDependency(GlobFinder::class, static function () : MigrationFinder {
             return new GlobFinder();
         });
     }
@@ -151,7 +141,7 @@ class DependencyFactory
         });
     }
 
-    public function getLogger(): LoggerInterface
+    public function getLogger() : LoggerInterface
     {
         return $this->logger;
     }
@@ -227,7 +217,8 @@ class DependencyFactory
         return $this->getDependency(MigrationStatusInfosHelper::class, function () : MigrationStatusInfosHelper {
             return new MigrationStatusInfosHelper(
                 $this->configuration,
-                $this->getMigrationRepository()
+                $this->connection,
+                $this->getVersionAliasResolver()
             );
         });
     }

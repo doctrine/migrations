@@ -210,7 +210,7 @@ EOT
         $version = $this->dependencyFactory->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
 
         if ($version !== null) {
-            return (string)$version;
+            return (string) $version;
         }
 
         if ($versionAlias === 'prev') {

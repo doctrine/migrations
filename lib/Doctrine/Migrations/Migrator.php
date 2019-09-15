@@ -11,7 +11,6 @@ use Doctrine\Migrations\Metadata\MetadataStorage;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use Doctrine\Migrations\Tools\BytesFormatter;
-use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Version;
 use Psr\Log\LoggerInterface;
@@ -19,9 +18,6 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
 use const COUNT_RECURSIVE;
 use function count;
-use function end;
-use function key;
-use function reset;
 
 /**
  * The Migrator class is responsible for generating and executing the SQL for a migration.
@@ -97,7 +93,6 @@ class Migrator
 
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-
 
         $migrationsPlan = $this->migrationPlanCalculator->getMigrationsToExecute($availableMigrations, $executedMigrations, $to);
 

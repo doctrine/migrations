@@ -16,27 +16,20 @@ use Psr\Log\LoggerInterface;
  */
 class Factory
 {
-    /**
-     * @var Connection
-     */
+    /** @var Connection */
     private $connection;
 
-    /**
-     * @var ExecutorInterface
-     */
+    /** @var ExecutorInterface */
     private $versionExecutor;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     private $logger;
 
     public function __construct(Connection $connection, ExecutorInterface $versionExecutor, LoggerInterface $logger)
     {
-
-        $this->connection = $connection;
+        $this->connection      = $connection;
         $this->versionExecutor = $versionExecutor;
-        $this->logger = $logger;
+        $this->logger          = $logger;
     }
 
     public function createVersion(string $migrationClassName) : AbstractMigration

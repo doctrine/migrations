@@ -28,7 +28,6 @@ use function strlen;
  */
 abstract class AbstractCommand extends Command
 {
-
     /** @var Configuration */
     protected $configuration;
 
@@ -97,9 +96,7 @@ abstract class AbstractCommand extends Command
         InputInterface $input,
         OutputInterface $output
     ) : DependencyFactory {
-
         if ($this->dependencyFactory === null) {
-
             $conn = $this->getConnection($input);
 
             if ($this->hasConfigurationHelper()) {
@@ -109,8 +106,8 @@ abstract class AbstractCommand extends Command
                 $configHelper = new ConfigurationHelper($this->configuration);
             }
 
-            $this->configuration = $configHelper->getMigrationConfig($input);
-            $logger = new ConsoleLogger($output);
+            $this->configuration     = $configHelper->getMigrationConfig($input);
+            $logger                  = new ConsoleLogger($output);
             $this->dependencyFactory = new DependencyFactory($this->configuration, $conn, $logger);
         }
 

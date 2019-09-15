@@ -28,6 +28,12 @@ class GenerateCommand extends AbstractCommand
                 InputOption::VALUE_OPTIONAL,
                 'Open file with this command upon creation.'
             )
+            ->addOption(
+                'namespace',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The namespace to use for the migration (must be in the list of configured namespaces)'
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
@@ -48,7 +54,9 @@ EOT
 
         $migrationGenerator = $this->dependencyFactory->getMigrationGenerator();
 
-        $path = $migrationGenerator->generateMigration($versionNumber);
+        $namespace = $input->getOption('namespace') ?: null;
+
+        $path = $migrationGenerator->generateMigration($versionNumber, $namespace);
 
         $editorCommand = $input->getOption('editor-cmd');
 

@@ -24,15 +24,13 @@ final class AliasResolver
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    /**
-     * @var MetadataStorage
-     */
+    /** @var MetadataStorage */
     private $metadataStorage;
 
     public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage = $metadataStorage;
+        $this->metadataStorage     = $metadataStorage;
     }
 
     /**
@@ -61,26 +59,32 @@ final class AliasResolver
         switch ($alias) {
             case self::ALIAS_FIRST:
                 $info = $executedMigrations->getFirst();
-                return $info ? $info->getVersion() : null;
 
+                return $info ? $info->getVersion() : null;
             case self::ALIAS_CURRENT:
                 $info = $executedMigrations->getLast();
-                return $info ? $info->getVersion() : null;
 
+                return $info ? $info->getVersion() : null;
             case self::ALIAS_PREV:
                 $info = $executedMigrations->getLast(-1);
-                return $info ? $info->getVersion() : null;
 
+                return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
-                $availableMigration = $availableMigrations->getFirst();
-                return $availableMigration ? $availableMigration->getVersion() : null;
+                foreach ($availableMigrations->getItems() as $availableMigration) {
+                    if (! $executedMigrations->getMigration((string) $availableMigration->getVersion())) {
+                        return $availableMigration->getVersion();
+                    }
+                }
 
+                return null;
             case self::ALIAS_LATEST:
                 $availableMigration = $availableMigrations->getLast();
+
                 return $availableMigration ? $availableMigration->getVersion() : null;
             default:
                 if (substr($alias, 0, 7) === self::ALIAS_CURRENT) {
-                    $availableMigration = $availableMigrations->getFirst((int)substr($alias, 7));
+                    $availableMigration = $availableMigrations->getFirst((int) substr($alias, 7));
+
                     return $availableMigration ? $availableMigration->getVersion() : null;
                 }
 

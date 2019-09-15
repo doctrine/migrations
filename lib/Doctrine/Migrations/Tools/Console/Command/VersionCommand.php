@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
 use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
@@ -54,18 +55,6 @@ class VersionCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Apply to all the versions.'
             )
-            ->addOption(
-                'range-from',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Apply from specified version.'
-            )
-            ->addOption(
-                'range-to',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Apply to specified version.'
-            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
@@ -79,11 +68,6 @@ If you want to synchronize by adding or deleting all migration versions availabl
 
     <info>%command.full_name% --add --all</info>
     <info>%command.full_name% --delete --all</info>
-
-If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range-from/--range-to</comment> option:
-
-    <info>%command.full_name% --add --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
-    <info>%command.full_name% --delete --range-from=YYYYMMDDHHMMSS --range-to=YYYYMMDDHHMMSS</info>
 
 You can also execute this command without a warning message which you need to interact with:
 
@@ -129,36 +113,12 @@ EOT
     {
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
-        $rangeFromOption = $input->getOption('range-from');
-        $rangeToOption   = $input->getOption('range-to');
-
-        if ($allOption === true && ($rangeFromOption !== null || $rangeToOption !== null)) {
-            throw InvalidOptionUsage::new(
-                'Options --all and --range-to/--range-from both used. You should use only one of them.'
-            );
-        }
-
-        if ($rangeFromOption !== null xor $rangeToOption !== null) {
-            throw InvalidOptionUsage::new(
-                'Options --range-to and --range-from should be used together.'
-            );
-        }
 
         if ($allOption === true) {
-            $availableVersions = $this->migrationRepository->getAvailableVersions();
+            $availableVersions = $this->migrationRepository->getMigrations();
 
-            foreach ($availableVersions as $version) {
-                $this->mark($input, $output, $version, true);
-            }
-        } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
-            $availableVersions = $this->migrationRepository->getAvailableVersions();
-
-            foreach ($availableVersions as $version) {
-                if ($version < $rangeFromOption || $version > $rangeToOption) {
-                    continue;
-                }
-
-                $this->mark($input, $output, $version, true);
+            foreach ($availableVersions->getItems() as $availableMigration) {
+                $this->mark($input, $output, $availableMigration, true);
             }
         } else {
             $this->mark($input, $output, $affectedVersion);
@@ -170,7 +130,7 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, string $version, bool $all = false) : void
+    private function mark(InputInterface $input, OutputInterface $output, AvailableMigration $migration, bool $all = false) : void
     {
         if (! $this->migrationRepository->hasVersion($version)) {
             if ((bool) $input->getOption('delete') === false) {
