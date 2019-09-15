@@ -50,7 +50,7 @@ final class AliasResolver
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
 
-        if ($availableMigration = $availableMigrations->getMigration($alias)) {
+        if ($availableMigration = $availableMigrations->getMigration(new Version($alias))) {
             return $availableMigration->getVersion();
         }
 
@@ -71,7 +71,7 @@ final class AliasResolver
                 return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
                 foreach ($availableMigrations->getItems() as $availableMigration) {
-                    if (! $executedMigrations->getMigration((string) $availableMigration->getVersion())) {
+                    if (! $executedMigrations->getMigration($availableMigration->getVersion())) {
                         return $availableMigration->getVersion();
                     }
                 }
