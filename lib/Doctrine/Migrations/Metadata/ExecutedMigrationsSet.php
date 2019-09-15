@@ -9,7 +9,7 @@ use function array_filter;
 use function array_values;
 use function count;
 
-class ExecutedMigrationsSet
+class ExecutedMigrationsSet implements \Countable
 {
     /** @var MigrationInfo[] */
     private $items = [];
@@ -35,6 +35,11 @@ class ExecutedMigrationsSet
     public function getLast(int $offset = 0) : ?MigrationInfo
     {
         return $this->items[count($this->items)-1-(-1*$offset)] ?? null;
+    }
+
+    public function count()
+    {
+        return count($this->items);
     }
 
     public function getMigration(Version $version) : ?MigrationInfo

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Generator;
 
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\Migrations\Metadata\MetadataStorage;
 use Doctrine\Migrations\Version\Direction;
 use function sprintf;
 
@@ -19,25 +20,15 @@ final class FileBuilder
     /** @var AbstractPlatform */
     private $platform;
 
-    /** @var string */
-    private $tableName;
-
-    /** @var string */
-    private $columnName;
-
-    /** @var string */
-    private $executedAtColumnName;
+    /**
+     * @var MetadataStorage
+     */
+    private $metadataStorage;
 
     public function __construct(
-        AbstractPlatform $platform,
-        string $tableName,
-        string $columnName,
-        string $executedAtColumnName
+        MetadataStorage $metadataStorage
     ) {
-        $this->platform             = $platform;
-        $this->tableName            = $tableName;
-        $this->columnName           = $columnName;
-        $this->executedAtColumnName = $executedAtColumnName;
+        $this->metadataStorage = $metadataStorage;
     }
 
     /** @param string[][] $queriesByVersion */
@@ -57,7 +48,8 @@ final class FileBuilder
                 $string .= $query . ";\n";
             }
 
-            $string .= $this->getVersionUpdateQuery($version, $direction);
+            // @todo this is missing
+            // $string .= $this->getVersionUpdateQuery($version, $direction);
         }
 
         return $string;

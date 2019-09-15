@@ -74,7 +74,7 @@ EOT
         $schemaDumper = $this->dependencyFactory->getSchemaDumper();
         $versions     = $this->dependencyFactory->getMigrationRepository()->getMigrations();
 
-        if (count($versions->getItems()) > 0) {
+        if (count($versions) > 0) {
             throw SchemaDumpRequiresNoMigrations::new();
         }
 

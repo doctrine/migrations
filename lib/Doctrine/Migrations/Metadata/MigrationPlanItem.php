@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Version\Version;
 
 class MigrationPlanItem
 {
@@ -12,7 +13,6 @@ class MigrationPlanItem
     private $direction;
     /** @var MigrationInfo */
     private $info;
-
     /** @var AbstractMigration */
     private $migration;
 
@@ -21,6 +21,11 @@ class MigrationPlanItem
         $this->info      = $info;
         $this->migration = $migration;
         $this->direction = $direction;
+    }
+
+    public function getVersion(): Version
+    {
+        return $this->info->getVersion();
     }
 
     public function getInfo() : MigrationInfo

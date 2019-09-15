@@ -101,10 +101,7 @@ class DependencyFactory
     {
         return $this->getDependency(FileBuilder::class, function () : FileBuilder {
             return new FileBuilder(
-                $this->connection->getDatabasePlatform(),
-                $this->configuration->getMigrationsTableName(),
-                $this->configuration->getQuotedMigrationsColumnName(),
-                $this->configuration->getQuotedMigrationsExecutedAtColumnName()
+                $this->getMetadataStorage()
             );
         });
     }
@@ -174,8 +171,8 @@ class DependencyFactory
     {
         return $this->getDependency(FileQueryWriter::class, function () : FileQueryWriter {
             return new FileQueryWriter(
-                $this->getOutputWriter(),
-                $this->getFileBuilder()
+                $this->getFileBuilder(),
+                $this->logger
             );
         });
     }
@@ -193,7 +190,10 @@ class DependencyFactory
     public function getMigrationPlanCalculator() : MigrationPlanCalculator
     {
         return $this->getDependency(MigrationPlanCalculator::class, function () : MigrationPlanCalculator {
-            return new MigrationPlanCalculator($this->getMigrationRepository());
+            return new MigrationPlanCalculator(
+                $this->getMigrationRepository(),
+                $this->getMetadataStorage()
+            );
         });
     }
 
@@ -240,8 +240,6 @@ class DependencyFactory
                 $this->getEventDispatcher(),
                 $this->getMigrationPlanCalculator(),
                 $this->getVersionExecutor(),
-                $this->getMetadataStorage(),
-                $this->getMigrationRepository(),
                 $this->logger,
                 $this->getStopwatch()
             );

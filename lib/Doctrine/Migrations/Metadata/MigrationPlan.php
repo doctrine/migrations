@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Metadata;
 use function end;
 use function reset;
 
-class MigrationPlan
+class MigrationPlan implements \Countable
 {
     /** @var string */
     private $direction;
@@ -19,6 +19,11 @@ class MigrationPlan
     {
         $this->items     = $items;
         $this->direction = $direction;
+    }
+
+    public function count()
+    {
+        return count($this->items);
     }
 
     /**

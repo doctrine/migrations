@@ -70,10 +70,10 @@ class MigrationStatusInfosHelper
             'Current Version'                   => $this->getFormattedVersionAlias('current'),
             'Next Version'                      => $this->getFormattedVersionAlias('next'),
             'Latest Version'                    => $this->getFormattedVersionAlias('latest'),
-            'Executed Migrations'               => count($executedMigrations->getItems()),
-            'Executed Unavailable Migrations'   => count($executedUnavailableMigrations->getItems()),
-            'Available Migrations'              => count($availableMigrations->getItems()),
-            'New Migrations'                    => count($newMigrations->getItems()),
+            'Executed Migrations'               => count($executedMigrations),
+            'Executed Unavailable Migrations'   => count($executedUnavailableMigrations),
+            'Available Migrations'              => count($availableMigrations),
+            'New Migrations'                    => count($newMigrations),
         ];
     }
 

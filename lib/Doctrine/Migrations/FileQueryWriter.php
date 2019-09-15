@@ -7,6 +7,7 @@ namespace Doctrine\Migrations;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Migrations\Generator\FileBuilder;
+use Psr\Log\LoggerInterface;
 use function file_put_contents;
 use function is_dir;
 use function sprintf;
@@ -21,10 +22,17 @@ final class FileQueryWriter implements QueryWriter
     /** @var FileBuilder */
     private $migrationFileBuilder;
 
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
+
     public function __construct(
-        FileBuilder $migrationFileBuilder
+        FileBuilder $migrationFileBuilder,
+        LoggerInterface $logger
     ) {
         $this->migrationFileBuilder = $migrationFileBuilder;
+        $this->logger = $logger;
     }
 
     /**
@@ -43,11 +51,9 @@ final class FileQueryWriter implements QueryWriter
 
         $path = $this->buildMigrationFilePath($path, $now);
 
-        if ($this->outputWriter !== null) {
-            $this->outputWriter->write(
-                "\n" . sprintf('Writing migration file to "<info>%s</info>"', $path)
-            );
-        }
+        $this->logger->info('Writing migration file to "{path}"', [
+            'path' => $path
+        ]);
 
         return file_put_contents($path, $string) !== false;
     }

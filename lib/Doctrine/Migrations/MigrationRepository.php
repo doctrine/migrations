@@ -110,6 +110,16 @@ class MigrationRepository
         return isset($this->migrations[$version]);
     }
 
+    public function getMigration(Version $version) : AvailableMigration
+    {
+        $this->loadMigrationsFromDirectories();
+
+        if (!isset($this->migrations[(string)$version])) {
+            throw MigrationClassNotFound::new((string)$version);
+        }
+        return $this->migrations[(string)$version];
+    }
+
     public function getMigrations() : AvailableMigrationsSet
     {
         $this->loadMigrationsFromDirectories();
@@ -117,25 +127,11 @@ class MigrationRepository
         return new AvailableMigrationsSet($this->migrations);
     }
 
-//    /**
-//     * @return string[]
-//     */
-//    public function getExecutedUnavailableMigrations() : array
-//    {
-//        $executedMigrations  = $this->getMigratedVersions();
-//        $availableMigrations = $this->getAvailableVersions();
-//
-//        return array_diff($executedMigrations, $availableMigrations);
-//    }
-
     /** @throws MigrationException */
     private function ensureMigrationClassExists(string $class) : void
     {
         if (! class_exists($class)) {
-            throw MigrationClassNotFound::new(
-                $class,
-                $class
-            );
+            throw MigrationClassNotFound::new($class);
         }
     }
 
