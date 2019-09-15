@@ -14,11 +14,11 @@ abstract class FinderTestCase extends MigrationTestCase
 
     public function testClassesInMultipleNamespacesCanBeLoadedByTheFinder() : void
     {
-        $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespace');
+        $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespace', 'TestMigrations');
 
-        self::assertSame([
-            '0001' => 'TestMigrations\\Test\\Version0001',
-            '0002' => 'TestMigrations\\TestOther\\Version0002',
+        self::assertArraySubset([
+            'TestMigrations\\Test\\Version0001',
+            'TestMigrations\\TestOther\\Version0002',
         ], $versions);
     }
 
@@ -29,6 +29,6 @@ abstract class FinderTestCase extends MigrationTestCase
             'TestMigrations\\Test'
         );
 
-        self::assertSame(['0001' => 'TestMigrations\\Test\\Version0001'], $versions);
+        self::assertSame(['TestMigrations\\Test\\Version0001'], $versions);
     }
 }

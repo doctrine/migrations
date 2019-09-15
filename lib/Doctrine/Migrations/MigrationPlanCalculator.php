@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MetadataStorage;
-use Doctrine\Migrations\Metadata\MigrationInfo;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\MigrationPlan;
-use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use function array_map;
@@ -41,18 +38,16 @@ final class MigrationPlanCalculator
         $this->metadataStorage = $metadataStorage;
     }
 
-    public function getPlanForExactVersion(Version $version, string $direction): MigrationPlan
+    public function getPlanForExactVersion(Version $version, string $direction): MigrationPlanList
     {
         $migration = $this->migrationRepository->getMigration($version);
 
-        $info = new MigrationInfo($migration->getVersion());
+        $planItem = new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
 
-        $planItem = new MigrationPlanItem($info, $migration->getMigration(), $direction);
-
-        return new MigrationPlan([$planItem], $direction);
+        return new MigrationPlanList([$planItem], $direction);
     }
 
-    public function getPlanUntilVersion(Version $to = null) : MigrationPlan
+    public function getPlanUntilVersion(Version $to = null) : MigrationPlanList
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
@@ -83,10 +78,8 @@ final class MigrationPlanCalculator
             }
         }
 
-        return new MigrationPlan(array_map(static function (AvailableMigration $migration) use ($direction) {
-            $info = new MigrationInfo($migration->getVersion());
-
-            return new MigrationPlanItem($info, $migration->getMigration(), $direction);
+        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) {
+            return new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
         }, $toExecute), $direction);
     }
 }

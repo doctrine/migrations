@@ -9,7 +9,7 @@ use function array_filter;
 use function array_values;
 use function count;
 
-class AvailableMigrationsSet implements \Countable
+class AvailableMigrationsList implements \Countable
 {
     /** @var AvailableMigration[] */
     private $items = [];
@@ -45,7 +45,7 @@ class AvailableMigrationsSet implements \Countable
     public function getMigration(Version $version) : ?AvailableMigration
     {
         foreach ($this->items as $migration) {
-            if ($migration->getVersion() == $version) {
+            if ((string)$migration->getVersion() == (string)$version) {
                 return $migration;
             }
         }
@@ -53,10 +53,10 @@ class AvailableMigrationsSet implements \Countable
         return null;
     }
 
-    public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsSet
+    public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsList
     {
-        return new AvailableMigrationsSet(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
-            return $executedMigrationsSet->getMigration($migrationInfo->getVersion());
+        return new AvailableMigrationsList(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
+            return !$executedMigrationsSet->getMigration($migrationInfo->getVersion());
         }));
     }
 }

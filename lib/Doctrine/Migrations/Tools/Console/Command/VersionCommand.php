@@ -4,11 +4,16 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
 use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutionResult;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -114,14 +119,15 @@ EOT
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
 
+        $executedMigrations = $this->dependencyFactory->getMetadataStorage()->getExecutedMigrations();
         if ($allOption === true) {
-            $availableVersions = $this->migrationRepository->getMigrations();
+            $availableVersions = $this->dependencyFactory->getMigrationRepository()->getMigrations();
 
             foreach ($availableVersions->getItems() as $availableMigration) {
-                $this->mark($input, $output, $availableMigration, true);
+                $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
             }
         } else {
-            $this->mark($input, $output, $affectedVersion);
+            $this->mark($input, $output, new Version($affectedVersion), false, $executedMigrations);
         }
     }
 
@@ -130,11 +136,18 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, AvailableMigration $migration, bool $all = false) : void
+    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsSet $executedMigrations) : void
     {
-        if (! $this->migrationRepository->hasVersion($version)) {
+        try{
+            $availableMigration = $this->dependencyFactory->getMigrationRepository()->getMigration($version);
+        } catch (MigrationClassNotFound $e) {
+            $availableMigration = null;
+        }
+
+        $storage = $this->dependencyFactory->getMetadataStorage();
+        if (! $availableMigration ) {
             if ((bool) $input->getOption('delete') === false) {
-                throw UnknownMigrationVersion::new($version);
+                throw UnknownMigrationVersion::new((string)$version);
             }
 
             $question =
@@ -144,22 +157,20 @@ EOT
             $confirmation = $this->askConfirmation($question, $input, $output);
 
             if ($confirmation) {
-                $this->migrationRepository->removeMigrationVersionFromDatabase($version);
-
+                $migrationResult = new ExecutionResult($version, Direction::DOWN);
+                $storage->complete($migrationResult);
                 $output->writeln(sprintf(
                     '<info>%s</info> deleted from the version table.',
-                    $version
+                    (string)$version
                 ));
 
                 return;
             }
         }
 
-        $version = $this->migrationRepository->getVersion($version);
-
         $marked = false;
 
-        if ($this->markMigrated && $this->migrationRepository->hasVersionMigrated($version)) {
+        if ($this->markMigrated && $executedMigrations->getMigration($version)) {
             if (! $all) {
                 throw VersionAlreadyExists::new($version);
             }
@@ -167,7 +178,7 @@ EOT
             $marked = true;
         }
 
-        if (! $this->markMigrated && ! $this->migrationRepository->hasVersionMigrated($version)) {
+        if (! $this->markMigrated && ! $executedMigrations->getMigration($version)) {
             if (! $all) {
                 throw VersionDoesNotExist::new($version);
             }
@@ -180,18 +191,20 @@ EOT
         }
 
         if ($this->markMigrated) {
-            $version->markMigrated();
+            $migrationResult = new ExecutionResult($version, Direction::UP);
+            $storage->complete($migrationResult);
 
             $output->writeln(sprintf(
                 '<info>%s</info> added to the version table.',
-                $version->getVersion()
+                (string)$version
             ));
         } else {
-            $version->markNotMigrated();
+            $migrationResult = new ExecutionResult($version, Direction::DOWN);
+            $storage->complete($migrationResult);
 
             $output->writeln(sprintf(
                 '<info>%s</info> deleted from the version table.',
-                $version->getVersion()
+                (string)$version
             ));
         }
     }

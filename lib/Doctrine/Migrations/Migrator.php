@@ -6,7 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
-use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Version;
@@ -26,9 +26,6 @@ class Migrator
     /** @var Stopwatch */
     private $stopwatch;
 
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
-
     /** @var LoggerInterface */
     private $logger;
 
@@ -44,13 +41,11 @@ class Migrator
     public function __construct(
         Connection $connection,
         EventDispatcher $dispatcher,
-        MigrationPlanCalculator $migrationPlanCalculator,
         ExecutorInterface $executor,
         LoggerInterface $logger,
         Stopwatch $stopwatch
     ) {
         $this->stopwatch               = $stopwatch;
-        $this->migrationPlanCalculator = $migrationPlanCalculator;
         $this->logger                  = $logger;
         $this->executor                = $executor;
         $this->connection              = $connection;
@@ -58,12 +53,12 @@ class Migrator
     }
 
     /**
-     * @param MigrationPlan $migrationsPlan
+     * @param MigrationPlanList $migrationsPlan
      *
      * @return string[][]
      */
     private function executeMigrations(
-        MigrationPlan $migrationsPlan,
+        MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
     ) : array {
         $dryRun = $migratorConfiguration->isDryRun();
@@ -116,7 +111,7 @@ class Migrator
      */
     private function endMigrations(
         StopwatchEvent $stopwatchEvent,
-        MigrationPlan $migrationsPlan,
+        MigrationPlanList $migrationsPlan,
         array $sql
     ) : void {
         $stopwatchEvent->stop();
@@ -132,7 +127,7 @@ class Migrator
         );
     }
 
-    public function migrate(MigrationPlan $migrationsPlan, MigratorConfiguration $migratorConfiguration, Version $currentVersion = null)
+    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration, Version $currentVersion = null)
     {
         /**
          * If there are no migrations to execute throw an exception.

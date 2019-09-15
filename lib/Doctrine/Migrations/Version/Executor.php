@@ -11,8 +11,7 @@ use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Metadata\MetadataStorage;
-use Doctrine\Migrations\Metadata\MigrationInfo;
-use Doctrine\Migrations\Metadata\MigrationPlanItem;
+use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -118,31 +117,30 @@ final class Executor implements ExecutorInterface
     }
 
     public function execute(
-        MigrationPlanItem $plan,
+        MigrationPlan $plan,
         MigratorConfiguration $configuration
     ) : ExecutionResult {
-        $result = new ExecutionResult($plan);
+        $result = new ExecutionResult($plan->getVersion(), $plan->getDirection());
 
         $this->startMigration($plan, $configuration);
 
         try {
             $this->executeMigration(
+                $plan,
                 $result,
                 $configuration
             );
 
-            $result->setSql($this->sql);
-            $result->setParams($this->params);
-            $result->setTypes($this->types);
+            $result->setSql($this->sql, $this->params, $this->types);
         } catch (SkipMigration $e) {
             $result->setSkipped(true);
 
-            $this->migrationEnd($e, $result, $configuration);
+            $this->migrationEnd($e, $plan, $result, $configuration);
         } catch (Throwable $e) {
             $result->setError(true);
             $result->setException($e);
 
-            $this->migrationEnd($e, $result, $configuration);
+            $this->migrationEnd($e, $plan, $result, $configuration);
 
             throw $e;
         }
@@ -151,7 +149,7 @@ final class Executor implements ExecutorInterface
     }
 
     private function startMigration(
-        MigrationPlanItem $plan,
+        MigrationPlan $plan,
         MigratorConfiguration $configuration
     ) : void {
         $this->sql    = [];
@@ -174,14 +172,13 @@ final class Executor implements ExecutorInterface
     }
 
     private function executeMigration(
+        MigrationPlan $plan,
         ExecutionResult $result,
         MigratorConfiguration $configuration
     ) : ExecutionResult {
         $stopwatchEvent = $this->stopwatch->start('execute');
 
-        $plan      = $result->getPlan();
         $migration = $plan->getMigration();
-        $info      = $plan->getInfo();
         $direction = $plan->getDirection();
 
         $result->setState(State::PRE);
@@ -190,7 +187,7 @@ final class Executor implements ExecutorInterface
 
         $migration->{'pre' . ucfirst($direction)}($fromSchema);
 
-        $this->logger->info(...$this->getMigrationHeader($info, $migration, $direction));
+        $this->logger->info(...$this->getMigrationHeader($plan, $migration, $direction));
 
         $result->setState(State::EXEC);
 
@@ -214,7 +211,7 @@ final class Executor implements ExecutorInterface
             }
         } else {
             $this->logger->warning('Migration {version} was executed but did not result in any SQL statements.', [
-                'version' => $info->getVersion(),
+                'version' => (string)$plan->getVersion(),
             ]);
         }
 
@@ -225,15 +222,14 @@ final class Executor implements ExecutorInterface
 
         $result->setTime($stopwatchEvent->getDuration());
         $result->setMemory($stopwatchEvent->getMemory());
-
-        $info->setResult($result);
+        $plan->setResult($result);
 
         if (! $configuration->isDryRun()) {
             $this->metadataStorage->complete($result);
         }
 
         $params = [
-            'version' => $info->getVersion(),
+            'version' => (string)$plan->getVersion(),
             'time' => $stopwatchEvent->getDuration(),
             'memory' => BytesFormatter::formatBytes($stopwatchEvent->getMemory()),
             'direction' => $direction === Direction::UP ? 'migrated' : 'reverted',
@@ -249,7 +245,7 @@ final class Executor implements ExecutorInterface
         $result->setState(State::NONE);
 
         $this->dispatcher->dispatchVersionEvent(
-            $result->getPlan()->getVersion(),
+            $plan->getVersion(),
             Events::onMigrationsVersionExecuted,
             $result,
             $configuration->isDryRun()
@@ -258,9 +254,9 @@ final class Executor implements ExecutorInterface
         return $result;
     }
 
-    private function getMigrationHeader(MigrationInfo $version, AbstractMigration $migration, string $direction) : array
+    private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction) : array
     {
-        $versionInfo = $version->getVersion();
+        $versionInfo = (string)$planItem->getVersion();
         $description = $migration->getDescription();
 
         if ($description !== '') {
@@ -276,15 +272,13 @@ final class Executor implements ExecutorInterface
         return ['++ reverting {version_name}', $params];
     }
 
-    private function migrationEnd(Throwable $e, ExecutionResult $result, MigratorConfiguration $configuration) : void
+    private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
     {
-        $info = $result->getPlan()->getInfo();
-
         if ($result->isSkipped()) {
             $this->logger->error(
                 'Migration {version} skipped during %s. Reason {error}',
                 [
-                    'version' =>(string) $info->getVersion(),
+                    'version' =>(string) $plan->getVersion(),
                     'reason' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
@@ -293,7 +287,7 @@ final class Executor implements ExecutorInterface
             $this->logger->error(
                 'Migration {version} failed during %s. Error {error}',
                 [
-                    'version' => (string) $info->getVersion(),
+                    'version' => (string) $plan->getVersion(),
                     'error' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
@@ -301,13 +295,13 @@ final class Executor implements ExecutorInterface
         }
 
         $this->dispatcher->dispatchVersionEvent(
-            $info->getVersion(),
+            $plan->getVersion(),
             Events::onMigrationsVersionSkipped,
             $result,
             $configuration->isDryRun()
         );
 
-        $migration = $result->getPlan()->getMigration();
+        $migration = $plan->getMigration();
 
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode

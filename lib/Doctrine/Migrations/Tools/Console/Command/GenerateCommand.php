@@ -17,7 +17,7 @@ class GenerateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:generate';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['generate'])
@@ -43,12 +43,12 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $versionNumber = $this->configuration->generateVersionNumber();
 
@@ -56,6 +56,14 @@ EOT
 
         $namespace = $input->getOption('namespace') ?: null;
 
+        $dirs = $this->configuration->getMigrationDirectories();
+        if ($namespace === null) {
+            $namespace = key($dirs);
+        } elseif (!isset($dirs[$namespace])) {
+            throw new \Exception(sprintf('Path not defined for the namespace %s', $namespace));
+        }
+
+        $fqcn = $namespace . '\\Version' . $versionNumber;
         $path = $migrationGenerator->generateMigration($versionNumber, $namespace);
 
         $editorCommand = $input->getOption('editor-cmd');
@@ -68,13 +76,13 @@ EOT
             sprintf('Generated new migration class to "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
-                $versionNumber
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                $fqcn
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down %s</info>',
-                $versionNumber
+                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                $fqcn
             ),
         ]);
 

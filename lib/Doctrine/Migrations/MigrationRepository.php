@@ -10,7 +10,7 @@ use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
@@ -30,9 +30,6 @@ class MigrationRepository
     /** @var array<string, string> */
     private $migrationDirectories;
 
-    /** @var Connection */
-    private $connection;
-
     /** @var MigrationFinder */
     private $migrationFinder;
 
@@ -47,13 +44,11 @@ class MigrationRepository
 
     public function __construct(
         array $migrationDirectories,
-        Connection $connection,
         MigrationFinder $migrationFinder,
         Factory $versionFactory,
         ?callable $sorter = null
     ) {
         $this->migrationDirectories = $migrationDirectories;
-        $this->connection           = $connection;
         $this->migrationFinder      = $migrationFinder;
         $this->versionFactory       = $versionFactory;
         $this->sorter               = $sorter ?: static function (AvailableMigration $m1, AvailableMigration $m2) {
@@ -120,11 +115,11 @@ class MigrationRepository
         return $this->migrations[(string)$version];
     }
 
-    public function getMigrations() : AvailableMigrationsSet
+    public function getMigrations() : AvailableMigrationsList
     {
         $this->loadMigrationsFromDirectories();
 
-        return new AvailableMigrationsSet($this->migrations);
+        return new AvailableMigrationsList($this->migrations);
     }
 
     /** @throws MigrationException */
