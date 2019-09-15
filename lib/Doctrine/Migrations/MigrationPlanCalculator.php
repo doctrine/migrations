@@ -11,6 +11,7 @@ use Doctrine\Migrations\Metadata\MigrationInfo;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Version;
 use function array_map;
 use function array_reverse;
 
@@ -28,23 +29,24 @@ final class MigrationPlanCalculator
         if ($to === null) {
             $direction = Direction::UP;
             foreach ($availableMigrations->getItems() as $availableMigration) {
-                if ($executedMigrations->getMigration((string) $availableMigration->getVersion())) {
+                if ($executedMigrations->getMigration($availableMigration->getVersion())) {
                     continue;
                 }
 
                 $toExecute[] = $availableMigration;
             }
         } else {
-            $direction = $to === '0' || ($executedMigrations->getMigration($to) && (string) $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
+            $to = new Version($to);
+            $direction = $to == new Version('0') || ($executedMigrations->getMigration($to) && $executedMigrations->getLast()->getVersion() != $to) ? Direction::DOWN : Direction::UP;
 
             foreach ($direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems()) as $availableMigration) {
-                if ($direction === Direction::UP && ! $executedMigrations->getMigration((string) $availableMigration->getVersion())) {
+                if ($direction === Direction::UP && ! $executedMigrations->getMigration($availableMigration->getVersion())) {
                     $toExecute[] = $availableMigration;
-                } elseif ($direction === Direction::DOWN && $executedMigrations->getMigration((string) $availableMigration->getVersion()) && (string) $availableMigration->getVersion() !== $to) {
+                } elseif ($direction === Direction::DOWN && $executedMigrations->getMigration($availableMigration->getVersion()) && $availableMigration->getVersion() != $to) {
                     $toExecute[] = $availableMigration;
                 }
 
-                if ((string) $availableMigration->getVersion() === $to) {
+                if ((string) $availableMigration->getVersion() == $to) {
                     break;
                 }
             }

@@ -132,7 +132,7 @@ EOT
         OutputInterface $output
     ) : void {
         foreach ($availableMigrationsSet->getItems() as $availableMigration) {
-            $executedMigration =  $executedMigrationsSet->getMigration((string) $availableMigration->getVersion());
+            $executedMigration =  $executedMigrationsSet->getMigration($availableMigration->getVersion());
 
             $status = $executedMigration ? '<info>migrated</info>' : '<error>not migrated</error>';
 

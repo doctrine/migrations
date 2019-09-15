@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
+use Doctrine\Migrations\Version\Version;
 use function array_filter;
 use function array_values;
 use function count;
@@ -36,10 +37,10 @@ class AvailableMigrationsSet
         return $this->items[count($this->items)-1-$offset] ?? null;
     }
 
-    public function getMigration(string $version) : ?AvailableMigration
+    public function getMigration(Version $version) : ?AvailableMigration
     {
         foreach ($this->items as $migration) {
-            if ((string) $migration->getVersion() === $version) {
+            if ($migration->getVersion() == $version) {
                 return $migration;
             }
         }
@@ -50,7 +51,7 @@ class AvailableMigrationsSet
     public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsSet
     {
         return new AvailableMigrationsSet(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
-            return $executedMigrationsSet->getMigration((string) $migrationInfo->getVersion());
+            return $executedMigrationsSet->getMigration($migrationInfo->getVersion());
         }));
     }
 }
