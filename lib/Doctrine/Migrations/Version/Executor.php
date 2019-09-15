@@ -159,7 +159,7 @@ final class Executor implements ExecutorInterface
         $this->types  = [];
 
         $this->dispatcher->dispatchVersionEvent(
-            $plan->getInfo()->getVersion(),
+            $plan->getVersion(),
             Events::onMigrationsVersionExecuting,
             $plan,
             $configuration->isDryRun()
@@ -249,7 +249,7 @@ final class Executor implements ExecutorInterface
         $result->setState(State::NONE);
 
         $this->dispatcher->dispatchVersionEvent(
-            $result->getPlan()->getInfo()->getVersion(),
+            $result->getPlan()->getVersion(),
             Events::onMigrationsVersionExecuted,
             $result,
             $configuration->isDryRun()

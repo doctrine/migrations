@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -137,12 +138,26 @@ EOT
             return 1;
         }
 
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setDryRun($dryRun)
+            ->setTimeAllQueries($timeAllQueries)
+            ->setNoMigrationException($allowNoMigration)
+            ->setAllOrNothing($allOrNothing);
+
+        $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanUntilVersion($version ? new Version($version): null);
+
         $migrator = $this->createMigrator();
 
         if ($path !== false) {
             $path = $path ?? getcwd();
 
-            $migrator->writeSqlFile($path, $version);
+            $migratorConfiguration->setDryRun(true);
+            $sql = $migrator->migrate($plan, $migratorConfiguration);
+
+            $path = $path ?? getcwd();
+
+            $writer = $this->dependencyFactory->getQueryWriter();
+            $writer->write($path, $plan->getDirection(), $sql);
 
             return 0;
         }
@@ -155,13 +170,7 @@ EOT
             return 1;
         }
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries)
-            ->setNoMigrationException($allowNoMigration)
-            ->setAllOrNothing($allOrNothing);
-
-        $migrator->migrate($version, $migratorConfiguration);
+        $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;
     }

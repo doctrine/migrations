@@ -87,13 +87,13 @@ EOT
 
         $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
-        if (count($availableMigrations->getItems()) !== 0) {
+        if (count($availableMigrations) !== 0) {
             $output->writeln("\n <info>==</info> Available Migration Versions\n");
 
             $this->showVersions($availableMigrations, $executedMigrations, $output);
         }
 
-        if (count($executedUnavailableMigrations->getItems()) === 0) {
+        if (count($executedUnavailableMigrations) === 0) {
             return 0;
         }
 

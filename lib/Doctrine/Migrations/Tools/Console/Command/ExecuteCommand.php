@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -94,18 +96,27 @@ EOT
     {
         $version        = $input->getArgument('version');
         $timeAllQueries = (bool) $input->getOption('query-time');
-        $dryRun         = (bool) $input->getOption('dry-run');
         $path           = $input->getOption('write-sql');
+        $dryRun         = (bool) $input->getOption('dry-run');
         $direction      = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
-        $version = $this->migrationRepository->getVersion($version);
+        $migrator = $this->dependencyFactory->getMigrator();
+        $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setDryRun($dryRun)
+            ->setTimeAllQueries($timeAllQueries);
 
         if ($path !== false) {
+            $migratorConfiguration->setDryRun(true);
+            $sql = $migrator->migrate($plan, $migratorConfiguration);
+
             $path = $path ?? getcwd();
 
-            $version->writeSqlFile($path, $direction);
+            $writer = $this->dependencyFactory->getQueryWriter();
+            $writer->write($path, $direction, $sql);
 
             return 0;
         }
@@ -118,12 +129,7 @@ EOT
             return 1;
         }
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries);
-
-        $version->execute($direction, $migratorConfiguration);
-
+        $migrator->migrate($plan, $migratorConfiguration);
         return 0;
     }
 }
