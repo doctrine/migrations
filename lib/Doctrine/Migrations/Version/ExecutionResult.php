@@ -190,7 +190,7 @@ class ExecutionResult
         return $this->state;
     }
 
-    public function setState(string $state) : void
+    public function setState(int $state) : void
     {
         $this->state = $state;
     }
