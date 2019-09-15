@@ -43,6 +43,9 @@ class DependencyFactory
     /** @var Connection */
     private $connection;
 
+    /** @var callable */
+    private $sorter;
+
     public function __construct(Configuration $configuration, Connection $connection, LoggerInterface $logger)
     {
         $this->configuration = $configuration;
@@ -120,6 +123,11 @@ class DependencyFactory
         });
     }
 
+    public function setSorter(callable $sorter) : void
+    {
+        $this->sorter = $sorter;
+    }
+
     public function getMigrationRepository() : MigrationRepository
     {
         return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
@@ -127,7 +135,8 @@ class DependencyFactory
                 $this->configuration->getMigrationDirectories(),
                 $this->connection,
                 $this->getMigrationsFinder(),
-                new Factory($this->getConnection(), $this->getVersionExecutor(), $this->getLogger())
+                new Factory($this->getConnection(), $this->getVersionExecutor(), $this->getLogger()),
+                $this->sorter
             );
         });
     }
