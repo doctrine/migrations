@@ -130,7 +130,6 @@ class DependencyFactory
         return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
             return new MigrationRepository(
                 $this->configuration->getMigrationDirectories(),
-                $this->connection,
                 $this->getMigrationsFinder(),
                 new Factory($this->getConnection(), $this->getVersionExecutor(), $this->getLogger()),
                 $this->sorter
@@ -238,7 +237,6 @@ class DependencyFactory
             return new Migrator(
                 $this->connection,
                 $this->getEventDispatcher(),
-                $this->getMigrationPlanCalculator(),
                 $this->getVersionExecutor(),
                 $this->logger,
                 $this->getStopwatch()

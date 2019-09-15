@@ -47,17 +47,17 @@ class TableMetadataStorage implements MetadataStorage
     {
         $schemaChangelog = new Table('schema_changelog');
 
-        $schemaChangelog->addColumn('version', 'string');
-        $schemaChangelog->addColumn('executed_on', 'datetime');
+        $schemaChangelog->addColumn('version', 'string', ['notnull' => true]);
+        $schemaChangelog->addColumn('executed_on', 'datetime', ['notnull' => false]);
         $schemaChangelog->addColumn('execution_time', 'integer', ['notnull' => false]);
-        $schemaChangelog->addColumn('success', 'boolean');
+
         $schemaChangelog->setPrimaryKey(['version']);
 
         $this->schemaManager->createTable($schemaChangelog);
     }
 
     /**
-     * @return MigrationInfo[]
+     * @return ExecutedMigrationsSet
      */
     public function getExecutedMigrations() : ExecutedMigrationsSet
     {
@@ -71,15 +71,13 @@ class TableMetadataStorage implements MetadataStorage
         foreach ($rows as $row) {
             $row = array_change_key_case($row, CASE_LOWER);
 
-            $version   = new Version($row['version']);
-            $migration = new MigrationInfo($version);
+            $version = new Version($row['version']);
 
-            $migration->setExecutedOn(DateTime::createFromFormat(
+            $executedOn = DateTime::createFromFormat(
                 $this->platform->getDateTimeFormatString(),
                 $row['executed_on']
-            ));
-//            $migration->setExecutionTime($row['execution_time']);
-//            $migration->success = $row['success'] ? true : false;
+            );
+            $migration = new ExecutedMigration($version, $executedOn, $row['execution_time']? intval($row['execution_time']) : null);
 
             $migrations[(string) $version] = $migration;
         }
@@ -89,19 +87,16 @@ class TableMetadataStorage implements MetadataStorage
 
     public function complete(ExecutionResult $result) : void
     {
-        $plan = $result->getPlan();
-        $info = $plan->getInfo();
 
-        if ($plan->getDirection() === Direction::DOWN) {
+        if ($result->getDirection() === Direction::DOWN) {
             $this->connection->delete('schema_changelog', [
-                'version' => (string) $info->getVersion(),
+                'version' => (string) $result->getVersion(),
             ]);
         } else {
             $this->connection->insert('schema_changelog', [
-                'version' => (string) $info->getVersion(),
-                'executed_on' => $info->getExecutedOn()->format($this->platform->getDateTimeFormatString()),
+                'version' => (string) $result->getVersion(),
+                'executed_on' => $result->getExecutedOn()->format($this->platform->getDateTimeFormatString()),
                 'execution_time' => $result->getTime(),
-                'success' => 1,
             ]);
         }
     }

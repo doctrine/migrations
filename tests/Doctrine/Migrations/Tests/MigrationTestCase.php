@@ -12,6 +12,7 @@ use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Stopwatch;
 use Exception;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function assert;
@@ -59,12 +60,9 @@ abstract class MigrationTestCase extends TestCase
         return new StreamOutput($stream);
     }
 
-    public function getOutputStreamContent(StreamOutput $streamOutput) : string
+    public function getLogOutput(LoggerInterface $logger) : string
     {
-        $stream = $streamOutput->getStream();
-        rewind($stream);
-
-        return stream_get_contents($stream);
+        return implode("\n", $logger->logs);
     }
 
     /** @return resource */

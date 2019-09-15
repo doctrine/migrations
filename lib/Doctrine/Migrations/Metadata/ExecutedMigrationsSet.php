@@ -11,7 +11,7 @@ use function count;
 
 class ExecutedMigrationsSet implements \Countable
 {
-    /** @var MigrationInfo[] */
+    /** @var ExecutedMigration[] */
     private $items = [];
 
     public function __construct(array $items)
@@ -20,19 +20,19 @@ class ExecutedMigrationsSet implements \Countable
     }
 
     /**
-     * @return MigrationInfo[]
+     * @return ExecutedMigration[]
      */
     public function getItems() : array
     {
         return $this->items;
     }
 
-    public function getFirst(int $offset = 0) : ?MigrationInfo
+    public function getFirst(int $offset = 0) : ?ExecutedMigration
     {
         return $this->items[$offset] ?? null;
     }
 
-    public function getLast(int $offset = 0) : ?MigrationInfo
+    public function getLast(int $offset = 0) : ?ExecutedMigration
     {
         return $this->items[count($this->items)-1-(-1*$offset)] ?? null;
     }
@@ -42,10 +42,10 @@ class ExecutedMigrationsSet implements \Countable
         return count($this->items);
     }
 
-    public function getMigration(Version $version) : ?MigrationInfo
+    public function getMigration(Version $version) : ?ExecutedMigration
     {
         foreach ($this->items as $migration) {
-            if ($migration->getVersion() == $version) {
+            if ((string)$migration->getVersion() == (string)$version) {
                 return $migration;
             }
         }
@@ -53,10 +53,10 @@ class ExecutedMigrationsSet implements \Countable
         return null;
     }
 
-    public function getExecutedUnavailableMigrations(AvailableMigrationsSet $availableMigrationsSet) : ExecutedMigrationsSet
+    public function getExecutedUnavailableMigrations(AvailableMigrationsList $availableMigrationsSet) : ExecutedMigrationsSet
     {
-        return new ExecutedMigrationsSet(array_filter($this->items, static function (MigrationInfo $migrationInfo) use ($availableMigrationsSet) {
-            return $availableMigrationsSet->getMigration($migrationInfo->getVersion());
+        return new ExecutedMigrationsSet(array_filter($this->items, static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
+            return !$availableMigrationsSet->getMigration($migrationInfo->getVersion());
         }));
     }
 }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Metadata\MigrationPlanItem;
+use Doctrine\Migrations\Metadata\MigrationPlan;
 use RuntimeException;
 use Throwable;
 use function count;
@@ -41,31 +41,68 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
+    /** @var \DateTime */
+    private $executedOn;
+
     /** @var int */
     private $state;
 
     /** @var Schema|null */
     private $toSchema;
 
-    /** @var MigrationPlanItem */
-    private $plan;
+    /**
+     * @var Version
+     */
+    private $version;
+
+    /**
+     * @var string
+     */
+    private $direction;
 
     /**
      * @param string[] $sql
      * @param mixed[]  $params
      * @param mixed[]  $types
      */
-    public function __construct(MigrationPlanItem $plan, array $sql = [], array $params = [], array $types = [])
+    public function __construct(Version $version, string $direction,  \DateTime $executedOn = null)
     {
-        $this->sql    = $sql;
-        $this->params = $params;
-        $this->types  = $types;
-        $this->plan   = $plan;
+        $this->executedOn   = $executedOn ?: new \DateTime();
+        $this->version = $version;
+        $this->direction = $direction;
     }
 
-    public function getPlan() : MigrationPlanItem
+    /**
+     * @return string
+     */
+    public function getDirection(): string
     {
-        return $this->plan;
+        return $this->direction;
+    }
+
+
+    /**
+     * @return \DateTime
+     */
+    public function getExecutedOn(): \DateTime
+    {
+        return $this->executedOn;
+    }
+
+    /**
+     * @param \DateTime $executedOn
+     */
+    public function setExecutedOn(\DateTime $executedOn): void
+    {
+        $this->executedOn = $executedOn;
+    }
+
+    /**
+     * @return Version
+     */
+    public function getVersion(): Version
+    {
+        return $this->version;
     }
 
     public function hasSql() : bool
@@ -84,9 +121,11 @@ class ExecutionResult
     /**
      * @param string[] $sql
      */
-    public function setSql(array $sql) : void
+    public function setSql(array $sql, array $params = [], array $types = []) : void
     {
-        $this->sql = $sql;
+        $this->sql    = $sql;
+        $this->params = $params;
+        $this->types  = $types;
     }
 
     /**
@@ -98,27 +137,11 @@ class ExecutionResult
     }
 
     /**
-     * @param mixed[] $params
-     */
-    public function setParams(array $params) : void
-    {
-        $this->params = $params;
-    }
-
-    /**
      * @return mixed[]
      */
     public function getTypes() : array
     {
         return $this->types;
-    }
-
-    /**
-     * @param mixed[] $types
-     */
-    public function setTypes(array $types) : void
-    {
-        $this->types = $types;
     }
 
     public function getTime() : ?float

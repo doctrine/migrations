@@ -39,12 +39,12 @@ class RecursiveRegexFinderTest extends FinderTestCase
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         $tests = [
-            '20150502000000' => 'TestMigrations\\Version20150502000000',
-            '20150502000001' => 'TestMigrations\\Version20150502000001',
-            '20150502000003' => 'TestMigrations\\Version20150502000003',
-            '20150502000004' => 'TestMigrations\\Version20150502000004',
-            '20150502000005' => 'TestMigrations\\Version20150502000005',
-            '1ResetVersions' => 'TestMigrations\\Version1ResetVersions',
+            'TestMigrations\\Version20150502000000',
+            'TestMigrations\\Version20150502000001',
+            'TestMigrations\\Version20150502000003',
+            'TestMigrations\\Version20150502000004',
+            'TestMigrations\\Version20150502000005',
+            'TestMigrations\\Version1ResetVersions',
         ];
 
         if (stripos(PHP_OS, 'Win') === false) {
@@ -74,8 +74,8 @@ class RecursiveRegexFinderTest extends FinderTestCase
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
         self::assertSame([
-            '0001' => 'TestMigrations\\MultiNested\\Version0001',
-            '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
+            'TestMigrations\\MultiNested\\Version0001',
+            'TestMigrations\\MultiNested\\Deep\\Version0002',
         ], $versions);
     }
 
@@ -87,8 +87,8 @@ class RecursiveRegexFinderTest extends FinderTestCase
         );
 
         self::assertSame([
-            '0001' => 'TestMigrations\MultiNested\Version0001',
-            '0002' => 'TestMigrations\MultiNested\Deep\Version0002',
+            'TestMigrations\MultiNested\Version0001',
+            'TestMigrations\MultiNested\Deep\Version0002',
         ], $versions);
     }
 
@@ -99,7 +99,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested\\Deep'
         );
 
-        self::assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
+        self::assertSame(['TestMigrations\MultiNested\Deep\Version0002'], $versions);
     }
 
     protected function setUp() : void

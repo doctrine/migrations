@@ -9,7 +9,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
-use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Version\Version;
 
 /**
@@ -31,7 +31,7 @@ final class EventDispatcher
         $this->eventManager  = $eventManager;
     }
 
-    public function dispatchMigrationEvent(string $eventName, MigrationPlan $migrationsPlan, bool $dryRun) : void
+    public function dispatchMigrationEvent(string $eventName, MigrationPlanList $migrationsPlan, bool $dryRun) : void
     {
 //        $event = $this->createMigrationEventArgs($direction, $dryRun);
 //

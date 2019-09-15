@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
-use Doctrine\Migrations\Metadata\MigrationPlanItem;
+use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\MigratorConfiguration;
 
 /**
@@ -20,5 +20,5 @@ interface ExecutorInterface
      */
     public function addSql(string $sql, array $params = [], array $types = []) : void;
 
-    public function execute(MigrationPlanItem $plan, MigratorConfiguration $migratorConfiguration) : ExecutionResult;
+    public function execute(MigrationPlan $plan, MigratorConfiguration $migratorConfiguration) : ExecutionResult;
 }

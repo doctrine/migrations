@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
@@ -51,7 +51,7 @@ class MigrationStatusInfosHelper
     }
 
     /** @return string[]|int[]|null[] */
-    public function getMigrationsInfos(ExecutedMigrationsSet $executedMigrations, AvailableMigrationsSet $availableMigrations) : array
+    public function getMigrationsInfos(ExecutedMigrationsSet $executedMigrations, AvailableMigrationsList $availableMigrations) : array
     {
         $newMigrations                 = $availableMigrations->getNewMigrations($executedMigrations);
         $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);

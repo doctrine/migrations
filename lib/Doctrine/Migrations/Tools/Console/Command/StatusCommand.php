@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use DateTimeImmutable;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -127,7 +127,7 @@ EOT
      * @param AvailableMigration[] $versions
      */
     private function showVersions(
-        AvailableMigrationsSet $availableMigrationsSet,
+        AvailableMigrationsList $availableMigrationsSet,
         ExecutedMigrationsSet $executedMigrationsSet,
         OutputInterface $output
     ) : void {

@@ -4,48 +4,51 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
-use function end;
-use function reset;
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Version\ExecutionResult;
+use Doctrine\Migrations\Version\Version;
 
-class MigrationPlan implements \Countable
+class MigrationPlan
 {
     /** @var string */
     private $direction;
+    /** @var Version */
+    private $version;
+    /** @var AbstractMigration */
+    private $migration;
 
-    /** @var MigrationPlanItem[] */
-    private $items = [];
+    /** @var ExecutionResult */
+    public $result;
 
-    public function __construct(array $items, string $direction)
+    public function __construct(Version $version, AbstractMigration $migration, string $direction)
     {
-        $this->items     = $items;
+        $this->version      = $version;
+        $this->migration = $migration;
         $this->direction = $direction;
     }
 
-    public function count()
+    public function getVersion(): Version
     {
-        return count($this->items);
+        return $this->version;
     }
 
-    /**
-     * @return MigrationPlanItem[]
-     */
-    public function getItems() : array
+    public function getResult() : ?ExecutionResult
     {
-        return $this->items;
+        return $this->result;
+    }
+
+    public function setResult(ExecutionResult $result) : void
+    {
+        $this->result = $result;
+    }
+
+    public function getMigration() : AbstractMigration
+    {
+        return $this->migration;
     }
 
     public function getDirection() : string
     {
         return $this->direction;
-    }
-
-    public function getFirst() : ?MigrationPlanItem
-    {
-        return reset($this->items) ?: null;
-    }
-
-    public function getLast() : ?MigrationPlanItem
-    {
-        return end($this->items) ?: null;
     }
 }

@@ -27,7 +27,7 @@ class LatestCommand extends AbstractCommand
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $migrations  = $this->migrationRepository->getMigrations();
+        $migrations  = $this->dependencyFactory->getMigrationRepository()->getMigrations();
         $last        = $migrations->getLast();
         $version     = (string) $last->getVersion();
         $description = $last->getMigration()->getDescription();

@@ -70,7 +70,7 @@ TEMPLATE;
 
     public function generateMigration(
         string $version,
-        ?string $namespace = null,
+        string $namespace,
         ?string $up = null,
         ?string $down = null
     ) : string {
@@ -84,12 +84,10 @@ TEMPLATE;
         $dirs = $this->configuration->getMigrationDirectories();
         if (isset($dirs[$namespace])) {
             $dir = $dirs[$namespace];
-        } elseif ($namespace === null) {
-            $dir       = reset($dirs);
-            $namespace = key($dirs);
         } else {
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
+
         $replacements = [
             $namespace,
             $version,
