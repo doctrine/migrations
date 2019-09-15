@@ -87,11 +87,6 @@ class TableMetadataStorage implements MetadataStorage
         return new ExecutedMigrationsSet($migrations);
     }
 
-    public function start(MigrationPlanItem $plan) : void
-    {
-        // not handled, in the future could use to add debug info when the migrations starts to run
-    }
-
     public function complete(ExecutionResult $result) : void
     {
         $plan = $result->getPlan();

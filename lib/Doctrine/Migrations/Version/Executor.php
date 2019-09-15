@@ -165,10 +165,6 @@ final class Executor implements ExecutorInterface
             $configuration->isDryRun()
         );
 
-        if (! $configuration->isDryRun()) {
-            $this->metadataStorage->start($plan);
-        }
-
         if (! $plan->getMigration()->isTransactional()) {
             return;
         }
