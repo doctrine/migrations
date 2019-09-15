@@ -41,7 +41,7 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
-    /** @var string */
+    /** @var int */
     private $state;
 
     /** @var Schema|null */
@@ -185,7 +185,7 @@ class ExecutionResult
         return $this->toSchema;
     }
 
-    public function getState()
+    public function getState(): int
     {
         return $this->state;
     }

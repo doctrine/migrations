@@ -286,7 +286,7 @@ final class Executor implements ExecutorInterface
                 [
                     'version' =>(string) $info->getVersion(),
                     'reason' => $e->getMessage(),
-                    'state' => $result->getState(),
+                    'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
             );
         } elseif ($result->hasError()) {
@@ -295,7 +295,7 @@ final class Executor implements ExecutorInterface
                 [
                     'version' => (string) $info->getVersion(),
                     'error' => $e->getMessage(),
-                    'state' => $result->getState(),
+                    'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
             );
         }
@@ -379,4 +379,19 @@ final class Executor implements ExecutorInterface
 
         return $this->schemaProvider->createFromSchema();
     }
+
+    private function getExecutionStateAsString(int $state) : string
+    {
+        switch ($state) {
+            case State::PRE:
+                return 'Pre-Checks';
+            case State::POST:
+                return 'Post-Checks';
+            case State::EXEC:
+                return 'Execution';
+            default:
+                return 'No State';
+        }
+    }
+
 }
