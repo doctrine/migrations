@@ -137,8 +137,7 @@ final class Executor implements ExecutorInterface
 
             $this->migrationEnd($e, $plan, $result, $configuration);
         } catch (Throwable $e) {
-            $result->setError(true);
-            $result->setException($e);
+            $result->setError(true, $e);
 
             $this->migrationEnd($e, $plan, $result, $configuration);
 

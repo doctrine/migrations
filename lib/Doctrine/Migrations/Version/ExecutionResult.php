@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\Metadata\MigrationPlan;
 use RuntimeException;
 use Throwable;
 use function count;
@@ -174,19 +173,15 @@ class ExecutionResult
         return $this->skipped;
     }
 
-    public function setError(bool $error) : void
+    public function setError(bool $error, Throwable $exception = null) : void
     {
         $this->error = $error;
+        $this->exception = $exception;
     }
 
     public function hasError() : bool
     {
         return $this->error;
-    }
-
-    public function setException(Throwable $exception) : void
-    {
-        $this->exception = $exception;
     }
 
     public function getException() : ?Throwable
