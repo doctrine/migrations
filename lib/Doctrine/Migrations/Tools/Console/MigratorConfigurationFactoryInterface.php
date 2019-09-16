@@ -1,0 +1,11 @@
+<?php
+
+namespace Doctrine\Migrations\Tools\Console;
+
+use Doctrine\Migrations\MigratorConfiguration;
+use Symfony\Component\Console\Input\InputInterface;
+
+interface MigratorConfigurationFactoryInterface
+{
+    public function getMigratorConfiguration(InputInterface $input): MigratorConfiguration;
+}
