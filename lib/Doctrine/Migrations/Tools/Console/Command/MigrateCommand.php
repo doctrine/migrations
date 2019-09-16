@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
@@ -116,14 +115,8 @@ EOT
     {
         $this->outputHeader($output);
 
-        $version          = (string) $input->getArgument('version');
-        $path             = $input->getOption('write-sql');
-        $allowNoMigration = (bool) $input->getOption('allow-no-migration');
-        $timeAllQueries   = (bool) $input->getOption('query-time');
-        $dryRun           = (bool) $input->getOption('dry-run');
-        $allOrNothing     = $this->getAllOrNothing($input->getOption('all-or-nothing'));
-
-        $this->configuration->setIsDryRun($dryRun);
+        $version = (string) $input->getArgument('version');
+        $path    = $input->getOption('write-sql');
 
         $version = $this->getVersionNameFromAlias(
             $version,
@@ -138,11 +131,8 @@ EOT
             return 1;
         }
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries)
-            ->setNoMigrationException($allowNoMigration)
-            ->setAllOrNothing($allOrNothing);
+        $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanUntilVersion($version ? new Version($version): null);
 
@@ -164,7 +154,7 @@ EOT
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
 
-        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 1;
@@ -246,19 +236,5 @@ EOT
         ));
 
         return '';
-    }
-
-    /**
-     * @param mixed $allOrNothing
-     */
-    private function getAllOrNothing($allOrNothing) : bool
-    {
-        if ($allOrNothing !== false) {
-            return $allOrNothing !== null
-                ? (bool) $allOrNothing
-                : true;
-        }
-
-        return $this->configuration->isAllOrNothing();
     }
 }

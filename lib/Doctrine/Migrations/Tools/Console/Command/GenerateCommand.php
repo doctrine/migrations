@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function key;
 use function sprintf;
 
 /**
@@ -17,7 +19,7 @@ class GenerateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:generate';
 
-    protected function configure(): void
+    protected function configure() : void
     {
         $this
             ->setAliases(['generate'])
@@ -48,7 +50,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): ?int
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $versionNumber = $this->configuration->generateVersionNumber();
 
@@ -59,8 +61,8 @@ EOT
         $dirs = $this->configuration->getMigrationDirectories();
         if ($namespace === null) {
             $namespace = key($dirs);
-        } elseif (!isset($dirs[$namespace])) {
-            throw new \Exception(sprintf('Path not defined for the namespace %s', $namespace));
+        } elseif (! isset($dirs[$namespace])) {
+            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
 
         $fqcn = $namespace . '\\Version' . $versionNumber;

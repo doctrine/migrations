@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
+use Countable;
+use function count;
 use function end;
 use function reset;
 
-class MigrationPlanList implements \Countable
+class MigrationPlanList implements Countable
 {
     /** @var string */
     private $direction;

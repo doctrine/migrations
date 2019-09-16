@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
-use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
@@ -138,16 +137,16 @@ EOT
      */
     private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsSet $executedMigrations) : void
     {
-        try{
+        try {
             $availableMigration = $this->dependencyFactory->getMigrationRepository()->getMigration($version);
         } catch (MigrationClassNotFound $e) {
             $availableMigration = null;
         }
 
         $storage = $this->dependencyFactory->getMetadataStorage();
-        if (! $availableMigration ) {
+        if (! $availableMigration) {
             if ((bool) $input->getOption('delete') === false) {
-                throw UnknownMigrationVersion::new((string)$version);
+                throw UnknownMigrationVersion::new((string) $version);
             }
 
             $question =
@@ -161,7 +160,7 @@ EOT
                 $storage->complete($migrationResult);
                 $output->writeln(sprintf(
                     '<info>%s</info> deleted from the version table.',
-                    (string)$version
+                    (string) $version
                 ));
 
                 return;
@@ -196,7 +195,7 @@ EOT
 
             $output->writeln(sprintf(
                 '<info>%s</info> added to the version table.',
-                (string)$version
+                (string) $version
             ));
         } else {
             $migrationResult = new ExecutionResult($version, Direction::DOWN);
@@ -204,7 +203,7 @@ EOT
 
             $output->writeln(sprintf(
                 '<info>%s</info> deleted from the version table.',
-                (string)$version
+                (string) $version
             ));
         }
     }

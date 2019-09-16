@@ -15,6 +15,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use const CASE_LOWER;
 use function array_change_key_case;
+use function intval;
 
 class TableMetadataStorage implements MetadataStorage
 {
@@ -56,9 +57,6 @@ class TableMetadataStorage implements MetadataStorage
         $this->schemaManager->createTable($schemaChangelog);
     }
 
-    /**
-     * @return ExecutedMigrationsSet
-     */
     public function getExecutedMigrations() : ExecutedMigrationsSet
     {
         if (! $this->isInitialized()) {
@@ -77,7 +75,7 @@ class TableMetadataStorage implements MetadataStorage
                 $this->platform->getDateTimeFormatString(),
                 $row['executed_on']
             );
-            $migration = new ExecutedMigration($version, $executedOn, $row['execution_time']? intval($row['execution_time']) : null);
+            $migration  = new ExecutedMigration($version, $executedOn, $row['execution_time']? intval($row['execution_time']) : null);
 
             $migrations[(string) $version] = $migration;
         }
@@ -87,7 +85,6 @@ class TableMetadataStorage implements MetadataStorage
 
     public function complete(ExecutionResult $result) : void
     {
-
         if ($result->getDirection() === Direction::DOWN) {
             $this->connection->delete('schema_changelog', [
                 'version' => (string) $result->getVersion(),

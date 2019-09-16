@@ -14,9 +14,7 @@ use function file_put_contents;
 use function implode;
 use function is_file;
 use function is_readable;
-use function key;
 use function preg_replace;
-use function reset;
 use function sprintf;
 use function str_replace;
 use function trim;
@@ -82,11 +80,11 @@ TEMPLATE;
         ];
 
         $dirs = $this->configuration->getMigrationDirectories();
-        if (isset($dirs[$namespace])) {
-            $dir = $dirs[$namespace];
-        } else {
+        if (! isset($dirs[$namespace])) {
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
+
+        $dir = $dirs[$namespace];
 
         $replacements = [
             $namespace,

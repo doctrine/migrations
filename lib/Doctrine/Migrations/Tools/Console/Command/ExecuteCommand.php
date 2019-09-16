@@ -4,8 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
@@ -94,20 +92,17 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version        = $input->getArgument('version');
-        $timeAllQueries = (bool) $input->getOption('query-time');
-        $path           = $input->getOption('write-sql');
-        $dryRun         = (bool) $input->getOption('dry-run');
-        $direction      = $input->getOption('down') !== false
+        $version   = $input->getArgument('version');
+        $path      = $input->getOption('write-sql');
+        $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
         $migrator = $this->dependencyFactory->getMigrator();
-        $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+        $plan     = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries);
+        $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         if ($path !== false) {
             $migratorConfiguration->setDryRun(true);
@@ -123,13 +118,14 @@ EOT
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
 
-        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 1;
         }
 
         $migrator->migrate($plan, $migratorConfiguration);
+
         return 0;
     }
 }

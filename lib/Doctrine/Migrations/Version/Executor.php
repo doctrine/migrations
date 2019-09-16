@@ -210,7 +210,7 @@ final class Executor implements ExecutorInterface
             }
         } else {
             $this->logger->warning('Migration {version} was executed but did not result in any SQL statements.', [
-                'version' => (string)$plan->getVersion(),
+                'version' => (string) $plan->getVersion(),
             ]);
         }
 
@@ -228,7 +228,7 @@ final class Executor implements ExecutorInterface
         }
 
         $params = [
-            'version' => (string)$plan->getVersion(),
+            'version' => (string) $plan->getVersion(),
             'time' => $stopwatchEvent->getDuration(),
             'memory' => BytesFormatter::formatBytes($stopwatchEvent->getMemory()),
             'direction' => $direction === Direction::UP ? 'migrated' : 'reverted',
@@ -255,7 +255,7 @@ final class Executor implements ExecutorInterface
 
     private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction) : array
     {
-        $versionInfo = (string)$planItem->getVersion();
+        $versionInfo = (string) $planItem->getVersion();
         $description = $migration->getDescription();
 
         if ($description !== '') {
@@ -386,5 +386,4 @@ final class Executor implements ExecutorInterface
                 return 'No State';
         }
     }
-
 }

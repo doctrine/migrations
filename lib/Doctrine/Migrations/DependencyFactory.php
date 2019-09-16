@@ -18,6 +18,7 @@ use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
+use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
@@ -216,6 +217,15 @@ class DependencyFactory
             return new SqlGenerator(
                 $this->configuration,
                 $this->connection->getDatabasePlatform()
+            );
+        });
+    }
+
+    public function getMigratorConfigurationFactory() : MigratorConfigurationFactory
+    {
+        return $this->getDependency(MigratorConfigurationFactory::class, function () : MigratorConfigurationFactory {
+            return new MigratorConfigurationFactory(
+                $this->configuration
             );
         });
     }
