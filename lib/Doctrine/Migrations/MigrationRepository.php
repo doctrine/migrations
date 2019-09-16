@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -109,10 +108,11 @@ class MigrationRepository
     {
         $this->loadMigrationsFromDirectories();
 
-        if (!isset($this->migrations[(string)$version])) {
-            throw MigrationClassNotFound::new((string)$version);
+        if (! isset($this->migrations[(string) $version])) {
+            throw MigrationClassNotFound::new((string) $version);
         }
-        return $this->migrations[(string)$version];
+
+        return $this->migrations[(string) $version];
     }
 
     public function getMigrations() : AvailableMigrationsList

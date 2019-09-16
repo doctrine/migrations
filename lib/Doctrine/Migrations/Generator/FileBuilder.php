@@ -20,9 +20,7 @@ final class FileBuilder
     /** @var AbstractPlatform */
     private $platform;
 
-    /**
-     * @var MetadataStorage
-     */
+    /** @var MetadataStorage */
     private $metadataStorage;
 
     public function __construct(

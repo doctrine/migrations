@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use DateTime;
 use Doctrine\DBAL\Schema\Schema;
 use RuntimeException;
 use Throwable;
@@ -40,7 +41,7 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
-    /** @var \DateTime */
+    /** @var DateTime */
     private $executedOn;
 
     /** @var int */
@@ -49,14 +50,10 @@ class ExecutionResult
     /** @var Schema|null */
     private $toSchema;
 
-    /**
-     * @var Version
-     */
+    /** @var Version */
     private $version;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $direction;
 
     /**
@@ -64,42 +61,29 @@ class ExecutionResult
      * @param mixed[]  $params
      * @param mixed[]  $types
      */
-    public function __construct(Version $version, string $direction,  \DateTime $executedOn = null)
+    public function __construct(Version $version, string $direction, ?DateTime $executedOn = null)
     {
-        $this->executedOn   = $executedOn ?: new \DateTime();
-        $this->version = $version;
-        $this->direction = $direction;
+        $this->executedOn = $executedOn ?: new DateTime();
+        $this->version    = $version;
+        $this->direction  = $direction;
     }
 
-    /**
-     * @return string
-     */
-    public function getDirection(): string
+    public function getDirection() : string
     {
         return $this->direction;
     }
 
-
-    /**
-     * @return \DateTime
-     */
-    public function getExecutedOn(): \DateTime
+    public function getExecutedOn() : DateTime
     {
         return $this->executedOn;
     }
 
-    /**
-     * @param \DateTime $executedOn
-     */
-    public function setExecutedOn(\DateTime $executedOn): void
+    public function setExecutedOn(DateTime $executedOn) : void
     {
         $this->executedOn = $executedOn;
     }
 
-    /**
-     * @return Version
-     */
-    public function getVersion(): Version
+    public function getVersion() : Version
     {
         return $this->version;
     }
@@ -173,9 +157,9 @@ class ExecutionResult
         return $this->skipped;
     }
 
-    public function setError(bool $error, Throwable $exception = null) : void
+    public function setError(bool $error, ?Throwable $exception = null) : void
     {
-        $this->error = $error;
+        $this->error     = $error;
         $this->exception = $exception;
     }
 
@@ -203,7 +187,7 @@ class ExecutionResult
         return $this->toSchema;
     }
 
-    public function getState(): int
+    public function getState() : int
     {
         return $this->state;
     }

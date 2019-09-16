@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
+use Countable;
 use Doctrine\Migrations\Version\Version;
 use function array_filter;
 use function array_values;
 use function count;
 
-class ExecutedMigrationsSet implements \Countable
+class ExecutedMigrationsSet implements Countable
 {
     /** @var ExecutedMigration[] */
     private $items = [];
@@ -45,7 +46,7 @@ class ExecutedMigrationsSet implements \Countable
     public function getMigration(Version $version) : ?ExecutedMigration
     {
         foreach ($this->items as $migration) {
-            if ((string)$migration->getVersion() == (string)$version) {
+            if ((string) $migration->getVersion() === (string) $version) {
                 return $migration;
             }
         }
@@ -56,7 +57,7 @@ class ExecutedMigrationsSet implements \Countable
     public function getExecutedUnavailableMigrations(AvailableMigrationsList $availableMigrationsSet) : ExecutedMigrationsSet
     {
         return new ExecutedMigrationsSet(array_filter($this->items, static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
-            return !$availableMigrationsSet->getMigration($migrationInfo->getVersion());
+            return ! $availableMigrationsSet->getMigration($migrationInfo->getVersion());
         }));
     }
 }

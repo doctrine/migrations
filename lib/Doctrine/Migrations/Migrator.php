@@ -45,16 +45,14 @@ class Migrator
         LoggerInterface $logger,
         Stopwatch $stopwatch
     ) {
-        $this->stopwatch               = $stopwatch;
-        $this->logger                  = $logger;
-        $this->executor                = $executor;
-        $this->connection              = $connection;
-        $this->dispatcher              = $dispatcher;
+        $this->stopwatch  = $stopwatch;
+        $this->logger     = $logger;
+        $this->executor   = $executor;
+        $this->connection = $connection;
+        $this->dispatcher = $dispatcher;
     }
 
     /**
-     * @param MigrationPlanList $migrationsPlan
-     *
      * @return string[][]
      */
     private function executeMigrations(
@@ -86,7 +84,7 @@ class Migrator
                 }
 
                 $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
-                $time                                        += $versionExecutionResult->getTime();
+                $time                             += $versionExecutionResult->getTime();
             }
 
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $dryRun);
@@ -127,7 +125,7 @@ class Migrator
         );
     }
 
-    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration, Version $currentVersion = null)
+    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration, ?Version $currentVersion = null)
     {
         /**
          * If there are no migrations to execute throw an exception.
@@ -152,8 +150,8 @@ class Migrator
             ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to} from {from}',
             [
                 'direction' => $migrationsPlan->getDirection(),
-                'to' => (string)$migrationsPlan->getLast()->getVersion(),
-                'from' => (string)$currentVersion,
+                'to' => (string) $migrationsPlan->getLast()->getVersion(),
+                'from' => (string) $currentVersion,
             ]
         );
 

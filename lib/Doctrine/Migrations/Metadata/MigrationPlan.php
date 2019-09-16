@@ -22,12 +22,12 @@ class MigrationPlan
 
     public function __construct(Version $version, AbstractMigration $migration, string $direction)
     {
-        $this->version      = $version;
+        $this->version   = $version;
         $this->migration = $migration;
         $this->direction = $direction;
     }
 
-    public function getVersion(): Version
+    public function getVersion() : Version
     {
         return $this->version;
     }

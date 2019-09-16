@@ -17,21 +17,19 @@ class ExecutedMigration
 
     /**
      * Milliseconds
+     *
      * @var int
      */
     public $executionTime;
 
     public function __construct(Version $version, ?DateTime $executedOn, ?int $executionTime)
     {
-        $this->version = $version;
-        $this->executedOn = $executedOn;
+        $this->version       = $version;
+        $this->executedOn    = $executedOn;
         $this->executionTime = $executionTime;
     }
 
-    /**
-     * @return int
-     */
-    public function getExecutionTime(): ?int
+    public function getExecutionTime() : ?int
     {
         return $this->executionTime;
     }
