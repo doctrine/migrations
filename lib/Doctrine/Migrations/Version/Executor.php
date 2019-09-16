@@ -156,10 +156,9 @@ final class Executor implements ExecutorInterface
         $this->types  = [];
 
         $this->dispatcher->dispatchVersionEvent(
-            $plan->getVersion(),
             Events::onMigrationsVersionExecuting,
             $plan,
-            $configuration->isDryRun()
+            $configuration
         );
 
         if (! $plan->getMigration()->isTransactional()) {
@@ -244,10 +243,9 @@ final class Executor implements ExecutorInterface
         $result->setState(State::NONE);
 
         $this->dispatcher->dispatchVersionEvent(
-            $plan->getVersion(),
             Events::onMigrationsVersionExecuted,
-            $result,
-            $configuration->isDryRun()
+            $plan,
+            $configuration
         );
 
         return $result;
@@ -294,10 +292,9 @@ final class Executor implements ExecutorInterface
         }
 
         $this->dispatcher->dispatchVersionEvent(
-            $plan->getVersion(),
             Events::onMigrationsVersionSkipped,
-            $result,
-            $configuration->isDryRun()
+            $plan,
+            $configuration
         );
 
         $migration = $plan->getMigration();

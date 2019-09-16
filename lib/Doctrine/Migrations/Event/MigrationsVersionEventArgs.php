@@ -4,28 +4,58 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Event;
 
-use Doctrine\Migrations\Version\Version;
+use Doctrine\Common\EventArgs;
+use Doctrine\DBAL\Connection;
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\MigratorConfiguration;
 
 /**
  * The MigrationsVersionEventArgs class is passed to events related to a single migration version.
  */
-class MigrationsVersionEventArgs extends MigrationsEventArgs
+class MigrationsVersionEventArgs extends EventArgs
 {
-    /** @var Version */
-    private $version;
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var Connection */
+    private $connection;
+
+    /** @var MigrationPlan */
+    private $plan;
+
+    /** @var MigratorConfiguration */
+    private $migratorConfiguration;
 
     public function __construct(
-        Version $version,
-        string $payload,
-        bool $dryRun
+        Configuration $configuration,
+        Connection $connection,
+        MigrationPlan $plan,
+        MigratorConfiguration $migratorConfiguration
     ) {
-        parent::__construct($config, $payload, $dryRun);
-
-        $this->version = $version;
+        $this->configuration         = $configuration;
+        $this->connection            = $connection;
+        $this->plan                  = $plan;
+        $this->migratorConfiguration = $migratorConfiguration;
     }
 
-    public function getVersion() : Version
+    public function getConfiguration() : Configuration
     {
-        return $this->version;
+        return $this->configuration;
+    }
+
+    public function getConnection() : Connection
+    {
+        return $this->connection;
+    }
+
+    public function getPlan() : MigrationPlan
+    {
+        return $this->plan;
+    }
+
+    public function getMigratorConfiguration() : MigratorConfiguration
+    {
+        return $this->migratorConfiguration;
     }
 }

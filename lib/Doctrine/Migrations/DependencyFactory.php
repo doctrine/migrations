@@ -69,6 +69,7 @@ class DependencyFactory
     {
         return $this->getDependency(EventDispatcher::class, function () : EventDispatcher {
             return new EventDispatcher(
+                $this->connection,
                 $this->configuration,
                 $this->connection->getEventManager()
             );
