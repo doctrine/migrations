@@ -19,6 +19,7 @@ use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
+use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactoryInterface;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
@@ -221,9 +222,9 @@ class DependencyFactory
         });
     }
 
-    public function getMigratorConfigurationFactory() : MigratorConfigurationFactory
+    public function getMigratorConfigurationFactory() : MigratorConfigurationFactoryInterface
     {
-        return $this->getDependency(MigratorConfigurationFactory::class, function () : MigratorConfigurationFactory {
+        return $this->getDependency(MigratorConfigurationFactoryInterface::class, function () : MigratorConfigurationFactoryInterface {
             return new MigratorConfigurationFactory(
                 $this->configuration
             );

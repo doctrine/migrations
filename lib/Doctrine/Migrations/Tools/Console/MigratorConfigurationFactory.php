@@ -8,7 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigratorConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
 
-class MigratorConfigurationFactory
+class MigratorConfigurationFactory implements MigratorConfigurationFactoryInterface
 {
     /** @var Configuration */
     private $configuration;
