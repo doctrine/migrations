@@ -7,6 +7,8 @@ namespace Doctrine\Migrations\Event;
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\MigratorConfiguration;
 
 /**
  * The MigrationEventsArgs class is passed to events not related to a single migration version.
@@ -16,17 +18,25 @@ class MigrationsEventArgs extends EventArgs
     /** @var Configuration */
     private $config;
 
-    /** @var string */
-    private $direction;
+    /** @var Connection */
+    private $connection;
 
-    /** @var bool */
-    private $dryRun;
+    /** @var MigrationPlanList */
+    private $plan;
 
-    public function __construct(Configuration $config, string $direction, bool $dryRun)
-    {
-        $this->config    = $config;
-        $this->direction = $direction;
-        $this->dryRun    = $dryRun;
+    /** @var MigratorConfiguration */
+    private $migratorConfiguration;
+
+    public function __construct(
+        Configuration $config,
+        Connection $connection,
+        MigrationPlanList $plan,
+        MigratorConfiguration $migratorConfiguration
+    ) {
+        $this->config                = $config;
+        $this->connection            = $connection;
+        $this->plan                  = $plan;
+        $this->migratorConfiguration = $migratorConfiguration;
     }
 
     public function getConfiguration() : Configuration
@@ -36,16 +46,16 @@ class MigrationsEventArgs extends EventArgs
 
     public function getConnection() : Connection
     {
-        return $this->config->getConnection();
+        return $this->connection;
     }
 
-    public function getDirection() : string
+    public function getPlan() : MigrationPlanList
     {
-        return $this->direction;
+        return $this->plan;
     }
 
-    public function isDryRun() : bool
+    public function getMigratorConfiguration() : MigratorConfiguration
     {
-        return $this->dryRun;
+        return $this->migratorConfiguration;
     }
 }

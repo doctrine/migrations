@@ -59,8 +59,6 @@ class Migrator
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
     ) : array {
-        $dryRun = $migratorConfiguration->isDryRun();
-
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
         if ($allOrNothing) {
@@ -68,7 +66,7 @@ class Migrator
         }
 
         try {
-            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $dryRun);
+            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $migratorConfiguration);
 
             $sql  = [];
             $time = 0;
@@ -87,7 +85,7 @@ class Migrator
                 $time                             += $versionExecutionResult->getTime();
             }
 
-            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $dryRun);
+            $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $migratorConfiguration);
         } catch (Throwable $e) {
             if ($allOrNothing) {
                 $this->connection->rollBack();
