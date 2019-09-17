@@ -4,22 +4,31 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\EventDispatcher;
+use Doctrine\Migrations\Events;
+use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
+use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\AbstractLogger;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 
 class ExecutorTest extends TestCase
@@ -51,6 +60,21 @@ class ExecutorTest extends TestCase
     /** @var VersionExecutorTestMigration */
     private $migration;
 
+    /**
+     * @var TestLogger
+     */
+    private $logger;
+
+    /**
+     * @var EventDispatcher
+     */
+    private $eventDispatcher;
+
+    /**
+     * @var EventManager
+     */
+    private $eventManager;
+
     public function testAddSql() : void
     {
         $this->versionExecutor->addSql('SELECT 1', [1], [2]);
@@ -62,37 +86,14 @@ class ExecutorTest extends TestCase
 
     public function testExecuteUp() : void
     {
-        $this->outputWriter->expects(self::at(0))
-            ->method('write')
-            ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
-
-        $this->outputWriter->expects(self::at(1))
-            ->method('write')
-            ->with('     <comment>-></comment> SELECT 1');
-
-        $this->outputWriter->expects(self::at(2))
-            ->method('write')
-            ->with('  <info>100ms</info>');
-
-        $this->outputWriter->expects(self::at(3))
-            ->method('write')
-            ->with('     <comment>-></comment> SELECT 2');
-
-        $this->outputWriter->expects(self::at(4))
-            ->method('write')
-            ->with('  <info>100ms</info>');
-
-        $this->outputWriter->expects(self::at(5))
-            ->method('write')
-            ->with("\n  <info>++</info> migrated (took 100ms, used 100 memory)");
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
         $versionExecutionResult = $this->versionExecutor->execute(
-            $this->version,
-            $this->migration,
-            Direction::UP,
+            $plan,
             $migratorConfiguration
         );
 
@@ -100,11 +101,22 @@ class ExecutorTest extends TestCase
         self::assertSame([[1], [2]], $versionExecutionResult->getParams());
         self::assertSame([[3], [4]], $versionExecutionResult->getTypes());
         self::assertNotNull($versionExecutionResult->getTime());
-        self::assertSame('No State', $this->version->getExecutionState());
+        self::assertSame(State::NONE, $versionExecutionResult->getState());
         self::assertTrue($this->migration->preUpExecuted);
         self::assertTrue($this->migration->postUpExecuted);
         self::assertFalse($this->migration->preDownExecuted);
         self::assertFalse($this->migration->postDownExecuted);
+
+
+        self::assertSame(array (
+            0 => '++ migrating test',
+            1 => 'SELECT 1 ',
+            2 => '100ms',
+            3 => 'SELECT 2 ',
+            4 => '100ms',
+            5 => 'Migration test migrated (took 100ms, used 100 memory)',
+        ), $this->logger->logs
+        );
     }
 
     /**
@@ -112,54 +124,26 @@ class ExecutorTest extends TestCase
      */
     public function executeUpShouldAppendDescriptionWhenItIsNotEmpty() : void
     {
-        $this->outputWriter->expects(self::at(0))
-            ->method('write')
-            ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>\n");
+        $this->migration->setDescription('testing');
 
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
-        $this->versionExecutor->execute(
-            $this->version,
-            new VersionExecutorTestMigration($this->version, 'testing'),
-            Direction::UP,
-            $migratorConfiguration
-        );
+        $this->versionExecutor->execute($plan, $migratorConfiguration );
+
+        self::assertSame('++ migrating test (testing)', $this->logger->logs[0]);
     }
 
     public function testExecuteDown() : void
     {
-        $this->outputWriter->expects(self::at(0))
-            ->method('write')
-            ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
-
-        $this->outputWriter->expects(self::at(1))
-            ->method('write')
-            ->with('     <comment>-></comment> SELECT 3');
-
-        $this->outputWriter->expects(self::at(2))
-            ->method('write')
-            ->with('  <info>100ms</info>');
-
-        $this->outputWriter->expects(self::at(3))
-            ->method('write')
-            ->with('     <comment>-></comment> SELECT 4');
-
-        $this->outputWriter->expects(self::at(4))
-            ->method('write')
-            ->with('  <info>100ms</info>');
-
-        $this->outputWriter->expects(self::at(5))
-            ->method('write')
-            ->with("\n  <info>--</info> reverted (took 100ms, used 100 memory)");
-
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::DOWN);
+
         $versionExecutionResult = $this->versionExecutor->execute(
-            $this->version,
-            $this->migration,
-            Direction::DOWN,
+            $plan,
             $migratorConfiguration
         );
 
@@ -167,11 +151,169 @@ class ExecutorTest extends TestCase
         self::assertSame([[5], [6]], $versionExecutionResult->getParams());
         self::assertSame([[7], [8]], $versionExecutionResult->getTypes());
         self::assertNotNull($versionExecutionResult->getTime());
-        self::assertSame('No State', $this->version->getExecutionState());
+        self::assertSame(State::NONE, $versionExecutionResult->getState());
         self::assertFalse($this->migration->preUpExecuted);
         self::assertFalse($this->migration->postUpExecuted);
         self::assertTrue($this->migration->preDownExecuted);
         self::assertTrue($this->migration->postDownExecuted);
+
+        self::assertSame(array (
+            0 => '++ reverting test',
+              1 => 'SELECT 3 ',
+              2 => '100ms',
+              3 => 'SELECT 4 ',
+              4 => '100ms',
+              5 => 'Migration test reverted (took 100ms, used 100 memory)',
+            ), $this->logger->logs
+        );
+    }
+
+    /**
+     * @test
+     */
+    public function testSkipMigration() : void
+    {
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $listener = new class() {
+            public $onMigrationsVersionExecuting = false;
+            public $onMigrationsVersionExecuted = false;
+            public $onMigrationsVersionSkipped = false;
+
+            public function onMigrationsVersionExecuting()
+            {
+                $this->onMigrationsVersionExecuting = true;
+            }
+
+            public function onMigrationsVersionExecuted()
+            {
+                $this->onMigrationsVersionExecuted = true;
+            }
+
+            public function onMigrationsVersionSkipped()
+            {
+                $this->onMigrationsVersionSkipped = true;
+            }
+        };
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+        $this->migration->skip = true;
+
+        $versionExecutionResult = $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+
+        self::assertTrue($versionExecutionResult->isSkipped());
+        self::assertSame([], $versionExecutionResult->getSql());
+        self::assertSame(State::EXEC, $versionExecutionResult->getState());
+        self::assertTrue($this->migration->preUpExecuted);
+        self::assertFalse($this->migration->postUpExecuted);
+        self::assertFalse($this->migration->preDownExecuted);
+        self::assertFalse($this->migration->postDownExecuted);
+
+        self::assertFalse($listener->onMigrationsVersionExecuted);
+        self::assertTrue($listener->onMigrationsVersionSkipped);
+        self::assertTrue($listener->onMigrationsVersionExecuting);
+
+    }
+
+    /**
+     * @test
+     */
+    public function testMigrationEvents() : void
+    {
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
+
+        $listener = new class() {
+            public $onMigrationsVersionExecuting = false;
+            public $onMigrationsVersionExecuted = false;
+
+            public function onMigrationsVersionExecuting()
+            {
+                $this->onMigrationsVersionExecuting = true;
+            }
+
+            public function onMigrationsVersionExecuted()
+            {
+                $this->onMigrationsVersionExecuted = true;
+            }
+        };
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+
+        $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+        self::assertTrue($listener->onMigrationsVersionExecuted);
+        self::assertTrue($listener->onMigrationsVersionExecuting);
+    }
+
+    /**
+     * @test
+     */
+    public function testErrorMigration() : void
+    {
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+        $this->migration->error = true;
+
+        $listener = new class() {
+            public $onMigrationsVersionExecuting = false;
+            public $onMigrationsVersionExecuted = false;
+            public $onMigrationsVersionSkipped = false;
+
+            public function onMigrationsVersionExecuting()
+            {
+                $this->onMigrationsVersionExecuting = true;
+            }
+
+            public function onMigrationsVersionExecuted()
+            {
+                $this->onMigrationsVersionExecuted = true;
+            }
+
+            public function onMigrationsVersionSkipped()
+            {
+                $this->onMigrationsVersionSkipped = true;
+            }
+        };
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+
+        try {
+            $this->versionExecutor->execute(
+                $plan,
+                $migratorConfiguration
+            );
+            self::assertFalse(true);
+        } catch (\Throwable $e){
+            self::assertFalse($listener->onMigrationsVersionExecuted);
+            self::assertTrue($listener->onMigrationsVersionSkipped);
+            self::assertTrue($listener->onMigrationsVersionExecuting);
+
+            $versionExecutionResult = $plan->getResult();
+
+            self::assertTrue($versionExecutionResult->hasError());
+            self::assertSame([], $versionExecutionResult->getSql());
+            self::assertSame(State::EXEC, $versionExecutionResult->getState());
+            self::assertTrue($this->migration->preUpExecuted);
+            self::assertFalse($this->migration->postUpExecuted);
+            self::assertFalse($this->migration->preDownExecuted);
+            self::assertFalse($this->migration->postDownExecuted);
+        }
     }
 
     /**
@@ -179,55 +321,47 @@ class ExecutorTest extends TestCase
      */
     public function executeDownShouldAppendDescriptionWhenItIsNotEmpty() : void
     {
-        $this->outputWriter->expects(self::at(0))
-            ->method('write')
-            ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>\n");
-
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::DOWN);
+
         $this->versionExecutor->execute(
-            $this->version,
-            new VersionExecutorTestMigration($this->version, 'testing'),
-            Direction::DOWN,
+            $plan,
             $migratorConfiguration
         );
+
+        self::assertSame('++ reverting test', $this->logger->logs[0]);
     }
 
     protected function setUp() : void
     {
+        $this->metadataStorage    = $this->createMock(MetadataStorage::class);
         $this->configuration      = $this->createMock(Configuration::class);
         $this->connection         = $this->createMock(Connection::class);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
-        $this->outputWriter       = $this->createMock(OutputWriter::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
+
+        $this->eventManager = new EventManager();
+        $this->eventDispatcher = new EventDispatcher($this->connection, $this->configuration, $this->eventManager);
+
         $this->stopwatch          = $this->createMock(Stopwatch::class);
+        $this->logger = new TestLogger();
+
 
         $this->versionExecutor = new Executor(
-            $this->configuration,
+            $this->metadataStorage,
+            $this->eventDispatcher,
             $this->connection,
             $this->schemaDiffProvider,
-            $this->outputWriter,
+            $this->logger,
             $this->parameterFormatter,
             $this->stopwatch
         );
 
-        $this->configuration->expects(self::any())
-            ->method('getConnection')
-            ->willReturn($this->connection);
+        $this->version = new Version('test');
 
-        $this->connection->expects(self::any())
-            ->method('getDatabasePlatform')
-            ->willReturn($this->createMock(AbstractPlatform::class));
-
-        $this->version = new Version(
-            $this->configuration,
-            '001',
-            VersionExecutorTestMigration::class,
-            $this->versionExecutor
-        );
-
-        $this->migration = new VersionExecutorTestMigration($this->version);
+        $this->migration = new VersionExecutorTestMigration($this->versionExecutor, $this->connection, $this->logger);
 
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
@@ -263,18 +397,19 @@ class VersionExecutorTestMigration extends AbstractMigration
     public $postDownExecuted = false;
 
     /** @var string */
-    private $description;
+    private $description = '';
 
-    public function __construct(Version $version, string $description = '')
-    {
-        parent::__construct($version);
-
-        $this->description = $description;
-    }
+    public $skip = false;
+    public $error = false;
 
     public function getDescription() : string
     {
         return $this->description;
+    }
+
+    public function setDescription(string $description): void
+    {
+        $this->description = $description;
     }
 
     public function preUp(Schema $fromSchema) : void
@@ -284,6 +419,9 @@ class VersionExecutorTestMigration extends AbstractMigration
 
     public function up(Schema $schema) : void
     {
+        $this->skipIf($this->skip);
+        $this->abortIf($this->error);
+
         $this->addSql('SELECT 1', [1], [3]);
         $this->addSql('SELECT 2', [2], [4]);
     }
