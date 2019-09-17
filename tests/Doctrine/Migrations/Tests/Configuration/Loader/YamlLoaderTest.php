@@ -24,22 +24,17 @@ use const DIRECTORY_SEPARATOR;
 
 class YamlLoaderTest extends AbstractLoaderTest
 {
-    public function getLoader(): Loader
+    public function load($prefix = ''): Configuration
     {
-        return new YamlFileLoader();
-    }
-
-    public function getExtension(): string
-    {
-        return 'yml';
+        $loader = new YamlFileLoader();
+        return $loader->load(__DIR__ . "/../_files/config" . ($prefix? ('_'.$prefix) : '') . ".yml");
     }
 
     public function testMalformed() : void
     {
         $this->expectException(YamlNotValid::class);
 
-        $loader = $this->getLoader();
-        $loader->load(__DIR__ ."/../_files/config_malformed.".$this->getExtension());
+        $this->load("malformed");
     }
 
 }

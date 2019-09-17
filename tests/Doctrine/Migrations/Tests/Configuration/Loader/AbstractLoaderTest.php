@@ -22,13 +22,11 @@ use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractLoaderTest extends TestCase
 {
-    abstract public function getLoader() : Loader;
-    abstract public function getExtension() : string;
+    abstract public function load($prefix = '') : Configuration;
 
     public function testLoad()
     {
-        $loader = $this->getLoader();
-        $config = $loader->load(__DIR__ ."/../_files/config.".$this->getExtension());
+        $config = $this->load();
 
         self::assertSame("Doctrine Sandbox Migrations", $config->getName());
         self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
@@ -50,14 +48,12 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $loader = $this->getLoader();
-        $loader->load(__DIR__ ."/../_files/not_existent.".$this->getExtension());
+        $this->load("not_existent");
     }
 
     public function testCustomTemplate() : void
     {
-        $loader = $this->getLoader();
-        $config = $loader->load(__DIR__ ."/../_files/config_custom_template.".$this->getExtension());
+        $config = $this->load("custom_template");
 
         self::assertSame('template.tpl', $config->getCustomTemplate());
     }
@@ -66,7 +62,35 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $this->expectException(InvalidConfigurationKey::class);
 
-        $loader = $this->getLoader();
-        $loader->load(__DIR__ ."/../_files/config_invalid.".$this->getExtension());
+        $this->load("invalid");
+    }
+
+
+    public function testVersionsOrganizationNoConfig() : void
+    {
+        $config = $this->load();
+        self::assertFalse($config->areMigrationsOrganizedByYear());
+        self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    public function testVersionsOrganizationByYear() : void
+    {
+        $config = $this->load('organize_by_year');
+        self::assertTrue($config->areMigrationsOrganizedByYear());
+        self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    public function testVersionsOrganizationByYearAndMonth() : void
+    {
+        $config = $this->load('organize_by_year_and_month');
+        self::assertTrue($config->areMigrationsOrganizedByYear());
+        self::assertTrue($config->areMigrationsOrganizedByYearAndMonth());
+    }
+
+    public function testVersionsOrganizationInvalid() : void
+    {
+        $this->expectException(MigrationException::class);
+
+        $this->load('organize_invalid');
     }
 }

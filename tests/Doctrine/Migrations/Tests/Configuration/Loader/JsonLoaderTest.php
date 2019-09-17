@@ -23,22 +23,16 @@ use const DIRECTORY_SEPARATOR;
 
 class JsonLoaderTest extends AbstractLoaderTest
 {
-    public function getLoader(): Loader
+    public function load($prefix = ''): Configuration
     {
-        return new JsonFileLoader();
-    }
-
-    public function getExtension(): string
-    {
-        return 'json';
+        $loader = new JsonFileLoader();
+        return $loader->load(__DIR__ . "/../_files/config" . ($prefix? ('_'.$prefix) : '') . ".json");
     }
 
     public function testMalformed() : void
     {
         $this->expectException(JsonNotValid::class);
-
-        $loader = $this->getLoader();
-        $loader->load(__DIR__ ."/../_files/config_malformed.".$this->getExtension());
+        $this->load("malformed");
     }
 
 }

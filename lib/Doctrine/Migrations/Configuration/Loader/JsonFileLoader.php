@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\JsonNotValid;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -28,6 +29,10 @@ class JsonFileLoader extends AbstractFileLoader
     
     public function load($file) : Configuration
     {
+        if (!file_exists($file)) {
+            throw FileNotFound::new();
+        }
+
         $contents = file_get_contents($file);
 
         assert($contents !== false);
