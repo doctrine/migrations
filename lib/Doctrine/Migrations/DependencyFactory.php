@@ -6,14 +6,16 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
 use Doctrine\Migrations\Finder\GlobFinder;
+use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
-use Doctrine\Migrations\Metadata\MetadataStorage;
-use Doctrine\Migrations\Metadata\TableMetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -118,9 +120,19 @@ class DependencyFactory
 
     public function getMigrationsFinder() : MigrationFinder
     {
-        return $this->getDependency(GlobFinder::class, static function () : MigrationFinder {
+        $finder =  $this->getDependency(GlobFinder::class, static function () : MigrationFinder {
             return new GlobFinder();
         });
+
+        // todo move this to DI
+
+        if (!($finder instanceof MigrationDeepFinder) && ($this->configuration->areMigrationsOrganizedByYear() || $this->configuration->areMigrationsOrganizedByYearAndMonth())) {
+            throw ParameterIncompatibleWithFinder::new(
+                'organize-migrations',
+                $finder
+            );
+        }
+        return $finder;
     }
 
     public function setSorter(callable $sorter) : void

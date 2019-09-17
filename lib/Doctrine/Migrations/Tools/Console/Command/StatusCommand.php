@@ -136,8 +136,8 @@ EOT
 
             $status = $executedMigration ? '<info>migrated</info>' : '<error>not migrated</error>';
 
-            $executedAtStatus = $executedMigration && $executedMigration->getExecutedOn() instanceof DateTimeImmutable
-                ? sprintf(' (executed at %s)', $executedMigration->getExecutedOn()->format('Y-m-d H:i:s'))
+            $executedAtStatus = $executedMigration && $executedMigration->getExecutedAt() instanceof DateTimeImmutable
+                ? sprintf(' (executed at %s)', $executedMigration->getExecutedAt()->format('Y-m-d H:i:s'))
                 : '';
 
             $description = $availableMigration->getMigration()->getDescription();
