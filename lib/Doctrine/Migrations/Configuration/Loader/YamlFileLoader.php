@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
@@ -26,6 +27,10 @@ class YamlFileLoader extends AbstractFileLoader
     {
         if (! class_exists(Yaml::class)) {
             throw YamlNotAvailable::new();
+        }
+
+        if (!file_exists($file)) {
+            throw FileNotFound::new();
         }
 
         $content = file_get_contents($file);

@@ -24,13 +24,18 @@ use const DIRECTORY_SEPARATOR;
 
 class PhpLoaderTest extends AbstractLoaderTest
 {
-    public function getLoader(): Loader
+
+    public function load($prefix = ''): Configuration
     {
-        return new PHPFileLoader();
+        $loader = new PHPFileLoader();
+        return $loader->load(__DIR__ . "/../_files/config" . ($prefix? ('_'.$prefix) : '') . ".php");
     }
 
-    public function getExtension(): string
+
+    public function testLoadInline()
     {
-        return 'php';
+        $config = $this->load("instance");
+
+        self::assertSame("inline", $config->getName());
     }
 }

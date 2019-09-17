@@ -17,12 +17,11 @@ abstract class AbstractFileLoader implements Loader
 {
     protected function getDirectoryRelativeToFile(string $file, array $input): array
     {
-        foreach ($input as $ns => $dir){
+        foreach ($input as $ns => $dir) {
             $path = realpath(dirname($file) . '/' . $dir);
 
             $input[$ns] = $path !== false ? $path : $dir;
         }
         return $input;
-
     }
 }

@@ -21,22 +21,17 @@ use const DIRECTORY_SEPARATOR;
 
 class XmlLoaderTest extends AbstractLoaderTest
 {
-    public function getLoader(): Loader
+    public function load($prefix = ''): Configuration
     {
-        return new XmlFileLoader();
+        $loader = new XmlFileLoader();
+        return $loader->load(__DIR__ . "/../_files/config" . ($prefix? ('_'.$prefix) : '') . ".xml");
     }
 
-    public function getExtension(): string
-    {
-        return 'xml';
-    }
 
-    public function testMalformed() : void
+    public function testMalformed(): void
     {
         $this->expectException(XmlNotValid::class);
 
-        $loader = $this->getLoader();
-        $loader->load(__DIR__ ."/../_files/config_malformed.".$this->getExtension());
+        $this->load('malformed');
     }
-
 }

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 
@@ -27,6 +28,9 @@ class PHPFileLoader extends AbstractFileLoader
 
     public function load($file) : Configuration
     {
+        if (!file_exists($file)) {
+            throw FileNotFound::new();
+        }
         $config = require $file;
         if ($config instanceof Configuration){
             return  $config;

@@ -42,6 +42,7 @@ class ArrayLoader implements Loader
 
         $object = new Configuration();
         self::applyConfigs($configMap, $object, $array);
+
         return $object;
     }
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
@@ -49,6 +50,9 @@ class XmlFileLoader extends AbstractFileLoader
     
     public function load($file) : Configuration
     {
+        if (!file_exists($file)) {
+            throw FileNotFound::new();
+        }
         libxml_use_internal_errors(true);
 
         $xml = new \DOMDocument();
@@ -59,6 +63,7 @@ class XmlFileLoader extends AbstractFileLoader
 
         $xsdPath = __DIR__ . DIRECTORY_SEPARATOR . 'XML' . DIRECTORY_SEPARATOR . 'configuration.xsd';
 
+        // @todo restore validation
 //        if (! $xml->schemaValidate($xsdPath)) {
 //            libxml_clear_errors();
 //
