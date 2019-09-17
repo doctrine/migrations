@@ -2,28 +2,27 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration;
+namespace Doctrine\Migrations\Configuration\Loader;
 
+use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
-use function assert;
-use function class_exists;
-use function file_get_contents;
-use function is_array;
 
-/**
- * The YamlConfiguration class is responsible for loading migration configuration information from a YAML file.
- *
- * @internal
- */
-class YamlConfiguration extends AbstractFileConfiguration
+class YamlFileLoader extends AbstractFileLoader
 {
     /**
-     * @inheritdoc
+     * @var ArrayLoader
      */
-    protected function doLoad(string $file) : void
+    private $arrayLoader;
+
+    public function __construct(ArrayLoader $arrayLoader = null)
+    {
+        $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
+    }
+    
+    public function load($file) : Configuration
     {
         if (! class_exists(Yaml::class)) {
             throw YamlNotAvailable::new();
@@ -43,13 +42,13 @@ class YamlConfiguration extends AbstractFileConfiguration
             throw YamlNotValid::invalid();
         }
 
-        if (isset($config['migrations_directory'])) {
-            $config['migrations_directory'] = $this->getDirectoryRelativeToFile(
+        if (isset($config['migrations_paths'])) {
+            $config['migrations_paths'] = $this->getDirectoryRelativeToFile(
                 $file,
-                $config['migrations_directory']
+                $config['migrations_paths']
             );
         }
 
-        $this->setConfiguration($config);
+        return $this->arrayLoader->load($config);
     }
 }

@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Generator;
 
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\Migrations\Metadata\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Version\Direction;
 use function sprintf;
 

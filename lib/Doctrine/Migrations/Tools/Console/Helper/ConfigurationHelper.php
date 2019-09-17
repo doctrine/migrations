@@ -4,9 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
-use Doctrine\Migrations\Configuration\ArrayConfiguration;
+use Doctrine\Migrations\Configuration\ArrayLoader;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
+use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
+use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
+use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
+use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
 use Doctrine\Migrations\Configuration\XmlConfiguration;
 use Doctrine\Migrations\Configuration\YamlConfiguration;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
@@ -80,11 +84,11 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     private function loadConfig(string $config) : Configuration
     {
         $map = [
-            'xml'   => XmlConfiguration::class,
-            'yaml'  => YamlConfiguration::class,
-            'yml'   => YamlConfiguration::class,
-            'php'   => ArrayConfiguration::class,
-            'json'  => JsonConfiguration::class,
+            'xml'   => new XmlFileLoader(),
+            'yaml'  => new YamlFileLoader(),
+            'yml'   => new YamlFileLoader(),
+            'php'   => new PHPFileLoader(),
+            'json'  => new JsonFileLoader(),
         ];
 
         $info = pathinfo($config);
@@ -94,11 +98,8 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
             throw FileTypeNotSupported::new();
         }
 
-        $class         = $map[$info['extension']];
-        $configuration = new $class();
-        $configuration->load($config);
-
-        return $configuration;
+        $loader         = $map[$info['extension']];
+        return $loader->load($config);
     }
 
     /**

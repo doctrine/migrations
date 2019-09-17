@@ -13,7 +13,7 @@ class ExecutedMigration
     private $version;
 
     /** @var DateTime */
-    private $executedOn;
+    private $executedAt;
 
     /**
      * Milliseconds
@@ -22,10 +22,10 @@ class ExecutedMigration
      */
     public $executionTime;
 
-    public function __construct(Version $version, ?DateTime $executedOn, ?int $executionTime)
+    public function __construct(Version $version, ?DateTime $executedAt, ?int $executionTime)
     {
         $this->version       = $version;
-        $this->executedOn    = $executedOn;
+        $this->executedAt    = $executedAt;
         $this->executionTime = $executionTime;
     }
 
@@ -34,9 +34,9 @@ class ExecutedMigration
         return $this->executionTime;
     }
 
-    public function getExecutedOn() : ?DateTime
+    public function getExecutedAt() : ?DateTime
     {
-        return $this->executedOn;
+        return $this->executedAt;
     }
 
     public function getVersion()

@@ -42,7 +42,7 @@ class ExecutionResult
     private $exception;
 
     /** @var DateTime */
-    private $executedOn;
+    private $executedAt;
 
     /** @var int */
     private $state;
@@ -61,9 +61,9 @@ class ExecutionResult
      * @param mixed[]  $params
      * @param mixed[]  $types
      */
-    public function __construct(Version $version, string $direction, ?DateTime $executedOn = null)
+    public function __construct(Version $version, string $direction, ?DateTime $executedAt = null)
     {
-        $this->executedOn = $executedOn ?: new DateTime();
+        $this->executedAt = $executedAt ?: new DateTime();
         $this->version    = $version;
         $this->direction  = $direction;
     }
@@ -73,14 +73,14 @@ class ExecutionResult
         return $this->direction;
     }
 
-    public function getExecutedOn() : DateTime
+    public function getExecutedAt() : DateTime
     {
-        return $this->executedOn;
+        return $this->executedAt;
     }
 
-    public function setExecutedOn(DateTime $executedOn) : void
+    public function setExecutedAt(DateTime $executedAt) : void
     {
-        $this->executedOn = $executedOn;
+        $this->executedAt = $executedAt;
     }
 
     public function getVersion() : Version
