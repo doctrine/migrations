@@ -290,9 +290,10 @@ final class Executor implements ExecutorInterface
                 ]
             );
         }
+        $plan->setResult($result);
 
         $this->dispatcher->dispatchVersionEvent(
-            Events::onMigrationsVersionSkipped,
+             Events::onMigrationsVersionSkipped,
             $plan,
             $configuration
         );
