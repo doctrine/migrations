@@ -27,7 +27,7 @@ use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
 {
-    /** @var VersionCommand|MockObject */
+    /** @var VersionCommand */
     private $command;
 
     /**
@@ -60,8 +60,6 @@ class MigrationVersionTest extends MigrationTestCase
 
         $this->command = new VersionCommand(null, $dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
-
-
     }
 
     /**

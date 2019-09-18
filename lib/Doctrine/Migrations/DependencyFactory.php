@@ -26,6 +26,7 @@ use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
 use Psr\Log\LoggerInterface;
+use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 
 /**
@@ -50,10 +51,10 @@ class DependencyFactory
     /** @var callable */
     private $sorter;
 
-    public function __construct(Configuration $configuration, Connection $connection, LoggerInterface $logger)
+    public function __construct(Configuration $configuration, Connection $connection, ?LoggerInterface $logger = null)
     {
         $this->configuration = $configuration;
-        $this->logger        = $logger;
+        $this->logger        = $logger ?: new NullLogger();
         $this->connection    = $connection;
     }
 

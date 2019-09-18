@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use function count;
@@ -56,16 +57,16 @@ class MigrationStatusInfosHelper
         $newMigrations                 = $availableMigrations->getNewMigrations($executedMigrations);
         $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
-        return [
+
+        $storage = $this->configuration->getMetadataStorageConfiguration();
+
+        $data = [
             'Name'                              => $this->configuration->getName() ?? 'Doctrine Database Migrations',
             'Database Driver'                   => $this->connection->getDriver()->getName(),
             'Database Host'                     => $this->connection->getHost(),
             'Database Name'                     => $this->connection->getDatabase(),
             'Configuration Source'              => $this->configuration instanceof AbstractFileConfiguration ? $this->configuration->getFile() : 'manually configured',
-            'Version Table Name'                => $this->configuration->getMigrationsTableName(),
-            'Version Column Name'               => $this->configuration->getMigrationsColumnName(),
-//            'Migrations Namespace'              => $this->configuration->getMigrationsNamespace(),
-//            'Migrations Directory'              => $this->configuration->getMigrationsDirectory(),
+            'Version storage'                   => get_class($storage),
             'Previous Version'                  => $this->getFormattedVersionAlias('prev'),
             'Current Version'                   => $this->getFormattedVersionAlias('current'),
             'Next Version'                      => $this->getFormattedVersionAlias('next'),
@@ -75,6 +76,18 @@ class MigrationStatusInfosHelper
             'Available Migrations'              => count($availableMigrations),
             'New Migrations'                    => count($newMigrations),
         ];
+
+        foreach ($this->configuration->getMigrationDirectories() as $ns => $directory){
+            //@todo
+        }
+
+        if ($storage instanceof TableMetadataStorageConfiguration){
+            $data +=  [
+                'Version Table Name'                => $storage->getTableName(),
+                'Version Column Name'               => $storage->getVersionColumnName(),
+            ];
+        }
+        return $data;
     }
 
     private function getFormattedVersionAlias(string $alias) : string

@@ -46,7 +46,7 @@ class Configuration
     private $checkDbPlatform = true;
 
     /** @var MetadataStorageConfigration */
-    private $metadataStorageConfiguration = true;
+    private $metadataStorageConfiguration;
 
     public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfiguration)
     {
