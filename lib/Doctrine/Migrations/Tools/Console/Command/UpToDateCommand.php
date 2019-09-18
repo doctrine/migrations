@@ -43,10 +43,10 @@ EOT
         $availableMigrations = $migrationRepo->getMigrations();
         $executedMigrations  = $storage->getExecutedMigrations();
 
-        $availableMigrationsCount           = count($availableMigrations->getNewMigrations($executedMigrations)->getItems());
-        $executedUnavailableMigrationsCount =  count($executedMigrations->getExecutedUnavailableMigrations($availableMigrations)->getItems());
+        $availableMigrationsCount           = count($availableMigrations->getNewMigrations($executedMigrations));
+        $executedUnavailableMigrationsCount =  count($executedMigrations->getExecutedUnavailableMigrations($availableMigrations));
 
-        if ($availableMigrationsCount === 0) {
+        if ($availableMigrationsCount === 0 &&  $executedUnavailableMigrationsCount ===0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
 
             return 0;
@@ -58,6 +58,7 @@ EOT
                 $availableMigrationsCount,
                 $availableMigrationsCount > 1 ? 's are' : ' is'
             ));
+            return 1;
         }
 
         // negative number means that there are unregistered migrations in the database

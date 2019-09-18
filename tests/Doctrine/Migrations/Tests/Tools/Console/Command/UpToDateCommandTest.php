@@ -4,15 +4,24 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\MigrationTestCase;
+use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
-class UpToDateCommandTest extends TestCase
+class UpToDateCommandTest extends MigrationTestCase
 {
     /** @var MigrationRepository|MockObject */
     private $migrationRepository;
@@ -20,43 +29,60 @@ class UpToDateCommandTest extends TestCase
     /** @var UpToDateCommand */
     private $upToDateCommand;
 
-    protected function setUp() : void
-    {
-        $this->migrationRepository = $this->createMock(MigrationRepository::class);
+    /**
+     * @var \Doctrine\Migrations\Metadata\Storage\MetadataStorage
+     */
+    private $metadataStorage;
 
-        $this->upToDateCommand = new UpToDateCommand();
-        $this->upToDateCommand->setMigrationRepository($this->migrationRepository);
+    /**
+     * @var CommandTester
+     */
+    private $commandTester;
+
+    /**
+     * @var UpToDateCommand
+     */
+    private $command;
+
+    protected function setUp(): void
+    {
+        $configuration = new Configuration();
+        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
+        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
+
+        $conn = $this->getSqliteConnection();
+
+        $dependencyFactory = new DependencyFactory($configuration, $conn);
+
+        $this->migrationRepository = $dependencyFactory->getMigrationRepository();
+        $this->metadataStorage = $dependencyFactory->getMetadataStorage();
+
+        $this->command = new UpToDateCommand(null, $dependencyFactory);
+        $this->commandTester = new CommandTester($this->command);
     }
 
     /**
-     * @param Version[] $migrations
-     * @param string[]  $migratedVersions
-     *
      * @dataProvider dataIsUpToDate
      */
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false) : void
     {
-        $this->migrationRepository
-            ->method('getMigrations')
-            ->willReturn($migrations);
 
-        $this->migrationRepository
-            ->method('getMigratedVersions')
-            ->willReturn($migratedVersions);
+        $migrationClass = $this->createMock(AbstractMigration::class);
+        foreach ($migrations as $version) {
+            $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
+        }
 
-        $input = $this->createMock(InputInterface::class);
-        $input->expects(self::any())
-            ->method('getOption')
-            ->with('fail-on-unregistered')
-            ->willReturn($failOnUnregistered);
+        foreach ($migratedVersions as $version){
+            $result = new ExecutionResult(new Version($version), Direction::UP);
+            $this->metadataStorage->complete($result);
+        }
 
-        $output = $this->createMock(OutputInterface::class);
-        $output->expects(self::once())
-            ->method('writeln');
 
-        $actual = $this->upToDateCommand->execute($input, $output);
+        $this->commandTester->execute([
+            '--fail-on-unregistered' => $failOnUnregistered
+        ]);
 
-        self::assertSame($exitCode, $actual);
+        self::assertSame($exitCode, $this->commandTester->getStatusCode());
     }
 
     /**
@@ -67,7 +93,7 @@ class UpToDateCommandTest extends TestCase
         return [
             'up-to-date' => [
                 [
-                    $this->createVersion('20160614015627'),
+                   '20160614015627',
                 ],
                 ['20160614015627'],
                 0,
@@ -79,17 +105,17 @@ class UpToDateCommandTest extends TestCase
             ],
             'one-migration-available' => [
                 [
-                    $this->createVersion('20150614015627'),
+                   '20150614015627',
                 ],
                 [],
                 1,
             ],
             'many-migrations-available' => [
                 [
-                    $this->createVersion('20110614015627'),
-                    $this->createVersion('20120614015627'),
-                    $this->createVersion('20130614015627'),
-                    $this->createVersion('20140614015627'),
+                   '20110614015627',
+                   '20120614015627',
+                   '20130614015627',
+                   '20140614015627',
                 ],
                 ['20110614015627'],
                 1,
@@ -106,15 +132,5 @@ class UpToDateCommandTest extends TestCase
                 true,
             ],
         ];
-    }
-
-    private function createVersion(string $migration) : Version
-    {
-        $version = $this->createMock(Version::class);
-
-        $version->method('getVersion')
-            ->willReturn($migration);
-
-        return $version;
     }
 }
