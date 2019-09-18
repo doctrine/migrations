@@ -67,7 +67,7 @@ class ExecutedMigrationsSet implements Countable
     public function getExecutedUnavailableMigrations(AvailableMigrationsList $availableMigrationsSet) : ExecutedMigrationsSet
     {
         return new ExecutedMigrationsSet(array_filter($this->items, static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
-            return ! $availableMigrationsSet->getMigration($migrationInfo->getVersion());
+            return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
     }
 }

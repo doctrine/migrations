@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Metadata;
 
 use Countable;
+use Doctrine\Migrations\Exception\MigrationNotAvailable;
 use Doctrine\Migrations\Version\Version;
 use function array_filter;
 use function array_values;
@@ -35,13 +36,24 @@ class AvailableMigrationsList implements Countable
 
     public function getLast(int $offset = 0) : ?AvailableMigration
     {
-        return $this->items[count($this->items)-1-$offset] ?? null;
+        return $this->items[count($this->items)-1-(-1*$offset)] ?? null;
     }
 
     public function count()
     {
         return count($this->items);
     }
+
+    public function hasMigration(Version $version) : bool
+    {
+        foreach ($this->items as $migration) {
+            if ((string) $migration->getVersion() === (string) $version) {
+                return true;
+            }
+        }
+        return false;
+    }
+
 
     public function getMigration(Version $version) : ?AvailableMigration
     {
@@ -51,7 +63,7 @@ class AvailableMigrationsList implements Countable
             }
         }
 
-        return null;
+        throw MigrationNotAvailable::new((string)$version);
     }
 
     public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsList
