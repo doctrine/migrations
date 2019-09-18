@@ -8,7 +8,10 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Tests\MigrationTestCase;
+use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\MockObject\MockObject;
 
 class AutoCommitListenerTest extends MigrationTestCase
@@ -64,6 +67,12 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     private function createArgs(bool $isDryRun) : MigrationsEventArgs
     {
-        return new MigrationsEventArgs(new Configuration($this->conn), 'up', $isDryRun);
+        $config = new Configuration();
+        $plan = new MigrationPlanList([], Direction::UP);
+
+        $configsMigration = new MigratorConfiguration();
+        $configsMigration->setDryRun($isDryRun);
+
+        return new MigrationsEventArgs($config, $this->conn, $plan, $configsMigration);
     }
 }
