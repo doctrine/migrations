@@ -4,127 +4,177 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
+
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
-    /** @var MigrationRepository|MockObject */
-    private $migrationRepository;
-
-    /** @var MigrationPlanCalculator */
+    /**
+     * @var MigrationPlanCalculator
+     */
     private $migrationPlanCalculator;
 
-    public function testGetMigrationsToExecuteUp() : void
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|MigrationRepository
+     */
+    private $migrationRepository;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|MetadataStorage
+     */
+    private $metadataStorage;
+
+    /**
+     * @var \PHPUnit\Framework\MockObject\MockObject|AbstractMigration
+     */
+    private $abstractMigration;
+
+    protected function setUp(): void
     {
-        $version1 = $this->createMock(Version::class);
-        $version1->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('01');
+//        $configuration = new Configuration();
+//        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
+//        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
+//
+//        $conn = $this->getSqliteConnection();
+//
+//        $versionFactory = $this->createMock(Factory::class);
 
-        $version2 = $this->createMock(Version::class);
-        $version2->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('02');
+        $this->abstractMigration = $this->createMock(AbstractMigration::class);
 
-        $version3 = $this->createMock(Version::class);
-        $version3->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('03');
-
-        $version4 = $this->createMock(Version::class);
-        $version4->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('04');
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getMigrations')
-            ->willReturn([
-                '01' => $version1,
-                '02' => $version2,
-                '03' => $version3,
-                '04' => $version4,
-            ]);
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getMigratedVersions')
-            ->willReturn([
-                '02',
-                '03',
-            ]);
-
-        $expected = [
-            '01' => $version1,
-            '04' => $version4,
-        ];
-
-        $migrationsToExecute = $this->migrationPlanCalculator->getMigrationsToExecute(
-            Direction::UP,
-            '04'
-        );
-
-        self::assertSame($expected, $migrationsToExecute);
-    }
-
-    public function testGetMigrationsToExecuteDown() : void
-    {
-        $version1 = $this->createMock(Version::class);
-        $version1->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('01');
-
-        $version2 = $this->createMock(Version::class);
-        $version2->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('02');
-
-        $version3 = $this->createMock(Version::class);
-        $version3->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('03');
-
-        $version4 = $this->createMock(Version::class);
-        $version4->expects(self::any())
-            ->method('getVersion')
-            ->willReturn('04');
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getMigrations')
-            ->willReturn([
-                '01' => $version1,
-                '02' => $version2,
-                '03' => $version3,
-                '04' => $version4,
-            ]);
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getMigratedVersions')
-            ->willReturn([
-                '02',
-                '03',
-            ]);
-
-        $expected = [
-            '03' => $version3,
-            '02' => $version2,
-        ];
-
-        $migrationsToExecute = $this->migrationPlanCalculator->getMigrationsToExecute(
-            Direction::DOWN,
-            '01'
-        );
-
-        self::assertSame($expected, $migrationsToExecute);
-    }
-
-    protected function setUp() : void
-    {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
+        $this->metadataStorage = $this->createMock(MetadataStorage::class);
+        $this->migrationPlanCalculator = new MigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
+    }
 
-        $this->migrationPlanCalculator = new MigrationPlanCalculator($this->migrationRepository);
+    public function testPlanForExactVersionWhenNoMigrations(): void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
+        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
+
+        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
+
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigration')
+            ->willReturnCallback(function (Version $version) use ($migrationList) {
+                return $migrationList->getMigration($version);
+            });
+
+        $plan = $this->migrationPlanCalculator->getPlanForExactVersion(new Version('C'), Direction::UP);
+
+        self::assertInstanceOf(MigrationPlanList::class, $plan);
+        self::assertCount(1, $plan);
+        self::assertSame(Direction::UP, $plan->getDirection());
+        self::assertSame(Direction::UP, $plan->getFirst()->getDirection());
+        self::assertEquals(new Version('C'), $plan->getFirst()->getVersion());
+    }
+
+    /**
+     * @dataProvider getPlanUpWhenNoMigrations
+     */
+    public function testPlanWhenNoMigrations(?string $to, array $expectedPlan, string $direction): void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
+        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
+
+        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigrations')
+            ->willReturn($migrationList);
+
+        $this->metadataStorage
+            ->expects($this->atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsSet([]));
+
+        $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
+
+        self::assertInstanceOf(MigrationPlanList::class, $plan);
+
+        self::assertSame($direction, $plan->getDirection());
+        self::assertCount(count($expectedPlan), $plan);
+
+        foreach ($expectedPlan as $itemN => $version) {
+            self::assertSame($direction, $plan->getItems()[$itemN]->getDirection());
+            self::assertEquals(new Version($version), $plan->getItems()[$itemN]->getVersion());
+        }
+    }
+
+    public function getPlanUpWhenNoMigrations()
+    {
+        return [
+            ['A', ['A'], Direction::UP],
+            ['B', ['A', 'B'], Direction::UP],
+            ['C', ['A', 'B', 'C'], Direction::UP],
+            ['C', ['A', 'B', 'C'], Direction::UP],
+            [null, ['A', 'B', 'C'], Direction::UP],
+        ];
+    }
+
+    /**
+     * @dataProvider getPlanUpWhenMigrations
+     */
+    public function testPlanWhenMigrations(?string $to, array $expectedPlan, ?string $direction): void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
+        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
+
+        $e1 = new ExecutedMigration(new Version('A'));
+        $e2 = new ExecutedMigration(new Version('B'));
+
+        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigrations')
+            ->willReturn($migrationList);
+
+        $this->metadataStorage
+            ->expects($this->atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
+
+        $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
+
+        self::assertInstanceOf(MigrationPlanList::class, $plan);
+
+        self::assertCount(count($expectedPlan), $plan);
+
+        self::assertSame($direction, $plan->getDirection());
+
+        foreach ($expectedPlan as $itemN => $version) {
+            self::assertSame($direction, $plan->getItems()[$itemN]->getDirection());
+            self::assertEquals(new Version($version), $plan->getItems()[$itemN]->getVersion());
+        }
+    }
+
+    public function getPlanUpWhenMigrations()
+    {
+        return [
+            ['0', ['B', 'A'], Direction::DOWN],
+            ['A', ['B'], Direction::DOWN],
+            ['B', [], Direction::DOWN],
+            ['C', ['C'], Direction::UP],
+            [null, ['C'], Direction::UP],
+        ];
     }
 }
