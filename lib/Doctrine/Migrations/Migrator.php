@@ -123,7 +123,7 @@ class Migrator implements MigratorInterface
         );
     }
 
-    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration, ?Version $currentVersion = null)
+    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
         /**
          * If there are no migrations to execute throw an exception.
@@ -141,7 +141,7 @@ class Migrator implements MigratorInterface
             [
                 'direction' => $migrationsPlan->getDirection(),
                 'to' => (string) $migrationsPlan->getLast()->getVersion(),
-                'from' => (string) $currentVersion,
+//                'from' => (string) $currentVersion,
             ]
         );
 
