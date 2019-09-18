@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Metadata;
 
 use Countable;
+use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Version\Version;
 use function array_filter;
 use function array_values;
@@ -43,6 +44,16 @@ class ExecutedMigrationsSet implements Countable
         return count($this->items);
     }
 
+    public function hasMigration(Version $version) : bool
+    {
+        foreach ($this->items as $migration) {
+            if ((string) $migration->getVersion() === (string) $version) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     public function getMigration(Version $version) : ?ExecutedMigration
     {
         foreach ($this->items as $migration) {
@@ -50,8 +61,7 @@ class ExecutedMigrationsSet implements Countable
                 return $migration;
             }
         }
-
-        return null;
+        throw MigrationNotExecuted::new((string) $version);
     }
 
     public function getExecutedUnavailableMigrations(AvailableMigrationsList $availableMigrationsSet) : ExecutedMigrationsSet

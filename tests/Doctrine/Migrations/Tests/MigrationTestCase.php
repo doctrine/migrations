@@ -4,12 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Stopwatch;
+use Doctrine\Migrations\Version\ExecutorInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -19,13 +22,13 @@ use function assert;
 use function fopen;
 use function fwrite;
 use function glob;
+use function implode;
 use function is_dir;
 use function is_file;
 use function is_resource;
 use function mkdir;
 use function realpath;
 use function rewind;
-use function stream_get_contents;
 
 abstract class MigrationTestCase extends TestCase
 {
@@ -44,9 +47,8 @@ abstract class MigrationTestCase extends TestCase
 
     public function getSqliteConfiguration() : Configuration
     {
-        $config = new Configuration($this->getSqliteConnection());
-        $config->setMigrationsDirectory(__DIR__ . '/Stub/migration-empty-folder');
-        $config->setMigrationsNamespace('DoctrineMigrations');
+        $config = new Configuration();
+        $config->addMigrationsDirectory('DoctrineMigrations', __DIR__ . '/Stub/migration-empty-folder');
 
         return $config;
     }
@@ -112,17 +114,24 @@ abstract class MigrationTestCase extends TestCase
 
         return [];
     }
-
-    protected function createTestMigrator(Configuration $config) : Migrator
-    {
-        $dependencyFactory   = $config->getDependencyFactory();
-        $migrationRepository = $dependencyFactory->getMigrationRepository();
-        $outputWriter        = $dependencyFactory->getOutputWriter();
-        $symfonyStopwatch    = new SymfonyStopwatch();
-        $stopwatch           = new Stopwatch($symfonyStopwatch);
-
-        return new Migrator($config, $migrationRepository, $outputWriter, $stopwatch);
-    }
+//
+//    protected function createTestMigrator(Configuration $config) : Migrator
+//    {
+//        $connection = $this->getSqliteConnection();
+//        $eventManager = new EventManager();
+//        $eventDispatcher = new EventDispatcher($connection,  $config, $eventManager);
+//        $executor = $this->createMock(ExecutorInterface::class);
+//
+//        $logger = new TestLogger();
+//
+////        $dependencyFactory   = $config->getDependencyFactory();
+////        $migrationRepository = $dependencyFactory->getMigrationRepository();
+////        $outputWriter        = $dependencyFactory->getOutputWriter();
+//        $symfonyStopwatch    = new SymfonyStopwatch();
+//        $stopwatch           = new Stopwatch($symfonyStopwatch);
+//
+//        return new Migrator($connection, $eventDispatcher, $executor, $logger, $stopwatch);
+//    }
 
     /**
      * @return mixed[]

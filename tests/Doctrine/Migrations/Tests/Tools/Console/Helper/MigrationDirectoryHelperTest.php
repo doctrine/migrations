@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 
+use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
@@ -12,44 +13,63 @@ use function date;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-    public function testMigrationDirectoryHelperReturnConfiguredDir() : void
-    {
-        $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
+    /**
+     * @var MigrationDirectoryHelper
+     */
+    private $mirationDirectoryHelper;
 
-        self::assertSame($this->getSqliteConfiguration()->getMigrationsDirectory(), $mirationDirectoryHelper->getMigrationDirectory());
+    /**
+     * @var \Doctrine\Migrations\Configuration\Configuration
+     */
+    private $configuration;
+
+    public function setUp()
+    {
+        $this->mirationDirectoryHelper = new MigrationDirectoryHelper();
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDir(): void
     {
-        $configuration = $this->getSqliteConfiguration();
-        $configuration->setMigrationsAreOrganizedByYear(true);
-        $mirationDirectoryHelper = new MigrationDirectoryHelper($configuration);
-
-        $dir = $configuration->getMigrationsDirectory() . DIRECTORY_SEPARATOR . date('Y');
-
-        self::assertSame($dir, $mirationDirectoryHelper->getMigrationDirectory());
+        foreach ($this->configuration->getMigrationDirectories() as $dir) {
+            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            self::assertSame($dir, $migrationDir);
+        }
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear(): void
     {
-        $configuration = $this->getSqliteConfiguration();
-        $configuration->setMigrationsAreOrganizedByYearAndMonth(true);
-        $mirationDirectoryHelper = new MigrationDirectoryHelper($configuration);
+        $this->configuration->setMigrationsAreOrganizedByYear(true);
 
-        $dir = $configuration->getMigrationsDirectory() . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
+        foreach ($this->configuration->getMigrationDirectories() as $dir) {
+            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            $expectedDir = $dir . DIRECTORY_SEPARATOR . date('Y');
 
-        self::assertSame($dir, $mirationDirectoryHelper->getMigrationDirectory());
+            self::assertSame($expectedDir, $migrationDir);
+        }
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth(): void
     {
-        $dir           = DIRECTORY_SEPARATOR . 'IDoNotExists';
-        $configuration = $this->getSqliteConfiguration();
-        $configuration->setMigrationsDirectory($dir);
-        $mirationDirectoryHelper = new MigrationDirectoryHelper($configuration);
+        $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
+        foreach ($this->configuration->getMigrationDirectories() as $dir) {
+            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            $expectedDir = $dir . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
+
+            self::assertSame($expectedDir, $migrationDir);
+        }
+    }
+
+    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
+    {
         $this->expectException(InvalidArgumentException::class);
 
-        $mirationDirectoryHelper->getMigrationDirectory();
+        $this->configuration->addMigrationsDirectory('DoctrineMigrations', '/non_exiting_folder');
+
+        foreach ($this->configuration->getMigrationDirectories() as $dir) {
+            $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+        }
     }
 }

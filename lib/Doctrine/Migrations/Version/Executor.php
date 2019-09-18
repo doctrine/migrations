@@ -305,7 +305,7 @@ final class Executor implements ExecutorInterface
             $this->connection->rollBack();
         }
 
-        if ($configuration->isDryRun() || $result->isSkipped()) {
+        if ($configuration->isDryRun() || $result->isSkipped() || $result->hasError()) {
             return;
         }
 

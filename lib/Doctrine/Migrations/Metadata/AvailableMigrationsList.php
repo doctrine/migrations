@@ -57,7 +57,7 @@ class AvailableMigrationsList implements Countable
     public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsList
     {
         return new AvailableMigrationsList(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
-            return ! $executedMigrationsSet->getMigration($migrationInfo->getVersion());
+            return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
     }
 }

@@ -21,7 +21,7 @@ use function count;
  *
  * @internal
  */
-class Migrator
+class Migrator implements MigratorInterface
 {
     /** @var Stopwatch */
     private $stopwatch;
@@ -131,14 +131,6 @@ class Migrator
         if (count($migrationsPlan) === 0 && $migratorConfiguration->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
         }
-        /**
-         * If
-         *  there are no migrations to execute
-         *  and there are migrations,
-         *  and the migration from and to are the same
-         * means we are already at the destination return an empty array()
-         * to signify that there is nothing left to do.
-         */
         if (count($migrationsPlan) === 0) {
             return $this->noMigrations();
         }

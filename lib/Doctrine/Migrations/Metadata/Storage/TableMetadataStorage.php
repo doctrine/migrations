@@ -98,6 +98,10 @@ class TableMetadataStorage implements MetadataStorage
 
     public function complete(ExecutionResult $result): void
     {
+        if (!$this->isInitialized()) {
+            $this->initialize();
+        }
+
         if ($result->getDirection() === Direction::DOWN) {
             $this->connection->delete($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string)$result->getVersion(),

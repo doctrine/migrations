@@ -17,6 +17,19 @@ use function sprintf;
 final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 {
     /**
+     * @var string
+     */
+    private $pattern;
+
+    public function __construct(?string $pattern =  null)
+    {
+        $this->pattern = $pattern ?: sprintf(
+            '#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i',
+            DIRECTORY_SEPARATOR,
+            DIRECTORY_SEPARATOR
+        );
+    }
+    /**
      * @return string[]
      */
     public function findMigrations(string $directory, ?string $namespace = null) : array
@@ -43,11 +56,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 
     private function getPattern() : string
     {
-        return sprintf(
-            '#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i',
-            DIRECTORY_SEPARATOR,
-            DIRECTORY_SEPARATOR
-        );
+        return $this->pattern;
     }
 
     /**
