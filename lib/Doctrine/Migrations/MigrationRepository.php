@@ -26,6 +26,9 @@ use function uasort;
  */
 class MigrationRepository
 {
+    /** @var bool */
+    private $migrationsLoaded = false;
+
     /** @var array<string, string> */
     private $migrationDirectories;
 
@@ -137,9 +140,11 @@ class MigrationRepository
     {
         $migrationDirectories = $this->migrationDirectories;
 
-        if (count($this->migrations) !== 0 || count($migrationDirectories) === 0) {
+        if ($this->migrationsLoaded) {
             return;
         }
+
+        $this->migrationsLoaded = true;
 
         foreach ($migrationDirectories as $namespace => $path) {
                 $migrations = $this->migrationFinder->findMigrations(
