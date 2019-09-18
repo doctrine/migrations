@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotAvailable;
-use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
@@ -16,17 +15,15 @@ use PHPUnit\Framework\TestCase;
 
 class AvailableMigrationListTest extends TestCase
 {
-    /**
-     * @var AbstractMigration
-     */
+    /** @var AbstractMigration */
     private $abstractMigration;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
     }
 
-    public function testFirst()
+    public function testFirst() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -37,7 +34,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getFirst(1));
     }
 
-    public function testLast()
+    public function testLast() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -48,7 +45,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getLast(-1));
     }
 
-    public function testItems()
+    public function testItems() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -58,7 +55,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame([$m1, $m2, $m3], $set->getItems());
     }
 
-    public function testCount()
+    public function testCount() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -68,7 +65,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertCount(3, $set);
     }
 
-    public function testGetMigration()
+    public function testGetMigration() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -78,7 +75,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getMigration(new Version('B')));
     }
 
-    public function testGetMigrationThrowsExceptionIfNotExisting()
+    public function testGetMigrationThrowsExceptionIfNotExisting() : void
     {
         $this->expectException(MigrationNotAvailable::class);
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
@@ -89,7 +86,7 @@ class AvailableMigrationListTest extends TestCase
         $set->getMigration(new Version('D'));
     }
 
-    public function testHasMigration()
+    public function testHasMigration() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -100,7 +97,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertFalse($set->hasMigration(new Version('D')));
     }
 
-    public function testGetNewMigrations()
+    public function testGetNewMigrations() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -118,13 +115,11 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
-
-    public function testAvailableMigration()
+    public function testAvailableMigration() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
         self::assertEquals(new Version('A'), $m1->getVersion());
         self::assertSame($this->abstractMigration, $m1->getMigration());
     }
-
 }

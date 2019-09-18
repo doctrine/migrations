@@ -46,7 +46,7 @@ EOT
         $availableMigrationsCount           = count($availableMigrations->getNewMigrations($executedMigrations));
         $executedUnavailableMigrationsCount =  count($executedMigrations->getExecutedUnavailableMigrations($availableMigrations));
 
-        if ($availableMigrationsCount === 0 &&  $executedUnavailableMigrationsCount ===0) {
+        if ($availableMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
 
             return 0;
@@ -58,6 +58,7 @@ EOT
                 $availableMigrationsCount,
                 $availableMigrationsCount > 1 ? 's are' : ' is'
             ));
+
             return 1;
         }
 

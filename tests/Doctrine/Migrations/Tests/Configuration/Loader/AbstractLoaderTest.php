@@ -4,31 +4,24 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Configuration\Loader;
 
-use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
-use Doctrine\Migrations\Configuration\Loader\Loader;
 use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Finder\GlobFinder;
-use Doctrine\Migrations\Finder\MigrationFinder;
-use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\OutputWriter;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use ReflectionProperty;
 use const DIRECTORY_SEPARATOR;
+use function dirname;
 
 abstract class AbstractLoaderTest extends TestCase
 {
     abstract public function load($prefix = '') : Configuration;
 
-    public function testLoad()
+    public function testLoad() : void
     {
         $config = $this->load();
 
-        self::assertSame("Doctrine Sandbox Migrations", $config->getName());
+        self::assertSame('Doctrine Sandbox Migrations', $config->getName());
         self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
 
         /**
@@ -48,12 +41,12 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $this->expectException(InvalidArgumentException::class);
 
-        $this->load("not_existent");
+        $this->load('not_existent');
     }
 
     public function testCustomTemplate() : void
     {
-        $config = $this->load("custom_template");
+        $config = $this->load('custom_template');
 
         self::assertSame('template.tpl', $config->getCustomTemplate());
     }
@@ -62,9 +55,8 @@ abstract class AbstractLoaderTest extends TestCase
     {
         $this->expectException(InvalidConfigurationKey::class);
 
-        $this->load("invalid");
+        $this->load('invalid');
     }
-
 
     public function testVersionsOrganizationNoConfig() : void
     {

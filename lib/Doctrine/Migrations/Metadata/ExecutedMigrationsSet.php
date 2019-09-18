@@ -51,6 +51,7 @@ class ExecutedMigrationsSet implements Countable
                 return true;
             }
         }
+
         return false;
     }
 

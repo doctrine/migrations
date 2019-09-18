@@ -6,4 +6,5 @@ use Doctrine\Migrations\Configuration\Configuration;
 
 $c = new Configuration();
 $c->setName('inline');
+
 return $c;

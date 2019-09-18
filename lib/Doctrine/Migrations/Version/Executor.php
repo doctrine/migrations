@@ -10,8 +10,8 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -293,7 +293,7 @@ final class Executor implements ExecutorInterface
         $plan->setResult($result);
 
         $this->dispatcher->dispatchVersionEvent(
-             Events::onMigrationsVersionSkipped,
+            Events::onMigrationsVersionSkipped,
             $plan,
             $configuration
         );

@@ -5,11 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Exception\MigrationNotExecuted;
-use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Version\Direction;
@@ -19,65 +14,55 @@ use PHPUnit\Framework\TestCase;
 
 class MigrationPlanListTest extends TestCase
 {
-    /**
-     * @var AbstractMigration
-     */
+    /** @var AbstractMigration */
     private $abstractMigration;
 
-    /**
-     * @var MigrationPlan
-     */
+    /** @var MigrationPlan */
     private $set;
-    /**
-     * @var MigrationPlan
-     */
+    /** @var MigrationPlan */
     private $m1;
-    /**
-     * @var MigrationPlan
-     */
+    /** @var MigrationPlan */
     private $m2;
-    /**
-     * @var MigrationPlan
-     */
+    /** @var MigrationPlan */
     private $m3;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
-        $this->m1 = new MigrationPlan(new Version('A'), $this->abstractMigration, Direction::UP);
-        $this->m2 = new MigrationPlan(new Version('B'), $this->abstractMigration, Direction::UP);
-        $this->m3 = new MigrationPlan(new Version('C'), $this->abstractMigration, Direction::UP);
+        $this->m1                = new MigrationPlan(new Version('A'), $this->abstractMigration, Direction::UP);
+        $this->m2                = new MigrationPlan(new Version('B'), $this->abstractMigration, Direction::UP);
+        $this->m3                = new MigrationPlan(new Version('C'), $this->abstractMigration, Direction::UP);
 
         $this->set = new MigrationPlanList([$this->m1, $this->m2, $this->m3], Direction::UP);
     }
 
-    public function testFirst()
+    public function testFirst() : void
     {
         self::assertSame($this->m1, $this->set->getFirst());
     }
 
-    public function testLast()
+    public function testLast() : void
     {
         self::assertSame($this->m3, $this->set->getLast());
     }
 
-    public function testItems()
+    public function testItems() : void
     {
         self::assertSame([$this->m1, $this->m2, $this->m3], $this->set->getItems());
     }
 
-    public function testCount()
+    public function testCount() : void
     {
         self::assertCount(3, $this->set);
     }
 
-    public function testDirection()
+    public function testDirection() : void
     {
         self::assertSame(Direction::UP, $this->set->getDirection());
         self::assertSame(Direction::UP, $this->set->getFirst()->getDirection());
     }
 
-    public function testPlan()
+    public function testPlan() : void
     {
         self::assertSame(Direction::UP, $this->m1->getDirection());
         self::assertSame($this->abstractMigration, $this->m1->getMigration());
@@ -85,9 +70,9 @@ class MigrationPlanListTest extends TestCase
         self::assertNull($this->m1->getResult());
     }
 
-    public function testPlanResult()
+    public function testPlanResult() : void
     {
-        $result = new ExecutionResult(new Version('A'),  Direction::UP);
+        $result = new ExecutionResult(new Version('A'), Direction::UP);
         $this->m1->setResult($result);
 
         self::assertSame($result, $this->m1->getResult());

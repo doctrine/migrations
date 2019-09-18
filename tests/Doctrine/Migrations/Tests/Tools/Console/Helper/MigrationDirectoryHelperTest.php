@@ -10,27 +10,24 @@ use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
 use const DIRECTORY_SEPARATOR;
 use function date;
+use function sys_get_temp_dir;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-    /**
-     * @var MigrationDirectoryHelper
-     */
+    /** @var MigrationDirectoryHelper */
     private $mirationDirectoryHelper;
 
-    /**
-     * @var \Doctrine\Migrations\Configuration\Configuration
-     */
+    /** @var Configuration */
     private $configuration;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->mirationDirectoryHelper = new MigrationDirectoryHelper();
-        $this->configuration = new Configuration();
+        $this->configuration           = new Configuration();
         $this->configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDir(): void
+    public function testMigrationDirectoryHelperReturnConfiguredDir() : void
     {
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
             $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
@@ -38,31 +35,31 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         }
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear(): void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear() : void
     {
         $this->configuration->setMigrationsAreOrganizedByYear(true);
 
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
             $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
-            $expectedDir = $dir . DIRECTORY_SEPARATOR . date('Y');
+            $expectedDir  = $dir . DIRECTORY_SEPARATOR . date('Y');
 
             self::assertSame($expectedDir, $migrationDir);
         }
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth(): void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth() : void
     {
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
             $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
-            $expectedDir = $dir . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
+            $expectedDir  = $dir . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
 
             self::assertSame($expectedDir, $migrationDir);
         }
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
+    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists() : void
     {
         $this->expectException(InvalidArgumentException::class);
 

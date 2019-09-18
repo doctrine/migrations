@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Migrations\Tests\Metadata\Storage\Configuration;
 
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -7,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class TableMetadataStorageConfigurationTest extends TestCase
 {
-    public function testDefaults()
+    public function testDefaults() : void
     {
         $config = new TableMetadataStorageConfiguration();
 
@@ -16,9 +18,9 @@ class TableMetadataStorageConfigurationTest extends TestCase
         self::assertSame(2048, $config->getVersionColumnLength());
         self::assertSame('executed_at', $config->getExecutedAtColumnName());
         self::assertSame('execution_time', $config->getExecutionTimeColumnName());
-
     }
-    public function testConfigs()
+
+    public function testConfigs() : void
     {
         $config = new TableMetadataStorageConfiguration();
 
@@ -33,6 +35,5 @@ class TableMetadataStorageConfigurationTest extends TestCase
         self::assertSame(1, $config->getVersionColumnLength());
         self::assertSame('c', $config->getExecutedAtColumnName());
         self::assertSame('d', $config->getExecutionTimeColumnName());
-
     }
 }

@@ -47,7 +47,7 @@ class SchemaDumperTest extends TestCase
             ->method('getTables')
             ->willReturn([]);
 
-        $this->schemaDumper->dump('1234');
+        $this->schemaDumper->dump('1234', 'Foo');
     }
 
     public function testDump() : void
@@ -84,10 +84,10 @@ class SchemaDumperTest extends TestCase
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
-            ->with('1234', 'up', 'down')
+            ->with('1234', 'Foo', 'up', 'down')
             ->willReturn('/path/to/migration.php');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234'));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo'));
     }
 
     protected function setUp() : void

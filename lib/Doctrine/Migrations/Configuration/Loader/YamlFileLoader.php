@@ -10,26 +10,29 @@ use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
 use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
+use function assert;
+use function class_exists;
+use function file_exists;
+use function file_get_contents;
+use function is_array;
 
 class YamlFileLoader extends AbstractFileLoader
 {
-    /**
-     * @var ArrayLoader
-     */
+    /** @var ArrayLoader */
     private $arrayLoader;
 
-    public function __construct(ArrayLoader $arrayLoader = null)
+    public function __construct(?ArrayLoader $arrayLoader = null)
     {
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
-    
+
     public function load($file) : Configuration
     {
         if (! class_exists(Yaml::class)) {
             throw YamlNotAvailable::new();
         }
 
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw FileNotFound::new();
         }
 

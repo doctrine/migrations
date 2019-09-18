@@ -61,9 +61,9 @@ class ExecutionResult
      * @param mixed[]  $params
      * @param mixed[]  $types
      */
-    public function __construct(Version $version, string $direction, ?DateTime $executedAt = null)
+    public function __construct(Version $version, string $direction = Direction::UP, ?DateTime $executedAt = null)
     {
-        $this->executedAt = $executedAt ?: new DateTime();
+        $this->executedAt = $executedAt;
         $this->version    = $version;
         $this->direction  = $direction;
     }
@@ -73,7 +73,7 @@ class ExecutionResult
         return $this->direction;
     }
 
-    public function getExecutedAt() : DateTime
+    public function getExecutedAt() : ?DateTime
     {
         return $this->executedAt;
     }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Metadata;
 
+use DateTime;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Metadata\AvailableMigration;
@@ -15,17 +16,15 @@ use PHPUnit\Framework\TestCase;
 
 class ExecutedMigrationSetTest extends TestCase
 {
-    /**
-     * @var AbstractMigration
-     */
+    /** @var AbstractMigration */
     private $abstractMigration;
 
-    public function setUp()
+    public function setUp() : void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
     }
 
-    public function testFirst()
+    public function testFirst() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -36,7 +35,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getFirst(1));
     }
 
-    public function testLast()
+    public function testLast() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -47,7 +46,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getLast(-1));
     }
 
-    public function testItems()
+    public function testItems() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -57,7 +56,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame([$m1, $m2, $m3], $set->getItems());
     }
 
-    public function testCount()
+    public function testCount() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -67,7 +66,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertCount(3, $set);
     }
 
-    public function testGetMigration()
+    public function testGetMigration() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -77,7 +76,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getMigration(new Version('B')));
     }
 
-    public function testGetMigrationThrowsExceptionIfNotExisting()
+    public function testGetMigrationThrowsExceptionIfNotExisting() : void
     {
         $this->expectException(MigrationNotExecuted::class);
         $m1 = new ExecutedMigration(new Version('A'));
@@ -88,7 +87,7 @@ class ExecutedMigrationSetTest extends TestCase
         $set->getMigration(new Version('D'));
     }
 
-    public function testHasMigration()
+    public function testHasMigration() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -99,7 +98,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertFalse($set->hasMigration(new Version('D')));
     }
 
-    public function testGetNewMigrations()
+    public function testGetNewMigrations() : void
     {
         $a1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
@@ -117,9 +116,8 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
-    public function testExecutedMigration()
+    public function testExecutedMigration() : void
     {
-
         $m1 = new ExecutedMigration(new Version('A'));
 
         self::assertEquals(new Version('A'), $m1->getVersion());
@@ -127,13 +125,12 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertNull($m1->getExecutionTime());
     }
 
-    public function testExecutedMigrationWithTiming()
+    public function testExecutedMigrationWithTiming() : void
     {
-        $date = new \DateTime();
-        $m1 = new ExecutedMigration(new Version('A'), $date, 123);
+        $date = new DateTime();
+        $m1   = new ExecutedMigration(new Version('A'), $date, 123);
 
         self::assertSame($date, $m1->getExecutedAt());
         self::assertSame(123, $m1->getExecutionTime());
     }
 }
-

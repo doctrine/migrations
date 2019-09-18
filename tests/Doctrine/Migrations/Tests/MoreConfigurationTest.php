@@ -19,7 +19,6 @@ use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Stopwatch;
-use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit_Framework_MockObject_MockObject;
