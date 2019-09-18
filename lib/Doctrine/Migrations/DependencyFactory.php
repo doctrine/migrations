@@ -127,12 +127,13 @@ class DependencyFactory
 
         // todo move this to DI
 
-        if (!($finder instanceof MigrationDeepFinder) && ($this->configuration->areMigrationsOrganizedByYear() || $this->configuration->areMigrationsOrganizedByYearAndMonth())) {
+        if (! ($finder instanceof MigrationDeepFinder) && ($this->configuration->areMigrationsOrganizedByYear() || $this->configuration->areMigrationsOrganizedByYearAndMonth())) {
             throw ParameterIncompatibleWithFinder::new(
                 'organize-migrations',
                 $finder
             );
         }
+
         return $finder;
     }
 

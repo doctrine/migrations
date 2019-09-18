@@ -51,9 +51,9 @@ class AvailableMigrationsList implements Countable
                 return true;
             }
         }
+
         return false;
     }
-
 
     public function getMigration(Version $version) : ?AvailableMigration
     {
@@ -63,7 +63,7 @@ class AvailableMigrationsList implements Countable
             }
         }
 
-        throw MigrationNotAvailable::new((string)$version);
+        throw MigrationNotAvailable::new((string) $version);
     }
 
     public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsList

@@ -7,8 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Finder\Finder;
-use Doctrine\Migrations\Finder\MigrationFinder;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
@@ -16,10 +15,8 @@ use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
-use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -30,19 +27,13 @@ class MigrationVersionTest extends MigrationTestCase
     /** @var VersionCommand */
     private $command;
 
-    /**
-     * @var MigrationRepository
-     */
+    /** @var MigrationRepository */
     private $migrationRepository;
 
-    /**
-     * @var \Doctrine\Migrations\Metadata\Storage\MetadataStorage
-     */
+    /** @var MetadataStorage */
     private $metadataStorage;
 
-    /**
-     * @var CommandTester
-     */
+    /** @var CommandTester */
     private $commandTester;
 
     protected function setUp() : void
@@ -50,15 +41,15 @@ class MigrationVersionTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn = $this->getSqliteConnection();
+        $conn   = $this->getSqliteConnection();
         $logger = new TestLogger();
-        
+
         $dependencyFactory = new DependencyFactory($configuration, $conn, $logger);
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
-        $this->metadataStorage = $dependencyFactory->getMetadataStorage();
+        $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
 
-        $this->command = new VersionCommand(null, $dependencyFactory);
+        $this->command       = new VersionCommand(null, $dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
     }
 
@@ -74,7 +65,6 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->registerMigration('1239', Version1Test::class);
         $this->configuration->registerMigration('1240', Version1Test::class);
 
-        
         $this->commandTester->execute(
             [
                 '--add'        => true,
@@ -186,7 +176,6 @@ class MigrationVersionTest extends MigrationTestCase
         $this->configuration->getVersion('1239')->markMigrated();
         $this->configuration->getVersion('1240')->markMigrated();
 
-        
         $this->commandTester->execute(
             [
                 '--delete'     => true,
@@ -216,11 +205,11 @@ class MigrationVersionTest extends MigrationTestCase
 
         $result = new ExecutionResult(new Version('1234'), Direction::UP);
         $this->metadataStorage->complete($result);
-        
+
         $this->commandTester->execute(
             [
                 '--add'   => true,
-                '--all'   => true
+                '--all'   => true,
             ],
             ['interactive' => false]
         );
@@ -271,7 +260,6 @@ class MigrationVersionTest extends MigrationTestCase
         $this->migrationRepository->registerMigrationInstance(new Version('1232'), $migrationClass);
         $this->migrationRepository->registerMigrationInstance(new Version('1234'), $migrationClass);
 
-        
         $this->commandTester->execute(
             [
                 '--add'   => true,
@@ -284,7 +272,6 @@ class MigrationVersionTest extends MigrationTestCase
 
         self::assertFalse($executedMigrations->hasMigration(new Version('1232')));
         self::assertTrue($executedMigrations->hasMigration(new Version('1234')));
-
     }
 
     /**
@@ -301,7 +288,7 @@ class MigrationVersionTest extends MigrationTestCase
 
         $result = new ExecutionResult(new Version('1234'), Direction::UP);
         $this->metadataStorage->complete($result);
-        
+
         $this->commandTester->execute(
             [
                 '--delete' => true,
@@ -321,10 +308,8 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOptionIfVersionAlreadyMigrated() : void
     {
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" already exists in the version table.');
-
 
         $migrationClass = $this->createMock(AbstractMigration::class);
 

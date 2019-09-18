@@ -31,7 +31,6 @@ class LatestCommand extends AbstractCommand
         $last        = $migrations->getLast();
         $version     = (string) $last->getVersion();
         $description = $last->getMigration()->getDescription();
-
         $output->writeln(sprintf(
             '<info>%s</info>%s',
             $version,

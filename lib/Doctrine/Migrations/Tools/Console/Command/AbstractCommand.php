@@ -4,16 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -40,11 +36,12 @@ abstract class AbstractCommand extends Command
         $this->dependencyFactory->getConfiguration()->validate();
     }
 
-    public function __construct(string $name = null, ?DependencyFactory $dependencyFactory = null)
+    public function __construct(?string $name = null, ?DependencyFactory $dependencyFactory = null)
     {
         parent::__construct($name);
         $this->dependencyFactory = $dependencyFactory;
     }
+
     protected function configure() : void
     {
         $this->addOption(
@@ -79,7 +76,6 @@ abstract class AbstractCommand extends Command
         OutputInterface $output
     ) : DependencyFactory {
         if ($this->dependencyFactory === null) {
-
             if ($this->hasConfigurationHelper()) {
                 /** @var ConfigurationHelper $configHelper */
                 $configHelper = $this->getHelperSet()->get('configuration');
@@ -87,12 +83,12 @@ abstract class AbstractCommand extends Command
                 $configHelper = new ConfigurationHelper();
             }
 
-            $configuration     = $configHelper->getMigrationConfig($input);
-            $connection = (new ConnectionLoader())
+            $configuration = $configHelper->getMigrationConfig($input);
+            $connection    = (new ConnectionLoader())
                 ->getConnection($input, $this->getHelperSet());
 
             $logger                  = new ConsoleLogger($output);
-            $this->dependencyFactory = new DependencyFactory($configuration,  $connection, $logger);
+            $this->dependencyFactory = new DependencyFactory($configuration, $connection, $logger);
         }
 
         return $this->dependencyFactory;

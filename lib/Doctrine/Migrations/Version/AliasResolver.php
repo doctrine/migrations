@@ -15,11 +15,11 @@ use function substr;
  */
 final class AliasResolver
 {
-    private const ALIAS_FIRST = 'first';
+    private const ALIAS_FIRST   = 'first';
     private const ALIAS_CURRENT = 'current';
-    private const ALIAS_PREV = 'prev';
-    private const ALIAS_NEXT = 'next';
-    private const ALIAS_LATEST = 'latest';
+    private const ALIAS_PREV    = 'prev';
+    private const ALIAS_NEXT    = 'next';
+    private const ALIAS_LATEST  = 'latest';
 
     /** @var MigrationRepository */
     private $migrationRepository;
@@ -30,7 +30,7 @@ final class AliasResolver
     public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage = $metadataStorage;
+        $this->metadataStorage     = $metadataStorage;
     }
 
     /**
@@ -46,7 +46,7 @@ final class AliasResolver
      *
      * If an existing version number is specified, it is returned verbatimly.
      */
-    public function resolveVersionAlias(string $alias): ?Version
+    public function resolveVersionAlias(string $alias) : ?Version
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
 
@@ -67,6 +67,7 @@ final class AliasResolver
                 return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
                 $newMigrations = $availableMigrations->getNewMigrations($executedMigrations);
+
                 return $newMigrations->getFirst() ? $newMigrations->getFirst()->getVersion() : null;
             case self::ALIAS_LATEST:
                 $availableMigration = $availableMigrations->getLast();
@@ -78,10 +79,11 @@ final class AliasResolver
                 }
 
                 if (substr($alias, 0, 7) === self::ALIAS_CURRENT) {
-                    $val = (int)substr($alias, 7);
+                    $val             = (int) substr($alias, 7);
                     $targetMigration = null;
                     if ($val > 0) {
                         $newMigrations = $availableMigrations->getNewMigrations($executedMigrations);
+
                         return $newMigrations->getFirst($val-1) ? $newMigrations->getFirst($val-1)->getVersion() : null;
                     } else {
                         $targetMigration = $executedMigrations->getLast($val);

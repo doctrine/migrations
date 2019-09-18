@@ -6,8 +6,9 @@ namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
-use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
-use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use function assert;
+use function file_exists;
+use function is_array;
 
 /**
  * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
@@ -16,24 +17,22 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
  */
 class PHPFileLoader extends AbstractFileLoader
 {
-    /**
-     * @var ArrayLoader
-     */
+    /** @var ArrayLoader */
     private $arrayLoader;
 
-    public function __construct(ArrayLoader $arrayLoader = null)
+    public function __construct(?ArrayLoader $arrayLoader = null)
     {
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
 
     public function load($file) : Configuration
     {
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw FileNotFound::new();
         }
         $config = require $file;
-        if ($config instanceof Configuration){
-            return  $config;
+        if ($config instanceof Configuration) {
+            return $config;
         }
 
         assert(is_array($config));

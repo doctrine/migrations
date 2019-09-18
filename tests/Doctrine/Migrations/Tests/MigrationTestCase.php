@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\EventDispatcher;
-use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Stopwatch;
-use Doctrine\Migrations\Version\ExecutorInterface;
 use Exception;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
@@ -114,7 +110,7 @@ abstract class MigrationTestCase extends TestCase
 
         return [];
     }
-//
+
 //    protected function createTestMigrator(Configuration $config) : Migrator
 //    {
 //        $connection = $this->getSqliteConnection();

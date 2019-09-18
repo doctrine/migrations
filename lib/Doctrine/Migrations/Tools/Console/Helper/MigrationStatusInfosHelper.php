@@ -14,6 +14,7 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use function count;
+use function get_class;
 use function sprintf;
 
 /**
@@ -57,7 +58,6 @@ class MigrationStatusInfosHelper
         $newMigrations                 = $availableMigrations->getNewMigrations($executedMigrations);
         $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
-
         $storage = $this->configuration->getMetadataStorageConfiguration();
 
         $data = [
@@ -77,16 +77,17 @@ class MigrationStatusInfosHelper
             'New Migrations'                    => count($newMigrations),
         ];
 
-        foreach ($this->configuration->getMigrationDirectories() as $ns => $directory){
+        foreach ($this->configuration->getMigrationDirectories() as $ns => $directory) {
             //@todo
         }
 
-        if ($storage instanceof TableMetadataStorageConfiguration){
+        if ($storage instanceof TableMetadataStorageConfiguration) {
             $data +=  [
                 'Version Table Name'                => $storage->getTableName(),
                 'Version Column Name'               => $storage->getVersionColumnName(),
             ];
         }
+
         return $data;
     }
 

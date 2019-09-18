@@ -16,12 +16,10 @@ use function sprintf;
  */
 final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $pattern;
 
-    public function __construct(?string $pattern =  null)
+    public function __construct(?string $pattern = null)
     {
         $this->pattern = $pattern ?: sprintf(
             '#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i',
@@ -29,6 +27,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
             DIRECTORY_SEPARATOR
         );
     }
+
     /**
      * @return string[]
      */

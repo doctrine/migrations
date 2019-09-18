@@ -13,9 +13,7 @@ return [
         'execution_time_column_name'   => 'doctrine_migration_execution_time_column_test',
     ],
 
-    'migrations_paths'      => [
-      'DoctrineMigrationsTest' => '.'
-    ],
+    'migrations_paths'      => ['DoctrineMigrationsTest' => '.'],
 
     'all_or_nothing'            => true,
     'check_database_platform'   => false,

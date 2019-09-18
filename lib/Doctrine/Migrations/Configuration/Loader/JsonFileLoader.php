@@ -6,9 +6,13 @@ namespace Doctrine\Migrations\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
-use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\JsonNotValid;
-use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use const JSON_ERROR_NONE;
+use function assert;
+use function file_exists;
+use function file_get_contents;
+use function json_decode;
+use function json_last_error;
 
 /**
  * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
@@ -17,19 +21,17 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
  */
 class JsonFileLoader extends AbstractFileLoader
 {
-    /**
-     * @var ArrayLoader
-     */
+    /** @var ArrayLoader */
     private $arrayLoader;
 
-    public function __construct(ArrayLoader $arrayLoader = null)
+    public function __construct(?ArrayLoader $arrayLoader = null)
     {
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
-    
+
     public function load($file) : Configuration
     {
-        if (!file_exists($file)) {
+        if (! file_exists($file)) {
             throw FileNotFound::new();
         }
 

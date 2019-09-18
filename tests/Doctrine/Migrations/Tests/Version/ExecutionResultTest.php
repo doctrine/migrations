@@ -4,17 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
+use DateTime;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Metadata\MigrationInfo;
-use Doctrine\Migrations\Metadata\MigrationPlanItem;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use function get_class;
 
 class ExecutionResultTest extends TestCase
 {
@@ -80,7 +78,7 @@ class ExecutionResultTest extends TestCase
 
     public function testExecutedAt() : void
     {
-        $date = new \DateTime();
+        $date = new DateTime();
         $this->versionExecutionResult->setExecutedAt($date);
 
         self::assertSame($date, $this->versionExecutionResult->getExecutedAt());
@@ -88,7 +86,7 @@ class ExecutionResultTest extends TestCase
 
     public function testGetVersion() : void
     {
-        self::assertSame('foo', (string)$this->versionExecutionResult->getVersion());
+        self::assertSame('foo', (string) $this->versionExecutionResult->getVersion());
     }
 
     public function testException() : void
@@ -122,7 +120,6 @@ class ExecutionResultTest extends TestCase
         $migration = $this->getMockBuilder(AbstractMigration::class)
                             ->disableOriginalConstructor()
                             ->getMock();
-
 
 //        $migrationPlanItem            = new MigrationPlanItem($info, $migration, Direction::UP);
         $this->versionExecutionResult = new ExecutionResult(

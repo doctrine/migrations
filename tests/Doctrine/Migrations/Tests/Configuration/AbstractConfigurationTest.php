@@ -4,21 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Configuration;
 
-use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
-use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
-use InvalidArgumentException;
 use ReflectionProperty;
-use const DIRECTORY_SEPARATOR;
 
 abstract class AbstractConfigurationTest extends MigrationTestCase
 {
-
-
     public function testFinderIsIncompatibleWithConfiguration() : void
     {
         $this->markTestSkipped();
@@ -44,7 +38,6 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $migrationFinderPropertyReflected->setAccessible(true);
         self::assertSame($migrationFinder, $migrationFinderPropertyReflected->getValue($config));
     }
-
 
     public function testVersionsOrganizationIncompatibleFinder() : void
     {

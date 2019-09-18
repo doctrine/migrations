@@ -18,6 +18,7 @@ use Doctrine\Migrations\Version\Version;
 use const CASE_LOWER;
 use function array_change_key_case;
 use function intval;
+use function sprintf;
 
 class TableMetadataStorage implements MetadataStorage
 {
@@ -30,20 +31,18 @@ class TableMetadataStorage implements MetadataStorage
     /** @var AbstractPlatform */
     private $platform;
 
-    /**
-     * @var TableMetadataStorageConfiguration
-     */
+    /** @var TableMetadataStorageConfiguration */
     private $configuration;
 
-    public function __construct(Connection $connection, TableMetadataStorageConfiguration $configuration = null)
+    public function __construct(Connection $connection, ?TableMetadataStorageConfiguration $configuration = null)
     {
-        $this->connection = $connection;
+        $this->connection    = $connection;
         $this->schemaManager = $connection->getSchemaManager();
-        $this->platform = $connection->getDatabasePlatform();
+        $this->platform      = $connection->getDatabasePlatform();
         $this->configuration = $configuration ?: new TableMetadataStorageConfiguration();
     }
 
-    private function isInitialized(): bool
+    private function isInitialized() : bool
     {
         if ($this->connection instanceof MasterSlaveConnection) {
             $this->connection->connect('master');
@@ -52,7 +51,7 @@ class TableMetadataStorage implements MetadataStorage
         return $this->schemaManager->tablesExist([$this->configuration->getTableName()]);
     }
 
-    private function initialize(): void
+    private function initialize() : void
     {
         $schemaChangelog = new Table($this->configuration->getTableName());
 
@@ -65,9 +64,9 @@ class TableMetadataStorage implements MetadataStorage
         $this->schemaManager->createTable($schemaChangelog);
     }
 
-    public function getExecutedMigrations(): ExecutedMigrationsSet
+    public function getExecutedMigrations() : ExecutedMigrationsSet
     {
-        if (!$this->isInitialized()) {
+        if (! $this->isInitialized()) {
             $this->initialize();
         }
 
@@ -79,7 +78,7 @@ class TableMetadataStorage implements MetadataStorage
 
             $version = new Version($row[$this->configuration->getVersionColumnName()]);
 
-            $executedAt = !empty($row[$this->configuration->getExecutedAtColumnName()]) ? DateTime::createFromFormat(
+            $executedAt = ! empty($row[$this->configuration->getExecutedAtColumnName()]) ? DateTime::createFromFormat(
                 $this->platform->getDateTimeFormatString(),
                 $row[$this->configuration->getExecutedAtColumnName()]
             ) : null;
@@ -90,25 +89,25 @@ class TableMetadataStorage implements MetadataStorage
                 $row[$this->configuration->getExecutionTimeColumnName()] ? intval($row[$this->configuration->getExecutionTimeColumnName()]) : null
             );
 
-            $migrations[(string)$version] = $migration;
+            $migrations[(string) $version] = $migration;
         }
 
         return new ExecutedMigrationsSet($migrations);
     }
 
-    public function complete(ExecutionResult $result): void
+    public function complete(ExecutionResult $result) : void
     {
-        if (!$this->isInitialized()) {
+        if (! $this->isInitialized()) {
             $this->initialize();
         }
 
         if ($result->getDirection() === Direction::DOWN) {
             $this->connection->delete($this->configuration->getTableName(), [
-                $this->configuration->getVersionColumnName() => (string)$result->getVersion(),
+                $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
             ]);
         } else {
             $this->connection->insert($this->configuration->getTableName(), [
-                $this->configuration->getVersionColumnName() => (string)$result->getVersion(),
+                $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt() ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): '',
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
             ]);

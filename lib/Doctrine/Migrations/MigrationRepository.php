@@ -13,8 +13,6 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
-use function count;
-use function get_class;
 use function strcmp;
 use function uasort;
 
@@ -61,18 +59,18 @@ class MigrationRepository
     /** @throws MigrationException */
     public function registerMigrationInstance(Version $version, AbstractMigration $migration) : AvailableMigration
     {
-        if (isset($this->migrations[(string)$version])) {
+        if (isset($this->migrations[(string) $version])) {
             throw DuplicateMigrationVersion::new(
-                (string)$version,
-                (string)$version
+                (string) $version,
+                (string) $version
             );
         }
 
-        $this->migrations[(string)$version] = new AvailableMigration($version, $migration);
+        $this->migrations[(string) $version] = new AvailableMigration($version, $migration);
 
         uasort($this->migrations, $this->sorter);
 
-        return $this->migrations[(string)$version];
+        return $this->migrations[(string) $version];
     }
 
     /** @throws MigrationException */
@@ -80,7 +78,7 @@ class MigrationRepository
     {
         $this->ensureMigrationClassExists($migrationClassName);
 
-        $version = new Version($migrationClassName);
+        $version   = new Version($migrationClassName);
         $migration = $this->versionFactory->createVersion($migrationClassName);
 
         return $this->registerMigrationInstance($version, $migration);
@@ -101,7 +99,6 @@ class MigrationRepository
 
         return $versions;
     }
-
 
     public function hasMigration(string $version) : bool
     {

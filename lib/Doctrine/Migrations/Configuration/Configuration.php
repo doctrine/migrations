@@ -11,15 +11,16 @@ use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
+use function strcasecmp;
 
 /**
  * The Configuration class is responsible for defining migration configuration information.
  */
 class Configuration
 {
-    public const VERSIONS_ORGANIZATION_BY_YEAR = 'year';
+    public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
-    public const VERSION_FORMAT = 'YmdHis';
+    public const VERSION_FORMAT                          = 'YmdHis';
 
     /** @var string|null */
     private $name;
@@ -48,47 +49,47 @@ class Configuration
     /** @var MetadataStorageConfigration */
     private $metadataStorageConfiguration;
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfiguration)
+    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfiguration) : void
     {
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
 
-    public function getMetadataStorageConfiguration(): MetadataStorageConfigration
+    public function getMetadataStorageConfiguration() : MetadataStorageConfigration
     {
         return $this->metadataStorageConfiguration;
     }
 
-    public function addMigrationsDirectory(string $namespace, string $path): void
+    public function addMigrationsDirectory(string $namespace, string $path) : void
     {
         $this->migrationsDirectories[$namespace] = $path;
     }
 
-    public function getMigrationDirectories(): array
+    public function getMigrationDirectories() : array
     {
         return $this->migrationsDirectories;
     }
 
-    public function setName(string $name): void
+    public function setName(string $name) : void
     {
         $this->name = $name;
     }
 
-    public function getName(): ?string
+    public function getName() : ?string
     {
         return $this->name;
     }
 
-    public function setCustomTemplate(?string $customTemplate): void
+    public function setCustomTemplate(?string $customTemplate) : void
     {
         $this->customTemplate = $customTemplate;
     }
 
-    public function getCustomTemplate(): ?string
+    public function getCustomTemplate() : ?string
     {
         return $this->customTemplate;
     }
 
-    public function areMigrationsOrganizedByYear(): bool
+    public function areMigrationsOrganizedByYear() : bool
     {
         return $this->migrationsAreOrganizedByYear;
     }
@@ -98,7 +99,7 @@ class Configuration
      */
     public function setMigrationsAreOrganizedByYear(
         bool $migrationsAreOrganizedByYear = true
-    ): void {
+    ) : void {
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
     }
 
@@ -107,67 +108,67 @@ class Configuration
      */
     public function setMigrationsAreOrganizedByYearAndMonth(
         bool $migrationsAreOrganizedByYearAndMonth = true
-    ): void {
-        $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYearAndMonth;
+    ) : void {
+        $this->migrationsAreOrganizedByYear         = $migrationsAreOrganizedByYearAndMonth;
         $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
     }
 
-    public function areMigrationsOrganizedByYearAndMonth(): bool
+    public function areMigrationsOrganizedByYearAndMonth() : bool
     {
         return $this->migrationsAreOrganizedByYearAndMonth;
     }
 
     /** @throws MigrationException */
-    public function validate(): void
+    public function validate() : void
     {
         if (empty($this->migrationsDirectories)) {
             throw MigrationsNamespaceRequired::new();
         }
     }
 
-    public function setIsDryRun(bool $isDryRun): void
+    public function setIsDryRun(bool $isDryRun) : void
     {
         $this->isDryRun = $isDryRun;
     }
 
-    public function isDryRun(): bool
+    public function isDryRun() : bool
     {
         return $this->isDryRun;
     }
 
-    public function setAllOrNothing(bool $allOrNothing): void
+    public function setAllOrNothing(bool $allOrNothing) : void
     {
         $this->allOrNothing = $allOrNothing;
     }
 
-    public function isAllOrNothing(): bool
+    public function isAllOrNothing() : bool
     {
         return $this->allOrNothing;
     }
 
-    public function setCheckDatabasePlatform(bool $checkDbPlatform): void
+    public function setCheckDatabasePlatform(bool $checkDbPlatform) : void
     {
         $this->checkDbPlatform = $checkDbPlatform;
     }
 
-    public function isDatabasePlatformChecked(): bool
+    public function isDatabasePlatformChecked() : bool
     {
         return $this->checkDbPlatform;
     }
 
-    public function generateVersionNumber(?DateTimeInterface $now = null): string
+    public function generateVersionNumber(?DateTimeInterface $now = null) : string
     {
         $now = $now ?: $this->createDateTime();
 
         return $now->format(self::VERSION_FORMAT);
     }
 
-    private function createDateTime(): DateTimeImmutable
+    private function createDateTime() : DateTimeImmutable
     {
         return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
-    public function setMigrationOrganization(string $migrationOrganization): void
+    public function setMigrationOrganization(string $migrationOrganization) : void
     {
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();

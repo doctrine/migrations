@@ -8,5 +8,5 @@ use Doctrine\Migrations\Configuration\Configuration;
 
 interface Loader
 {
-    function load($resource): Configuration;
+    function load($resource) : Configuration;
 }

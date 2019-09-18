@@ -8,7 +8,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -20,6 +19,7 @@ use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
 {
@@ -29,22 +29,20 @@ final class AliasResolverTest extends TestCase
     /** @var AliasResolver */
     private $versionAliasResolver;
 
-    /**
-     * @var TableMetadataStorage
-     */
+    /** @var TableMetadataStorage */
     private $metadataStorage;
 
     /**
      * @dataProvider getAliases
      */
-    public function testAliases(string $alias, ?string $expectedVersion)
+    public function testAliases(string $alias, ?string $expectedVersion) : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
         }
 
-        foreach (['A', 'B'] as $version){
+        foreach (['A', 'B'] as $version) {
             $result = new ExecutionResult(new Version($version), Direction::UP);
             $this->metadataStorage->complete($result);
         }
@@ -55,7 +53,7 @@ final class AliasResolverTest extends TestCase
     /**
      * @dataProvider getAliasesWithNoExecuted
      */
-    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion)
+    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion) : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
@@ -64,6 +62,7 @@ final class AliasResolverTest extends TestCase
 
         self::assertEquals($expectedVersion!== null ? new Version($expectedVersion) : null, $this->versionAliasResolver->resolveVersionAlias($alias));
     }
+
     /**
      * @return mixed[][]
      */
@@ -108,14 +107,14 @@ final class AliasResolverTest extends TestCase
 
         $conn = $this->getSqliteConnection();
 
-        $versionFactory  = $this->createMock(Factory::class);
+        $versionFactory = $this->createMock(Factory::class);
 
         $this->migrationRepository = new MigrationRepository(
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
             $versionFactory
         );
-        $this->metadataStorage = new TableMetadataStorage($conn);
+        $this->metadataStorage     = new TableMetadataStorage($conn);
 
         $this->versionAliasResolver = new AliasResolver($this->migrationRepository, $this->metadataStorage);
     }

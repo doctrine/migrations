@@ -21,9 +21,9 @@ use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Version;
+use Exception;
 use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -44,19 +44,13 @@ class MigratorTest extends MigrationTestCase
     /** @var StreamOutput */
     protected $output;
 
-    /**
-     * @var MigratorConfiguration
-     */
+    /** @var MigratorConfiguration */
     private $migratorConfiguration;
 
-    /**
-     * @var MockObject|ExecutorInterface
-     */
+    /** @var MockObject|ExecutorInterface */
     private $executor;
 
-    /**
-     * @var TestLogger
-     */
+    /** @var TestLogger */
     private $logger;
 
     protected function setUp() : void
@@ -130,7 +124,6 @@ class MigratorTest extends MigrationTestCase
     {
         $this->markTestSkipped();
         $migrator = $this->createTestMigrator($this->config);
-
 
         $this->migratorConfiguration->setNoMigrationException(true);
 
@@ -281,14 +274,14 @@ class MigratorTest extends MigrationTestCase
 
     protected function createTestMigrator(Configuration $config) : Migrator
     {
-        $eventManager = new EventManager();
-        $eventDispatcher = new EventDispatcher($this->conn,  $config, $eventManager);
-        $this->executor = $this->createMock(ExecutorInterface::class);
+        $eventManager    = new EventManager();
+        $eventDispatcher = new EventDispatcher($this->conn, $config, $eventManager);
+        $this->executor  = $this->createMock(ExecutorInterface::class);
 
         $this->logger = new TestLogger();
 
-        $symfonyStopwatch    = new SymfonyStopwatch();
-        $stopwatch           = new Stopwatch($symfonyStopwatch);
+        $symfonyStopwatch = new SymfonyStopwatch();
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
 
         return new Migrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
     }
@@ -301,9 +294,8 @@ class MigratorTest extends MigrationTestCase
         $this->migratorConfiguration->setAllOrNothing(true);
 
         $migration = new MigrateNotTouchingTheSchema($this->executor, $this->conn, $this->logger);
-        $plan = new MigrationPlan(new Version(MigrateNotTouchingTheSchema::class), $migration, Direction::UP);
-        $planList = new MigrationPlanList([$plan], Direction::UP);
-
+        $plan      = new MigrationPlan(new Version(MigrateNotTouchingTheSchema::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
 
         $sql = $migrator->migrate($planList, $this->migratorConfiguration);
         self::assertCount(1, $sql);
@@ -323,15 +315,14 @@ class MigratorTest extends MigrationTestCase
         $this->executor
             ->expects($this->any())
             ->method('execute')
-            ->willThrowException(new \Exception());
+            ->willThrowException(new Exception());
 
         $this->migratorConfiguration->setAllOrNothing(true);
 
         $migration = new MigrationThrowsError($this->executor, $this->conn, $this->logger);
-        $plan = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
-        $planList = new MigrationPlanList([$plan], Direction::UP);
+        $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
 
         $migrator->migrate($planList, $this->migratorConfiguration);
-
     }
 }

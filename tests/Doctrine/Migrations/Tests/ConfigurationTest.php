@@ -23,7 +23,6 @@ class ConfigurationTest extends MigrationTestCase
         $config->validate();
     }
 
-
     public function testValidateMigrations() : void
     {
         $config = new Configuration();

@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
-use Doctrine\Migrations\Configuration\ArrayLoader;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
 use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
 use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
 use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
-use Doctrine\Migrations\Configuration\XmlConfiguration;
-use Doctrine\Migrations\Configuration\YamlConfiguration;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -98,7 +94,8 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
             throw FileTypeNotSupported::new();
         }
 
-        $loader         = $map[$info['extension']];
+        $loader = $map[$info['extension']];
+
         return $loader->load($config);
     }
 

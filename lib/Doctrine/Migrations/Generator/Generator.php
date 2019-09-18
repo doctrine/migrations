@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
-use Exception;
+use InvalidArgumentException;
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
@@ -81,7 +81,7 @@ TEMPLATE;
 
         $dirs = $this->configuration->getMigrationDirectories();
         if (! isset($dirs[$namespace])) {
-            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
+            throw new InvalidArgumentException(sprintf('Path not defined for the namespace "%s"', $namespace));
         }
 
         $dir = $dirs[$namespace];
