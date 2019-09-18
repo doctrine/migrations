@@ -71,7 +71,7 @@ final class AliasResolver
                 return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
                 foreach ($availableMigrations->getItems() as $availableMigration) {
-                    if (! $executedMigrations->getMigration($availableMigration->getVersion())) {
+                    if (! $executedMigrations->hasMigration($availableMigration->getVersion())) {
                         return $availableMigration->getVersion();
                     }
                 }

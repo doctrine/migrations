@@ -13,6 +13,7 @@ use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Input\InputDefinition;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Logger\ConsoleLogger;
@@ -28,32 +29,8 @@ use function strlen;
  */
 abstract class AbstractCommand extends Command
 {
-    /** @var Configuration */
-    protected $configuration;
-
-    /** @var Connection */
-    protected $connection;
-
     /** @var DependencyFactory */
     protected $dependencyFactory;
-
-    /** @var MigrationRepository */
-    protected $migrationRepository;
-
-    public function setConnection(Connection $connection) : void
-    {
-        $this->connection = $connection;
-    }
-
-    public function setDependencyFactory(DependencyFactory $dependencyFactory) : void
-    {
-        $this->dependencyFactory = $dependencyFactory;
-    }
-
-    public function setMigrationRepository(MigrationRepository $migrationRepository) : void
-    {
-        $this->migrationRepository = $migrationRepository;
-    }
 
     public function initialize(
         InputInterface $input,
@@ -63,6 +40,11 @@ abstract class AbstractCommand extends Command
         $this->dependencyFactory->getConfiguration()->validate();
     }
 
+    public function __construct(string $name = null, ?DependencyFactory $dependencyFactory = null)
+    {
+        parent::__construct($name);
+        $this->dependencyFactory = $dependencyFactory;
+    }
     protected function configure() : void
     {
         $this->addOption(
@@ -83,7 +65,7 @@ abstract class AbstractCommand extends Command
     protected function outputHeader(
         OutputInterface $output
     ) : void {
-        $name = $this->configuration->getName();
+        $name = $this->dependencyFactory->getConfiguration()->getName();
         $name = $name ?? 'Doctrine Database Migrations';
         $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
         $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
@@ -97,18 +79,20 @@ abstract class AbstractCommand extends Command
         OutputInterface $output
     ) : DependencyFactory {
         if ($this->dependencyFactory === null) {
-            $conn = $this->getConnection($input);
 
             if ($this->hasConfigurationHelper()) {
                 /** @var ConfigurationHelper $configHelper */
                 $configHelper = $this->getHelperSet()->get('configuration');
             } else {
-                $configHelper = new ConfigurationHelper($this->configuration);
+                $configHelper = new ConfigurationHelper();
             }
 
-            $this->configuration     = $configHelper->getMigrationConfig($input);
+            $configuration     = $configHelper->getMigrationConfig($input);
+            $connection = (new ConnectionLoader())
+                ->getConnection($input, $this->getHelperSet());
+
             $logger                  = new ConsoleLogger($output);
-            $this->dependencyFactory = new DependencyFactory($this->configuration, $conn, $logger);
+            $this->dependencyFactory = new DependencyFactory($configuration,  $connection, $logger);
         }
 
         return $this->dependencyFactory;
@@ -153,15 +137,5 @@ abstract class AbstractCommand extends Command
         }
 
         return $helperSet->get('configuration') instanceof ConfigurationHelperInterface;
-    }
-
-    private function getConnection(InputInterface $input) : Connection
-    {
-        if ($this->connection === null) {
-            $this->connection = (new ConnectionLoader($this->configuration))
-                ->getConnection($input, $this->getHelperSet());
-        }
-
-        return $this->connection;
     }
 }

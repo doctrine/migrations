@@ -16,37 +16,17 @@ use function sys_get_temp_dir;
 
 class ConfigurationTest extends MigrationTestCase
 {
-    public function testGetConnection() : void
-    {
-        $conn   = $this->getSqliteConnection();
-        $config = new Configuration($conn);
-
-        self::assertSame($conn, $config->getConnection());
-    }
-
     public function testValidateMigrationsNamespaceRequired() : void
     {
-        $config = new Configuration($this->getSqliteConnection());
-
+        $config = new Configuration();
         $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Migrations namespace must be configured in order to use Doctrine migrations.');
         $config->validate();
     }
 
-    public function testValidateMigrationsDirectoryRequired() : void
-    {
-        $config = new Configuration($this->getSqliteConnection());
-        $config->setMigrationsNamespace('DoctrineMigrations\\');
-
-        $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Migrations directory must be configured in order to use Doctrine migrations.');
-
-        $config->validate();
-    }
 
     public function testValidateMigrations() : void
     {
-        $config = new Configuration($this->getSqliteConnection());
+        $config = new Configuration();
         $config->setMigrationsNamespace('DoctrineMigrations\\');
         $config->setMigrationsDirectory(sys_get_temp_dir());
 
@@ -57,46 +37,10 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testSetGetName() : void
     {
-        $config = new Configuration($this->getSqliteConnection());
+        $config = new Configuration();
         $config->setName('Test');
 
         self::assertSame('Test', $config->getName());
-    }
-
-    public function testMigrationsTable() : void
-    {
-        $config = new Configuration($this->getSqliteConnection());
-
-        self::assertSame('doctrine_migration_versions', $config->getMigrationsTableName());
-    }
-
-    public function testSetGetMigrationsColumnLength() : void
-    {
-        $config = new Configuration($this->getSqliteConnection());
-
-        self::assertSame(14, $config->getMigrationsColumnLength());
-
-        $config->setMigrationsColumnLength(200);
-
-        self::assertSame(200, $config->getMigrationsColumnLength());
-    }
-
-    public function testSetGetSetMigrationsExecutedAtColumnName() : void
-    {
-        $config = new Configuration($this->getSqliteConnection());
-
-        self::assertSame('executed_at', $config->getMigrationsExecutedAtColumnName());
-
-        $config->setMigrationsExecutedAtColumnName('executedAt');
-
-        self::assertSame('executedAt', $config->getMigrationsExecutedAtColumnName());
-    }
-
-    public function testGetQuotedMigrationsExecutedAtColumnName() : void
-    {
-        $config = new Configuration($this->getSqliteConnection());
-
-        self::assertSame('executed_at', $config->getQuotedMigrationsExecutedAtColumnName());
     }
 
     public function testEmptyProjectDefaults() : void
@@ -446,7 +390,7 @@ class ConfigurationTest extends MigrationTestCase
      */
     public function testSetCustomTemplateShould(?string $template) : void
     {
-        $config = new Configuration($this->getSqliteConnection());
+        $config = new Configuration();
         $config->setCustomTemplate($template);
 
         self::assertSame($template, $config->getCustomTemplate());

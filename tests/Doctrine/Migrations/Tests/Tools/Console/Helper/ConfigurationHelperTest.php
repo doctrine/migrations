@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\ArrayConfiguration;
+use Doctrine\Migrations\Configuration\ArrayLoader;
 use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
@@ -74,7 +74,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
         $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
 
-        self::assertInstanceOf(ArrayConfiguration::class, $migrationConfig);
+        self::assertInstanceOf(ArrayLoader::class, $migrationConfig);
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 

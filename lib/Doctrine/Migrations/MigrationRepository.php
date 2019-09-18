@@ -56,24 +56,31 @@ class MigrationRepository
     }
 
     /** @throws MigrationException */
+    public function registerMigrationInstance(Version $version, AbstractMigration $migration) : AvailableMigration
+    {
+        if (isset($this->migrations[(string)$version])) {
+            throw DuplicateMigrationVersion::new(
+                (string)$version,
+                (string)$version
+            );
+        }
+
+        $this->migrations[(string)$version] = new AvailableMigration($version, $migration);
+
+        uasort($this->migrations, $this->sorter);
+
+        return $this->migrations[(string)$version];
+    }
+
+    /** @throws MigrationException */
     public function registerMigration(string $migrationClassName) : AvailableMigration
     {
         $this->ensureMigrationClassExists($migrationClassName);
 
-        if (isset($this->migrations[$migrationClassName])) {
-            throw DuplicateMigrationVersion::new(
-                $migrationClassName,
-                get_class($migrationClassName)
-            );
-        }
-
+        $version = new Version($migrationClassName);
         $migration = $this->versionFactory->createVersion($migrationClassName);
 
-        $this->migrations[$migrationClassName] = new AvailableMigration(new Version($migrationClassName), $migration);
-
-        uasort($this->migrations, $this->sorter);
-
-        return $this->migrations[$migrationClassName];
+        return $this->registerMigrationInstance($version, $migration);
     }
 
     /**
@@ -81,7 +88,7 @@ class MigrationRepository
      *
      * @return AvailableMigration[]
      */
-    public function registerMigrations(array $migrations) : array
+    private function registerMigrations(array $migrations) : array
     {
         $versions = [];
 
@@ -92,12 +99,8 @@ class MigrationRepository
         return $versions;
     }
 
-    public function clearVersions() : void
-    {
-        $this->migrations = [];
-    }
 
-    public function hasVersion(string $version) : bool
+    public function hasMigration(string $version) : bool
     {
         $this->loadMigrationsFromDirectories();
 

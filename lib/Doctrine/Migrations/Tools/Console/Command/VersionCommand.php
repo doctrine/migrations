@@ -122,6 +122,11 @@ EOT
         if ($allOption === true) {
             $availableVersions = $this->dependencyFactory->getMigrationRepository()->getMigrations();
 
+            if ((bool) $input->getOption('delete') === true) {
+                foreach ($executedMigrations->getItems() as $availableMigration) {
+                    $this->mark($input, $output, $availableMigration->getVersion(), false, $executedMigrations);
+                }
+            }
             foreach ($availableVersions->getItems() as $availableMigration) {
                 $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
             }
@@ -169,7 +174,7 @@ EOT
 
         $marked = false;
 
-        if ($this->markMigrated && $executedMigrations->getMigration($version)) {
+        if ($this->markMigrated && $executedMigrations->hasMigration($version)) {
             if (! $all) {
                 throw VersionAlreadyExists::new($version);
             }
@@ -177,7 +182,7 @@ EOT
             $marked = true;
         }
 
-        if (! $this->markMigrated && ! $executedMigrations->getMigration($version)) {
+        if (! $this->markMigrated && ! $executedMigrations->hasMigration($version)) {
             if (! $all) {
                 throw VersionDoesNotExist::new($version);
             }

@@ -51,19 +51,19 @@ final class MigrationPlanCalculator
         if ($to === null) {
             $direction = Direction::UP;
             foreach ($availableMigrations->getItems() as $availableMigration) {
-                if ($executedMigrations->getMigration($availableMigration->getVersion())) {
+                if ($executedMigrations->hasMigration($availableMigration->getVersion())) {
                     continue;
                 }
 
                 $toExecute[] = $availableMigration;
             }
         } else {
-            $direction = $to === new Version('0') || ($executedMigrations->getMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
+            $direction = $to === new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
 
             foreach ($direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems()) as $availableMigration) {
-                if ($direction === Direction::UP && ! $executedMigrations->getMigration($availableMigration->getVersion())) {
+                if ($direction === Direction::UP && ! $executedMigrations->hasMigration($availableMigration->getVersion())) {
                     $toExecute[] = $availableMigration;
-                } elseif ($direction === Direction::DOWN && $executedMigrations->getMigration($availableMigration->getVersion()) && $availableMigration->getVersion() !== $to) {
+                } elseif ($direction === Direction::DOWN && $executedMigrations->hasMigration($availableMigration->getVersion()) && $availableMigration->getVersion() !== $to) {
                     $toExecute[] = $availableMigration;
                 }
 

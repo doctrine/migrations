@@ -22,6 +22,7 @@ use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
@@ -75,6 +76,11 @@ class ExecutorTest extends TestCase
      */
     private $eventManager;
 
+    /**
+     * @var MockObject
+     */
+    private $metadataStorage;
+
     public function testAddSql() : void
     {
         $this->versionExecutor->addSql('SELECT 1', [1], [2]);
@@ -86,22 +92,29 @@ class ExecutorTest extends TestCase
 
     public function testExecuteUp() : void
     {
+        $this->metadataStorage
+            ->expects($this->once())
+            ->method('complete')->willReturnCallback(function (ExecutionResult $result){
+                self::assertSame(Direction::UP, $result->getDirection());
+                self::assertNotNull($result->getTime());
+                self::assertNotNull($result->getExecutedAt());
+            });
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
-        $versionExecutionResult = $this->versionExecutor->execute(
+        $result = $this->versionExecutor->execute(
             $plan,
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 1', 'SELECT 2'], $versionExecutionResult->getSql());
-        self::assertSame([[1], [2]], $versionExecutionResult->getParams());
-        self::assertSame([[3], [4]], $versionExecutionResult->getTypes());
-        self::assertNotNull($versionExecutionResult->getTime());
-        self::assertSame(State::NONE, $versionExecutionResult->getState());
+        self::assertSame(['SELECT 1', 'SELECT 2'], $result->getSql());
+        self::assertSame([[1]], $result->getParams());
+        self::assertSame([[3]], $result->getTypes());
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
         self::assertTrue($this->migration->preUpExecuted);
         self::assertTrue($this->migration->postUpExecuted);
         self::assertFalse($this->migration->preDownExecuted);
@@ -137,21 +150,29 @@ class ExecutorTest extends TestCase
 
     public function testExecuteDown() : void
     {
+        $this->metadataStorage
+            ->expects($this->once())
+            ->method('complete')->willReturnCallback(function (ExecutionResult $result){
+                self::assertSame(Direction::DOWN, $result->getDirection());
+                self::assertNotNull($result->getTime());
+                self::assertNotNull($result->getExecutedAt());
+            });
+
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::DOWN);
 
-        $versionExecutionResult = $this->versionExecutor->execute(
+        $result = $this->versionExecutor->execute(
             $plan,
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 3', 'SELECT 4'], $versionExecutionResult->getSql());
-        self::assertSame([[5], [6]], $versionExecutionResult->getParams());
-        self::assertSame([[7], [8]], $versionExecutionResult->getTypes());
-        self::assertNotNull($versionExecutionResult->getTime());
-        self::assertSame(State::NONE, $versionExecutionResult->getState());
+        self::assertSame(['SELECT 3', 'SELECT 4'], $result->getSql());
+        self::assertSame([[5], [6]], $result->getParams());
+        self::assertSame([[7], [8]], $result->getTypes());
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
         self::assertFalse($this->migration->preUpExecuted);
         self::assertFalse($this->migration->postUpExecuted);
         self::assertTrue($this->migration->preDownExecuted);
@@ -173,6 +194,10 @@ class ExecutorTest extends TestCase
      */
     public function testSkipMigration() : void
     {
+        $this->metadataStorage
+            ->expects($this->never())
+            ->method('complete');
+
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
@@ -203,14 +228,14 @@ class ExecutorTest extends TestCase
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
         $this->migration->skip = true;
 
-        $versionExecutionResult = $this->versionExecutor->execute(
+        $result = $this->versionExecutor->execute(
             $plan,
             $migratorConfiguration
         );
 
-        self::assertTrue($versionExecutionResult->isSkipped());
-        self::assertSame([], $versionExecutionResult->getSql());
-        self::assertSame(State::EXEC, $versionExecutionResult->getState());
+        self::assertTrue($result->isSkipped());
+        self::assertSame([], $result->getSql());
+        self::assertSame(State::EXEC, $result->getState());
         self::assertTrue($this->migration->preUpExecuted);
         self::assertFalse($this->migration->postUpExecuted);
         self::assertFalse($this->migration->preDownExecuted);
@@ -219,7 +244,6 @@ class ExecutorTest extends TestCase
         self::assertFalse($listener->onMigrationsVersionExecuted);
         self::assertTrue($listener->onMigrationsVersionSkipped);
         self::assertTrue($listener->onMigrationsVersionExecuting);
-
     }
 
     /**
@@ -263,6 +287,10 @@ class ExecutorTest extends TestCase
      */
     public function testErrorMigration() : void
     {
+        $this->metadataStorage
+            ->expects($this->never())
+            ->method('complete');
+
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
@@ -304,11 +332,11 @@ class ExecutorTest extends TestCase
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);
 
-            $versionExecutionResult = $plan->getResult();
+            $result = $plan->getResult();
 
-            self::assertTrue($versionExecutionResult->hasError());
-            self::assertSame([], $versionExecutionResult->getSql());
-            self::assertSame(State::EXEC, $versionExecutionResult->getState());
+            self::assertTrue($result->hasError());
+            self::assertSame([], $result->getSql());
+            self::assertSame(State::EXEC, $result->getState());
             self::assertTrue($this->migration->preUpExecuted);
             self::assertFalse($this->migration->postUpExecuted);
             self::assertFalse($this->migration->preDownExecuted);
@@ -423,7 +451,7 @@ class VersionExecutorTestMigration extends AbstractMigration
         $this->abortIf($this->error);
 
         $this->addSql('SELECT 1', [1], [3]);
-        $this->addSql('SELECT 2', [2], [4]);
+        $this->addSql('SELECT 2');
     }
 
     public function postUp(Schema $toSchema) : void

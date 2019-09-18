@@ -4,24 +4,16 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
-use Doctrine\Migrations\Tests\Stub\VersionDummy;
 use Doctrine\Migrations\Version\ExecutorInterface;
-use Doctrine\Migrations\Version\Version;
 use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
-use Symfony\Component\Console\Logger\ConsoleLogger;
-use function sys_get_temp_dir;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
-
     /** @var AbstractMigrationStub */
     private $migration;
 
@@ -32,7 +24,8 @@ class AbstractMigrationTest extends MigrationTestCase
     {
         $this->logger = new class () extends AbstractLogger {
             public $logs = [];
-            public function log($level, $message, array $context = array())
+
+            public function log($level, $message, array $context = []) : void
             {
                 $this->logs[] = $message;
             }
@@ -49,7 +42,8 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testWarnIfOutputMessage() : void
     {
-        $this->migration->warnIf(true, 'Warning was thrown');;
+        $this->migration->warnIf(true, 'Warning was thrown');
+
         self::assertContains('Warning during No State: Warning was thrown', $this->getLogOutput($this->logger));
     }
 

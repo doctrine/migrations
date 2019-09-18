@@ -22,14 +22,6 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 class ConnectionLoader
 {
-    /** @var Configuration|null */
-    private $configuration;
-
-    public function __construct(?Configuration $configuration)
-    {
-        $this->configuration = $configuration;
-    }
-
     public function getConnection(InputInterface $input, HelperSet $helperSet) : Connection
     {
         $connection = $this->createConnectionConfigurationChainLoader($input, $helperSet)
@@ -49,8 +41,7 @@ class ConnectionLoader
         return new ConnectionConfigurationChainLoader([
             new ArrayConnectionConfigurationLoader($input->getOption('db-configuration')),
             new ArrayConnectionConfigurationLoader('migrations-db.php'),
-            new ConnectionHelperLoader($helperSet, 'connection'),
-            new ConnectionConfigurationLoader($this->configuration),
+            new ConnectionHelperLoader($helperSet, 'connection')
         ]);
     }
 }
