@@ -22,19 +22,19 @@ class ExecutedMigration
      */
     public $executionTime;
 
-    public function __construct(Version $version, ?DateTime $executedAt, ?int $executionTime)
+    public function __construct(Version $version, ?DateTime $executedAt = null, ?int $executionTime = null)
     {
-        $this->version       = $version;
-        $this->executedAt    = $executedAt;
+        $this->version = $version;
+        $this->executedAt = $executedAt;
         $this->executionTime = $executionTime;
     }
 
-    public function getExecutionTime() : ?int
+    public function getExecutionTime(): ?int
     {
         return $this->executionTime;
     }
 
-    public function getExecutedAt() : ?DateTime
+    public function getExecutedAt(): ?DateTime
     {
         return $this->executedAt;
     }
