@@ -13,5 +13,5 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 interface MigratorInterface
 {
-    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : void;
+    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array;
 }
