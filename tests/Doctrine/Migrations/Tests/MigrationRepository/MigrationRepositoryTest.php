@@ -11,6 +11,7 @@ use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
@@ -37,107 +38,6 @@ class MigrationRepositoryTest extends TestCase
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    public function testGetDeltaVersionReturnsNull() : void
-    {
-        $this->markTestSkipped();
-        self::assertNull($this->migrationRepository->getDeltaVersion('00'));
-        self::assertNull($this->migrationRepository->getDeltaVersion('01'));
-    }
-
-    public function testGetVersions() : void
-    {
-        $this->markTestSkipped();
-        $version1 = $this->createMock(Version::class);
-        $version1->expects(self::once())
-            ->method('getVersion')
-            ->willReturn('01');
-
-        $version2 = $this->createMock(Version::class);
-        $version2->expects(self::once())
-            ->method('getVersion')
-            ->willReturn('02');
-
-        $versions = [
-            '01' => $version1,
-            '02' => $version2,
-        ];
-
-        $this->migrationRepository->addVersions($versions);
-
-        self::assertSame($versions, $this->migrationRepository->getVersions());
-
-        $this->migrationRepository->clearVersions();
-
-        self::assertEmpty($this->migrationRepository->getVersions());
-    }
-
-    public function testGetVersionData() : void
-    {
-        $this->markTestSkipped();
-        $version = $this->createMock(Version::class);
-
-        $this->configuration->expects(self::once())
-            ->method('connect');
-
-        $this->configuration->expects(self::once())
-            ->method('createMigrationTable');
-
-        $this->configuration->expects(self::exactly(2))
-            ->method('getQuotedMigrationsColumnName')
-            ->willReturn('version');
-
-        $this->configuration->expects(self::once())
-            ->method('getQuotedMigrationsExecutedAtColumnName')
-            ->willReturn('executed_at');
-
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsTableName')
-            ->willReturn('versions');
-
-        $versionData = [
-            'version' => '1234',
-            'executed_at' => '2018-05-16 11:14:40',
-        ];
-
-        $this->connection->expects(self::once())
-            ->method('fetchAssoc')
-            ->with('SELECT version, executed_at FROM versions WHERE version = ?')
-            ->willReturn($versionData);
-
-        self::assertSame($versionData, $this->migrationRepository->getVersionData($version));
-    }
-
-    public function testRegisterMigrationWithNonExistentClassCausesError() : void
-    {
-        $this->markTestSkipped();
-        $this->expectException(MigrationClassNotFound::class);
-
-//        $this->migrationRepository->registerMigration('123', DoesNotExistAtAll::class);
-    }
-
-    public function testRemoveMigrationVersionFromDatabase() : void
-    {
-        $this->markTestSkipped();
-        $migrationsTableName  = 'migration_versions';
-        $migrationsColumnName = 'version';
-        $version              = '123';
-
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsTableName')
-            ->willReturn($migrationsTableName);
-
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsColumnName')
-            ->willReturn($migrationsColumnName);
-
-        $this->connection->expects(self::once())
-            ->method('delete')
-            ->with($migrationsTableName, [$migrationsColumnName => $version])
-            ->willReturn(1);
-
-        $this->migrationRepository->removeMigrationVersionFromDatabase($version);
-    }
-
     public function testCheckNonExistentMigration()
     {
         self::assertFalse($this->migrationRepository->hasMigration('non_existent'));
@@ -158,9 +58,70 @@ class MigrationRepositoryTest extends TestCase
         self::assertInstanceOf(A::class, $migration->getMigration());
     }
 
+    public function testNoMigrationsInFolder()
+    {
+        $migrationRepository = new MigrationRepository(
+            [
+                'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__. '/NoMigrations'
+            ],
+            new RecursiveRegexFinder('#.*\\.php$#i'),
+            $this->versionFactory
+        );
+
+        $migrations = $migrationRepository->getMigrations();
+
+        self::assertCount(0, $migrations);
+    }
+
+    public function testCustomMigrationSorting()
+    {
+        $migrationRepository = new MigrationRepository(
+            [
+                'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__. '/Migrations'
+            ],
+            new RecursiveRegexFinder('#.*\\.php$#i'),
+            $this->versionFactory,
+            static function (AvailableMigration $m1, AvailableMigration $m2) {
+                return strcmp((string) $m1->getVersion(), (string) $m2->getVersion())*-1;
+            }
+        );
+
+        $migrations = $migrationRepository->getMigrations();
+
+        self::assertCount(3, $migrations);
+
+        // reverse order
+        self::assertSame(A::class, (string)$migrations->getItems()[2]->getVersion());
+        self::assertSame(B::class, (string)$migrations->getItems()[1]->getVersion());
+        self::assertSame(C::class, (string)$migrations->getItems()[0]->getVersion());
+    }
+
+    public function testLoadMigrationInstance()
+    {
+        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
+
+        $migrations = $this->migrationRepository->getMigrations();
+
+        self::assertCount(4, $migrations);
+        self::assertSame('Z', (string)$migrations->getItems()[3]->getVersion());
+    }
+
+    public function testDuplicateLoadMigrationInstance()
+    {
+        $this->expectException(DuplicateMigrationVersion::class);
+        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
+        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
+    }
 
     public function testFindMigrations()
     {
+        $this->versionFactory
+            ->expects($this->exactly(3))
+            ->method('createVersion')
+            ->willReturnCallback(function ($class){
+                return $this->createMock($class);
+            });
+
         $migrations = $this->migrationRepository->getMigrations();
 
         self::assertCount(3, $migrations);
@@ -176,11 +137,9 @@ class MigrationRepositoryTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration   = $this->createMock(Configuration::class);
-        $this->connection      = $this->createMock(Connection::class);
         $this->versionFactory  = $this->createMock(Factory::class);
         $this->versionFactory
-            ->expects($this->exactly(3))
+            ->expects($this->any())
             ->method('createVersion')
             ->willReturnCallback(function ($class){
                 return $this->createMock($class);
