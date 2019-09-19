@@ -15,7 +15,9 @@ use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -154,11 +156,24 @@ class DependencyFactory
         });
     }
 
+    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfigration)
+    {
+        $this->dependencies[MetadataStorageConfigration::class] = $metadataStorageConfigration;
+    }
+
+    private function getMetadataStorageConfiguration() : MetadataStorageConfigration
+    {
+        return $this->getDependency(MetadataStorageConfigration::class, function () : MetadataStorageConfigration {
+            return new TableMetadataStorageConfiguration();
+        });
+    }
+
     public function getMetadataStorage() : MetadataStorage
     {
         return $this->getDependency(TableMetadataStorage::class, function () : MetadataStorage {
             return new TableMetadataStorage(
-                $this->connection
+                $this->connection,
+                $this->getMetadataStorageConfiguration()
             );
         });
     }
@@ -232,7 +247,8 @@ class DependencyFactory
         return $this->getDependency(SqlGenerator::class, function () : SqlGenerator {
             return new SqlGenerator(
                 $this->configuration,
-                $this->connection->getDatabasePlatform()
+                $this->connection->getDatabasePlatform(),
+                $this->getMetadataStorageConfiguration()
             );
         });
     }

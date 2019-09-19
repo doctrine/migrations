@@ -34,11 +34,15 @@ class TableMetadataStorage implements MetadataStorage
     /** @var TableMetadataStorageConfiguration */
     private $configuration;
 
-    public function __construct(Connection $connection, ?TableMetadataStorageConfiguration $configuration = null)
+    public function __construct(Connection $connection, ?MetadataStorageConfigration $configuration = null)
     {
         $this->connection    = $connection;
         $this->schemaManager = $connection->getSchemaManager();
         $this->platform      = $connection->getDatabasePlatform();
+
+        if ($configuration!== null && !($configuration instanceof TableMetadataStorageConfiguration)){
+            throw new \InvalidArgumentException(sprintf('%s accepts only %s as configuration', __CLASS__, TableMetadataStorageConfiguration::class));
+        }
         $this->configuration = $configuration ?: new TableMetadataStorageConfiguration();
     }
 
@@ -93,6 +97,11 @@ class TableMetadataStorage implements MetadataStorage
         }
 
         return new ExecutedMigrationsSet($migrations);
+    }
+
+    public function reset() : void
+    {
+        $this->connection->delete($this->configuration->getTableName(), []);
     }
 
     public function complete(ExecutionResult $result) : void

@@ -17,14 +17,20 @@ use function is_array;
  *
  * @internal
  */
-class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
+final class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
 {
     /** @var string|null */
     private $filename;
 
-    public function __construct(?string $filename)
+    /**
+     * @var ConnectionLoaderInterface
+     */
+    private $fallback;
+
+    public function __construct(?string $filename, ConnectionLoaderInterface $fallback)
     {
         $this->filename = $filename;
+        $this->fallback = $fallback;
     }
 
     /**
@@ -33,14 +39,14 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
      *
      * @throws InvalidConfiguration
      */
-    public function chosen() : ?Connection
+    public function getConnection() : Connection
     {
         if ($this->filename === null) {
-            return null;
+            return $this->fallback->getConnection();
         }
 
         if (! file_exists($this->filename)) {
-            return null;
+            return $this->fallback->getConnection();
         }
 
         $params = include $this->filename;

@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Generator;
 
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Version\Direction;
 use function sprintf;
 
@@ -15,26 +14,18 @@ use function sprintf;
  *
  * @internal
  */
-final class FileBuilder
+final class FileBuilder implements FileBuilderInterface
 {
     /** @var AbstractPlatform */
     private $platform;
-
-    /** @var MetadataStorage */
-    private $metadataStorage;
-
-    public function __construct(
-        MetadataStorage $metadataStorage
-    ) {
-        $this->metadataStorage = $metadataStorage;
-    }
 
     /** @param string[][] $queriesByVersion */
     public function buildMigrationFile(
         array $queriesByVersion,
         string $direction,
-        DateTimeInterface $now
+        ?DateTimeInterface $now = null
     ) : string {
+        $now ?: new \DateTimeImmutable();
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
@@ -46,15 +37,16 @@ final class FileBuilder
                 $string .= $query . ";\n";
             }
 
-            // @todo this is missing
-            // $string .= $this->getVersionUpdateQuery($version, $direction);
+            $string .= $this->getVersionUpdateQuery($version, $direction);
         }
 
         return $string;
     }
 
+    // @todo this is hard to implement since MetadataStorage abstracts the migrations table
     private function getVersionUpdateQuery(string $version, string $direction) : string
     {
+        return '';
         if ($direction === Direction::DOWN) {
             return sprintf(
                 "DELETE FROM %s WHERE %s = '%s';\n",
