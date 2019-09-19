@@ -89,7 +89,7 @@ CODE
         $this->configuration = $this->createMock(Configuration::class);
         $this->platform      = $this->createMock(AbstractPlatform::class);
 
-        $this->metadataConfig = $this->createMock(TableMetadataStorageConfiguration::class);
+        $this->metadataConfig        = $this->createMock(TableMetadataStorageConfiguration::class);
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
             $this->platform,

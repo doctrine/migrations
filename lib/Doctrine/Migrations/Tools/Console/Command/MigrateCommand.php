@@ -6,10 +6,6 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
-use Doctrine\Migrations\Metadata\MigrationPlanList;
-use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorInterface;
-use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function getcwd;
+use function is_string;
 use function sprintf;
 use function substr;
 
@@ -29,7 +26,7 @@ class MigrateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:migrate';
 
-    protected function configure(): void
+    protected function configure() : void
     {
         $this
             ->setAliases(['migrate'])
@@ -115,53 +112,50 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): ?int
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $this->outputHeader($output);
 
-        $versionAlias = (string)$input->getArgument('version');
-        $path = $input->getOption('write-sql');
+        $versionAlias = (string) $input->getArgument('version');
+        $path         = $input->getOption('write-sql');
 
         try {
             $version = $this->dependencyFactory->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
         } catch (UnknownMigrationVersion $e) {
             $this->getVersionNameFromAlias($versionAlias, $output);
+
             return 1;
         }
-
 
         $repository = $this->dependencyFactory->getMigrationRepository();
 
         $availableMigrations = $repository->getMigrations();
 
-        $metadata = $this->dependencyFactory->getMetadataStorage();
-        $executedMigrations = $metadata->getExecutedMigrations();
+        $metadata                      = $this->dependencyFactory->getMetadataStorage();
+        $executedMigrations            = $metadata->getExecutedMigrations();
         $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
-
         if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
-
             return 3;
         }
 
         $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
-        $migratorConfiguration = $migratorConfigurationFactory->getMigratorConfiguration($input);
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanUntilVersion($version);
 
         if (count($plan) === 0) {
             $this->getVersionNameFromAlias($versionAlias, $output);
+
             return 0;
         }
 
         $migrator = $this->dependencyFactory->getMigrator();
         if ($path !== false) {
-
-
             $migratorConfiguration->setDryRun(true);
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
-            $path = is_string($path) ? $path : getcwd();
+            $path   = is_string($path) ? $path : getcwd();
             $writer = $this->dependencyFactory->getQueryWriter();
             $writer->write($path, $plan->getDirection(), $sql);
 
@@ -170,7 +164,7 @@ EOT
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
 
-        if (!$migratorConfiguration->isDryRun() && !$this->canExecute($question, $input, $output)) {
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 3;
@@ -185,8 +179,7 @@ EOT
         ExecutedMigrationsSet $executedUnavailableMigrations,
         InputInterface $input,
         OutputInterface $output
-    ): bool {
-
+    ) : bool {
         if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
@@ -203,7 +196,7 @@ EOT
 
             $question = 'Are you sure you wish to continue? (y/n)';
 
-            if (!$this->canExecute($question, $input, $output)) {
+            if (! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
                 return false;
@@ -216,15 +209,15 @@ EOT
     private function getVersionNameFromAlias(
         string $versionAlias,
         OutputInterface $output
-    ): void {
+    ) : void {
         switch (true) {
             case $versionAlias === 'first':
                 $output->writeln('<error>Already at first version.</error>');
                 break;
-            case ($versionAlias === 'next' || $versionAlias === 'latest'):
+            case $versionAlias === 'next' || $versionAlias === 'latest':
                 $output->writeln('<error>Already at latest version.</error>');
                 break;
-            case substr($versionAlias, 0, 7) === 'current' :
+            case substr($versionAlias, 0, 7) === 'current':
                 $output->writeln('<error>The delta couldn\'t be reached.</error>');
                 break;
             default:

@@ -12,6 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sys_get_temp_dir;
 
 final class GenerateCommandTest extends TestCase
 {
@@ -70,11 +71,11 @@ final class GenerateCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration      = $this->createMock(Configuration::class);
+        $this->configuration = $this->createMock(Configuration::class);
         $this->configuration->expects(self::any())
             ->method('getMigrationDirectories')
             ->willReturn([
-                'FooNs' => sys_get_temp_dir()
+                'FooNs' => sys_get_temp_dir(),
             ]);
 
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
@@ -87,7 +88,6 @@ final class GenerateCommandTest extends TestCase
         $this->dependencyFactory->expects(self::once())
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
-
 
         $this->generateCommand = $this->getMockBuilder(GenerateCommand::class)
             ->setConstructorArgs([null, $this->dependencyFactory])

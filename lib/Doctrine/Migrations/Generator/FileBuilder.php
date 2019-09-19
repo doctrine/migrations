@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Generator;
 
+use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Version\Direction;
@@ -25,7 +26,7 @@ final class FileBuilder implements FileBuilderInterface
         string $direction,
         ?DateTimeInterface $now = null
     ) : string {
-        $now ?: new \DateTimeImmutable();
+        $now ?: new DateTimeImmutable();
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
@@ -47,6 +48,7 @@ final class FileBuilder implements FileBuilderInterface
     private function getVersionUpdateQuery(string $version, string $direction) : string
     {
         return '';
+
         if ($direction === Direction::DOWN) {
             return sprintf(
                 "DELETE FROM %s WHERE %s = '%s';\n",

@@ -55,6 +55,6 @@ final class RollupCommandTest extends TestCase
             ->method('getRollup')
             ->willReturn($this->rollup);
 
-        $this->rollupCommand  = new RollupCommand(null, $this->dependencyFactory);
+        $this->rollupCommand = new RollupCommand(null, $this->dependencyFactory);
     }
 }

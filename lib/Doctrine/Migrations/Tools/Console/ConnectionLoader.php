@@ -22,7 +22,6 @@ class ConnectionLoader
         InputInterface $input,
         HelperSet $helperSet
     ) : Connection {
-
         $loader = new ArrayConnectionConfigurationLoader(
             $input->getOption('db-configuration'),
             new ArrayConnectionConfigurationLoader(

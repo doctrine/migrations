@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\RollupFailed;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use function count;
-use function current;
-use function sprintf;
 
 /**
  * The Rollup class is responsible for deleting all previously executed migrations from the versions table
@@ -25,9 +21,7 @@ class Rollup
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    /**
-     * @var MetadataStorage
-     */
+    /** @var MetadataStorage */
     private $metadataStorage;
 
     public function __construct(
@@ -35,13 +29,13 @@ class Rollup
         MigrationRepository $migrationRepository
     ) {
         $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage = $metadataStorage;
+        $this->metadataStorage     = $metadataStorage;
     }
 
     /**
      * @throws RollupFailed
      */
-    public function rollup(): Version
+    public function rollup() : Version
     {
         $versions = $this->migrationRepository->getMigrations();
 

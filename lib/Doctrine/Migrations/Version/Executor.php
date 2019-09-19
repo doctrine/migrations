@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use DateTime;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -120,7 +121,7 @@ final class Executor implements ExecutorInterface
         MigrationPlan $plan,
         MigratorConfiguration $configuration
     ) : ExecutionResult {
-        $result = new ExecutionResult($plan->getVersion(), $plan->getDirection());
+        $result = new ExecutionResult($plan->getVersion(), $plan->getDirection(), new DateTime());
 
         $this->startMigration($plan, $configuration);
 

@@ -5,48 +5,36 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
-use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
-use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
-
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use function count;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
-    /**
-     * @var MigrationPlanCalculator
-     */
+    /** @var MigrationPlanCalculator */
     private $migrationPlanCalculator;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MigrationRepository
-     */
+    /** @var MockObject|MigrationRepository */
     private $migrationRepository;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|MetadataStorage
-     */
+    /** @var MockObject|MetadataStorage */
     private $metadataStorage;
 
-    /**
-     * @var \PHPUnit\Framework\MockObject\MockObject|AbstractMigration
-     */
+    /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
 //        $configuration = new Configuration();
 //        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
@@ -58,12 +46,12 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
 
-        $this->migrationRepository = $this->createMock(MigrationRepository::class);
-        $this->metadataStorage = $this->createMock(MetadataStorage::class);
+        $this->migrationRepository     = $this->createMock(MigrationRepository::class);
+        $this->metadataStorage         = $this->createMock(MetadataStorage::class);
         $this->migrationPlanCalculator = new MigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
     }
 
-    public function testPlanForExactVersionWhenNoMigrations(): void
+    public function testPlanForExactVersionWhenNoMigrations() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -74,7 +62,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationRepository
             ->expects($this->any())
             ->method('getMigration')
-            ->willReturnCallback(function (Version $version) use ($migrationList) {
+            ->willReturnCallback(static function (Version $version) use ($migrationList) {
                 return $migrationList->getMigration($version);
             });
 
@@ -90,7 +78,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /**
      * @dataProvider getPlanUpWhenNoMigrations
      */
-    public function testPlanWhenNoMigrations(?string $to, array $expectedPlan, string $direction): void
+    public function testPlanWhenNoMigrations(?string $to, array $expectedPlan, string $direction) : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -134,7 +122,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /**
      * @dataProvider getPlanUpWhenMigrations
      */
-    public function testPlanWhenMigrations(?string $to, array $expectedPlan, ?string $direction): void
+    public function testPlanWhenMigrations(?string $to, array $expectedPlan, ?string $direction) : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -168,7 +156,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    public function testNoAvailableMigrations()
+    public function testNoAvailableMigrations() : void
     {
         $this->expectException(NoMigrationsToExecute::class);
         $e1 = new ExecutedMigration(new Version('A'));

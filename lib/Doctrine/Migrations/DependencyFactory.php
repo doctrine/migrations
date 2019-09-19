@@ -31,7 +31,6 @@ use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -59,9 +58,7 @@ class DependencyFactory
     /** @var callable */
     private $sorter;
 
-    /**
-     * @var EntityManagerInterface|null
-     */
+    /** @var EntityManagerInterface|null */
     private $em;
 
     public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
@@ -69,7 +66,7 @@ class DependencyFactory
         $this->configuration = $configuration;
         $this->logger        = $logger ?: new NullLogger();
         $this->connection    = $connection;
-        $this->em = $em;
+        $this->em            = $em;
     }
 
     public function getConfiguration() : Configuration
@@ -105,7 +102,7 @@ class DependencyFactory
         });
     }
 
-    private function getSchemaProvider(): SchemaProviderInterface
+    private function getSchemaProvider() : SchemaProviderInterface
     {
         return $this->getDependency(SchemaProviderInterface::class, function () : SchemaProviderInterface {
             return new OrmSchemaProvider($this->em);
@@ -125,6 +122,7 @@ class DependencyFactory
             );
         });
     }
+
     public function getSchemaDiffProvider() : SchemaDiffProviderInterface
     {
         return $this->getDependency(SchemaDiffProviderInterface::class, function () : LazySchemaDiffProvider {
@@ -139,7 +137,7 @@ class DependencyFactory
 
     public function getFileBuilder() : FileBuilder
     {
-        return $this->getDependency(FileBuilder::class, function () : FileBuilder {
+        return $this->getDependency(FileBuilder::class, static function () : FileBuilder {
             return new FileBuilder();
         });
     }
@@ -191,14 +189,14 @@ class DependencyFactory
         });
     }
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfigration)
+    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfigration) : void
     {
         $this->dependencies[MetadataStorageConfigration::class] = $metadataStorageConfigration;
     }
 
     private function getMetadataStorageConfiguration() : MetadataStorageConfigration
     {
-        return $this->getDependency(MetadataStorageConfigration::class, function () : MetadataStorageConfigration {
+        return $this->getDependency(MetadataStorageConfigration::class, static function () : MetadataStorageConfigration {
             return new TableMetadataStorageConfiguration();
         });
     }

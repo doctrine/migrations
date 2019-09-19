@@ -4,28 +4,23 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
-use Doctrine\Migrations\Version\AliasResolver;
-use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
+use function strpos;
 
 class MigrateCommandTest extends MigrationTestCase
 {
@@ -41,47 +36,36 @@ class MigrateCommandTest extends MigrationTestCase
     /** @var MigrateCommand|MockObject */
     private $migrateCommand;
 
-    /**
-     * @var CommandTester
-     */
+    /** @var CommandTester */
     private $migrateCommandTester;
 
-    /**
-     * @var \Doctrine\Migrations\Metadata\Storage\MetadataStorage
-     */
+    /** @var MetadataStorage */
     private $storage;
 
-    /**
-     * @var MockObject
-     */
+    /** @var MockObject */
     private $queryWriter;
 
-    public function testExecuteAlreadyAtFirstVersion(): void
+    public function testExecuteAlreadyAtFirstVersion() : void
     {
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            [
-                'version' => 'first',
-            ],
+            ['version' => 'first'],
             ['interactive' => false]
         );
-
 
         self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Already at first version.') !== false);
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteAlreadyAtLatestVersion(): void
+    public function testExecuteAlreadyAtLatestVersion() : void
     {
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            [
-                'version' => 'latest',
-            ],
+            ['version' => 'latest'],
             ['interactive' => false]
         );
 
@@ -89,16 +73,13 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-
-    public function testExecuteTheDeltaCouldNotBeReached(): void
+    public function testExecuteTheDeltaCouldNotBeReached() : void
     {
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            [
-                'version' => 'current+1',
-            ],
+            ['version' => 'current+1'],
             ['interactive' => false]
         );
 
@@ -106,12 +87,10 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteUnknownVersion(): void
+    public function testExecuteUnknownVersion() : void
     {
         $this->migrateCommandTester->execute(
-            [
-                'version' => 'unknown',
-            ],
+            ['version' => 'unknown'],
             ['interactive' => false]
         );
 
@@ -119,7 +98,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecutedUnavailableMigrationsCancel(): void
+    public function testExecutedUnavailableMigrationsCancel() : void
     {
         $result = new ExecutionResult(new Version('345'));
         $this->storage->complete($result);
@@ -138,9 +117,7 @@ class MigrateCommandTest extends MigrationTestCase
             ->with('Are you sure you wish to continue? (y/n)')
             ->willReturn(false);
 
-        $this->migrateCommandTester->execute([
-            'version' => 'prev',
-        ]);
+        $this->migrateCommandTester->execute(['version' => 'prev']);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
@@ -148,7 +125,7 @@ class MigrateCommandTest extends MigrationTestCase
     /**
      * @dataProvider getWriteSqlValues
      */
-    public function testExecuteWriteSql($arg, $path): void
+    public function testExecuteWriteSql($arg, $path) : void
     {
         $migrator = $this->createMock(Migrator::class);
 
@@ -158,7 +135,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 return ['A'];
             });
 
@@ -167,9 +144,7 @@ class MigrateCommandTest extends MigrationTestCase
             ->with($path, 'up', ['A']);
 
         $this->migrateCommandTester->execute(
-            [
-                '--write-sql' => $arg
-            ],
+            ['--write-sql' => $arg],
             ['interactive' => false]
         );
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
@@ -183,7 +158,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    public function testExecuteMigrate(): void
+    public function testExecuteMigrate() : void
     {
         $migrator = $this->createMock(Migrator::class);
 
@@ -195,12 +170,12 @@ class MigrateCommandTest extends MigrationTestCase
             ->method('canExecute')
             ->willReturn(true);
 
-
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 self::assertCount(1, $planList);
                 self::assertEquals(new Version('A'), $planList->getFirst()->getVersion());
+
                 return ['A'];
             });
 
@@ -209,7 +184,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteMigrateAllOrNothing(): void
+    public function testExecuteMigrateAllOrNothing() : void
     {
         $migrator = $this->createMock(Migrator::class);
 
@@ -219,9 +194,10 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 self::assertTrue($configuration->isAllOrNothing());
                 self::assertCount(1, $planList);
+
                 return ['A'];
             });
 
@@ -230,16 +206,14 @@ class MigrateCommandTest extends MigrationTestCase
             ->willReturn(true);
 
         $this->migrateCommandTester->execute(
-            [
-                '--all-or-nothing' => true
-            ],
+            ['--all-or-nothing' => true],
             ['interactive' => false]
         );
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
+    public function testExecuteMigrateCancelExecutedUnavailableMigrations() : void
     {
         $result = new ExecutionResult(new Version('345'));
         $this->storage->complete($result);
@@ -263,14 +237,12 @@ class MigrateCommandTest extends MigrationTestCase
             ->with('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)')
             ->willReturn(false);
 
-        $this->migrateCommandTester->execute([
-            'version' => 'latest',
-        ]);
+        $this->migrateCommandTester->execute(['version' => 'latest']);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteMigrateCancel(): void
+    public function testExecuteMigrateCancel() : void
     {
         $migrator = $this->createMock(Migrator::class);
 
@@ -286,30 +258,25 @@ class MigrateCommandTest extends MigrationTestCase
             ->with('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)')
             ->willReturn(false);
 
-        $this->migrateCommandTester->execute([
-            'version' => 'latest',
-        ]);
+        $this->migrateCommandTester->execute(['version' => 'latest']);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
 
-    protected function setUp(): void
+    protected function setUp() : void
     {
         $this->configuration = $this->createMock(Configuration::class);
-        $connection = $this->getSqliteConnection();
-
+        $connection          = $this->getSqliteConnection();
 
         $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->setConstructorArgs([$this->configuration, $connection])
             ->setMethods(['getMigrator', 'getQueryWriter'])
             ->getMock();
 
-
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->expects(self::any())
             ->method('getQueryWriter')
             ->willReturn($this->queryWriter);
-
 
         $migration = $this->createMock(AbstractMigration::class);
 

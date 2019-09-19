@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Migrations\Version;
 
 /**
@@ -22,5 +24,5 @@ interface AliasResolverInterface
      *
      * If an existing version number is specified, it is returned verbatimly.
      */
-    public function resolveVersionAlias(string $alias): Version;
+    public function resolveVersionAlias(string $alias) : Version;
 }

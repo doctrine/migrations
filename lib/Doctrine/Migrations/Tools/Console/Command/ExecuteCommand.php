@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
+use function is_string;
 
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.

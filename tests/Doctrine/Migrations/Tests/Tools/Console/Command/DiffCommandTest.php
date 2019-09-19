@@ -12,6 +12,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sys_get_temp_dir;
 
 final class DiffCommandTest extends TestCase
 {
@@ -24,9 +25,7 @@ final class DiffCommandTest extends TestCase
     /** @var DiffCommand|MockObject */
     private $diffCommand;
 
-    /**
-     * @var MockObject
-     */
+    /** @var MockObject */
     private $dependencyFactory;
 
     public function testExecute() : void
@@ -101,10 +100,10 @@ final class DiffCommandTest extends TestCase
         $this->configuration->expects(self::any())
             ->method('getMigrationDirectories')
             ->willReturn([
-                'FooNs' => sys_get_temp_dir()
+                'FooNs' => sys_get_temp_dir(),
             ]);
 
-        $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
+        $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getConfiguration')
@@ -114,11 +113,9 @@ final class DiffCommandTest extends TestCase
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 
-
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setConstructorArgs([null,  $this->dependencyFactory])
+            ->setConstructorArgs([null, $this->dependencyFactory])
             ->setMethods(['procOpen'])
             ->getMock();
-
     }
 }

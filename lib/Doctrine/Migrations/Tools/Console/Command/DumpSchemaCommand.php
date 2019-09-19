@@ -95,12 +95,12 @@ EOT
         $configuration = $this->dependencyFactory->getConfiguration();
         $versionNumber = $configuration->generateVersionNumber();
 
-        if (!($namespace = $input->getOption('namespace'))) {
+        if (! ($namespace = $input->getOption('namespace'))) {
             $dirs      = $configuration->getMigrationDirectories();
             $namespace = key($dirs);
         }
 
-        $path      = $schemaDumper->dump(
+        $path = $schemaDumper->dump(
             $versionNumber,
             $namespace,
             $formatted,

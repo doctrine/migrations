@@ -11,12 +11,12 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
-use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sys_get_temp_dir;
 
 final class DumpSchemaCommandTest extends TestCase
 {
@@ -106,12 +106,12 @@ final class DumpSchemaCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration       = $this->createMock(Configuration::class);
+        $this->configuration = $this->createMock(Configuration::class);
 
         $this->configuration->expects(self::any())
             ->method('getMigrationDirectories')
             ->willReturn([
-                'FooNs' => sys_get_temp_dir()
+                'FooNs' => sys_get_temp_dir(),
             ]);
 
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
@@ -131,6 +131,5 @@ final class DumpSchemaCommandTest extends TestCase
             ->willReturn($this->migrationRepository);
 
         $this->dumpSchemaCommand = new DumpSchemaCommand(null, $this->dependencyFactory);
-
     }
 }
