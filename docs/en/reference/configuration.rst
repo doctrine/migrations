@@ -25,12 +25,20 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
         return [
             'name' => 'My Project Migrations',
-            'migrations_namespace' => 'MyProject\Migrations',
-            'table_name' => 'doctrine_migration_versions',
-            'column_name' => 'version',
-            'column_length' => 14,
-            'executed_at_column_name' => 'executed_at',
-            'migrations_directory' => '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations',
+
+            'table_storage' => [
+                'table_name' => 'doctrine_migration_versions',
+                'version_column_name' => 'version',
+                'version_column_length' => 2048,
+                'executed_at_column_name' => 'executed_at',
+                'execution_time_column_name' => 'execution_time',
+            ],
+
+            'migrations_paths' => [
+                'MyProject\Migrations' => '/data/doctrine/migrations/lib/MyProject/Migrations',
+                'MyProject\Component\Migrations' => './Component/MyProject/Migrations',
+            ],
+
             'all_or_nothing' => true,
             'check_database_platform' => true,
         ];
@@ -38,30 +46,44 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
     .. code-block:: yaml
 
         name: "My Project Migrations"
-        migrations_namespace: "MyProject\Migrations"
-        table_name: "doctrine_migration_versions"
-        column_name: "version"
-        column_length: 14
-        executed_at_column_name: "executed_at"
-        migrations_directory: "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations"
+
+        table_storage:
+           table_name: doctrine_migration_versions
+           version_column_name: version
+           version_column_length: 2048
+           executed_at_column_name: executed_at
+           execution_time_column_name: execution_time
+
+        migrations_paths:
+           'MyProject\Migrations': /data/doctrine/migrations/lib/MyProject/Migrations
+           'MyProject\Component\Migrations': ./Component/MyProject/Migrations
+
         all_or_nothing: true
         check_database_platform: true
 
     .. code-block:: xml
 
         <?xml version="1.0" encoding="UTF-8"?>
-        <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
+        <doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration/3.0"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-              xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
-                            http://doctrine-project.org/schemas/migrations/configuration.xsd">
+              xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration/3.0
+                            http://doctrine-project.org/schemas/migrations/configuration-3.0.xsd">
 
             <name>My Project Migrations</name>
 
-            <migrations-namespace>MyProject\Migrations</migrations-namespace>
-
-            <table name="doctrine_migration_versions" column="version" column_length="14" executed_at_column="executed_at" />
-
-            <migrations-directory>/data/doctrine/migrations-docs-example/lib/MyProject/Migrations</migrations-directory>
+            <storage>
+                <table-storage
+                        table-name="doctrine_migration_versions"
+                        version-column-name="version"
+                        version-column-length="2048"
+                        executed-at-column-name="executed_at"
+                        execution-time-column-name="execution_time"
+                />
+            </storage>
+            <migrations-paths>
+                <path namespace="MyProject\Migrations">/data/doctrine/migrations/lib/MyProject/Migrations</path>
+                <path namespace="MyProject\Component\Migrations">./Component/MyProject/Migrations</path>
+            </migrations-paths>
 
             <all-or-nothing>true</all-or-nothing>
 
@@ -72,12 +94,21 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
         {
             "name": "My Project Migrations",
-            "migrations_namespace": "MyProject\Migrations",
-            "table_name": "doctrine_migration_versions",
-            "column_name": "version",
-            "column_length": 14,
-            "executed_at_column_name": "executed_at",
-            "migrations_directory": "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations",
+            "name": "My Project Migrations"
+
+            "table_storage": {
+               "table_name: "doctrine_migration_versions",
+               "version_column_name": "version",
+               "version_column_length": 2048,
+               "executed_at_column_name": "executed_at",
+               "execution_time_column_name": "execution_time",
+            },
+
+            "migrations_paths": {
+               "MyProject\Migrations": "/data/doctrine/migrations/lib/MyProject/Migrations",
+               "MyProject\Component\Migrations": "./Component/MyProject/Migrations"
+            },
+
             "all_or_nothing": true,
             "check_database_platform": true
         }
@@ -95,17 +126,17 @@ Here are details about what each configuration option does:
 +============================+============+==============================+==================================================================================+
 | name                       | no         | Doctrine Database Migrations | The name that shows at the top of the migrations console application.            |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| migrations_namespace       | yes        | null                         | The PHP namespace your migration classes are located under.                      |
+| migrations_paths<string, string>       | yes        | null                         | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_name                 | no         | doctrine_migration_versions  | The name of the table to track executed migrations in.                           |
+| table_storage.table_name                 | no         | doctrine_migration_versions  | The name of the table to track executed migrations in.                           |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| column_name                | no         | version                      | The name of the column which stores the version name.                            |
+| table_storage.version_column_name                | no         | version                      | The name of the column which stores the version name.                            |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| column_length              | no         | 14                           | The length of the column which stores the version name.                          |
+| table_storage.version_column_length              | no         | 2048                           | The length of the column which stores the version name.                          |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
+| table_storage.executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| migrations_directory       | yes        | null                         | The path to a directory where to look for migration classes.                     |
+| table_storage.execution_time_column_name    | no         | executed_at                  | The name of the column which stores how long a migration took (milliseconds).      |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | all_or_nothing             | no         | false                        | Whether or not to wrap multiple migrations in a single transaction.              |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
@@ -130,10 +161,7 @@ classes using the ``migrations`` configuration setting:
             // ..
 
             'migrations' => [
-                'migration1' => [
-                    'version' => '1',
-                    'class' => 'MyProject\Migrations\NewMigration',
-                ],
+                'MyProject\Migrations\NewMigration',
             ],
         ];
 
@@ -142,9 +170,7 @@ classes using the ``migrations`` configuration setting:
         // ...
 
         migrations:
-            migration1:
-                version: "1"
-                class: "MyProject\Migrations\NewMigration"
+            - "MyProject\Migrations\NewMigration"
 
     .. code-block:: xml
 
@@ -157,7 +183,7 @@ classes using the ``migrations`` configuration setting:
             // ...
 
             <migrations>
-                <migration class="MyProject\Migrations\NewMigration" version="1" />
+                <migration class="MyProject\Migrations\NewMigration" />
             </migrations>
         </doctrine-migrations>
 
@@ -166,13 +192,9 @@ classes using the ``migrations`` configuration setting:
         {
             // ...
 
-            "migrations": {
-                    "migration1": {
-                        "version": 1,
-                        "class": "DoctrineMigrations\NewMigration"
-                    }
-                }
-            }
+            "migrations": [
+                "DoctrineMigrations\NewMigration"
+            ]
         }
 
 All or Nothing Transaction
