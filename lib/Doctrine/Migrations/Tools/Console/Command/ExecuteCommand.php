@@ -108,7 +108,7 @@ EOT
             $migratorConfiguration->setDryRun(true);
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
-            $path = $path ?? getcwd();
+            $path = is_string($path) ? $path : getcwd();
 
             $writer = $this->dependencyFactory->getQueryWriter();
             $writer->write($path, $direction, $sql);

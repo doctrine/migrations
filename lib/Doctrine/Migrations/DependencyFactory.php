@@ -87,7 +87,7 @@ class DependencyFactory
         return $this->getDependency(EventDispatcher::class, function () : EventDispatcher {
             return new EventDispatcher(
                 $this->connection,
-                $this->configuration,
+                $this->getConfiguration(),
                 $this->connection->getEventManager()
             );
         });
@@ -159,7 +159,7 @@ class DependencyFactory
 
         // todo move this to DI
 
-        if (! ($finder instanceof MigrationDeepFinder) && ($this->configuration->areMigrationsOrganizedByYear() || $this->configuration->areMigrationsOrganizedByYearAndMonth())) {
+        if (! ($finder instanceof MigrationDeepFinder) && ($this->getConfiguration()->areMigrationsOrganizedByYear() || $this->getConfiguration()->areMigrationsOrganizedByYearAndMonth())) {
             throw ParameterIncompatibleWithFinder::new(
                 'organize-migrations',
                 $finder
@@ -183,7 +183,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
             return new MigrationRepository(
-                $this->configuration->getMigrationDirectories(),
+                $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
                 new Factory($this->getConnection(), $this->getVersionExecutor(), $this->getLogger()),
                 $this->sorter
@@ -238,9 +238,9 @@ class DependencyFactory
         });
     }
 
-    public function getQueryWriter() : FileQueryWriter
+    public function getQueryWriter() : QueryWriter
     {
-        return $this->getDependency(FileQueryWriter::class, function () : FileQueryWriter {
+        return $this->getDependency(QueryWriter::class, function () : QueryWriter {
             return new FileQueryWriter(
                 $this->getFileBuilder(),
                 $this->logger
@@ -278,7 +278,7 @@ class DependencyFactory
     public function getMigrationGenerator() : Generator
     {
         return $this->getDependency(Generator::class, function () : Generator {
-            return new Generator($this->configuration);
+            return new Generator($this->getConfiguration());
         });
     }
 
@@ -286,7 +286,7 @@ class DependencyFactory
     {
         return $this->getDependency(SqlGenerator::class, function () : SqlGenerator {
             return new SqlGenerator(
-                $this->configuration,
+                $this->getConfiguration(),
                 $this->connection->getDatabasePlatform(),
                 $this->getMetadataStorageConfiguration()
             );
@@ -297,7 +297,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigratorConfigurationFactoryInterface::class, function () : MigratorConfigurationFactoryInterface {
             return new MigratorConfigurationFactory(
-                $this->configuration
+                $this->getConfiguration()
             );
         });
     }
@@ -306,16 +306,16 @@ class DependencyFactory
     {
         return $this->getDependency(MigrationStatusInfosHelper::class, function () : MigrationStatusInfosHelper {
             return new MigrationStatusInfosHelper(
-                $this->configuration,
+                $this->getConfiguration(),
                 $this->connection,
                 $this->getVersionAliasResolver()
             );
         });
     }
 
-    public function getMigrator() : Migrator
+    public function getMigrator() : MigratorInterface
     {
-        return $this->getDependency(Migrator::class, function () : Migrator {
+        return $this->getDependency(MigratorInterface::class, function () : MigratorInterface {
             return new Migrator(
                 $this->connection,
                 $this->getEventDispatcher(),
