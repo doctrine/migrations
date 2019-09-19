@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -47,34 +48,30 @@ final class MigrationPlanCalculator
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
-        $toExecute = [];
         if ($to === null) {
-            $direction = Direction::UP;
-            foreach ($availableMigrations->getItems() as $availableMigration) {
-                if ($executedMigrations->hasMigration($availableMigration->getVersion())) {
-                    continue;
-                }
+            if ($availableMigrations->getLast()===null) {
+                throw NoMigrationsToExecute::new();
+            }
+            $to = $availableMigrations->getLast()->getVersion();
+        }
 
+        $direction = $to == new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
+        $toExecute = [];
+        $migrationsToCheck = $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
+        foreach ($migrationsToCheck as $availableMigration) {
+
+            if ($direction === Direction::DOWN && $availableMigration->getVersion() == $to) {
+                break;
+            }
+
+            if ($direction === Direction::UP && ! $executedMigrations->hasMigration($availableMigration->getVersion())) {
+                $toExecute[] = $availableMigration;
+            } elseif ($direction === Direction::DOWN && $executedMigrations->hasMigration($availableMigration->getVersion())) {
                 $toExecute[] = $availableMigration;
             }
-        } else {
-            $direction = $to == new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
 
-            foreach ($direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems()) as $availableMigration) {
-
-                if ($direction === Direction::DOWN && $availableMigration->getVersion() == $to) {
-                    break;
-                }
-
-                if ($direction === Direction::UP && ! $executedMigrations->hasMigration($availableMigration->getVersion())) {
-                    $toExecute[] = $availableMigration;
-                } elseif ($direction === Direction::DOWN && $executedMigrations->hasMigration($availableMigration->getVersion())) {
-                    $toExecute[] = $availableMigration;
-                }
-
-                if ($direction === Direction::UP && $availableMigration->getVersion() == $to) {
-                    break;
-                }
+            if ($direction === Direction::UP && $availableMigration->getVersion() == $to) {
+                break;
             }
         }
 
