@@ -88,7 +88,7 @@ abstract class AbstractCommand extends Command
                 ->getConnection($input, $this->getHelperSet());
 
             $logger                  = new ConsoleLogger($output);
-            $this->dependencyFactory = new DependencyFactory($configuration, $connection, $logger);
+            $this->dependencyFactory = new DependencyFactory($configuration, $connection, null, $logger);
         }
 
         return $this->dependencyFactory;
