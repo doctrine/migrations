@@ -7,6 +7,8 @@ namespace Doctrine\Migrations;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\RollupFailed;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use function count;
 use function current;
@@ -17,36 +19,31 @@ use function sprintf;
  * and marking the freshly dumped schema migration (that was created with SchemaDumper) as migrated.
  *
  * @internal
- *
- * @see Doctrine\Migrations\SchemaDumper
  */
 class Rollup
 {
-    /** @var Configuration */
-    private $configuration;
-
-    /** @var Connection */
-    private $connection;
-
     /** @var MigrationRepository */
     private $migrationRepository;
 
+    /**
+     * @var MetadataStorage
+     */
+    private $metadataStorage;
+
     public function __construct(
-        Configuration $configuration,
-        Connection $connection,
+        MetadataStorage $metadataStorage,
         MigrationRepository $migrationRepository
     ) {
-        $this->configuration       = $configuration;
-        $this->connection          = $connection;
         $this->migrationRepository = $migrationRepository;
+        $this->metadataStorage = $metadataStorage;
     }
 
     /**
      * @throws RollupFailed
      */
-    public function rollup() : Version
+    public function rollup(): Version
     {
-        $versions = $this->migrationRepository->getVersions();
+        $versions = $this->migrationRepository->getMigrations();
 
         if (count($versions) === 0) {
             throw RollupFailed::noMigrationsFound();
@@ -56,17 +53,11 @@ class Rollup
             throw RollupFailed::tooManyMigrations();
         }
 
-        $sql = sprintf(
-            'DELETE FROM %s',
-            $this->configuration->getMigrationsTableName()
-        );
+        $this->metadataStorage->reset();
 
-        $this->connection->executeQuery($sql);
+        $result = new ExecutionResult($versions->getFirst()->getVersion());
+        $this->metadataStorage->complete($result);
 
-        $version = current($versions);
-
-        $version->markMigrated();
-
-        return $version;
+        return $result->getVersion();
     }
 }
