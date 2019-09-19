@@ -28,20 +28,13 @@ class MigrationsVersionEventArgs extends EventArgs
     private $migratorConfiguration;
 
     public function __construct(
-        Configuration $configuration,
         Connection $connection,
         MigrationPlan $plan,
         MigratorConfiguration $migratorConfiguration
     ) {
-        $this->configuration         = $configuration;
         $this->connection            = $connection;
         $this->plan                  = $plan;
         $this->migratorConfiguration = $migratorConfiguration;
-    }
-
-    public function getConfiguration() : Configuration
-    {
-        return $this->configuration;
     }
 
     public function getConnection() : Connection

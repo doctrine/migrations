@@ -357,7 +357,7 @@ class ExecutorTest extends TestCase
         $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
 
         $this->eventManager    = new EventManager();
-        $this->eventDispatcher = new EventDispatcher($this->connection, $this->configuration, $this->eventManager);
+        $this->eventDispatcher = new EventDispatcher($this->connection, $this->eventManager);
 
         $this->stopwatch = $this->createMock(Stopwatch::class);
         $this->logger    = new TestLogger();
@@ -428,6 +428,7 @@ class VersionExecutorTestMigration extends AbstractMigration
     public function preUp(Schema $fromSchema) : void
     {
         $this->preUpExecuted = true;
+        parent::preUp($fromSchema);
     }
 
     public function up(Schema $schema) : void
@@ -442,21 +443,26 @@ class VersionExecutorTestMigration extends AbstractMigration
     public function postUp(Schema $toSchema) : void
     {
         $this->postUpExecuted = true;
+        parent::postUp($toSchema);
     }
 
     public function preDown(Schema $fromSchema) : void
     {
         $this->preDownExecuted = true;
+        parent::preDown($fromSchema);
     }
 
     public function down(Schema $schema) : void
     {
         $this->addSql('SELECT 3', [5], [7]);
         $this->addSql('SELECT 4', [6], [8]);
+        parent::down($schema);
     }
 
     public function postDown(Schema $toSchema) : void
     {
         $this->postDownExecuted = true;
+        parent::postDown($toSchema);
     }
 }
+

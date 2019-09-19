@@ -113,7 +113,7 @@ class MigratorTest extends MigrationTestCase
     public function testMigrateWithNoMigrationsThrowsException() : void
     {
         $this->markTestSkipped();
-        $migration = $this->createTestMigrator($this->config);
+        $migration = $this->createTestMigrator();
 
         $this->expectException(MigrationException::class);
         $this->expectExceptionMessage('Could not find any migrations to execute.');
@@ -124,7 +124,7 @@ class MigratorTest extends MigrationTestCase
     public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption() : void
     {
         $this->markTestSkipped();
-        $migrator = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
 
         $this->migratorConfiguration->setNoMigrationException(true);
 
@@ -142,7 +142,7 @@ class MigratorTest extends MigrationTestCase
 
         $this->config->getOutputWriter()->setCallback($callback);
 
-        $migrator = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setNoMigrationException(true);
@@ -266,7 +266,7 @@ class MigratorTest extends MigrationTestCase
 
     public function testEmptyPlanShowsMessage() : void
     {
-        $migrator = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
 
         $planList = new MigrationPlanList([], Direction::UP);
         $migrator->migrate($planList, $this->migratorConfiguration);
@@ -275,10 +275,10 @@ class MigratorTest extends MigrationTestCase
         self::assertContains('No migrations', $this->logger->logs[0]);
     }
 
-    protected function createTestMigrator(Configuration $config) : Migrator
+    protected function createTestMigrator() : Migrator
     {
         $eventManager    = new EventManager();
-        $eventDispatcher = new EventDispatcher($this->conn, $config, $eventManager);
+        $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
         $this->executor  = $this->createMock(ExecutorInterface::class);
 
         $this->logger = new TestLogger();
@@ -293,7 +293,7 @@ class MigratorTest extends MigrationTestCase
     {
         $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
 
-        $migrator = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
         $this->migratorConfiguration->setAllOrNothing(true);
 
         $migration = new MigrateNotTouchingTheSchema($this->executor, $this->conn, $this->logger);
@@ -313,7 +313,7 @@ class MigratorTest extends MigrationTestCase
             ->expects($this->once())
             ->method('rollback');
 
-        $migrator = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
 
         $this->executor
             ->expects($this->any())
