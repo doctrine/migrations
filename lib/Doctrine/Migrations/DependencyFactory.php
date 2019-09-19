@@ -11,6 +11,7 @@ use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
@@ -19,14 +20,18 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
+use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
+use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactoryInterface;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
+use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -53,12 +58,19 @@ class DependencyFactory
     /** @var callable */
     private $sorter;
 
-    public function __construct(Configuration $configuration, Connection $connection, ?LoggerInterface $logger = null)
+    /**
+     * @var EntityManagerInterface|null
+     */
+    private $em;
+
+    public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
     {
         $this->configuration = $configuration;
         $this->logger        = $logger ?: new NullLogger();
         $this->connection    = $connection;
+        $this->em = $em;
     }
+
 
     public function getConfiguration() : Configuration
     {
@@ -93,6 +105,26 @@ class DependencyFactory
         });
     }
 
+    private function getSchemaProvider(): SchemaProviderInterface
+    {
+        return $this->getDependency(SchemaProviderInterface::class, function () : SchemaProviderInterface {
+            return new OrmSchemaProvider($this->em);
+        });
+    }
+
+    public function getDiffGenerator() : DiffGenerator
+    {
+        return $this->getDependency(DiffGenerator::class, function () : DiffGenerator {
+            return new DiffGenerator(
+                $this->getConnection()->getConfiguration(),
+                $this->getConnection()->getSchemaManager(),
+                $this->getSchemaProvider(),
+                $this->getConnection()->getDatabasePlatform(),
+                $this->getMigrationGenerator(),
+                $this->getMigrationSqlGenerator()
+            );
+        });
+    }
     public function getSchemaDiffProvider() : SchemaDiffProviderInterface
     {
         return $this->getDependency(SchemaDiffProviderInterface::class, function () : LazySchemaDiffProvider {
@@ -108,9 +140,7 @@ class DependencyFactory
     public function getFileBuilder() : FileBuilder
     {
         return $this->getDependency(FileBuilder::class, function () : FileBuilder {
-            return new FileBuilder(
-                $this->getMetadataStorage()
-            );
+            return new FileBuilder();
         });
     }
 
@@ -137,6 +167,11 @@ class DependencyFactory
         }
 
         return $finder;
+    }
+
+    public function setEntityManager(EntityManagerInterface $em) : void
+    {
+        $this->em = $em;
     }
 
     public function setSorter(callable $sorter) : void
@@ -176,6 +211,11 @@ class DependencyFactory
                 $this->getMetadataStorageConfiguration()
             );
         });
+    }
+
+    public function getEntityManager() : ?EntityManagerInterface
+    {
+        return $this->em;
     }
 
     public function getLogger() : LoggerInterface

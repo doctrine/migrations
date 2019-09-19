@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -22,6 +23,11 @@ final class DiffCommandTest extends TestCase
 
     /** @var DiffCommand|MockObject */
     private $diffCommand;
+
+    /**
+     * @var MockObject
+     */
+    private $dependencyFactory;
 
     public function testExecute() : void
     {
@@ -92,15 +98,27 @@ final class DiffCommandTest extends TestCase
     {
         $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
         $this->configuration          = $this->createMock(Configuration::class);
+        $this->configuration->expects(self::any())
+            ->method('getMigrationDirectories')
+            ->willReturn([
+                'FooNs' => sys_get_temp_dir()
+            ]);
+
+        $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($this->configuration);
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getDiffGenerator')
+            ->willReturn($this->migrationDiffGenerator);
+
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setMethods(['createMigrationDiffGenerator', 'procOpen'])
+            ->setConstructorArgs([null,  $this->dependencyFactory])
+            ->setMethods(['procOpen'])
             ->getMock();
 
-        $this->diffCommand->setMigrationConfiguration($this->configuration);
-
-        $this->diffCommand->expects(self::once())
-            ->method('createMigrationDiffGenerator')
-            ->willReturn($this->migrationDiffGenerator);
     }
 }

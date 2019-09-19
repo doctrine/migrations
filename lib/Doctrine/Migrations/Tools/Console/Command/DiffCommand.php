@@ -4,10 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
-use Doctrine\Migrations\Provider\OrmSchemaProvider;
-use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -25,16 +22,6 @@ class DiffCommand extends AbstractCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:diff';
-
-    /** @var SchemaProviderInterface|null */
-    protected $schemaProvider;
-
-    public function __construct(?SchemaProviderInterface $schemaProvider = null)
-    {
-        $this->schemaProvider = $schemaProvider;
-
-        parent::__construct();
-    }
 
     protected function configure() : void
     {
@@ -114,10 +101,12 @@ EOT
             }
         }
 
-        $versionNumber = $this->configuration->generateVersionNumber();
+        $versionNumber = $this->dependencyFactory->getConfiguration()->generateVersionNumber();
+
+        $diffGenerator = $this->dependencyFactory->getDiffGenerator();
 
         try {
-            $path = $this->createMigrationDiffGenerator()->generate(
+            $path = $diffGenerator->generate(
                 $versionNumber,
                 $filterExpression,
                 $formatted,
@@ -154,28 +143,5 @@ EOT
         ]);
 
         return 0;
-    }
-
-    protected function createMigrationDiffGenerator() : DiffGenerator
-    {
-        return new DiffGenerator(
-            $this->connection->getConfiguration(),
-            $this->connection->getSchemaManager(),
-            $this->getSchemaProvider(),
-            $this->connection->getDatabasePlatform(),
-            $this->dependencyFactory->getMigrationGenerator(),
-            $this->dependencyFactory->getMigrationSqlGenerator()
-        );
-    }
-
-    private function getSchemaProvider() : SchemaProviderInterface
-    {
-        if ($this->schemaProvider === null) {
-            $this->schemaProvider = new OrmSchemaProvider(
-                $this->getHelper('entityManager')->getEntityManager()
-            );
-        }
-
-        return $this->schemaProvider;
     }
 }
