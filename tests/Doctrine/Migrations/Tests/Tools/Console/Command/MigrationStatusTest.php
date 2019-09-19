@@ -53,7 +53,7 @@ class MigrationStatusTest extends MigrationTestCase
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
             ->setMethods(
-                ['getMigrationConfiguration']
+                ['getConfigurationuration']
             )
             ->getMock();
 
@@ -82,7 +82,7 @@ class MigrationStatusTest extends MigrationTestCase
 
         $command
             ->expects(self::once())
-            ->method('getMigrationConfiguration')
+            ->method('getConfigurationuration')
             ->will(self::returnValue($configuration));
 
         $commandTester = new CommandTester($command);
@@ -116,12 +116,12 @@ class MigrationStatusTest extends MigrationTestCase
         $command = $this
             ->getMockBuilder(StatusCommand::class)
             ->setConstructorArgs(['migrations:status'])
-            ->setMethods(['getMigrationConfiguration'])
+            ->setMethods(['getConfigurationuration'])
             ->getMock();
 
         $command
             ->expects(self::once())
-            ->method('getMigrationConfiguration')
+            ->method('getConfigurationuration')
             ->will(self::returnValue($configuration));
 
         $commandTester = new CommandTester($command);

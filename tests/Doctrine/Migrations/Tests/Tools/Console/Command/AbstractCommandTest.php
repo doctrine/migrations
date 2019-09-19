@@ -38,7 +38,7 @@ class AbstractCommandTest extends MigrationTestCase
         ?HelperSet $helperSet = null
     ) : Configuration {
         $class  = new ReflectionClass(AbstractCommand::class);
-        $method = $class->getMethod('getMigrationConfiguration');
+        $method = $class->getMethod('getConfigurationuration');
         $method->setAccessible(true);
 
         /** @var AbstractCommand $command */
@@ -81,7 +81,7 @@ class AbstractCommandTest extends MigrationTestCase
         self::assertSame($connection, $command->getConnection());
     }
 
-    public function testGetMigrationConfigurationDefaultsToConnection() : void
+    public function testgetConfigurationurationDefaultsToConnection() : void
     {
         $configuration = $this->createMock(Configuration::class);
         $input         = $this->createMock(InputInterface::class);
@@ -272,7 +272,7 @@ class AbstractCommandTest extends MigrationTestCase
             ->getMock();
 
         $helperSet    = new HelperSet();
-        $configHelper = new ConfigurationHelper($this->getSqliteConnection(), $configuration);
+        $configHelper = new ConfigurationHelper($configuration);
         $helperSet->set($configHelper, 'configuration');
 
         $actualConfiguration = $this->invokeMigrationConfigurationGetter($input, null, false, $helperSet);
@@ -346,6 +346,6 @@ class TestAbstractCommand extends AbstractCommand
 
     public function getConfiguration(InputInterface $input, OutputInterface $output) : Configuration
     {
-        return $this->getMigrationConfiguration($input, $output);
+        return $this->getConfigurationuration($input, $output);
     }
 }

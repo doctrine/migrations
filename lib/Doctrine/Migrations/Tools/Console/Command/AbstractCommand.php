@@ -83,7 +83,7 @@ abstract class AbstractCommand extends Command
                 $configHelper = new ConfigurationHelper();
             }
 
-            $configuration = $configHelper->getMigrationConfig($input);
+            $configuration = $configHelper->getConfiguration($input);
             $connection    = (new ConnectionLoader())
                 ->getConnection($input, $this->getHelperSet());
 

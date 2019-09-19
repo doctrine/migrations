@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
@@ -165,6 +166,26 @@ final class MigrationPlanCalculatorTest extends TestCase
             self::assertSame($direction, $plan->getItems()[$itemN]->getDirection());
             self::assertEquals(new Version($version), $plan->getItems()[$itemN]->getVersion());
         }
+    }
+
+    public function testNoAvailableMigrations()
+    {
+        $this->expectException(NoMigrationsToExecute::class);
+        $e1 = new ExecutedMigration(new Version('A'));
+        $e2 = new ExecutedMigration(new Version('B'));
+
+        $migrationList = new AvailableMigrationsList([]);
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigrations')
+            ->willReturn($migrationList);
+
+        $this->metadataStorage
+            ->expects($this->atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
+
+        $this->migrationPlanCalculator->getPlanUntilVersion();
     }
 
     public function getPlanUpWhenMigrations()

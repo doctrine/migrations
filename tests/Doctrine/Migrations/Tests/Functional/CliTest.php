@@ -235,6 +235,8 @@ class CliTest extends MigrationTestCase
 
     protected function setUp() : void
     {
+
+        $this->markTestSkipped();
         $migrationsDbFilePath =
             __DIR__ . DIRECTORY_SEPARATOR . '_files ' . DIRECTORY_SEPARATOR . 'migrations.db';
         if (file_exists($migrationsDbFilePath)) {

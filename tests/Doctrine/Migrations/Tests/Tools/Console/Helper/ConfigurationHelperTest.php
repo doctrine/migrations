@@ -31,9 +31,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     protected function setUp() : void
     {
-        $this->connection = $this->getSqliteConnection();
 
-        $this->output = $this->getOutputStream();
 
         $this->input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -56,8 +54,8 @@ class ConfigurationHelperTest extends MigrationTestCase
                 ->with('configuration')
                 ->will(self::returnValue(null));
 
-            $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-            $configfileLoaded    = $configurationHelper->getMigrationConfig($this->input);
+            $configurationHelper = new ConfigurationHelper();
+            $configfileLoaded    = $configurationHelper->getConfiguration($this->input);
 
             return trim($this->getOutputStreamContent($this->output));
         } finally {
@@ -71,8 +69,8 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->will(self::returnValue(__DIR__ . '/files/config.php'));
 
-        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-        $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
+        $configurationHelper = new ConfigurationHelper();
+        $migrationConfig     = $configurationHelper->getConfiguration($this->input);
 
         self::assertInstanceOf(ArrayLoader::class, $migrationConfig);
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
@@ -84,8 +82,8 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->will(self::returnValue(__DIR__ . '/files/config.json'));
 
-        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
-        $migrationConfig     = $configurationHelper->getMigrationConfig($this->input);
+        $configurationHelper = new ConfigurationHelper();
+        $migrationConfig     = $configurationHelper->getConfiguration($this->input);
 
         self::assertInstanceOf(JsonConfiguration::class, $migrationConfig);
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
@@ -100,12 +98,12 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->will(self::returnValue('testconfig.wrong'));
 
-        $configurationHelper = new ConfigurationHelper($this->getSqliteConnection());
+        $configurationHelper = new ConfigurationHelper();
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Given config file type is not supported');
 
-        $configurationHelper->getMigrationConfig($this->input);
+        $configurationHelper->getConfiguration($this->input);
     }
 
     public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath() : void
@@ -116,7 +114,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
         $configurationHelper = new ConfigurationHelper($this->connection, null);
 
-        $migrationConfig = $configurationHelper->getMigrationConfig($this->input);
+        $migrationConfig = $configurationHelper->getConfiguration($this->input);
 
         self::assertStringMatchesFormat('', $this->getOutputStreamContent($this->output));
     }
