@@ -15,6 +15,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
+use InvalidArgumentException;
 use const CASE_LOWER;
 use function array_change_key_case;
 use function intval;
@@ -40,8 +41,8 @@ class TableMetadataStorage implements MetadataStorage
         $this->schemaManager = $connection->getSchemaManager();
         $this->platform      = $connection->getDatabasePlatform();
 
-        if ($configuration!== null && !($configuration instanceof TableMetadataStorageConfiguration)){
-            throw new \InvalidArgumentException(sprintf('%s accepts only %s as configuration', __CLASS__, TableMetadataStorageConfiguration::class));
+        if ($configuration!== null && ! ($configuration instanceof TableMetadataStorageConfiguration)) {
+            throw new InvalidArgumentException(sprintf('%s accepts only %s as configuration', self::class, TableMetadataStorageConfiguration::class));
         }
         $this->configuration = $configuration ?: new TableMetadataStorageConfiguration();
     }
@@ -103,7 +104,7 @@ class TableMetadataStorage implements MetadataStorage
     {
         $this->connection->executeUpdate(
             sprintf(
-                "DELETE FROM %s WHERE 1 = 1",
+                'DELETE FROM %s WHERE 1 = 1',
                 $this->connection->getDatabasePlatform()->quoteIdentifier($this->configuration->getTableName())
             )
         );

@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Doctrine\Migrations\Generator;
 
 use DateTimeInterface;
@@ -12,5 +14,5 @@ use DateTimeInterface;
 interface FileBuilderInterface
 {
     /** @param string[][] $queriesByVersion */
-    public function buildMigrationFile(array $queriesByVersion, string $direction, ?DateTimeInterface $now = null): string;
+    public function buildMigrationFile(array $queriesByVersion, string $direction, ?DateTimeInterface $now = null) : string;
 }

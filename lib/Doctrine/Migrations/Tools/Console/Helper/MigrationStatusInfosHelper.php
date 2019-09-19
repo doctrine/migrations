@@ -13,6 +13,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use Throwable;
 use function count;
 use function get_class;
 use function sprintf;
@@ -93,7 +94,11 @@ class MigrationStatusInfosHelper
 
     private function getFormattedVersionAlias(string $alias) : string
     {
-        $version = $this->aliasResolver->resolveVersionAlias($alias);
+        try {
+            $version = $this->aliasResolver->resolveVersionAlias($alias);
+        } catch (Throwable $e) {
+            $version = null;
+        }
 
         // No version found
         if ($version === null) {

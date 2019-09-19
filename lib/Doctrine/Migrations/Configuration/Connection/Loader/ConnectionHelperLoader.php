@@ -22,16 +22,14 @@ final class ConnectionHelperLoader implements ConnectionLoaderInterface
     /** @var  HelperSet */
     private $helperSet;
 
-    /**
-     * @var ConnectionLoaderInterface
-     */
+    /** @var ConnectionLoaderInterface */
     private $fallback;
 
     public function __construct(?HelperSet $helperSet = null, string $helperName, ConnectionLoaderInterface $fallback)
     {
-        $this->helperSet = $helperSet ?:  new HelperSet();
+        $this->helperSet  = $helperSet ?:  new HelperSet();
         $this->helperName = $helperName;
-        $this->fallback = $fallback;
+        $this->fallback   = $fallback;
     }
 
     /**

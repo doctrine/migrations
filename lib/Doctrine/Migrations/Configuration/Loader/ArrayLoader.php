@@ -10,9 +10,9 @@ use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\UnknownResource;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
-use function assert;
 use function call_user_func;
 use function is_array;
+use function is_bool;
 
 /**
  * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
@@ -23,7 +23,7 @@ class ArrayLoader implements Loader
 {
     public function load($array) : Configuration
     {
-        if (!is_array($array)) {
+        if (! is_array($array)) {
             throw UnknownResource::new(static::class);
         }
 
@@ -37,7 +37,7 @@ class ArrayLoader implements Loader
                 'table_name' => 'setTableName',
                 'version_column_name' => 'setVersionColumnName',
                 'version_column_length' => static function ($value, TableMetadataStorageConfiguration $configuration) : void {
-                    $configuration->setVersionColumnLength((int)$value);
+                    $configuration->setVersionColumnLength((int) $value);
                 },
                 'executed_at_column_name' => 'setExecutedAtColumnName',
                 'execution_time_column_name' => 'setExecutionTimeColumnName',

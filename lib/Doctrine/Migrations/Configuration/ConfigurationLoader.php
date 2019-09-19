@@ -4,11 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use DateTimeZone;
-use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
-use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
 use Doctrine\Migrations\Configuration\Loader\ArrayLoader;
 use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
@@ -16,26 +11,19 @@ use Doctrine\Migrations\Configuration\Loader\Loader;
 use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
 use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
 use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
-use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
-use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
-use Symfony\Component\Console\Input\InputInterface;
-use function strcasecmp;
+use function count;
 
 class ConfigurationLoader
 {
-    /**
-     * @var Loader[]
-     */
+    /** @var Loader[] */
     private $loaders = [];
 
-
-    public function addLoader(string $type, Loader $loader)
+    public function addLoader(string $type, Loader $loader) : void
     {
         $this->loaders[$type] = $loader;
     }
 
-    private function setDefaultLoaders()
+    private function setDefaultLoaders() : void
     {
         $this->loaders = [
             'array' => new ArrayLoader(),
@@ -47,13 +35,13 @@ class ConfigurationLoader
         ];
     }
 
-    public function getLoader($type): Loader
+    public function getLoader($type) : Loader
     {
         if (count($this->loaders) === 0) {
             $this->setDefaultLoaders();
         }
 
-        if (!isset($this->loaders[$type])) {
+        if (! isset($this->loaders[$type])) {
             throw UnknownLoader::new($type);
         }
 

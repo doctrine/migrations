@@ -89,7 +89,7 @@ abstract class AbstractCommand extends Command
                 ->getConnection($input, $this->getHelperSet());
 
             $em = null;
-            if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper){
+            if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper) {
                 $em = $this->getHelperSet()->get('em')->getEntityManager();
             }
 

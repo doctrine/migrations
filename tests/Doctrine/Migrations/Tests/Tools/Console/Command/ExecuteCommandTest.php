@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -20,33 +19,25 @@ use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+use function getcwd;
+use function sys_get_temp_dir;
 
 class ExecuteCommandTest extends TestCase
 {
     /** @var ExecuteCommand|MockObject */
     private $executeCommand;
 
-    /**
-     * @var MockObject|DependencyFactory
-     */
+    /** @var MockObject|DependencyFactory */
     private $dependencyFactory;
 
-    /**
-     * @var CommandTester
-     */
+    /** @var CommandTester */
     private $executeCommandTester;
 
-    /**
-     * @var MockObject
-     */
+    /** @var MockObject */
     private $migrator;
 
-    /**
-     * @var MockObject
-     */
+    /** @var MockObject */
     private $queryWriter;
 
     /**
@@ -57,11 +48,11 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 self::assertTrue($configuration->isDryRun());
+
                 return ['A'];
-            })
-        ;
+            });
 
         $this->queryWriter->expects(self::once())
             ->method('write')
@@ -93,8 +84,9 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 self::assertFalse($configuration->isDryRun());
+
                 return ['A'];
             });
 
@@ -115,15 +107,15 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::never())
             ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
                 self::assertFalse($configuration->isDryRun());
+
                 return ['A'];
             });
-        ;
 
         $this->executeCommandTester->execute([
             'version' => '1',
-            '--down' => true
+            '--down' => true,
         ]);
 
         self::assertSame(1, $this->executeCommandTester->getStatusCode());
@@ -148,7 +140,7 @@ class ExecuteCommandTest extends TestCase
 
         $planCalculator = new MigrationPlanCalculator($migrationRepository, $storage);
 
-        $migration  = $this->createMock(AbstractMigration::class);
+        $migration = $this->createMock(AbstractMigration::class);
         $migrationRepository->registerMigrationInstance(new Version('1'), $migration);
 
         $configuration = new Configuration();
@@ -167,7 +159,6 @@ class ExecuteCommandTest extends TestCase
             ->method('getMigrationPlanCalculator')
             ->willReturn($planCalculator);
 
-
         $this->dependencyFactory->expects(self::any())
             ->method('getQueryWriter')
             ->willReturn($this->queryWriter);
@@ -182,6 +173,5 @@ class ExecuteCommandTest extends TestCase
             ->getMock();
 
         $this->executeCommandTester = new CommandTester($this->executeCommand);
-
     }
 }

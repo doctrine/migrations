@@ -4,9 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\RollupFailed;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
@@ -17,63 +15,53 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class RollupTest extends TestCase
 {
-    /**
-     * @var MockObject|AbstractMigration
-     */
+    /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    /**
-     * @var MigrationRepository|MockObject
-     */
+    /** @var MigrationRepository|MockObject */
     private $repository;
 
-    /**
-     * @var MetadataStorage|MockObject
-     */
+    /** @var MetadataStorage|MockObject */
     private $storage;
 
-    /**
-     * @var Rollup
-     */
+    /** @var Rollup */
     private $rollup;
 
-    public function setUp()
-   {
-       $this->abstractMigration = $this->createMock(AbstractMigration::class);
-       $this->repository = $this->createMock(MigrationRepository::class);
-       $this->storage = $this->createMock(MetadataStorage::class);
-       $this->rollup = new Rollup($this->storage, $this->repository);
-   }
+    public function setUp() : void
+    {
+        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->repository        = $this->createMock(MigrationRepository::class);
+        $this->storage           = $this->createMock(MetadataStorage::class);
+        $this->rollup            = new Rollup($this->storage, $this->repository);
+    }
 
-   public function testRollup()
-   {
-       $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+    public function testRollup() : void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
-       $this->repository
+        $this->repository
            ->expects($this->any())
            ->method('getMigrations')
            ->willReturn(new AvailableMigrationsList([$m1]));
 
-       $this->repository->expects($this->once())->method('getMigrations');
+        $this->repository->expects($this->once())->method('getMigrations');
 
-       $this->storage
+        $this->storage
            ->expects($this->at(0))->method('reset')->with();
-       $this->storage
+        $this->storage
            ->expects($this->at(1))
            ->method('complete')
-           ->willReturnCallback(function (ExecutionResult $result) {
+           ->willReturnCallback(static function (ExecutionResult $result) : void {
               self::assertEquals(new Version('A'), $result->getVersion());
            })->with();
-       ;
 
-       $this->rollup->rollup();
-   }
+        $this->rollup->rollup();
+    }
 
-    public function testRollupTooManyMigrations()
+    public function testRollupTooManyMigrations() : void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -93,7 +81,7 @@ class RollupTest extends TestCase
         $this->rollup->rollup();
     }
 
-    public function testRollupNoMigrations()
+    public function testRollupNoMigrations() : void
     {
         $this->repository
             ->expects($this->any())

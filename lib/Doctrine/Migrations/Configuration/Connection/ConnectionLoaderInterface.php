@@ -18,6 +18,7 @@ interface ConnectionLoaderInterface
     /**
      * Read the input and return a Connection, returns null if the config
      * is not supported.
+     *
      * @throws ConnectionNotSpecified
      */
     public function getConnection() : Connection;

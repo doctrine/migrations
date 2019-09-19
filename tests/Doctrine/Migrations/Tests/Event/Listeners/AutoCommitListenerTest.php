@@ -68,7 +68,7 @@ class AutoCommitListenerTest extends MigrationTestCase
     private function createArgs(bool $isDryRun) : MigrationsEventArgs
     {
         $config = new Configuration();
-        $plan = new MigrationPlanList([], Direction::UP);
+        $plan   = new MigrationPlanList([], Direction::UP);
 
         $configsMigration = new MigratorConfiguration();
         $configsMigration->setDryRun($isDryRun);

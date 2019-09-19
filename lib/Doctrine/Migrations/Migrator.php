@@ -141,7 +141,7 @@ class Migrator implements MigratorInterface
             [
                 'direction' => $migrationsPlan->getDirection(),
                 'to' => (string) $migrationsPlan->getLast()->getVersion(),
-//                'from' => (string) $currentVersion,
+            //                'from' => (string) $currentVersion,
             ]
         );
 

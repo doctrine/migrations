@@ -54,13 +54,11 @@ final class MigrationPlanCalculator
             $to = $availableMigrations->getLast()->getVersion();
         }
 
-
-        $direction = $to == new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
-        $toExecute = [];
+        $direction         = $to === new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
+        $toExecute         = [];
         $migrationsToCheck = $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
         foreach ($migrationsToCheck as $availableMigration) {
-
-            if ($direction === Direction::DOWN && $availableMigration->getVersion() == $to) {
+            if ($direction === Direction::DOWN && $availableMigration->getVersion() === $to) {
                 break;
             }
 
@@ -70,7 +68,7 @@ final class MigrationPlanCalculator
                 $toExecute[] = $availableMigration;
             }
 
-            if ($direction === Direction::UP && $availableMigration->getVersion() == $to) {
+            if ($direction === Direction::UP && $availableMigration->getVersion() === $to) {
                 break;
             }
         }

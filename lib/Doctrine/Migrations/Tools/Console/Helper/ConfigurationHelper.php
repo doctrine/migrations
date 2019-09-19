@@ -7,10 +7,6 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\ConfigurationLoader;
 use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
-use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
-use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
-use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
-use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,12 +19,10 @@ use function pathinfo;
  */
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
-    /**
-     * @var ConfigurationLoader
-     */
+    /** @var ConfigurationLoader */
     private $loader;
 
-    public function __construct(ConfigurationLoader $loader = null)
+    public function __construct(?ConfigurationLoader $loader = null)
     {
         $this->loader = $loader ?: new ConfigurationLoader();
     }
@@ -61,6 +55,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
                 return $this->loadConfig($config);
             }
         }
+
         return $this->loader->getLoader('array')->load([]);
     }
 
@@ -78,7 +73,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 
         try {
             return $this->loader->getLoader($info['extension'])->load($configFile);
-        } catch (UnknownLoader $e){
+        } catch (UnknownLoader $e) {
             throw FileTypeNotSupported::new();
         }
     }

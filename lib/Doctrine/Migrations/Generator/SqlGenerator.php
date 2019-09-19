@@ -35,9 +35,9 @@ class SqlGenerator
 
     public function __construct(Configuration $configuration, AbstractPlatform $platform, MetadataStorageConfigration $storageConfiguration)
     {
-        $this->configuration = $configuration;
+        $this->configuration        = $configuration;
         $this->storageConfiguration = $storageConfiguration;
-        $this->platform  = $platform;
+        $this->platform             = $platform;
     }
 
     /** @param string[] $sql */

@@ -22,9 +22,7 @@ final class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterf
     /** @var string|null */
     private $filename;
 
-    /**
-     * @var ConnectionLoaderInterface
-     */
+    /** @var ConnectionLoaderInterface */
     private $fallback;
 
     public function __construct(?string $filename, ConnectionLoaderInterface $fallback)
