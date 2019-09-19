@@ -68,22 +68,7 @@ class Migrator implements MigratorInterface
         try {
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $migratorConfiguration);
 
-            $sql  = [];
-            $time = 0;
-
-            foreach ($migrationsPlan->getItems() as $plan) {
-                $versionExecutionResult = $this->executor->execute($plan, $migratorConfiguration);
-
-                // capture the to Schema for the migration so we have the ability to use
-                // it as the from Schema for the next migration when we are running a dry run
-                // $toSchema may be null in the case of skipped migrations
-                if (! $versionExecutionResult->isSkipped()) {
-                    $migratorConfiguration->setFromSchema($versionExecutionResult->getToSchema());
-                }
-
-                $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
-                $time                             += $versionExecutionResult->getTime();
-            }
+            $sql = $this->executePlan($migrationsPlan, $migratorConfiguration);
 
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $migratorConfiguration);
         } catch (Throwable $e) {
@@ -96,6 +81,28 @@ class Migrator implements MigratorInterface
 
         if ($allOrNothing) {
             $this->connection->commit();
+        }
+
+        return $sql;
+    }
+
+    private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
+    {
+        $sql  = [];
+        $time = 0;
+
+        foreach ($migrationsPlan->getItems() as $plan) {
+            $versionExecutionResult = $this->executor->execute($plan, $migratorConfiguration);
+
+            // capture the to Schema for the migration so we have the ability to use
+            // it as the from Schema for the next migration when we are running a dry run
+            // $toSchema may be null in the case of skipped migrations
+            if (! $versionExecutionResult->isSkipped()) {
+                $migratorConfiguration->setFromSchema($versionExecutionResult->getToSchema());
+            }
+
+            $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
+            $time                             += $versionExecutionResult->getTime();
         }
 
         return $sql;

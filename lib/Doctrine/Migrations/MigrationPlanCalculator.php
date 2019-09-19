@@ -47,16 +47,41 @@ final class MigrationPlanCalculator
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-        if ($to === null) {
-            if ($availableMigrations->getLast()===null) {
-                throw NoMigrationsToExecute::new();
-            }
-            $to = $availableMigrations->getLast()->getVersion();
+
+        if ($availableMigrations->getLast() === null) {
+            throw NoMigrationsToExecute::new();
         }
 
-        $direction         = $to === new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
-        $toExecute         = [];
-        $migrationsToCheck = $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
+        $to = $to ?: $availableMigrations->getLast()->getVersion();
+
+        $direction = $this->findDirection($to, $executedMigrations);
+
+        $migrationsToCheck = $this->arrangeMigrationsForDirection($direction, $availableMigrations);
+
+        $toExecute = $this->findMigrationsToExecute($to, $migrationsToCheck, $direction, $executedMigrations);
+
+        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) {
+            return new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
+        }, $toExecute), $direction);
+    }
+
+    private function findDirection(Version $to, Metadata\ExecutedMigrationsSet $executedMigrations) : string
+    {
+        if ($to === new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to)) {
+            return Direction::UP;
+        }
+
+        return Direction::UP;
+    }
+
+    private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations) : array
+    {
+        return $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
+    }
+
+    private function findMigrationsToExecute(?Version $to, $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsSet $executedMigrations) : array
+    {
+        $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {
             if ($direction === Direction::DOWN && $availableMigration->getVersion() === $to) {
                 break;
@@ -73,8 +98,6 @@ final class MigrationPlanCalculator
             }
         }
 
-        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) {
-            return new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
-        }, $toExecute), $direction);
+        return $toExecute;
     }
 }

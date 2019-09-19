@@ -272,26 +272,8 @@ final class Executor implements ExecutorInterface
 
     private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
     {
-        if ($result->isSkipped()) {
-            $this->logger->error(
-                'Migration {version} skipped during %s. Reason {error}',
-                [
-                    'version' =>(string) $plan->getVersion(),
-                    'reason' => $e->getMessage(),
-                    'state' => $this->getExecutionStateAsString($result->getState()),
-                ]
-            );
-        } elseif ($result->hasError()) {
-            $this->logger->error(
-                'Migration {version} failed during %s. Error {error}',
-                [
-                    'version' => (string) $plan->getVersion(),
-                    'error' => $e->getMessage(),
-                    'state' => $this->getExecutionStateAsString($result->getState()),
-                ]
-            );
-        }
         $plan->setResult($result);
+        $this->logResult($result, $plan);
 
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionSkipped,
@@ -311,6 +293,29 @@ final class Executor implements ExecutorInterface
         }
 
         $this->metadataStorage->complete($result);
+    }
+
+    private function logResult(ExecutionResult $result, MigrationPlan $plan) : void
+    {
+        if ($result->isSkipped()) {
+            $this->logger->error(
+                'Migration {version} skipped during %s. Reason {error}',
+                [
+                    'version' => (string) $plan->getVersion(),
+                    'reason' => $result->getException()->getMessage(),
+                    'state' => $this->getExecutionStateAsString($result->getState()),
+                ]
+            );
+        } elseif ($result->hasError()) {
+            $this->logger->error(
+                'Migration {version} failed during %s. Error {error}',
+                [
+                    'version' => (string) $plan->getVersion(),
+                    'error' => $result->getException()->getMessage(),
+                    'state' => $this->getExecutionStateAsString($result->getState()),
+                ]
+            );
+        }
     }
 
     private function executeResult(MigratorConfiguration $configuration) : void
