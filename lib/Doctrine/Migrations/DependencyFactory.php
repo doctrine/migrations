@@ -28,6 +28,7 @@ use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactoryInterface;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\ORM\EntityManager;
@@ -70,7 +71,6 @@ class DependencyFactory
         $this->connection    = $connection;
         $this->em = $em;
     }
-
 
     public function getConfiguration() : Configuration
     {
@@ -248,9 +248,9 @@ class DependencyFactory
         });
     }
 
-    public function getVersionAliasResolver() : AliasResolver
+    public function getVersionAliasResolver() : AliasResolverInterface
     {
-        return $this->getDependency(AliasResolver::class, function () : AliasResolver {
+        return $this->getDependency(AliasResolverInterface::class, function () : AliasResolverInterface {
             return new AliasResolver(
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage()

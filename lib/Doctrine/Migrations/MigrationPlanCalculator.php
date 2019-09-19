@@ -47,13 +47,13 @@ final class MigrationPlanCalculator
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-
         if ($to === null) {
             if ($availableMigrations->getLast()===null) {
                 throw NoMigrationsToExecute::new();
             }
             $to = $availableMigrations->getLast()->getVersion();
         }
+
 
         $direction = $to == new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to) ? Direction::DOWN : Direction::UP;
         $toExecute = [];

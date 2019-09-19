@@ -49,7 +49,10 @@ class ExecuteCommandTest extends TestCase
      */
     private $queryWriter;
 
-    public function testWriteSqlCustomPath() : void
+    /**
+     * @dataProvider getWriteSqlValues
+     */
+    public function testWriteSql($arg, $path) : void
     {
         $this->migrator
             ->expects(self::once())
@@ -59,42 +62,26 @@ class ExecuteCommandTest extends TestCase
                 return ['A'];
             })
         ;
+
         $this->queryWriter->expects(self::once())
             ->method('write')
-            ->with('foo', 'down', ['A']);
+            ->with($path, 'down', ['A']);
 
         $this->executeCommandTester->execute([
             'version' => '1',
             '--down' => true,
-            '--write-sql' => 'foo',
+            '--write-sql' => $arg,
         ]);
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
     }
 
-    public function testWriteSqlCurrentWorkingDirectory() : void
+    public function getWriteSqlValues()
     {
-        $this->migrator
-            ->expects(self::once())
-            ->method('migrate')
-            ->willReturnCallback(function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
-                self::assertTrue($configuration->isDryRun());
-                return ['A'];
-            })
-        ;
-
-        $this->queryWriter->expects(self::once())
-            ->method('write')
-            ->with(getcwd(), 'down', ['A']);
-
-        $this->executeCommandTester->execute([
-            'version' => '1',
-            '--down' => true,
-            '--write-sql' => true,
-        ]);
-
-
-        self::assertSame(0, $this->executeCommandTester->getStatusCode());
+        return [
+            [true, getcwd()],
+            ['test', 'test'],
+        ];
     }
 
     public function testExecute() : void
