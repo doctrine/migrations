@@ -6,6 +6,8 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
@@ -30,7 +32,7 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var SchemaDumper|MockObject */
     private $schemaDumper;
 
-    /** @var DumpSchemaCommand|MockObject */
+    /** @var DumpSchemaCommand */
     private $dumpSchemaCommand;
 
     public function testExecuteThrowsRuntimeException() : void
@@ -41,13 +43,11 @@ final class DumpSchemaCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $version = $this->createMock(Version::class);
-
-        $versions = [$version];
+        $migration = $this->createMock(AvailableMigration::class);
 
         $this->migrationRepository->expects(self::once())
-            ->method('getVersions')
-            ->willReturn($versions);
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([$migration]));
 
         $this->dumpSchemaCommand->execute($input, $output);
     }
@@ -69,14 +69,17 @@ final class DumpSchemaCommandTest extends TestCase
 
         $input->expects(self::at(2))
             ->method('getOption')
+            ->with('namespace')
+            ->willReturn(null);
+
+        $input->expects(self::at(3))
+            ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('test');
 
-        $versions = [];
-
         $this->migrationRepository->expects(self::once())
-            ->method('getVersions')
-            ->willReturn($versions);
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
 
         $this->configuration->expects(self::once())
             ->method('generateVersionNumber')
@@ -84,7 +87,7 @@ final class DumpSchemaCommandTest extends TestCase
 
         $this->schemaDumper->expects(self::once())
             ->method('dump')
-            ->with('1234', true, 80);
+            ->with('1234', 'FooNs', true, 80);
 
         $output->expects(self::once())
             ->method('writeln')
@@ -104,6 +107,13 @@ final class DumpSchemaCommandTest extends TestCase
     protected function setUp() : void
     {
         $this->configuration       = $this->createMock(Configuration::class);
+
+        $this->configuration->expects(self::any())
+            ->method('getMigrationDirectories')
+            ->willReturn([
+                'FooNs' => sys_get_temp_dir()
+            ]);
+
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
@@ -112,10 +122,15 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getSchemaDumper')
             ->willReturn($this->schemaDumper);
 
-        $this->dumpSchemaCommand = $this->createPartialMock(DumpSchemaCommand::class, []);
+        $this->dependencyFactory->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($this->configuration);
 
-        $this->dumpSchemaCommand->setMigrationConfiguration($this->configuration);
-        $this->dumpSchemaCommand->setDependencyFactory($this->dependencyFactory);
-        $this->dumpSchemaCommand->setMigrationRepository($this->migrationRepository);
+        $this->dependencyFactory->expects(self::any())
+            ->method('getMigrationRepository')
+            ->willReturn($this->migrationRepository);
+
+        $this->dumpSchemaCommand = new DumpSchemaCommand(null, $this->dependencyFactory);
+
     }
 }

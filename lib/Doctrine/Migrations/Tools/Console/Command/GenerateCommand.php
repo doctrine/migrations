@@ -52,13 +52,14 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $versionNumber = $this->configuration->generateVersionNumber();
+        $configuration = $this->dependencyFactory->getConfiguration();
+        $versionNumber = $configuration->generateVersionNumber();
 
         $migrationGenerator = $this->dependencyFactory->getMigrationGenerator();
 
         $namespace = $input->getOption('namespace') ?: null;
 
-        $dirs = $this->configuration->getMigrationDirectories();
+        $dirs = $configuration->getMigrationDirectories();
         if ($namespace === null) {
             $namespace = key($dirs);
         } elseif (! isset($dirs[$namespace])) {

@@ -53,6 +53,12 @@ EOT
                 'Format the generated SQL.'
             )
             ->addOption(
+                'namespace',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Namespace for the save the generated migrations (defaults to the first namespace definition).'
+            )
+            ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -86,10 +92,14 @@ EOT
             }
         }
 
-        $versionNumber = $this->configuration->generateVersionNumber();
+        $configuration = $this->dependencyFactory->getConfiguration();
+        $versionNumber = $configuration->generateVersionNumber();
 
-        $dirs      = $this->configuration->getMigrationDirectories();
-        $namespace = key($dirs);
+        if (!($namespace = $input->getOption('namespace'))) {
+            $dirs      = $configuration->getMigrationDirectories();
+            $namespace = key($dirs);
+        }
+
         $path      = $schemaDumper->dump(
             $versionNumber,
             $namespace,

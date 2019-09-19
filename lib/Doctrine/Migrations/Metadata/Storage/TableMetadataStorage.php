@@ -101,7 +101,12 @@ class TableMetadataStorage implements MetadataStorage
 
     public function reset() : void
     {
-        $this->connection->delete($this->configuration->getTableName(), []);
+        $this->connection->executeUpdate(
+            sprintf(
+                "DELETE FROM %s WHERE 1 = 1",
+                $this->connection->getDatabasePlatform()->quoteIdentifier($this->configuration->getTableName())
+            )
+        );
     }
 
     public function complete(ExecutionResult $result) : void
@@ -117,7 +122,7 @@ class TableMetadataStorage implements MetadataStorage
         } else {
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
-                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt() ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): '',
+                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt() ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): null,
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
             ]);
         }
