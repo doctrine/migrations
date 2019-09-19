@@ -8,6 +8,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
@@ -87,8 +88,13 @@ abstract class AbstractCommand extends Command
             $connection    = (new ConnectionLoader())
                 ->getConnection($input, $this->getHelperSet());
 
+            $em = null;
+            if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper){
+                $em = $this->getHelperSet()->get('em')->getEntityManager();
+            }
+
             $logger                  = new ConsoleLogger($output);
-            $this->dependencyFactory = new DependencyFactory($configuration, $connection, null, $logger);
+            $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
         }
 
         return $this->dependencyFactory;
