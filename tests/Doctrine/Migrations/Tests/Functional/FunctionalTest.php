@@ -52,6 +52,7 @@ class FunctionalTest extends MigrationTestCase
 
     protected function setUp() : void
     {
+        $this->markTestSkipped();
         $this->connection = $this->getSqliteConnection();
         $this->config     = self::createConfiguration($this->connection);
     }

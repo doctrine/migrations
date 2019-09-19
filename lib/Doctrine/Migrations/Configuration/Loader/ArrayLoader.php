@@ -7,7 +7,9 @@ namespace Doctrine\Migrations\Configuration\Loader;
 use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
+use Doctrine\Migrations\Configuration\Exception\UnknownResource;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;
 use function call_user_func;
 use function is_array;
@@ -21,7 +23,10 @@ class ArrayLoader implements Loader
 {
     public function load($array) : Configuration
     {
-        assert(is_array($array));
+        if (!is_array($array)) {
+            throw UnknownResource::new(static::class);
+        }
+
         $configMap = [
             'migrations_paths' => static function ($paths, Configuration $configuration) : void {
                 foreach ($paths as $namespace => $path) {
@@ -31,7 +36,9 @@ class ArrayLoader implements Loader
             'table_storage' => [
                 'table_name' => 'setTableName',
                 'version_column_name' => 'setVersionColumnName',
-                'version_column_length' => 'setVersionColumnLength',
+                'version_column_length' => static function ($value, TableMetadataStorageConfiguration $configuration) : void {
+                    $configuration->setVersionColumnLength((int)$value);
+                },
                 'executed_at_column_name' => 'setExecutedAtColumnName',
                 'execution_time_column_name' => 'setExecutionTimeColumnName',
             ],
@@ -39,8 +46,12 @@ class ArrayLoader implements Loader
             'organize_migrations' => 'setMigrationOrganization',
             'name' => 'setName',
             'custom_template' => 'setCustomTemplate',
-            'all_or_nothing' => 'setAllOrNothing',
-            'check_database_platform' =>  'setCheckDatabasePlatform',
+            'all_or_nothing' => static function ($value, Configuration $configuration) : void {
+                $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
+            },
+            'check_database_platform' =>  static function ($value, Configuration $configuration) : void {
+                $configuration->setCheckDatabasePlatform(is_bool($value) ? $value :BooleanStringFormatter::toBoolean($value, false));
+            },
         ];
 
         $object = new Configuration();

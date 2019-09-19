@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\ConfigurationLoader;
+use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
 use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
 use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
 use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
@@ -21,32 +23,26 @@ use function pathinfo;
  */
 class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
-    /** @var Configuration|null */
-    private $configuration;
+    /**
+     * @var ConfigurationLoader
+     */
+    private $loader;
 
-    public function __construct(
-        ?Configuration $configuration = null
-    ) {
-        $this->configuration = $configuration;
+    public function __construct(ConfigurationLoader $loader)
+    {
+        $this->loader = $loader;
     }
 
-    public function getMigrationConfig(InputInterface $input) : Configuration
+    public function getConfiguration(InputInterface $input) : Configuration
     {
         /**
          * If a configuration option is passed to the command line, use that configuration
          * instead of any other one.
          */
-        $configuration = $input->getOption('configuration');
+        $configurationFile = $input->getOption('configuration');
 
-        if ($configuration !== null) {
-            return $this->loadConfig($configuration);
-        }
-
-        /**
-         * If a configuration has already been set using DI or a Setter use it.
-         */
-        if ($this->configuration !== null) {
-            return $this->configuration;
+        if ($configurationFile !== null) {
+            return $this->loadConfig($configurationFile);
         }
 
         /**
@@ -65,8 +61,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
                 return $this->loadConfig($config);
             }
         }
-
-        return new Configuration();
+        return $this->loader->getLoader('array')->load([]);
     }
 
     private function configExists(string $config) : bool
@@ -77,26 +72,15 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     /**
      * @throws FileTypeNotSupported
      */
-    private function loadConfig(string $config) : Configuration
+    private function loadConfig(string $configFile) : Configuration
     {
-        $map = [
-            'xml'   => new XmlFileLoader(),
-            'yaml'  => new YamlFileLoader(),
-            'yml'   => new YamlFileLoader(),
-            'php'   => new PHPFileLoader(),
-            'json'  => new JsonFileLoader(),
-        ];
+        $info = pathinfo($configFile);
 
-        $info = pathinfo($config);
-
-        // check we can support this file type
-        if (! isset($map[$info['extension']])) {
+        try {
+            return $this->loader->getLoader($info['extension'])->load($configFile);
+        } catch (UnknownLoader $e){
             throw FileTypeNotSupported::new();
         }
-
-        $loader = $map[$info['extension']];
-
-        return $loader->load($config);
     }
 
     /**

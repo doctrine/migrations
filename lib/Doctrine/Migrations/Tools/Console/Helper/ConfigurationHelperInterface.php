@@ -12,7 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
  */
 interface ConfigurationHelperInterface
 {
-    public function getMigrationConfig(
+    public function getConfiguration(
         InputInterface $input
     ) : Configuration;
 }
