@@ -15,9 +15,6 @@ use Doctrine\Migrations\MigratorConfiguration;
  */
 class MigrationsEventArgs extends EventArgs
 {
-    /** @var Configuration */
-    private $config;
-
     /** @var Connection */
     private $connection;
 
@@ -28,20 +25,13 @@ class MigrationsEventArgs extends EventArgs
     private $migratorConfiguration;
 
     public function __construct(
-        Configuration $config,
         Connection $connection,
         MigrationPlanList $plan,
         MigratorConfiguration $migratorConfiguration
     ) {
-        $this->config                = $config;
         $this->connection            = $connection;
         $this->plan                  = $plan;
         $this->migratorConfiguration = $migratorConfiguration;
-    }
-
-    public function getConfiguration() : Configuration
-    {
-        return $this->config;
     }
 
     public function getConnection() : Connection

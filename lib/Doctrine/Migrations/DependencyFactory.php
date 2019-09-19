@@ -83,9 +83,8 @@ class DependencyFactory
     {
         return $this->getDependency(EventDispatcher::class, function () : EventDispatcher {
             return new EventDispatcher(
-                $this->connection,
-                $this->getConfiguration(),
-                $this->connection->getEventManager()
+                $this->getConnection(),
+                $this->getConnection()->getEventManager()
             );
         });
     }
@@ -94,8 +93,8 @@ class DependencyFactory
     {
         return $this->getDependency(SchemaDumper::class, function () : SchemaDumper {
             return new SchemaDumper(
-                $this->connection->getDatabasePlatform(),
-                $this->connection->getSchemaManager(),
+                $this->getConnection()->getDatabasePlatform(),
+                $this->getConnection()->getSchemaManager(),
                 $this->getMigrationGenerator(),
                 $this->getMigrationSqlGenerator()
             );

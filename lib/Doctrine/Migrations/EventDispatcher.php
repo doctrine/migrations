@@ -20,8 +20,6 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 final class EventDispatcher
 {
-    /** @var Configuration */
-    private $configuration;
 
     /** @var EventManager */
     private $eventManager;
@@ -29,9 +27,8 @@ final class EventDispatcher
     /** @var Connection */
     private $connection;
 
-    public function __construct(Connection $connection, Configuration $configuration, EventManager $eventManager)
+    public function __construct(Connection $connection, EventManager $eventManager)
     {
-        $this->configuration = $configuration;
         $this->eventManager  = $eventManager;
         $this->connection    = $connection;
     }
@@ -68,7 +65,7 @@ final class EventDispatcher
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
     ) : MigrationsEventArgs {
-        return new MigrationsEventArgs($this->configuration, $this->connection, $migrationsPlan, $migratorConfiguration);
+        return new MigrationsEventArgs($this->connection, $migrationsPlan, $migratorConfiguration);
     }
 
     private function createMigrationsVersionEventArgs(
@@ -76,7 +73,6 @@ final class EventDispatcher
         MigratorConfiguration $migratorConfiguration
     ) : MigrationsVersionEventArgs {
         return new MigrationsVersionEventArgs(
-            $this->configuration,
             $this->connection,
             $plan,
             $migratorConfiguration

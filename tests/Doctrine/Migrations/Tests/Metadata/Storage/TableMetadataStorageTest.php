@@ -158,4 +158,21 @@ class TableMetadataStorageTest extends TestCase
 
         self::assertCount(0, $this->connection->fetchAll($sql));
     }
+
+    public function testReset() : void
+    {
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-05 10:30:21'));
+        $result->setTime(31);
+        $this->storage->complete($result);
+
+        $sql = sprintf(
+            'SELECT * FROM %s',
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+        );
+        self::assertCount(1, $this->connection->fetchAll($sql));
+
+        $this->storage->reset($result);
+
+        self::assertCount(0, $this->connection->fetchAll($sql));
+    }
 }
