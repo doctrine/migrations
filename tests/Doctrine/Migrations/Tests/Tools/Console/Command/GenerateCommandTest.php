@@ -32,7 +32,12 @@ final class GenerateCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $input->expects(self::once())
+        $input->expects(self::at(0))
+            ->method('getOption')
+            ->with('namespace')
+            ->willReturn(null);
+
+        $input->expects(self::at(1))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
@@ -55,9 +60,9 @@ final class GenerateCommandTest extends TestCase
             ->with([
                 'Generated new migration class to "<info>/path/to/migration.php</info>"',
                 '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up 1234</info>',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\Version1234\'</info>',
                 '',
-                'To revert the migration you can use <info>migrations:execute --down 1234</info>',
+                'To revert the migration you can use <info>migrations:execute --down \'FooNs\Version1234\'</info>',
             ]);
 
         $this->generateCommand->execute($input, $output);
@@ -66,18 +71,27 @@ final class GenerateCommandTest extends TestCase
     protected function setUp() : void
     {
         $this->configuration      = $this->createMock(Configuration::class);
+        $this->configuration->expects(self::any())
+            ->method('getMigrationDirectories')
+            ->willReturn([
+                'FooNs' => sys_get_temp_dir()
+            ]);
+
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($this->configuration);
 
         $this->dependencyFactory->expects(self::once())
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
 
+
         $this->generateCommand = $this->getMockBuilder(GenerateCommand::class)
+            ->setConstructorArgs([null, $this->dependencyFactory])
             ->setMethods(['procOpen'])
             ->getMock();
-
-        $this->generateCommand->setMigrationConfiguration($this->configuration);
-        $this->generateCommand->setDependencyFactory($this->dependencyFactory);
     }
 }
