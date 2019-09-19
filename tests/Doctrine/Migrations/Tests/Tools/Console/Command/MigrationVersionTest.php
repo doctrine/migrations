@@ -44,7 +44,7 @@ class MigrationVersionTest extends MigrationTestCase
         $conn   = $this->getSqliteConnection();
         $logger = new TestLogger();
 
-        $dependencyFactory = new DependencyFactory($configuration, $conn, $logger);
+        $dependencyFactory = new DependencyFactory($configuration, $conn, null, $logger);
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
