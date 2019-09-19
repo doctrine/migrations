@@ -283,8 +283,7 @@ class DependencyFactory
     {
         return $this->getDependency(Rollup::class, function () : Rollup {
             return new Rollup(
-                $this->configuration,
-                $this->connection,
+                $this->getMetadataStorage(),
                 $this->getMigrationRepository()
             );
         });
