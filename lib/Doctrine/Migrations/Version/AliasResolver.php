@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use function substr;
@@ -49,11 +50,14 @@ final class AliasResolver
     public function resolveVersionAlias(string $alias) : ?Version
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
-
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
 
         switch ($alias) {
             case self::ALIAS_FIRST:
+                if (!count($availableMigrations)) {
+                    throw NoMigrationsToExecute::new();
+                }
+
                 $info = $availableMigrations->getFirst();
 
                 return $info ? $info->getVersion() : null;
@@ -66,10 +70,17 @@ final class AliasResolver
 
                 return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
+                if (!count($availableMigrations)) {
+                    throw NoMigrationsToExecute::new();
+                }
+
                 $newMigrations = $availableMigrations->getNewMigrations($executedMigrations);
 
                 return $newMigrations->getFirst() ? $newMigrations->getFirst()->getVersion() : null;
             case self::ALIAS_LATEST:
+                if (!count($availableMigrations)) {
+                    throw NoMigrationsToExecute::new();
+                }
                 $availableMigration = $availableMigrations->getLast();
 
                 return $availableMigration ? $availableMigration->getVersion() : null;

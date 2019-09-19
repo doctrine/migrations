@@ -28,9 +28,9 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
      */
     private $loader;
 
-    public function __construct(ConfigurationLoader $loader)
+    public function __construct(ConfigurationLoader $loader = null)
     {
-        $this->loader = $loader;
+        $this->loader = $loader ?: new ConfigurationLoader();
     }
 
     public function getConfiguration(InputInterface $input) : Configuration
