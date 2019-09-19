@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SqlFormatter;
@@ -88,9 +89,11 @@ CODE
         $this->configuration = $this->createMock(Configuration::class);
         $this->platform      = $this->createMock(AbstractPlatform::class);
 
+        $this->metadataConfig = $this->createMock(TableMetadataStorageConfiguration::class);
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
-            $this->platform
+            $this->platform,
+            $this->metadataConfig
         );
     }
 
@@ -107,8 +110,8 @@ CODE
 
         $expectedCode = sprintf($expectedCode, $formattedUpdate);
 
-        $this->configuration->expects(self::any())
-            ->method('getMigrationsTableName')
+        $this->metadataConfig->expects(self::any())
+            ->method('getTableName')
             ->willReturn('migrations_table_name');
 
         return $expectedCode;

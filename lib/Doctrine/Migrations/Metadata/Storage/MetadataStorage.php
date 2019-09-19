@@ -12,4 +12,6 @@ interface MetadataStorage
     public function getExecutedMigrations() : ExecutedMigrationsSet;
 
     public function complete(ExecutionResult $migration) : void;
+
+    public function reset() : void;
 }

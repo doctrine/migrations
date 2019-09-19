@@ -7,6 +7,7 @@ namespace Doctrine\Migrations;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Migrations\Generator\FileBuilder;
+use Doctrine\Migrations\Generator\FileBuilderInterface;
 use Psr\Log\LoggerInterface;
 use function file_put_contents;
 use function is_dir;
@@ -25,7 +26,7 @@ final class FileQueryWriter implements QueryWriter
     private $logger;
 
     public function __construct(
-        FileBuilder $migrationFileBuilder,
+        FileBuilderInterface $migrationFileBuilder,
         LoggerInterface $logger
     ) {
         $this->migrationFileBuilder = $migrationFileBuilder;
