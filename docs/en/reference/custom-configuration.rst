@@ -16,6 +16,7 @@ Once you have your custom integration setup, you can modify it to look like the 
     use Doctrine\DBAL\DriverManager;
     use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
     use Doctrine\Migrations\Configuration\Configuration;
+    une Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
     use Doctrine\Migrations\Tools\Console\Command;
     use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
     use Symfony\Component\Console\Application;
@@ -33,15 +34,16 @@ Once you have your custom integration setup, you can modify it to look like the 
     $connection = DriverManager::getConnection($dbParams);
 
     $configuration = new Configuration($connection);
+
     $configuration->setName('My Project Migrations');
-    $configuration->setMigrationsNamespace('MyProject\Migrations');
-    $configuration->setMigrationsTableName('doctrine_migration_versions');
-    $configuration->setMigrationsColumnName('version');
-    $configuration->setMigrationsColumnLength(255);
-    $configuration->setMigrationsExecutedAtColumnName('executed_at');
-    $configuration->setMigrationsDirectory('/data/doctrine/migrations-docs-example/lib/MyProject/Migrations');
+    $configuration->addMigrationsDirectory('MyProject\Migrations', '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations');
     $configuration->setAllOrNothing(true);
     $configuration->setCheckDatabasePlatform(false);
+
+    $storageConfiguration = new TableMetadataStorageConfiguration();
+    $storageConfiguration->setTableName('doctrine_migration_versions');
+
+    $configuration->setMetadataStorageConfiguration($storageConfiguration);
 
     $helperSet = new HelperSet();
     $helperSet->set(new QuestionHelper(), 'question');
