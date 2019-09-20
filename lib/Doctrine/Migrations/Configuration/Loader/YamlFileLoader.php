@@ -26,6 +26,9 @@ class YamlFileLoader extends AbstractFileLoader
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
 
+    /**
+     * @param mixed $file
+     */
     public function load($file) : Configuration
     {
         if (! class_exists(Yaml::class)) {

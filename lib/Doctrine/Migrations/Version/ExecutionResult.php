@@ -41,7 +41,7 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
-    /** @var DateTime */
+    /** @var DateTime|null */
     private $executedAt;
 
     /** @var int */
@@ -56,11 +56,6 @@ class ExecutionResult
     /** @var string */
     private $direction;
 
-    /**
-     * @param string[] $sql
-     * @param mixed[]  $params
-     * @param mixed[]  $types
-     */
     public function __construct(Version $version, string $direction = Direction::UP, ?DateTime $executedAt = null)
     {
         $this->executedAt = $executedAt;

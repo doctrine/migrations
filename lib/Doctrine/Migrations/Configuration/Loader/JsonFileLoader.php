@@ -29,6 +29,9 @@ class JsonFileLoader extends AbstractFileLoader
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
 
+    /**
+     * @param mixed $file
+     */
     public function load($file) : Configuration
     {
         if (! file_exists($file)) {

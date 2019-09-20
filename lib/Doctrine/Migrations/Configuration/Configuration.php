@@ -11,6 +11,7 @@ use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
+use function count;
 use function strcasecmp;
 
 /**
@@ -121,7 +122,7 @@ class Configuration
     /** @throws MigrationException */
     public function validate() : void
     {
-        if (empty($this->migrationsDirectories)) {
+        if (count($this->migrationsDirectories) === 0) {
             throw MigrationsNamespaceRequired::new();
         }
     }

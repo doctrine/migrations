@@ -21,6 +21,9 @@ use function is_bool;
  */
 class ArrayLoader implements Loader
 {
+    /**
+     * @param mixed|array $array
+     */
     public function load($array) : Configuration
     {
         if (! is_array($array)) {
@@ -60,7 +63,12 @@ class ArrayLoader implements Loader
         return $object;
     }
 
-    private static function applyConfigs(array $configMap, $object, $data) : void
+    /**
+     * @param array                                           $configMap
+     * @param Configuration|TableMetadataStorageConfiguration $object
+     * @param array                                           $data
+     */
+    private static function applyConfigs(array $configMap, $object, array $data) : void
     {
         foreach ($data as $configurationKey => $configurationValue) {
             if (! isset($configMap[$configurationKey])) {
