@@ -7,7 +7,6 @@ namespace Doctrine\Migrations;
 use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -20,7 +19,6 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 final class EventDispatcher
 {
-
     /** @var EventManager */
     private $eventManager;
 
@@ -29,8 +27,8 @@ final class EventDispatcher
 
     public function __construct(Connection $connection, EventManager $eventManager)
     {
-        $this->eventManager  = $eventManager;
-        $this->connection    = $connection;
+        $this->eventManager = $eventManager;
+        $this->connection   = $connection;
     }
 
     public function dispatchMigrationEvent(

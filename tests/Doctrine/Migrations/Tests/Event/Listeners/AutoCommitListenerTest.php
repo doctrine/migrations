@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Event\Listeners;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -67,7 +66,7 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     private function createArgs(bool $isDryRun) : MigrationsEventArgs
     {
-        $plan   = new MigrationPlanList([], Direction::UP);
+        $plan = new MigrationPlanList([], Direction::UP);
 
         $configsMigration = new MigratorConfiguration();
         $configsMigration->setDryRun($isDryRun);
