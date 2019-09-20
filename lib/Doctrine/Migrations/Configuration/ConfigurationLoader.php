@@ -35,7 +35,7 @@ class ConfigurationLoader
         ];
     }
 
-    public function getLoader($type) : Loader
+    public function getLoader(string $type) : Loader
     {
         if (count($this->loaders) === 0) {
             $this->setDefaultLoaders();

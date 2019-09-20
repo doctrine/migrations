@@ -8,5 +8,8 @@ use Doctrine\Migrations\Configuration\Configuration;
 
 interface Loader
 {
+    /**
+     * @param mixed $resource
+     */
     function load($resource) : Configuration;
 }

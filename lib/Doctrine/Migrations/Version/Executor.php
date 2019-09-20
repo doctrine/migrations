@@ -273,7 +273,7 @@ final class Executor implements ExecutorInterface
     private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
     {
         $plan->setResult($result);
-        $this->logResult($result, $plan);
+        $this->logResult($e, $result, $plan);
 
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionSkipped,
@@ -295,14 +295,14 @@ final class Executor implements ExecutorInterface
         $this->metadataStorage->complete($result);
     }
 
-    private function logResult(ExecutionResult $result, MigrationPlan $plan) : void
+    private function logResult(Throwable $e, ExecutionResult $result, MigrationPlan $plan) : void
     {
         if ($result->isSkipped()) {
             $this->logger->error(
                 'Migration {version} skipped during %s. Reason {error}',
                 [
                     'version' => (string) $plan->getVersion(),
-                    'reason' => $result->getException()->getMessage(),
+                    'reason' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
             );
@@ -311,7 +311,7 @@ final class Executor implements ExecutorInterface
                 'Migration {version} failed during %s. Error {error}',
                 [
                     'version' => (string) $plan->getVersion(),
-                    'error' => $result->getException()->getMessage(),
+                    'error' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
                 ]
             );

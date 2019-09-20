@@ -39,7 +39,7 @@ class ExecutedMigration
         return $this->executedAt;
     }
 
-    public function getVersion()
+    public function getVersion() : Version
     {
         return $this->version;
     }
