@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Event;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\MigratorConfiguration;
 

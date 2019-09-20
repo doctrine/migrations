@@ -465,4 +465,3 @@ class VersionExecutorTestMigration extends AbstractMigration
         parent::postDown($toSchema);
     }
 }
-
