@@ -47,7 +47,7 @@ class XmlFileLoader extends AbstractFileLoader
     /**
      * @param mixed $file
      */
-    public function __construct(?ArrayLoader $arrayLoader = null) : Configuration
+    public function __construct(?ArrayLoader $arrayLoader = null)
     {
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }

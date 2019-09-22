@@ -64,11 +64,4 @@ class ExecutedMigrationsSet implements Countable
         }
         throw MigrationNotExecuted::new((string) $version);
     }
-
-    public function getExecutedUnavailableMigrations(AvailableMigrationsList $availableMigrationsSet) : ExecutedMigrationsSet
-    {
-        return new ExecutedMigrationsSet(array_filter($this->items, static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
-            return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
-        }));
-    }
 }

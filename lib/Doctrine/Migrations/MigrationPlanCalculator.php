@@ -6,6 +6,9 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -99,5 +102,24 @@ final class MigrationPlanCalculator
         }
 
         return $toExecute;
+    }
+
+    public function getExecutedUnavailableMigrations() : ExecutedMigrationsSet
+    {
+        $executedMigrationsSet = $this->metadataStorage->getExecutedMigrations();
+        $availableMigrationsSet = $this->migrationRepository->getMigrations();
+        return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
+            return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
+        }));
+    }
+
+
+    public function getNewMigrations() : AvailableMigrationsList
+    {
+        $executedMigrationsSet = $this->metadataStorage->getExecutedMigrations();
+        $availableMigrationsSet = $this->migrationRepository->getMigrations();
+        return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
+            return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
+        }));
     }
 }
