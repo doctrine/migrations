@@ -5,10 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata;
 
 use DateTime;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
-use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Version;
@@ -16,14 +13,6 @@ use PHPUnit\Framework\TestCase;
 
 class ExecutedMigrationSetTest extends TestCase
 {
-    /** @var AbstractMigration */
-    private $abstractMigration;
-
-    public function setUp() : void
-    {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
-    }
-
     public function testFirst() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));
@@ -96,24 +85,6 @@ class ExecutedMigrationSetTest extends TestCase
         $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
         self::assertTrue($set->hasMigration(new Version('B')));
         self::assertFalse($set->hasMigration(new Version('D')));
-    }
-
-    public function testGetNewMigrations() : void
-    {
-        $a1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-
-        $m1 = new ExecutedMigration(new Version('A'));
-        $m2 = new ExecutedMigration(new Version('B'));
-        $m3 = new ExecutedMigration(new Version('C'));
-
-        $executedSet = new ExecutedMigrationsSet([$m1, $m2, $m3]);
-
-        $availableSet = new AvailableMigrationsList([$a1]);
-
-        $newSet = $executedSet->getExecutedUnavailableMigrations($availableSet);
-        self::assertInstanceOf(ExecutedMigrationsSet::class, $newSet);
-
-        self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
     public function testExecutedMigration() : void

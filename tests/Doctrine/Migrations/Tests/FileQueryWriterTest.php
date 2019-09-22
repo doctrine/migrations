@@ -9,11 +9,29 @@ use Doctrine\Migrations\Generator\FileBuilderInterface;
 use Doctrine\Migrations\Version\Direction;
 use Psr\Log\LoggerInterface;
 use function file_get_contents;
+use function glob;
+use function is_dir;
+use function is_file;
+use function realpath;
 use function sys_get_temp_dir;
 use function unlink;
 
 final class FileQueryWriterTest extends MigrationTestCase
 {
+    /** @return string[] */
+    private function getSqlFilesList(string $path) : array
+    {
+        if (is_dir($path)) {
+            return glob(realpath($path) . '/*.sql');
+        }
+
+        if (is_file($path)) {
+            return [$path];
+        }
+
+        return [];
+    }
+
     public function testWrite() : void
     {
         $path                 = sys_get_temp_dir();

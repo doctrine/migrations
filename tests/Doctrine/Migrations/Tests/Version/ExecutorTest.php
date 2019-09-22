@@ -8,13 +8,11 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
@@ -32,17 +30,11 @@ use Throwable;
 
 class ExecutorTest extends TestCase
 {
-    /** @var Configuration|MockObject */
-    private $configuration;
-
     /** @var Connection|MockObject */
     private $connection;
 
     /** @var SchemaDiffProviderInterface|MockObject */
     private $schemaDiffProvider;
-
-    /** @var OutputWriter|MockObject */
-    private $outputWriter;
 
     /** @var ParameterFormatter|MockObject */
     private $parameterFormatter;
@@ -189,9 +181,12 @@ class ExecutorTest extends TestCase
             ->setTimeAllQueries(true);
 
         $listener = new class() {
+            /** @var bool */
             public $onMigrationsVersionExecuting = false;
-            public $onMigrationsVersionExecuted  = false;
-            public $onMigrationsVersionSkipped   = false;
+            /** @var bool */
+            public $onMigrationsVersionExecuted = false;
+            /** @var bool */
+            public $onMigrationsVersionSkipped = false;
 
             public function onMigrationsVersionExecuting() : void
             {
@@ -244,8 +239,10 @@ class ExecutorTest extends TestCase
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
         $listener = new class() {
+            /** @var bool */
             public $onMigrationsVersionExecuting = false;
-            public $onMigrationsVersionExecuted  = false;
+            /** @var bool */
+            public $onMigrationsVersionExecuted = false;
 
             public function onMigrationsVersionExecuting() : void
             {
@@ -284,9 +281,12 @@ class ExecutorTest extends TestCase
         $this->migration->error = true;
 
         $listener = new class() {
+            /** @var bool */
             public $onMigrationsVersionExecuting = false;
-            public $onMigrationsVersionExecuted  = false;
-            public $onMigrationsVersionSkipped   = false;
+            /** @var bool */
+            public $onMigrationsVersionExecuted = false;
+            /** @var bool */
+            public $onMigrationsVersionSkipped = false;
 
             public function onMigrationsVersionExecuting() : void
             {
@@ -351,7 +351,6 @@ class ExecutorTest extends TestCase
     protected function setUp() : void
     {
         $this->metadataStorage    = $this->createMock(MetadataStorage::class);
-        $this->configuration      = $this->createMock(Configuration::class);
         $this->connection         = $this->createMock(Connection::class);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
@@ -374,7 +373,7 @@ class ExecutorTest extends TestCase
 
         $this->version = new Version('test');
 
-        $this->migration = new VersionExecutorTestMigration($this->versionExecutor, $this->connection, $this->logger);
+        $this->migration = new VersionExecutorTestMigration($this->connection, $this->logger);
 
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
@@ -412,7 +411,9 @@ class VersionExecutorTestMigration extends AbstractMigration
     /** @var string */
     private $description = '';
 
-    public $skip  = false;
+    /** @var bool */
+    public $skip = false;
+    /** @var bool */
     public $error = false;
 
     public function getDescription() : string

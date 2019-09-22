@@ -7,24 +7,21 @@ namespace Doctrine\Migrations\Tests\Version;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Version\ExecutorInterface;
 use Doctrine\Migrations\Version\Factory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionProperty;
 
 final class FactoryTest extends TestCase
 {
-    /** @var ExecutorInterface */
-    private $migrationExecutor;
+    /** @var MockObject|Connection */
+    private $connection;
+    /** @var MockObject|LoggerInterface */
+    private $logger;
 
     /** @var Factory */
-    private $migrationFactory;
-
-
-    private $connection;
-
-    private $logger;
+    private $versionFactory;
 
     public function testCreateVersion() : void
     {
@@ -38,21 +35,15 @@ final class FactoryTest extends TestCase
         $ref = new ReflectionProperty(AbstractMigration::class, 'logger');
         $ref->setAccessible(true);
         self::assertSame($this->logger, $ref->getValue($migration));
-
-        $ref = new ReflectionProperty(AbstractMigration::class, 'executor');
-        $ref->setAccessible(true);
-        self::assertSame($this->versionExecutor, $ref->getValue($migration));
     }
 
     protected function setUp() : void
     {
-        $this->connection      = $this->createMock(Connection::class);
-        $this->versionExecutor = $this->createMock(ExecutorInterface::class);
-        $this->logger          = $this->createMock(LoggerInterface::class);
+        $this->connection = $this->createMock(Connection::class);
+        $this->logger     = $this->createMock(LoggerInterface::class);
 
         $this->versionFactory = new Factory(
             $this->connection,
-            $this->versionExecutor,
             $this->logger
         );
     }
@@ -68,7 +59,7 @@ class VersionFactoryTestMigration extends AbstractMigration
     {
     }
 
-    public function getConnection()
+    public function getConnection() : Connection
     {
         return $this->connection;
     }

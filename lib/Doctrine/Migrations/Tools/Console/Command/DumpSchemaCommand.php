@@ -95,7 +95,8 @@ EOT
         $configuration = $this->dependencyFactory->getConfiguration();
         $versionNumber = $configuration->generateVersionNumber();
 
-        if (! ($namespace = $input->getOption('namespace'))) {
+        $namespace = $input->getOption('namespace');
+        if ($namespace === null) {
             $dirs      = $configuration->getMigrationDirectories();
             $namespace = key($dirs);
         }

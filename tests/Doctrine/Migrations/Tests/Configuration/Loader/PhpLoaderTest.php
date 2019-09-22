@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
 
 class PhpLoaderTest extends AbstractLoaderTest
 {
-    public function load($prefix = '') : Configuration
+    public function load(string $prefix = '') : Configuration
     {
         $loader = new PHPFileLoader();
 

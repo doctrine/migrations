@@ -32,12 +32,29 @@
         <exclude-pattern>lib/Doctrine/Migrations/Events.php</exclude-pattern>
     </rule>
 
+
     <rule ref="Generic.Strings.UnnecessaryStringConcat.Found">
         <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
+    </rule>
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedMethod">
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint">
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
+    </rule>
+
+    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint">
+        <exclude-pattern>lib/Doctrine/Migrations/Metadata/ExecutedMigrationsSet.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Metadata/AvailableMigrationsList.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Metadata/MigrationPlanList.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Version/Version.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
@@ -47,6 +64,8 @@
         <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
         <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/AbstractConfigurationTest.php</exclude-pattern>
         <exclude-pattern>tests/Doctrine/Migrations/Tests/Tools/Console/Command/AbstractCommandTest.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/Loader/AbstractLoaderTest.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
@@ -58,6 +77,11 @@
         <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/ExecutorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Version/VersionInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/MigratorConfigurationFactoryInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Generator/FileBuilderInterface.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Version/AliasResolverInterface.php</exclude-pattern>
+
+
     </rule>
 </ruleset>

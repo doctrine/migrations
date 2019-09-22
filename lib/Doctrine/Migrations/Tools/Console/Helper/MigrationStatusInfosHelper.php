@@ -5,24 +5,17 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
-use Doctrine\Migrations\Metadata\MigrationPlan;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationPlanCalculator;
-use Doctrine\Migrations\MigrationRepository;
-use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\AliasResolverInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Component\Console\Helper\TableStyle;
-use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+use function array_unshift;
 use function count;
 use function get_class;
 use function sprintf;
@@ -52,7 +45,7 @@ class MigrationStatusInfosHelper
         AliasResolverInterface $aliasResolver
     ) {
         $this->configuration = $configuration;
-        $this->connection = $connection;
+        $this->connection    = $connection;
         $this->aliasResolver = $aliasResolver;
     }
 
@@ -62,9 +55,7 @@ class MigrationStatusInfosHelper
         ExecutedMigrationsSet $executedMigrations,
         AvailableMigrationsList $newMigrations,
         ExecutedMigrationsSet $executedUnavailableMigrations
-    ): void
-    {
-
+    ) : void {
         $storage = $this->configuration->getMetadataStorageConfiguration();
 
         $table = new Table($output);
@@ -79,7 +70,7 @@ class MigrationStatusInfosHelper
         foreach ($data as $k => $v) {
             $table->addRow([
                 '<info>' . $k . '</info>',
-                new TableCell((string)$v, ['colspan' => 2])
+                new TableCell((string) $v, ['colspan' => 2]),
             ]);
         }
         $dataGroup = [
@@ -114,15 +105,14 @@ class MigrationStatusInfosHelper
             ];
             $table->addRow([new TableSeparator(['colspan' => 3])]);
             foreach ($data as $k => $v) {
-                $table->addRows([
-                    '<info>'.$k.'</info>',
-                    new TableCell($v, ['colspan' => 2])
+                $table->addRow([
+                    '<info>' . $k . '</info>',
+                    new TableCell($v, ['colspan' => 2]),
                 ]);
             }
         }
 
-
-        foreach ($dataGroup as $group => $dataValues){
+        foreach ($dataGroup as $group => $dataValues) {
             $nsRows = [];
             foreach ($dataValues as $k => $v) {
                 $nsRows[] = [
@@ -130,20 +120,22 @@ class MigrationStatusInfosHelper
                     $v,
                 ];
             }
-            if (count($nsRows) > 0) {
-                $table->addRow([new TableSeparator(['colspan' => 3])]);
-                array_unshift($nsRows[0],
-                    new TableCell(  '<info>' . $group . '</info>', ['rowspan' => count($dataValues)])
-                );
-                $table->addRows($nsRows);
+            if (count($nsRows) <= 0) {
+                continue;
             }
-        }
 
+            $table->addRow([new TableSeparator(['colspan' => 3])]);
+            array_unshift(
+                $nsRows[0],
+                new TableCell('<info>' . $group . '</info>', ['rowspan' => count($dataValues)])
+            );
+            $table->addRows($nsRows);
+        }
 
         $table->render();
     }
 
-    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsSet $executedMigrationsSet): string
+    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsSet $executedMigrationsSet) : string
     {
         try {
             $version = $this->aliasResolver->resolveVersionAlias($alias);

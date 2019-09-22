@@ -7,19 +7,12 @@ namespace Doctrine\Migrations\Tests\Finder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use InvalidArgumentException;
 use const PHP_OS;
-use function asort;
 use function count;
+use function in_array;
 use function stripos;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {
-    public function testVersionNameCausesErrorWhen0() : void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->finder->findMigrations(__DIR__ . '/_regression/NoVersionNamed0');
-    }
-
     public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -48,19 +41,14 @@ class RecursiveRegexFinderTest extends FinderTestCase
         ];
 
         if (stripos(PHP_OS, 'Win') === false) {
-            $tests['1SymlinkedFile'] = 'TestMigrations\\Version1SymlinkedFile';
+            $tests[] = 'TestMigrations\\Version1SymlinkedFile';
         }
 
         self::assertCount(count($tests), $migrations); // Windows does not support symlinks
-        foreach ($tests as $version => $namespace) {
-            self::assertArrayHasKey($version, $migrations);
-            self::assertSame($namespace, $migrations[$version]);
+        foreach ($tests as $fqcn) {
+            self::assertTrue(in_array($fqcn, $migrations, true));
         }
-        $migrationsForTestSort = $migrations;
 
-        asort($migrationsForTestSort);
-
-        self::assertSame($migrations, $migrationsForTestSort, 'Finder have to return sorted list of the files.');
         self::assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
         self::assertArrayNotHasKey('Version20150502000002', $migrations);
         self::assertArrayNotHasKey('20150502000002', $migrations);

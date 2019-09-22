@@ -26,7 +26,7 @@ use function strlen;
  */
 abstract class AbstractCommand extends Command
 {
-    /** @var DependencyFactory */
+    /** @var DependencyFactory|null */
     protected $dependencyFactory;
 
     public function initialize(

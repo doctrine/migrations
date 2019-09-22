@@ -10,7 +10,7 @@ use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
 
 class JsonLoaderTest extends AbstractLoaderTest
 {
-    public function load($prefix = '') : Configuration
+    public function load(string $prefix = '') : Configuration
     {
         $loader = new JsonFileLoader();
 

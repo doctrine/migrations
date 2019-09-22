@@ -8,8 +8,6 @@ use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
-use Doctrine\Migrations\Version\ExecutorInterface;
-use Psr\Log\AbstractLogger;
 use Psr\Log\LoggerInterface;
 
 class AbstractMigrationTest extends MigrationTestCase
@@ -22,17 +20,9 @@ class AbstractMigrationTest extends MigrationTestCase
 
     protected function setUp() : void
     {
-        $this->logger = new class () extends AbstractLogger {
-            public $logs = [];
+        $this->logger = new TestLogger();
 
-            public function log($level, $message, array $context = []) : void
-            {
-                $this->logs[] = $message;
-            }
-        };
-
-        $versionExecutor = $this->createMock(ExecutorInterface::class);
-        $this->migration = new AbstractMigrationStub($versionExecutor, $this->getSqliteConnection(), $this->logger);
+        $this->migration = new AbstractMigrationStub($this->getSqliteConnection(), $this->logger);
     }
 
     public function testGetDescriptionReturnsEmptyString() : void
@@ -40,17 +30,24 @@ class AbstractMigrationTest extends MigrationTestCase
         self::assertSame('', $this->migration->getDescription());
     }
 
+    public function testAddSql() : void
+    {
+        $this->migration->exposedAddSql('SELECT 1', [1], [2]);
+
+        self::assertSame([['SELECT 1', [1], [2]]], $this->migration->getSql());
+    }
+
     public function testWarnIfOutputMessage() : void
     {
         $this->migration->warnIf(true, 'Warning was thrown');
 
-        self::assertContains('Warning during No State: Warning was thrown', $this->getLogOutput($this->logger));
+        self::assertContains('Warning was thrown', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfAddDefaultMessage() : void
     {
         $this->migration->warnIf(true);
-        self::assertContains('Warning during No State: Unknown Reason', $this->getLogOutput($this->logger));
+        self::assertContains('Unknown Reason', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfDontOutputMessageIfFalse() : void

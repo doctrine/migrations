@@ -4,9 +4,10 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\ArrayLoader;
-use Doctrine\Migrations\Configuration\JsonConfiguration;
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\ConfigurationLoader;
+use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
+use Doctrine\Migrations\Configuration\Loader\Loader;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use InvalidArgumentException;
@@ -14,20 +15,22 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
-use function copy;
-use function trim;
-use function unlink;
+use function chdir;
+use function getcwd;
 
 class ConfigurationHelperTest extends MigrationTestCase
 {
-    /** @var Connection */
-    private $connection;
-
     /** @var StreamOutput */
     protected $output;
 
     /** @var InputInterface|MockObject */
     private $input;
+
+    /** @var MockObject */
+    private $loader;
+
+    /** @var ConfigurationHelper */
+    private $configurationHelper;
 
     protected function setUp() : void
     {
@@ -35,85 +38,126 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->setConstructorArgs([[]])
             ->setMethods(['getOption'])
             ->getMock();
-    }
 
-    /**
-     * Used in other tests to see if xml or yaml or yml config files are loaded.
-     */
-    protected function getConfigurationHelperLoadsASpecificFormat(
-        string $baseFile,
-        string $configFile
-    ) : string {
-        try {
-            $file = 'tests/Doctrine/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
-            copy($file, $configFile);
+        $this->loader = $this->getMockBuilder(ArrayInput::class)
+            ->setConstructorArgs([[]])
+            ->setMethods(['getOption'])
+            ->getMock();
 
-            $this->input->method('getOption')
-                ->with('configuration')
-                ->will(self::returnValue(null));
-
-            $configurationHelper = new ConfigurationHelper();
-            $configfileLoaded    = $configurationHelper->getConfiguration($this->input);
-
-            return trim($this->getOutputStreamContent($this->output));
-        } finally {
-            unlink($configFile); //i want to be really sure to cleanup this file
-        }
-    }
-
-    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() : void
-    {
-        $this->input->method('getOption')
-            ->with('configuration')
-            ->will(self::returnValue(__DIR__ . '/files/config.php'));
-
-        $configurationHelper = new ConfigurationHelper();
-        $migrationConfig     = $configurationHelper->getConfiguration($this->input);
-
-        self::assertInstanceOf(ArrayLoader::class, $migrationConfig);
-        self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
-    }
-
-    public function testConfigurationHelperLoadsJsonFormatFromCommandLine() : void
-    {
-        $this->input->method('getOption')
-            ->with('configuration')
-            ->will(self::returnValue(__DIR__ . '/files/config.json'));
-
-        $configurationHelper = new ConfigurationHelper();
-        $migrationConfig     = $configurationHelper->getConfiguration($this->input);
-
-        self::assertInstanceOf(JsonConfiguration::class, $migrationConfig);
-        self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
+        $this->loader              = $this->createMock(ConfigurationLoader::class);
+        $this->configurationHelper = new ConfigurationHelper($this->loader);
     }
 
     /**
      * Test that unsupported file type throws exception
      */
+    public function testNoAvailableConfigGivesBackEmptyConfig() : void
+    {
+        $this->input->method('getOption')
+            ->with('configuration')
+            ->willReturn(null);
+
+        $confExpected = $this->createMock(Configuration::class);
+        $configLoader = $this->createMock(Loader::class);
+
+        $configLoader
+            ->expects($this->once())
+            ->method('load')
+            ->with([])
+            ->willReturn($confExpected);
+
+        $this->loader
+            ->expects($this->once())
+            ->method('getLoader')
+            ->with('array')
+            ->willReturn($configLoader);
+
+        $dir = getcwd();
+        try {
+            chdir(__DIR__);
+            $this->configurationHelper->getConfiguration($this->input);
+        } finally {
+            chdir($dir);
+        }
+    }
+
     public function testConfigurationHelperFailsToLoadOtherFormat() : void
     {
         $this->input->method('getOption')
             ->with('configuration')
             ->will(self::returnValue('testconfig.wrong'));
-
-        $configurationHelper = new ConfigurationHelper();
+        $this->loader
+            ->expects($this->once())
+            ->method('getLoader')
+            ->with('wrong')
+            ->willThrowException(UnknownLoader::new('dummy'));
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Given config file type is not supported');
 
-        $configurationHelper->getConfiguration($this->input);
+        $dir = getcwd();
+        try {
+            chdir(__DIR__);
+            $this->configurationHelper->getConfiguration($this->input);
+        } finally {
+            chdir($dir);
+        }
     }
 
-    public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath() : void
+    public function testLoadsFile() : void
     {
+        $confExpected = $this->createMock(Configuration::class);
+        $configLoader = $this->createMock(Loader::class);
+
+        $configLoader
+            ->expects($this->once())
+            ->method('load')
+            ->with('config.php')
+            ->willReturn($confExpected);
+
+        $this->loader
+            ->expects($this->once())
+            ->method('getLoader')
+            ->with('php')
+            ->willReturn($configLoader);
+
         $this->input->method('getOption')
             ->with('configuration')
-            ->will(self::returnValue(null));
+            ->will(self::returnValue('config.php'));
 
-        $configurationHelper = new ConfigurationHelper($this->connection, null);
+        $config = $this->configurationHelper->getConfiguration($this->input);
 
-        $migrationConfig = $configurationHelper->getConfiguration($this->input);
+        self::assertSame($config, $confExpected);
+    }
 
-        self::assertStringMatchesFormat('', $this->getOutputStreamContent($this->output));
+    public function testLoadsDefaultFile() : void
+    {
+        $confExpected = $this->createMock(Configuration::class);
+        $configLoader = $this->createMock(Loader::class);
+
+        $configLoader
+            ->expects($this->once())
+            ->method('load')
+            ->with('migrations.php')
+            ->willReturn($confExpected);
+
+        $this->loader
+            ->expects($this->once())
+            ->method('getLoader')
+            ->with('php')
+            ->willReturn($configLoader);
+
+        $this->input->method('getOption')
+            ->with('configuration')
+            ->willReturn(null);
+
+        $dir = getcwd();
+        try {
+            chdir(__DIR__ . '/files');
+            $config = $this->configurationHelper->getConfiguration($this->input);
+        } finally {
+            chdir($dir);
+        }
+        self::assertSame($config, $confExpected);
     }
 }

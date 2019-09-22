@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Metadata;
 use Countable;
 use Doctrine\Migrations\Exception\MigrationNotAvailable;
 use Doctrine\Migrations\Version\Version;
-use function array_filter;
 use function array_values;
 use function count;
 
@@ -16,6 +15,9 @@ class AvailableMigrationsList implements Countable
     /** @var AvailableMigration[] */
     private $items = [];
 
+    /**
+     * @param AvailableMigration[] $items
+     */
     public function __construct(array $items)
     {
         $this->items = array_values($items);
@@ -65,5 +67,4 @@ class AvailableMigrationsList implements Countable
 
         throw MigrationNotAvailable::new((string) $version);
     }
-
 }

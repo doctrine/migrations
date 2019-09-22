@@ -11,5 +11,5 @@ interface Loader
     /**
      * @param mixed $resource
      */
-    function load($resource) : Configuration;
+    public function load($resource) : Configuration;
 }

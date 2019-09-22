@@ -17,8 +17,12 @@ use function strtr;
 
 class TestLogger extends AbstractLogger
 {
+    /** @var string[] */
     public $logs = [];
 
+    /**
+     * @param mixed[] $context
+     */
     public function log($level, $message, array $context = []) : void
     {
         $this->logs[] = $this->interpolate($message, $context);
@@ -26,6 +30,8 @@ class TestLogger extends AbstractLogger
 
     /**
      * Interpolates context values into the message placeholders.
+     *
+     * @param mixed[] $context
      */
     private function interpolate(string $message, array $context) : string
     {

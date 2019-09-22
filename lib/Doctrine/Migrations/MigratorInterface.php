@@ -13,5 +13,8 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 interface MigratorInterface
 {
+    /**
+     * @return string[][]
+     */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array;
 }

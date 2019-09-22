@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Metadata;
 use Countable;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Version\Version;
-use function array_filter;
 use function array_values;
 use function count;
 
@@ -16,6 +15,9 @@ class ExecutedMigrationsSet implements Countable
     /** @var ExecutedMigration[] */
     private $items = [];
 
+    /**
+     * @param ExecutedMigration[] $items
+     */
     public function __construct(array $items)
     {
         $this->items = array_values($items);

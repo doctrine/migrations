@@ -24,6 +24,9 @@ class XmlFileLoader extends AbstractFileLoader
     /** @var ArrayLoader */
     private $arrayLoader;
 
+    /**
+     * @return mixed[]
+     */
     private function extractParameters(SimpleXMLElement $root, bool $nodes = true) : array
     {
         $config = [];
@@ -52,6 +55,9 @@ class XmlFileLoader extends AbstractFileLoader
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
     }
 
+    /**
+     * @param mixed|string $file
+     */
     public function load($file) : Configuration
     {
         if (! file_exists($file)) {

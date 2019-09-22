@@ -8,8 +8,6 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotAvailable;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
@@ -95,24 +93,6 @@ class AvailableMigrationListTest extends TestCase
         $set = new AvailableMigrationsList([$m1, $m2, $m3]);
         self::assertTrue($set->hasMigration(new Version('B')));
         self::assertFalse($set->hasMigration(new Version('D')));
-    }
-
-    public function testGetNewMigrations() : void
-    {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
-        $e1 = new ExecutedMigration(new Version('A'));
-
-        $executedSet = new ExecutedMigrationsSet([$e1]);
-
-        $set = new AvailableMigrationsList([$m1, $m2, $m3]);
-
-        $newSet = $set->getNewMigrations($executedSet);
-
-        self::assertInstanceOf(AvailableMigrationsList::class, $newSet);
-        self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
     public function testAvailableMigration() : void

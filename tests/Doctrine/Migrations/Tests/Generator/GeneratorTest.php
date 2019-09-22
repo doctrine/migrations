@@ -60,14 +60,10 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
-    public function testCustomTemplateThrowsInvalidArgumentExceptionWhenNamespaceDirMissing() : void
+    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing() : void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Path not defined for the namespace "Bar"');
-
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn('invalid');
 
         $this->migrationGenerator->generateMigration('1234', 'Bar');
     }

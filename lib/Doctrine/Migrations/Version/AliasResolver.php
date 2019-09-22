@@ -31,15 +31,13 @@ final class AliasResolver implements AliasResolverInterface
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /**
-     * @var MigrationPlanCalculator
-     */
+    /** @var MigrationPlanCalculator */
     private $migrationPlanCalculator;
 
     public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage, MigrationPlanCalculator $migrationPlanCalculator)
     {
-        $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage     = $metadataStorage;
+        $this->migrationRepository     = $migrationRepository;
+        $this->metadataStorage         = $metadataStorage;
         $this->migrationPlanCalculator = $migrationPlanCalculator;
     }
 
@@ -61,10 +59,9 @@ final class AliasResolver implements AliasResolverInterface
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
-
         switch ($alias) {
             case self::ALIAS_FIRST:
-                if (! count($availableMigrations)) {
+                if (count($availableMigrations) === 0) {
                     throw NoMigrationsToExecute::new();
                 }
 
@@ -73,32 +70,31 @@ final class AliasResolver implements AliasResolverInterface
                 if ($info !== null) {
                     return $info->getVersion();
                 }
-
+                throw UnknownMigrationVersion::new($alias);
             case self::ALIAS_CURRENT:
                 $info = $executedMigrations->getLast();
 
-                if ($info !== null) {
-                    return $info->getVersion();
-                }
+                return $info !== null ? $info->getVersion() : new Version('0');
             case self::ALIAS_PREV:
                 $info = $executedMigrations->getLast(-1);
 
-                return $info ? $info->getVersion() : new Version('0');
+                return $info !== null ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
                 $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
-                if (!count($newMigrations)) {
-                    throw NoMigrationsToExecute::new();
+
+                $info = $newMigrations->getFirst();
+                if ($info !== null) {
+                    return $info->getVersion();
                 }
-                return $newMigrations->getFirst()->getVersion();
+
+                throw NoMigrationsToExecute::new();
             case self::ALIAS_LATEST:
-                if (! count($availableMigrations)) {
-                    throw NoMigrationsToExecute::new();
-                }
                 $availableMigration = $availableMigrations->getLast();
 
                 if ($availableMigration !== null) {
                     return $availableMigration->getVersion();
                 }
+                throw NoMigrationsToExecute::new();
 
             default:
                 if ($availableMigrations->hasMigration(new Version($alias))) {

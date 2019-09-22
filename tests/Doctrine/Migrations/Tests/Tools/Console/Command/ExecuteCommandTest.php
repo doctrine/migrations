@@ -41,9 +41,11 @@ class ExecuteCommandTest extends TestCase
     private $queryWriter;
 
     /**
+     * @param mixed $arg
+     *
      * @dataProvider getWriteSqlValues
      */
-    public function testWriteSql($arg, $path) : void
+    public function testWriteSql($arg, string $path) : void
     {
         $this->migrator
             ->expects(self::once())
@@ -67,7 +69,10 @@ class ExecuteCommandTest extends TestCase
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
     }
 
-    public function getWriteSqlValues()
+    /**
+     * @return mixed[]
+     */
+    public function getWriteSqlValues() : array
     {
         return [
             [true, getcwd()],

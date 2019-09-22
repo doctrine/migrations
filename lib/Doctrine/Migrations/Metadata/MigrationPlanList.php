@@ -17,6 +17,9 @@ class MigrationPlanList implements Countable
     /** @var MigrationPlan[] */
     private $items = [];
 
+    /**
+     * @param MigrationPlan[] $items
+     */
     public function __construct(array $items, string $direction)
     {
         $this->items     = $items;

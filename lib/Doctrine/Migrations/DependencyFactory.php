@@ -103,6 +103,7 @@ class DependencyFactory
 
     private function getSchemaProvider() : SchemaProviderInterface
     {
+        // @todo what about the other schema providers?
         return $this->getDependency(SchemaProviderInterface::class, function () : SchemaProviderInterface {
             return new OrmSchemaProvider($this->em);
         });
@@ -182,7 +183,7 @@ class DependencyFactory
             return new MigrationRepository(
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                new Factory($this->getConnection(), $this->getVersionExecutor(), $this->getLogger()),
+                new Factory($this->getConnection(), $this->getLogger()),
                 $this->sorter
             );
         });
@@ -252,7 +253,6 @@ class DependencyFactory
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage(),
                 $this->getMigrationPlanCalculator()
-
             );
         });
     }

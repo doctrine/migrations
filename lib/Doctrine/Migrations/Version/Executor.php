@@ -196,6 +196,10 @@ final class Executor implements ExecutorInterface
 
         $migration->$direction($toSchema);
 
+        foreach ($migration->getSql() as $sqlData) {
+            $this->addSql(...$sqlData);
+        }
+
         foreach ($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema) as $sql) {
             $this->addSql($sql);
         }
@@ -252,6 +256,9 @@ final class Executor implements ExecutorInterface
         return $result;
     }
 
+    /**
+     * @return mixed[]
+     */
     private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction) : array
     {
         $versionInfo = (string) $planItem->getVersion();

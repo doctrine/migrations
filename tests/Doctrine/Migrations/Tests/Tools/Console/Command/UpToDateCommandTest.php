@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
@@ -23,9 +24,6 @@ class UpToDateCommandTest extends MigrationTestCase
 {
     /** @var MigrationRepository|MockObject */
     private $migrationRepository;
-
-    /** @var UpToDateCommand */
-    private $upToDateCommand;
 
     /** @var MetadataStorage */
     private $metadataStorage;
@@ -54,6 +52,11 @@ class UpToDateCommandTest extends MigrationTestCase
     }
 
     /**
+     * @param string[] $migrations
+     * @param string[] $migratedVersions
+     *
+     * @throws MigrationException
+     *
      * @dataProvider dataIsUpToDate
      */
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false) : void
