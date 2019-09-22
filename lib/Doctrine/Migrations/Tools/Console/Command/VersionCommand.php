@@ -149,7 +149,7 @@ EOT
         }
 
         $storage = $this->dependencyFactory->getMetadataStorage();
-        if (! $availableMigration) {
+        if ($availableMigration === null) {
             if ((bool) $input->getOption('delete') === false) {
                 throw UnknownMigrationVersion::new((string) $version);
             }

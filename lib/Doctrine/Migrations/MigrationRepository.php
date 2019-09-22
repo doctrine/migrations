@@ -42,6 +42,9 @@ class MigrationRepository
     /** @var callable */
     private $sorter;
 
+    /**
+     * @param array<string, string> $migrationDirectories
+     */
     public function __construct(
         array $migrationDirectories,
         MigrationFinder $migrationFinder,

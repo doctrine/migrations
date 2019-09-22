@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Configuration;
 use DateTimeImmutable;
 use DateTimeInterface;
 use DateTimeZone;
-use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
+use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
@@ -65,6 +65,9 @@ class Configuration
         $this->migrationsDirectories[$namespace] = $path;
     }
 
+    /**
+     * @return array<string,string>
+     */
     public function getMigrationDirectories() : array
     {
         return $this->migrationsDirectories;
@@ -123,7 +126,7 @@ class Configuration
     public function validate() : void
     {
         if (count($this->migrationsDirectories) === 0) {
-            throw MigrationsNamespaceRequired::new();
+            throw MissingNamespaceConfiguration::new();
         }
     }
 

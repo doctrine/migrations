@@ -98,6 +98,8 @@ class ExecutionResult
 
     /**
      * @param string[] $sql
+     * @param mixed[]  $params
+     * @param int[]    $types
      */
     public function setSql(array $sql, array $params = [], array $types = []) : void
     {

@@ -56,7 +56,7 @@ class StatusCommandTest extends MigrationTestCase
 
     public function testExecute() : void
     {
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime());
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-01 02:03:04'));
         $result->setTime(10);
         $this->metadataStorage->complete($result);
 
@@ -72,24 +72,33 @@ class StatusCommandTest extends MigrationTestCase
 
         self::assertSame(
             [
-                0 => '== Configuration',
-                1 => '',
-                2 => '>> Name:                                               Doctrine Database Migrations',
-                3 => '>> Database Driver:                                    pdo_sqlite',
-                4 => '>> Database Host:',
-                5 => '>> Database Name:',
-                6 => '>> Configuration Source:                               manually configured',
-                7 => '>> Version storage:                                    Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration',
-                8 => '>> Previous Version:                                   1230',
-                9 => '>> Current Version:                                    1233',
-                10 => '>> Next Version:                                       Already at latest version',
-                11 => '>> Latest Version:',
-                12 => '>> Executed Migrations:                                2',
-                13 => '>> Executed Unavailable Migrations:                    2',
-                14 => '>> Available Migrations:                               0',
-                15 => '>> New Migrations:                                     0',
-                16 => '>> Version Table Name:                                 doctrine_migration_versions',
-                17 => '>> Version Column Name:                                version',
+                0 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                1 => '| Configuration                                                                                                        |',
+                2 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                3 => '| Project              | Doctrine Database Migrations                                                                  |',
+                4 => '|----------------------------------------------------------------------------------------------------------------------|',
+                5 => '| Project              | Doctrine Database Migrations                                                                  |',
+                6 => '|----------------------------------------------------------------------------------------------------------------------|',
+                7 => '| Storage              | Type                 | Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration |',
+                8 => '|                      | Table Name           | doctrine_migration_versions                                            |',
+                9 => '|                      | Column Name          | version                                                                |',
+                10 => '|----------------------------------------------------------------------------------------------------------------------|',
+                11 => '| Database             | Driver               | pdo_sqlite                                                             |',
+                12 => '|                      | Host                 |                                                                        |',
+                13 => '|                      | Name                 |                                                                        |',
+                14 => '|----------------------------------------------------------------------------------------------------------------------|',
+                15 => '| Versions             | Previous             | 1230                                                                   |',
+                16 => '|                      | Current              | 1233                                                                   |',
+                17 => '|                      | Next                 | Already at latest version                                              |',
+                18 => '|                      | Latest               |                                                                        |',
+                19 => '|----------------------------------------------------------------------------------------------------------------------|',
+                20 => '| Migrations           | Executed             | 2                                                                      |',
+                21 => '|                      | Executed Unavailable | 2                                                                      |',
+                22 => '|                      | Available            | 0                                                                      |',
+                23 => '|                      | New                  | 0                                                                      |',
+                24 => '|----------------------------------------------------------------------------------------------------------------------|',
+                25 => '| Migration Namespaces | DoctrineMigrations   | /tmp                                                                   |',
+                26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
             ],
             $lines
         );
@@ -101,7 +110,7 @@ class StatusCommandTest extends MigrationTestCase
         $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
         $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
 
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime());
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-01 02:03:04'));
         $result->setTime(10);
         $this->metadataStorage->complete($result);
 
@@ -114,36 +123,50 @@ class StatusCommandTest extends MigrationTestCase
         );
 
         $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay())));
-
         self::assertSame(
             [
-                0 => '== Configuration',
-                1 => '',
-                2 => '>> Name:                                               Doctrine Database Migrations',
-                3 => '>> Database Driver:                                    pdo_sqlite',
-                4 => '>> Database Host:',
-                5 => '>> Database Name:',
-                6 => '>> Configuration Source:                               manually configured',
-                7 => '>> Version storage:                                    Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration',
-                8 => '>> Previous Version:                                   1230',
-                9 => '>> Current Version:                                    1233',
-                10 => '>> Next Version:                                       1231',
-                11 => '>> Latest Version:                                     1231',
-                12 => '>> Executed Migrations:                                2',
-                13 => '>> Executed Unavailable Migrations:                    1',
-                14 => '>> Available Migrations:                               2',
-                15 => '>> New Migrations:                                     1',
-                16 => '>> Version Table Name:                                 doctrine_migration_versions',
-                17 => '>> Version Column Name:                                version',
-                18 => '',
-                19 => '== Available Migration Versions',
-                20 => '',
-                21 => '>> 1230                                             migrated',
-                22 => '>> 1231                                             not migrated',
-                23 => '',
-                24 => '== Previously Executed Unavailable Migration Versions',
-                25 => '',
-                26 => '>> 1233',
+                0 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                1 => '| Configuration                                                                                                        |',
+                2 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                3 => '| Project              | Doctrine Database Migrations                                                                  |',
+                4 => '|----------------------------------------------------------------------------------------------------------------------|',
+                5 => '| Project              | Doctrine Database Migrations                                                                  |',
+                6 => '|----------------------------------------------------------------------------------------------------------------------|',
+                7 => '| Storage              | Type                 | Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration |',
+                8 => '|                      | Table Name           | doctrine_migration_versions                                            |',
+                9 => '|                      | Column Name          | version                                                                |',
+                10 => '|----------------------------------------------------------------------------------------------------------------------|',
+                11 => '| Database             | Driver               | pdo_sqlite                                                             |',
+                12 => '|                      | Host                 |                                                                        |',
+                13 => '|                      | Name                 |                                                                        |',
+                14 => '|----------------------------------------------------------------------------------------------------------------------|',
+                15 => '| Versions             | Previous             | 1230                                                                   |',
+                16 => '|                      | Current              | 1233                                                                   |',
+                17 => '|                      | Next                 | 1231                                                                   |',
+                18 => '|                      | Latest               | 1231                                                                   |',
+                19 => '|----------------------------------------------------------------------------------------------------------------------|',
+                20 => '| Migrations           | Executed             | 2                                                                      |',
+                21 => '|                      | Executed Unavailable | 1                                                                      |',
+                22 => '|                      | Available            | 2                                                                      |',
+                23 => '|                      | New                  | 1                                                                      |',
+                24 => '|----------------------------------------------------------------------------------------------------------------------|',
+                25 => '| Migration Namespaces | DoctrineMigrations   | /tmp                                                                   |',
+                26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                27 => '+-----------+--------------+---------------------+-------------+',
+                28 => '| Available Migration Versions                                 |',
+                29 => '+-----------+--------------+---------------------+-------------+',
+                30 => '| Migration | Migrated     | Migrated At         | Description |',
+                31 => '+-----------+--------------+---------------------+-------------+',
+                32 => '| 1230      | migrated     | 2010-01-01 02:03:04 |             |',
+                33 => '| 1231      | not migrated |                     |             |',
+                34 => '+-----------+--------------+---------------------+-------------+',
+                35 => '+---------------------------+---------------------------+',
+                36 => '| Previously Executed Unavailable Migration Versions    |',
+                37 => '+---------------------------+---------------------------+',
+                38 => '| Migration                 | Migrated At               |',
+                39 => '+---------------------------+---------------------------+',
+                40 => '| 1233                      |                           |',
+                41 => '+---------------------------+---------------------------+',
             ],
             $lines
         );

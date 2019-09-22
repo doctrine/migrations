@@ -8,9 +8,11 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Direction;
@@ -35,8 +37,11 @@ final class AliasResolverTest extends TestCase
     /**
      * @dataProvider getAliases
      */
-    public function testAliases(string $alias, ?string $expectedVersion) : void
+    public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
     {
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
+        }
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
@@ -47,20 +52,33 @@ final class AliasResolverTest extends TestCase
             $this->metadataStorage->complete($result);
         }
 
-        self::assertEquals($expectedVersion !== null? new Version($expectedVersion) : null, $this->versionAliasResolver->resolveVersionAlias($alias));
+        $resolvedAlias = $this->versionAliasResolver->resolveVersionAlias($alias);
+        if ($expectedVersion === null) {
+            return;
+        }
+
+        self::assertEquals(new Version($expectedVersion), $resolvedAlias);
     }
 
     /**
      * @dataProvider getAliasesWithNoExecuted
      */
-    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion) : void
+    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
     {
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
+        }
+
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
         }
+        $resolvedAlias = $this->versionAliasResolver->resolveVersionAlias($alias);
+        if ($expectedVersion === null) {
+            return;
+        }
 
-        self::assertEquals($expectedVersion!== null ? new Version($expectedVersion) : null, $this->versionAliasResolver->resolveVersionAlias($alias));
+        self::assertEquals(new Version($expectedVersion), $resolvedAlias);
     }
 
     /**
@@ -70,14 +88,14 @@ final class AliasResolverTest extends TestCase
     {
         return [
             ['first', 'A'],
-            ['current', null],
+            ['current', '0'],
             ['prev', '0'],
             ['next', 'A'],
             ['latest', 'C'],
-            ['current-1', null],
+            ['current-1', null, UnknownMigrationVersion::class],
             ['current+1', 'A'],
             ['B', 'B'],
-            ['X', null],
+            ['X', null, UnknownMigrationVersion::class],
         ];
     }
 
@@ -95,7 +113,7 @@ final class AliasResolverTest extends TestCase
             ['current-1', 'A'],
             ['current+1', 'C'],
             ['B', 'B'],
-            ['X', null],
+            ['X', null, UnknownMigrationVersion::class],
         ];
     }
 
@@ -109,14 +127,18 @@ final class AliasResolverTest extends TestCase
 
         $versionFactory = $this->createMock(Factory::class);
 
-        $this->migrationRepository = new MigrationRepository(
+        $this->migrationRepository  = new MigrationRepository(
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
             $versionFactory
         );
-        $this->metadataStorage     = new TableMetadataStorage($conn);
-
-        $this->versionAliasResolver = new AliasResolver($this->migrationRepository, $this->metadataStorage);
+        $this->metadataStorage      = new TableMetadataStorage($conn);
+        $this->planCalculator       = new MigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
+        $this->versionAliasResolver = new AliasResolver(
+            $this->migrationRepository,
+            $this->metadataStorage,
+            $this->planCalculator
+        );
     }
 
     private function getSqliteConnection() : Connection

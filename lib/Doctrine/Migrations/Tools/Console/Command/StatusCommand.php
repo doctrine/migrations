@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use DateTimeImmutable;
+use DateTime;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
@@ -13,13 +13,7 @@ use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function assert;
 use function count;
-use function is_string;
-use function max;
-use function sprintf;
-use function str_repeat;
-use function strlen;
 
 /**
  * The StatusCommand class is responsible for outputting what the current state is of all your migrations. It shows
@@ -30,7 +24,7 @@ class StatusCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:status';
 
-    protected function configure(): void
+    protected function configure() : void
     {
         $this
             ->setAliases(['status'])
@@ -55,18 +49,16 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output): ?int
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $storage = $this->dependencyFactory->getMetadataStorage();
-        $migrationRepo = $this->dependencyFactory->getMigrationRepository();
+        $storage        = $this->dependencyFactory->getMetadataStorage();
+        $migrationRepo  = $this->dependencyFactory->getMigrationRepository();
         $planCalculator = $this->dependencyFactory->getMigrationPlanCalculator();
 
         $availableMigrations = $migrationRepo->getMigrations();
-        $executedMigrations = $storage->getExecutedMigrations();
+        $executedMigrations  = $storage->getExecutedMigrations();
 
-
-
-        $newMigrations = $planCalculator->getNewMigrations();
+        $newMigrations                 = $planCalculator->getNewMigrations();
         $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
 
         $infosHelper = $this->dependencyFactory->getMigrationStatusInfosHelper();
@@ -83,21 +75,22 @@ EOT
         if (count($executedUnavailableMigrations) !== 0) {
             $this->showUnavailableVersions($output, $executedUnavailableMigrations);
         }
+
         return 0;
     }
 
-    private function showUnavailableVersions(OutputInterface $output, ExecutedMigrationsSet $executedUnavailableMigrations): void
+    private function showUnavailableVersions(OutputInterface $output, ExecutedMigrationsSet $executedUnavailableMigrations) : void
     {
         $table = new Table($output);
         $table->setHeaders(
             [
                 [new TableCell('<error>Previously Executed Unavailable Migration Versions</error>', ['colspan' => 2])],
-                ['Migration', 'Migrated At']
+                ['Migration', 'Migrated At'],
             ]
         );
         foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
             $table->addRow([
-                (string)$executedUnavailableMigration->getVersion(),
+                (string) $executedUnavailableMigration->getVersion(),
                 $executedUnavailableMigration->getExecutedAt()
                     ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
                     : null,
@@ -113,13 +106,12 @@ EOT
         AvailableMigrationsList $availableMigrationsSet,
         ExecutedMigrationsSet $executedMigrationsSet,
         OutputInterface $output
-    ): void {
-
+    ) : void {
         $table = new Table($output);
         $table->setHeaders(
             [
                 [new TableCell('Available Migration Versions', ['colspan' => 4])],
-                ['Migration', 'Migrated', 'Migrated At', 'Description']
+                ['Migration', 'Migrated', 'Migrated At', 'Description'],
             ]
         );
         foreach ($availableMigrationsSet->getItems() as $availableMigration) {
@@ -127,17 +119,17 @@ EOT
                 ? $executedMigrationsSet->getMigration($availableMigration->getVersion())
                 : null;
 
-            $executedAt = $executedMigration && $executedMigration->getExecutedAt() instanceof \DateTime
+            $executedAt = $executedMigration && $executedMigration->getExecutedAt() instanceof DateTime
                 ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
                 : null;
 
             $description = $availableMigration->getMigration()->getDescription();
 
             $table->addRow([
-                (string)$availableMigration->getVersion(),
+                (string) $availableMigration->getVersion(),
                 $executedMigration ? '<comment>migrated</comment>' : '<error>not migrated</error>',
-                (string)$executedAt,
-                (string)$description,
+                (string) $executedAt,
+                (string) $description,
             ]);
         }
         $table->render();

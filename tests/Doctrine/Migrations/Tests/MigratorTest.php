@@ -296,7 +296,7 @@ class MigratorTest extends MigrationTestCase
         $migrator = $this->createTestMigrator();
         $this->migratorConfiguration->setAllOrNothing(true);
 
-        $migration = new MigrateNotTouchingTheSchema($this->executor, $this->conn, $this->logger);
+        $migration = new MigrateNotTouchingTheSchema($this->conn, $this->logger);
         $plan      = new MigrationPlan(new Version(MigrateNotTouchingTheSchema::class), $migration, Direction::UP);
         $planList  = new MigrationPlanList([$plan], Direction::UP);
 
@@ -322,7 +322,7 @@ class MigratorTest extends MigrationTestCase
 
         $this->migratorConfiguration->setAllOrNothing(true);
 
-        $migration = new MigrationThrowsError($this->executor, $this->conn, $this->logger);
+        $migration = new MigrationThrowsError($this->conn, $this->logger);
         $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
         $planList  = new MigrationPlanList([$plan], Direction::UP);
 

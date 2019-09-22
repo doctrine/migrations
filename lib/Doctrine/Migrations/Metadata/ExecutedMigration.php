@@ -12,13 +12,13 @@ class ExecutedMigration
     /** @var Version */
     private $version;
 
-    /** @var DateTime */
+    /** @var DateTime|null */
     private $executedAt;
 
     /**
      * Milliseconds
      *
-     * @var int
+     * @var int|null
      */
     public $executionTime;
 

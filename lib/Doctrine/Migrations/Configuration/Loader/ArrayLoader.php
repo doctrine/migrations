@@ -22,7 +22,7 @@ use function is_bool;
 class ArrayLoader implements Loader
 {
     /**
-     * @param mixed|array $array
+     * @param mixed $array
      */
     public function load($array) : Configuration
     {
@@ -64,9 +64,9 @@ class ArrayLoader implements Loader
     }
 
     /**
-     * @param array                                           $configMap
+     * @param mixed[]                                         $configMap
      * @param Configuration|TableMetadataStorageConfiguration $object
-     * @param array                                           $data
+     * @param mixed[]                                         $data
      */
     private static function applyConfigs(array $configMap, $object, array $data) : void
     {

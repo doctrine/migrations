@@ -86,6 +86,9 @@ class Migrator implements MigratorInterface
         return $sql;
     }
 
+    /**
+     * @return array<string, string[]>
+     */
     private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
         $sql  = [];
@@ -130,6 +133,9 @@ class Migrator implements MigratorInterface
         );
     }
 
+    /**
+     * @return string[][]
+     */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
         /**

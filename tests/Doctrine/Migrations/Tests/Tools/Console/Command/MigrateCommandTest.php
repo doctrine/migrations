@@ -9,7 +9,6 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
@@ -26,9 +25,6 @@ class MigrateCommandTest extends MigrationTestCase
 {
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
-
-    /** @var MigrationRepository|MockObject */
-    private $migrationRepository;
 
     /** @var Configuration|MockObject */
     private $configuration;
@@ -123,9 +119,11 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
+     * @param mixed $arg
+     *
      * @dataProvider getWriteSqlValues
      */
-    public function testExecuteWriteSql($arg, $path) : void
+    public function testExecuteWriteSql($arg, string $path) : void
     {
         $migrator = $this->createMock(Migrator::class);
 
@@ -150,7 +148,10 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function getWriteSqlValues()
+    /**
+     * @return mixed[]
+     */
+    public function getWriteSqlValues() : array
     {
         return [
             [true, getcwd()],

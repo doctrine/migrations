@@ -11,8 +11,8 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\Version\ExecutorInterface;
 use Psr\Log\LoggerInterface;
+use function func_get_args;
 
 /**
  * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
@@ -32,16 +32,15 @@ abstract class AbstractMigration
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var ExecutorInterface */
-    private $executor;
+    /** @var mixed[] */
+    private $plannedSql = [];
 
-    public function __construct(ExecutorInterface $executor, Connection $connection, LoggerInterface $logger)
+    public function __construct(Connection $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->sm         = $this->connection->getSchemaManager();
         $this->platform   = $this->connection->getDatabasePlatform();
         $this->logger     = $logger;
-        $this->executor   = $executor;
     }
 
     /**
@@ -125,7 +124,15 @@ abstract class AbstractMigration
         array $params = [],
         array $types = []
     ) : void {
-        $this->executor->addSql($sql, $params, $types);
+        $this->plannedSql[] = func_get_args();
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getSql() : array
+    {
+        return $this->plannedSql;
     }
 
     protected function write(string $message) : void

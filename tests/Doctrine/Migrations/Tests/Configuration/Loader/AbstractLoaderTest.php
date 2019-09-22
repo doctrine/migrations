@@ -15,7 +15,7 @@ use function dirname;
 
 abstract class AbstractLoaderTest extends TestCase
 {
-    abstract public function load($prefix = '') : Configuration;
+    abstract public function load(string $prefix = '') : Configuration;
 
     public function testLoad() : void
     {

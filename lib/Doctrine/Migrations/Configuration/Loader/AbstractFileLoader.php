@@ -14,6 +14,11 @@ use function realpath;
  */
 abstract class AbstractFileLoader implements Loader
 {
+    /**
+     * @param array<string,string> $input
+     *
+     * @return array<string,string>
+     */
     protected function getDirectoryRelativeToFile(string $file, array $input) : array
     {
         foreach ($input as $ns => $dir) {

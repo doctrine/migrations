@@ -11,6 +11,6 @@ final class UnknownResource extends LogicException implements ConfigurationExcep
 {
     public static function new(string $loader) : self
     {
-        return new self(sprintf('The provided resource can not be loaded by %s loader configuration key "%s".', $loader), 10);
+        return new self(sprintf('The provided resource can not be loaded by the loader "%s".', $loader), 10);
     }
 }

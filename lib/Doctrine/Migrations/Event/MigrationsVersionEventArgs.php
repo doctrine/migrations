@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Event;
 
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\MigratorConfiguration;
 
@@ -15,9 +14,6 @@ use Doctrine\Migrations\MigratorConfiguration;
  */
 class MigrationsVersionEventArgs extends EventArgs
 {
-    /** @var Configuration */
-    private $configuration;
-
     /** @var Connection */
     private $connection;
 

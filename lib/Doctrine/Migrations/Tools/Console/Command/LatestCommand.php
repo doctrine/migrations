@@ -27,10 +27,16 @@ class LatestCommand extends AbstractCommand
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $migrations  = $this->dependencyFactory->getMigrationRepository()->getMigrations();
-        $last        = $migrations->getLast();
-        $version     = (string) $last->getVersion();
-        $description = $last->getMigration()->getDescription();
+        $migrations = $this->dependencyFactory->getMigrationRepository()->getMigrations();
+        $last       = $migrations->getLast();
+
+        if ($last !== null) {
+            $version     = (string) $last->getVersion();
+            $description = $last->getMigration()->getDescription();
+        } else {
+            $version     = '0';
+            $description = '';
+        }
         $output->writeln(sprintf(
             '<info>%s</info>%s',
             $version,

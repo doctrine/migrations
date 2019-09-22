@@ -39,9 +39,9 @@ EOT
     {
         $planCalculator                = $this->dependencyFactory->getMigrationPlanCalculator();
         $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
-        $newMigrations = $planCalculator->getNewMigrations();
+        $newMigrations                 = $planCalculator->getNewMigrations();
 
-        $newMigrationsCount           = count($newMigrations);
+        $newMigrationsCount                 = count($newMigrations);
         $executedUnavailableMigrationsCount =  count($executedUnavailableMigrations);
 
         if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {

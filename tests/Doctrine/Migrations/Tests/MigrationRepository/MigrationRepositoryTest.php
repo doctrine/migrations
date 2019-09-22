@@ -4,12 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\MigrationRepository;
 
-use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
-use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\MigrationRepository;
@@ -24,15 +21,6 @@ use function strcmp;
 
 class MigrationRepositoryTest extends TestCase
 {
-    /** @var Configuration|MockObject */
-    private $configuration;
-
-    /** @var Connection|MockObject */
-    private $connection;
-
-    /** @var MigrationFinder|MockObject */
-    private $migrationFinder;
-
     /** @var Factory|MockObject */
     private $versionFactory;
 

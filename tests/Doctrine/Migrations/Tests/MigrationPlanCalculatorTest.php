@@ -36,14 +36,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     protected function setUp() : void
     {
-//        $configuration = new Configuration();
-//        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
-//        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
-//
-//        $conn = $this->getSqliteConnection();
-//
-//        $versionFactory = $this->createMock(Factory::class);
-
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
 
         $this->migrationRepository     = $this->createMock(MigrationRepository::class);
@@ -76,6 +68,8 @@ final class MigrationPlanCalculatorTest extends TestCase
     }
 
     /**
+     * @param string[] $expectedPlan
+     *
      * @dataProvider getPlanUpWhenNoMigrations
      */
     public function testPlanWhenNoMigrations(?string $to, array $expectedPlan, string $direction) : void
@@ -108,7 +102,10 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    public function getPlanUpWhenNoMigrations()
+    /**
+     * @return mixed[]
+     */
+    public function getPlanUpWhenNoMigrations() : array
     {
         return [
             ['A', ['A'], Direction::UP],
@@ -120,6 +117,8 @@ final class MigrationPlanCalculatorTest extends TestCase
     }
 
     /**
+     * @param string[] $expectedPlan
+     *
      * @dataProvider getPlanUpWhenMigrations
      */
     public function testPlanWhenMigrations(?string $to, array $expectedPlan, ?string $direction) : void
@@ -176,12 +175,63 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationPlanCalculator->getPlanUntilVersion();
     }
 
-    public function getPlanUpWhenMigrations()
+    public function testGetNewMigrations() : void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
+        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
+
+        $e1 = new ExecutedMigration(new Version('A'));
+
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1, $m2, $m3]));
+
+        $this->metadataStorage
+            ->expects($this->atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1]));
+
+        $newSet = $this->migrationPlanCalculator->getNewMigrations();
+
+        self::assertInstanceOf(AvailableMigrationsList::class, $newSet);
+        self::assertSame([$m2, $m3], $newSet->getItems());
+    }
+
+    public function testGetExecutedUnavailableMigrations() : void
+    {
+        $a1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+
+        $e1 = new ExecutedMigration(new Version('A'));
+        $e2 = new ExecutedMigration(new Version('B'));
+        $e3 = new ExecutedMigration(new Version('C'));
+
+        $this->migrationRepository
+            ->expects($this->any())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([$a1]));
+
+        $this->metadataStorage
+            ->expects($this->atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1, $e2, $e3]));
+
+        $newSet = $this->migrationPlanCalculator->getExecutedUnavailableMigrations();
+        self::assertInstanceOf(ExecutedMigrationsSet::class, $newSet);
+
+        self::assertSame([$e2, $e3], $newSet->getItems());
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getPlanUpWhenMigrations() : array
     {
         return [
             ['0', ['B', 'A'], Direction::DOWN],
             ['A', ['B'], Direction::DOWN],
-            ['B', [], Direction::DOWN],
+            ['B', [], Direction::UP],
             ['C', ['C'], Direction::UP],
             [null, ['C'], Direction::UP],
         ];

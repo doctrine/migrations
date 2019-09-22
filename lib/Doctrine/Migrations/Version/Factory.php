@@ -19,23 +19,18 @@ class Factory
     /** @var Connection */
     private $connection;
 
-    /** @var ExecutorInterface */
-    private $versionExecutor;
-
     /** @var LoggerInterface */
     private $logger;
 
-    public function __construct(Connection $connection, ExecutorInterface $versionExecutor, LoggerInterface $logger)
+    public function __construct(Connection $connection, LoggerInterface $logger)
     {
-        $this->connection      = $connection;
-        $this->versionExecutor = $versionExecutor;
-        $this->logger          = $logger;
+        $this->connection = $connection;
+        $this->logger     = $logger;
     }
 
     public function createVersion(string $migrationClassName) : AbstractMigration
     {
         return new $migrationClassName(
-            $this->versionExecutor,
             $this->connection,
             $this->logger
         );

@@ -44,9 +44,9 @@ final class FileBuilder implements FileBuilderInterface
         return $string;
     }
 
-    // @todo this is hard to implement since MetadataStorage abstracts the migrations table
     private function getVersionUpdateQuery(string $version, string $direction) : string
     {
+        // @todo this is hard to implement since MetadataStorage abstracts the migrations table
         return '';
 
         if ($direction === Direction::DOWN) {

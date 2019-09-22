@@ -14,6 +14,7 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+use function array_filter;
 use function array_map;
 use function array_reverse;
 
@@ -70,23 +71,31 @@ final class MigrationPlanCalculator
 
     private function findDirection(Version $to, Metadata\ExecutedMigrationsSet $executedMigrations) : string
     {
-        if ($to === new Version('0') || ($executedMigrations->hasMigration($to) && $executedMigrations->getLast()->getVersion() !== $to)) {
-            return Direction::UP;
+        if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && (string) $executedMigrations->getLast()->getVersion() !== (string) $to)) {
+            return Direction::DOWN;
         }
 
         return Direction::UP;
     }
 
+    /**
+     * @return  Metadata\AvailableMigration[]
+     */
     private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations) : array
     {
         return $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
     }
 
-    private function findMigrationsToExecute(?Version $to, $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsSet $executedMigrations) : array
+    /**
+     * @param ExecutedMigration[] $migrationsToCheck
+     *
+     * @return ExecutedMigration[]
+     */
+    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsSet $executedMigrations) : array
     {
         $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {
-            if ($direction === Direction::DOWN && $availableMigration->getVersion() === $to) {
+            if ($direction === Direction::DOWN && (string) $availableMigration->getVersion() === (string) $to) {
                 break;
             }
 
@@ -96,7 +105,7 @@ final class MigrationPlanCalculator
                 $toExecute[] = $availableMigration;
             }
 
-            if ($direction === Direction::UP && $availableMigration->getVersion() === $to) {
+            if ($direction === Direction::UP && (string) $availableMigration->getVersion() === (string) $to) {
                 break;
             }
         }
@@ -106,18 +115,19 @@ final class MigrationPlanCalculator
 
     public function getExecutedUnavailableMigrations() : ExecutedMigrationsSet
     {
-        $executedMigrationsSet = $this->metadataStorage->getExecutedMigrations();
+        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrationsSet = $this->migrationRepository->getMigrations();
+
         return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
             return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
     }
 
-
     public function getNewMigrations() : AvailableMigrationsList
     {
-        $executedMigrationsSet = $this->metadataStorage->getExecutedMigrations();
+        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrationsSet = $this->migrationRepository->getMigrations();
+
         return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
             return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
