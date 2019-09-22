@@ -66,10 +66,4 @@ class AvailableMigrationsList implements Countable
         throw MigrationNotAvailable::new((string) $version);
     }
 
-    public function getNewMigrations(ExecutedMigrationsSet $executedMigrationsSet) : AvailableMigrationsList
-    {
-        return new AvailableMigrationsList(array_filter($this->items, static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
-            return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
-        }));
-    }
 }

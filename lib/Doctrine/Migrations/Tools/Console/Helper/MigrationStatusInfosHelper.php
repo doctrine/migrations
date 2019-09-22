@@ -9,10 +9,19 @@ use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\AliasResolverInterface;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
+use Symfony\Component\Console\Helper\TableSeparator;
+use Symfony\Component\Console\Helper\TableStyle;
+use Symfony\Component\Console\Output\Output;
+use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use function count;
 use function get_class;
@@ -28,71 +37,113 @@ use function sprintf;
  */
 class MigrationStatusInfosHelper
 {
-    /** @var Configuration  */
+    /** @var Configuration */
     private $configuration;
-
-    /** @var MigrationRepository  */
-    private $migrationRepository;
-
-    /** @var MetadataStorage */
-    private $metadataStorage;
 
     /** @var Connection */
     private $connection;
 
-    /** @var AliasResolver */
+    /** @var AliasResolverInterface */
     private $aliasResolver;
 
     public function __construct(
         Configuration $configuration,
         Connection $connection,
-        AliasResolver $aliasResolver
+        AliasResolverInterface $aliasResolver
     ) {
         $this->configuration = $configuration;
-        $this->connection    = $connection;
+        $this->connection = $connection;
         $this->aliasResolver = $aliasResolver;
     }
 
-    /** @return string[]|int[]|null[] */
-    public function getMigrationsInfos(ExecutedMigrationsSet $executedMigrations, AvailableMigrationsList $availableMigrations) : array
+    public function showMigrationsInfo(
+        OutputInterface $output,
+        AvailableMigrationsList $availableMigrations,
+        ExecutedMigrationsSet $executedMigrations,
+        AvailableMigrationsList $newMigrations,
+        ExecutedMigrationsSet $executedUnavailableMigrations
+    ): void
     {
-        $newMigrations                 = $availableMigrations->getNewMigrations($executedMigrations);
-        $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
 
         $storage = $this->configuration->getMetadataStorageConfiguration();
 
+        $table = new Table($output);
+        $table->setHeaders(
+            [
+                [new TableCell('Configuration', ['colspan' => 3])],
+            ]
+        );
         $data = [
-            'Name'                              => $this->configuration->getName() ?? 'Doctrine Database Migrations',
-            'Database Driver'                   => $this->connection->getDriver()->getName(),
-            'Database Host'                     => $this->connection->getHost(),
-            'Database Name'                     => $this->connection->getDatabase(),
-            'Configuration Source'              => $this->configuration instanceof AbstractFileConfiguration ? $this->configuration->getFile() : 'manually configured',
-            'Version storage'                   => get_class($storage),
-            'Previous Version'                  => $this->getFormattedVersionAlias('prev'),
-            'Current Version'                   => $this->getFormattedVersionAlias('current'),
-            'Next Version'                      => $this->getFormattedVersionAlias('next'),
-            'Latest Version'                    => $this->getFormattedVersionAlias('latest'),
-            'Executed Migrations'               => count($executedMigrations),
-            'Executed Unavailable Migrations'   => count($executedUnavailableMigrations),
-            'Available Migrations'              => count($availableMigrations),
-            'New Migrations'                    => count($newMigrations),
+            'Project' => $this->configuration->getName() ?? 'Doctrine Database Migrations',
         ];
-
-        foreach ($this->configuration->getMigrationDirectories() as $ns => $directory) {
-            //@todo
+        foreach ($data as $k => $v) {
+            $table->addRow([
+                '<info>' . $k . '</info>',
+                new TableCell((string)$v, ['colspan' => 2])
+            ]);
         }
+        $dataGroup = [
+            'Storage' => [
+                'Type' => $storage ? get_class($storage) : null,
+            ],
+            'Database' => [
+                'Driver' => $this->connection->getDriver()->getName(),
+                'Host' => $this->connection->getHost(),
+                'Name' => $this->connection->getDatabase(),
+            ],
+            'Versions' => [
+                'Previous' => $this->getFormattedVersionAlias('prev', $executedMigrations),
+                'Current' => $this->getFormattedVersionAlias('current', $executedMigrations),
+                'Next' => $this->getFormattedVersionAlias('next', $executedMigrations),
+                'Latest' => $this->getFormattedVersionAlias('latest', $executedMigrations),
+            ],
 
+            'Migrations' => [
+                'Executed' => count($executedMigrations),
+                'Executed Unavailable' => count($executedUnavailableMigrations) > 0 ? ('<error>' . count($executedUnavailableMigrations) . '</error>') : '0',
+                'Available' => count($availableMigrations),
+                'New' => count($newMigrations) > 0 ? ('<question>' . count($newMigrations) . '</question>') : '0',
+            ],
+            'Migration Namespaces' => $this->configuration->getMigrationDirectories(),
+
+        ];
         if ($storage instanceof TableMetadataStorageConfiguration) {
-            $data +=  [
-                'Version Table Name'                => $storage->getTableName(),
-                'Version Column Name'               => $storage->getVersionColumnName(),
+            $dataGroup['Storage'] += [
+                'Table Name' => $storage->getTableName(),
+                'Column Name' => $storage->getVersionColumnName(),
             ];
+            $table->addRow([new TableSeparator(['colspan' => 3])]);
+            foreach ($data as $k => $v) {
+                $table->addRows([
+                    '<info>'.$k.'</info>',
+                    new TableCell($v, ['colspan' => 2])
+                ]);
+            }
         }
 
-        return $data;
+
+        foreach ($dataGroup as $group => $dataValues){
+            $nsRows = [];
+            foreach ($dataValues as $k => $v) {
+                $nsRows[] = [
+                    $k,
+                    $v,
+                ];
+            }
+            if (count($nsRows) > 0) {
+                $table->addRow([new TableSeparator(['colspan' => 3])]);
+                array_unshift($nsRows[0],
+                    new TableCell(  '<info>' . $group . '</info>', ['rowspan' => count($dataValues)])
+                );
+                $table->addRows($nsRows);
+            }
+        }
+
+
+        $table->render();
     }
 
-    private function getFormattedVersionAlias(string $alias) : string
+    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsSet $executedMigrationsSet): string
     {
         try {
             $version = $this->aliasResolver->resolveVersionAlias($alias);
@@ -110,7 +161,9 @@ class MigrationStatusInfosHelper
                 return 'Already at first version';
             }
         }
-
+        if ($alias === 'latest' && $version && $executedMigrationsSet->hasMigration($version)) {
+            return 'Already at latest version';
+        }
         // Before first version "virtual" version number
         if ($version === '0') {
             return '<comment>0</comment>';
@@ -118,7 +171,7 @@ class MigrationStatusInfosHelper
 
         // Show normal version number
         return sprintf(
-            '<comment>%s</comment>',
+            '<comment>%s </comment>',
             $version
         );
     }

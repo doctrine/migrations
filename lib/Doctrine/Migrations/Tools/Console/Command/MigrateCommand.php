@@ -127,13 +127,8 @@ EOT
             return 1;
         }
 
-        $repository = $this->dependencyFactory->getMigrationRepository();
-
-        $availableMigrations = $repository->getMigrations();
-
-        $metadata                      = $this->dependencyFactory->getMetadataStorage();
-        $executedMigrations            = $metadata->getExecutedMigrations();
-        $executedUnavailableMigrations = $executedMigrations->getExecutedUnavailableMigrations($availableMigrations);
+        $planCalculator                = $this->dependencyFactory->getMigrationPlanCalculator();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
 
         if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
             return 3;
@@ -142,7 +137,7 @@ EOT
         $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
-        $plan = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanUntilVersion($version);
+        $plan = $planCalculator->getPlanUntilVersion($version);
 
         if (count($plan) === 0) {
             $this->getVersionNameFromAlias($versionAlias, $output);

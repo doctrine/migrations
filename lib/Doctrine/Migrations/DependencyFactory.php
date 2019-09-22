@@ -250,7 +250,9 @@ class DependencyFactory
         return $this->getDependency(AliasResolverInterface::class, function () : AliasResolverInterface {
             return new AliasResolver(
                 $this->getMigrationRepository(),
-                $this->getMetadataStorage()
+                $this->getMetadataStorage(),
+                $this->getMigrationPlanCalculator()
+
             );
         });
     }

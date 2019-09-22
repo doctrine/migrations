@@ -55,7 +55,7 @@ class Configuration
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
 
-    public function getMetadataStorageConfiguration() : MetadataStorageConfigration
+    public function getMetadataStorageConfiguration() : ?MetadataStorageConfigration
     {
         return $this->metadataStorageConfiguration;
     }

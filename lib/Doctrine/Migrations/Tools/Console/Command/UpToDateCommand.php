@@ -37,26 +37,24 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $storage       = $this->dependencyFactory->getMetadataStorage();
-        $migrationRepo = $this->dependencyFactory->getMigrationRepository();
+        $planCalculator                = $this->dependencyFactory->getMigrationPlanCalculator();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+        $newMigrations = $planCalculator->getNewMigrations();
 
-        $availableMigrations = $migrationRepo->getMigrations();
-        $executedMigrations  = $storage->getExecutedMigrations();
+        $newMigrationsCount           = count($newMigrations);
+        $executedUnavailableMigrationsCount =  count($executedUnavailableMigrations);
 
-        $availableMigrationsCount           = count($availableMigrations->getNewMigrations($executedMigrations));
-        $executedUnavailableMigrationsCount =  count($executedMigrations->getExecutedUnavailableMigrations($availableMigrations));
-
-        if ($availableMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {
+        if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
 
             return 0;
         }
 
-        if ($availableMigrationsCount > 0) {
+        if ($newMigrationsCount > 0) {
             $output->writeln(sprintf(
                 '<error>Out-of-date! %u migration%s available to execute.</error>',
-                $availableMigrationsCount,
-                $availableMigrationsCount > 1 ? 's are' : ' is'
+                $newMigrationsCount,
+                $newMigrationsCount > 1 ? 's are' : ' is'
             ));
 
             return 1;

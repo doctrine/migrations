@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Version;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use function count;
 use function substr;
@@ -30,10 +31,16 @@ final class AliasResolver implements AliasResolverInterface
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
+    /**
+     * @var MigrationPlanCalculator
+     */
+    private $migrationPlanCalculator;
+
+    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage, MigrationPlanCalculator $migrationPlanCalculator)
     {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;
+        $this->migrationPlanCalculator = $migrationPlanCalculator;
     }
 
     /**
@@ -53,6 +60,7 @@ final class AliasResolver implements AliasResolverInterface
     {
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
+
 
         switch ($alias) {
             case self::ALIAS_FIRST:
@@ -77,15 +85,11 @@ final class AliasResolver implements AliasResolverInterface
 
                 return $info ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
-                if (! count($availableMigrations)) {
+                $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
+                if (!count($newMigrations)) {
                     throw NoMigrationsToExecute::new();
                 }
-
-                $newMigrations = $availableMigrations->getNewMigrations($executedMigrations);
-
-                if ($newMigrations->getFirst() !== null) {
-                    return $newMigrations->getFirst()->getVersion();
-                }
+                return $newMigrations->getFirst()->getVersion();
             case self::ALIAS_LATEST:
                 if (! count($availableMigrations)) {
                     throw NoMigrationsToExecute::new();
@@ -105,7 +109,7 @@ final class AliasResolver implements AliasResolverInterface
                     $val             = (int) substr($alias, 7);
                     $targetMigration = null;
                     if ($val > 0) {
-                        $newMigrations = $availableMigrations->getNewMigrations($executedMigrations);
+                        $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
 
                         $targetMigration = $newMigrations->getFirst($val - 1);
                     } else {
