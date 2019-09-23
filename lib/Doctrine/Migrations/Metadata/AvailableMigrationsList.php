@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Metadata;
 
 use Countable;
 use Doctrine\Migrations\Exception\MigrationNotAvailable;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Version\Version;
 use function array_values;
 use function count;
@@ -31,16 +32,28 @@ class AvailableMigrationsList implements Countable
         return $this->items;
     }
 
-    public function getFirst(int $offset = 0) : ?AvailableMigration
+    public function getFirst(int $offset = 0) : AvailableMigration
     {
-        return $this->items[$offset] ?? null;
+        if (! isset($this->items[$offset])) {
+            throw NoMigrationsFoundWithCriteria::new('first' . ($offset>0 ? ('+' . $offset) : ''));
+        }
+
+        return $this->items[$offset];
     }
 
-    public function getLast(int $offset = 0) : ?AvailableMigration
+    public function getLast(int $offset = 0) : AvailableMigration
     {
-        return $this->items[count($this->items)-1-(-1*$offset)] ?? null;
+        $offset = count($this->items)-1-(-1*$offset);
+        if (! isset($this->items[$offset])) {
+            throw NoMigrationsFoundWithCriteria::new('first' . ($offset>0 ? ('+' . $offset) : ''));
+        }
+
+        return $this->items[$offset];
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->items);
@@ -57,7 +70,7 @@ class AvailableMigrationsList implements Countable
         return false;
     }
 
-    public function getMigration(Version $version) : ?AvailableMigration
+    public function getMigration(Version $version) : AvailableMigration
     {
         foreach ($this->items as $migration) {
             if ((string) $migration->getVersion() === (string) $version) {

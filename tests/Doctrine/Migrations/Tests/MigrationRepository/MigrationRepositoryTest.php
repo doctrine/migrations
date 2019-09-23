@@ -105,7 +105,7 @@ class MigrationRepositoryTest extends TestCase
     public function testFindMigrations() : void
     {
         $this->versionFactory
-            ->expects($this->exactly(3))
+            ->expects(self::exactly(3))
             ->method('createVersion')
             ->willReturnCallback(function ($class) {
                 return $this->createMock($class);
@@ -128,7 +128,7 @@ class MigrationRepositoryTest extends TestCase
     {
         $this->versionFactory = $this->createMock(Factory::class);
         $this->versionFactory
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('createVersion')
             ->willReturnCallback(function ($class) {
                 return $this->createMock($class);

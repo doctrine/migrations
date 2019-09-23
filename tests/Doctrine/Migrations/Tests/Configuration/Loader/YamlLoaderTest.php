@@ -14,7 +14,7 @@ class YamlLoaderTest extends AbstractLoaderTest
     {
         $loader = new YamlFileLoader();
 
-        return $loader->load(__DIR__ . '/../_files/config' . ($prefix? ('_' . $prefix) : '') . '.yml');
+        return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.yml');
     }
 
     public function testMalformed() : void

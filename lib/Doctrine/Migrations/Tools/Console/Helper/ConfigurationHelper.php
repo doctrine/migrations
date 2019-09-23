@@ -11,6 +11,7 @@ use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
 use function file_exists;
+use function is_string;
 use function pathinfo;
 
 /**
@@ -35,7 +36,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
          */
         $configurationFile = $input->getOption('configuration');
 
-        if ($configurationFile !== null) {
+        if ($configurationFile !== null && is_string($configurationFile)) {
             return $this->loadConfig($configurationFile);
         }
 

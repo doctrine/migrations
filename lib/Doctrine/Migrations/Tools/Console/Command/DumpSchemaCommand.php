@@ -77,8 +77,8 @@ EOT
         $formatted  = (bool) $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 
-        $schemaDumper = $this->dependencyFactory->getSchemaDumper();
-        $versions     = $this->dependencyFactory->getMigrationRepository()->getMigrations();
+        $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
+        $versions     = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
 
         if (count($versions) > 0) {
             throw SchemaDumpRequiresNoMigrations::new();
@@ -92,7 +92,7 @@ EOT
             }
         }
 
-        $configuration = $this->dependencyFactory->getConfiguration();
+        $configuration = $this->getDependencyFactory()->getConfiguration();
         $versionNumber = $configuration->generateVersionNumber();
 
         $namespace = $input->getOption('namespace');

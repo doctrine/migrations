@@ -9,7 +9,6 @@ use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\ExecutorInterface;
-use Doctrine\Migrations\Version\Version;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
@@ -112,7 +111,6 @@ class Migrator implements MigratorInterface
     }
 
     /**
-     * @param Version[]  $migrationsToExecute
      * @param string[][] $sql
      */
     private function endMigrations(
@@ -144,6 +142,7 @@ class Migrator implements MigratorInterface
         if (count($migrationsPlan) === 0 && $migratorConfiguration->getNoMigrationException()) {
             throw NoMigrationsToExecute::new();
         }
+
         if (count($migrationsPlan) === 0) {
             return $this->noMigrations();
         }

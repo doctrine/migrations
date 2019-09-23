@@ -99,10 +99,10 @@ EOT
             ? Direction::DOWN
             : Direction::UP;
 
-        $migrator = $this->dependencyFactory->getMigrator();
-        $plan     = $this->dependencyFactory->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+        $migrator = $this->getDependencyFactory()->getMigrator();
+        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
 
-        $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         if ($path !== false) {
@@ -111,7 +111,7 @@ EOT
 
             $path = is_string($path) ? $path : getcwd();
 
-            $writer = $this->dependencyFactory->getQueryWriter();
+            $writer = $this->getDependencyFactory()->getQueryWriter();
             $writer->write($path, $direction, $sql);
 
             return 0;

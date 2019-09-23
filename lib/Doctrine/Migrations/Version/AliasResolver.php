@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -65,37 +66,36 @@ final class AliasResolver implements AliasResolverInterface
                     throw NoMigrationsToExecute::new();
                 }
 
-                $info = $availableMigrations->getFirst();
-
-                if ($info !== null) {
-                    return $info->getVersion();
-                }
-                throw UnknownMigrationVersion::new($alias);
+                return $availableMigrations->getFirst()->getVersion();
             case self::ALIAS_CURRENT:
-                $info = $executedMigrations->getLast();
+                try {
+                    return $executedMigrations->getLast()->getVersion();
+                } catch (NoMigrationsFoundWithCriteria $e) {
+                    return new Version('0');
+                }
 
-                return $info !== null ? $info->getVersion() : new Version('0');
             case self::ALIAS_PREV:
-                $info = $executedMigrations->getLast(-1);
+                try {
+                    return $executedMigrations->getLast(-1)->getVersion();
+                } catch (NoMigrationsFoundWithCriteria $e) {
+                    return new Version('0');
+                }
 
-                return $info !== null ? $info->getVersion() : new Version('0');
             case self::ALIAS_NEXT:
                 $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
 
-                $info = $newMigrations->getFirst();
-                if ($info !== null) {
-                    return $info->getVersion();
+                try {
+                    return $newMigrations->getFirst()->getVersion();
+                } catch (NoMigrationsFoundWithCriteria $e) {
+                    throw NoMigrationsToExecute::new();
                 }
 
-                throw NoMigrationsToExecute::new();
             case self::ALIAS_LATEST:
-                $availableMigration = $availableMigrations->getLast();
-
-                if ($availableMigration !== null) {
-                    return $availableMigration->getVersion();
+                try {
+                    return $availableMigrations->getLast()->getVersion();
+                } catch (NoMigrationsFoundWithCriteria $e) {
+                    throw NoMigrationsToExecute::new();
                 }
-                throw NoMigrationsToExecute::new();
-
             default:
                 if ($availableMigrations->hasMigration(new Version($alias))) {
                     return $availableMigrations->getMigration(new Version($alias))->getVersion();
@@ -107,14 +107,10 @@ final class AliasResolver implements AliasResolverInterface
                     if ($val > 0) {
                         $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
 
-                        $targetMigration = $newMigrations->getFirst($val - 1);
-                    } else {
-                        $targetMigration = $executedMigrations->getLast($val);
+                        return $newMigrations->getFirst($val - 1)->getVersion();
                     }
 
-                    if ($targetMigration !== null) {
-                        return $targetMigration->getVersion();
-                    }
+                    return $executedMigrations->getLast($val)->getVersion();
                 }
         }
 

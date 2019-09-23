@@ -25,7 +25,7 @@ use function trim;
 
 class StatusCommandTest extends MigrationTestCase
 {
-    /** @var VersionCommand */
+    /** @var StatusCommand */
     private $command;
 
     /** @var MigrationRepository */

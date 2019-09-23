@@ -27,7 +27,7 @@ final class ConnectionHelperLoader implements ConnectionLoaderInterface
 
     public function __construct(?HelperSet $helperSet = null, string $helperName, ConnectionLoaderInterface $fallback)
     {
-        $this->helperSet  = $helperSet ?:  new HelperSet();
+        $this->helperSet  = $helperSet ?: new HelperSet();
         $this->helperName = $helperName;
         $this->fallback   = $fallback;
     }

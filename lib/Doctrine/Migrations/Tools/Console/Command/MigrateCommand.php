@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -120,21 +121,21 @@ EOT
         $path         = $input->getOption('write-sql');
 
         try {
-            $version = $this->dependencyFactory->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
-        } catch (UnknownMigrationVersion $e) {
+            $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
+        } catch (UnknownMigrationVersion|NoMigrationsFoundWithCriteria $e) {
             $this->getVersionNameFromAlias($versionAlias, $output);
 
             return 1;
         }
 
-        $planCalculator                = $this->dependencyFactory->getMigrationPlanCalculator();
+        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
         $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
 
         if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
             return 3;
         }
 
-        $migratorConfigurationFactory = $this->dependencyFactory->getMigratorConfigurationFactory();
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         $plan = $planCalculator->getPlanUntilVersion($version);
@@ -145,13 +146,13 @@ EOT
             return 0;
         }
 
-        $migrator = $this->dependencyFactory->getMigrator();
+        $migrator = $this->getDependencyFactory()->getMigrator();
         if ($path !== false) {
             $migratorConfiguration->setDryRun(true);
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
             $path   = is_string($path) ? $path : getcwd();
-            $writer = $this->dependencyFactory->getQueryWriter();
+            $writer = $this->getDependencyFactory()->getQueryWriter();
             $writer->write($path, $plan->getDirection(), $sql);
 
             return 0;

@@ -118,9 +118,9 @@ EOT
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
 
-        $executedMigrations = $this->dependencyFactory->getMetadataStorage()->getExecutedMigrations();
+        $executedMigrations = $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations();
         if ($allOption === true) {
-            $availableVersions = $this->dependencyFactory->getMigrationRepository()->getMigrations();
+            $availableVersions = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
 
             if ((bool) $input->getOption('delete') === true) {
                 foreach ($executedMigrations->getItems() as $availableMigration) {
@@ -143,12 +143,12 @@ EOT
     private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsSet $executedMigrations) : void
     {
         try {
-            $availableMigration = $this->dependencyFactory->getMigrationRepository()->getMigration($version);
+            $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
         } catch (MigrationClassNotFound $e) {
             $availableMigration = null;
         }
 
-        $storage = $this->dependencyFactory->getMetadataStorage();
+        $storage = $this->getDependencyFactory()->getMetadataStorage();
         if ($availableMigration === null) {
             if ((bool) $input->getOption('delete') === false) {
                 throw UnknownMigrationVersion::new((string) $version);

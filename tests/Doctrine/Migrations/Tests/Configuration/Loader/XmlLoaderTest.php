@@ -14,7 +14,7 @@ class XmlLoaderTest extends AbstractLoaderTest
     {
         $loader = new XmlFileLoader();
 
-        return $loader->load(__DIR__ . '/../_files/config' . ($prefix? ('_' . $prefix) : '') . '.xml');
+        return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.xml');
     }
 
     public function testMalformed() : void

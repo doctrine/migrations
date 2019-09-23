@@ -310,13 +310,13 @@ class MigratorTest extends MigrationTestCase
 
         $this->conn = $this->createMock(Connection::class);
         $this->conn
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('rollback');
 
         $migrator = $this->createTestMigrator();
 
         $this->executor
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('execute')
             ->willThrowException(new Exception());
 

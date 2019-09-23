@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
@@ -27,16 +28,17 @@ class LatestCommand extends AbstractCommand
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $migrations = $this->dependencyFactory->getMigrationRepository()->getMigrations();
-        $last       = $migrations->getLast();
+        $aliasResolver = $this->getDependencyFactory()->getVersionAliasResolver();
 
-        if ($last !== null) {
-            $version     = (string) $last->getVersion();
-            $description = $last->getMigration()->getDescription();
-        } else {
+        try {
+            $version            = $aliasResolver->resolveVersionAlias('latest');
+            $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
+            $description        = $availableMigration->getMigration()->getDescription();
+        } catch (NoMigrationsToExecute $e) {
             $version     = '0';
             $description = '';
         }
+
         $output->writeln(sprintf(
             '<info>%s</info>%s',
             $version,

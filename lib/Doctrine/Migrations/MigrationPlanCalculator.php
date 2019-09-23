@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
@@ -52,11 +53,11 @@ final class MigrationPlanCalculator
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
-        if ($availableMigrations->getLast() === null) {
+        try {
+            $to = $to ?: $availableMigrations->getLast()->getVersion();
+        } catch (NoMigrationsFoundWithCriteria $e) {
             throw NoMigrationsToExecute::new();
         }
-
-        $to = $to ?: $availableMigrations->getLast()->getVersion();
 
         $direction = $this->findDirection($to, $executedMigrations);
 
@@ -87,9 +88,9 @@ final class MigrationPlanCalculator
     }
 
     /**
-     * @param ExecutedMigration[] $migrationsToCheck
+     * @param AvailableMigration[] $migrationsToCheck
      *
-     * @return ExecutedMigration[]
+     * @return AvailableMigration[]
      */
     private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsSet $executedMigrations) : array
     {

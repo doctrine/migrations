@@ -21,20 +21,12 @@ class ConnectionLoaderTest extends TestCase
 
     public function testGetConnectionFromArray() : void
     {
-        $input = $this->createMock(InputInterface::class);
-
-        $input
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('db-configuration')
-            ->willReturn('_files/sqlite-connection.php');
-
         $helperSet = $this->createMock(HelperSet::class);
 
         $dir = getcwd();
         chdir(__DIR__);
         try {
-            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection($input, $helperSet));
+            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection('_files/sqlite-connection.php', $helperSet));
         } finally {
             chdir($dir);
         }
@@ -43,20 +35,13 @@ class ConnectionLoaderTest extends TestCase
     public function testGetConnectionFromArrayNotFound() : void
     {
         $this->expectException(ConnectionNotSpecified::class);
-        $input = $this->createMock(InputInterface::class);
-
-        $input
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('db-configuration')
-            ->willReturn(__DIR__ . '/_files/wrong.php');
-
+        $input     = $this->createMock(InputInterface::class);
         $helperSet = $this->createMock(HelperSet::class);
 
         $dir = getcwd();
         chdir(__DIR__);
         try {
-            $this->connectionLoader->getConnection($input, $helperSet);
+            $this->connectionLoader->getConnection(__DIR__ . '/_files/wrong.php', $helperSet);
         } finally {
             chdir($dir);
         }
@@ -64,20 +49,12 @@ class ConnectionLoaderTest extends TestCase
 
     public function testGetConnectionFromArrayFromFallbackFile() : void
     {
-        $input = $this->createMock(InputInterface::class);
-
-        $input
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('db-configuration')
-            ->willReturn(null);
-
         $helperSet = $this->createMock(HelperSet::class);
 
         $dir = getcwd();
         chdir(__DIR__ . '/_files');
         try {
-            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection($input, $helperSet));
+            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection(null, $helperSet));
         } finally {
             chdir($dir);
         }
@@ -85,17 +62,10 @@ class ConnectionLoaderTest extends TestCase
 
     public function testGetConnectionFromHelper() : void
     {
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->expects($this->once())
-            ->method('getOption')
-            ->with('db-configuration')
-            ->willReturn(null);
-
         $connection = $this->createMock(Connection::class);
 
         $helper = $this->createMock(ConnectionHelper::class);
-        $helper->expects($this->once())->method('getConnection')->willReturn($connection);
+        $helper->expects(self::once())->method('getConnection')->willReturn($connection);
 
         $helperSet = new HelperSet();
         $helperSet->set($helper, 'connection');
@@ -103,7 +73,7 @@ class ConnectionLoaderTest extends TestCase
         $dir = getcwd();
         chdir(__DIR__);
         try {
-            self::assertSame($connection, $this->connectionLoader->getConnection($input, $helperSet));
+            self::assertSame($connection, $this->connectionLoader->getConnection(null, $helperSet));
         } finally {
             chdir($dir);
         }

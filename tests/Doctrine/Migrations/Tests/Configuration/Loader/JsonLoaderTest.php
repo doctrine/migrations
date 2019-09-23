@@ -14,7 +14,7 @@ class JsonLoaderTest extends AbstractLoaderTest
     {
         $loader = new JsonFileLoader();
 
-        return $loader->load(__DIR__ . '/../_files/config' . ($prefix? ('_' . $prefix) : '') . '.json');
+        return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.json');
     }
 
     public function testMalformed() : void

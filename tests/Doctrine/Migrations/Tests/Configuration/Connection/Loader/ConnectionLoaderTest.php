@@ -57,7 +57,7 @@ final class ConnectionLoaderTest extends TestCase
         $connection = $this->createMock(Connection::class);
 
         $helper = $this->createMock(ConnectionHelper::class);
-        $helper->expects($this->once())->method('getConnection')->willReturn($connection);
+        $helper->expects(self::once())->method('getConnection')->willReturn($connection);
 
         $helperSet = new HelperSet();
         $helperSet->set($helper, 'connection');

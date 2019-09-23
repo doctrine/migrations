@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
@@ -92,7 +93,7 @@ final class AliasResolverTest extends TestCase
             ['prev', '0'],
             ['next', 'A'],
             ['latest', 'C'],
-            ['current-1', null, UnknownMigrationVersion::class],
+            ['current-1', null, NoMigrationsFoundWithCriteria::class],
             ['current+1', 'A'],
             ['B', 'B'],
             ['X', null, UnknownMigrationVersion::class],

@@ -36,9 +36,4 @@ class AbstractMigrationStub extends AbstractMigration
     {
         $this->addSql($sql, $params, $types);
     }
-
-    public function getVersion() : Version
-    {
-        return $this->version;
-    }
 }
