@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Generator;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\Migrations\Version\Direction;
 use function sprintf;
 
 /**
@@ -26,7 +25,7 @@ final class FileBuilder implements FileBuilderInterface
         string $direction,
         ?DateTimeInterface $now = null
     ) : string {
-        $now ?: new DateTimeImmutable();
+        $now    = $now ?: new DateTimeImmutable();
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
@@ -49,22 +48,22 @@ final class FileBuilder implements FileBuilderInterface
         // @todo this is hard to implement since MetadataStorage abstracts the migrations table
         return '';
 
-        if ($direction === Direction::DOWN) {
-            return sprintf(
-                "DELETE FROM %s WHERE %s = '%s';\n",
-                $this->tableName,
-                $this->columnName,
-                $version
-            );
-        }
-
-        return sprintf(
-            "INSERT INTO %s (%s, %s) VALUES ('%s', %s);\n",
-            $this->tableName,
-            $this->columnName,
-            $this->executedAtColumnName,
-            $version,
-            $this->platform->getCurrentTimestampSQL()
-        );
+//        if ($direction === Direction::DOWN) {
+//            return sprintf(
+//                "DELETE FROM %s WHERE %s = '%s';\n",
+//                $this->tableName,
+//                $this->columnName,
+//                $version
+//            );
+//        }
+//
+//        return sprintf(
+//            "INSERT INTO %s (%s, %s) VALUES ('%s', %s);\n",
+//            $this->tableName,
+//            $this->columnName,
+//            $this->executedAtColumnName,
+//            $version,
+//            $this->platform->getCurrentTimestampSQL()
+//        );
     }
 }

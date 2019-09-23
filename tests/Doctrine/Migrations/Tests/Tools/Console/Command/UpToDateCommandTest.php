@@ -22,7 +22,7 @@ use function sys_get_temp_dir;
 
 class UpToDateCommandTest extends MigrationTestCase
 {
-    /** @var MigrationRepository|MockObject */
+    /** @var MigrationRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */

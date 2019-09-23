@@ -52,7 +52,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
 
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigration')
             ->willReturnCallback(static function (Version $version) use ($migrationList) {
                 return $migrationList->getMigration($version);
@@ -80,12 +80,12 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn($migrationList);
 
         $this->metadataStorage
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([]));
 
@@ -132,12 +132,12 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn($migrationList);
 
         $this->metadataStorage
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
 
@@ -163,12 +163,12 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $migrationList = new AvailableMigrationsList([]);
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn($migrationList);
 
         $this->metadataStorage
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
 
@@ -184,12 +184,12 @@ final class MigrationPlanCalculatorTest extends TestCase
         $e1 = new ExecutedMigration(new Version('A'));
 
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$m1, $m2, $m3]));
 
         $this->metadataStorage
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1]));
 
@@ -208,12 +208,12 @@ final class MigrationPlanCalculatorTest extends TestCase
         $e3 = new ExecutedMigration(new Version('C'));
 
         $this->migrationRepository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$a1]));
 
         $this->metadataStorage
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1, $e2, $e3]));
 

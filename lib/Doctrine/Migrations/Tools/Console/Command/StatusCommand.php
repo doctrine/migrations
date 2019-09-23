@@ -51,9 +51,9 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $storage        = $this->dependencyFactory->getMetadataStorage();
-        $migrationRepo  = $this->dependencyFactory->getMigrationRepository();
-        $planCalculator = $this->dependencyFactory->getMigrationPlanCalculator();
+        $storage        = $this->getDependencyFactory()->getMetadataStorage();
+        $migrationRepo  = $this->getDependencyFactory()->getMigrationRepository();
+        $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
 
         $availableMigrations = $migrationRepo->getMigrations();
         $executedMigrations  = $storage->getExecutedMigrations();
@@ -61,7 +61,7 @@ EOT
         $newMigrations                 = $planCalculator->getNewMigrations();
         $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
 
-        $infosHelper = $this->dependencyFactory->getMigrationStatusInfosHelper();
+        $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
         $infosHelper->showMigrationsInfo($output, $availableMigrations, $executedMigrations, $newMigrations, $executedUnavailableMigrations);
 
         if ($input->getOption('show-versions') === false) {
@@ -119,7 +119,7 @@ EOT
                 ? $executedMigrationsSet->getMigration($availableMigration->getVersion())
                 : null;
 
-            $executedAt = $executedMigration && $executedMigration->getExecutedAt() instanceof DateTime
+            $executedAt = $executedMigration!==null && $executedMigration->getExecutedAt() instanceof DateTime
                 ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
                 : null;
 
@@ -127,9 +127,9 @@ EOT
 
             $table->addRow([
                 (string) $availableMigration->getVersion(),
-                $executedMigration ? '<comment>migrated</comment>' : '<error>not migrated</error>',
+                $executedMigration !== null ? '<comment>migrated</comment>' : '<error>not migrated</error>',
                 (string) $executedAt,
-                (string) $description,
+                $description,
             ]);
         }
         $table->render();

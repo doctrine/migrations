@@ -37,7 +37,7 @@ final class FileQueryWriterTest extends MigrationTestCase
         $path                 = sys_get_temp_dir();
         $migrationFileBuilder = $this->createMock(FileBuilderInterface::class);
         $migrationFileBuilder
-            ->expects($this->atLeastOnce())
+            ->expects(self::atLeastOnce())
             ->method('buildMigrationFile')
             ->with(['A'], Direction::UP)
             ->willReturn('foo');

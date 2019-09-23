@@ -43,16 +43,16 @@ class RollupTest extends TestCase
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
         $this->repository
-           ->expects($this->any())
+           ->expects(self::any())
            ->method('getMigrations')
            ->willReturn(new AvailableMigrationsList([$m1]));
 
-        $this->repository->expects($this->once())->method('getMigrations');
+        $this->repository->expects(self::once())->method('getMigrations');
 
         $this->storage
-           ->expects($this->at(0))->method('reset')->with();
+           ->expects(self::at(0))->method('reset')->with();
         $this->storage
-           ->expects($this->at(1))
+           ->expects(self::at(1))
            ->method('complete')
            ->willReturnCallback(static function (ExecutionResult $result) : void {
               self::assertEquals(new Version('A'), $result->getVersion());
@@ -67,14 +67,14 @@ class RollupTest extends TestCase
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
 
         $this->repository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$m1, $m2]));
 
-        $this->repository->expects($this->once())->method('getMigrations');
+        $this->repository->expects(self::once())->method('getMigrations');
 
-        $this->storage->expects($this->never())->method('reset');
-        $this->storage->expects($this->never())->method('complete');
+        $this->storage->expects(self::never())->method('reset');
+        $this->storage->expects(self::never())->method('complete');
         $this->expectException(RollupFailed::class);
         $this->expectExceptionMessage('Too many migrations.');
 
@@ -84,14 +84,14 @@ class RollupTest extends TestCase
     public function testRollupNoMigrations() : void
     {
         $this->repository
-            ->expects($this->any())
+            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([]));
 
-        $this->repository->expects($this->once())->method('getMigrations');
+        $this->repository->expects(self::once())->method('getMigrations');
 
-        $this->storage->expects($this->never())->method('reset');
-        $this->storage->expects($this->never())->method('complete');
+        $this->storage->expects(self::never())->method('reset');
+        $this->storage->expects(self::never())->method('complete');
         $this->expectException(RollupFailed::class);
         $this->expectExceptionMessage('No migrations found.');
 

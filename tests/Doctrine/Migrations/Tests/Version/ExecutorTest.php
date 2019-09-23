@@ -75,7 +75,7 @@ class ExecutorTest extends TestCase
     public function testExecuteUp() : void
     {
         $this->metadataStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result) : void {
                 self::assertSame(Direction::UP, $result->getDirection());
                 self::assertNotNull($result->getTime());
@@ -131,7 +131,7 @@ class ExecutorTest extends TestCase
     public function testExecuteDown() : void
     {
         $this->metadataStorage
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result) : void {
                 self::assertSame(Direction::DOWN, $result->getDirection());
                 self::assertNotNull($result->getTime());
@@ -174,7 +174,7 @@ class ExecutorTest extends TestCase
     public function testSkipMigration() : void
     {
         $this->metadataStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('complete');
 
         $migratorConfiguration = (new MigratorConfiguration())
@@ -271,7 +271,7 @@ class ExecutorTest extends TestCase
     public function testErrorMigration() : void
     {
         $this->metadataStorage
-            ->expects($this->never())
+            ->expects(self::never())
             ->method('complete');
 
         $migratorConfiguration = (new MigratorConfiguration())

@@ -101,9 +101,9 @@ EOT
             }
         }
 
-        $versionNumber = $this->dependencyFactory->getConfiguration()->generateVersionNumber();
+        $versionNumber = $this->getDependencyFactory()->getConfiguration()->generateVersionNumber();
 
-        $diffGenerator = $this->dependencyFactory->getDiffGenerator();
+        $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
 
         try {
             $path = $diffGenerator->generate(

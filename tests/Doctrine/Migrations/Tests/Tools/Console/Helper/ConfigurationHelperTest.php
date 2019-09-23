@@ -61,13 +61,13 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('load')
             ->with([])
             ->willReturn($confExpected);
 
         $this->loader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getLoader')
             ->with('array')
             ->willReturn($configLoader);
@@ -87,7 +87,7 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->will(self::returnValue('testconfig.wrong'));
         $this->loader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getLoader')
             ->with('wrong')
             ->willThrowException(UnknownLoader::new('dummy'));
@@ -110,13 +110,13 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('load')
             ->with('config.php')
             ->willReturn($confExpected);
 
         $this->loader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getLoader')
             ->with('php')
             ->willReturn($configLoader);
@@ -136,13 +136,13 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('load')
             ->with('migrations.php')
             ->willReturn($confExpected);
 
         $this->loader
-            ->expects($this->once())
+            ->expects(self::once())
             ->method('getLoader')
             ->with('php')
             ->willReturn($configLoader);

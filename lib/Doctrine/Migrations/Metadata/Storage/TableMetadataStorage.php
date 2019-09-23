@@ -83,10 +83,14 @@ class TableMetadataStorage implements MetadataStorage
 
             $version = new Version($row[$this->configuration->getVersionColumnName()]);
 
-            $executedAt = ! empty($row[$this->configuration->getExecutedAtColumnName()]) ? DateTime::createFromFormat(
-                $this->platform->getDateTimeFormatString(),
-                $row[$this->configuration->getExecutedAtColumnName()]
-            ) : null;
+            $executedAt = (isset($row[$this->configuration->getExecutedAtColumnName()])
+                && $row[$this->configuration->getExecutedAtColumnName()] !== null
+                && $row[$this->configuration->getExecutedAtColumnName()] !== ''
+                ? DateTime::createFromFormat(
+                    $this->platform->getDateTimeFormatString(),
+                    $row[$this->configuration->getExecutedAtColumnName()]
+                )
+                : null) ?: null;
 
             $migration = new ExecutedMigration(
                 $version,
@@ -123,7 +127,7 @@ class TableMetadataStorage implements MetadataStorage
         } else {
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
-                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt() ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): null,
+                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt()!== null ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): null,
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
             ]);
         }

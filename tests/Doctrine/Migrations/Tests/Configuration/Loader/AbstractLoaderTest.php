@@ -24,9 +24,6 @@ abstract class AbstractLoaderTest extends TestCase
         self::assertSame('Doctrine Sandbox Migrations', $config->getName());
         self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
 
-        /**
-         * @var $storage TableMetadataStorageConfiguration
-         */
         $storage = $config->getMetadataStorageConfiguration();
         self::assertInstanceOf(TableMetadataStorageConfiguration::class, $storage);
 

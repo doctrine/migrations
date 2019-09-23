@@ -52,10 +52,10 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $configuration = $this->dependencyFactory->getConfiguration();
+        $configuration = $this->getDependencyFactory()->getConfiguration();
         $versionNumber = $configuration->generateVersionNumber();
 
-        $migrationGenerator = $this->dependencyFactory->getMigrationGenerator();
+        $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 
         $namespace = $input->getOption('namespace') ?: null;
 

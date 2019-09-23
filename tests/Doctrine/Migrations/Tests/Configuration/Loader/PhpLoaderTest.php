@@ -13,7 +13,7 @@ class PhpLoaderTest extends AbstractLoaderTest
     {
         $loader = new PHPFileLoader();
 
-        return $loader->load(__DIR__ . '/../_files/config' . ($prefix? ('_' . $prefix) : '') . '.php');
+        return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.php');
     }
 
     public function testLoadInline() : void

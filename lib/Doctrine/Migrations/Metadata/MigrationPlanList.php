@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Metadata;
 
 use Countable;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use function count;
 use function end;
 use function reset;
@@ -26,6 +27,9 @@ class MigrationPlanList implements Countable
         $this->direction = $direction;
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->items);
@@ -44,13 +48,21 @@ class MigrationPlanList implements Countable
         return $this->direction;
     }
 
-    public function getFirst() : ?MigrationPlan
+    public function getFirst() : MigrationPlan
     {
-        return reset($this->items) ?: null;
+        if (count($this->items) === 0) {
+            throw NoMigrationsFoundWithCriteria::new('first');
+        }
+
+        return reset($this->items);
     }
 
-    public function getLast() : ?MigrationPlan
+    public function getLast() : MigrationPlan
     {
-        return end($this->items) ?: null;
+        if (count($this->items) === 0) {
+            throw NoMigrationsFoundWithCriteria::new('last');
+        }
+
+        return end($this->items);
     }
 }

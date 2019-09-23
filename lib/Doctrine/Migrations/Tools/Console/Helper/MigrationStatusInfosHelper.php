@@ -70,12 +70,12 @@ class MigrationStatusInfosHelper
         foreach ($data as $k => $v) {
             $table->addRow([
                 '<info>' . $k . '</info>',
-                new TableCell((string) $v, ['colspan' => 2]),
+                new TableCell($v, ['colspan' => 2]),
             ]);
         }
         $dataGroup = [
             'Storage' => [
-                'Type' => $storage ? get_class($storage) : null,
+                'Type' => $storage!== null ? get_class($storage) : null,
             ],
             'Database' => [
                 'Driver' => $this->connection->getDriver()->getName(),
@@ -153,18 +153,18 @@ class MigrationStatusInfosHelper
                 return 'Already at first version';
             }
         }
-        if ($alias === 'latest' && $version && $executedMigrationsSet->hasMigration($version)) {
+        if ($alias === 'latest' && $version!== null && $executedMigrationsSet->hasMigration($version)) {
             return 'Already at latest version';
         }
         // Before first version "virtual" version number
-        if ($version === '0') {
+        if ((string) $version === '0') {
             return '<comment>0</comment>';
         }
 
         // Show normal version number
         return sprintf(
             '<comment>%s </comment>',
-            $version
+            (string) $version
         );
     }
 }

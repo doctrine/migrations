@@ -9,6 +9,7 @@ use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +18,7 @@ use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function escapeshellarg;
+use function is_string;
 use function proc_open;
 use function str_repeat;
 use function strlen;
@@ -27,14 +29,14 @@ use function strlen;
 abstract class AbstractCommand extends Command
 {
     /** @var DependencyFactory|null */
-    protected $dependencyFactory;
+    private $dependencyFactory;
 
     public function initialize(
         InputInterface $input,
         OutputInterface $output
     ) : void {
         $this->initializeDependencies($input, $output);
-        $this->dependencyFactory->getConfiguration()->validate();
+        $this->getDependencyFactory()->getConfiguration()->validate();
     }
 
     public function __construct(?string $name = null, ?DependencyFactory $dependencyFactory = null)
@@ -63,7 +65,7 @@ abstract class AbstractCommand extends Command
     protected function outputHeader(
         OutputInterface $output
     ) : void {
-        $name = $this->dependencyFactory->getConfiguration()->getName();
+        $name = $this->getDependencyFactory()->getConfiguration()->getName();
         $name = $name ?? 'Doctrine Database Migrations';
         $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
         $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
@@ -75,26 +77,39 @@ abstract class AbstractCommand extends Command
     protected function initializeDependencies(
         InputInterface $input,
         OutputInterface $output
-    ) : DependencyFactory {
+    ) : void {
+        if ($this->dependencyFactory !== null) {
+            return;
+        }
+
+        if ($this->hasConfigurationHelper()) {
+            /** @var ConfigurationHelper $configHelper */
+            $configHelper = $this->getHelperSet()->get('configuration');
+        } else {
+            $configHelper = new ConfigurationHelper();
+        }
+
+        $configuration = $configHelper->getConfiguration($input);
+
+        $dbConfig = is_string($input->getOption('db-configuration')) ? $input->getOption('db-configuration'): null;
+
+        $connection = (new ConnectionLoader())
+            ->getConnection($dbConfig, $this->getHelperSet());
+
+        $em = null;
+        if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper) {
+            $em = $this->getHelperSet()->get('em')->getEntityManager();
+        }
+
+        $logger                  = new ConsoleLogger($output);
+        $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
+    }
+
+    protected function getDependencyFactory() : DependencyFactory
+    {
         if ($this->dependencyFactory === null) {
-            if ($this->hasConfigurationHelper()) {
-                /** @var ConfigurationHelper $configHelper */
-                $configHelper = $this->getHelperSet()->get('configuration');
-            } else {
-                $configHelper = new ConfigurationHelper();
-            }
-
-            $configuration = $configHelper->getConfiguration($input);
-            $connection    = (new ConnectionLoader())
-                ->getConnection($input, $this->getHelperSet());
-
-            $em = null;
-            if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper) {
-                $em = $this->getHelperSet()->get('em')->getEntityManager();
-            }
-
-            $logger                  = new ConsoleLogger($output);
-            $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
+            // todo doctrine exception
+            throw new Exception('dependencyFactory not initialized');
         }
 
         return $this->dependencyFactory;

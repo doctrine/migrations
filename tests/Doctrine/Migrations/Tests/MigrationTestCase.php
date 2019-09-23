@@ -19,7 +19,7 @@ abstract class MigrationTestCase extends TestCase
         return DriverManager::getConnection($params);
     }
 
-    public function getLogOutput(LoggerInterface $logger) : string
+    public function getLogOutput(TestLogger $logger) : string
     {
         return implode("\n", $logger->logs);
     }
