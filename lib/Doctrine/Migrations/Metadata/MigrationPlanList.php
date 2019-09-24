@@ -27,10 +27,7 @@ class MigrationPlanList implements Countable
         $this->direction = $direction;
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count() : int
     {
         return count($this->items);
     }

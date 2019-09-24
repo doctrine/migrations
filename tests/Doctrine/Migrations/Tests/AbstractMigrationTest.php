@@ -8,14 +8,13 @@ use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
-use Psr\Log\LoggerInterface;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
     /** @var AbstractMigrationStub */
     private $migration;
 
-    /** @var LoggerInterface */
+    /** @var TestLogger */
     private $logger;
 
     protected function setUp() : void

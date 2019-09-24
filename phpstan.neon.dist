@@ -6,16 +6,26 @@ parameters:
     autoload_directories:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_features
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_files
+    excludes_analyse:
+        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     autoload_files:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/realpath.php
     ignoreErrors:
         # Ignore proxy manager magic
         - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
-        - '~^Parameter #1 \$files of method Doctrine\\Migrations\\Finder\\Finder::loadMigrationClasses\(\) expects array<string>, array<int, string\|false> given\.\z~'
-        - '~^Class Doctrine\\Migrations\\Tests\\DoesNotExistAtAll not found\.\z~'
+        - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
+        -
+            message: '~^Variable property access on mixed\.$~'
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Loader/XmlFileLoader.php
+        -
+            message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/ParameterFormatter.php
 
+    symfony:
+            console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - vendor/phpstan/phpstan-symfony/extension.neon

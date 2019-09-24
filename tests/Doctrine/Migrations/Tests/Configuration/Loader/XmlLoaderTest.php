@@ -17,6 +17,13 @@ class XmlLoaderTest extends AbstractLoaderTest
         return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.xml');
     }
 
+    public function testConfigurationWithInvalidOption() : void
+    {
+        $this->expectException(XmlNotValid::class);
+
+        $this->load('invalid');
+    }
+
     public function testMalformed() : void
     {
         $this->expectException(XmlNotValid::class);

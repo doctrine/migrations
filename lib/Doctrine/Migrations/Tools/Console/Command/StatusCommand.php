@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use DateTime;
-use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Helper\Table;
@@ -91,7 +90,7 @@ EOT
         foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
             $table->addRow([
                 (string) $executedUnavailableMigration->getVersion(),
-                $executedUnavailableMigration->getExecutedAt()
+                $executedUnavailableMigration->getExecutedAt() !== null
                     ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
                     : null,
             ]);
@@ -99,9 +98,6 @@ EOT
         $table->render();
     }
 
-    /**
-     * @param AvailableMigration[] $versions
-     */
     private function showVersions(
         AvailableMigrationsList $availableMigrationsSet,
         ExecutedMigrationsSet $executedMigrationsSet,

@@ -9,8 +9,10 @@ use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
 use function class_exists;
 use function count;
+use function is_string;
 use function key;
 use function sprintf;
 
@@ -74,7 +76,7 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : ?int {
-        $formatted  = (bool) $input->getOption('formatted');
+        $formatted  = $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
@@ -100,6 +102,7 @@ EOT
             $dirs      = $configuration->getMigrationDirectories();
             $namespace = key($dirs);
         }
+        assert(is_string($namespace));
 
         $path = $schemaDumper->dump(
             $versionNumber,
@@ -111,6 +114,7 @@ EOT
         $editorCommand = $input->getOption('editor-cmd');
 
         if ($editorCommand !== null) {
+            assert(is_string($editorCommand));
             $this->procOpen($editorCommand, $path);
         }
 

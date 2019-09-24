@@ -32,6 +32,7 @@ use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -105,6 +106,10 @@ class DependencyFactory
     {
         // @todo what about the other schema providers?
         return $this->getDependency(SchemaProviderInterface::class, function () : SchemaProviderInterface {
+            if ($this->em === null) {
+                throw new Exception('foo');
+            }
+
             return new OrmSchemaProvider($this->em);
         });
     }

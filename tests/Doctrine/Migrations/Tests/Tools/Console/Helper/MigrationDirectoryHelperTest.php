@@ -5,17 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
 use const DIRECTORY_SEPARATOR;
-use function closedir;
 use function date;
-use function is_dir;
 use function mkdir;
-use function opendir;
-use function readdir;
-use function rmdir;
 use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
@@ -43,7 +39,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
 
     public function tearDown() : void
     {
-        rrmdir($this->tempDir);
+        Helper::deleteDir($this->tempDir);
     }
 
     public function testMigrationDirectoryHelperReturnConfiguredDir() : void
@@ -88,23 +84,4 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
             $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
         }
     }
-}
-
-function rrmdir(string $src) : void
-{
-    $dir = opendir($src);
-    while (( $file = readdir($dir)) !== false) {
-        if (( $file === '.' ) || ( $file === '..' )) {
-            continue;
-        }
-
-        $full = $src . '/' . $file;
-        if (is_dir($full)) {
-            rrmdir($full);
-        } else {
-            unlink($full);
-        }
-    }
-    closedir($dir);
-    rmdir($src);
 }

@@ -33,7 +33,7 @@ class Helper
 
         $files = glob($path . '/*');
 
-        if ($files !== []) {
+        if ($files !== [] && $files !== false) {
             array_map($classFunction, $files);
 
             @rmdir($path);

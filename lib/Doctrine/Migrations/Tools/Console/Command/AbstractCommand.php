@@ -81,10 +81,11 @@ abstract class AbstractCommand extends Command
         if ($this->dependencyFactory !== null) {
             return;
         }
+        $helperSet = $this->getHelperSet() ?: new HelperSet();
 
-        if ($this->hasConfigurationHelper()) {
+        if ($helperSet->has('configuration') && $helperSet->get('configuration') instanceof ConfigurationHelperInterface) {
             /** @var ConfigurationHelper $configHelper */
-            $configHelper = $this->getHelperSet()->get('configuration');
+            $configHelper = $helperSet->get('configuration');
         } else {
             $configHelper = new ConfigurationHelper();
         }
@@ -94,11 +95,11 @@ abstract class AbstractCommand extends Command
         $dbConfig = is_string($input->getOption('db-configuration')) ? $input->getOption('db-configuration'): null;
 
         $connection = (new ConnectionLoader())
-            ->getConnection($dbConfig, $this->getHelperSet());
+            ->getConnection($dbConfig, $helperSet);
 
         $em = null;
-        if ($this->getHelperSet()->has('em') && $this->getHelperSet()->get('em') instanceof EntityManagerHelper) {
-            $em = $this->getHelperSet()->get('em')->getEntityManager();
+        if ($helperSet->has('em') && $helperSet->get('em') instanceof EntityManagerHelper) {
+            $em = $helperSet->get('em')->getEntityManager();
         }
 
         $logger                  = new ConsoleLogger($output);
@@ -138,21 +139,5 @@ abstract class AbstractCommand extends Command
     protected function procOpen(string $editorCommand, string $path) : void
     {
         proc_open($editorCommand . ' ' . escapeshellarg($path), [], $pipes);
-    }
-
-    private function hasConfigurationHelper() : bool
-    {
-        /** @var HelperSet|null $helperSet */
-        $helperSet = $this->getHelperSet();
-
-        if ($helperSet === null) {
-            return false;
-        }
-
-        if (! $helperSet->has('configuration')) {
-            return false;
-        }
-
-        return $helperSet->get('configuration') instanceof ConfigurationHelperInterface;
     }
 }

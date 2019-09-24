@@ -155,7 +155,7 @@ class MigrateCommandTest extends MigrationTestCase
     {
         return [
             [true, getcwd()],
-            ['test', 'test'],
+            [ __DIR__ . '/_files', __DIR__ . '/_files'],
         ];
     }
 

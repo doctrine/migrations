@@ -27,9 +27,7 @@ final class SqlGeneratorTest extends TestCase
     /** @var string[] */
     private $sql;
 
-    /**
-     * @var MockObject|TableMetadataStorageConfiguration
-     */
+    /** @var MockObject|TableMetadataStorageConfiguration */
     private $metadataConfig;
 
     public function testGenerate() : void

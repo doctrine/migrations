@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Metadata\Storage\Configuration\Storage;
+namespace Doctrine\Migrations\Tests\Metadata\Storage\Storage;
 
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use PHPUnit\Framework\TestCase;

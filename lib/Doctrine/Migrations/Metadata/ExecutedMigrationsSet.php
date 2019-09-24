@@ -51,10 +51,7 @@ class ExecutedMigrationsSet implements Countable
         return $this->items[$offset];
     }
 
-    /**
-     * @return int
-     */
-    public function count()
+    public function count() : int
     {
         return count($this->items);
     }
