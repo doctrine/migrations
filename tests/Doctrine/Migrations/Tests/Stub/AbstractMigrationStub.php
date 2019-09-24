@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Stub;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Version\Version;
 
 class AbstractMigrationStub extends AbstractMigration
 {

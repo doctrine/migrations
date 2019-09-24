@@ -91,7 +91,7 @@ EOT
             throw InvalidOptionUsage::new('You must specify whether you want to --add or --delete the specified version.');
         }
 
-        $this->markMigrated = (bool) $input->getOption('add');
+        $this->markMigrated = $input->getOption('add');
 
         if ($input->isInteractive()) {
             $question = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)';
@@ -122,7 +122,7 @@ EOT
         if ($allOption === true) {
             $availableVersions = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
 
-            if ((bool) $input->getOption('delete') === true) {
+            if ($input->getOption('delete') === true) {
                 foreach ($executedMigrations->getItems() as $availableMigration) {
                     $this->mark($input, $output, $availableMigration->getVersion(), false, $executedMigrations);
                 }
@@ -130,8 +130,10 @@ EOT
             foreach ($availableVersions->getItems() as $availableMigration) {
                 $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
             }
-        } else {
+        } elseif ($affectedVersion !== null) {
             $this->mark($input, $output, new Version($affectedVersion), false, $executedMigrations);
+        } else {
+            throw InvalidOptionUsage::new('You must specify the version or use the --all argument.');
         }
     }
 
@@ -150,7 +152,7 @@ EOT
 
         $storage = $this->getDependencyFactory()->getMetadataStorage();
         if ($availableMigration === null) {
-            if ((bool) $input->getOption('delete') === false) {
+            if ($input->getOption('delete') === false) {
                 throw UnknownMigrationVersion::new((string) $version);
             }
 

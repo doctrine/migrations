@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Generator;
 
 use DateTimeImmutable;
 use DateTimeInterface;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use function sprintf;
 
 /**
@@ -16,9 +15,6 @@ use function sprintf;
  */
 final class FileBuilder implements FileBuilderInterface
 {
-    /** @var AbstractPlatform */
-    private $platform;
-
     /** @param string[][] $queriesByVersion */
     public function buildMigrationFile(
         array $queriesByVersion,

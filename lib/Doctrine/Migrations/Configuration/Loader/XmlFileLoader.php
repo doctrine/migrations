@@ -15,6 +15,7 @@ use const LIBXML_NOCDATA;
 use function assert;
 use function file_exists;
 use function file_get_contents;
+use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_string;
 use function strtr;
@@ -27,10 +28,16 @@ class XmlFileLoader extends AbstractFileLoader
     /**
      * @return mixed[]
      */
-    private function extractParameters(SimpleXMLElement $root, bool $nodes = true) : array
+    private function extractParameters(SimpleXMLElement $root, bool $loopOverNodes = true) : array
     {
         $config = [];
-        foreach ($nodes ? $root->children() : $root->attributes() as $node) {
+
+        $itemsToCheck = $loopOverNodes ? $root->children() : $root->attributes();
+
+        if (! ($itemsToCheck instanceof SimpleXMLElement)) {
+            return $config;
+        }
+        foreach ($itemsToCheck as $node) {
             $nodeName = strtr($node->getName(), '-', '_');
             if ($nodeName === 'migrations_paths') {
                 $config['migrations_paths'] = [];
@@ -47,9 +54,6 @@ class XmlFileLoader extends AbstractFileLoader
         return $config;
     }
 
-    /**
-     * @param mixed $file
-     */
     public function __construct(?ArrayLoader $arrayLoader = null)
     {
         $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
@@ -63,27 +67,29 @@ class XmlFileLoader extends AbstractFileLoader
         if (! file_exists($file)) {
             throw FileNotFound::new();
         }
-        libxml_use_internal_errors(true);
+        try {
+            libxml_use_internal_errors(true);
 
-        $xml = new DOMDocument();
+            $xml = new DOMDocument();
 
-        if ($xml->load($file) === false) {
-            throw XmlNotValid::malformed();
+            if ($xml->load($file) === false) {
+                throw XmlNotValid::malformed();
+            }
+
+            $xsdPath = __DIR__ . DIRECTORY_SEPARATOR . 'XML' . DIRECTORY_SEPARATOR . 'configuration.xsd';
+
+            if ($xml->schemaValidate($xsdPath) === false) {
+                throw XmlNotValid::failedValidation();
+            }
+        } finally {
+            libxml_clear_errors();
+            libxml_use_internal_errors(false);
         }
-
-        $xsdPath = __DIR__ . DIRECTORY_SEPARATOR . 'XML' . DIRECTORY_SEPARATOR . 'configuration.xsd';
-// @todo restore validation
-//        if (! $xml->schemaValidate($xsdPath)) {
-//            libxml_clear_errors();
-//
-//            throw XmlNotValid::failedValidation();
-//        }
-
         $rawXML = file_get_contents($file);
         assert($rawXML !== false);
 
         $root = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
-        assert($xml !== false);
+        assert($root !== false);
 
         $config = $this->extractParameters($root);
 

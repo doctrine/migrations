@@ -8,6 +8,8 @@ use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
+use function is_string;
 use function key;
 use function sprintf;
 
@@ -65,13 +67,14 @@ EOT
         } elseif (! isset($dirs[$namespace])) {
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
-
+        assert(is_string($namespace));
         $fqcn = $namespace . '\\Version' . $versionNumber;
         $path = $migrationGenerator->generateMigration($versionNumber, $namespace);
 
         $editorCommand = $input->getOption('editor-cmd');
 
         if ($editorCommand !== null) {
+            assert(is_string($editorCommand));
             $this->procOpen($editorCommand, $path);
         }
 

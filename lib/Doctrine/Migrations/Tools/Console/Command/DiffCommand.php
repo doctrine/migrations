@@ -10,8 +10,10 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use const FILTER_VALIDATE_BOOLEAN;
+use function assert;
 use function class_exists;
 use function filter_var;
+use function is_string;
 use function sprintf;
 
 /**
@@ -43,13 +45,13 @@ EOT
             ->addOption(
                 'editor-cmd',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Open file with this command upon creation.'
             )
             ->addOption(
                 'filter-expression',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Tables which are filtered by Regular Expression.'
             )
             ->addOption(
@@ -61,7 +63,7 @@ EOT
             ->addOption(
                 'line-length',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Max line length of unformatted lines.',
                 120
             )
@@ -70,7 +72,7 @@ EOT
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Check Database Platform to the generated code.',
-                true
+                1
             )
             ->addOption(
                 'allow-empty-diff',
@@ -87,8 +89,8 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : ?int {
-        $filterExpression = $input->getOption('filter-expression') ?? null;
-        $formatted        = (bool) $input->getOption('formatted');
+        $filterExpression = (string) $input->getOption('filter-expression') ?: null;
+        $formatted        = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
         $lineLength       = (int) $input->getOption('line-length');
         $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
         $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
@@ -125,6 +127,7 @@ EOT
         $editorCommand = $input->getOption('editor-cmd');
 
         if ($editorCommand !== null) {
+            assert(is_string($editorCommand));
             $this->procOpen($editorCommand, $path);
         }
 

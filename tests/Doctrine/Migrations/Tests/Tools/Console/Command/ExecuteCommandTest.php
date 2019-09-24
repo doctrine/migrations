@@ -76,7 +76,7 @@ class ExecuteCommandTest extends TestCase
     {
         return [
             [true, getcwd()],
-            ['test', 'test'],
+            [ __DIR__ . '/_files', __DIR__ . '/_files'],
         ];
     }
 

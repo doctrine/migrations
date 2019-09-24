@@ -73,14 +73,14 @@ final class AliasResolver implements AliasResolverInterface
                 } catch (NoMigrationsFoundWithCriteria $e) {
                     return new Version('0');
                 }
-
+                break;
             case self::ALIAS_PREV:
                 try {
                     return $executedMigrations->getLast(-1)->getVersion();
                 } catch (NoMigrationsFoundWithCriteria $e) {
                     return new Version('0');
                 }
-
+                break;
             case self::ALIAS_NEXT:
                 $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
 
@@ -89,13 +89,14 @@ final class AliasResolver implements AliasResolverInterface
                 } catch (NoMigrationsFoundWithCriteria $e) {
                     throw NoMigrationsToExecute::new();
                 }
-
+                break;
             case self::ALIAS_LATEST:
                 try {
                     return $availableMigrations->getLast()->getVersion();
                 } catch (NoMigrationsFoundWithCriteria $e) {
                     throw NoMigrationsToExecute::new();
                 }
+                break;
             default:
                 if ($availableMigrations->hasMigration(new Version($alias))) {
                     return $availableMigrations->getMigration(new Version($alias))->getVersion();

@@ -9,7 +9,7 @@
                 <xs:element type="xs:string" name="name" minOccurs="0" maxOccurs="1"/>
                 <xs:element type="xs:string" name="custom-template" minOccurs="0" maxOccurs="1"/>
 
-                <xs:element name="migrations-paths" minOccurs="1" maxOccurs="1">
+                <xs:element name="migrations-paths" minOccurs="0" maxOccurs="1">
                     <xs:complexType>
                         <xs:sequence>
                             <xs:element name="path" minOccurs="0" maxOccurs="1">

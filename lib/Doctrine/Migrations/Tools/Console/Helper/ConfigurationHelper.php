@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
+use const PATHINFO_EXTENSION;
 use function file_exists;
 use function is_string;
 use function pathinfo;
@@ -70,10 +71,10 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
      */
     private function loadConfig(string $configFile) : Configuration
     {
-        $info = pathinfo($configFile);
+        $extension = pathinfo($configFile, PATHINFO_EXTENSION);
 
         try {
-            return $this->loader->getLoader($info['extension'])->load($configFile);
+            return $this->loader->getLoader($extension)->load($configFile);
         } catch (UnknownLoader $e) {
             throw FileTypeNotSupported::new();
         }

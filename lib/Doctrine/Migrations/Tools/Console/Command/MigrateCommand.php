@@ -15,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function getcwd;
 use function is_string;
+use function is_writable;
 use function sprintf;
 use function substr;
 
@@ -117,7 +118,7 @@ EOT
     {
         $this->outputHeader($output);
 
-        $versionAlias = (string) $input->getArgument('version');
+        $versionAlias = $input->getArgument('version');
         $path         = $input->getOption('write-sql');
 
         try {
@@ -151,7 +152,13 @@ EOT
             $migratorConfiguration->setDryRun(true);
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
-            $path   = is_string($path) ? $path : getcwd();
+            $path = is_string($path) ? $path : getcwd();
+
+            if (! is_string($path) || ! is_writable($path)) {
+                $output->writeln('<error>Path not writeable!</error>');
+
+                return 1;
+            }
             $writer = $this->getDependencyFactory()->getQueryWriter();
             $writer->write($path, $plan->getDirection(), $sql);
 
@@ -185,7 +192,9 @@ EOT
             foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
                 $output->writeln(sprintf(
                     '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $executedUnavailableMigration->getExecutedAt() ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s') : null,
+                    $executedUnavailableMigration->getExecutedAt() !== null
+                        ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                        : null,
                     $executedUnavailableMigration->getVersion()
                 ));
             }

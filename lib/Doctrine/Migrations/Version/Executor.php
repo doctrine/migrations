@@ -42,7 +42,7 @@ final class Executor implements ExecutorInterface
     /** @var Stopwatch */
     private $stopwatch;
 
-    /** @var string[] */
+    /** @var array<int, string> */
     private $sql = [];
 
     /** @var mixed[] */

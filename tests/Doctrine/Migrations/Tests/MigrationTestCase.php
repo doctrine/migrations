@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use PHPUnit\Framework\TestCase;
-use Psr\Log\LoggerInterface;
 use function implode;
 
 abstract class MigrationTestCase extends TestCase

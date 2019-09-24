@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
 use function is_string;
+use function is_writable;
 
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.
@@ -110,6 +111,12 @@ EOT
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
             $path = is_string($path) ? $path : getcwd();
+
+            if (! is_string($path) || ! is_writable($path)) {
+                $output->writeln('<error>Path not writeable!</error>');
+
+                return 1;
+            }
 
             $writer = $this->getDependencyFactory()->getQueryWriter();
             $writer->write($path, $direction, $sql);
