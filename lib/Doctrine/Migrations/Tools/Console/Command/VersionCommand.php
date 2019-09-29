@@ -59,19 +59,36 @@ class VersionCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Apply to all the versions.'
             )
+            ->addOption(
+                'range-from',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Apply from specified version.'
+            )
+            ->addOption(
+                'range-to',
+                null,
+                InputOption::VALUE_OPTIONAL,
+                'Apply to specified version.'
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --add</info>
+    <info>%command.full_name% MIGRATION-FQCN --add</info>
 
 If you want to delete a version you can use the <comment>--delete</comment> option:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --delete</info>
+    <info>%command.full_name% MIGRATION-FQCN --delete</info>
 
 If you want to synchronize by adding or deleting all migration versions available in the version table you can use the <comment>--all</comment> option:
 
     <info>%command.full_name% --add --all</info>
     <info>%command.full_name% --delete --all</info>
+
+If you want to synchronize by adding or deleting some range of migration versions available in the version table you can use the <comment>--range-from/--range-to</comment> option:
+
+    <info>%command.full_name% --add --range-from=MIGRATION-FQCN --range-to=MIGRATION-FQCN</info>
+    <info>%command.full_name% --delete --range-from=MIGRATION-FQCN --range-to=MIGRATION-FQCN</info>
 
 You can also execute this command without a warning message which you need to interact with:
 
@@ -117,11 +134,24 @@ EOT
     {
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
+        $rangeFromOption = $input->getOption('range-from');
+        $rangeToOption   = $input->getOption('range-to');
+
+        if ($allOption === true && ($rangeFromOption !== null || $rangeToOption !== null)) {
+            throw InvalidOptionUsage::new(
+                'Options --all and --range-to/--range-from both used. You should use only one of them.'
+            );
+        }
+
+        if ($rangeFromOption !== null xor $rangeToOption !== null) {
+            throw InvalidOptionUsage::new(
+                'Options --range-to and --range-from should be used together.'
+            );
+        }
 
         $executedMigrations = $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations();
+        $availableVersions  = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
         if ($allOption === true) {
-            $availableVersions = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
-
             if ($input->getOption('delete') === true) {
                 foreach ($executedMigrations->getItems() as $availableMigration) {
                     $this->mark($input, $output, $availableMigration->getVersion(), false, $executedMigrations);
@@ -132,6 +162,21 @@ EOT
             }
         } elseif ($affectedVersion !== null) {
             $this->mark($input, $output, new Version($affectedVersion), false, $executedMigrations);
+        } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
+            $migrate = false;
+            foreach ($availableVersions->getItems() as $availableMigration) {
+                if ((string) $availableMigration->getVersion() === $rangeFromOption) {
+                    $migrate = true;
+                }
+
+                if ($migrate) {
+                    $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
+                }
+
+                if ((string) $availableMigration->getVersion() === $rangeToOption) {
+                    break;
+                }
+            }
         } else {
             throw InvalidOptionUsage::new('You must specify the version or use the --all argument.');
         }
