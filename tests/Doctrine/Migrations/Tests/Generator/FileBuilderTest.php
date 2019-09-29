@@ -21,8 +21,6 @@ class FileBuilderTest extends TestCase
 
     public function testBuildMigrationFile() : void
     {
-        //@todo find a wayt to get the metadata sql here
-        $this->markTestSkipped();
         $queriesByVersion = [
             '1' => [
                 'SELECT 1',
@@ -52,17 +50,14 @@ class FileBuilderTest extends TestCase
 -- Version 1
 SELECT 1;
 SELECT 2;
-INSERT INTO table_name (column_name, executed_at) VALUES ('1', CURRENT_TIMESTAMP);
 
 -- Version 2
 SELECT 3;
 SELECT 4;
-INSERT INTO table_name (column_name, executed_at) VALUES ('2', CURRENT_TIMESTAMP);
 
 -- Version 3
 SELECT 5;
 SELECT 6;
-INSERT INTO table_name (column_name, executed_at) VALUES ('3', CURRENT_TIMESTAMP);
 
 FILE;
 
@@ -75,11 +70,6 @@ FILE;
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
 
-        $this->migrationFileBuilder = new FileBuilder(
-            $this->platform,
-            'table_name',
-            'column_name',
-            'executed_at'
-        );
+        $this->migrationFileBuilder = new FileBuilder();
     }
 }

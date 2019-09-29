@@ -6,10 +6,10 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
+use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use Exception;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
@@ -109,8 +109,7 @@ abstract class AbstractCommand extends Command
     protected function getDependencyFactory() : DependencyFactory
     {
         if ($this->dependencyFactory === null) {
-            // todo doctrine exception
-            throw new Exception('dependencyFactory not initialized');
+            throw DependenciesNotSatisfied::new();
         }
 
         return $this->dependencyFactory;
