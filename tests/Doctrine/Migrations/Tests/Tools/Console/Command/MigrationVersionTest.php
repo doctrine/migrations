@@ -10,7 +10,6 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\MigrationTestCase;
-use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use Doctrine\Migrations\Version\Direction;
@@ -58,12 +57,12 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeOption() : void
     {
-        $this->markTestSkipped();
-        $this->configuration->registerMigration('1233', Version1Test::class);
-        $this->configuration->registerMigration('1234', Version1Test::class);
-        $this->configuration->registerMigration('1235', Version1Test::class);
-        $this->configuration->registerMigration('1239', Version1Test::class);
-        $this->configuration->registerMigration('1240', Version1Test::class);
+        $mock = $this->createMock(AbstractMigration::class);
+        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1235'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1239'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1240'), $mock);
 
         $this->commandTester->execute(
             [
@@ -74,11 +73,12 @@ class MigrationVersionTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertFalse($this->configuration->getVersion('1233')->isMigrated());
-        self::assertTrue($this->configuration->getVersion('1234')->isMigrated());
-        self::assertTrue($this->configuration->getVersion('1235')->isMigrated());
-        self::assertTrue($this->configuration->getVersion('1239')->isMigrated());
-        self::assertFalse($this->configuration->getVersion('1240')->isMigrated());
+        $executed = $this->metadataStorage->getExecutedMigrations();
+        self::assertFalse($executed->hasMigration(new Version('1233')));
+        self::assertTrue($executed->hasMigration(new Version('1234')));
+        self::assertTrue($executed->hasMigration(new Version('1235')));
+        self::assertTrue($executed->hasMigration(new Version('1239')));
+        self::assertFalse($executed->hasMigration(new Version('1240')));
     }
 
     /**
@@ -86,8 +86,6 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeWithoutRangeToOption() : void
     {
-        $this->markTestSkipped();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
 
@@ -105,8 +103,6 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeWithoutRangeFromOption() : void
     {
-        $this->markTestSkipped();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
 
@@ -124,8 +120,6 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddAllOptionsWithRangeTo() : void
     {
-        $this->markTestSkipped();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
 
@@ -144,8 +138,6 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddAllOptionsWithRangeFrom() : void
     {
-        $this->markTestSkipped();
-
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
 
@@ -164,17 +156,17 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteRangeOption() : void
     {
-        $this->markTestSkipped();
-        $this->configuration->registerMigration('1233', Version1Test::class);
-        $this->configuration->registerMigration('1234', Version1Test::class);
-        $this->configuration->registerMigration('1235', Version1Test::class);
-        $this->configuration->registerMigration('1239', Version1Test::class);
-        $this->configuration->registerMigration('1240', Version1Test::class);
+        $mock = $this->createMock(AbstractMigration::class);
+        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1235'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1239'), $mock);
+        $this->migrationRepository->registerMigrationInstance(new Version('1240'), $mock);
 
-        $this->configuration->getVersion('1233')->markMigrated();
-        $this->configuration->getVersion('1234')->markMigrated();
-        $this->configuration->getVersion('1239')->markMigrated();
-        $this->configuration->getVersion('1240')->markMigrated();
+        foreach (['1233', '1234', '1239', '1240'] as $v) {
+            $r = new ExecutionResult(new Version($v));
+            $this->metadataStorage->complete($r);
+        }
 
         $this->commandTester->execute(
             [
@@ -185,11 +177,12 @@ class MigrationVersionTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue($this->configuration->getVersion('1233')->isMigrated());
-        self::assertFalse($this->configuration->getVersion('1234')->isMigrated());
-        self::assertFalse($this->configuration->getVersion('1235')->isMigrated());
-        self::assertFalse($this->configuration->getVersion('1239')->isMigrated());
-        self::assertTrue($this->configuration->getVersion('1240')->isMigrated());
+        $executed = $this->metadataStorage->getExecutedMigrations();
+        self::assertTrue($executed->hasMigration(new Version('1233')));
+        self::assertFalse($executed->hasMigration(new Version('1234')));
+        self::assertFalse($executed->hasMigration(new Version('1235')));
+        self::assertFalse($executed->hasMigration(new Version('1239')));
+        self::assertTrue($executed->hasMigration(new Version('1240')));
     }
 
     /**
