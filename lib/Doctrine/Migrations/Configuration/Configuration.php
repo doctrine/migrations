@@ -29,6 +29,9 @@ class Configuration
     /** @var array<string, string> */
     private $migrationsDirectories = [];
 
+    /** @var string[] */
+    private $migrationClasses = [];
+
     /** @var bool */
     private $migrationsAreOrganizedByYear = false;
 
@@ -53,6 +56,19 @@ class Configuration
     public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfiguration) : void
     {
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getMigrationClasses() : array
+    {
+        return $this->migrationClasses;
+    }
+
+    public function addMigrationClass(string $className) : void
+    {
+        $this->migrationClasses[] = $className;
     }
 
     public function getMetadataStorageConfiguration() : ?MetadataStorageConfigration

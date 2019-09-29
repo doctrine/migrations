@@ -18,6 +18,10 @@ class ConfigurationTest extends TestCase
         $config = new Configuration();
         $config->addMigrationsDirectory('foo', 'bar');
         $config->addMigrationsDirectory('a', 'b');
+
+        $config->addMigrationClass('Foo');
+        $config->addMigrationClass('Bar');
+
         $config->setName('test migration');
         $config->setAllOrNothing(false);
         $config->setCheckDatabasePlatform(false);
@@ -29,6 +33,8 @@ class ConfigurationTest extends TestCase
             'foo' => 'bar',
             'a' => 'b',
         ], $config->getMigrationDirectories());
+
+        self::assertSame(['Foo', 'Bar'], $config->getMigrationClasses());
         self::assertSame('test migration', $config->getName());
         self::assertSame($storage, $config->getMetadataStorageConfiguration());
         self::assertFalse($config->isAllOrNothing());

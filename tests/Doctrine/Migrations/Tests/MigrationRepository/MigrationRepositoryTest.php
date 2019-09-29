@@ -47,9 +47,25 @@ class MigrationRepositoryTest extends TestCase
         self::assertInstanceOf(A::class, $migration->getMigration());
     }
 
+    public function testLoadMigrationClassesProvidedViaConstructor() : void
+    {
+        $migrationRepository = new MigrationRepository(
+            [A::class],
+            [],
+            new RecursiveRegexFinder('#.*\\.php$#i'),
+            $this->versionFactory
+        );
+
+        $migrations = $migrationRepository->getMigrations();
+
+        self::assertCount(1, $migrations);
+        self::assertInstanceOf(A::class, $migrations->getMigration(new Version(A::class))->getMigration());
+    }
+
     public function testNoMigrationsInFolder() : void
     {
         $migrationRepository = new MigrationRepository(
+            [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/NoMigrations',
             ],
@@ -65,6 +81,7 @@ class MigrationRepositoryTest extends TestCase
     public function testCustomMigrationSorting() : void
     {
         $migrationRepository = new MigrationRepository(
+            [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',
             ],
@@ -135,6 +152,7 @@ class MigrationRepositoryTest extends TestCase
             });
 
         $this->migrationRepository = new MigrationRepository(
+            [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',
             ],

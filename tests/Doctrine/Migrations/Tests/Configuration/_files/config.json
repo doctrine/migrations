@@ -3,6 +3,7 @@
     "migrations_paths" : {
         "DoctrineMigrationsTest": "."
     },
+    "migrations" : ["Foo", "Bar"],
     "table_storage" :{
         "table_name" : "doctrine_migration_versions_test",
         "version_column_name" : "doctrine_migration_column_test",

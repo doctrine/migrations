@@ -47,36 +47,4 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
         $config = $this->loadConfiguration('organize_by_year_and_month');
         $config->setMigrationsFinder(new GlobFinder());
     }
-
-    public function testLoadMigrationsList() : void
-    {
-        $this->markTestSkipped();
-        $configuration1 = $this->loadConfiguration('migrations_list');
-
-        self::assertContains('migrations_list', $configuration1->getFile());
-
-        $configuration2 = $this->loadConfiguration('migrations_list2');
-
-        self::assertContains('migrations_list2', $configuration2->getFile());
-    }
-
-    /**
-     * @dataProvider getConfigWithKeysInVariousOrder
-     */
-    public function testThatTheOrderOfConfigKeysDoesNotMatter(string $file) : void
-    {
-        $this->markTestSkipped();
-        $configuration = $this->loadConfiguration($file);
-
-        self::assertContains($file, $configuration->getFile());
-    }
-
-    /** @return string[][] */
-    public function getConfigWithKeysInVariousOrder() : array
-    {
-        return [
-            ['order_1'],
-            ['order_2'],
-        ];
-    }
 }

@@ -38,6 +38,11 @@ class ArrayLoader implements Loader
                     $configuration->addMigrationsDirectory($namespace, $path);
                 }
             },
+            'migrations' => static function ($migrations, Configuration $configuration) : void {
+                foreach ($migrations as $className) {
+                    $configuration->addMigrationClass($className);
+                }
+            },
             'table_storage' => [
                 'table_name' => 'setTableName',
                 'version_column_name' => 'setVersionColumnName',

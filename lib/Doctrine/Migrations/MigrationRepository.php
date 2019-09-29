@@ -44,8 +44,10 @@ class MigrationRepository
 
     /**
      * @param array<string, string> $migrationDirectories
+     * @param string[]              $classes
      */
     public function __construct(
+        array $classes,
         array $migrationDirectories,
         MigrationFinder $migrationFinder,
         Factory $versionFactory,
@@ -57,11 +59,14 @@ class MigrationRepository
         $this->sorter               = $sorter ?: static function (AvailableMigration $m1, AvailableMigration $m2) {
             return strcmp((string) $m1->getVersion(), (string) $m2->getVersion());
         };
+
+        $this->registerMigrations($classes);
     }
 
     /** @throws MigrationException */
     public function registerMigrationInstance(Version $version, AbstractMigration $migration) : AvailableMigration
     {
+        // todo mark private
         if (isset($this->migrations[(string) $version])) {
             throw DuplicateMigrationVersion::new(
                 (string) $version,

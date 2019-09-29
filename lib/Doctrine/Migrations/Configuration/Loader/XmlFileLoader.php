@@ -46,6 +46,11 @@ class XmlFileLoader extends AbstractFileLoader
                 }
             } elseif ($nodeName === 'storage' && $node->{'table-storage'} instanceof SimpleXMLElement) {
                 $config['table_storage'] = $this->extractParameters($node->{'table-storage'}, false);
+            } elseif ($nodeName === 'migrations') {
+                $config['migrations'] = [];
+                foreach ($node->{'migration'} as $pathNode) {
+                    $config['migrations'][] = (string) $pathNode;
+                }
             } else {
                 $config[$nodeName] = (string) $node;
             }
