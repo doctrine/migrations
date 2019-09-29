@@ -14,6 +14,7 @@ return [
     ],
 
     'migrations_paths'      => ['DoctrineMigrationsTest' => '.'],
+    'migrations'      => ['Foo', 'Bar'],
 
     'all_or_nothing'            => true,
     'check_database_platform'   => false,

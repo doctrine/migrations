@@ -19,8 +19,13 @@
             execution-time-column-name="doctrine_migration_execution_time_column_test"
     />
 </storage>
+<migrations>
+    <migration>Foo</migration>
+    <migration>Bar</migration>
+</migrations>
 
 <all-or-nothing>true</all-or-nothing>
 <check-database-platform>true</check-database-platform>
 </doctrine-migrations>
+
 
