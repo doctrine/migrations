@@ -6,9 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
 use Doctrine\Migrations\Finder\GlobFinder;
-use Doctrine\Migrations\Finder\MigrationDeepFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Generator\DiffGenerator;
@@ -156,20 +154,12 @@ class DependencyFactory
 
     public function getMigrationsFinder() : MigrationFinder
     {
-        $finder =  $this->getDependency(GlobFinder::class, static function () : MigrationFinder {
-            return new GlobFinder();
+        return $this->getDependency(GlobFinder::class, function () : MigrationFinder {
+            $configs              = $this->getConfiguration();
+            $needsRecursiveFinder = $configs->areMigrationsOrganizedByYear() || $configs->areMigrationsOrganizedByYearAndMonth();
+
+            return $needsRecursiveFinder ? new RecursiveRegexFinder(): new GlobFinder();
         });
-
-        // todo move this to DI
-
-        if (! ($finder instanceof MigrationDeepFinder) && ($this->getConfiguration()->areMigrationsOrganizedByYear() || $this->getConfiguration()->areMigrationsOrganizedByYearAndMonth())) {
-            throw ParameterIncompatibleWithFinder::new(
-                'organize-migrations',
-                $finder
-            );
-        }
-
-        return $finder;
     }
 
     public function setEntityManager(EntityManagerInterface $em) : void
@@ -186,6 +176,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
             return new MigrationRepository(
+                $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
                 new Factory($this->getConnection(), $this->getLogger()),
