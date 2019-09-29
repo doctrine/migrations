@@ -20,13 +20,12 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
 {
-    /** @var MigrationRepository|MockObject */
+    /** @var MigrationRepository */
     private $migrationRepository;
 
     /** @var AliasResolver */
@@ -34,6 +33,9 @@ final class AliasResolverTest extends TestCase
 
     /** @var TableMetadataStorage */
     private $metadataStorage;
+
+    /** @var MigrationPlanCalculator */
+    private $planCalculator;
 
     /**
      * @dataProvider getAliases
@@ -129,6 +131,7 @@ final class AliasResolverTest extends TestCase
         $versionFactory = $this->createMock(Factory::class);
 
         $this->migrationRepository  = new MigrationRepository(
+            [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
             $versionFactory

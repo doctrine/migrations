@@ -14,7 +14,7 @@ use function sprintf;
 /**
  * The RecursiveRegexFinder class recursively searches the given directory for migrations.
  */
-final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
+final class RecursiveRegexFinder extends Finder
 {
     /** @var string */
     private $pattern;
