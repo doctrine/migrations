@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Metadata;
 
 use DateTime;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Version;
@@ -13,6 +14,22 @@ use PHPUnit\Framework\TestCase;
 
 class ExecutedMigrationSetTest extends TestCase
 {
+    public function testFirstWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
+        $set = new ExecutedMigrationsSet([]);
+        $set->getFirst();
+    }
+
+    public function testLastWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
+        $set = new ExecutedMigrationsSet([]);
+        $set->getLast();
+    }
+
     public function testFirst() : void
     {
         $m1 = new ExecutedMigration(new Version('A'));

@@ -6,8 +6,10 @@ namespace Doctrine\Migrations\Tests\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotAvailable;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
@@ -19,6 +21,22 @@ class AvailableMigrationListTest extends TestCase
     public function setUp() : void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
+    }
+
+    public function testFirstWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
+        $set = new AvailableMigrationsList([]);
+        $set->getFirst();
+    }
+
+    public function testLastWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
+        $set = new AvailableMigrationsList([]);
+        $set->getLast();
     }
 
     public function testFirst() : void
