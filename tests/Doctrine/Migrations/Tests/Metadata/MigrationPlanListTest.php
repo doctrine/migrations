@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Version\Direction;
@@ -34,6 +35,22 @@ class MigrationPlanListTest extends TestCase
         $this->m3                = new MigrationPlan(new Version('C'), $this->abstractMigration, Direction::UP);
 
         $this->set = new MigrationPlanList([$this->m1, $this->m2, $this->m3], Direction::UP);
+    }
+
+    public function testFirstWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
+        $set = new MigrationPlanList([], Direction::UP);
+        $set->getFirst();
+    }
+
+    public function testLastWhenEmpty() : void
+    {
+        $this->expectException(NoMigrationsFoundWithCriteria::class);
+        $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
+        $set = new MigrationPlanList([], Direction::UP);
+        $set->getLast();
     }
 
     public function testFirst() : void

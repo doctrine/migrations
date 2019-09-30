@@ -45,7 +45,7 @@ class ExecutedMigrationsSet implements Countable
     {
         $offset = count($this->items)-1-(-1*$offset);
         if (! isset($this->items[$offset])) {
-            throw NoMigrationsFoundWithCriteria::new('first' . ($offset>0 ? ('+' . $offset) : ''));
+            throw NoMigrationsFoundWithCriteria::new('last' . ($offset>0 ? ('+' . $offset) : ''));
         }
 
         return $this->items[$offset];
