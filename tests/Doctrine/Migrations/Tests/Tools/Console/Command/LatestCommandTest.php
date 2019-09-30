@@ -12,7 +12,6 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
-use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -23,7 +22,7 @@ use function trim;
 
 class LatestCommandTest extends MigrationTestCase
 {
-    /** @var VersionCommand */
+    /** @var LatestCommand */
     private $command;
 
     /** @var MigrationRepository */

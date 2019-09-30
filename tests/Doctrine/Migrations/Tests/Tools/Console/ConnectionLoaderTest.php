@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
@@ -26,7 +27,8 @@ class ConnectionLoaderTest extends TestCase
         $dir = getcwd();
         chdir(__DIR__);
         try {
-            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection('_files/sqlite-connection.php', $helperSet));
+            $conn = $this->connectionLoader->getConnection('_files/sqlite-connection.php', $helperSet);
+            self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
         } finally {
             chdir($dir);
         }
@@ -54,7 +56,8 @@ class ConnectionLoaderTest extends TestCase
         $dir = getcwd();
         chdir(__DIR__ . '/_files');
         try {
-            self::assertInstanceOf(Connection::class, $this->connectionLoader->getConnection(null, $helperSet));
+            $conn = $this->connectionLoader->getConnection(null, $helperSet);
+            self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
         } finally {
             chdir($dir);
         }

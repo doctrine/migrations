@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Metadata\Storage\Configuration;
+namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use DateTime;
 use Doctrine\DBAL\Connection;
@@ -12,7 +12,6 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Version\Direction;
@@ -110,21 +109,18 @@ class TableMetadataStorageTest extends TestCase
 
         $executedMigrations = $this->storage->getExecutedMigrations();
 
-        self::assertInstanceOf(ExecutedMigrationsSet::class, $executedMigrations);
-
         self::assertTrue($executedMigrations->hasMigration(new Version('1230')));
         self::assertTrue($executedMigrations->hasMigration(new Version('1231')));
         self::assertFalse($executedMigrations->hasMigration(new Version('1232')));
 
         $m1 = $executedMigrations->getMigration($result1->getVersion());
-        self::assertInstanceOf(ExecutedMigration::class, $m1);
 
         self::assertEquals($result1->getVersion(), $m1->getVersion());
+        self::assertNotNull($m1->getExecutedAt());
         self::assertSame($date->format(DateTime::ISO8601), $m1->getExecutedAt()->format(DateTime::ISO8601));
         self::assertSame(31, $m1->getExecutionTime());
 
         $m2 = $executedMigrations->getMigration($result2->getVersion());
-        self::assertInstanceOf(ExecutedMigration::class, $m1);
 
         self::assertEquals($result2->getVersion(), $m2->getVersion());
         self::assertNull($m2->getExecutedAt());
@@ -171,7 +167,7 @@ class TableMetadataStorageTest extends TestCase
         );
         self::assertCount(1, $this->connection->fetchAll($sql));
 
-        $this->storage->reset($result);
+        $this->storage->reset();
 
         self::assertCount(0, $this->connection->fetchAll($sql));
     }
