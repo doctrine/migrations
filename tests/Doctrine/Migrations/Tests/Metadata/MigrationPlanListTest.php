@@ -18,7 +18,7 @@ class MigrationPlanListTest extends TestCase
     /** @var AbstractMigration */
     private $abstractMigration;
 
-    /** @var MigrationPlan */
+    /** @var MigrationPlanList */
     private $set;
     /** @var MigrationPlan */
     private $m1;

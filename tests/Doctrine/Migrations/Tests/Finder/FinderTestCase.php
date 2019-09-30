@@ -16,10 +16,8 @@ abstract class FinderTestCase extends MigrationTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespace', 'TestMigrations');
 
-        self::assertArraySubset([
-            'TestMigrations\\Test\\Version0001',
-            'TestMigrations\\TestOther\\Version0002',
-        ], $versions);
+        self::assertContains('TestMigrations\\Test\\Version0001', $versions);
+        self::assertContains('TestMigrations\\TestOther\\Version0002', $versions);
     }
 
     public function testOnlyClassesInTheProvidedNamespaceAreLoadedWhenNamespaceIsProvided() : void

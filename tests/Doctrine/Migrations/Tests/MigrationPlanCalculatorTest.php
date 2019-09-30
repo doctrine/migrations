@@ -10,7 +10,6 @@ use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
-use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
@@ -60,7 +59,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $plan = $this->migrationPlanCalculator->getPlanForExactVersion(new Version('C'), Direction::UP);
 
-        self::assertInstanceOf(MigrationPlanList::class, $plan);
         self::assertCount(1, $plan);
         self::assertSame(Direction::UP, $plan->getDirection());
         self::assertSame(Direction::UP, $plan->getFirst()->getDirection());
@@ -90,8 +88,6 @@ final class MigrationPlanCalculatorTest extends TestCase
             ->willReturn(new ExecutedMigrationsSet([]));
 
         $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
-
-        self::assertInstanceOf(MigrationPlanList::class, $plan);
 
         self::assertSame($direction, $plan->getDirection());
         self::assertCount(count($expectedPlan), $plan);
@@ -143,8 +139,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
 
-        self::assertInstanceOf(MigrationPlanList::class, $plan);
-
         self::assertCount(count($expectedPlan), $plan);
 
         self::assertSame($direction, $plan->getDirection());
@@ -195,7 +189,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $newSet = $this->migrationPlanCalculator->getNewMigrations();
 
-        self::assertInstanceOf(AvailableMigrationsList::class, $newSet);
         self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
@@ -218,7 +211,6 @@ final class MigrationPlanCalculatorTest extends TestCase
             ->willReturn(new ExecutedMigrationsSet([$e1, $e2, $e3]));
 
         $newSet = $this->migrationPlanCalculator->getExecutedUnavailableMigrations();
-        self::assertInstanceOf(ExecutedMigrationsSet::class, $newSet);
 
         self::assertSame([$e2, $e3], $newSet->getItems());
     }

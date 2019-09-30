@@ -9,7 +9,6 @@ use Doctrine\Migrations\Exception\MigrationNotAvailable;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 

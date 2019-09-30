@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigurationLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
@@ -28,7 +29,7 @@ final class ConnectionLoaderTest extends TestCase
         $loader = new ArrayConnectionConfigurationLoader(__DIR__ . '/sqlite-connection.php', new NoConnectionLoader());
         $conn   = $loader->getConnection();
 
-        self::assertInstanceOf(Connection::class, $conn);
+        self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
     }
 
     public function testArrayConnectionConfigurationLoaderInvalid() : void
@@ -64,7 +65,7 @@ final class ConnectionLoaderTest extends TestCase
         $loader = new ConnectionHelperLoader($helperSet, 'connection', new NoConnectionLoader());
         $conn   = $loader->getConnection();
 
-        self::assertInstanceOf(Connection::class, $conn);
+        self::assertSame($connection, $conn);
     }
 
     public function testConnectionHelperLoaderNoHelper() : void
