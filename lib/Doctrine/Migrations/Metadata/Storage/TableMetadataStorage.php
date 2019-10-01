@@ -10,12 +10,14 @@ use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
+use PDO;
 use const CASE_LOWER;
 use function array_change_key_case;
 use function intval;
@@ -109,7 +111,7 @@ class TableMetadataStorage implements MetadataStorage
         $this->connection->executeUpdate(
             sprintf(
                 'DELETE FROM %s WHERE 1 = 1',
-                $this->connection->getDatabasePlatform()->quoteIdentifier($this->configuration->getTableName())
+                $this->platform->quoteIdentifier($this->configuration->getTableName())
             )
         );
     }
@@ -127,8 +129,12 @@ class TableMetadataStorage implements MetadataStorage
         } else {
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
-                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt()!== null ? $result->getExecutedAt()->format($this->platform->getDateTimeFormatString()): null,
+                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
+            ], [
+                PDO::PARAM_STR,
+                Type::DATETIME,
+                PDO::PARAM_INT,
             ]);
         }
     }

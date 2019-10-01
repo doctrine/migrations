@@ -56,7 +56,7 @@ final class MigrationPlanCalculator
         try {
             $to = $to ?: $availableMigrations->getLast()->getVersion();
         } catch (NoMigrationsFoundWithCriteria $e) {
-            throw NoMigrationsToExecute::new();
+            throw NoMigrationsToExecute::new($e);
         }
 
         $direction = $this->findDirection($to, $executedMigrations);
