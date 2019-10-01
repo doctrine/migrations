@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Schema\Schema;
 use RuntimeException;
 use Throwable;
@@ -41,7 +41,7 @@ class ExecutionResult
     /** @var Throwable|null */
     private $exception;
 
-    /** @var DateTime|null */
+    /** @var DateTimeImmutable|null */
     private $executedAt;
 
     /** @var int */
@@ -56,7 +56,7 @@ class ExecutionResult
     /** @var string */
     private $direction;
 
-    public function __construct(Version $version, string $direction = Direction::UP, ?DateTime $executedAt = null)
+    public function __construct(Version $version, string $direction = Direction::UP, ?DateTimeImmutable $executedAt = null)
     {
         $this->executedAt = $executedAt;
         $this->version    = $version;
@@ -68,12 +68,12 @@ class ExecutionResult
         return $this->direction;
     }
 
-    public function getExecutedAt() : ?DateTime
+    public function getExecutedAt() : ?DateTimeImmutable
     {
         return $this->executedAt;
     }
 
-    public function setExecutedAt(DateTime $executedAt) : void
+    public function setExecutedAt(DateTimeImmutable $executedAt) : void
     {
         $this->executedAt = $executedAt;
     }

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
@@ -55,7 +55,7 @@ class StatusCommandTest extends MigrationTestCase
 
     public function testExecute() : void
     {
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-01 02:03:04'));
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
         $result->setTime(10);
         $this->metadataStorage->complete($result);
 
@@ -109,7 +109,7 @@ class StatusCommandTest extends MigrationTestCase
         $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
         $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
 
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-01 02:03:04'));
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
         $result->setTime(10);
         $this->metadataStorage->complete($result);
 

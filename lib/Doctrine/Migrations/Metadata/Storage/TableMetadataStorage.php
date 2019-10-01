@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata\Storage;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -88,7 +88,7 @@ class TableMetadataStorage implements MetadataStorage
             $executedAt = (isset($row[$this->configuration->getExecutedAtColumnName()])
                 && $row[$this->configuration->getExecutedAtColumnName()] !== null
                 && $row[$this->configuration->getExecutedAtColumnName()] !== ''
-                ? DateTime::createFromFormat(
+                ? DateTimeImmutable::createFromFormat(
                     $this->platform->getDateTimeFormatString(),
                     $row[$this->configuration->getExecutedAtColumnName()]
                 )

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Migrations\Version\Version;
 
 class ExecutedMigration
@@ -12,7 +12,7 @@ class ExecutedMigration
     /** @var Version */
     private $version;
 
-    /** @var DateTime|null */
+    /** @var DateTimeImmutable|null */
     private $executedAt;
 
     /**
@@ -22,7 +22,7 @@ class ExecutedMigration
      */
     public $executionTime;
 
-    public function __construct(Version $version, ?DateTime $executedAt = null, ?int $executionTime = null)
+    public function __construct(Version $version, ?DateTimeImmutable $executedAt = null, ?int $executionTime = null)
     {
         $this->version       = $version;
         $this->executedAt    = $executedAt;
@@ -34,7 +34,7 @@ class ExecutedMigration
         return $this->executionTime;
     }
 
-    public function getExecutedAt() : ?DateTime
+    public function getExecutedAt() : ?DateTimeImmutable
     {
         return $this->executedAt;
     }
