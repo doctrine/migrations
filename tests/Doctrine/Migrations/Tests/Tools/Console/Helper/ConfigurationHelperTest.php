@@ -72,7 +72,7 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('array')
             ->willReturn($configLoader);
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         try {
             chdir(__DIR__);
             $this->configurationHelper->getConfiguration($this->input);
@@ -95,7 +95,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Given config file type is not supported');
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         try {
             chdir(__DIR__);
             $this->configurationHelper->getConfiguration($this->input);
@@ -151,7 +151,7 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->willReturn(null);
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         try {
             chdir(__DIR__ . '/files');
             $config = $this->configurationHelper->getConfiguration($this->input);
