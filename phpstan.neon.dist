@@ -8,8 +8,6 @@ parameters:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_files
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
-    autoload_files:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/realpath.php
     ignoreErrors:
         # Ignore proxy manager magic
         - '~ProxyManager\\Proxy\\VirtualProxyInterface~'

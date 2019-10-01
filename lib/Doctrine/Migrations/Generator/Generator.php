@@ -51,6 +51,12 @@ final class Version<version> extends AbstractMigration
         // this up() migration is auto-generated, please modify it to your needs
 <up>
     }
+
+    public function down(Schema $schema) : void
+    {
+        // this down() migration is auto-generated, please modify it to your needs
+<down>
+    }
 }
 
 TEMPLATE;
