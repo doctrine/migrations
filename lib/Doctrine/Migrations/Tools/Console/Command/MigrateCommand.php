@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -117,7 +118,7 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $this->outputHeader($output);
-
+        $allowNoMigration = $input->getOption('allow-no-migration');
         $versionAlias = $input->getArgument('version');
         $path         = $input->getOption('write-sql');
 
@@ -140,6 +141,14 @@ EOT
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         $plan = $planCalculator->getPlanUntilVersion($version);
+
+        /**
+         * If there are no migrations to execute throw an exception.
+         */
+        if (count($plan) === 0 && !$allowNoMigration) {
+            $output->writeln('Could not find any migrations to execute.');
+            return 1;
+        }
 
         if (count($plan) === 0) {
             $this->getVersionNameFromAlias($versionAlias, $output);
