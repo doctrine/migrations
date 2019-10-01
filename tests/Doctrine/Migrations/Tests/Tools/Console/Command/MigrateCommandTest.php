@@ -46,11 +46,8 @@ class MigrateCommandTest extends MigrationTestCase
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
 
-
         $this->migrateCommandTester->execute(
-            [
-                'version' => 'first',
-            ],
+            ['version' => 'first'],
             ['interactive' => false]
         );
 
@@ -66,7 +63,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute(
             [
                 'version' => 'first',
-                '--allow-no-migration' => true
+                '--allow-no-migration' => true,
             ],
             ['interactive' => false]
         );
@@ -83,7 +80,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute(
             [
                 'version' => 'latest',
-                '--allow-no-migration' => true
+                '--allow-no-migration' => true,
             ],
             ['interactive' => false]
         );
