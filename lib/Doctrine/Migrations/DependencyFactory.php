@@ -263,13 +263,6 @@ class DependencyFactory
         });
     }
 
-    public function getRecursiveRegexFinder() : RecursiveRegexFinder
-    {
-        return $this->getDependency(RecursiveRegexFinder::class, static function () : RecursiveRegexFinder {
-            return new RecursiveRegexFinder();
-        });
-    }
-
     public function getMigrationGenerator() : Generator
     {
         return $this->getDependency(Generator::class, function () : Generator {

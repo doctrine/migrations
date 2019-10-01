@@ -458,7 +458,6 @@ class VersionExecutorTestMigration extends AbstractMigration
     {
         $this->addSql('SELECT 3', [5], [7]);
         $this->addSql('SELECT 4', [6], [8]);
-        parent::down($schema);
     }
 
     public function postDown(Schema $toSchema) : void
