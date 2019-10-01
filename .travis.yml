@@ -19,11 +19,10 @@ install:
   - rm composer.lock
   - travis_retry composer update --prefer-dist
 
-jobs:
-
 script:
   - ./vendor/bin/phpunit
 
+jobs:
   include:
     - stage: Test
       env: DEPENDENCIES=low
