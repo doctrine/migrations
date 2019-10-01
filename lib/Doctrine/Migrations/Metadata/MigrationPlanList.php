@@ -10,7 +10,7 @@ use function count;
 use function end;
 use function reset;
 
-class MigrationPlanList implements Countable
+final class MigrationPlanList implements Countable
 {
     /** @var string */
     private $direction;

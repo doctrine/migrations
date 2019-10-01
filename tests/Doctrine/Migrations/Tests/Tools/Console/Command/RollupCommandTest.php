@@ -29,14 +29,9 @@ final class RollupCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $version = $this->createMock(Version::class);
-        $version->expects(self::once())
-            ->method('__toString')
-            ->willReturn('1234');
-
         $this->rollup->expects(self::once())
             ->method('rollup')
-            ->willReturn($version);
+            ->willReturn(new Version('1234'));
 
         $output->expects(self::once())
             ->method('writeln')

@@ -15,7 +15,7 @@ use function count;
  *
  * @internal
  */
-class ExecutionResult
+final class ExecutionResult
 {
     /** @var string[] */
     private $sql = [];

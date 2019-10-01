@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\AvailableMigration;
@@ -11,6 +12,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -43,7 +45,7 @@ final class DumpSchemaCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $migration = $this->createMock(AvailableMigration::class);
+        $migration = new AvailableMigration(new Version('1'), $this->createMock(AbstractMigration::class));
 
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')

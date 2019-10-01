@@ -34,8 +34,9 @@ class RollupTest extends TestCase
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
         $this->repository        = $this->createMock(MigrationRepository::class);
-        $this->storage           = $this->createMock(MetadataStorage::class);
-        $this->rollup            = new Rollup($this->storage, $this->repository);
+
+        $this->storage = $this->createMock(MetadataStorage::class);
+        $this->rollup  = new Rollup($this->storage, $this->repository);
     }
 
     public function testRollup() : void
@@ -43,11 +44,9 @@ class RollupTest extends TestCase
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
         $this->repository
-           ->expects(self::any())
+           ->expects(self::once())
            ->method('getMigrations')
            ->willReturn(new AvailableMigrationsList([$m1]));
-
-        $this->repository->expects(self::once())->method('getMigrations');
 
         $this->storage
            ->expects(self::at(0))->method('reset')->with();
@@ -67,11 +66,9 @@ class RollupTest extends TestCase
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
 
         $this->repository
-            ->expects(self::any())
+            ->expects(self::once())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$m1, $m2]));
-
-        $this->repository->expects(self::once())->method('getMigrations');
 
         $this->storage->expects(self::never())->method('reset');
         $this->storage->expects(self::never())->method('complete');
@@ -87,8 +84,6 @@ class RollupTest extends TestCase
             ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([]));
-
-        $this->repository->expects(self::once())->method('getMigrations');
 
         $this->storage->expects(self::never())->method('reset');
         $this->storage->expects(self::never())->method('complete');
