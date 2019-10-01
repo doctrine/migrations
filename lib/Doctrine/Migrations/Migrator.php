@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\ExecutorInterface;
@@ -138,6 +137,7 @@ class Migrator implements MigratorInterface
     {
         if (count($migrationsPlan) === 0) {
             $this->logger->info('No migrations to execute.');
+
             return [];
         }
 
