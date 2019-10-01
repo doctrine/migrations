@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
+use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
@@ -117,7 +118,7 @@ class TableMetadataStorageTest extends TestCase
 
         self::assertEquals($result1->getVersion(), $m1->getVersion());
         self::assertNotNull($m1->getExecutedAt());
-        self::assertSame($date->format(DateTimeImmutable::ISO8601), $m1->getExecutedAt()->format(DateTimeImmutable::ISO8601));
+        self::assertSame($date->format(DateTime::ISO8601), $m1->getExecutedAt()->format(DateTime::ISO8601));
         self::assertSame(31, $m1->getExecutionTime());
 
         $m2 = $executedMigrations->getMigration($result2->getVersion());

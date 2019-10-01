@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
-class Version
+final class Version
 {
     /** @var string */
     private $version;

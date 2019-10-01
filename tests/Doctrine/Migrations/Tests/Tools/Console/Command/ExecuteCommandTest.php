@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -139,14 +140,16 @@ class ExecuteCommandTest extends TestCase
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
 
-        $migrationRepository = $this->getMockBuilder(MigrationRepository::class)
-           ->disableOriginalConstructor()
-           ->getMock();
+        $migration = $this->createMock(AbstractMigration::class);
+        $m1        = new AvailableMigration(new Version('1'), $migration);
+
+        $migrationRepository = $this->createMock(MigrationRepository::class);
+        $migrationRepository
+            ->expects(self::once())
+            ->method('getMigration')
+            ->willReturn($m1);
 
         $planCalculator = new MigrationPlanCalculator($migrationRepository, $storage);
-
-        $migration = $this->createMock(AbstractMigration::class);
-        $migrationRepository->registerMigrationInstance(new Version('1'), $migration);
 
         $configuration = new Configuration();
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());

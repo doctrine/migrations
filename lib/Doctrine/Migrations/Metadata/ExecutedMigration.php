@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Metadata;
 use DateTimeImmutable;
 use Doctrine\Migrations\Version\Version;
 
-class ExecutedMigration
+final class ExecutedMigration
 {
     /** @var Version */
     private $version;

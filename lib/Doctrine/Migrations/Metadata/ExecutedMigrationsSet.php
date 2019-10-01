@@ -11,7 +11,7 @@ use Doctrine\Migrations\Version\Version;
 use function array_values;
 use function count;
 
-class ExecutedMigrationsSet implements Countable
+final class ExecutedMigrationsSet implements Countable
 {
     /** @var ExecutedMigration[] */
     private $items = [];

@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\Version;
 
-class AvailableMigration
+final class AvailableMigration
 {
     /** @var Version */
     private $version;

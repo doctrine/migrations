@@ -8,7 +8,7 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 
-class MigrationPlan
+final class MigrationPlan
 {
     /** @var string */
     private $direction;
