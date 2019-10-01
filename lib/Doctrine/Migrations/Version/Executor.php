@@ -344,7 +344,7 @@ final class Executor implements ExecutorInterface
                 continue;
             }
 
-            $this->logger->info('{duration}ms', [
+            $this->logger->debug('{duration}ms', [
                 'duration' => $stopwatchEvent->getDuration(),
             ]);
         }
@@ -368,7 +368,7 @@ final class Executor implements ExecutorInterface
             $this->types[$idx] ?? []
         );
 
-        $this->logger->info('{query} {params}', [
+        $this->logger->debug('{query} {params}', [
             'query' => $query,
             'params' => $params,
         ]);
