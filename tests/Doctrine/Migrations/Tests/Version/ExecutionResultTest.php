@@ -4,9 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -78,7 +77,7 @@ class ExecutionResultTest extends TestCase
 
     public function testExecutedAt() : void
     {
-        $date = new DateTime();
+        $date = new DateTimeImmutable();
         $this->versionExecutionResult->setExecutedAt($date);
 
         self::assertSame($date, $this->versionExecutionResult->getExecutedAt());
@@ -117,11 +116,6 @@ class ExecutionResultTest extends TestCase
 
     protected function setUp() : void
     {
-        $migration = $this->getMockBuilder(AbstractMigration::class)
-                            ->disableOriginalConstructor()
-                            ->getMock();
-
-//        $migrationPlanItem            = new MigrationPlanItem($info, $migration, Direction::UP);
         $this->versionExecutionResult = new ExecutionResult(
             new Version('foo'),
             Direction::UP

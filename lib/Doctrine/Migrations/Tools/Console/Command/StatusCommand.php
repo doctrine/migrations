@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Helper\Table;
@@ -115,7 +115,7 @@ EOT
                 ? $executedMigrationsSet->getMigration($availableMigration->getVersion())
                 : null;
 
-            $executedAt = $executedMigration!==null && $executedMigration->getExecutedAt() instanceof DateTime
+            $executedAt = $executedMigration!==null && $executedMigration->getExecutedAt() instanceof DateTimeImmutable
                 ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
                 : null;
 

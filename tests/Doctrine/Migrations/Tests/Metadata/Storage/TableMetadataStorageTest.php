@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
@@ -78,7 +78,7 @@ class TableMetadataStorageTest extends TestCase
 
     public function testComplete() : void
     {
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-05 10:30:21'));
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31);
         $this->storage->complete($result);
 
@@ -99,7 +99,7 @@ class TableMetadataStorageTest extends TestCase
 
     public function testRead() : void
     {
-        $date    = new DateTime('2010-01-05 10:30:21');
+        $date    = new DateTimeImmutable('2010-01-05 10:30:21');
         $result1 = new ExecutionResult(new Version('1230'), Direction::UP, $date);
         $result1->setTime(31);
         $this->storage->complete($result1);
@@ -117,7 +117,7 @@ class TableMetadataStorageTest extends TestCase
 
         self::assertEquals($result1->getVersion(), $m1->getVersion());
         self::assertNotNull($m1->getExecutedAt());
-        self::assertSame($date->format(DateTime::ISO8601), $m1->getExecutedAt()->format(DateTime::ISO8601));
+        self::assertSame($date->format(DateTimeImmutable::ISO8601), $m1->getExecutedAt()->format(DateTimeImmutable::ISO8601));
         self::assertSame(31, $m1->getExecutionTime());
 
         $m2 = $executedMigrations->getMigration($result2->getVersion());
@@ -129,7 +129,7 @@ class TableMetadataStorageTest extends TestCase
 
     public function testExecutedMigrationWithTiming() : void
     {
-        $date = new DateTime();
+        $date = new DateTimeImmutable();
         $m1   = new ExecutedMigration(new Version('A'), $date, 123);
 
         self::assertSame($date, $m1->getExecutedAt());
@@ -138,7 +138,7 @@ class TableMetadataStorageTest extends TestCase
 
     public function testCompleteDownRemovesTheRow() : void
     {
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-05 10:30:21'));
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31);
         $this->storage->complete($result);
 
@@ -148,7 +148,7 @@ class TableMetadataStorageTest extends TestCase
         );
         self::assertCount(1, $this->connection->fetchAll($sql));
 
-        $result = new ExecutionResult(new Version('1230'), Direction::DOWN, new DateTime('2010-01-05 10:30:21'));
+        $result = new ExecutionResult(new Version('1230'), Direction::DOWN, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31);
         $this->storage->complete($result);
 
@@ -157,7 +157,7 @@ class TableMetadataStorageTest extends TestCase
 
     public function testReset() : void
     {
-        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTime('2010-01-05 10:30:21'));
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31);
         $this->storage->complete($result);
 

@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Metadata;
 
-use DateTime;
+use DateTimeImmutable;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
@@ -115,7 +115,7 @@ class ExecutedMigrationSetTest extends TestCase
 
     public function testExecutedMigrationWithTiming() : void
     {
-        $date = new DateTime();
+        $date = new DateTimeImmutable();
         $m1   = new ExecutedMigration(new Version('A'), $date, 123);
 
         self::assertSame($date, $m1->getExecutedAt());
