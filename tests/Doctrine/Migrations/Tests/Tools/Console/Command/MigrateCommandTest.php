@@ -41,13 +41,33 @@ class MigrateCommandTest extends MigrationTestCase
     /** @var MockObject */
     private $queryWriter;
 
+    public function testExecuteEmptyMigrationPlanCausesException() : void
+    {
+        $result = new ExecutionResult(new Version('A'));
+        $this->storage->complete($result);
+
+
+        $this->migrateCommandTester->execute(
+            [
+                'version' => 'first',
+            ],
+            ['interactive' => false]
+        );
+
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Could not find any migrations to execute') !== false);
+        self::assertSame(1, $this->migrateCommandTester->getStatusCode());
+    }
+
     public function testExecuteAlreadyAtFirstVersion() : void
     {
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            ['version' => 'first'],
+            [
+                'version' => 'first',
+                '--allow-no-migration' => true
+            ],
             ['interactive' => false]
         );
 
@@ -61,7 +81,10 @@ class MigrateCommandTest extends MigrationTestCase
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            ['version' => 'latest'],
+            [
+                'version' => 'latest',
+                '--allow-no-migration' => true
+            ],
             ['interactive' => false]
         );
 

@@ -136,24 +136,17 @@ class Migrator implements MigratorInterface
      */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
-        /**
-         * If there are no migrations to execute throw an exception.
-         */
-        if (count($migrationsPlan) === 0 && $migratorConfiguration->getNoMigrationException()) {
-            throw NoMigrationsToExecute::new();
-        }
-
         if (count($migrationsPlan) === 0) {
-            return $this->noMigrations();
+            $this->logger->info('No migrations to execute.');
+            return [];
         }
 
         $dryRun = $migratorConfiguration->isDryRun();
         $this->logger->info(
-            ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to} from {from}',
+            ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to}',
             [
                 'direction' => $migrationsPlan->getDirection(),
                 'to' => (string) $migrationsPlan->getLast()->getVersion(),
-            //                'from' => (string) $currentVersion,
             ]
         );
 
@@ -164,13 +157,5 @@ class Migrator implements MigratorInterface
         $this->endMigrations($stopwatchEvent, $migrationsPlan, $sql);
 
         return $sql;
-    }
-
-    /** @return string[][] */
-    private function noMigrations() : array
-    {
-        $this->logger->info('No migrations to execute.');
-
-        return [];
     }
 }
