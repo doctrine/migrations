@@ -11,7 +11,6 @@ use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Input\InputInterface;
 use function chdir;
 use function getcwd;
 
@@ -24,7 +23,7 @@ class ConnectionLoaderTest extends TestCase
     {
         $helperSet = $this->createMock(HelperSet::class);
 
-        $dir = getcwd();
+        $dir = getcwd() ?: '.';
         chdir(__DIR__);
         try {
             $conn = $this->connectionLoader->getConnection('_files/sqlite-connection.php', $helperSet);
@@ -37,10 +36,9 @@ class ConnectionLoaderTest extends TestCase
     public function testGetConnectionFromArrayNotFound() : void
     {
         $this->expectException(ConnectionNotSpecified::class);
-        $input     = $this->createMock(InputInterface::class);
         $helperSet = $this->createMock(HelperSet::class);
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         chdir(__DIR__);
         try {
             $this->connectionLoader->getConnection(__DIR__ . '/_files/wrong.php', $helperSet);
@@ -53,7 +51,7 @@ class ConnectionLoaderTest extends TestCase
     {
         $helperSet = $this->createMock(HelperSet::class);
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         chdir(__DIR__ . '/_files');
         try {
             $conn = $this->connectionLoader->getConnection(null, $helperSet);
@@ -73,7 +71,7 @@ class ConnectionLoaderTest extends TestCase
         $helperSet = new HelperSet();
         $helperSet->set($helper, 'connection');
 
-        $dir = getcwd();
+        $dir = getcwd()?: '.';
         chdir(__DIR__);
         try {
             self::assertSame($connection, $this->connectionLoader->getConnection(null, $helperSet));

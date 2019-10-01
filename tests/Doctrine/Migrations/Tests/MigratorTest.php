@@ -28,11 +28,9 @@ use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
 
-require_once __DIR__ . '/realpath.php';
-
 class MigratorTest extends MigrationTestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $conn;
 
     /** @var Configuration */
@@ -44,7 +42,7 @@ class MigratorTest extends MigrationTestCase
     /** @var MigratorConfiguration */
     private $migratorConfiguration;
 
-    /** @var MockObject|ExecutorInterface */
+    /** @var ExecutorInterface */
     private $executor;
 
     /** @var TestLogger */

@@ -27,7 +27,12 @@ class BoxPharCompileTest extends TestCase
 
         assert($boxPharPath !== false);
 
-        $process = new Process(['php', $boxPharPath, 'compile', '-vvv']);
+        $process = new Process([
+            'php',
+            $boxPharPath,
+            'compile',
+            '-vvv',
+        ]);
         $process->run();
 
         $doctrinePharPath = realpath(__DIR__ . '/../../../../build/doctrine-migrations.phar');

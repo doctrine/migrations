@@ -13,7 +13,6 @@ use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
@@ -36,7 +35,7 @@ class ExecutorTest extends TestCase
     /** @var SchemaDiffProviderInterface|MockObject */
     private $schemaDiffProvider;
 
-    /** @var ParameterFormatter|MockObject */
+    /** @var ParameterFormatterInterface|MockObject */
     private $parameterFormatter;
 
     /** @var Stopwatch|MockObject */
@@ -307,20 +306,21 @@ class ExecutorTest extends TestCase
         $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
         $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
 
+        $migrationSucceed = false;
         try {
             $this->versionExecutor->execute(
                 $plan,
                 $migratorConfiguration
             );
-            self::assertFalse(true);
+            $migrationSucceed = true;
         } catch (Throwable $e) {
             self::assertFalse($listener->onMigrationsVersionExecuted);
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);
 
             $result = $plan->getResult();
-
-            self::assertTrue($result->hasError());
+            self::assertNotNull($result);
+            self::assertSame([], $result->getSql());
             self::assertSame([], $result->getSql());
             self::assertSame(State::EXEC, $result->getState());
             self::assertTrue($this->migration->preUpExecuted);
@@ -328,6 +328,7 @@ class ExecutorTest extends TestCase
             self::assertFalse($this->migration->preDownExecuted);
             self::assertFalse($this->migration->postDownExecuted);
         }
+        self::assertFalse($migrationSucceed);
     }
 
     /**
