@@ -132,9 +132,9 @@ class TableMetadataStorage implements MetadataStorage
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
             ], [
-                PDO::PARAM_STR,
+                Type::STRING,
                 Type::DATETIME,
-                PDO::PARAM_INT,
+                Type::INTEGER,
             ]);
         }
     }
