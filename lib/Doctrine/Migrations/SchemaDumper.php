@@ -11,6 +11,7 @@ use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use function count;
 use function implode;
+use function preg_match;
 
 /**
  * The SchemaDumper class is responsible for dumping the current state of your database schema to a migration. This
@@ -34,16 +35,24 @@ class SchemaDumper
     /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
+    /** @var string[] */
+    private $excludedTablesRegexes;
+
+    /**
+     * @param string[] $excludedTablesRegexes
+     */
     public function __construct(
         AbstractPlatform $platform,
         AbstractSchemaManager $schemaManager,
         Generator $migrationGenerator,
-        SqlGenerator $migrationSqlGenerator
+        SqlGenerator $migrationSqlGenerator,
+        array $excludedTablesRegexes = []
     ) {
         $this->platform              = $platform;
         $this->schemaManager         = $schemaManager;
         $this->migrationGenerator    = $migrationGenerator;
         $this->migrationSqlGenerator = $migrationSqlGenerator;
+        $this->excludedTablesRegexes = $excludedTablesRegexes;
     }
 
     /**
@@ -61,6 +70,12 @@ class SchemaDumper
         $down = [];
 
         foreach ($schema->getTables() as $table) {
+            foreach ($this->excludedTablesRegexes as $regex) {
+                if (preg_match($regex, $table->getName()) === 0) {
+                    continue 2;
+                }
+            }
+
             $upSql = $this->platform->getCreateTableSQL($table);
 
             $upCode = $this->migrationSqlGenerator->generate(

@@ -34,6 +34,8 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use function preg_quote;
+use function sprintf;
 
 /**
  * The DepenencyFactory is responsible for wiring up and managing internal class dependencies.
@@ -91,11 +93,19 @@ class DependencyFactory
     public function getSchemaDumper() : SchemaDumper
     {
         return $this->getDependency(SchemaDumper::class, function () : SchemaDumper {
+            $excludedTables = [];
+
+            $metadataConfig = $this->configuration->getMetadataStorageConfiguration();
+            if ($metadataConfig instanceof TableMetadataStorageConfiguration) {
+                $excludedTables[] = sprintf('/^%s$/', preg_quote($metadataConfig->getTableName(), '/'));
+            }
+
             return new SchemaDumper(
                 $this->getConnection()->getDatabasePlatform(),
                 $this->getConnection()->getSchemaManager(),
                 $this->getMigrationGenerator(),
-                $this->getMigrationSqlGenerator()
+                $this->getMigrationSqlGenerator(),
+                $excludedTables
             );
         });
     }
@@ -158,7 +168,7 @@ class DependencyFactory
             $configs              = $this->getConfiguration();
             $needsRecursiveFinder = $configs->areMigrationsOrganizedByYear() || $configs->areMigrationsOrganizedByYearAndMonth();
 
-            return $needsRecursiveFinder ? new RecursiveRegexFinder(): new GlobFinder();
+            return $needsRecursiveFinder ? new RecursiveRegexFinder() : new GlobFinder();
         });
     }
 
