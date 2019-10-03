@@ -376,7 +376,7 @@ class FunctionalTest extends MigrationTestCase
     {
         foreach ($migrations as $key => $class) {
             $migrator = $this->createTestMigrator($this->config);
-            $this->config->registerMigration($key->getName(), $class);
+            $this->config->registerMigration((string) $key, $class);
             $sql = $migrator->migrate();
             self::assertCount(1, $sql, 'should have executed one migration');
         }
