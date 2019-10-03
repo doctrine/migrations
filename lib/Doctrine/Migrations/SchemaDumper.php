@@ -6,9 +6,11 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
+use function array_merge;
 use function count;
 use function implode;
 use function preg_match;
@@ -56,11 +58,14 @@ class SchemaDumper
     }
 
     /**
+     * @param string[] $excludedTablesRegexes
+     *
      * @throws NoTablesFound
      */
     public function dump(
         string $versionNumber,
         string $namespace,
+        array $excludedTablesRegexes = [],
         bool $formatted = false,
         int $lineLength = 120
     ) : string {
@@ -70,10 +75,8 @@ class SchemaDumper
         $down = [];
 
         foreach ($schema->getTables() as $table) {
-            foreach ($this->excludedTablesRegexes as $regex) {
-                if (preg_match($regex, $table->getName()) === 0) {
-                    continue 2;
-                }
+            if ($this->shouldSkipTable($table, $excludedTablesRegexes)) {
+                continue;
             }
 
             $upSql = $this->platform->getCreateTableSQL($table);
@@ -116,5 +119,19 @@ class SchemaDumper
             $up,
             $down
         );
+    }
+
+    /**
+     * @param string[] $excludedTablesRegexes
+     */
+    private function shouldSkipTable(Table $table, array $excludedTablesRegexes) : bool
+    {
+        foreach (array_merge($excludedTablesRegexes, $this->excludedTablesRegexes) as $regex) {
+            if (preg_match($regex, $table->getName()) !== 0) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

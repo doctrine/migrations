@@ -99,7 +99,7 @@ class SchemaDumperTest extends TestCase
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
 
         $table = $this->createMock(Table::class);
-        $table->expects(self::once())
+        $table->expects(self::atLeastOnce())
             ->method('getName')
             ->willReturn('skipped_table_name');
 
@@ -126,6 +126,41 @@ class SchemaDumperTest extends TestCase
             ->method('generateMigration');
 
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo'));
+    }
+
+    public function testExcludedTableViaParamIsNotInTheDump() : void
+    {
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Your database schema does not contain any tables.');
+
+        $table = $this->createMock(Table::class);
+        $table->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn('other_skipped_table_name');
+
+        $schema = $this->createMock(Schema::class);
+
+        $this->schemaManager->expects(self::once())
+            ->method('createSchema')
+            ->willReturn($schema);
+
+        $schema->expects(self::once())
+            ->method('getTables')
+            ->willReturn([$table]);
+
+        $this->platform->expects(self::never())
+            ->method('getCreateTableSQL');
+
+        $this->platform->expects(self::never())
+            ->method('getDropTableSQL');
+
+        $this->migrationSqlGenerator->expects(self::never())
+            ->method('generate');
+
+        $this->migrationGenerator->expects(self::never())
+            ->method('generateMigration');
+
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo', ['/other_skipped_table_name/']));
     }
 
     protected function setUp() : void
