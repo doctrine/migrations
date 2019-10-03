@@ -76,6 +76,11 @@ final class DumpSchemaCommandTest extends TestCase
 
         $input->expects(self::at(3))
             ->method('getOption')
+            ->with('filter-tables')
+            ->willReturn(['/foo/']);
+
+        $input->expects(self::at(4))
+            ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('test');
 
@@ -89,7 +94,7 @@ final class DumpSchemaCommandTest extends TestCase
 
         $this->schemaDumper->expects(self::once())
             ->method('dump')
-            ->with('1234', 'FooNs', true, 80);
+            ->with('1234', 'FooNs', ['/foo/'], true, 80);
 
         $output->expects(self::once())
             ->method('writeln')

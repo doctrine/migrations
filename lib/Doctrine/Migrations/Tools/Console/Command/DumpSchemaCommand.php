@@ -61,6 +61,12 @@ EOT
                 'Namespace for the save the generated migrations (defaults to the first namespace definition).'
             )
             ->addOption(
+                'filter-tables',
+                null,
+                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+                'Filter the tables to dump via Regex.'
+            )
+            ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -107,6 +113,7 @@ EOT
         $path = $schemaDumper->dump(
             $versionNumber,
             $namespace,
+            $input->getOption('filter-tables'),
             $formatted,
             $lineLength
         );
