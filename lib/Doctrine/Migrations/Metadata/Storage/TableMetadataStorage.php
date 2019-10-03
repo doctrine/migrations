@@ -61,7 +61,7 @@ class TableMetadataStorage implements MetadataStorage
     {
         $schemaChangelog = new Table($this->configuration->getTableName());
 
-        $schemaChangelog->addColumn($this->configuration->getVersionColumnName(), 'string', ['notnull' => true, 'length' => $this->configuration->getVersionColumnName()]);
+        $schemaChangelog->addColumn($this->configuration->getVersionColumnName(), 'string', ['notnull' => true, 'length' => $this->configuration->getVersionColumnLength()]);
         $schemaChangelog->addColumn($this->configuration->getExecutedAtColumnName(), 'datetime', ['notnull' => false]);
         $schemaChangelog->addColumn($this->configuration->getExecutionTimeColumnName(), 'integer', ['notnull' => false]);
 
