@@ -17,7 +17,6 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
-use PDO;
 use const CASE_LOWER;
 use function array_change_key_case;
 use function intval;
