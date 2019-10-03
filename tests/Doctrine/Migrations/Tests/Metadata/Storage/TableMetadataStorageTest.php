@@ -11,6 +11,7 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
+use Doctrine\DBAL\Types\StringType;
 use Doctrine\DBAL\Types\TextType;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
@@ -72,7 +73,7 @@ class TableMetadataStorageTest extends TestCase
 
         $table = $this->schemaManager->listTableDetails($config->getTableName());
 
-        self::assertInstanceOf(TextType::class, $table->getColumn('b')->getType());
+        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
     }
