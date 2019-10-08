@@ -61,7 +61,7 @@ class MigrateCommand extends AbstractCommand
                 'allow-no-migration',
                 null,
                 InputOption::VALUE_NONE,
-                'Don\'t throw an exception if no migration is available (CI).'
+                'Do not throw an exception if no migration is available.'
             )
             ->addOption(
                 'all-or-nothing',
