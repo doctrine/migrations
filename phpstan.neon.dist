@@ -18,6 +18,10 @@ parameters:
         -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/ParameterFormatter.php
+        -
+            message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
+
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php

@@ -119,7 +119,7 @@ class Migrator implements MigratorInterface
     ) : void {
         $stopwatchEvent->stop();
 
-        $this->logger->info(
+        $this->logger->notice(
             'finished in {duration}ms, used {memory} memory, {migrations_count} migrations executed, {queries_count} sql queries',
             [
                 'duration' => $stopwatchEvent->getDuration(),
@@ -136,13 +136,13 @@ class Migrator implements MigratorInterface
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
         if (count($migrationsPlan) === 0) {
-            $this->logger->info('No migrations to execute.');
+            $this->logger->notice('No migrations to execute.');
 
             return [];
         }
 
         $dryRun = $migratorConfiguration->isDryRun();
-        $this->logger->info(
+        $this->logger->notice(
             ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to}',
             [
                 'direction' => $migrationsPlan->getDirection(),
