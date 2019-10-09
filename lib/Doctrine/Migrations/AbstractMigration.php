@@ -135,7 +135,7 @@ abstract class AbstractMigration
 
     protected function write(string $message) : void
     {
-        $this->logger->info($message, ['migration' => $this]);
+        $this->logger->notice($message, ['migration' => $this]);
     }
 
     protected function throwIrreversibleMigrationException(?string $message = null) : void

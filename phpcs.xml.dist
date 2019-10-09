@@ -20,6 +20,10 @@
         <exclude-pattern>tests/Doctrine/Migrations/Tests/realpath.php</exclude-pattern>
     </rule>
 
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
+    </rule>
+
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
@@ -31,7 +35,6 @@
     <rule ref="Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase">
         <exclude-pattern>lib/Doctrine/Migrations/Events.php</exclude-pattern>
     </rule>
-
 
     <rule ref="Generic.Strings.UnnecessaryStringConcat.Found">
         <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
