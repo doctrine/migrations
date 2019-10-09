@@ -15,7 +15,7 @@ class TableMetadataStorageConfigurationTest extends TestCase
 
         self::assertSame('doctrine_migration_versions', $config->getTableName());
         self::assertSame('version', $config->getVersionColumnName());
-        self::assertSame(2048, $config->getVersionColumnLength());
+        self::assertSame(1024, $config->getVersionColumnLength());
         self::assertSame('executed_at', $config->getExecutedAtColumnName());
         self::assertSame('execution_time', $config->getExecutionTimeColumnName());
     }
