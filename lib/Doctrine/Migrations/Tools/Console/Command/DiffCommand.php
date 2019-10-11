@@ -81,7 +81,7 @@ EOT
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Check Database Platform to the generated code.',
-                1
+                false
             )
             ->addOption(
                 'allow-empty-diff',

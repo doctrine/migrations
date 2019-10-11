@@ -10,6 +10,7 @@ use Doctrine\Migrations\Generator\FileBuilderInterface;
 use Psr\Log\LoggerInterface;
 use function file_put_contents;
 use function is_dir;
+use function realpath;
 
 /**
  * The FileQueryWriter class is responsible for writing migration SQL queries to a file on disk.
