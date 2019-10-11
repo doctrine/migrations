@@ -6,14 +6,17 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
+use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use const FILTER_VALIDATE_BOOLEAN;
+use function addslashes;
 use function assert;
 use function class_exists;
 use function filter_var;
 use function is_string;
+use function key;
 use function sprintf;
 
 /**
@@ -41,6 +44,12 @@ You can optionally specify a <comment>--editor-cmd</comment> option to open the 
 
     <info>%command.full_name% --editor-cmd=mate</info>
 EOT
+            )
+            ->addOption(
+                'namespace',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The namespace to use for the migration (must be in the list of configured namespaces)'
             )
             ->addOption(
                 'editor-cmd',
@@ -94,7 +103,7 @@ EOT
         $lineLength       = (int) $input->getOption('line-length');
         $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
         $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
-
+        $namespace        = $input->getOption('namespace') ?: null;
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
                 throw InvalidOptionUsage::new(
@@ -103,13 +112,23 @@ EOT
             }
         }
 
-        $versionNumber = $this->getDependencyFactory()->getConfiguration()->generateVersionNumber();
+        $configuration = $this->getDependencyFactory()->getConfiguration();
+
+        $dirs = $configuration->getMigrationDirectories();
+        if ($namespace === null) {
+            $namespace = key($dirs);
+        } elseif (! isset($dirs[$namespace])) {
+            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
+        }
+        assert(is_string($namespace));
+
+        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
         $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
 
         try {
             $path = $diffGenerator->generate(
-                $versionNumber,
+            $fqcn,
                 $filterExpression,
                 $formatted,
                 $lineLength,
@@ -135,13 +154,13 @@ EOT
             sprintf('Generated new migration class to "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
-                $versionNumber
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                addslashes($fqcn)
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down %s</info>',
-                $versionNumber
+                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                addslashes($fqcn)
             ),
         ]);
 

@@ -9,6 +9,7 @@ use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function addslashes;
 use function assert;
 use function class_exists;
 use function count;
@@ -101,7 +102,6 @@ EOT
         }
 
         $configuration = $this->getDependencyFactory()->getConfiguration();
-        $versionNumber = $configuration->generateVersionNumber();
 
         $namespace = $input->getOption('namespace');
         if ($namespace === null) {
@@ -110,9 +110,10 @@ EOT
         }
         assert(is_string($namespace));
 
+        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
+
         $path = $schemaDumper->dump(
-            $versionNumber,
-            $namespace,
+            $fqcn,
             $input->getOption('filter-tables'),
             $formatted,
             $lineLength
@@ -129,13 +130,13 @@ EOT
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
-                $versionNumber
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                addslashes($fqcn)
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down %s</info>',
-                $versionNumber
+                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                addslashes($fqcn)
             ),
             '',
             'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',

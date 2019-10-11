@@ -47,7 +47,7 @@ class SchemaDumperTest extends TestCase
             ->method('getTables')
             ->willReturn([]);
 
-        $this->schemaDumper->dump('1234', 'Foo');
+        $this->schemaDumper->dump('Foo\\1234');
     }
 
     public function testDump() : void
@@ -87,10 +87,10 @@ class SchemaDumperTest extends TestCase
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
-            ->with('1234', 'Foo', 'up', 'down')
+            ->with('Foo\\1234', 'up', 'down')
             ->willReturn('/path/to/migration.php');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo'));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
     }
 
     public function testExcludedTableIsNotInTheDump() : void
@@ -125,7 +125,7 @@ class SchemaDumperTest extends TestCase
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo'));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
     }
 
     public function testExcludedTableViaParamIsNotInTheDump() : void
@@ -160,7 +160,7 @@ class SchemaDumperTest extends TestCase
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234', 'Foo', ['/other_skipped_table_name/']));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['/other_skipped_table_name/']));
     }
 
     protected function setUp() : void

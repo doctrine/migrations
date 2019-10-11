@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
@@ -87,6 +88,13 @@ class DependencyFactory
                 $this->getConnection(),
                 $this->getConnection()->getEventManager()
             );
+        });
+    }
+
+    public function getClassNameGenerator() : ClassNameGenerator
+    {
+        return $this->getDependency(ClassNameGenerator::class, static function () : ClassNameGenerator {
+            return new ClassNameGenerator();
         });
     }
 

@@ -55,7 +55,6 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $configuration = $this->getDependencyFactory()->getConfiguration();
-        $versionNumber = $configuration->generateVersionNumber();
 
         $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 
@@ -68,8 +67,10 @@ EOT
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
         assert(is_string($namespace));
-        $fqcn = $namespace . '\\Version' . $versionNumber;
-        $path = $migrationGenerator->generateMigration($versionNumber, $namespace);
+
+        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
+
+        $path = $migrationGenerator->generateMigration($fqcn);
 
         $editorCommand = $input->getOption('editor-cmd');
 

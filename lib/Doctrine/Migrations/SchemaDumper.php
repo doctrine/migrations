@@ -63,8 +63,7 @@ class SchemaDumper
      * @throws NoTablesFound
      */
     public function dump(
-        string $versionNumber,
-        string $namespace,
+        string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
         int $lineLength = 120
@@ -114,8 +113,7 @@ class SchemaDumper
         $down = implode("\n", $down);
 
         return $this->migrationGenerator->generateMigration(
-            $versionNumber,
-            $namespace,
+            $fqcn,
             $up,
             $down
         );

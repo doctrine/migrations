@@ -61,7 +61,7 @@ class DiffGenerator
      * @throws NoChangesDetected
      */
     public function generate(
-        string $versionNumber,
+        string $fqcn,
         ?string $filterExpression,
         bool $formatted = false,
         int $lineLength = 120,
@@ -102,7 +102,7 @@ class DiffGenerator
         }
 
         return $this->migrationGenerator->generateMigration(
-            $versionNumber,
+            $fqcn,
             $up,
             $down
         );

@@ -14,9 +14,10 @@ use function file_put_contents;
 use function implode;
 use function is_file;
 use function is_readable;
+use function preg_match;
 use function preg_replace;
 use function sprintf;
-use function str_replace;
+use function strtr;
 use function trim;
 
 /**
@@ -39,7 +40,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version<version> extends AbstractMigration
+final class <className> extends AbstractMigration
 {
     public function getDescription() : string
     {
@@ -73,17 +74,15 @@ TEMPLATE;
     }
 
     public function generateMigration(
-        string $version,
-        string $namespace,
+        string $fqcn,
         ?string $up = null,
         ?string $down = null
     ) : string {
-        $placeHolders = [
-            '<namespace>',
-            '<version>',
-            '<up>',
-            '<down>',
-        ];
+        $mch = [];
+        if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
+            throw new InvalidArgumentException(sprintf('Invalid FQCN'));
+        }
+        [$fqcn, $namespace, $className] = $mch;
 
         $dirs = $this->configuration->getMigrationDirectories();
         if (! isset($dirs[$namespace])) {
@@ -93,18 +92,18 @@ TEMPLATE;
         $dir = $dirs[$namespace];
 
         $replacements = [
-            $namespace,
-            $version,
-            $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
-            $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
+            '<namespace>' => $namespace,
+            '<className>' => $className,
+            '<up>' => $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
+            '<down>' => $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
         ];
 
-        $code = str_replace($placeHolders, $replacements, $this->getTemplate());
+        $code = strtr($this->getTemplate(), $replacements);
         $code = preg_replace('/^ +$/m', '', $code);
 
         $directoryHelper = new MigrationDirectoryHelper();
         $dir             = $directoryHelper->getMigrationDirectory($this->configuration, $dir);
-        $path            = $dir . '/Version' . $version . '.php';
+        $path            = $dir . '/' . $className . '.php';
 
         file_put_contents($path, $code);
 
