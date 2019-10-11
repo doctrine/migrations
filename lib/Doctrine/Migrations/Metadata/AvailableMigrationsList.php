@@ -59,7 +59,7 @@ final class AvailableMigrationsList implements Countable
     public function hasMigration(Version $version) : bool
     {
         foreach ($this->items as $migration) {
-            if ((string) $migration->getVersion() === (string) $version) {
+            if ($migration->getVersion()->equals($version)) {
                 return true;
             }
         }
@@ -70,7 +70,7 @@ final class AvailableMigrationsList implements Countable
     public function getMigration(Version $version) : AvailableMigration
     {
         foreach ($this->items as $migration) {
-            if ((string) $migration->getVersion() === (string) $version) {
+            if ($migration->getVersion()->equals($version)) {
                 return $migration;
             }
         }
