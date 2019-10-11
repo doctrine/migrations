@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\MigrationRepository;
@@ -90,16 +91,16 @@ final class DumpSchemaCommandTest extends TestCase
 
         $this->schemaDumper->expects(self::once())
             ->method('dump')
-            ->with('1234', 'FooNs', ['/foo/'], true, 80);
+            ->with('FooNs\\Version1234', ['/foo/'], true, 80);
 
         $output->expects(self::once())
             ->method('writeln')
             ->with([
                 'Dumped your schema to a new migration class at "<info></info>"',
                 '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up 1234</info>',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\\\\Version1234\'</info>',
                 '',
-                'To revert the migration you can use <info>migrations:execute --down 1234</info>',
+                'To revert the migration you can use <info>migrations:execute --down \'FooNs\\\\Version1234\'</info>',
                 '',
                 'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',
             ]);
@@ -115,6 +116,16 @@ final class DumpSchemaCommandTest extends TestCase
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
+
+        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator->expects(self::any())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getClassNameGenerator')
+            ->willReturn($classNameGenerator);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getSchemaDumper')

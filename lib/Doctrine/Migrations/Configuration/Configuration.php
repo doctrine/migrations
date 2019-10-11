@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
-use DateTimeImmutable;
-use DateTimeInterface;
-use DateTimeZone;
 use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -21,7 +18,6 @@ final class Configuration
 {
     public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
-    public const VERSION_FORMAT                          = 'YmdHis';
 
     /** @var string|null */
     private $name;
@@ -174,18 +170,6 @@ final class Configuration
     public function isDatabasePlatformChecked() : bool
     {
         return $this->checkDbPlatform;
-    }
-
-    public function generateVersionNumber(?DateTimeInterface $now = null) : string
-    {
-        $now = $now ?: $this->createDateTime();
-
-        return $now->format(self::VERSION_FORMAT);
-    }
-
-    private function createDateTime() : DateTimeImmutable
-    {
-        return new DateTimeImmutable('now', new DateTimeZone('UTC'));
     }
 
     public function setMigrationOrganization(string $migrationOrganization) : void

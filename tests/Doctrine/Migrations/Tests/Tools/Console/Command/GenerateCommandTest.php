@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -45,7 +46,7 @@ final class GenerateCommandTest extends TestCase
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
-            ->with('1234')
+            ->with('FooNs\\Version1234')
             ->willReturn('/path/to/migration.php');
 
         $this->generateCommand->expects(self::once())
@@ -72,6 +73,16 @@ final class GenerateCommandTest extends TestCase
 
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
+
+        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->dependencyFactory->expects(self::once())
+            ->method('getClassNameGenerator')
+            ->willReturn($classNameGenerator);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getConfiguration')
