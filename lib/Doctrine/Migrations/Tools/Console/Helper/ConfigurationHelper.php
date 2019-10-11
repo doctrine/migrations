@@ -19,7 +19,7 @@ use function pathinfo;
  * The ConfigurationHelper class is responsible for getting the Configuration instance from one of the supported methods
  * for defining the configuration for your migrations.
  */
-class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
+final class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 {
     /** @var ConfigurationLoader */
     private $loader;

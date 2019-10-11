@@ -22,7 +22,7 @@ use function array_change_key_case;
 use function intval;
 use function sprintf;
 
-class TableMetadataStorage implements MetadataStorage
+final class TableMetadataStorage implements MetadataStorage
 {
     /** @var Connection */
     private $connection;
@@ -42,7 +42,7 @@ class TableMetadataStorage implements MetadataStorage
         $this->schemaManager = $connection->getSchemaManager();
         $this->platform      = $connection->getDatabasePlatform();
 
-        if ($configuration!== null && ! ($configuration instanceof TableMetadataStorageConfiguration)) {
+        if ($configuration !== null && ! ($configuration instanceof TableMetadataStorageConfiguration)) {
             throw new InvalidArgumentException(sprintf('%s accepts only %s as configuration', self::class, TableMetadataStorageConfiguration::class));
         }
         $this->configuration = $configuration ?: new TableMetadataStorageConfiguration();
@@ -85,8 +85,8 @@ class TableMetadataStorage implements MetadataStorage
             $version = new Version($row[$this->configuration->getVersionColumnName()]);
 
             $executedAt = (isset($row[$this->configuration->getExecutedAtColumnName()])
-                && $row[$this->configuration->getExecutedAtColumnName()] !== null
-                && $row[$this->configuration->getExecutedAtColumnName()] !== ''
+            && $row[$this->configuration->getExecutedAtColumnName()] !== null
+            && $row[$this->configuration->getExecutedAtColumnName()] !== ''
                 ? DateTimeImmutable::createFromFormat(
                     $this->platform->getDateTimeFormatString(),
                     $row[$this->configuration->getExecutedAtColumnName()]

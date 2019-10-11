@@ -12,7 +12,7 @@ final class NoMigrationsFoundWithCriteria extends RuntimeException implements Mi
     public static function new(?string $criteria = null) : self
     {
         return new self(
-            $criteria!==null
+            $criteria !== null
                 ? sprintf('Could not find any migrations matching your criteria (%s).', $criteria)
                 : 'Could not find any migrations matching your criteria.',
             4

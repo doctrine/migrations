@@ -14,7 +14,7 @@ use Psr\Log\LoggerInterface;
  *
  * @var internal
  */
-class Factory
+/*final*/ class Factory
 {
     /** @var Connection */
     private $connection;

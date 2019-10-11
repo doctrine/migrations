@@ -16,7 +16,7 @@ use function sys_get_temp_dir;
 
 final class GenerateCommandTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var DependencyFactory|MockObject */
@@ -43,10 +43,6 @@ final class GenerateCommandTest extends TestCase
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
-
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
             ->with('1234')
@@ -71,12 +67,8 @@ final class GenerateCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-        $this->configuration->expects(self::any())
-            ->method('getMigrationDirectories')
-            ->willReturn([
-                'FooNs' => sys_get_temp_dir(),
-            ]);
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);

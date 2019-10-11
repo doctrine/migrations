@@ -8,8 +8,6 @@ use function dirname;
 use function realpath;
 
 /**
- * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
- *
  * @internal
  */
 abstract class AbstractFileLoader implements Loader

@@ -4,8 +4,10 @@
 - `MigrationsEventArgs` and `MigrationsVersionEventArgs` expose different API, please refer to the *Code BC breaks* section.
 
 ## Console
-- Console output changed. The commands use different output style. If you were relying on it probably things are broken.
- Different lever of verbosity are available now (`-v`, `-vv` and `-vvv` ).
+- Console output changed. The commands use different output style. If you were relying on specific output, 
+  please update your scripts. 
+  Console output is not covered by the BC promise, so please try not to rely on specific output.
+  Different levels of verbosity are available now (`-v`, `-vv` and `-vvv` ).
 
 ## Migrations table
 
@@ -41,7 +43,7 @@ return [
     'table_storage' => [
         'table_name' => 'doctrine_migration_versions',
         'version_column_name' => 'version',
-        'version_column_length' => 2048,
+        'version_column_length' => 1024,
         'executed_at_column_name' => 'executed_at',
         'execution_time_column_name' => 'execution_time',
     ],

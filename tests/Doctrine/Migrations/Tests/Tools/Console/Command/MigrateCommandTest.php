@@ -20,13 +20,14 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function strpos;
+use function sys_get_temp_dir;
 
 class MigrateCommandTest extends MigrationTestCase
 {
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var MigrateCommand|MockObject */
@@ -286,8 +287,10 @@ class MigrateCommandTest extends MigrationTestCase
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-        $connection          = $this->getSqliteConnection();
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
+
+        $connection = $this->getSqliteConnection();
 
         $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->setConstructorArgs([$this->configuration, $connection])

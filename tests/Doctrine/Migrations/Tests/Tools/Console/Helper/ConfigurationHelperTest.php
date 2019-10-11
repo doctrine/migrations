@@ -57,7 +57,8 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->with('configuration')
             ->willReturn(null);
 
-        $confExpected = $this->createMock(Configuration::class);
+        $confExpected = new Configuration();
+
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader
@@ -106,7 +107,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testLoadsFile() : void
     {
-        $confExpected = $this->createMock(Configuration::class);
+        $confExpected = new Configuration();
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader
@@ -132,7 +133,7 @@ class ConfigurationHelperTest extends MigrationTestCase
 
     public function testLoadsDefaultFile() : void
     {
-        $confExpected = $this->createMock(Configuration::class);
+        $confExpected = new Configuration();
         $configLoader = $this->createMock(Loader::class);
 
         $configLoader

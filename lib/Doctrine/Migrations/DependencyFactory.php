@@ -75,7 +75,7 @@ class DependencyFactory
         return $this->configuration;
     }
 
-    public function getConnection() : Connection
+    private function getConnection() : Connection
     {
         return $this->connection;
     }
@@ -170,11 +170,6 @@ class DependencyFactory
 
             return $needsRecursiveFinder ? new RecursiveRegexFinder() : new GlobFinder();
         });
-    }
-
-    public function setEntityManager(EntityManagerInterface $em) : void
-    {
-        $this->em = $em;
     }
 
     public function setSorter(callable $sorter) : void
@@ -285,8 +280,7 @@ class DependencyFactory
         return $this->getDependency(SqlGenerator::class, function () : SqlGenerator {
             return new SqlGenerator(
                 $this->getConfiguration(),
-                $this->connection->getDatabasePlatform(),
-                $this->getMetadataStorageConfiguration()
+                $this->connection->getDatabasePlatform()
             );
         });
     }

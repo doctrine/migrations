@@ -19,7 +19,7 @@ final class DiffCommandTest extends TestCase
     /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
 
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var DiffCommand|MockObject */
@@ -32,10 +32,6 @@ final class DiffCommandTest extends TestCase
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
-
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
 
         $input->expects(self::at(0))
             ->method('getOption')
@@ -67,10 +63,6 @@ final class DiffCommandTest extends TestCase
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
-
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('1234', 'filter expression', true, 80)
@@ -96,12 +88,8 @@ final class DiffCommandTest extends TestCase
     protected function setUp() : void
     {
         $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
-        $this->configuration          = $this->createMock(Configuration::class);
-        $this->configuration->expects(self::any())
-            ->method('getMigrationDirectories')
-            ->willReturn([
-                'FooNs' => sys_get_temp_dir(),
-            ]);
+        $this->configuration          = new Configuration();
+        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 

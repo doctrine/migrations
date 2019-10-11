@@ -17,11 +17,9 @@ use function is_bool;
 use function is_callable;
 
 /**
- * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
- *
  * @internal
  */
-class ArrayLoader implements Loader
+final class ArrayLoader implements Loader
 {
     /**
      * @param mixed $array

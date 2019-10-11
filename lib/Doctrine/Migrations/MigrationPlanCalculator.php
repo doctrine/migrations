@@ -80,7 +80,7 @@ final class MigrationPlanCalculator
     }
 
     /**
-     * @return  Metadata\AvailableMigration[]
+     * @return  AvailableMigration[]
      */
     private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations) : array
     {
