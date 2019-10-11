@@ -18,7 +18,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
-use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
@@ -128,7 +128,7 @@ final class AliasResolverTest extends TestCase
 
         $conn = $this->getSqliteConnection();
 
-        $versionFactory = $this->createMock(Factory::class);
+        $versionFactory = $this->createMock(MigrationFactory::class);
 
         $this->migrationRepository  = new MigrationRepository(
             [],

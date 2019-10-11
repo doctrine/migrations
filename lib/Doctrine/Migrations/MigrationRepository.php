@@ -10,7 +10,7 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
 use function strcmp;
@@ -33,7 +33,7 @@ class MigrationRepository
     /** @var MigrationFinder */
     private $migrationFinder;
 
-    /** @var Factory */
+    /** @var MigrationFactory */
     private $versionFactory;
 
     /** @var AvailableMigration[] */
@@ -50,7 +50,7 @@ class MigrationRepository
         array $classes,
         array $migrationDirectories,
         MigrationFinder $migrationFinder,
-        Factory $versionFactory,
+        MigrationFactory $versionFactory,
         ?callable $sorter = null
     ) {
         $this->migrationDirectories = $migrationDirectories;
