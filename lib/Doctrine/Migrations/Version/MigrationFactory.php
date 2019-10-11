@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 use Psr\Log\LoggerInterface;
 
 /**
- * The Factory class is responsible for creating instances of the Version class for a version number
+ * The MigrationFactory class is responsible for creating instances of the Version class for a version number
  * and a migration class name.
  *
  * @var internal
  */
-/*final*/ class Factory
+/*final*/ class MigrationFactory
 {
     /** @var Connection */
     private $connection;

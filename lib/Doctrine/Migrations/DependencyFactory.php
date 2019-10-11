@@ -29,7 +29,7 @@ use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
-use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
@@ -192,7 +192,7 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                new Factory($this->getConnection(), $this->getLogger()),
+                new MigrationFactory($this->getConnection(), $this->getLogger()),
                 $this->sorter
             );
         });

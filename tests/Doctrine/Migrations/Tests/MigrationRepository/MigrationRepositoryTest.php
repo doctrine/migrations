@@ -13,7 +13,7 @@ use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\B\C;
-use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -21,7 +21,7 @@ use function strcmp;
 
 class MigrationRepositoryTest extends TestCase
 {
-    /** @var Factory|MockObject */
+    /** @var MigrationFactory|MockObject */
     private $versionFactory;
 
     /** @var MigrationRepository */
@@ -143,7 +143,7 @@ class MigrationRepositoryTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->versionFactory = $this->createMock(Factory::class);
+        $this->versionFactory = $this->createMock(MigrationFactory::class);
         $this->versionFactory
             ->expects(self::any())
             ->method('createVersion')
