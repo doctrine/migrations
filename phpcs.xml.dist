@@ -81,7 +81,6 @@
         <exclude-pattern>lib/Doctrine/Migrations/Version/ExecutorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/MigratorConfigurationFactoryInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Generator/FileBuilderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/AliasResolverInterface.php</exclude-pattern>
 

@@ -131,7 +131,7 @@ class ExecuteCommandTest extends TestCase
     {
         $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->disableOriginalConstructor()
-            ->setMethodsExcept(['getMigratorConfigurationFactory'])
+            ->setMethodsExcept(['getConsoleInputMigratorConfigurationFactory'])
             ->getMock();
 
         $storage = $this->createMock(MetadataStorage::class);

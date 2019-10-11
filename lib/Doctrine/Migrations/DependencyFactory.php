@@ -23,9 +23,9 @@ use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
+use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
-use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactoryInterface;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
@@ -293,10 +293,10 @@ class DependencyFactory
         });
     }
 
-    public function getMigratorConfigurationFactory() : MigratorConfigurationFactoryInterface
+    public function getConsoleInputMigratorConfigurationFactory() : MigratorConfigurationFactory
     {
-        return $this->getDependency(MigratorConfigurationFactoryInterface::class, function () : MigratorConfigurationFactoryInterface {
-            return new MigratorConfigurationFactory(
+        return $this->getDependency(MigratorConfigurationFactory::class, function () : MigratorConfigurationFactory {
+            return new ConsoleInputMigratorConfigurationFactory(
                 $this->getConfiguration()
             );
         });
