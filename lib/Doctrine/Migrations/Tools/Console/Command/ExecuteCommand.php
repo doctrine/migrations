@@ -103,7 +103,7 @@ EOT
         $migrator = $this->getDependencyFactory()->getMigrator();
         $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
 
-        $migratorConfigurationFactory = $this->getDependencyFactory()->getMigratorConfigurationFactory();
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         if ($path !== false) {

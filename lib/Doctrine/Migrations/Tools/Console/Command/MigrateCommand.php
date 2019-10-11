@@ -136,7 +136,7 @@ EOT
             return 3;
         }
 
-        $migratorConfigurationFactory = $this->getDependencyFactory()->getMigratorConfigurationFactory();
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         $plan = $planCalculator->getPlanUntilVersion($version);
