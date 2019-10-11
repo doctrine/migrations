@@ -15,15 +15,6 @@
 
     <rule ref="Doctrine"/>
 
-    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
-        <exclude-pattern>lib/Doctrine/Migrations/FileQueryWriter.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/realpath.php</exclude-pattern>
-    </rule>
-
-    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
-    </rule>
-
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
@@ -39,24 +30,13 @@
     <rule ref="Generic.Strings.UnnecessaryStringConcat.Found">
         <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
     </rule>
+
     <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
         <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedMethod">
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
-    </rule>
-
-    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingParameterTypeHint">
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint">
-        <exclude-pattern>lib/Doctrine/Migrations/Metadata/ExecutedMigrationsSet.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Metadata/AvailableMigrationsList.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Metadata/MigrationPlanList.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/Version.php</exclude-pattern>
     </rule>
 
@@ -83,7 +63,5 @@
         <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Generator/FileBuilderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/AliasResolverInterface.php</exclude-pattern>
-
-
     </rule>
 </ruleset>
