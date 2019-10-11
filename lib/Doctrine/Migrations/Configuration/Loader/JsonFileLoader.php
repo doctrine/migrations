@@ -15,11 +15,9 @@ use function json_decode;
 use function json_last_error;
 
 /**
- * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
- *
  * @internal
  */
-class JsonFileLoader extends AbstractFileLoader
+final class JsonFileLoader extends AbstractFileLoader
 {
     /** @var ArrayLoader */
     private $arrayLoader;

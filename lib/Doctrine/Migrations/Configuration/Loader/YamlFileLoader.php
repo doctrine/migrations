@@ -16,7 +16,10 @@ use function file_exists;
 use function file_get_contents;
 use function is_array;
 
-class YamlFileLoader extends AbstractFileLoader
+/**
+ * @internal
+ */
+final class YamlFileLoader extends AbstractFileLoader
 {
     /** @var ArrayLoader */
     private $arrayLoader;

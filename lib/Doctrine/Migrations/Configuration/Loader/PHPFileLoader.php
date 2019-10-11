@@ -11,11 +11,9 @@ use function file_exists;
 use function is_array;
 
 /**
- * The ArrayConfiguration class is responsible for loading migration configuration information from a PHP file.
- *
  * @internal
  */
-class PHPFileLoader extends AbstractFileLoader
+final class PHPFileLoader extends AbstractFileLoader
 {
     /** @var ArrayLoader */
     private $arrayLoader;

@@ -23,9 +23,11 @@ use function strtr;
 /**
  * PSR-3 compliant console logger.
  *
+ * @internal
+ *
  * @see https://www.php-fig.org/psr/psr-3/
  */
-class ConsoleLogger extends AbstractLogger
+final class ConsoleLogger extends AbstractLogger
 {
     public const INFO  = 'info';
     public const ERROR = 'error';

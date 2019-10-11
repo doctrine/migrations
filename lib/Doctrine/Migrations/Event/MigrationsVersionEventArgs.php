@@ -12,7 +12,7 @@ use Doctrine\Migrations\MigratorConfiguration;
 /**
  * The MigrationsVersionEventArgs class is passed to events related to a single migration version.
  */
-class MigrationsVersionEventArgs extends EventArgs
+final class MigrationsVersionEventArgs extends EventArgs
 {
     /** @var Connection */
     private $connection;

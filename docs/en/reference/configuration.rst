@@ -29,7 +29,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             'table_storage' => [
                 'table_name' => 'doctrine_migration_versions',
                 'version_column_name' => 'version',
-                'version_column_length' => 2048,
+                'version_column_length' => 1024,
                 'executed_at_column_name' => 'executed_at',
                 'execution_time_column_name' => 'execution_time',
             ],
@@ -50,7 +50,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
         table_storage:
            table_name: doctrine_migration_versions
            version_column_name: version
-           version_column_length: 2048
+           version_column_length: 1024
            executed_at_column_name: executed_at
            execution_time_column_name: execution_time
 
@@ -75,7 +75,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
                 <table-storage
                         table-name="doctrine_migration_versions"
                         version-column-name="version"
-                        version-column-length="2048"
+                        version-column-length="1024"
                         executed-at-column-name="executed_at"
                         execution-time-column-name="execution_time"
                 />
@@ -94,14 +94,14 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
         {
             "name": "My Project Migrations",
-            "name": "My Project Migrations"
+            "name": "My Project Migrations",
 
             "table_storage": {
                "table_name: "doctrine_migration_versions",
                "version_column_name": "version",
-               "version_column_length": 2048,
+               "version_column_length": 1024,
                "executed_at_column_name": "executed_at",
-               "execution_time_column_name": "execution_time",
+               "execution_time_column_name": "execution_time"
             },
 
             "migrations_paths": {
@@ -132,7 +132,7 @@ Here are details about what each configuration option does:
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | table_storage.version_column_name                | no         | version                      | The name of the column which stores the version name.                            |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.version_column_length              | no         | 2048                           | The length of the column which stores the version name.                          |
+| table_storage.version_column_length              | no         | 1024                           | The length of the column which stores the version name.                          |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | table_storage.executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+

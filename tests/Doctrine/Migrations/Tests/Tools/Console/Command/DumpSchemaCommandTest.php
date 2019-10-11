@@ -22,7 +22,7 @@ use function sys_get_temp_dir;
 
 final class DumpSchemaCommandTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var DependencyFactory|MockObject */
@@ -88,10 +88,6 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([]));
 
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
-
         $this->schemaDumper->expects(self::once())
             ->method('dump')
             ->with('1234', 'FooNs', ['/foo/'], true, 80);
@@ -113,13 +109,8 @@ final class DumpSchemaCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-
-        $this->configuration->expects(self::any())
-            ->method('getMigrationDirectories')
-            ->willReturn([
-                'FooNs' => sys_get_temp_dir(),
-            ]);
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
         $this->migrationRepository = $this->createMock(MigrationRepository::class);

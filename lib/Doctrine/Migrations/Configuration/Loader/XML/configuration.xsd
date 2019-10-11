@@ -37,8 +37,8 @@
                 <xs:element name="organize-migrations" minOccurs="0" maxOccurs="1">
                     <xs:simpleType>
                         <xs:restriction base="xs:string">
-                            <xs:pattern
-                                    value="((y|Y)(e|E)(a|A)(r|R))|((y|Y)(e|E)(a|A)(r|R)_(a|A)(n|N)(d|D)_(m|M)(o|O)(n|N)(t|T)(h|H))"/>
+                            <xs:enumeration value="year" />
+                            <xs:enumeration value="year_and_month" />
                         </xs:restriction>
                     </xs:simpleType>
                 </xs:element>

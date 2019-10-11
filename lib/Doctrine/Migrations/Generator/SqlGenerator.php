@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Generator;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use SqlFormatter;
 use function array_unshift;
@@ -28,16 +27,13 @@ class SqlGenerator
     /** @var Configuration */
     private $configuration;
 
-    /** @var MetadataStorageConfigration */
-    private $storageConfiguration;
     /** @var AbstractPlatform */
     private $platform;
 
-    public function __construct(Configuration $configuration, AbstractPlatform $platform, MetadataStorageConfigration $storageConfiguration)
+    public function __construct(Configuration $configuration, AbstractPlatform $platform)
     {
-        $this->configuration        = $configuration;
-        $this->storageConfiguration = $storageConfiguration;
-        $this->platform             = $platform;
+        $this->configuration = $configuration;
+        $this->platform      = $platform;
     }
 
     /** @param string[] $sql */
@@ -49,9 +45,10 @@ class SqlGenerator
     ) : string {
         $code = [];
 
+        $storageConfiguration = $this->configuration->getMetadataStorageConfiguration();
         foreach ($sql as $query) {
-            if ($this->storageConfiguration instanceof TableMetadataStorageConfiguration
-                && stripos($query, $this->storageConfiguration->getTableName()) !== false) {
+            if ($storageConfiguration instanceof TableMetadataStorageConfiguration
+                && stripos($query, $storageConfiguration->getTableName()) !== false) {
                 continue;
             }
 

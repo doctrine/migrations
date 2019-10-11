@@ -20,10 +20,53 @@ use function libxml_use_internal_errors;
 use function simplexml_load_string;
 use function strtr;
 
-class XmlFileLoader extends AbstractFileLoader
+/**
+ * @internal
+ */
+final class XmlFileLoader extends AbstractFileLoader
 {
     /** @var ArrayLoader */
     private $arrayLoader;
+
+    public function __construct(?ArrayLoader $arrayLoader = null)
+    {
+        $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
+    }
+
+    /**
+     * @param mixed|string $file
+     */
+    public function load($file) : Configuration
+    {
+        if (! file_exists($file)) {
+            throw FileNotFound::new();
+        }
+
+        $this->validateXML($file);
+
+        $rawXML = file_get_contents($file);
+        assert($rawXML !== false);
+
+        $root = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
+        assert($root !== false);
+
+        $config = $this->extractParameters($root);
+
+        if (isset($config['all_or_nothing'])) {
+            $config['all_or_nothing'] = BooleanStringFormatter::toBoolean(
+                $config['all_or_nothing'],
+                false
+            );
+        }
+        if (isset($config['migrations_paths'])) {
+            $config['migrations_paths'] = $this->getDirectoryRelativeToFile(
+                $file,
+                $config['migrations_paths']
+            );
+        }
+
+        return $this->arrayLoader->load($config);
+    }
 
     /**
      * @return mixed[]
@@ -59,19 +102,8 @@ class XmlFileLoader extends AbstractFileLoader
         return $config;
     }
 
-    public function __construct(?ArrayLoader $arrayLoader = null)
+    private function validateXML(string $file) : void
     {
-        $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
-    }
-
-    /**
-     * @param mixed|string $file
-     */
-    public function load($file) : Configuration
-    {
-        if (! file_exists($file)) {
-            throw FileNotFound::new();
-        }
         try {
             libxml_use_internal_errors(true);
 
@@ -90,27 +122,5 @@ class XmlFileLoader extends AbstractFileLoader
             libxml_clear_errors();
             libxml_use_internal_errors(false);
         }
-        $rawXML = file_get_contents($file);
-        assert($rawXML !== false);
-
-        $root = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
-        assert($root !== false);
-
-        $config = $this->extractParameters($root);
-
-        if (isset($config['all_or_nothing'])) {
-            $config['all_or_nothing'] = BooleanStringFormatter::toBoolean(
-                $config['all_or_nothing'],
-                false
-            );
-        }
-        if (isset($config['migrations_paths'])) {
-            $config['migrations_paths'] = $this->getDirectoryRelativeToFile(
-                $file,
-                $config['migrations_paths']
-            );
-        }
-
-        return $this->arrayLoader->load($config);
     }
 }

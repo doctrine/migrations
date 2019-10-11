@@ -18,7 +18,7 @@ use function unlink;
 
 final class GeneratorTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var Generator */
@@ -47,9 +47,7 @@ final class GeneratorTest extends TestCase
 
         file_put_contents($customTemplate, 'custom template test');
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn($customTemplate);
+        $this->configuration->setCustomTemplate($customTemplate);
 
         $path = $this->migrationGenerator->generateMigration('1234', 'Test', '// up', '// down');
 
@@ -73,9 +71,7 @@ final class GeneratorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn('invalid');
+        $this->configuration->setCustomTemplate('invalid');
 
         $this->migrationGenerator->generateMigration('1234', 'Test');
     }
@@ -92,9 +88,7 @@ final class GeneratorTest extends TestCase
             $customTemplate
         ));
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn($customTemplate);
+        $this->configuration->setCustomTemplate($customTemplate);
 
         $this->migrationGenerator->generateMigration('1234', 'Test');
 
@@ -103,11 +97,8 @@ final class GeneratorTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-        $this->configuration->expects(self::once())
-            ->method('getMigrationDirectories')
-            ->willReturn(['Test' => sys_get_temp_dir()]);
-
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('Test', sys_get_temp_dir());
         $this->migrationGenerator = new Generator($this->configuration);
     }
 }

@@ -20,7 +20,7 @@ class MigratorConfigurationFactory implements MigratorConfigurationFactoryInterf
 
     public function getMigratorConfiguration(InputInterface $input) : MigratorConfiguration
     {
-        $timeAllQueries = $input->hasOption('query-time') ?(bool) $input->getOption('query-time'): false;
+        $timeAllQueries = $input->hasOption('query-time') ? (bool) $input->getOption('query-time') : false;
         $dryRun         = $input->hasOption('dry-run') ? (bool) $input->getOption('dry-run') : false;
         $allOrNothing   = $input->hasOption('all-or-nothing') ? (bool) $input->getOption('all-or-nothing') : $this->configuration->isAllOrNothing();
 

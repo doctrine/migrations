@@ -17,7 +17,7 @@ use function strcasecmp;
 /**
  * The Configuration class is responsible for defining migration configuration information.
  */
-class Configuration
+final class Configuration
 {
     public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
