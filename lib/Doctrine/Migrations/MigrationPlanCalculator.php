@@ -72,7 +72,7 @@ final class MigrationPlanCalculator
 
     private function findDirection(Version $to, Metadata\ExecutedMigrationsSet $executedMigrations) : string
     {
-        if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && (string) $executedMigrations->getLast()->getVersion() !== (string) $to)) {
+        if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && ! $executedMigrations->getLast()->getVersion()->equals($to))) {
             return Direction::DOWN;
         }
 
@@ -96,7 +96,7 @@ final class MigrationPlanCalculator
     {
         $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {
-            if ($direction === Direction::DOWN && (string) $availableMigration->getVersion() === (string) $to) {
+            if ($direction === Direction::DOWN && $availableMigration->getVersion()->equals($to)) {
                 break;
             }
 
@@ -106,7 +106,7 @@ final class MigrationPlanCalculator
                 $toExecute[] = $availableMigration;
             }
 
-            if ($direction === Direction::UP && (string) $availableMigration->getVersion() === (string) $to) {
+            if ($direction === Direction::UP && $availableMigration->getVersion()->equals($to)) {
                 break;
             }
         }
