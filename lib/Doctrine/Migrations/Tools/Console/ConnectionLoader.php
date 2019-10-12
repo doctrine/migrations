@@ -25,7 +25,7 @@ class ConnectionLoader
             $dbConfig,
             new ArrayConnectionConfigurationLoader(
                 'migrations-db.php',
-                new ConnectionHelperLoader($helperSet, 'connection', new NoConnectionLoader())
+                new ConnectionHelperLoader('connection', new NoConnectionLoader(), $helperSet)
             )
         );
 
