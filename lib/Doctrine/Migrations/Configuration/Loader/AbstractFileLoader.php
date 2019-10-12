@@ -17,7 +17,7 @@ abstract class AbstractFileLoader implements Loader
      *
      * @return array<string,string>
      */
-    protected function getDirectoryRelativeToFile(string $file, array $input) : array
+    final protected function getDirectoryRelativeToFile(string $file, array $input) : array
     {
         foreach ($input as $ns => $dir) {
             $path = realpath(dirname($file) . '/' . $dir);
