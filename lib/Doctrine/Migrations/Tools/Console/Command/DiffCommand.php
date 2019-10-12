@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
-use Exception;
+use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -118,7 +118,7 @@ EOT
         if ($namespace === null) {
             $namespace = key($dirs);
         } elseif (! isset($dirs[$namespace])) {
-            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
+            throw new OutOfBoundsException(sprintf('Path not defined for the namespace %s', $namespace));
         }
         assert(is_string($namespace));
 

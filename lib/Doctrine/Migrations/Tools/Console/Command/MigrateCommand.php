@@ -141,9 +141,6 @@ EOT
 
         $plan = $planCalculator->getPlanUntilVersion($version);
 
-        /**
-         * If there are no migrations to execute throw an exception.
-         */
         if (count($plan) === 0 && ! $allowNoMigration) {
             $output->writeln('Could not find any migrations to execute.');
 
@@ -224,21 +221,25 @@ EOT
         string $versionAlias,
         OutputInterface $output
     ) : void {
-        switch (true) {
-            case $versionAlias === 'first':
-                $output->writeln('<error>Already at first version.</error>');
-                break;
-            case $versionAlias === 'next' || $versionAlias === 'latest':
-                $output->writeln('<error>Already at latest version.</error>');
-                break;
-            case substr($versionAlias, 0, 7) === 'current':
-                $output->writeln('<error>The delta couldn\'t be reached.</error>');
-                break;
-            default:
-                $output->writeln(sprintf(
-                    '<error>Unknown version: %s</error>',
-                    OutputFormatter::escape($versionAlias)
-                ));
+        if ($versionAlias === 'first') {
+            $output->writeln('<error>Already at first version.</error>');
+
+            return;
         }
+        if ($versionAlias === 'next' || $versionAlias === 'latest') {
+            $output->writeln('<error>Already at latest version.</error>');
+
+            return;
+        }
+        if (substr($versionAlias, 0, 7) === 'current') {
+            $output->writeln('<error>The delta couldn\'t be reached.</error>');
+
+            return;
+        }
+
+        $output->writeln(sprintf(
+            '<error>Unknown version: %s</error>',
+            OutputFormatter::escape($versionAlias)
+        ));
     }
 }
