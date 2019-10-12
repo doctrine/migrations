@@ -21,6 +21,7 @@ use const CASE_LOWER;
 use function array_change_key_case;
 use function intval;
 use function sprintf;
+use function strtolower;
 
 final class TableMetadataStorage implements MetadataStorage
 {
@@ -82,17 +83,21 @@ final class TableMetadataStorage implements MetadataStorage
         foreach ($rows as $row) {
             $row = array_change_key_case($row, CASE_LOWER);
 
-            $version = new Version($row[$this->configuration->getVersionColumnName()]);
+            $version = new Version($row[strtolower($this->configuration->getVersionColumnName())]);
 
-            $executedAt = $row[$this->configuration->getExecutedAtColumnName()] ?? '';
+            $executedAt = $row[strtolower($this->configuration->getExecutedAtColumnName())] ?? '';
             $executedAt = $executedAt !== ''
                 ? DateTimeImmutable::createFromFormat($this->platform->getDateTimeFormatString(), $executedAt)
+                : null;
+
+            $executionTime = isset($row[strtolower($this->configuration->getExecutionTimeColumnName())])
+                ? intval($row[strtolower($this->configuration->getExecutionTimeColumnName())])
                 : null;
 
             $migration = new ExecutedMigration(
                 $version,
                 $executedAt instanceof DateTimeImmutable ? $executedAt : null,
-                $row[$this->configuration->getExecutionTimeColumnName()] ? intval($row[$this->configuration->getExecutionTimeColumnName()]) : null
+                $executionTime
             );
 
             $migrations[(string) $version] = $migration;
