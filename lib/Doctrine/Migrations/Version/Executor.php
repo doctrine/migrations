@@ -306,7 +306,7 @@ final class Executor implements ExecutorInterface
     {
         if ($result->isSkipped()) {
             $this->logger->error(
-                'Migration {version} skipped during %s. Reason {error}',
+                'Migration {version} skipped during {state}. Reason: "{reason}"',
                 [
                     'version' => (string) $plan->getVersion(),
                     'reason' => $e->getMessage(),
@@ -315,7 +315,7 @@ final class Executor implements ExecutorInterface
             );
         } elseif ($result->hasError()) {
             $this->logger->error(
-                'Migration {version} failed during %s. Error {error}',
+                'Migration {version} failed during {state}. Error: "{error}"',
                 [
                     'version' => (string) $plan->getVersion(),
                     'error' => $e->getMessage(),

@@ -1,12 +1,13 @@
 # Upgrade to 3.0
 
-- The "version" is the FQCN of the migration class (exiting entries in the migrations table will be automatically updated).
-- `MigrationsEventArgs` and `MigrationsVersionEventArgs` expose different API, please refer to the *Code BC breaks* section.
+- The "version" is the FQCN of the migration class (existing entries in the migrations table will be automatically updated).
+- `MigrationsEventArgs` and `MigrationsVersionEventArgs` expose different API, 
+please refer to the [Code BC breaks](#code-bc-breaks) section.
 
 ## Console
-- Console output changed. The commands use different output style. If you were relying on specific output, 
+- Console output changed. The commands use a different output style. If you were relying on specific output, 
   please update your scripts. 
-  Console output is not covered by the BC promise, so please try not to rely on specific output.
+  Console output is not covered by the BC promise, so please try not to rely on specific a output.
   Different levels of verbosity are available now (`-v`, `-vv` and `-vvv` ).
 
 ## Migrations table
@@ -57,11 +58,11 @@ return [
     'check_database_platform' => true,
 ];
 ```
-In similar way also XML, YAML and JSON file changed. Please refer to the official documentation for more details.
+Files in XML, YAML or JSON also changed in a similar way. Please refer to the official documentation for more details.
 
 ## Code BC breaks
 
-Most of the code is protected by the `@internal` declaration and in a very rare case you should have dealt with the 
+Most of the code is protected by the `@internal` declaration and in a very rare cases you might have dealt with the 
 internals of this library. If you did, this are the main changes in the 3.0 release.
 
 

@@ -59,7 +59,7 @@ EOT
                 'namespace',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Namespace for the save the generated migrations (defaults to the first namespace definition).'
+                'Namespace to use for the generated migrations (defaults to the first namespace definition).'
             )
             ->addOption(
                 'filter-tables',

@@ -87,14 +87,14 @@ final class AliasResolver implements AliasResolverInterface
                 try {
                     return $newMigrations->getFirst()->getVersion();
                 } catch (NoMigrationsFoundWithCriteria $e) {
-                    throw NoMigrationsToExecute::new();
+                    throw NoMigrationsToExecute::new($e);
                 }
                 break;
             case self::ALIAS_LATEST:
                 try {
                     return $availableMigrations->getLast()->getVersion();
                 } catch (NoMigrationsFoundWithCriteria $e) {
-                    throw NoMigrationsToExecute::new();
+                    throw NoMigrationsToExecute::new($e);
                 }
                 break;
             default:

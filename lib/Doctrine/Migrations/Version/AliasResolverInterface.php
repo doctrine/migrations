@@ -22,7 +22,7 @@ interface AliasResolverInterface
      * - next: The version following the current version.
      * - latest: The latest available version.
      *
-     * If an existing version number is specified, it is returned verbatimly.
+     * If an existing version number is specified, it is returned verbatim.
      */
     public function resolveVersionAlias(string $alias) : Version;
 }
