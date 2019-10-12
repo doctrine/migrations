@@ -126,23 +126,31 @@ Here are details about what each configuration option does:
 +============================+============+==============================+==================================================================================+
 | name                       | no         | Doctrine Database Migrations | The name that shows at the top of the migrations console application.            |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| migrations_paths<string, string>       | yes        | null                         | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
+| migrations_paths<string, string>       | yes        | null             | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.table_name                 | no         | doctrine_migration_versions  | The name of the table to track executed migrations in.                           |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.version_column_name                | no         | version                      | The name of the column which stores the version name.                            |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.version_column_length              | no         | 1024                           | The length of the column which stores the version name.                          |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage.execution_time_column_name    | no         | executed_at                  | The name of the column which stores how long a migration took (milliseconds).      |
+| table_storage              | no         |                              | Used by doctrine migrations to track the currently executed migrations           |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | all_or_nothing             | no         | false                        | Whether or not to wrap multiple migrations in a single transaction.              |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.  |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+
+
+Here the possible options for ``table_storage``:
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| Name                       | Required   | Default                      | Description                                                                      |
++============================+============+==============================+==================================================================================+
+| table_name                 | no         | doctrine_migration_versions  | The name of the table to track executed migrations in.                           |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| version_column_name        | no         | version                      | The name of the column which stores the version name.                            |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| version_column_length      | no         | 1024                         | The length of the column which stores the version name.                          |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| execution_time_column_name | no         | executed_at                  | The name of the column which stores how long a migration took (milliseconds).    |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 
 Manually Providing Migrations
