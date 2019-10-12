@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
 use Doctrine\Migrations\Configuration\Loader\ArrayLoader;
 use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
 use Doctrine\Migrations\Configuration\Loader\Loader;
-use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
+use Doctrine\Migrations\Configuration\Loader\PhpFileLoader;
 use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
 use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
 use PHPUnit\Framework\TestCase;
@@ -46,7 +46,7 @@ class ConfigurationLoaderTest extends TestCase
             'xml' =>  XmlFileLoader::class,
             'yaml' => YamlFileLoader::class,
             'yml' => YamlFileLoader::class,
-            'php' => PHPFileLoader::class,
+            'php' => PhpFileLoader::class,
             'json' => JsonFileLoader::class,
         ];
 

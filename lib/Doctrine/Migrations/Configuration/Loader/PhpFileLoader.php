@@ -13,7 +13,7 @@ use function is_array;
 /**
  * @internal
  */
-final class PHPFileLoader extends AbstractFileLoader
+final class PhpFileLoader extends AbstractFileLoader
 {
     /** @var ArrayLoader */
     private $arrayLoader;
