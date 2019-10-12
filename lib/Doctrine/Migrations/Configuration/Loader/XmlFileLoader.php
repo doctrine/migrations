@@ -42,7 +42,7 @@ final class XmlFileLoader extends AbstractFileLoader
             throw FileNotFound::new();
         }
 
-        $this->validateXML($file);
+        $this->validateXml($file);
 
         $rawXML = file_get_contents($file);
         assert($rawXML !== false);
@@ -102,7 +102,7 @@ final class XmlFileLoader extends AbstractFileLoader
         return $config;
     }
 
-    private function validateXML(string $file) : void
+    private function validateXml(string $file) : void
     {
         try {
             libxml_use_internal_errors(true);

@@ -62,7 +62,7 @@ final class ConnectionLoaderTest extends TestCase
 
         $helperSet = new HelperSet();
         $helperSet->set($helper, 'connection');
-        $loader = new ConnectionHelperLoader($helperSet, 'connection', new NoConnectionLoader());
+        $loader = new ConnectionHelperLoader('connection', new NoConnectionLoader(), $helperSet);
         $conn   = $loader->getConnection();
 
         self::assertSame($connection, $conn);
@@ -72,7 +72,7 @@ final class ConnectionLoaderTest extends TestCase
     {
         $this->expectException(ConnectionNotSpecified::class);
         $helperSet = new HelperSet();
-        $loader    = new ConnectionHelperLoader($helperSet, 'connection', new NoConnectionLoader());
+        $loader    = new ConnectionHelperLoader('connection', new NoConnectionLoader(), $helperSet);
         $loader->getConnection();
     }
 }
