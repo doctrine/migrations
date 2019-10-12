@@ -75,6 +75,6 @@ final class AvailableMigrationsList implements Countable
             }
         }
 
-        throw MigrationNotAvailable::new((string) $version);
+        throw MigrationNotAvailable::forVersion($version);
     }
 }

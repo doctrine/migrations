@@ -4,17 +4,18 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Exception;
 
+use Doctrine\Migrations\Version\Version;
 use RuntimeException;
 use function sprintf;
 
 final class MigrationNotAvailable extends RuntimeException implements MigrationException
 {
-    public static function new(string $version) : self
+    public static function forVersion(Version $version) : self
     {
         return new self(
             sprintf(
                 'The migration %s is not available',
-                $version
+                (string) $version
             ),
             5
         );
