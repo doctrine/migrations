@@ -5,13 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration\Loader;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Loader\PHPFileLoader;
+use Doctrine\Migrations\Configuration\Loader\PhpFileLoader;
 
 class PhpLoaderTest extends AbstractLoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new PHPFileLoader();
+        $loader = new PhpFileLoader();
 
         return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.php');
     }
