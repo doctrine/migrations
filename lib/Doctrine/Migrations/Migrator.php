@@ -131,7 +131,7 @@ class Migrator implements MigratorInterface
     }
 
     /**
-     * @return string[][]
+     * {@inheritDoc}
      */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {

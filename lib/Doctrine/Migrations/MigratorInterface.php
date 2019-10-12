@@ -14,7 +14,7 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
 interface MigratorInterface
 {
     /**
-     * @return string[][]
+     * @return array<string, string[]> A list of SQL statements executed, grouped by migration version
      */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array;
 }
