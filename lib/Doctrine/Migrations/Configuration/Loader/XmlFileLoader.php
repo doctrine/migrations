@@ -50,7 +50,7 @@ final class XmlFileLoader extends AbstractFileLoader
         $root = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
         assert($root !== false);
 
-        $config = $this->extractParameters($root);
+        $config = $this->extractParameters($root, true);
 
         if (isset($config['all_or_nothing'])) {
             $config['all_or_nothing'] = BooleanStringFormatter::toBoolean(
@@ -71,7 +71,7 @@ final class XmlFileLoader extends AbstractFileLoader
     /**
      * @return mixed[]
      */
-    private function extractParameters(SimpleXMLElement $root, bool $loopOverNodes = true) : array
+    private function extractParameters(SimpleXMLElement $root, bool $loopOverNodes) : array
     {
         $config = [];
 
