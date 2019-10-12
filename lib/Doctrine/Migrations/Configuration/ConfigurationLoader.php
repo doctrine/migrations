@@ -13,6 +13,9 @@ use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
 use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
 use function count;
 
+/**
+ * @internal
+ */
 class ConfigurationLoader
 {
     /** @var Loader[] */
