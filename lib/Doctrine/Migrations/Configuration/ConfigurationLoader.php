@@ -27,11 +27,11 @@ class ConfigurationLoader
     {
         $this->loaders = [
             'array' => new ArrayLoader(),
+            'json' => new JsonFileLoader(),
+            'php' => new PHPFileLoader(),
             'xml' => new XmlFileLoader(),
             'yaml' => new YamlFileLoader(),
             'yml' => new YamlFileLoader(),
-            'php' => new PHPFileLoader(),
-            'json' => new JsonFileLoader(),
         ];
     }
 
