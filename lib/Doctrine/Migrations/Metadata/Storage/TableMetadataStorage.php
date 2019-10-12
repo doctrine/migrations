@@ -84,18 +84,14 @@ final class TableMetadataStorage implements MetadataStorage
 
             $version = new Version($row[$this->configuration->getVersionColumnName()]);
 
-            $executedAt = (isset($row[$this->configuration->getExecutedAtColumnName()])
-            && $row[$this->configuration->getExecutedAtColumnName()] !== null
-            && $row[$this->configuration->getExecutedAtColumnName()] !== ''
-                ? DateTimeImmutable::createFromFormat(
-                    $this->platform->getDateTimeFormatString(),
-                    $row[$this->configuration->getExecutedAtColumnName()]
-                )
-                : null) ?: null;
+            $executedAt = $row[$this->configuration->getExecutedAtColumnName()] ?? '';
+            $executedAt = $executedAt !== ''
+                ? DateTimeImmutable::createFromFormat($this->platform->getDateTimeFormatString(), $executedAt)
+                : null;
 
             $migration = new ExecutedMigration(
                 $version,
-                $executedAt,
+                $executedAt instanceof DateTimeImmutable ? $executedAt : null,
                 $row[$this->configuration->getExecutionTimeColumnName()] ? intval($row[$this->configuration->getExecutionTimeColumnName()]) : null
             );
 
