@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Provider;
 
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\Migrations\Provider\DBALSchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 
@@ -40,7 +41,7 @@ class SchemaDiffProviderTest extends MigrationTestCase
     {
         $conn           = $this->getSqliteConnection();
         $schemaManager  = $conn->getSchemaManager();
-        $this->provider = new SchemaDiffProvider($schemaManager, $conn->getDatabasePlatform());
+        $this->provider = new DBALSchemaDiffProvider($schemaManager, $conn->getDatabasePlatform());
 
         $schemaChangelog = new Table('foo');
         $schemaChangelog->addColumn('a', 'string');
