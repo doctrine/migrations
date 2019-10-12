@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Configuration\Loader;
 use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
-use Doctrine\Migrations\Configuration\Exception\UnknownResource;
+use Doctrine\Migrations\Configuration\Exception\UnableToLoadResource;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;
@@ -27,7 +27,7 @@ final class ArrayLoader implements Loader
     public function load($array) : Configuration
     {
         if (! is_array($array)) {
-            throw UnknownResource::new(static::class);
+            throw UnableToLoadResource::with(static::class);
         }
 
         $configMap = [
