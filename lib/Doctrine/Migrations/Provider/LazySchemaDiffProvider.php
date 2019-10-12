@@ -16,24 +16,24 @@ use ProxyManager\Proxy\LazyLoadingInterface;
  *
  * @internal
  */
-class LazySchemaDiffProvider implements SchemaDiffProviderInterface
+class LazySchemaDiffProvider implements SchemaDiffProvider
 {
     /** @var LazyLoadingValueHolderFactory */
     private $proxyFactory;
 
-    /** @var SchemaDiffProviderInterface */
+    /** @var SchemaDiffProvider */
     private $originalSchemaManipulator;
 
     public function __construct(
         LazyLoadingValueHolderFactory $proxyFactory,
-        SchemaDiffProviderInterface $originalSchemaManipulator
+        SchemaDiffProvider $originalSchemaManipulator
     ) {
         $this->proxyFactory              = $proxyFactory;
         $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
     public static function fromDefaultProxyFactoryConfiguration(
-        SchemaDiffProviderInterface $originalSchemaManipulator
+        SchemaDiffProvider $originalSchemaManipulator
     ) : LazySchemaDiffProvider {
         $proxyConfig = new Configuration();
         $proxyConfig->setGeneratorStrategy(new EvaluatingGeneratorStrategy());

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
@@ -18,11 +19,11 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\Provider\DBALSchemaDiffProvider;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
-use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
-use Doctrine\Migrations\Provider\SchemaProviderInterface;
+use Doctrine\Migrations\Provider\SchemaProvider;
 use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
@@ -31,7 +32,6 @@ use Doctrine\Migrations\Version\AliasResolverInterface;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use Exception;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -39,7 +39,7 @@ use function preg_quote;
 use function sprintf;
 
 /**
- * The DepenencyFactory is responsible for wiring up and managing internal class dependencies.
+ * The DependencyFactory is responsible for wiring up and managing internal class dependencies.
  *
  * @internal
  */
@@ -118,12 +118,11 @@ class DependencyFactory
         });
     }
 
-    private function getSchemaProvider() : SchemaProviderInterface
+    private function getSchemaProvider() : SchemaProvider
     {
-        // @todo what about the other schema providers?
-        return $this->getDependency(SchemaProviderInterface::class, function () : SchemaProviderInterface {
+        return $this->getDependency(SchemaProvider::class, function () : SchemaProvider {
             if ($this->em === null) {
-                throw new Exception('foo');
+                throw new MissingDependency('The doctrine entity manager should be provided in order to be able to instantiate SchemaProvider');
             }
 
             return new OrmSchemaProvider($this->em);
@@ -144,11 +143,11 @@ class DependencyFactory
         });
     }
 
-    public function getSchemaDiffProvider() : SchemaDiffProviderInterface
+    public function getSchemaDiffProvider() : SchemaDiffProvider
     {
-        return $this->getDependency(SchemaDiffProviderInterface::class, function () : LazySchemaDiffProvider {
+        return $this->getDependency(SchemaDiffProvider::class, function () : LazySchemaDiffProvider {
             return LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
-                new SchemaDiffProvider(
+                new DBALSchemaDiffProvider(
                     $this->connection->getSchemaManager(),
                     $this->connection->getDatabasePlatform()
                 )

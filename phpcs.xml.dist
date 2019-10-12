@@ -53,11 +53,8 @@
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaDiffProviderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaProviderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Helper/ConfigurationHelperInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationFinderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/ExecutorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
