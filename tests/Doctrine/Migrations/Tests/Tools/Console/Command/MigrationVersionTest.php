@@ -359,6 +359,6 @@ class MigrationVersionTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertContains('1233 deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertContains('1233 deleted from the version table.', $this->commandTester->getDisplay(true));
     }
 }

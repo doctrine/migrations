@@ -52,7 +52,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Could not find any migrations to execute') !== false);
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Could not find any migrations to execute') !== false);
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
@@ -69,7 +69,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Already at first version.') !== false);
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Already at first version.') !== false);
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
@@ -86,7 +86,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Already at latest version.') !== false);
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Already at latest version.') !== false);
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
@@ -100,7 +100,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'The delta couldn\'t be reached.') !== false);
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'The delta couldn\'t be reached.') !== false);
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
@@ -111,7 +111,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(), 'Unknown version: unknown') !== false);
+        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Unknown version: unknown') !== false);
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 

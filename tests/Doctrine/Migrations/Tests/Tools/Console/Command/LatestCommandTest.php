@@ -64,7 +64,7 @@ class LatestCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay())));
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
         self::assertSame('1231', $lines[0]);
     }
 }
