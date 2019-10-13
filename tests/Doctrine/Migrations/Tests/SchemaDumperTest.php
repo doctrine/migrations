@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\SchemaDumper;
+use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -126,6 +127,29 @@ class SchemaDumperTest extends TestCase
             ->method('generateMigration');
 
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
+    }
+
+    public function testRegexErrorsAreConvertedToExceptions() : void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Internal PCRE error, please check your Regex. Reported errors: preg_match(): Delimiter must not be alphanumeric or backslash.');
+
+        $table = $this->createMock(Table::class);
+        $table->expects(self::atLeastOnce())
+            ->method('getName')
+            ->willReturn('other_skipped_table_name');
+
+        $schema = $this->createMock(Schema::class);
+
+        $this->schemaManager->expects(self::once())
+            ->method('createSchema')
+            ->willReturn($schema);
+
+        $schema->expects(self::once())
+            ->method('getTables')
+            ->willReturn([$table]);
+
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['invalid regex']));
     }
 
     public function testExcludedTableViaParamIsNotInTheDump() : void
