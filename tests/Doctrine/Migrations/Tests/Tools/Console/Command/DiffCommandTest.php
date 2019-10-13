@@ -64,7 +64,7 @@ final class DiffCommandTest extends TestCase
             ->with('namespace')
             ->willReturn('FooNs');
 
-        $input->expects(self::at(5))
+        $input->expects(self::at(6))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');

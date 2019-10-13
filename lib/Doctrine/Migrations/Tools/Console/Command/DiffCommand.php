@@ -101,7 +101,7 @@ EOT
         $filterExpression = (string) $input->getOption('filter-expression') ?: null;
         $formatted        = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
         $lineLength       = (int) $input->getOption('line-length');
-        $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
+        $allowEmptyDiff   = $input->getOption('allow-empty-diff');
         $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
         $namespace        = $input->getOption('namespace') ?: null;
         if ($formatted) {
@@ -128,7 +128,7 @@ EOT
 
         try {
             $path = $diffGenerator->generate(
-            $fqcn,
+                $fqcn,
                 $filterExpression,
                 $formatted,
                 $lineLength,
