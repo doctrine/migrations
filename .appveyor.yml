@@ -13,7 +13,9 @@ cache:
 
 environment:
   matrix:
-    - php: 7.2
+    - php: 7.2.23
+    - php: 7.3.10
+    - php: 7.1.32
 
 init:
   - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;C:\tools\composer;%PATH%
@@ -25,14 +27,15 @@ install:
     - ps: |
         # Check if installation is cached
         if (!(Test-Path c:\tools\php)) {
-          appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --ignore-checksums -y php --version ((choco search php --exact --all-versions -r | select-string -pattern $env:php | sort { [version]($_ -split '\|' | select -last 1) } -Descending | Select-Object -first 1) -replace '[php|]','')
+          appveyor-retry cinst --params '""/InstallDir:C:\tools\php""' --no-progress --ignore-checksums -y php --version $env:php
           # install sqlite
-          appveyor-retry cinst -y sqlite
+          appveyor-retry cinst -y sqlite  --no-progress
           Get-ChildItem -Path c:\tools\php
           cd c:\tools\php
 
           # Set PHP environment items that are always needed
           copy php.ini-production php.ini
+
           Add-Content php.ini "`n date.timezone=UTC"
           Add-Content php.ini "`n extension_dir=ext"
           Add-Content php.ini "`n memory_limit=1G"

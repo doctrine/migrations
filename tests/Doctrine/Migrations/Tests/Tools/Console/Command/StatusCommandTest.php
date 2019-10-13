@@ -19,6 +19,9 @@ use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
 use function array_map;
 use function explode;
+use function sprintf;
+use function str_pad;
+use function strlen;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -67,7 +70,10 @@ class StatusCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay())));
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+
+        $tempDir = sys_get_temp_dir();
+        $tempDir = str_pad($tempDir, 74-strlen($tempDir));
 
         self::assertSame(
             [
@@ -96,7 +102,7 @@ class StatusCommandTest extends MigrationTestCase
                 22 => '|                      | Available            | 0                                                                      |',
                 23 => '|                      | New                  | 0                                                                      |',
                 24 => '|----------------------------------------------------------------------------------------------------------------------|',
-                25 => '| Migration Namespaces | DoctrineMigrations   | /tmp                                                                   |',
+                25 => sprintf('| Migration Namespaces | DoctrineMigrations   | %s |', str_pad(sys_get_temp_dir(), 70)),
                 26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
             ],
             $lines
@@ -121,7 +127,7 @@ class StatusCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay())));
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
         self::assertSame(
             [
                 0 => '+----------------------+----------------------+------------------------------------------------------------------------+',
@@ -149,7 +155,7 @@ class StatusCommandTest extends MigrationTestCase
                 22 => '|                      | Available            | 2                                                                      |',
                 23 => '|                      | New                  | 1                                                                      |',
                 24 => '|----------------------------------------------------------------------------------------------------------------------|',
-                25 => '| Migration Namespaces | DoctrineMigrations   | /tmp                                                                   |',
+                25 => sprintf('| Migration Namespaces | DoctrineMigrations   | %s |', str_pad(sys_get_temp_dir(), 70)),
                 26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
                 27 => '+-----------+--------------+---------------------+-------------+',
                 28 => '| Available Migration Versions                                 |',
