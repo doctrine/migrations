@@ -58,6 +58,7 @@ return [
     'check_database_platform' => true,
 ];
 ```
+
 Files in XML, YAML or JSON also changed in a similar way. Please refer to the official documentation for more details.
 
 ## Code BC breaks
