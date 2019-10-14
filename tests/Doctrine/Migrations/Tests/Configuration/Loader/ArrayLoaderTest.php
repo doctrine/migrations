@@ -24,9 +24,7 @@ class ArrayLoaderTest extends TestCase
         $this->expectException(InvalidConfigurationKey::class);
         $this->expectExceptionMessage('Migrations configuration key "foo" does not exist');
         $loader = new ArrayLoader();
-        $loader->load([
-            'foo' => 'aaa'
-        ]);
+        $loader->load(['foo' => 'aaa']);
     }
 
     public function testInvalidKeyInteger() : void
@@ -34,8 +32,6 @@ class ArrayLoaderTest extends TestCase
         $this->expectException(InvalidConfigurationKey::class);
         $this->expectExceptionMessage('Migrations configuration key "0" does not exist.');
         $loader = new ArrayLoader();
-        $loader->load([
-            'aaa'
-        ]);
+        $loader->load(['aaa']);
     }
 }

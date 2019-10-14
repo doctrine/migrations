@@ -8,7 +8,6 @@ use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\UnableToLoadResource;
-use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;
@@ -78,18 +77,18 @@ final class ArrayLoader implements Loader
     {
         foreach ($data as $configurationKey => $configurationValue) {
             if (! isset($configMap[$configurationKey])) {
-                throw InvalidConfigurationKey::new((string)$configurationKey);
+                throw InvalidConfigurationKey::new((string) $configurationKey);
             }
 
             if (is_array($configMap[$configurationKey])) {
-                if ($configurationKey === 'table_storage') {
-                    $storageConfig = new TableMetadataStorageConfiguration();
-                    assert($object instanceof Configuration);
-                    $object->setMetadataStorageConfiguration($storageConfig);
-                    self::applyConfigs($configMap[$configurationKey], $storageConfig, $configurationValue);
-                } else {
-                    throw InvalidConfigurationKey::new((string)$configurationKey);
+                if ($configurationKey !== 'table_storage') {
+                    throw InvalidConfigurationKey::new((string) $configurationKey);
                 }
+
+                $storageConfig = new TableMetadataStorageConfiguration();
+                assert($object instanceof Configuration);
+                $object->setMetadataStorageConfiguration($storageConfig);
+                self::applyConfigs($configMap[$configurationKey], $storageConfig, $configurationValue);
             } else {
                 $callable = $configMap[$configurationKey] instanceof Closure
                     ? $configMap[$configurationKey]
