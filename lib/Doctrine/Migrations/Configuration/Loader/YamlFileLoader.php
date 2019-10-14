@@ -24,9 +24,9 @@ final class YamlFileLoader extends AbstractFileLoader
     /** @var ArrayLoader */
     private $arrayLoader;
 
-    public function __construct(?ArrayLoader $arrayLoader = null)
+    public function __construct()
     {
-        $this->arrayLoader = $arrayLoader ?: new ArrayLoader();
+        $this->arrayLoader = new ArrayLoader();
     }
 
     /**
