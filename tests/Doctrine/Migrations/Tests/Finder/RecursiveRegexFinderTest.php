@@ -9,6 +9,7 @@ use InvalidArgumentException;
 use const PHP_OS;
 use function count;
 use function in_array;
+use function sort;
 use function stripos;
 
 class RecursiveRegexFinderTest extends FinderTestCase
@@ -61,10 +62,15 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
-        self::assertSame([
+        $expectedVersions = [
             'TestMigrations\\MultiNested\\Version0001',
             'TestMigrations\\MultiNested\\Deep\\Version0002',
-        ], $versions);
+        ];
+
+        sort($expectedVersions);
+        sort($versions);
+
+        self::assertSame($expectedVersions, $versions);
     }
 
     public function testMigrationsInSubnamespaceAreLoadedIfNamespaceIsParentNamespace() : void
@@ -74,10 +80,15 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested'
         );
 
-        self::assertSame([
+        $expectedVersions = [
             'TestMigrations\MultiNested\Version0001',
             'TestMigrations\MultiNested\Deep\Version0002',
-        ], $versions);
+        ];
+
+        sort($expectedVersions);
+        sort($versions);
+
+        self::assertSame($expectedVersions, $versions);
     }
 
     public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided() : void
