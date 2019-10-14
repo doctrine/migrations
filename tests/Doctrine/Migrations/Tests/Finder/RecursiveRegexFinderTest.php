@@ -39,6 +39,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\Version20150502000004',
             'TestMigrations\\Version20150502000005',
             'TestMigrations\\Version1ResetVersions',
+            'TestMigrations\\DifferentNamingSchema',
         ];
 
         if (stripos(PHP_OS, 'Win') === false) {
