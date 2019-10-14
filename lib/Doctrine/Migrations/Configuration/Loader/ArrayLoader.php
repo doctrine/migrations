@@ -8,6 +8,7 @@ use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\UnableToLoadResource;
+use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;
@@ -71,13 +72,13 @@ final class ArrayLoader implements Loader
     /**
      * @param mixed[]                                         $configMap
      * @param Configuration|TableMetadataStorageConfiguration $object
-     * @param mixed[]                                         $data
+     * @param array<string|int,mixed>                         $data
      */
     private static function applyConfigs(array $configMap, $object, array $data) : void
     {
         foreach ($data as $configurationKey => $configurationValue) {
             if (! isset($configMap[$configurationKey])) {
-                throw InvalidConfigurationKey::new($configurationKey);
+                throw InvalidConfigurationKey::new((string)$configurationKey);
             }
 
             if (is_array($configMap[$configurationKey])) {
@@ -86,6 +87,8 @@ final class ArrayLoader implements Loader
                     assert($object instanceof Configuration);
                     $object->setMetadataStorageConfiguration($storageConfig);
                     self::applyConfigs($configMap[$configurationKey], $storageConfig, $configurationValue);
+                } else {
+                    throw InvalidConfigurationKey::new((string)$configurationKey);
                 }
             } else {
                 $callable = $configMap[$configurationKey] instanceof Closure
