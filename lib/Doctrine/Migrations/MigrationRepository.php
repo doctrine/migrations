@@ -63,10 +63,11 @@ class MigrationRepository
         $this->registerMigrations($classes);
     }
 
-    /** @throws MigrationException */
+    /**
+     * @internal DO NOT USE, THIS METHOD IS HERE ONLY TO EASE THE TESTING, WILL BE REMOVED IN UPCOMING MINOR/BUGFIX RELEASE
+     */
     public function registerMigrationInstance(Version $version, AbstractMigration $migration) : AvailableMigration
     {
-        // todo mark private
         if (isset($this->migrations[(string) $version])) {
             throw DuplicateMigrationVersion::new(
                 (string) $version,
