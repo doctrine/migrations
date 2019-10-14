@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
+use Doctrine\Migrations\Exception\PlanAlreadyExecuted;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Version\Direction;
@@ -87,10 +88,20 @@ class MigrationPlanListTest extends TestCase
         self::assertNull($this->m1->getResult());
     }
 
+    public function testPlanResultCanBeSetOnlyOnce() : void
+    {
+        $this->expectException(PlanAlreadyExecuted::class);
+        $this->expectExceptionMessage('This plan was already marked as executed.');
+
+        $result = new ExecutionResult(new Version('A'), Direction::UP);
+        $this->m1->markAsExecuted($result);
+        $this->m1->markAsExecuted($result);
+    }
+
     public function testPlanResult() : void
     {
         $result = new ExecutionResult(new Version('A'), Direction::UP);
-        $this->m1->setResult($result);
+        $this->m1->markAsExecuted($result);
 
         self::assertSame($result, $this->m1->getResult());
     }

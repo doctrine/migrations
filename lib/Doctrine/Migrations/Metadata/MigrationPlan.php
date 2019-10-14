@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Metadata;
 
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\PlanAlreadyExecuted;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 
@@ -37,8 +38,12 @@ final class MigrationPlan
         return $this->result;
     }
 
-    public function setResult(ExecutionResult $result) : void
+    public function markAsExecuted(ExecutionResult $result) : void
     {
+        if ($this->result !== null) {
+            throw PlanAlreadyExecuted::new();
+        }
+
         $this->result = $result;
     }
 
