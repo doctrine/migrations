@@ -225,7 +225,7 @@ final class Executor implements ExecutorInterface
 
         $result->setTime($stopwatchEvent->getDuration());
         $result->setMemory($stopwatchEvent->getMemory());
-        $plan->setResult($result);
+        $plan->markAsExecuted($result);
 
         if (! $configuration->isDryRun()) {
             $this->metadataStorage->complete($result);
@@ -279,7 +279,7 @@ final class Executor implements ExecutorInterface
 
     private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
     {
-        $plan->setResult($result);
+        $plan->markAsExecuted($result);
         $this->logResult($e, $result, $plan);
 
         $this->dispatcher->dispatchVersionEvent(
