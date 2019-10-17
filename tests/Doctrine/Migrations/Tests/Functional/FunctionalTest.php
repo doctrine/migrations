@@ -61,7 +61,7 @@ class FunctionalTest extends MigrationTestCase
      */
     public function testDoctrineMigrationsBin() : void
     {
-        $process = new Process(__DIR__ . '/../../../../../bin/doctrine-migrations');
+        $process = new Process([__DIR__ . '/../../../../../bin/doctrine-migrations']);
         $process->run();
 
         self::assertTrue($process->isSuccessful());
