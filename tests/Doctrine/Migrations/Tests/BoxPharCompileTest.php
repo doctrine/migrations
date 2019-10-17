@@ -9,7 +9,6 @@ use Symfony\Component\Process\Process;
 use function assert;
 use function file_exists;
 use function realpath;
-use function sprintf;
 
 /**
  * @requires OS Linux|Darwin
@@ -28,9 +27,7 @@ class BoxPharCompileTest extends TestCase
 
         assert($boxPharPath !== false);
 
-        $compilePharCommand = sprintf('php %s compile -vvv', $boxPharPath);
-
-        $process = new Process($compilePharCommand);
+        $process = new Process(['php', $boxPharPath, 'compile', '-vvv']);
         $process->run();
 
         $doctrinePharPath = realpath(__DIR__ . '/../../../../build/doctrine-migrations.phar');
@@ -40,11 +37,9 @@ class BoxPharCompileTest extends TestCase
         self::assertTrue($process->isSuccessful());
         self::assertTrue(file_exists($doctrinePharPath));
 
-        $runDoctrinePharCommand = sprintf('php %s', $doctrinePharPath);
-
         $successful = true;
 
-        $process = new Process($runDoctrinePharCommand);
+        $process = new Process(['php', $doctrinePharPath]);
 
         $process->start(static function ($type) use (&$successful) : void {
             if ($type !== 'err') {
