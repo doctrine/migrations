@@ -13,7 +13,7 @@ use DateTimeZone;
 
     public function generateClassName(string $namespace) : string
     {
-        return $namespace . '\\' . $this->generateVersionNumber();
+        return $namespace . '\\Version' . $this->generateVersionNumber();
     }
 
     private function generateVersionNumber() : string
