@@ -9,9 +9,11 @@ use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -51,10 +53,49 @@ class TableMetadataStorageTest extends TestCase
         $this->storage = new TableMetadataStorage($this->connection, $this->config);
     }
 
-    public function testTableCreatedOnRead() : void
+    public function testDifferentTableNotUpdatedOnRead() : void
     {
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
+
+        $table = new Table($this->config->getTableName());
+        $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+        $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+        $this->schemaManager->createTable($table);
+
         $this->storage->getExecutedMigrations();
-        self::assertTrue($this->schemaManager->tablesExist([$this->config->getTableName()]));
+    }
+
+    public function testTableNotCreatedOnRead() : void
+    {
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not initialized, please run the sync-metadata-storage command to fix this issue.');
+        $this->storage->getExecutedMigrations();
+    }
+
+    public function testTableStructureUpdate() : void
+    {
+        $config = new TableMetadataStorageConfiguration();
+        $config->setTableName('a');
+        $config->setVersionColumnName('b');
+        $config->setVersionColumnLength(199);
+        $config->setExecutedAtColumnName('c');
+        $config->setExecutionTimeColumnName('d');
+
+        $table = new Table($config->getTableName());
+        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+        $table->setPrimaryKey([$config->getVersionColumnName()]);
+        $this->schemaManager->createTable($table);
+
+        $storage = new TableMetadataStorage($this->connection, $config);
+
+        $storage->ensureInitialized();
+
+        $table = $this->schemaManager->listTableDetails($config->getTableName());
+
+        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
     }
 
     public function testTableStructure() : void
@@ -67,8 +108,8 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutionTimeColumnName('d');
 
         $storage = new TableMetadataStorage($this->connection, $config);
-        // trigger table creation
-        $storage->getExecutedMigrations();
+
+        $storage->ensureInitialized();
 
         $table = $this->schemaManager->listTableDetails($config->getTableName());
 
@@ -79,6 +120,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testComplete() : void
     {
+        $this->storage->ensureInitialized();
+
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.0);
         $this->storage->complete($result);
@@ -121,6 +164,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testRead() : void
     {
+        $this->storage->ensureInitialized();
+
         $date    = new DateTimeImmutable('2010-01-05 10:30:21');
         $result1 = new ExecutionResult(new Version('1230'), Direction::UP, $date);
         $result1->setTime(31.0);
@@ -160,6 +205,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testCompleteDownRemovesTheRow() : void
     {
+        $this->storage->ensureInitialized();
+
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.0);
         $this->storage->complete($result);
@@ -179,6 +226,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testReset() : void
     {
+        $this->storage->ensureInitialized();
+
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.0);
         $this->storage->complete($result);

@@ -13,6 +13,7 @@ use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
+use Doctrine\Migrations\Tools\Console\Command\SyncMetadataCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use PackageVersions\Versions;
@@ -59,6 +60,7 @@ class ConsoleRunner
             new StatusCommand(),
             new VersionCommand(),
             new UpToDateCommand(),
+            new SyncMetadataCommand(),
         ]);
 
         if (! $cli->getHelperSet()->has('em')) {

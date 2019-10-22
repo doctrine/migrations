@@ -132,6 +132,7 @@ EOT
             return 1;
         }
 
+        $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
         $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;

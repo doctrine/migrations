@@ -46,6 +46,7 @@ class LatestCommandTest extends MigrationTestCase
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
+        $this->metadataStorage->ensureInitialized();
 
         $this->command       = new LatestCommand(null, $dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
