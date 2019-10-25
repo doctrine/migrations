@@ -36,6 +36,25 @@ abstract class AbstractLoaderTest extends TestCase
         self::assertSame('doctrine_migration_executed_at_column_test', $storage->getExecutedAtColumnName());
     }
 
+    public function testLoadBasic() : void
+    {
+        $config = $this->load('basic');
+
+        self::assertNull($config->getName());
+        self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
+
+        self::assertSame([], $config->getMigrationClasses());
+
+        $storage = $config->getMetadataStorageConfiguration();
+        self::assertInstanceOf(TableMetadataStorageConfiguration::class, $storage);
+
+        self::assertSame('doctrine_migration_versions', $storage->getTableName());
+        self::assertSame('version', $storage->getVersionColumnName());
+        self::assertSame(1024, $storage->getVersionColumnLength());
+        self::assertSame('execution_time', $storage->getExecutionTimeColumnName());
+        self::assertSame('executed_at', $storage->getExecutedAtColumnName());
+    }
+
     public function testConfigurationFileNotExists() : void
     {
         $this->expectException(InvalidArgumentException::class);
