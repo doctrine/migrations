@@ -65,6 +65,10 @@ final class ArrayLoader implements Loader
         $object = new Configuration();
         self::applyConfigs($configMap, $object, $array);
 
+        if ($object->getMetadataStorageConfiguration() === null) {
+            $object->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
+        }
+
         return $object;
     }
 
