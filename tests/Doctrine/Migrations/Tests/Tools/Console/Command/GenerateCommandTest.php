@@ -41,6 +41,11 @@ final class GenerateCommandTest extends TestCase
 
         $input->expects(self::at(1))
             ->method('getOption')
+            ->with('with-down-migration')
+            ->willReturn(true);
+
+        $input->expects(self::at(2))
+            ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 

@@ -76,7 +76,8 @@ class SchemaDumper
         string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
-        int $lineLength = 120
+        int $lineLength = 120,
+        bool $includeDownMigration = false
     ) : string {
         $schema = $this->schemaManager->createSchema();
 
@@ -100,6 +101,9 @@ class SchemaDumper
                 $up[] = $upCode;
             }
 
+            if (! $includeDownMigration) {
+                continue;
+            }
             $downSql = [$this->platform->getDropTableSQL($table)];
 
             $downCode = $this->migrationSqlGenerator->generate(
@@ -119,13 +123,14 @@ class SchemaDumper
             throw NoTablesFound::new();
         }
 
-        $up   = implode("\n", $up);
-        $down = implode("\n", $down);
+        $up = implode("\n", $up);
 
         return $this->migrationGenerator->generateMigration(
             $fqcn,
             $up,
-            $down
+            null,
+            null,
+            $includeDownMigration ? null : ''
         );
     }
 

@@ -8,16 +8,18 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
+use function assert;
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
 use function implode;
 use function is_file;
 use function is_readable;
+use function is_string;
 use function preg_match;
 use function preg_replace;
+use function preg_replace_callback;
 use function sprintf;
-use function strtr;
 use function trim;
 
 /**
@@ -47,18 +49,18 @@ final class <className> extends AbstractMigration
         return '';
     }
 
-    public function up(Schema $schema) : void
+<upMethod,    public function up(Schema $schema) : void
     {
         // this up() migration is auto-generated, please modify it to your needs
 <up>
     }
 
-    public function down(Schema $schema) : void
+><downMethod,    public function down(Schema $schema) : void
     {
         // this down() migration is auto-generated, please modify it to your needs
 <down>
     }
-}
+>}
 
 TEMPLATE;
 
@@ -76,7 +78,9 @@ TEMPLATE;
     public function generateMigration(
         string $fqcn,
         ?string $up = null,
-        ?string $down = null
+        ?string $down = null,
+        ?string $upMethod = null,
+        ?string $downMethod = null
     ) : string {
         $mch = [];
         if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
@@ -92,13 +96,37 @@ TEMPLATE;
         $dir = $dirs[$namespace];
 
         $replacements = [
-            '<namespace>' => $namespace,
-            '<className>' => $className,
-            '<up>' => $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
-            '<down>' => $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
+            'namespace' => $namespace,
+            'className' => $className,
+            'up' => $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
+            'down' => $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
         ];
 
-        $code = strtr($this->getTemplate(), $replacements);
+        if ($upMethod !== null) {
+            $replacements['upMethod'] = $upMethod;
+        }
+
+        if ($downMethod !== null) {
+            $replacements['downMethod'] = $downMethod;
+        }
+        $code = $this->getTemplate();
+
+        for ($i = 0; $i<2; $i++) {
+            $code = preg_replace_callback('/\<(?:[^<>]+|(?R))*+\>/m', static function (array $mch) use ($replacements) : string {
+                $subMatch = [];
+                if (preg_match('/^\<([a-z]+)\>$/i', $mch[0], $subMatch)!==0) {
+                    return $replacements[$subMatch[1]] ?? '';
+                }
+
+                if (preg_match('/\<([a-z]+),(.+)\>/ixs', $mch[0], $subMatch)!==0) {
+                    return $replacements[$subMatch[1]] ?? $subMatch[2];
+                }
+
+                return '';
+            }, $code);
+            assert(is_string($code));
+        }
+
         $code = preg_replace('/^ +$/m', '', $code);
 
         $directoryHelper = new MigrationDirectoryHelper();

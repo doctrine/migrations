@@ -38,6 +38,12 @@ class GenerateCommand extends AbstractCommand
                 InputOption::VALUE_REQUIRED,
                 'The namespace to use for the migration (must be in the list of configured namespaces)'
             )
+            ->addOption(
+                'with-down-migration',
+                null,
+                InputOption::VALUE_NONE,
+                'Generate down() migrations.'
+            )
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command generates a blank migration class:
 
@@ -58,7 +64,8 @@ EOT
 
         $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 
-        $namespace = $input->getOption('namespace') ?: null;
+        $namespace            = $input->getOption('namespace') ?: null;
+        $includeDownMigration = $input->getOption('with-down-migration');
 
         $dirs = $configuration->getMigrationDirectories();
         if ($namespace === null) {
@@ -70,7 +77,13 @@ EOT
 
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
-        $path = $migrationGenerator->generateMigration($fqcn);
+        $path = $migrationGenerator->generateMigration(
+            $fqcn,
+            null,
+            null,
+            null,
+            $includeDownMigration ? null : ''
+        );
 
         $editorCommand = $input->getOption('editor-cmd');
 

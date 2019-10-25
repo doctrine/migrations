@@ -13,6 +13,7 @@ use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Psr\Log\LoggerInterface;
 use function func_get_args;
+use function sprintf;
 
 /**
  * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
@@ -111,7 +112,10 @@ abstract class AbstractMigration
 
     abstract public function up(Schema $schema) : void;
 
-    abstract public function down(Schema $schema) : void;
+    public function down(Schema $schema) : void
+    {
+        $this->abortIf(true, sprintf('No down() migration provided for "%s"', static::class));
+    }
 
     /**
      * @param mixed[] $params

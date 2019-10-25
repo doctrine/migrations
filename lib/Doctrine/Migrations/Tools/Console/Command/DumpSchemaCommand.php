@@ -73,6 +73,12 @@ EOT
                 InputOption::VALUE_OPTIONAL,
                 'Max line length of unformatted lines.',
                 120
+            )
+            ->addOption(
+                'with-down-migration',
+                null,
+                InputOption::VALUE_NONE,
+                'Generate down() migrations.'
             );
     }
 
@@ -83,8 +89,9 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : ?int {
-        $formatted  = $input->getOption('formatted');
-        $lineLength = (int) $input->getOption('line-length');
+        $formatted            = $input->getOption('formatted');
+        $lineLength           = (int) $input->getOption('line-length');
+        $includeDownMigration = $input->getOption('with-down-migration');
 
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
         $versions     = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
@@ -116,7 +123,8 @@ EOT
             $fqcn,
             $input->getOption('filter-tables'),
             $formatted,
-            $lineLength
+            $lineLength,
+            $includeDownMigration === true
         );
 
         $editorCommand = $input->getOption('editor-cmd');

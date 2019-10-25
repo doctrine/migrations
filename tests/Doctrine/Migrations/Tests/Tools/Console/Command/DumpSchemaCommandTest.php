@@ -72,15 +72,20 @@ final class DumpSchemaCommandTest extends TestCase
 
         $input->expects(self::at(2))
             ->method('getOption')
+            ->with('with-down-migration')
+            ->willReturn(true);
+
+        $input->expects(self::at(3))
+            ->method('getOption')
             ->with('namespace')
             ->willReturn(null);
 
-        $input->expects(self::at(3))
+        $input->expects(self::at(4))
             ->method('getOption')
             ->with('filter-tables')
             ->willReturn(['/foo/']);
 
-        $input->expects(self::at(4))
+        $input->expects(self::at(5))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('test');

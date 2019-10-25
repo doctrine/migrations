@@ -72,6 +72,44 @@ class SchemaDumperTest extends TestCase
             ->method('getCreateTableSQL')
             ->willReturn(['CREATE TABLE test']);
 
+        $this->platform->expects(self::never())
+            ->method('getDropTableSQL')
+            ->willReturn('DROP TABLE test');
+
+        $this->migrationSqlGenerator->expects(self::once())
+            ->method('generate')
+            ->with(['CREATE TABLE test'])
+            ->willReturn('up');
+
+        $this->migrationGenerator->expects(self::once())
+            ->method('generateMigration')
+            ->with('Foo\\1234', 'up', null, null, '')
+            ->willReturn('/path/to/migration.php');
+
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
+    }
+
+    public function testDumpWithDownMigration() : void
+    {
+        $table = $this->createMock(Table::class);
+        $table->expects(self::once())
+            ->method('getName')
+            ->willReturn('test');
+
+        $schema = $this->createMock(Schema::class);
+
+        $this->schemaManager->expects(self::once())
+            ->method('createSchema')
+            ->willReturn($schema);
+
+        $schema->expects(self::once())
+            ->method('getTables')
+            ->willReturn([$table]);
+
+        $this->platform->expects(self::once())
+            ->method('getCreateTableSQL')
+            ->willReturn(['CREATE TABLE test']);
+
         $this->platform->expects(self::once())
             ->method('getDropTableSQL')
             ->willReturn('DROP TABLE test');
@@ -88,10 +126,10 @@ class SchemaDumperTest extends TestCase
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
-            ->with('Foo\\1234', 'up', 'down')
+            ->with('Foo\\1234', 'up', null, null, '')
             ->willReturn('/path/to/migration.php');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
+        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', [], false, 120, true));
     }
 
     public function testExcludedTableIsNotInTheDump() : void
