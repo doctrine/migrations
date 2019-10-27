@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
@@ -63,12 +64,28 @@ class DependencyFactory
     /** @var EntityManagerInterface|null */
     private $em;
 
+    /** @var bool */
+    private $frozen = false;
+
     public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
     {
         $this->configuration = $configuration;
         $this->logger        = $logger ?: new NullLogger();
         $this->connection    = $connection;
         $this->em            = $em;
+    }
+
+    public function freeze() : void
+    {
+        $this->frozen = true;
+        $this->configuration->freeze();
+    }
+
+    private function assertNotFrozen() : void
+    {
+        if ($this->frozen) {
+            throw FrozenDependencies::new();
+        }
     }
 
     public function getConfiguration() : Configuration
@@ -181,6 +198,7 @@ class DependencyFactory
 
     public function setSorter(callable $sorter) : void
     {
+        $this->assertNotFrozen();
         $this->sorter = $sorter;
     }
 
@@ -197,9 +215,13 @@ class DependencyFactory
         });
     }
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfigration) : void
+    /**
+     * @param mixed $service
+     */
+    public function setService(string $id, $service) : void
     {
-        $this->dependencies[MetadataStorageConfiguration::class] = $metadataStorageConfigration;
+        $this->assertNotFrozen();
+        $this->dependencies[$id] = $service;
     }
 
     private function getMetadataStorageConfiguration() : MetadataStorageConfiguration

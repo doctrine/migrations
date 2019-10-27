@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration;
 
+use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
 use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
@@ -49,8 +50,27 @@ final class Configuration
     /** @var MetadataStorageConfiguration */
     private $metadataStorageConfiguration;
 
+    /** @var bool */
+    private $frozen = false;
+
+    public function freeze() : void
+    {
+        if (! $this->frozen) {
+            $this->validate();
+        }
+        $this->frozen = true;
+    }
+
+    private function assertNotFrozen() : void
+    {
+        if ($this->frozen) {
+            throw FrozenConfiguration::new();
+        }
+    }
+
     public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfiguration) : void
     {
+        $this->assertNotFrozen();
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
 
@@ -64,6 +84,7 @@ final class Configuration
 
     public function addMigrationClass(string $className) : void
     {
+        $this->assertNotFrozen();
         $this->migrationClasses[] = $className;
     }
 
@@ -74,6 +95,7 @@ final class Configuration
 
     public function addMigrationsDirectory(string $namespace, string $path) : void
     {
+        $this->assertNotFrozen();
         $this->migrationsDirectories[$namespace] = $path;
     }
 
@@ -87,6 +109,7 @@ final class Configuration
 
     public function setName(string $name) : void
     {
+        $this->assertNotFrozen();
         $this->name = $name;
     }
 
@@ -97,6 +120,7 @@ final class Configuration
 
     public function setCustomTemplate(?string $customTemplate) : void
     {
+        $this->assertNotFrozen();
         $this->customTemplate = $customTemplate;
     }
 
@@ -116,6 +140,7 @@ final class Configuration
     public function setMigrationsAreOrganizedByYear(
         bool $migrationsAreOrganizedByYear = true
     ) : void {
+        $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
     }
 
@@ -125,6 +150,7 @@ final class Configuration
     public function setMigrationsAreOrganizedByYearAndMonth(
         bool $migrationsAreOrganizedByYearAndMonth = true
     ) : void {
+        $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear         = $migrationsAreOrganizedByYearAndMonth;
         $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
     }
@@ -134,8 +160,7 @@ final class Configuration
         return $this->migrationsAreOrganizedByYearAndMonth;
     }
 
-    /** @throws MigrationException */
-    public function validate() : void
+    private function validate() : void
     {
         if (count($this->migrationsDirectories) === 0) {
             throw MissingNamespaceConfiguration::new();
@@ -144,6 +169,7 @@ final class Configuration
 
     public function setIsDryRun(bool $isDryRun) : void
     {
+        $this->assertNotFrozen();
         $this->isDryRun = $isDryRun;
     }
 
@@ -154,6 +180,7 @@ final class Configuration
 
     public function setAllOrNothing(bool $allOrNothing) : void
     {
+        $this->assertNotFrozen();
         $this->allOrNothing = $allOrNothing;
     }
 
@@ -174,6 +201,7 @@ final class Configuration
 
     public function setMigrationOrganization(string $migrationOrganization) : void
     {
+        $this->assertNotFrozen();
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();
         } elseif (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {

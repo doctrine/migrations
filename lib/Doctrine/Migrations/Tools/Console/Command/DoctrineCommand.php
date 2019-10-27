@@ -31,14 +31,6 @@ abstract class DoctrineCommand extends Command
     /** @var DependencyFactory|null */
     private $dependencyFactory;
 
-    public function initialize(
-        InputInterface $input,
-        OutputInterface $output
-    ) : void {
-        $this->initializeDependencies($input, $output);
-        $this->getDependencyFactory()->getConfiguration()->validate();
-    }
-
     public function __construct(?string $name = null, ?DependencyFactory $dependencyFactory = null)
     {
         parent::__construct($name);
@@ -74,13 +66,14 @@ abstract class DoctrineCommand extends Command
         $output->writeln('');
     }
 
-    protected function initializeDependencies(
-        InputInterface $input,
-        OutputInterface $output
-    ) : void {
+    protected function initialize(InputInterface $input, OutputInterface $output) : void
+    {
         if ($this->dependencyFactory !== null) {
+            $this->dependencyFactory->freeze();
+
             return;
         }
+
         $helperSet = $this->getHelperSet() ?: new HelperSet();
 
         if ($helperSet->has('configuration') && $helperSet->get('configuration') instanceof ConfigurationHelper) {
@@ -104,6 +97,7 @@ abstract class DoctrineCommand extends Command
 
         $logger                  = new ConsoleLogger($output);
         $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
+        $this->dependencyFactory->freeze();
     }
 
     protected function getDependencyFactory() : DependencyFactory
