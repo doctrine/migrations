@@ -130,7 +130,7 @@ final class TableMetadataStorage implements MetadataStorage
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
-                $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
+                $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) $result->getTime(),
             ], [
                 Type::STRING,
                 Type::DATETIME,
