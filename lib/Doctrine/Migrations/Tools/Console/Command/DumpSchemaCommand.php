@@ -12,10 +12,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function addslashes;
 use function assert;
 use function class_exists;
-use function count;
 use function is_string;
 use function key;
 use function sprintf;
+use function strpos;
 
 /**
  * The DumpSchemaCommand class is responsible for dumping your current database schema to a migration class. This is
@@ -87,11 +87,6 @@ EOT
         $lineLength = (int) $input->getOption('line-length');
 
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
-        $versions     = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
-
-        if (count($versions) > 0) {
-            throw SchemaDumpRequiresNoMigrations::new();
-        }
 
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
@@ -109,6 +104,8 @@ EOT
             $namespace = key($dirs);
         }
         assert(is_string($namespace));
+
+        $this->checkNoPreviousDumpExistsForNamespace($namespace);
 
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
@@ -143,5 +140,15 @@ EOT
         ]);
 
         return 0;
+    }
+
+    private function checkNoPreviousDumpExistsForNamespace(string $namespace) : void
+    {
+        $migrations = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
+        foreach ($migrations->getItems() as $migration) {
+            if (strpos((string) $migration->getVersion(), $namespace) !== false) {
+                throw SchemaDumpRequiresNoMigrations::new($namespace);
+            }
+        }
     }
 }
