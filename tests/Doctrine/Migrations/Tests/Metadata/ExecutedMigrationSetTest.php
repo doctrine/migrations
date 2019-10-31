@@ -116,9 +116,9 @@ class ExecutedMigrationSetTest extends TestCase
     public function testExecutedMigrationWithTiming() : void
     {
         $date = new DateTimeImmutable();
-        $m1   = new ExecutedMigration(new Version('A'), $date, 123);
+        $m1   = new ExecutedMigration(new Version('A'), $date, 123.0);
 
         self::assertSame($date, $m1->getExecutedAt());
-        self::assertSame(123, $m1->getExecutionTime());
+        self::assertSame(123.0, $m1->getExecutionTime());
     }
 }

@@ -16,20 +16,20 @@ final class ExecutedMigration
     private $executedAt;
 
     /**
-     * Milliseconds
+     * Seconds
      *
-     * @var int|null
+     * @var float|null
      */
     public $executionTime;
 
-    public function __construct(Version $version, ?DateTimeImmutable $executedAt = null, ?int $executionTime = null)
+    public function __construct(Version $version, ?DateTimeImmutable $executedAt = null, ?float $executionTime = null)
     {
         $this->version       = $version;
         $this->executedAt    = $executedAt;
         $this->executionTime = $executionTime;
     }
 
-    public function getExecutionTime() : ?int
+    public function getExecutionTime() : ?float
     {
         return $this->executionTime;
     }

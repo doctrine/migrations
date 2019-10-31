@@ -19,7 +19,8 @@ use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
 use const CASE_LOWER;
 use function array_change_key_case;
-use function intval;
+use function floatval;
+use function round;
 use function sprintf;
 use function strtolower;
 
@@ -91,7 +92,7 @@ final class TableMetadataStorage implements MetadataStorage
                 : null;
 
             $executionTime = isset($row[strtolower($this->configuration->getExecutionTimeColumnName())])
-                ? intval($row[strtolower($this->configuration->getExecutionTimeColumnName())])
+                ? floatval($row[strtolower($this->configuration->getExecutionTimeColumnName())]/1000)
                 : null;
 
             $migration = new ExecutedMigration(
@@ -130,7 +131,7 @@ final class TableMetadataStorage implements MetadataStorage
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
-                $this->configuration->getExecutionTimeColumnName() => $result->getTime(),
+                $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : round($result->getTime()*1000),
             ], [
                 Type::STRING,
                 Type::DATETIME,
