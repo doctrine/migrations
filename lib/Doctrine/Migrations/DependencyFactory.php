@@ -65,6 +65,10 @@ class DependencyFactory
 
     public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
     {
+        if ($configuration->getMetadataStorageConfiguration() instanceof MetadataStorageConfigration) {
+            $this->setMetadataStorageConfiguration($configuration->getMetadataStorageConfiguration());
+        }
+
         $this->configuration = $configuration;
         $this->logger        = $logger ?: new NullLogger();
         $this->connection    = $connection;
