@@ -75,6 +75,11 @@ class DependencyFactory
         $this->em            = $em;
     }
 
+    public function setLogger(LoggerInterface $logger) : void
+    {
+        $this->logger = $logger;
+    }
+
     public function getConfiguration() : Configuration
     {
         return $this->configuration;
