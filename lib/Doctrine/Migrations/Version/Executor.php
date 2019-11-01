@@ -225,11 +225,6 @@ final class Executor implements ExecutorInterface
 
         $result->setTime($stopwatchEvent->getDuration());
         $result->setMemory($stopwatchEvent->getMemory());
-        $plan->markAsExecuted($result);
-
-        if (! $configuration->isDryRun()) {
-            $this->metadataStorage->complete($result);
-        }
 
         $params = [
             'version' => (string) $plan->getVersion(),
@@ -240,11 +235,16 @@ final class Executor implements ExecutorInterface
 
         $this->logger->info('Migration {version} {direction} (took {time}ms, used {memory} memory)', $params);
 
+        if (! $configuration->isDryRun()) {
+            $this->metadataStorage->complete($result);
+        }
+
         if ($migration->isTransactional()) {
             //commit only if running in transactional mode
             $this->connection->commit();
         }
 
+        $plan->markAsExecuted($result);
         $result->setState(State::NONE);
 
         $this->dispatcher->dispatchVersionEvent(
@@ -279,21 +279,19 @@ final class Executor implements ExecutorInterface
 
     private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
     {
+        $migration = $plan->getMigration();
+        if ($migration->isTransactional()) {
+            //only rollback transaction if in transactional mode
+            $this->connection->rollBack();
+        }
+
         $plan->markAsExecuted($result);
         $this->logResult($e, $result, $plan);
-
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionSkipped,
             $plan,
             $configuration
         );
-
-        $migration = $plan->getMigration();
-
-        if ($migration->isTransactional()) {
-            //only rollback transaction if in transactional mode
-            $this->connection->rollBack();
-        }
 
         if ($configuration->isDryRun() || $result->isSkipped() || $result->hasError()) {
             return;
