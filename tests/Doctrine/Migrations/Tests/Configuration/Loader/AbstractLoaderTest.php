@@ -17,6 +17,25 @@ abstract class AbstractLoaderTest extends TestCase
 {
     abstract public function load(string $prefix = '') : Configuration;
 
+    public function testLoadMinimal() : void
+    {
+        $config = $this->load('minimal');
+
+        self::assertNull($config->getName());
+        self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
+
+        self::assertSame([], $config->getMigrationClasses());
+
+        $storage = $config->getMetadataStorageConfiguration();
+        self::assertInstanceOf(TableMetadataStorageConfiguration::class, $storage);
+
+        self::assertSame('doctrine_migration_versions', $storage->getTableName());
+        self::assertSame('version', $storage->getVersionColumnName());
+        self::assertSame(1024, $storage->getVersionColumnLength());
+        self::assertSame('execution_time', $storage->getExecutionTimeColumnName());
+        self::assertSame('executed_at', $storage->getExecutedAtColumnName());
+    }
+
     public function testLoad() : void
     {
         $config = $this->load();
