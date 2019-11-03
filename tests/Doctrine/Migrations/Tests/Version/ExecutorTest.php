@@ -112,6 +112,27 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
+    public function testExecuteUsedExecuteUpdate() : void
+    {
+        $this->connection
+            ->expects(self::never())
+            ->method('executeQuery');
+
+        $this->connection
+            ->expects(self::exactly(2))
+            ->method('executeUpdate');
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
+        $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+    }
+
     /**
      * @test
      */
