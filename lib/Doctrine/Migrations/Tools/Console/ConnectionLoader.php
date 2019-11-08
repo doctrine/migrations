@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\Loader\ArrayConnectionConfigurationLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\NoConnectionLoader;
+use Doctrine\Migrations\Configuration\Connection\Loader\ShardedConnectionLoader;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
@@ -15,19 +16,19 @@ use Symfony\Component\Console\Helper\HelperSet;
  *
  * @internal
  */
-class ConnectionLoader
+final class ConnectionLoader
 {
     public function getConnection(
         ?string $dbConfig,
+        ?string $shard,
         HelperSet $helperSet
     ) : Connection {
-        $loader = new ArrayConnectionConfigurationLoader(
-            $dbConfig,
-            new ArrayConnectionConfigurationLoader(
-                'migrations-db.php',
-                new ConnectionHelperLoader('connection', new NoConnectionLoader(), $helperSet)
-            )
-        );
+        // create a chain of connection loaders
+        $loader = new NoConnectionLoader();
+        $loader = new ConnectionHelperLoader('connection', $loader, $helperSet);
+        $loader = new ArrayConnectionConfigurationLoader('migrations-db.php', $loader);
+        $loader = new ArrayConnectionConfigurationLoader($dbConfig, $loader);
+        $loader = new ShardedConnectionLoader($shard, $loader);
 
         return $loader->getConnection();
     }

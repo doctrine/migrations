@@ -60,6 +60,13 @@ abstract class AbstractCommand extends Command
             InputOption::VALUE_OPTIONAL,
             'The path to a database connection configuration file.'
         );
+
+        $this->addOption(
+            'shard',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The shard connection to use for this command.'
+        );
     }
 
     protected function outputHeader(
@@ -74,11 +81,19 @@ abstract class AbstractCommand extends Command
         $output->writeln('');
     }
 
+    private function enusreLogger(OutputInterface $output, DependencyFactory $dependencyFactory) : void
+    {
+        $logger = new ConsoleLogger($output);
+        $dependencyFactory->setLogger($logger);
+    }
+
     protected function initializeDependencies(
         InputInterface $input,
         OutputInterface $output
     ) : void {
         if ($this->dependencyFactory !== null) {
+            $this->enusreLogger($output, $this->dependencyFactory);
+
             return;
         }
         $helperSet = $this->getHelperSet() ?: new HelperSet();
@@ -93,17 +108,18 @@ abstract class AbstractCommand extends Command
         $configuration = $configHelper->getConfiguration($input);
 
         $dbConfig = is_string($input->getOption('db-configuration')) ? $input->getOption('db-configuration'): null;
+        $shardId  = is_string($input->getOption('shard')) ? $input->getOption('shard'): null;
 
         $connection = (new ConnectionLoader())
-            ->getConnection($dbConfig, $helperSet);
+            ->getConnection($dbConfig, $shardId, $helperSet);
 
         $em = null;
         if ($helperSet->has('em') && $helperSet->get('em') instanceof EntityManagerHelper) {
             $em = $helperSet->get('em')->getEntityManager();
         }
 
-        $logger                  = new ConsoleLogger($output);
-        $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
+        $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em);
+        $this->enusreLogger($output, $this->dependencyFactory);
     }
 
     protected function getDependencyFactory() : DependencyFactory

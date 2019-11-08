@@ -12,4 +12,9 @@ final class InvalidConfiguration extends InvalidArgumentException implements Loa
     {
         return new self('The connection file has to return an array with database configuration parameters.');
     }
+
+    public static function notShardedConnection() : self
+    {
+        return new self('The connection must implement shards configuration.');
+    }
 }
