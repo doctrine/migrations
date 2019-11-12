@@ -38,7 +38,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
     .. code-block:: yaml
 
         name: "My Project Migrations"
-        migrations_namespace: "MyProject\Migrations"
+        migrations_namespace: "MyProject\\Migrations"
         table_name: "doctrine_migration_versions"
         column_name: "version"
         column_length: 14
