@@ -152,7 +152,7 @@ You may want to just execute a single migration up or down. You can do this with
 No Interaction
 --------------
 
-Alternately, if you wish to run the migrations in an unattended mode, we can add the ``--no--interaction`` option and then
+Alternately, if you wish to run the migrations in an unattended mode, we can add the ``--no-interaction`` option and then
 execute the migrations without any extra prompting from Doctrine.
 
 .. code-block:: sh
