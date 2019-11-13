@@ -26,7 +26,7 @@ Now to install with Composer it is as simple as running the following command in
 
 .. code-block:: sh
 
-    composer require doctrine/migrations:2.0
+    composer require "doctrine/migrations:^2.0"
 
 Now you will have a file in ``vendor/bin`` available to run the migrations console application:
 
