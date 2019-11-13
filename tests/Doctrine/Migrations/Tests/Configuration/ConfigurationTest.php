@@ -9,9 +9,7 @@ use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\Driver\IBMDB2\DB2Driver;
-use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
-use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\MigrationRepository;
@@ -254,29 +252,6 @@ class ConfigurationTest extends MigrationTestCase
             ['getMigrationsToExecute', ['down', '0'], []],
             ['getMigrationsToExecute', ['down', '2'], []],
         ];
-    }
-
-    public function testGetQueryWriterCreatesAnInstanceIfItWasNotConfigured() : void
-    {
-        $dp = $this->getMockForAbstractClass(AbstractPlatform::class, [], '', false, true, true, ['getReservedKeywordsClass']);
-
-        $dp->method('getReservedKeywordsClass')
-            ->willReturn(EmptyKeywordList::class);
-
-        $conn = $this->getConnectionMock();
-        $conn->method('getDatabasePlatform')
-            ->willReturn($dp);
-
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-
-        $conn->expects(self::any())
-            ->method('getSchemaManager')
-            ->willReturn($schemaManager);
-
-        $configuration = new Configuration($conn);
-        $queryWriter   = $configuration->getQueryWriter();
-
-        self::assertAttributeSame($configuration->getOutputWriter(), 'outputWriter', $queryWriter);
     }
 
     public function testGetQueryWriterShouldReturnTheObjectGivenOnTheConstructor() : void
