@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\Version\AliasResolverInterface;
+use Doctrine\Migrations\Version\AliasResolver;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -36,13 +36,13 @@ class MigrationStatusInfosHelper
     /** @var Connection */
     private $connection;
 
-    /** @var AliasResolverInterface */
+    /** @var AliasResolver */
     private $aliasResolver;
 
     public function __construct(
         Configuration $configuration,
         Connection $connection,
-        AliasResolverInterface $aliasResolver
+        AliasResolver $aliasResolver
     ) {
         $this->configuration = $configuration;
         $this->connection    = $connection;

@@ -59,6 +59,5 @@
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Generator/FileBuilderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Version/AliasResolverInterface.php</exclude-pattern>
     </rule>
 </ruleset>

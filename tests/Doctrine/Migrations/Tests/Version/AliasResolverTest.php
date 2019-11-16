@@ -15,7 +15,7 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
-use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
@@ -28,7 +28,7 @@ final class AliasResolverTest extends TestCase
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    /** @var AliasResolver */
+    /** @var DefaultAliasResolver */
     private $versionAliasResolver;
 
     /** @var TableMetadataStorage */
@@ -138,7 +138,7 @@ final class AliasResolverTest extends TestCase
         );
         $this->metadataStorage      = new TableMetadataStorage($conn);
         $this->planCalculator       = new MigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
-        $this->versionAliasResolver = new AliasResolver(
+        $this->versionAliasResolver = new DefaultAliasResolver(
             $this->migrationRepository,
             $this->metadataStorage,
             $this->planCalculator
