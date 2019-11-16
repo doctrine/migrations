@@ -7,7 +7,7 @@ namespace Doctrine\Migrations;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Tools\BytesFormatter;
-use Doctrine\Migrations\Version\ExecutorInterface;
+use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
@@ -27,7 +27,7 @@ class Migrator implements MigratorInterface
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var ExecutorInterface */
+    /** @var Executor */
     private $executor;
 
     /** @var Connection */
@@ -39,7 +39,7 @@ class Migrator implements MigratorInterface
     public function __construct(
         Connection $connection,
         EventDispatcher $dispatcher,
-        ExecutorInterface $executor,
+        Executor $executor,
         LoggerInterface $logger,
         Stopwatch $stopwatch
     ) {

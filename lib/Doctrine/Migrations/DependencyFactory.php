@@ -29,7 +29,7 @@ use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\AliasResolver;
-use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -229,10 +229,10 @@ class DependencyFactory
         return $this->logger;
     }
 
-    public function getVersionExecutor() : Executor
+    public function getVersionExecutor() : DbalExecutor
     {
-        return $this->getDependency(Executor::class, function () : Executor {
-            return new Executor(
+        return $this->getDependency(DbalExecutor::class, function () : DbalExecutor {
+            return new DbalExecutor(
                 $this->getMetadataStorage(),
                 $this->getEventDispatcher(),
                 $this->connection,

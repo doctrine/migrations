@@ -16,7 +16,7 @@ use Doctrine\DBAL\Schema\Schema;
  *
  * @internal
  *
- * @see Doctrine\Migrations\Version\Executor
+ * @see Doctrine\Migrations\Version\DbalExecutor
  */
 class DBALSchemaDiffProvider implements SchemaDiffProvider
 {

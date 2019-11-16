@@ -19,7 +19,7 @@ use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
-use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -41,7 +41,7 @@ class ExecutorTest extends TestCase
     /** @var Stopwatch|MockObject */
     private $stopwatch;
 
-    /** @var Executor */
+    /** @var DbalExecutor */
     private $versionExecutor;
 
     /** @var Version */
@@ -362,7 +362,7 @@ class ExecutorTest extends TestCase
         $this->stopwatch = $this->createMock(Stopwatch::class);
         $this->logger    = new TestLogger();
 
-        $this->versionExecutor = new Executor(
+        $this->versionExecutor = new DbalExecutor(
             $this->metadataStorage,
             $this->eventDispatcher,
             $this->connection,
