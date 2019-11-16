@@ -23,7 +23,7 @@ use function sprintf;
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
-class DumpSchemaCommand extends AbstractCommand
+class DumpSchemaCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';

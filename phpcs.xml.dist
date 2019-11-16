@@ -42,7 +42,6 @@
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Command/AbstractCommand.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Finder/AbstractFinder.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
         <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/AbstractConfigurationTest.php</exclude-pattern>

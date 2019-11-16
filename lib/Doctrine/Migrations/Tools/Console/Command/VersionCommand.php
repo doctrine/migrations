@@ -22,7 +22,7 @@ use function sprintf;
 /**
  * The VersionCommand class is responsible for manually adding and deleting migration versions from the tracking table.
  */
-class VersionCommand extends AbstractCommand
+class VersionCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:version';

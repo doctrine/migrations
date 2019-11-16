@@ -17,7 +17,7 @@ use function is_writable;
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.
  */
-class ExecuteCommand extends AbstractCommand
+class ExecuteCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:execute';

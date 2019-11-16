@@ -16,7 +16,7 @@ use function sprintf;
 /**
  * The GenerateCommand class is responsible for generating a blank migration class for you to modify to your needs.
  */
-class GenerateCommand extends AbstractCommand
+class GenerateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:generate';

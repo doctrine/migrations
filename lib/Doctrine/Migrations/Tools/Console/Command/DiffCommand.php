@@ -23,7 +23,7 @@ use function sprintf;
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
  * your mapping information.
  */
-class DiffCommand extends AbstractCommand
+class DiffCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:diff';

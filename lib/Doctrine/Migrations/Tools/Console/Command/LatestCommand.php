@@ -12,7 +12,7 @@ use function sprintf;
 /**
  * The LatestCommand class is responsible for outputting what your latest version is.
  */
-class LatestCommand extends AbstractCommand
+class LatestCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:latest';
