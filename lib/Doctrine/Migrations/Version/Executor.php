@@ -14,7 +14,7 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\ParameterFormatterInterface;
+use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
@@ -36,7 +36,7 @@ final class Executor implements ExecutorInterface
     /** @var SchemaDiffProvider */
     private $schemaProvider;
 
-    /** @var ParameterFormatterInterface */
+    /** @var ParameterFormatter */
     private $parameterFormatter;
 
     /** @var Stopwatch */
@@ -66,7 +66,7 @@ final class Executor implements ExecutorInterface
         Connection $connection,
         SchemaDiffProvider $schemaProvider,
         LoggerInterface $logger,
-        ParameterFormatterInterface $parameterFormatter,
+        ParameterFormatter $parameterFormatter,
         Stopwatch $stopwatch
     ) {
         $this->connection         = $connection;

@@ -162,10 +162,10 @@ class DependencyFactory
         });
     }
 
-    public function getParameterFormatter() : ParameterFormatterInterface
+    public function getParameterFormatter() : ParameterFormatter
     {
-        return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
-            return new ParameterFormatter($this->connection);
+        return $this->getDependency(InlineParameterFormatter::class, function () : InlineParameterFormatter {
+            return new InlineParameterFormatter($this->connection);
         });
     }
 

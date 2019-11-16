@@ -13,7 +13,7 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\ParameterFormatterInterface;
+use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
@@ -97,7 +97,7 @@ class MigratorTest extends MigrationTestCase
 
         $symfonyStopwatch = new SymfonyStopwatch();
         $stopwatch        = new Stopwatch($symfonyStopwatch);
-        $paramFormatter   = $this->createMock(ParameterFormatterInterface::class);
+        $paramFormatter   = $this->createMock(ParameterFormatter::class);
         $storage          = $this->createMock(MetadataStorage::class);
         $schemaDiff       = $this->createMock(SchemaDiffProvider::class);
 

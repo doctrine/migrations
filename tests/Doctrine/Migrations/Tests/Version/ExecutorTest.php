@@ -13,7 +13,7 @@ use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\ParameterFormatterInterface;
+use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
@@ -35,7 +35,7 @@ class ExecutorTest extends TestCase
     /** @var SchemaDiffProvider|MockObject */
     private $schemaDiffProvider;
 
-    /** @var ParameterFormatterInterface|MockObject */
+    /** @var ParameterFormatter|MockObject */
     private $parameterFormatter;
 
     /** @var Stopwatch|MockObject */
@@ -354,7 +354,7 @@ class ExecutorTest extends TestCase
         $this->metadataStorage    = $this->createMock(MetadataStorage::class);
         $this->connection         = $this->createMock(Connection::class);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
-        $this->parameterFormatter = $this->createMock(ParameterFormatterInterface::class);
+        $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
 
         $this->eventManager    = new EventManager();
         $this->eventDispatcher = new EventDispatcher($this->connection, $this->eventManager);

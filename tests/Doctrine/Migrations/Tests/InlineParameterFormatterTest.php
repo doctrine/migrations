@@ -7,10 +7,10 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Type;
-use Doctrine\Migrations\ParameterFormatter;
+use Doctrine\Migrations\InlineParameterFormatter;
 use PHPUnit\Framework\TestCase;
 
-class ParameterFormatterTest extends TestCase
+class InlineParameterFormatterTest extends TestCase
 {
     /** @var Connection */
     private $connection;
@@ -18,7 +18,7 @@ class ParameterFormatterTest extends TestCase
     /** @var AbstractPlatform */
     private $platform;
 
-    /** @var ParameterFormatter */
+    /** @var InlineParameterFormatter */
     private $parameterFormatter;
 
     public function testFormatParameters() : void
@@ -68,6 +68,6 @@ class ParameterFormatterTest extends TestCase
             ->method('getDatabasePlatform')
             ->willReturn($this->platform);
 
-        $this->parameterFormatter = new ParameterFormatter($this->connection);
+        $this->parameterFormatter = new InlineParameterFormatter($this->connection);
     }
 }
