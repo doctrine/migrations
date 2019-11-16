@@ -8,8 +8,8 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
+use Doctrine\Migrations\Tools\Console\Helper\MigrationsConfigurationHelper;
 use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
-use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelperInterface;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -83,11 +83,11 @@ abstract class DoctrineCommand extends Command
         }
         $helperSet = $this->getHelperSet() ?: new HelperSet();
 
-        if ($helperSet->has('configuration') && $helperSet->get('configuration') instanceof ConfigurationHelperInterface) {
-            /** @var ConfigurationHelper $configHelper */
+        if ($helperSet->has('configuration') && $helperSet->get('configuration') instanceof ConfigurationHelper) {
+            /** @var MigrationsConfigurationHelper $configHelper */
             $configHelper = $helperSet->get('configuration');
         } else {
-            $configHelper = new ConfigurationHelper();
+            $configHelper = new MigrationsConfigurationHelper();
         }
 
         $configuration = $configHelper->getConfiguration($input);

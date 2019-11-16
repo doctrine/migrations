@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\ConfigurationLoader;
 use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
 use Doctrine\Migrations\Configuration\Loader\Loader;
 use Doctrine\Migrations\Tests\MigrationTestCase;
-use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
+use Doctrine\Migrations\Tools\Console\Helper\MigrationsConfigurationHelper;
 use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
@@ -29,7 +29,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     /** @var MockObject */
     private $loader;
 
-    /** @var ConfigurationHelper */
+    /** @var MigrationsConfigurationHelper */
     private $configurationHelper;
 
     protected function setUp() : void
@@ -40,7 +40,7 @@ class ConfigurationHelperTest extends MigrationTestCase
             ->getMock();
 
         $this->loader              = $this->createMock(ConfigurationLoader::class);
-        $this->configurationHelper = new ConfigurationHelper($this->loader);
+        $this->configurationHelper = new MigrationsConfigurationHelper($this->loader);
     }
 
     /**

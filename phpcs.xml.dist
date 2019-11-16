@@ -49,7 +49,6 @@
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Helper/ConfigurationHelperInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Version/ExecutorInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
