@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
+use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Helper\HelperSet;
  *
  * @internal
  */
-final class ConnectionHelperLoader implements ConnectionLoaderInterface
+final class ConnectionHelperLoader implements ConnectionLoader
 {
     /** @var string */
     private $helperName;
@@ -22,10 +22,10 @@ final class ConnectionHelperLoader implements ConnectionLoaderInterface
     /** @var  HelperSet */
     private $helperSet;
 
-    /** @var ConnectionLoaderInterface */
+    /** @var ConnectionLoader */
     private $fallback;
 
-    public function __construct(string $helperName, ConnectionLoaderInterface $fallback, ?HelperSet $helperSet = null)
+    public function __construct(string $helperName, ConnectionLoader $fallback, ?HelperSet $helperSet = null)
     {
         $this->helperSet  = $helperSet ?: new HelperSet();
         $this->helperName = $helperName;
