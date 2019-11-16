@@ -6,10 +6,10 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;

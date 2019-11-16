@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console;
 
-use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
