@@ -36,10 +36,6 @@
         <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
     </rule>
 
-    <rule ref="SlevomatCodingStandard.TypeHints.TypeHintDeclaration.MissingReturnTypeHint">
-        <exclude-pattern>lib/Doctrine/Migrations/Version/Version.php</exclude-pattern>
-    </rule>
-
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
         <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
         <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/Loader/AbstractLoaderTest.php</exclude-pattern>
