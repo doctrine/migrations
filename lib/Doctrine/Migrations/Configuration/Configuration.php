@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Configuration;
 use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 use function count;
 use function strcasecmp;
 
@@ -46,10 +46,10 @@ final class Configuration
     /** @var bool */
     private $checkDbPlatform = true;
 
-    /** @var MetadataStorageConfigration */
+    /** @var MetadataStorageConfiguration */
     private $metadataStorageConfiguration;
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfiguration) : void
+    public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfiguration) : void
     {
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
@@ -67,7 +67,7 @@ final class Configuration
         $this->migrationClasses[] = $className;
     }
 
-    public function getMetadataStorageConfiguration() : ?MetadataStorageConfigration
+    public function getMetadataStorageConfiguration() : ?MetadataStorageConfiguration
     {
         return $this->metadataStorageConfiguration;
     }

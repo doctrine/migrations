@@ -16,7 +16,7 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Provider\DBALSchemaDiffProvider;
@@ -197,14 +197,14 @@ class DependencyFactory
         });
     }
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfigration $metadataStorageConfigration) : void
+    public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfigration) : void
     {
-        $this->dependencies[MetadataStorageConfigration::class] = $metadataStorageConfigration;
+        $this->dependencies[MetadataStorageConfiguration::class] = $metadataStorageConfigration;
     }
 
-    private function getMetadataStorageConfiguration() : MetadataStorageConfigration
+    private function getMetadataStorageConfiguration() : MetadataStorageConfiguration
     {
-        return $this->getDependency(MetadataStorageConfigration::class, static function () : MetadataStorageConfigration {
+        return $this->getDependency(MetadataStorageConfiguration::class, static function () : MetadataStorageConfiguration {
             return new TableMetadataStorageConfiguration();
         });
     }

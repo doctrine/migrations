@@ -37,7 +37,7 @@ final class TableMetadataStorage implements MetadataStorage
     /** @var TableMetadataStorageConfiguration */
     private $configuration;
 
-    public function __construct(Connection $connection, ?MetadataStorageConfigration $configuration = null)
+    public function __construct(Connection $connection, ?MetadataStorageConfiguration $configuration = null)
     {
         $this->connection    = $connection;
         $this->schemaManager = $connection->getSchemaManager();

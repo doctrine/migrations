@@ -7,14 +7,14 @@ namespace Doctrine\Migrations\Tests\Configuration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
-use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfigration;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationTest extends TestCase
 {
     public function testBase() : void
     {
-        $storage = $this->createMock(MetadataStorageConfigration::class);
+        $storage = $this->createMock(MetadataStorageConfiguration::class);
 
         $config = new Configuration();
         $config->addMigrationsDirectory('foo', 'bar');

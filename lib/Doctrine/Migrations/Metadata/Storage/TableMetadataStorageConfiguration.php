@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Metadata\Storage;
 
-final class TableMetadataStorageConfiguration implements MetadataStorageConfigration
+final class TableMetadataStorageConfiguration implements MetadataStorageConfiguration
 {
     /** @var string */
     private $tableName = 'doctrine_migration_versions';
