@@ -11,8 +11,8 @@ use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
+use Doctrine\Migrations\Generator\ConcatenationFileBuilder;
 use Doctrine\Migrations\Generator\DiffGenerator;
-use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -155,10 +155,10 @@ class DependencyFactory
         });
     }
 
-    public function getFileBuilder() : FileBuilder
+    public function getFileBuilder() : ConcatenationFileBuilder
     {
-        return $this->getDependency(FileBuilder::class, static function () : FileBuilder {
-            return new FileBuilder();
+        return $this->getDependency(ConcatenationFileBuilder::class, static function () : ConcatenationFileBuilder {
+            return new ConcatenationFileBuilder();
         });
     }
 

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\FileQueryWriter;
-use Doctrine\Migrations\Generator\FileBuilderInterface;
+use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Version\Direction;
 use Psr\Log\LoggerInterface;
 use function file_get_contents;
@@ -35,7 +35,7 @@ final class FileQueryWriterTest extends MigrationTestCase
     public function testWrite() : void
     {
         $path                 = sys_get_temp_dir();
-        $migrationFileBuilder = $this->createMock(FileBuilderInterface::class);
+        $migrationFileBuilder = $this->createMock(FileBuilder::class);
         $migrationFileBuilder
             ->expects(self::atLeastOnce())
             ->method('buildMigrationFile')

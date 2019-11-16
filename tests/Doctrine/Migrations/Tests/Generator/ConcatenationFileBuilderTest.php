@@ -6,12 +6,13 @@ namespace Doctrine\Migrations\Tests\Generator;
 
 use DateTime;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\Migrations\Generator\ConcatenationFileBuilder;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
-class FileBuilderTest extends TestCase
+class ConcatenationFileBuilderTest extends TestCase
 {
     /** @var AbstractPlatform|MockObject */
     private $platform;
@@ -70,6 +71,6 @@ FILE;
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
 
-        $this->migrationFileBuilder = new FileBuilder();
+        $this->migrationFileBuilder = new ConcatenationFileBuilder();
     }
 }
