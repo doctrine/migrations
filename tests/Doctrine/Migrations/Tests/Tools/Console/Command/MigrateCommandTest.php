@@ -9,7 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\Migrator;
+use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
@@ -120,7 +120,7 @@ class MigrateCommandTest extends MigrationTestCase
         $result = new ExecutionResult(new Version('345'));
         $this->storage->complete($result);
 
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getMigrator')
@@ -146,7 +146,7 @@ class MigrateCommandTest extends MigrationTestCase
      */
     public function testExecuteWriteSql($arg, string $path) : void
     {
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getMigrator')
@@ -182,7 +182,7 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testExecuteMigrate() : void
     {
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getMigrator')
@@ -208,7 +208,7 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testExecuteMigrateAllOrNothing() : void
     {
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getMigrator')
@@ -240,7 +240,7 @@ class MigrateCommandTest extends MigrationTestCase
         $result = new ExecutionResult(new Version('345'));
         $this->storage->complete($result);
 
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::once())
             ->method('getMigrator')
@@ -266,7 +266,7 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testExecuteMigrateCancel() : void
     {
-        $migrator = $this->createMock(Migrator::class);
+        $migrator = $this->createMock(DbalMigrator::class);
 
         $this->dependencyFactory->expects(self::once())
             ->method('getMigrator')

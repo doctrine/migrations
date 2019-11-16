@@ -11,7 +11,7 @@ use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\Migrator;
+use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
@@ -88,7 +88,7 @@ class MigratorTest extends MigrationTestCase
         self::assertContains('No migrations', $this->logger->logs[0]);
     }
 
-    protected function createTestMigrator() : Migrator
+    protected function createTestMigrator() : DbalMigrator
     {
         $eventManager    = new EventManager();
         $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
@@ -103,7 +103,7 @@ class MigratorTest extends MigrationTestCase
 
         $this->executor = new DbalExecutor($storage, $eventDispatcher, $this->conn, $schemaDiff, $this->logger, $paramFormatter, $stopwatch);
 
-        return new Migrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
+        return new DbalMigrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
     }
 
     public function testMigrateAllOrNothing() : void

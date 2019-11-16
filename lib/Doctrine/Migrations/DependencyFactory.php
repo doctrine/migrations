@@ -312,10 +312,10 @@ class DependencyFactory
         });
     }
 
-    public function getMigrator() : MigratorInterface
+    public function getMigrator() : Migrator
     {
-        return $this->getDependency(MigratorInterface::class, function () : MigratorInterface {
-            return new Migrator(
+        return $this->getDependency(Migrator::class, function () : Migrator {
+            return new DbalMigrator(
                 $this->connection,
                 $this->getEventDispatcher(),
                 $this->getVersionExecutor(),

@@ -14,7 +14,7 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\MigratorInterface;
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version\Version;
@@ -136,7 +136,7 @@ class ExecuteCommandTest extends TestCase
 
         $storage = $this->createMock(MetadataStorage::class);
 
-        $this->migrator = $this->createMock(MigratorInterface::class);
+        $this->migrator = $this->createMock(Migrator::class);
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
 

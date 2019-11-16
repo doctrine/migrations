@@ -46,7 +46,4 @@
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 
-    <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
-        <exclude-pattern>lib/Doctrine/Migrations/MigratorInterface.php</exclude-pattern>
-    </rule>
 </ruleset>
