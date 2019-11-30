@@ -66,9 +66,9 @@ Now when you run the ``diff`` command it will generate a migration which will cr
     $ ./vendor/bin/doctrine-migrations diff
     Generated new migration class to "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations/Version20180601215504.php"
 
-    To run just this migration for testing purposes, you can use migrations:execute --up 20180601215504
+    To run just this migration for testing purposes, you can use migrations:execute --up 'MyProject\Migrations\Version20180601215504'
 
-    To revert the migration you can use migrations:execute --down 20180601215504
+    To revert the migration you can use migrations:execute --down 'MyProject\Migrations\Version20180601215504'
 
 Take a look at the generated migration:
 
@@ -129,9 +129,9 @@ Now you are ready to execute your diff migration:
 
 
     WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)y
-    Migrating up to 20180601215504 from 20180601193057
+    Migrating up to MyProject\Migrations\Version20180601215504 from MyProject\Migrations\Version20180601193057
 
-      ++ migrating 20180601215504
+      ++ migrating MyProject\Migrations\Version20180601215504
 
          -> CREATE TABLE users (id INT AUTO_INCREMENT NOT NULL, username VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8 COLLATE utf8_unicode_ci ENGINE = InnoDB
          -> DROP TABLE example_table

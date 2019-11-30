@@ -12,7 +12,7 @@ use function sprintf;
  * The RollupCommand class is responsible for deleting all previously executed migrations from the versions table
  * and marking the freshly dumped schema migration (that was created with DumpSchemaCommand) as migrated.
  */
-class RollupCommand extends AbstractCommand
+class RollupCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:rollup';
@@ -39,12 +39,11 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : ?int {
-        $version = $this->dependencyFactory
-            ->getRollup()->rollup();
+        $version = $this->getDependencyFactory()->getRollup()->rollup();
 
         $output->writeln(sprintf(
             'Rolled up migrations to version <info>%s</info>',
-            $version->getVersion()
+            (string) $version
         ));
 
         return 0;

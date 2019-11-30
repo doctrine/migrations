@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Generator;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function class_exists;
 use function file_get_contents;
@@ -18,7 +17,7 @@ use function unlink;
 
 final class GeneratorTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var Generator */
@@ -26,22 +25,13 @@ final class GeneratorTest extends TestCase
 
     public function testGenerateMigration() : void
     {
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsNamespace')
-            ->willReturn('Test');
-
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsDirectory')
-            ->willReturn(sys_get_temp_dir());
-
-        $path = $this->migrationGenerator->generateMigration('1234', '// up', '// down');
+        $path = $this->migrationGenerator->generateMigration('Test\\Version1234', '// up', '// down');
 
         self::assertFileExists($path);
 
         $migrationCode = file_get_contents($path);
 
         self::assertContains('// up', $migrationCode);
-        self::assertContains('// down', $migrationCode);
 
         include $path;
 
@@ -56,11 +46,9 @@ final class GeneratorTest extends TestCase
 
         file_put_contents($customTemplate, 'custom template test');
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn($customTemplate);
+        $this->configuration->setCustomTemplate($customTemplate);
 
-        $path = $this->migrationGenerator->generateMigration('1234', '// up', '// down');
+        $path = $this->migrationGenerator->generateMigration('Test\\Version1234', '// up', '// down');
 
         self::assertFileExists($path);
 
@@ -69,16 +57,22 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
+    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing() : void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Path not defined for the namespace "Bar"');
+
+        $this->migrationGenerator->generateMigration('Bar\\Version1234');
+    }
+
     public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateMissing() : void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn('invalid');
+        $this->configuration->setCustomTemplate('invalid');
 
-        $this->migrationGenerator->generateMigration('1234');
+        $this->migrationGenerator->generateMigration('Test\\Version1234');
     }
 
     public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateEmpty() : void
@@ -93,19 +87,17 @@ final class GeneratorTest extends TestCase
             $customTemplate
         ));
 
-        $this->configuration->expects(self::once())
-            ->method('getCustomTemplate')
-            ->willReturn($customTemplate);
+        $this->configuration->setCustomTemplate($customTemplate);
 
-        $this->migrationGenerator->generateMigration('1234');
+        $this->migrationGenerator->generateMigration('Test\\Version1234');
 
         unlink($customTemplate);
     }
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
-
+        $this->configuration = new Configuration();
+        $this->configuration->addMigrationsDirectory('Test', sys_get_temp_dir());
         $this->migrationGenerator = new Generator($this->configuration);
     }
 }

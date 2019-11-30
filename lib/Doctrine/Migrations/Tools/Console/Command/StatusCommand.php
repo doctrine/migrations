@@ -5,23 +5,20 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use DateTimeImmutable;
-use Doctrine\Migrations\Version\Version;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Symfony\Component\Console\Helper\Table;
+use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use function assert;
 use function count;
-use function is_string;
-use function max;
-use function sprintf;
-use function str_repeat;
-use function strlen;
 
 /**
  * The StatusCommand class is responsible for outputting what the current state is of all your migrations. It shows
  * what your current version is, how many new versions you have to execute, etc. and details about each of your migrations.
  */
-class StatusCommand extends AbstractCommand
+class StatusCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:status';
@@ -46,112 +43,91 @@ You can output a list of all available migrations and their status with <comment
 
     <info>%command.full_name% --show-versions</info>
 EOT
-        );
+            );
 
         parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $output->writeln("\n <info>==</info> Configuration\n");
+        $storage        = $this->getDependencyFactory()->getMetadataStorage();
+        $migrationRepo  = $this->getDependencyFactory()->getMigrationRepository();
+        $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
 
-        $infos = $this->dependencyFactory->getMigrationStatusInfosHelper();
+        $availableMigrations = $migrationRepo->getMigrations();
+        $executedMigrations  = $storage->getExecutedMigrations();
 
-        foreach ($infos->getMigrationsInfos() as $name => $value) {
-            assert(is_string($name));
+        $newMigrations                 = $planCalculator->getNewMigrations();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
 
-            $string = (string) $value;
-
-            if ($name === 'New Migrations') {
-                $string = $value > 0 ? '<question>' . $value . '</question>' : '0';
-            }
-
-            if ($name === 'Executed Unavailable Migrations') {
-                $string = $value > 0 ? '<error>' . $value . '</error>' : '0';
-            }
-
-            $this->writeStatusInfosLineAligned($output, $name, $string);
-        }
+        $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
+        $infosHelper->showMigrationsInfo($output, $availableMigrations, $executedMigrations, $newMigrations, $executedUnavailableMigrations);
 
         if ($input->getOption('show-versions') === false) {
             return 0;
         }
 
-        $versions                      = $this->migrationRepository->getMigrations();
-        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
-
-        if (count($versions) !== 0) {
-            $output->writeln("\n <info>==</info> Available Migration Versions\n");
-
-            $this->showVersions($versions, $output);
+        if (count($availableMigrations) !== 0) {
+            $this->showVersions($availableMigrations, $executedMigrations, $output);
         }
 
-        if (count($executedUnavailableMigrations) === 0) {
-            return 0;
-        }
-
-        $output->writeln(
-            "\n <info>==</info> Previously Executed Unavailable Migration Versions\n"
-        );
-
-        foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
-            $output->writeln(
-                sprintf(
-                    '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $this->configuration->getDateTime($executedUnavailableMigration),
-                    $executedUnavailableMigration
-                )
-            );
+        if (count($executedUnavailableMigrations) !== 0) {
+            $this->showUnavailableVersions($output, $executedUnavailableMigrations);
         }
 
         return 0;
     }
 
-    private function writeStatusInfosLineAligned(OutputInterface $output, string $title, ?string $value) : void
+    private function showUnavailableVersions(OutputInterface $output, ExecutedMigrationsSet $executedUnavailableMigrations) : void
     {
-        $output->writeln(sprintf(
-            '    <comment>>></comment> %s: %s%s',
-            $title,
-            str_repeat(' ', 50 - strlen($title)),
-            $value
-        ));
+        $table = new Table($output);
+        $table->setHeaders(
+            [
+                [new TableCell('<error>Previously Executed Unavailable Migration Versions</error>', ['colspan' => 2])],
+                ['Migration', 'Migrated At'],
+            ]
+        );
+        foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
+            $table->addRow([
+                (string) $executedUnavailableMigration->getVersion(),
+                $executedUnavailableMigration->getExecutedAt() !== null
+                    ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                    : null,
+            ]);
+        }
+        $table->render();
     }
 
-    /**
-     * @param Version[] $versions
-     */
     private function showVersions(
-        array $versions,
+        AvailableMigrationsList $availableMigrationsSet,
+        ExecutedMigrationsSet $executedMigrationsSet,
         OutputInterface $output
     ) : void {
-        foreach ($versions as $version) {
-            $executedAt = $version->getExecutedAt();
+        $table = new Table($output);
+        $table->setHeaders(
+            [
+                [new TableCell('Available Migration Versions', ['colspan' => 4])],
+                ['Migration', 'Migrated', 'Migrated At', 'Description'],
+            ]
+        );
+        foreach ($availableMigrationsSet->getItems() as $availableMigration) {
+            $executedMigration = $executedMigrationsSet->hasMigration($availableMigration->getVersion())
+                ? $executedMigrationsSet->getMigration($availableMigration->getVersion())
+                : null;
 
-            $status = $version->isMigrated() ? '<info>migrated</info>' : '<error>not migrated</error>';
+            $executedAt = $executedMigration!==null && $executedMigration->getExecutedAt() instanceof DateTimeImmutable
+                ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                : null;
 
-            $executedAtStatus = $executedAt instanceof DateTimeImmutable
-                ? sprintf(' (executed at %s)', $executedAt->format('Y-m-d H:i:s'))
-                : '';
+            $description = $availableMigration->getMigration()->getDescription();
 
-            $migration   = $version->getMigration();
-            $description = $migration->getDescription();
-
-            $migrationDescription = $description !== ''
-                ? str_repeat(' ', 5) . $description
-                : '';
-
-            $versionName      = $version->getVersion();
-            $formattedVersion = $version->getDateTime();
-
-            $output->writeln(sprintf(
-                '    <comment>>></comment> %s (<comment>%s</comment>)%s%s%s%s',
-                $formattedVersion,
-                $versionName,
-                str_repeat(' ', max(1, 49 - strlen($formattedVersion) - strlen($versionName))),
-                $status,
-                $executedAtStatus,
-                $migrationDescription
-            ));
+            $table->addRow([
+                (string) $availableMigration->getVersion(),
+                $executedMigration !== null ? '<comment>migrated</comment>' : '<error>not migrated</error>',
+                (string) $executedAt,
+                $description,
+            ]);
         }
+        $table->render();
     }
 }

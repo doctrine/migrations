@@ -4,95 +4,92 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Exception\RollupFailed;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Rollup;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use RuntimeException;
 
 class RollupTest extends TestCase
 {
-    /** @var Configuration|MockObject */
-    private $configuration;
-
-    /** @var Connection|MockObject */
-    private $connection;
+    /** @var MockObject|AbstractMigration */
+    private $abstractMigration;
 
     /** @var MigrationRepository|MockObject */
-    private $migrationRepository;
+    private $repository;
+
+    /** @var MetadataStorage|MockObject */
+    private $storage;
 
     /** @var Rollup */
     private $rollup;
 
-    public function testRollupNoMigrtionsFoundException() : void
+    public function setUp() : void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('No migrations found.');
+        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->repository        = $this->createMock(MigrationRepository::class);
 
-        $this->migrationRepository->expects(self::once())
-            ->method('getVersions')
-            ->willReturn([]);
-
-        $this->rollup->rollup();
-    }
-
-    public function testRollupTooManyMigrationsException() : void
-    {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Too many migrations.');
-
-        $version1 = $this->createMock(Version::class);
-        $version2 = $this->createMock(Version::class);
-
-        $versions = [
-            '01' => $version1,
-            '02' => $version2,
-        ];
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getVersions')
-            ->willReturn($versions);
-
-        $this->rollup->rollup();
+        $this->storage = $this->createMock(MetadataStorage::class);
+        $this->rollup  = new Rollup($this->storage, $this->repository);
     }
 
     public function testRollup() : void
     {
-        $version1 = $this->createMock(Version::class);
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
-        $versions = ['01' => $version1];
+        $this->repository
+           ->expects(self::once())
+           ->method('getMigrations')
+           ->willReturn(new AvailableMigrationsList([$m1]));
 
-        $this->migrationRepository->expects(self::once())
-            ->method('getVersions')
-            ->willReturn($versions);
+        $this->storage
+           ->expects(self::at(0))->method('reset')->with();
+        $this->storage
+           ->expects(self::at(1))
+           ->method('complete')
+           ->willReturnCallback(static function (ExecutionResult $result) : void {
+              self::assertEquals(new Version('A'), $result->getVersion());
+           })->with();
 
-        $this->configuration->expects(self::once())
-            ->method('getMigrationsTableName')
-            ->willReturn('versions');
-
-        $this->connection->expects(self::once())
-            ->method('executeQuery')
-            ->with('DELETE FROM versions');
-
-        $version1->expects(self::once())
-            ->method('markMigrated');
-
-        self::assertSame($version1, $this->rollup->rollup());
+        $this->rollup->rollup();
     }
 
-    protected function setUp() : void
+    public function testRollupTooManyMigrations() : void
     {
-        $this->configuration       = $this->createMock(Configuration::class);
-        $this->connection          = $this->createMock(Connection::class);
-        $this->migrationRepository = $this->createMock(MigrationRepository::class);
+        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
 
-        $this->rollup = new Rollup(
-            $this->configuration,
-            $this->connection,
-            $this->migrationRepository
-        );
+        $this->repository
+            ->expects(self::once())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1, $m2]));
+
+        $this->storage->expects(self::never())->method('reset');
+        $this->storage->expects(self::never())->method('complete');
+        $this->expectException(RollupFailed::class);
+        $this->expectExceptionMessage('Too many migrations.');
+
+        $this->rollup->rollup();
+    }
+
+    public function testRollupNoMigrations() : void
+    {
+        $this->repository
+            ->expects(self::any())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->storage->expects(self::never())->method('reset');
+        $this->storage->expects(self::never())->method('complete');
+        $this->expectException(RollupFailed::class);
+        $this->expectExceptionMessage('No migrations found.');
+
+        $this->rollup->rollup();
     }
 }

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Generator;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use SqlFormatter;
 use function array_unshift;
 use function count;
@@ -44,8 +45,10 @@ class SqlGenerator
     ) : string {
         $code = [];
 
+        $storageConfiguration = $this->configuration->getMetadataStorageConfiguration();
         foreach ($sql as $query) {
-            if (stripos($query, $this->configuration->getMigrationsTableName()) !== false) {
+            if ($storageConfiguration instanceof TableMetadataStorageConfiguration
+                && stripos($query, $storageConfiguration->getTableName()) !== false) {
                 continue;
             }
 

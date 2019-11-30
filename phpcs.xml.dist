@@ -15,11 +15,6 @@
 
     <rule ref="Doctrine"/>
 
-    <rule ref="SlevomatCodingStandard.Namespaces.ReferenceUsedNamesOnly">
-        <exclude-pattern>lib/Doctrine/Migrations/FileQueryWriter.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/realpath.php</exclude-pattern>
-    </rule>
-
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
         <exclude-pattern>*/tests/*</exclude-pattern>
     </rule>
@@ -36,28 +31,15 @@
         <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
     </rule>
 
-    <rule ref="SlevomatCodingStandard.Classes.UnusedPrivateElements.UnusedMethod">
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
+    <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/AbstractFileConfiguration.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Command/AbstractCommand.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Finder/AbstractFinder.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/AbstractConfigurationTest.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/Tools/Console/Command/AbstractCommandTest.php</exclude-pattern>
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/Loader/AbstractLoaderTest.php</exclude-pattern>
+        <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 
-    <rule ref="SlevomatCodingStandard.Classes.SuperfluousInterfaceNaming">
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/Connection/ConnectionLoaderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaDiffProviderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Provider/SchemaProviderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/Helper/ConfigurationHelperInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationFinderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Finder/MigrationDeepFinderInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Version/ExecutorInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/ParameterFormatterInterface.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Version/VersionInterface.php</exclude-pattern>
-    </rule>
 </ruleset>

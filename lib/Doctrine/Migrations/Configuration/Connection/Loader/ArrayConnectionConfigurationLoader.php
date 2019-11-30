@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
+use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Doctrine\Migrations\Configuration\Connection\Loader\Exception\InvalidConfiguration;
 use function file_exists;
 use function is_array;
@@ -17,14 +17,18 @@ use function is_array;
  *
  * @internal
  */
-class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
+final class ArrayConnectionConfigurationLoader implements ConnectionLoader
 {
     /** @var string|null */
     private $filename;
 
-    public function __construct(?string $filename)
+    /** @var ConnectionLoader */
+    private $fallback;
+
+    public function __construct(?string $filename, ConnectionLoader $fallback)
     {
         $this->filename = $filename;
+        $this->fallback = $fallback;
     }
 
     /**
@@ -33,14 +37,14 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
      *
      * @throws InvalidConfiguration
      */
-    public function chosen() : ?Connection
+    public function getConnection() : Connection
     {
         if ($this->filename === null) {
-            return null;
+            return $this->fallback->getConnection();
         }
 
         if (! file_exists($this->filename)) {
-            return null;
+            return $this->fallback->getConnection();
         }
 
         $params = include $this->filename;

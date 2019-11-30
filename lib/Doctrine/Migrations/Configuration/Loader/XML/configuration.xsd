@@ -1,0 +1,70 @@
+<xs:schema
+        attributeFormDefault="unqualified"
+        elementFormDefault="qualified"
+        targetNamespace="http://doctrine-project.org/schemas/migrations/configuration/3.0"
+        xmlns:xs="http://www.w3.org/2001/XMLSchema">
+    <xs:element name="doctrine-migrations">
+        <xs:complexType>
+            <xs:all minOccurs="0">
+                <xs:element type="xs:string" name="name" minOccurs="0" maxOccurs="1"/>
+                <xs:element type="xs:string" name="custom-template" minOccurs="0" maxOccurs="1"/>
+
+                <xs:element name="migrations-paths" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:element name="path" minOccurs="0" maxOccurs="1">
+                                <xs:complexType>
+                                    <xs:simpleContent>
+                                        <xs:extension base="xs:string">
+                                            <xs:attribute name="namespace" type="xs:string" use="required"/>
+                                        </xs:extension>
+                                    </xs:simpleContent>
+                                </xs:complexType>
+                            </xs:element>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+
+                <xs:element name="storage" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence>
+                            <xs:any maxOccurs="1" processContents="lax"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+
+                <xs:element name="organize-migrations" minOccurs="0" maxOccurs="1">
+                    <xs:simpleType>
+                        <xs:restriction base="xs:string">
+                            <xs:enumeration value="year" />
+                            <xs:enumeration value="year_and_month" />
+                        </xs:restriction>
+                    </xs:simpleType>
+                </xs:element>
+
+                <xs:element type="xs:boolean" name="all-or-nothing" minOccurs="0" maxOccurs="1"/>
+                <xs:element type="xs:boolean" name="check-database-platform" minOccurs="0" maxOccurs="1"/>
+                <xs:element name="migrations" minOccurs="0" maxOccurs="1">
+                    <xs:complexType>
+                        <xs:sequence minOccurs="0" maxOccurs="unbounded">
+                            <xs:element name="migration" type="xs:string"/>
+                        </xs:sequence>
+                    </xs:complexType>
+                </xs:element>
+            </xs:all>
+        </xs:complexType>
+    </xs:element>
+
+    <xs:element name="table-storage">
+        <xs:complexType>
+            <xs:attribute name="table-name" type="xs:string" use="optional"/>
+            <xs:attribute name="version-column-name" type="xs:string" use="optional"/>
+            <xs:attribute name="version-column-length" type="xs:positiveInteger" use="optional"/>
+            <xs:attribute name="executed-at-column-name" type="xs:string" use="optional"/>
+            <xs:attribute name="execution-time-column-name" type="xs:string" use="optional"/>
+        </xs:complexType>
+    </xs:element>
+</xs:schema>
+
+

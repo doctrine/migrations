@@ -8,152 +8,172 @@ use DateTimeImmutable;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
-use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
+use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
-use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
+use function array_map;
+use function explode;
+use function sprintf;
+use function str_pad;
+use function strlen;
+use function sys_get_temp_dir;
+use function trim;
 
-class StatusCommandTest extends TestCase
+class StatusCommandTest extends MigrationTestCase
 {
-    /** @var Configuration|MockObject */
-    private $configuration;
+    /** @var StatusCommand */
+    private $command;
 
-    /** @var DependencyFactory|MockObject */
-    private $dependencyFactory;
-
-    /** @var MigrationRepository|MockObject */
+    /** @var MigrationRepository */
     private $migrationRepository;
 
-    /** @var MigrationStatusInfosHelper|MockObject */
-    private $migrationStatusInfosHelper;
+    /** @var MetadataStorage */
+    private $metadataStorage;
 
-    /** @var StatusCommand */
-    private $statusCommand;
-
-    public function testExecute() : void
-    {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
-
-        $this->migrationStatusInfosHelper->expects(self::once())
-            ->method('getMigrationsInfos')
-            ->willReturn(['name' => 'value']);
-
-        $input->expects(self::once())
-            ->method('getOption')
-            ->with('show-versions')
-            ->willReturn(true);
-
-        $version1   = $this->createMock(Version::class);
-        $migration1 = $this->createMock(AbstractMigration::class);
-
-        $version1->expects(self::once())
-            ->method('getVersion')
-            ->willReturn('1');
-
-        $version1->expects(self::once())
-            ->method('getMigration')
-            ->willReturn($migration1);
-
-        $version1->expects(self::once())
-            ->method('isMigrated')
-            ->willReturn(true);
-
-        $executedAt = new DateTimeImmutable('2018-05-16 11:14:40');
-
-        $version1->expects(self::once())
-            ->method('getExecutedAt')
-            ->willReturn($executedAt);
-
-        $migration1->expects(self::once())
-            ->method('getDescription')
-            ->willReturn('Test description.');
-
-        $version2   = $this->createMock(Version::class);
-        $migration2 = $this->createMock(AbstractMigration::class);
-
-        $version2->expects(self::once())
-            ->method('getVersion')
-            ->willReturn('2');
-
-        $version2->expects(self::once())
-            ->method('getMigration')
-            ->willReturn($migration2);
-
-        $version2->expects(self::once())
-            ->method('isMigrated')
-            ->willReturn(false);
-
-        $version2->expects(self::once())
-            ->method('getExecutedAt')
-            ->willReturn(null);
-
-        $migration2->expects(self::once())
-            ->method('getDescription')
-            ->willReturn('Test description.');
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getMigrations')
-            ->willReturn([$version1, $version2]);
-
-        $this->migrationRepository->expects(self::once())
-            ->method('getExecutedUnavailableMigrations')
-            ->willReturn(['1234']);
-
-        $this->configuration->expects(self::at(0))
-            ->method('getDateTime')
-            ->with('1234')
-            ->willReturn('123456789');
-
-        $output->expects(self::at(0))
-            ->method('writeln')
-            ->with("\n <info>==</info> Configuration\n");
-
-        $output->expects(self::at(1))
-            ->method('writeln')
-            ->with('    <comment>>></comment> name:                                               value');
-
-        $output->expects(self::at(2))
-            ->method('writeln')
-            ->with("\n <info>==</info> Available Migration Versions\n");
-
-        $output->expects(self::at(3))
-            ->method('writeln')
-            ->with('    <comment>>></comment>  (<comment>1</comment>)                                                <info>migrated</info> (executed at 2018-05-16 11:14:40)     Test description.');
-
-        $output->expects(self::at(4))
-            ->method('writeln')
-            ->with('    <comment>>></comment>  (<comment>2</comment>)                                                <error>not migrated</error>     Test description.');
-
-        $output->expects(self::at(5))
-            ->method('writeln')
-            ->with("\n <info>==</info> Previously Executed Unavailable Migration Versions\n");
-
-        $output->expects(self::at(6))
-            ->method('writeln')
-            ->with('    <comment>>></comment> 123456789 (<comment>1234</comment>)');
-
-        $this->statusCommand->execute($input, $output);
-    }
+    /** @var CommandTester */
+    private $commandTester;
 
     protected function setUp() : void
     {
-        $this->configuration              = $this->createMock(Configuration::class);
-        $this->dependencyFactory          = $this->createMock(DependencyFactory::class);
-        $this->migrationRepository        = $this->createMock(MigrationRepository::class);
-        $this->migrationStatusInfosHelper = $this->createMock(MigrationStatusInfosHelper::class);
+        $configuration = new Configuration();
+        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
+        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $this->dependencyFactory->expects(self::once())
-            ->method('getMigrationStatusInfosHelper')
-            ->willReturn($this->migrationStatusInfosHelper);
+        $conn = $this->getSqliteConnection();
 
-        $this->statusCommand = new StatusCommand();
-        $this->statusCommand->setMigrationConfiguration($this->configuration);
-        $this->statusCommand->setDependencyFactory($this->dependencyFactory);
-        $this->statusCommand->setMigrationRepository($this->migrationRepository);
+        $dependencyFactory = new DependencyFactory($configuration, $conn);
+
+        $this->migrationRepository = $dependencyFactory->getMigrationRepository();
+        $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
+
+        $this->command       = new StatusCommand(null, $dependencyFactory);
+        $this->commandTester = new CommandTester($this->command);
+    }
+
+    public function testExecute() : void
+    {
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
+        $result->setTime(10);
+        $this->metadataStorage->complete($result);
+
+        $result = new ExecutionResult(new Version('1233'), Direction::UP);
+        $this->metadataStorage->complete($result);
+
+        $this->commandTester->execute(
+            [],
+            ['interactive' => false]
+        );
+
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+
+        $tempDir = sys_get_temp_dir();
+        $tempDir = str_pad($tempDir, 74-strlen($tempDir));
+
+        self::assertSame(
+            [
+                0 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                1 => '| Configuration                                                                                                        |',
+                2 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                3 => '| Project              | Doctrine Database Migrations                                                                  |',
+                4 => '|----------------------------------------------------------------------------------------------------------------------|',
+                5 => '| Project              | Doctrine Database Migrations                                                                  |',
+                6 => '|----------------------------------------------------------------------------------------------------------------------|',
+                7 => '| Storage              | Type                 | Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration |',
+                8 => '|                      | Table Name           | doctrine_migration_versions                                            |',
+                9 => '|                      | Column Name          | version                                                                |',
+                10 => '|----------------------------------------------------------------------------------------------------------------------|',
+                11 => '| Database             | Driver               | pdo_sqlite                                                             |',
+                12 => '|                      | Host                 |                                                                        |',
+                13 => '|                      | Name                 |                                                                        |',
+                14 => '|----------------------------------------------------------------------------------------------------------------------|',
+                15 => '| Versions             | Previous             | 1230                                                                   |',
+                16 => '|                      | Current              | 1233                                                                   |',
+                17 => '|                      | Next                 | Already at latest version                                              |',
+                18 => '|                      | Latest               |                                                                        |',
+                19 => '|----------------------------------------------------------------------------------------------------------------------|',
+                20 => '| Migrations           | Executed             | 2                                                                      |',
+                21 => '|                      | Executed Unavailable | 2                                                                      |',
+                22 => '|                      | Available            | 0                                                                      |',
+                23 => '|                      | New                  | 0                                                                      |',
+                24 => '|----------------------------------------------------------------------------------------------------------------------|',
+                25 => sprintf('| Migration Namespaces | DoctrineMigrations   | %s |', str_pad(sys_get_temp_dir(), 70)),
+                26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+            ],
+            $lines
+        );
+    }
+
+    public function testExecuteDetails() : void
+    {
+        $migrationClass = $this->createMock(AbstractMigration::class);
+        $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
+        $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
+
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
+        $result->setTime(10);
+        $this->metadataStorage->complete($result);
+
+        $result = new ExecutionResult(new Version('1233'), Direction::UP);
+        $this->metadataStorage->complete($result);
+
+        $this->commandTester->execute(
+            ['--show-versions' => true],
+            ['interactive' => false]
+        );
+
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        self::assertSame(
+            [
+                0 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                1 => '| Configuration                                                                                                        |',
+                2 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                3 => '| Project              | Doctrine Database Migrations                                                                  |',
+                4 => '|----------------------------------------------------------------------------------------------------------------------|',
+                5 => '| Project              | Doctrine Database Migrations                                                                  |',
+                6 => '|----------------------------------------------------------------------------------------------------------------------|',
+                7 => '| Storage              | Type                 | Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration |',
+                8 => '|                      | Table Name           | doctrine_migration_versions                                            |',
+                9 => '|                      | Column Name          | version                                                                |',
+                10 => '|----------------------------------------------------------------------------------------------------------------------|',
+                11 => '| Database             | Driver               | pdo_sqlite                                                             |',
+                12 => '|                      | Host                 |                                                                        |',
+                13 => '|                      | Name                 |                                                                        |',
+                14 => '|----------------------------------------------------------------------------------------------------------------------|',
+                15 => '| Versions             | Previous             | 1230                                                                   |',
+                16 => '|                      | Current              | 1233                                                                   |',
+                17 => '|                      | Next                 | 1231                                                                   |',
+                18 => '|                      | Latest               | 1231                                                                   |',
+                19 => '|----------------------------------------------------------------------------------------------------------------------|',
+                20 => '| Migrations           | Executed             | 2                                                                      |',
+                21 => '|                      | Executed Unavailable | 1                                                                      |',
+                22 => '|                      | Available            | 2                                                                      |',
+                23 => '|                      | New                  | 1                                                                      |',
+                24 => '|----------------------------------------------------------------------------------------------------------------------|',
+                25 => sprintf('| Migration Namespaces | DoctrineMigrations   | %s |', str_pad(sys_get_temp_dir(), 70)),
+                26 => '+----------------------+----------------------+------------------------------------------------------------------------+',
+                27 => '+-----------+--------------+---------------------+-------------+',
+                28 => '| Available Migration Versions                                 |',
+                29 => '+-----------+--------------+---------------------+-------------+',
+                30 => '| Migration | Migrated     | Migrated At         | Description |',
+                31 => '+-----------+--------------+---------------------+-------------+',
+                32 => '| 1230      | migrated     | 2010-01-01 02:03:04 |             |',
+                33 => '| 1231      | not migrated |                     |             |',
+                34 => '+-----------+--------------+---------------------+-------------+',
+                35 => '+---------------------------+---------------------------+',
+                36 => '| Previously Executed Unavailable Migration Versions    |',
+                37 => '+---------------------------+---------------------------+',
+                38 => '| Migration                 | Migrated At               |',
+                39 => '+---------------------------+---------------------------+',
+                40 => '| 1233                      |                           |',
+                41 => '+---------------------------+---------------------------+',
+            ],
+            $lines
+        );
     }
 }

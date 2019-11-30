@@ -4,30 +4,33 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Exception\MigrationException;
-use Doctrine\Migrations\MigrationRepository;
-use Doctrine\Migrations\Migrator;
+use Doctrine\Migrations\DbalMigrator;
+use Doctrine\Migrations\EventDispatcher;
+use Doctrine\Migrations\Metadata\MigrationPlan;
+use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
-use Doctrine\Migrations\OutputWriter;
-use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\ParameterFormatter;
+use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
+use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
-use PHPUnit\Framework\Constraint\RegularExpression;
+use Doctrine\Migrations\Version\Executor;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
+use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
 use const DIRECTORY_SEPARATOR;
 
-require_once __DIR__ . '/realpath.php';
-
 class MigratorTest extends MigrationTestCase
 {
-    /** @var Connection */
+    /** @var Connection|MockObject */
     private $conn;
 
     /** @var Configuration */
@@ -36,246 +39,100 @@ class MigratorTest extends MigrationTestCase
     /** @var StreamOutput */
     protected $output;
 
+    /** @var MigratorConfiguration */
+    private $migratorConfiguration;
+
+    /** @var Executor */
+    private $executor;
+
+    /** @var TestLogger */
+    private $logger;
+
     protected function setUp() : void
     {
-        $this->conn   = $this->getSqliteConnection();
-        $this->config = new Configuration($this->conn);
-        $this->config->setMigrationsDirectory(__DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder');
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
+        $this->conn   = $this->createMock(Connection::class);
+        $this->config = new Configuration();
+
+        $this->migratorConfiguration = new MigratorConfiguration();
+        $this->config->addMigrationsDirectory(
+            'DoctrineMigrations\\',
+            __DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder'
+        );
     }
 
-    public function testWriteSqlDown() : void
+    public function testGetSql() : void
     {
-        $configuration       = $this->createMock(Configuration::class);
-        $migrationRepository = $this->createMock(MigrationRepository::class);
-        $outputWriter        = $this->createMock(OutputWriter::class);
-        $stopwatch           = $this->createMock(Stopwatch::class);
-        $queryWriter         = $this->createMock(QueryWriter::class);
+        $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
 
-        $sql = ['SELECT 1'];
+        $migrator = $this->createTestMigrator();
 
-        $migration = $this->getMockBuilder(Migrator::class)
-            ->setConstructorArgs([
-                $configuration,
-                $migrationRepository,
-                $outputWriter,
-                $stopwatch,
-            ])
-            ->setMethods(['getSql'])
-            ->getMock();
+        $migration = new MigrateNotTouchingTheSchema($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrateNotTouchingTheSchema::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
 
-        $migration->expects(self::once())
-            ->method('getSql')
-            ->with('1')
-            ->willReturn($sql);
+        $sql = $migrator->migrate($planList, $this->migratorConfiguration);
 
-        $migrationRepository->expects(self::once())
-            ->method('getCurrentVersion')
-            ->willReturn('5');
-
-        $outputWriter->expects(self::once())
-            ->method('write')
-            ->with("-- Migrating from 5 to 1\n");
-
-        $configuration->expects(self::once())
-            ->method('getQueryWriter')
-            ->willReturn($queryWriter);
-
-        $queryWriter->expects(self::once())
-            ->method('write')
-            ->with('/path', Direction::DOWN, $sql);
-
-        $migration->writeSqlFile('/path', '1');
+        self::assertSame([
+            'Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema' => ['SELECT 1'],
+        ], $sql);
     }
 
-    public function testMigrateToUnknownVersionThrowsException() : void
+    public function testEmptyPlanShowsMessage() : void
     {
-        $migration = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
 
-        $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Could not find migration version 1234');
+        $planList = new MigrationPlanList([], Direction::UP);
+        $migrator->migrate($planList, $this->migratorConfiguration);
 
-        $migration->migrate('1234');
+        self::assertCount(1, $this->logger->logs, 'should output the no migrations message');
+        self::assertContains('No migrations', $this->logger->logs[0]);
     }
 
-    public function testMigrateWithNoMigrationsThrowsException() : void
+    protected function createTestMigrator() : DbalMigrator
     {
-        $migration = $this->createTestMigrator($this->config);
+        $eventManager    = new EventManager();
+        $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
 
-        $this->expectException(MigrationException::class);
-        $this->expectExceptionMessage('Could not find any migrations to execute.');
+        $this->logger = new TestLogger();
 
-        $migration->migrate();
-    }
+        $symfonyStopwatch = new SymfonyStopwatch();
+        $stopwatch        = new Stopwatch($symfonyStopwatch);
+        $paramFormatter   = $this->createMock(ParameterFormatter::class);
+        $storage          = $this->createMock(MetadataStorage::class);
+        $schemaDiff       = $this->createMock(SchemaDiffProvider::class);
 
-    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption() : void
-    {
-        $messages = [];
+        $this->executor = new DbalExecutor($storage, $eventDispatcher, $this->conn, $schemaDiff, $this->logger, $paramFormatter, $stopwatch);
 
-        $callback = static function ($msg) use (&$messages) : void {
-            $messages[] = $msg;
-        };
-
-        $this->config->getOutputWriter()->setCallback($callback);
-
-        $migrator = $this->createTestMigrator($this->config);
-
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setNoMigrationException(true);
-
-        $migrator->migrate(null, $migratorConfiguration);
-
-        self::assertCount(2, $messages, 'should output header and no migrations message');
-        self::assertContains('No migrations', $messages[1]);
-    }
-
-    /**
-     * @dataProvider getSqlProvider
-     */
-    public function testGetSql(?string $to) : void
-    {
-        /** @var Migrator|MockObject $migration */
-        $migration = $this->getMockBuilder(Migrator::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['migrate'])
-            ->getMock();
-
-        $expected = [['something']];
-
-        $migration->expects(self::once())
-            ->method('migrate')
-            ->with($to)
-            ->willReturn($expected);
-
-        $result = $migration->getSql($to);
-
-        self::assertSame($expected, $result);
-    }
-
-    /** @return mixed[][] */
-    public function getSqlProvider() : array
-    {
-        return [
-            [null],
-            ['test'],
-        ];
-    }
-
-    /**
-     * @param string[] $getSqlReturn
-     *
-     * @dataProvider writeSqlFileProvider
-     */
-    public function testWriteSqlFile(string $path, string $from, ?string $to, array $getSqlReturn) : void
-    {
-        $queryWriter  = $this->createMock(QueryWriter::class);
-        $outputWriter = $this->createMock(OutputWriter::class);
-
-        $queryWriter->method('write')
-            ->with($path, new RegularExpression('/(up|down)/'), $getSqlReturn)
-            ->willReturn(true);
-
-        $outputWriter->expects(self::atLeastOnce())
-            ->method('write');
-
-        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
-        $config = $this->createMock(Configuration::class);
-
-        $dependencyFactory   = $this->createMock(DependencyFactory::class);
-        $migrationRepository = $this->createMock(MigrationRepository::class);
-
-        $config->expects(self::once())
-            ->method('getDependencyFactory')
-            ->willReturn($dependencyFactory);
-
-        $dependencyFactory->expects(self::once())
-            ->method('getMigrationRepository')
-            ->willReturn($migrationRepository);
-
-        $dependencyFactory->expects(self::once())
-            ->method('getOutputWriter')
-            ->willReturn($outputWriter);
-
-        $config->method('getCurrentVersion')
-            ->willReturn($from);
-
-        $config->method('getOutputWriter')
-            ->willReturn($outputWriter);
-
-        $config->method('getQueryWriter')
-            ->willReturn($queryWriter);
-
-        if ($to === null) { // this will always just test the "up" direction
-            $config->method('getLatestVersion')
-                ->willReturn((int) $from + 1);
-        }
-
-        /** @var Migrator|MockObject $migration */
-        $migration = $this->getMockBuilder(Migrator::class)
-            ->setConstructorArgs($this->getMigratorConstructorArgs($config))
-            ->setMethods(['getSql'])
-            ->getMock();
-
-        $migration->expects(self::once())
-            ->method('getSql')
-            ->with($to)
-            ->willReturn($getSqlReturn);
-
-        self::assertTrue($migration->writeSqlFile($path, $to));
-    }
-
-    /**
-     * @return mixed[][]
-     */
-    public function writeSqlFileProvider() : array
-    {
-        return [
-            [__DIR__, '0', '1', ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, '0', null, ['1' => ['SHOW DATABASES;']]], // up
-            [__DIR__, '1', '1', ['1' => ['SHOW DATABASES;']]], // up (same)
-            [__DIR__, '1', '0', ['1' => ['SHOW DATABASES;']]], // down
-            [__DIR__ . '/tmpfile.sql', '0', '1', ['1' => ['SHOW DATABASES']]], // tests something actually got written
-        ];
-    }
-
-    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage() : void
-    {
-        $messages = [];
-
-        $callback = static function ($msg) use (&$messages) : void {
-            $messages[] = $msg;
-        };
-
-        $this->config->getOutputWriter()->setCallback($callback);
-        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
-        $this->config->createMigrationTable();
-        $this->conn->insert($this->config->getMigrationsTableName(), [
-            'version' => '20160707000000',
-            'executed_at' => '2018-05-14 20:44:28',
-        ]);
-
-        $migration = $this->createTestMigrator($this->config);
-
-        $migration->migrate();
-
-        self::assertCount(1, $messages, 'should output the no migrations message');
-        self::assertContains('No migrations', $messages[0]);
+        return new DbalMigrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
     }
 
     public function testMigrateAllOrNothing() : void
     {
-        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-        $this->config->registerMigration('20160707000000', MigrateNotTouchingTheSchema::class);
+        $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
 
-        $migration = $this->createTestMigrator($this->config);
+        $migrator = $this->createTestMigrator();
+        $this->conn
+            ->expects(self::exactly(2))
+            ->method('beginTransaction');
 
-        $sql = $migration->migrate(null, (new MigratorConfiguration())
-            ->setAllOrNothing(true));
+        $this->conn
+            ->expects(self::never())
+            ->method('rollback');
 
-        self::assertCount(1, $sql);
+        $this->conn
+            ->expects(self::exactly(2))
+            ->method('commit');
+
+        $this->migratorConfiguration->setAllOrNothing(true);
+
+        $migration = new MigrateNotTouchingTheSchema($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrateNotTouchingTheSchema::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        $sql = $migrator->migrate($planList, $this->migratorConfiguration);
+        self::assertSame([
+            'Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema' => ['SELECT 1'],
+        ], $sql);
     }
 
     public function testMigrateAllOrNothingRollback() : void
@@ -283,13 +140,26 @@ class MigratorTest extends MigrationTestCase
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Migration up throws exception.');
 
-        $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-        $this->config->registerMigration('20160707000000', MigrationThrowsError::class);
+        $this->conn
+            ->expects(self::exactly(2))
+            ->method('beginTransaction');
 
-        $migration = $this->createTestMigrator($this->config);
+        $this->conn
+            ->expects(self::never())
+            ->method('commit');
 
-        $migration->migrate(null, (new MigratorConfiguration())
-            ->setAllOrNothing(true));
+        $this->conn
+            ->expects(self::exactly(2))
+            ->method('rollback');
+
+        $migrator = $this->createTestMigrator();
+
+        $this->migratorConfiguration->setAllOrNothing(true);
+
+        $migration = new MigrationThrowsError($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        $migrator->migrate($planList, $this->migratorConfiguration);
     }
 }

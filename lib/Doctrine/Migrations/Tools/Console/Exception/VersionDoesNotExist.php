@@ -12,6 +12,6 @@ final class VersionDoesNotExist extends InvalidArgumentException implements Cons
 {
     public static function new(Version $version) : self
     {
-        return new self(sprintf('The version "%s" does not exist in the version table.', $version->getVersion()));
+        return new self(sprintf('The version "%s" does not exist in the version table.', (string) $version));
     }
 }

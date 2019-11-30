@@ -5,32 +5,34 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use function sys_get_temp_dir;
 
 final class DiffCommandTest extends TestCase
 {
     /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
 
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var DiffCommand|MockObject */
     private $diffCommand;
 
+    /** @var MockObject */
+    private $dependencyFactory;
+
     public function testExecute() : void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
-
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
 
         $input->expects(self::at(0))
             ->method('getOption')
@@ -59,16 +61,17 @@ final class DiffCommandTest extends TestCase
 
         $input->expects(self::at(5))
             ->method('getOption')
+            ->with('namespace')
+            ->willReturn('FooNs');
+
+        $input->expects(self::at(6))
+            ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
 
-        $this->configuration->expects(self::once())
-            ->method('generateVersionNumber')
-            ->willReturn('1234');
-
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
-            ->with('1234', 'filter expression', true, 80)
+            ->with('FooNs\\Version1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
         $this->diffCommand->expects(self::once())
@@ -80,9 +83,9 @@ final class DiffCommandTest extends TestCase
             ->with([
                 'Generated new migration class to "<info>/path/to/migration.php</info>"',
                 '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up 1234</info>',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\\\\Version1234\'</info>',
                 '',
-                'To revert the migration you can use <info>migrations:execute --down 1234</info>',
+                'To revert the migration you can use <info>migrations:execute --down \'FooNs\\\\Version1234\'</info>',
             ]);
 
         $this->diffCommand->execute($input, $output);
@@ -91,16 +94,32 @@ final class DiffCommandTest extends TestCase
     protected function setUp() : void
     {
         $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
-        $this->configuration          = $this->createMock(Configuration::class);
+        $this->configuration          = new Configuration();
+        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
+
+        $this->dependencyFactory = $this->createMock(DependencyFactory::class);
+
+        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->dependencyFactory->expects(self::once())
+            ->method('getClassNameGenerator')
+            ->willReturn($classNameGenerator);
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getConfiguration')
+            ->willReturn($this->configuration);
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getDiffGenerator')
+            ->willReturn($this->migrationDiffGenerator);
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setMethods(['createMigrationDiffGenerator', 'procOpen'])
+            ->setConstructorArgs([null, $this->dependencyFactory])
+            ->setMethods(['procOpen'])
             ->getMock();
-
-        $this->diffCommand->setMigrationConfiguration($this->configuration);
-
-        $this->diffCommand->expects(self::once())
-            ->method('createMigrationDiffGenerator')
-            ->willReturn($this->migrationDiffGenerator);
     }
 }

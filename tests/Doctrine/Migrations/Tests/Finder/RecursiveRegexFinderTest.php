@@ -7,19 +7,13 @@ namespace Doctrine\Migrations\Tests\Finder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use InvalidArgumentException;
 use const PHP_OS;
-use function asort;
 use function count;
+use function in_array;
+use function sort;
 use function stripos;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {
-    public function testVersionNameCausesErrorWhen0() : void
-    {
-        $this->expectException(InvalidArgumentException::class);
-
-        $this->finder->findMigrations(__DIR__ . '/_regression/NoVersionNamed0');
-    }
-
     public function testBadFilenameCausesErrorWhenFindingMigrations() : void
     {
         $this->expectException(InvalidArgumentException::class);
@@ -39,28 +33,24 @@ class RecursiveRegexFinderTest extends FinderTestCase
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
         $tests = [
-            '20150502000000' => 'TestMigrations\\Version20150502000000',
-            '20150502000001' => 'TestMigrations\\Version20150502000001',
-            '20150502000003' => 'TestMigrations\\Version20150502000003',
-            '20150502000004' => 'TestMigrations\\Version20150502000004',
-            '20150502000005' => 'TestMigrations\\Version20150502000005',
-            '1ResetVersions' => 'TestMigrations\\Version1ResetVersions',
+            'TestMigrations\\Version20150502000000',
+            'TestMigrations\\Version20150502000001',
+            'TestMigrations\\Version20150502000003',
+            'TestMigrations\\Version20150502000004',
+            'TestMigrations\\Version20150502000005',
+            'TestMigrations\\Version1ResetVersions',
+            'TestMigrations\\DifferentNamingSchema',
         ];
 
         if (stripos(PHP_OS, 'Win') === false) {
-            $tests['1SymlinkedFile'] = 'TestMigrations\\Version1SymlinkedFile';
+            $tests[] = 'TestMigrations\\Version1SymlinkedFile';
         }
 
         self::assertCount(count($tests), $migrations); // Windows does not support symlinks
-        foreach ($tests as $version => $namespace) {
-            self::assertArrayHasKey($version, $migrations);
-            self::assertSame($namespace, $migrations[$version]);
+        foreach ($tests as $fqcn) {
+            self::assertTrue(in_array($fqcn, $migrations, true));
         }
-        $migrationsForTestSort = $migrations;
 
-        asort($migrationsForTestSort);
-
-        self::assertSame($migrations, $migrationsForTestSort, 'Finder have to return sorted list of the files.');
         self::assertArrayNotHasKey('InvalidVersion20150502000002', $migrations);
         self::assertArrayNotHasKey('Version20150502000002', $migrations);
         self::assertArrayNotHasKey('20150502000002', $migrations);
@@ -73,10 +63,15 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
-        self::assertSame([
-            '0001' => 'TestMigrations\\MultiNested\\Version0001',
-            '0002' => 'TestMigrations\\MultiNested\\Deep\\Version0002',
-        ], $versions);
+        $expectedVersions = [
+            'TestMigrations\\MultiNested\\Version0001',
+            'TestMigrations\\MultiNested\\Deep\\Version0002',
+        ];
+
+        sort($expectedVersions);
+        sort($versions);
+
+        self::assertSame($expectedVersions, $versions);
     }
 
     public function testMigrationsInSubnamespaceAreLoadedIfNamespaceIsParentNamespace() : void
@@ -86,10 +81,15 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested'
         );
 
-        self::assertSame([
-            '0001' => 'TestMigrations\MultiNested\Version0001',
-            '0002' => 'TestMigrations\MultiNested\Deep\Version0002',
-        ], $versions);
+        $expectedVersions = [
+            'TestMigrations\MultiNested\Version0001',
+            'TestMigrations\MultiNested\Deep\Version0002',
+        ];
+
+        sort($expectedVersions);
+        sort($versions);
+
+        self::assertSame($expectedVersions, $versions);
     }
 
     public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided() : void
@@ -99,7 +99,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\MultiNested\\Deep'
         );
 
-        self::assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
+        self::assertSame(['TestMigrations\MultiNested\Deep\Version0002'], $versions);
     }
 
     protected function setUp() : void

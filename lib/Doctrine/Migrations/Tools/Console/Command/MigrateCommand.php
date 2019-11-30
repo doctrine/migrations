@@ -4,8 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Migrator;
-use Doctrine\Migrations\MigratorConfiguration;
+use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +14,8 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function getcwd;
+use function is_string;
+use function is_writable;
 use function sprintf;
 use function substr;
 
@@ -20,7 +23,7 @@ use function substr;
  * The MigrateCommand class is responsible for executing a migration from the current version to another
  * version up or down. It will calculate all the migration versions that need to be executed and execute them.
  */
-class MigrateCommand extends AbstractCommand
+class MigrateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:migrate';
@@ -106,7 +109,7 @@ You can also time all the different queries if you wanna know which one is takin
 
 Use the --all-or-nothing option to wrap the entire migration in a transaction.
 EOT
-        );
+            );
 
         parent::configure();
     }
@@ -114,80 +117,91 @@ EOT
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $this->outputHeader($output);
-
-        $version          = (string) $input->getArgument('version');
+        $allowNoMigration = $input->getOption('allow-no-migration');
+        $versionAlias     = $input->getArgument('version');
         $path             = $input->getOption('write-sql');
-        $allowNoMigration = (bool) $input->getOption('allow-no-migration');
-        $timeAllQueries   = (bool) $input->getOption('query-time');
-        $dryRun           = (bool) $input->getOption('dry-run');
-        $allOrNothing     = $this->getAllOrNothing($input->getOption('all-or-nothing'));
 
-        $this->configuration->setIsDryRun($dryRun);
+        try {
+            $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
+        } catch (UnknownMigrationVersion|NoMigrationsFoundWithCriteria $e) {
+            $this->getVersionNameFromAlias($versionAlias, $output);
 
-        $version = $this->getVersionNameFromAlias(
-            $version,
-            $output
-        );
-
-        if ($version === '') {
             return 1;
         }
 
-        if ($this->checkExecutedUnavailableMigrations($input, $output) === 1) {
+        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+
+        if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
+            return 3;
+        }
+
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
+
+        $plan = $planCalculator->getPlanUntilVersion($version);
+
+        if (count($plan) === 0 && ! $allowNoMigration) {
+            $output->writeln('Could not find any migrations to execute.');
+
             return 1;
         }
 
-        $migrator = $this->createMigrator();
+        if (count($plan) === 0) {
+            $this->getVersionNameFromAlias($versionAlias, $output);
 
+            return 0;
+        }
+
+        $migrator = $this->getDependencyFactory()->getMigrator();
         if ($path !== false) {
-            $path = $path ?? getcwd();
+            $migratorConfiguration->setDryRun(true);
+            $sql = $migrator->migrate($plan, $migratorConfiguration);
 
-            $migrator->writeSqlFile($path, $version);
+            $path = is_string($path) ? $path : getcwd();
+
+            if (! is_string($path) || ! is_writable($path)) {
+                $output->writeln('<error>Path not writeable!</error>');
+
+                return 1;
+            }
+            $writer = $this->getDependencyFactory()->getQueryWriter();
+            $writer->write($path, $plan->getDirection(), $sql);
 
             return 0;
         }
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
 
-        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
-            return 1;
+            return 3;
         }
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries)
-            ->setNoMigrationException($allowNoMigration)
-            ->setAllOrNothing($allOrNothing);
-
-        $migrator->migrate($version, $migratorConfiguration);
+        $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;
     }
 
-    protected function createMigrator() : Migrator
-    {
-        return $this->dependencyFactory->getMigrator();
-    }
-
     private function checkExecutedUnavailableMigrations(
+        ExecutedMigrationsSet $executedUnavailableMigrations,
         InputInterface $input,
         OutputInterface $output
-    ) : int {
-        $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
-
+    ) : bool {
         if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
                 count($executedUnavailableMigrations)
             ));
 
-            foreach ($executedUnavailableMigrations as $executedUnavailableMigration) {
+            foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
                 $output->writeln(sprintf(
                     '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $this->configuration->getDateTime($executedUnavailableMigration),
-                    $executedUnavailableMigration
+                    $executedUnavailableMigration->getExecutedAt() !== null
+                        ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                        : null,
+                    $executedUnavailableMigration->getVersion()
                 ));
             }
 
@@ -196,60 +210,36 @@ EOT
             if (! $this->canExecute($question, $input, $output)) {
                 $output->writeln('<error>Migration cancelled!</error>');
 
-                return 1;
+                return false;
             }
         }
 
-        return 0;
+        return true;
     }
 
     private function getVersionNameFromAlias(
         string $versionAlias,
         OutputInterface $output
-    ) : string {
-        $version = $this->configuration->resolveVersionAlias($versionAlias);
-
-        if ($version !== null) {
-            return $version;
-        }
-
-        if ($versionAlias === 'prev') {
+    ) : void {
+        if ($versionAlias === 'first') {
             $output->writeln('<error>Already at first version.</error>');
 
-            return '';
+            return;
         }
-
-        if ($versionAlias === 'next') {
+        if ($versionAlias === 'next' || $versionAlias === 'latest') {
             $output->writeln('<error>Already at latest version.</error>');
 
-            return '';
+            return;
         }
-
         if (substr($versionAlias, 0, 7) === 'current') {
             $output->writeln('<error>The delta couldn\'t be reached.</error>');
 
-            return '';
+            return;
         }
 
         $output->writeln(sprintf(
             '<error>Unknown version: %s</error>',
             OutputFormatter::escape($versionAlias)
         ));
-
-        return '';
-    }
-
-    /**
-     * @param mixed $allOrNothing
-     */
-    private function getAllOrNothing($allOrNothing) : bool
-    {
-        if ($allOrNothing !== false) {
-            return $allOrNothing !== null
-                ? (bool) $allOrNothing
-                : true;
-        }
-
-        return $this->configuration->isAllOrNothing();
     }
 }

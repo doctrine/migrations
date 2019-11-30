@@ -4,49 +4,24 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
-use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
-use Doctrine\Migrations\Tests\Stub\VersionDummy;
-use Doctrine\Migrations\Version\ExecutorInterface;
-use Doctrine\Migrations\Version\Version;
-use function sys_get_temp_dir;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
-    /** @var Configuration */
-    private $config;
-
-    /** @var Version */
-    private $version;
-
     /** @var AbstractMigrationStub */
     private $migration;
 
-    /** @var OutputWriter */
-    private $outputWriter;
+    /** @var TestLogger */
+    private $logger;
 
     protected function setUp() : void
     {
-        $this->outputWriter = $this->getOutputWriter();
+        $this->logger = new TestLogger();
 
-        $this->config = new Configuration($this->getSqliteConnection(), $this->outputWriter);
-        $this->config->setMigrationsDirectory(sys_get_temp_dir());
-        $this->config->setMigrationsNamespace('DoctrineMigrations\\');
-
-        $versionExecutor = $this->createMock(ExecutorInterface::class);
-
-        $this->version = new Version(
-            $this->config,
-            'Dummy',
-            VersionDummy::class,
-            $versionExecutor
-        );
-
-        $this->migration = new AbstractMigrationStub($this->version);
+        $this->migration = new AbstractMigrationStub($this->getSqliteConnection(), $this->logger);
     }
 
     public function testGetDescriptionReturnsEmptyString() : void
@@ -54,28 +29,36 @@ class AbstractMigrationTest extends MigrationTestCase
         self::assertSame('', $this->migration->getDescription());
     }
 
+    public function testAddSql() : void
+    {
+        $this->migration->exposedAddSql('SELECT 1', [1], [2]);
+
+        self::assertSame([['SELECT 1', [1], [2]]], $this->migration->getSql());
+    }
+
     public function testWarnIfOutputMessage() : void
     {
         $this->migration->warnIf(true, 'Warning was thrown');
-        self::assertContains('Warning during No State: Warning was thrown', $this->getOutputStreamContent($this->output));
+
+        self::assertContains('Warning was thrown', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfAddDefaultMessage() : void
     {
         $this->migration->warnIf(true);
-        self::assertContains('Warning during No State: Unknown Reason', $this->getOutputStreamContent($this->output));
+        self::assertContains('Unknown Reason', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfDontOutputMessageIfFalse() : void
     {
         $this->migration->warnIf(false, 'trallala');
-        self::assertSame('', $this->getOutputStreamContent($this->output));
+        self::assertSame('', $this->getLogOutput($this->logger));
     }
 
     public function testWriteInvokesOutputWriter() : void
     {
         $this->migration->exposedWrite('Message');
-        self::assertContains('Message', $this->getOutputStreamContent($this->output));
+        self::assertContains('Message', $this->getLogOutput($this->logger));
     }
 
     public function testAbortIfThrowsException() : void

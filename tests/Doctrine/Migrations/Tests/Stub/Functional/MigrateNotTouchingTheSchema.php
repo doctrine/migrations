@@ -28,7 +28,7 @@ class MigrateNotTouchingTheSchema extends AbstractMigration
 
     public function down(Schema $schema) : void
     {
-        $this->addSql('SELECT 1');
+        $this->addSql('SELECT 2');
     }
 
     public function postDown(Schema $schema) : void

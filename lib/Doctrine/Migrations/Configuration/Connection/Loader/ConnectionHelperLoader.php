@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
+use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Symfony\Component\Console\Helper\HelperSet;
 
 /**
@@ -14,7 +14,7 @@ use Symfony\Component\Console\Helper\HelperSet;
  *
  * @internal
  */
-class ConnectionHelperLoader implements ConnectionLoaderInterface
+final class ConnectionHelperLoader implements ConnectionLoader
 {
     /** @var string */
     private $helperName;
@@ -22,22 +22,21 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
     /** @var  HelperSet */
     private $helperSet;
 
-    public function __construct(?HelperSet $helperSet = null, string $helperName)
+    /** @var ConnectionLoader */
+    private $fallback;
+
+    public function __construct(string $helperName, ConnectionLoader $fallback, ?HelperSet $helperSet = null)
     {
+        $this->helperSet  = $helperSet ?: new HelperSet();
         $this->helperName = $helperName;
-
-        if ($helperSet === null) {
-            $helperSet = new HelperSet();
-        }
-
-        $this->helperSet = $helperSet;
+        $this->fallback   = $fallback;
     }
 
     /**
      * Read the input and return a Configuration, returns null if the config
      * is not supported.
      */
-    public function chosen() : ?Connection
+    public function getConnection() : Connection
     {
         if ($this->helperSet->has($this->helperName)) {
             $connectionHelper = $this->helperSet->get($this->helperName);
@@ -47,6 +46,6 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
             }
         }
 
-        return null;
+        return $this->fallback->getConnection();
     }
 }

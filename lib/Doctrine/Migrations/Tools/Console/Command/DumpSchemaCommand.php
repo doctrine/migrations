@@ -9,8 +9,12 @@ use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function addslashes;
+use function assert;
 use function class_exists;
 use function count;
+use function is_string;
+use function key;
 use function sprintf;
 
 /**
@@ -19,7 +23,7 @@ use function sprintf;
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
-class DumpSchemaCommand extends AbstractCommand
+class DumpSchemaCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';
@@ -52,6 +56,18 @@ EOT
                 'Format the generated SQL.'
             )
             ->addOption(
+                'namespace',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Namespace to use for the generated migrations (defaults to the first namespace definition).'
+            )
+            ->addOption(
+                'filter-tables',
+                null,
+                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+                'Filter the tables to dump via Regex.'
+            )
+            ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_OPTIONAL,
@@ -67,11 +83,11 @@ EOT
         InputInterface $input,
         OutputInterface $output
     ) : ?int {
-        $formatted  = (bool) $input->getOption('formatted');
+        $formatted  = $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 
-        $schemaDumper = $this->dependencyFactory->getSchemaDumper();
-        $versions     = $this->migrationRepository->getVersions();
+        $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
+        $versions     = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
 
         if (count($versions) > 0) {
             throw SchemaDumpRequiresNoMigrations::new();
@@ -85,10 +101,20 @@ EOT
             }
         }
 
-        $versionNumber = $this->configuration->generateVersionNumber();
+        $configuration = $this->getDependencyFactory()->getConfiguration();
+
+        $namespace = $input->getOption('namespace');
+        if ($namespace === null) {
+            $dirs      = $configuration->getMigrationDirectories();
+            $namespace = key($dirs);
+        }
+        assert(is_string($namespace));
+
+        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
         $path = $schemaDumper->dump(
-            $versionNumber,
+            $fqcn,
+            $input->getOption('filter-tables'),
             $formatted,
             $lineLength
         );
@@ -96,6 +122,7 @@ EOT
         $editorCommand = $input->getOption('editor-cmd');
 
         if ($editorCommand !== null) {
+            assert(is_string($editorCommand));
             $this->procOpen($editorCommand, $path);
         }
 
@@ -103,13 +130,13 @@ EOT
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up %s</info>',
-                $versionNumber
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                addslashes($fqcn)
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down %s</info>',
-                $versionNumber
+                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                addslashes($fqcn)
             ),
             '',
             'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',

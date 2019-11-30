@@ -4,43 +4,47 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Version\ExecutorInterface;
-use Doctrine\Migrations\Version\Factory;
+use Doctrine\Migrations\Version\MigrationFactory;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use ReflectionProperty;
 
 final class FactoryTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
+    /** @var MockObject|Connection */
+    private $connection;
+    /** @var MockObject|LoggerInterface */
+    private $logger;
 
-    /** @var ExecutorInterface */
-    private $versionExecutor;
-
-    /** @var Factory */
+    /** @var MigrationFactory */
     private $versionFactory;
 
     public function testCreateVersion() : void
     {
-        $version = $this->versionFactory->createVersion(
-            '001',
+        $migration = $this->versionFactory->createVersion(
             VersionFactoryTestMigration::class
         );
 
-        self::assertSame($this->configuration, $version->getConfiguration());
-        self::assertInstanceOf(VersionFactoryTestMigration::class, $version->getMigration());
+        self::assertInstanceOf(VersionFactoryTestMigration::class, $migration);
+        self::assertSame($this->connection, $migration->getConnection());
+
+        $ref = new ReflectionProperty(AbstractMigration::class, 'logger');
+        $ref->setAccessible(true);
+        self::assertSame($this->logger, $ref->getValue($migration));
     }
 
     protected function setUp() : void
     {
-        $this->configuration   = $this->createMock(Configuration::class);
-        $this->versionExecutor = $this->createMock(ExecutorInterface::class);
+        $this->connection = $this->createMock(Connection::class);
+        $this->logger     = $this->createMock(LoggerInterface::class);
 
-        $this->versionFactory = new Factory(
-            $this->configuration,
-            $this->versionExecutor
+        $this->versionFactory = new MigrationFactory(
+            $this->connection,
+            $this->logger
         );
     }
 }
@@ -53,5 +57,10 @@ class VersionFactoryTestMigration extends AbstractMigration
 
     public function down(Schema $schema) : void
     {
+    }
+
+    public function getConnection() : Connection
+    {
+        return $this->connection;
     }
 }

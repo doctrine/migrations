@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SqlFormatter;
@@ -14,7 +15,7 @@ use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration */
     private $configuration;
 
     /** @var AbstractPlatform|MockObject */
@@ -26,9 +27,12 @@ final class SqlGeneratorTest extends TestCase
     /** @var string[] */
     private $sql;
 
+    /** @var TableMetadataStorageConfiguration */
+    private $metadataConfig;
+
     public function testGenerate() : void
     {
-        $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
+        $this->configuration->setCheckDatabasePlatform(true);
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
@@ -51,7 +55,7 @@ CODE
 
     public function testGenerationWithoutCheckingDatabasePlatform() : void
     {
-        $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
+        $this->configuration->setCheckDatabasePlatform(true);
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
@@ -68,7 +72,7 @@ CODE
 
     public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration() : void
     {
-        $this->configuration->method('isDatabasePlatformChecked')->willReturn(false);
+        $this->configuration->setCheckDatabasePlatform(false);
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
@@ -85,9 +89,11 @@ CODE
 
     protected function setUp() : void
     {
-        $this->configuration = $this->createMock(Configuration::class);
+        $this->configuration = new Configuration();
         $this->platform      = $this->createMock(AbstractPlatform::class);
 
+        $this->metadataConfig = new TableMetadataStorageConfiguration();
+        $this->configuration->setMetadataStorageConfiguration($this->metadataConfig);
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
             $this->platform
@@ -107,9 +113,7 @@ CODE
 
         $expectedCode = sprintf($expectedCode, $formattedUpdate);
 
-        $this->configuration->expects(self::any())
-            ->method('getMigrationsTableName')
-            ->willReturn('migrations_table_name');
+        $this->metadataConfig->setTableName('migrations_table_name');
 
         return $expectedCode;
     }

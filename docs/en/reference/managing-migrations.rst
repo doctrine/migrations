@@ -27,8 +27,8 @@ that the new migration is registered and ready to be executed:
         >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
         >> Previous Version:                                   Already at first version
         >> Current Version:                                    0
-        >> Next Version:                                       2018-06-01 19:30:57 (20180601193057)
-        >> Latest Version:                                     2018-06-01 19:30:57 (20180601193057)
+        >> Next Version:                                       2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
+        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
         >> Executed Migrations:                                0
         >> Executed Unavailable Migrations:                    0
         >> Available Migrations:                               1
@@ -36,7 +36,7 @@ that the new migration is registered and ready to be executed:
 
      == Available Migration Versions
 
-        >> 2018-06-01 19:30:57 (20180601193057)                not migrated     This is my example migration.
+        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                not migrated     This is my example migration.
 
 As you can see we have a new migration version available and it is ready to be executed. The problem
 is, it does not have anything in it so nothing would be executed! Let's add some code to it and add a new table:
@@ -85,9 +85,9 @@ Now we are ready to give it a test! First lets just do a dry-run to make sure it
                         My Project Migrations
 
 
-    Executing dry run of migration up to 20180601193057 from 0
+    Executing dry run of migration up to MyProject\Migrations\Version20180601193057 from 0
 
-      ++ migrating 20180601193057
+      ++ migrating MyProject\Migrations\Version20180601193057
 
          -> CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
 
@@ -118,9 +118,9 @@ Everything looks good so we can remove the ``--dry-run`` option and actually exe
 
 
     WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)y
-    Migrating up to 20180601193057 from 0
+    Migrating up to MyProject\Migrations\Version20180601193057 from 0
 
-      ++ migrating 20180601193057
+      ++ migrating MyProject\Migrations\Version20180601193057
 
          -> CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
 
@@ -140,10 +140,10 @@ You may want to just execute a single migration up or down. You can do this with
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations execute 20180601193057 --down
+    $ ./vendor/bin/doctrine-migrations execute MyProject\Migrations\Version20180601193057 --down
     WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)y
 
-      ++ migrating 20180601193057
+      ++ migrating MyProject\Migrations\Version20180601193057
 
          -> DROP TABLE example_table
 
@@ -162,9 +162,9 @@ execute the migrations without any extra prompting from Doctrine.
                         My Project Migrations
 
 
-    Migrating up to 20180601193057 from 0
+    Migrating up to MyProject\Migrations\Version20180601193057 from 0
 
-      ++ migrating 20180601193057
+      ++ migrating MyProject\Migrations\Version20180601193057
 
          -> CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
 
@@ -195,9 +195,9 @@ By checking the status again after using either method you will see everything i
         >> Migrations Namespace:                               MyProject\Migrations
         >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
         >> Previous Version:                                   0
-        >> Current Version:                                    2018-06-01 19:30:57 (20180601193057)
+        >> Current Version:                                    2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
         >> Next Version:                                       Already at latest version
-        >> Latest Version:                                     2018-06-01 19:30:57 (20180601193057)
+        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
         >> Executed Migrations:                                1
         >> Executed Unavailable Migrations:                    0
         >> Available Migrations:                               1
@@ -205,7 +205,7 @@ By checking the status again after using either method you will see everything i
 
      == Available Migration Versions
 
-        >> 2018-06-01 19:30:57 (20180601193057)                migrated (executed at 2018-06-01 17:08:44)     This is my example migration.
+        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                migrated (executed at 2018-06-01 17:08:44)     This is my example migration.
 
 Reverting Migrations
 --------------------
@@ -222,9 +222,9 @@ it will migrate down. To rollback to the the first version you can use the ``fir
 
 
     WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)y
-    Migrating down to 0 from 20180601193057
+    Migrating down to 0 from MyProject\Migrations\Version20180601193057
 
-      -- reverting 20180601193057
+      -- reverting MyProject\Migrations\Version20180601193057
 
          -> DROP TABLE example_table
 
@@ -256,8 +256,8 @@ Now if you run the ``status`` command again, you will see that the database is b
         >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
         >> Previous Version:                                   Already at first version
         >> Current Version:                                    0
-        >> Next Version:                                       2018-06-01 19:30:57 (20180601193057)
-        >> Latest Version:                                     2018-06-01 19:30:57 (20180601193057)
+        >> Next Version:                                       2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
+        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
         >> Executed Migrations:                                0
         >> Executed Unavailable Migrations:                    0
         >> Available Migrations:                               1
@@ -265,7 +265,7 @@ Now if you run the ``status`` command again, you will see that the database is b
 
      == Available Migration Versions
 
-        >> 2018-06-01 19:30:57 (20180601193057)                not migrated     This is my example migration.
+        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                not migrated     This is my example migration.
 
 Version Aliases
 ---------------
@@ -298,9 +298,9 @@ statement to a file. This is possible by using the ``--write-sql`` option:
                         My Project Migrations
 
 
-    Executing dry run of migration up to 20180601193057 from 0
+    Executing dry run of migration up to MyProject\Migrations\Version20180601193057 from 0
 
-      ++ migrating 20180601193057
+      ++ migrating MyProject\Migrations\Version20180601193057
 
          -> CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))
 
@@ -312,7 +312,7 @@ statement to a file. This is possible by using the ``--write-sql`` option:
       ++ used 8M memory
       ++ 1 migrations executed
       ++ 1 sql queries
-    -- Migrating from 0 to 20180601193057
+    -- Migrating from 0 to MyProject\Migrations\Version20180601193057
 
 
     Writing migration file to "/data/doctrine/migrations-docs-example/doctrine_migration_20180601172528.sql"
@@ -325,9 +325,9 @@ executed SQL outputted in a nice format:
     $ cat doctrine_migration_20180601172528.sql
     -- Doctrine Migration File Generated on 2018-06-01 17:25:28
 
-    -- Version 20180601193057
+    -- Version MyProject\Migrations\Version20180601193057
     CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id));
-    INSERT INTO doctrine_migration_versions (version, executed_at) VALUES ('20180601193057', CURRENT_TIMESTAMP);
+    INSERT INTO doctrine_migration_versions (version, executed_at) VALUES ('MyProject\Migrations\Version20180601193057', CURRENT_TIMESTAMP);
 
 The ``--write-sql`` option also accepts an optional value for where to write the sql file. It can be a relative path
 to a file that will write to the current working directory:
@@ -360,13 +360,13 @@ Sometimes you may need to manually mark a migration as migrated or not. You can 
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations version 20180601193057 --add
+    $ ./vendor/bin/doctrine-migrations version 'MyProject\Migrations\Version20180601193057' --add
 
 Or you can delete that version:
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations version 20180601193057 --delete
+    $ ./vendor/bin/doctrine-migrations version 'MyProject\Migrations\Version20180601193057' --delete
 
 This command does not actually execute any migrations, it just adds or deletes the version from the version table where
 we track whether or not a migration version has been executed or not.
