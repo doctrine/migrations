@@ -177,7 +177,7 @@ class ExecuteCommandTest extends TestCase
 
         $this->executeCommand = $this->getMockBuilder(ExecuteCommand::class)
             ->setConstructorArgs([null, $this->dependencyFactory])
-            ->setMethods(['canExecute'])
+            ->onlyMethods(['canExecute'])
             ->getMock();
 
         $this->executeCommandTester = new CommandTester($this->executeCommand);

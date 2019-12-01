@@ -59,11 +59,11 @@ final class FileQueryWriterTest extends MigrationTestCase
         self::assertCount(1, $files);
 
         foreach ($files as $file) {
-            $contents = file_get_contents($file);
+            $contents = (string) file_get_contents($file);
             unlink($file);
 
             self::assertNotEmpty($contents);
-            self::assertContains('foo', $contents);
+            self::assertStringContainsString('foo', $contents);
         }
     }
 }

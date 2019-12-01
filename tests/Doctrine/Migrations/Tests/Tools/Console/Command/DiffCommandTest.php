@@ -119,7 +119,7 @@ final class DiffCommandTest extends TestCase
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
             ->setConstructorArgs([null, $this->dependencyFactory])
-            ->setMethods(['procOpen'])
+            ->onlyMethods(['procOpen'])
             ->getMock();
     }
 }

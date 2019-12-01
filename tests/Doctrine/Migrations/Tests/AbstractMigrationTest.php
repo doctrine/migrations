@@ -40,13 +40,13 @@ class AbstractMigrationTest extends MigrationTestCase
     {
         $this->migration->warnIf(true, 'Warning was thrown');
 
-        self::assertContains('Warning was thrown', $this->getLogOutput($this->logger));
+        self::assertStringContainsString('Warning was thrown', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfAddDefaultMessage() : void
     {
         $this->migration->warnIf(true);
-        self::assertContains('Unknown Reason', $this->getLogOutput($this->logger));
+        self::assertStringContainsString('Unknown Reason', $this->getLogOutput($this->logger));
     }
 
     public function testWarnIfDontOutputMessageIfFalse() : void
@@ -58,7 +58,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWriteInvokesOutputWriter() : void
     {
         $this->migration->exposedWrite('Message');
-        self::assertContains('Message', $this->getLogOutput($this->logger));
+        self::assertStringContainsString('Message', $this->getLogOutput($this->logger));
     }
 
     public function testAbortIfThrowsException() : void

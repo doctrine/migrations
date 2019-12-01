@@ -4,13 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\QuestionHelper;
 
 trait DialogSupport
 {
-    /** @var QuestionHelper|PHPUnit_Framework_MockObject_MockObject */
+    /** @var QuestionHelper|MockObject */
     protected $questions;
 
     protected function configureDialogs(Application $app) : void
