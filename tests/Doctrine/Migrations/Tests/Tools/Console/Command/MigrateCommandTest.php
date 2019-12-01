@@ -294,7 +294,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->setConstructorArgs([$this->configuration, $connection])
-            ->setMethods(['getMigrator', 'getQueryWriter'])
+            ->onlyMethods(['getMigrator', 'getQueryWriter'])
             ->getMock();
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
@@ -309,7 +309,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommand = $this->getMockBuilder(MigrateCommand::class)
             ->setConstructorArgs([null, $this->dependencyFactory])
-            ->setMethods(['canExecute'])
+            ->onlyMethods(['canExecute'])
             ->getMock();
 
         $this->migrateCommandTester = new CommandTester($this->migrateCommand);

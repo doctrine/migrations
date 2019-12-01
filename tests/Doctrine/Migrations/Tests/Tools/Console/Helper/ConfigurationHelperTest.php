@@ -36,7 +36,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     {
         $this->input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
-            ->setMethods(['getOption'])
+            ->onlyMethods(['getOption'])
             ->getMock();
 
         $this->loader              = $this->createMock(ConfigurationLoader::class);

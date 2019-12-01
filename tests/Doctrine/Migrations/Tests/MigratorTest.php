@@ -85,7 +85,7 @@ class MigratorTest extends MigrationTestCase
         $migrator->migrate($planList, $this->migratorConfiguration);
 
         self::assertCount(1, $this->logger->logs, 'should output the no migrations message');
-        self::assertContains('No migrations', $this->logger->logs[0]);
+        self::assertStringContainsString('No migrations', $this->logger->logs[0]);
     }
 
     protected function createTestMigrator() : DbalMigrator

@@ -29,9 +29,9 @@ final class GeneratorTest extends TestCase
 
         self::assertFileExists($path);
 
-        $migrationCode = file_get_contents($path);
+        $migrationCode = (string) file_get_contents($path);
 
-        self::assertContains('// up', $migrationCode);
+        self::assertStringContainsString('// up', $migrationCode);
 
         include $path;
 
