@@ -36,6 +36,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use function array_key_exists;
 use function preg_quote;
 use function sprintf;
 
@@ -46,10 +47,12 @@ use function sprintf;
  */
 class DependencyFactory
 {
+    public const MIGRATIONS_SORTER = 'Doctrine\Migrations\MigrationsSorter';
+
     /** @var Configuration */
     private $configuration;
 
-    /** @var object[] */
+    /** @var object[]|callable[] */
     private $dependencies = [];
 
     /** @var LoggerInterface */
@@ -57,9 +60,6 @@ class DependencyFactory
 
     /** @var Connection */
     private $connection;
-
-    /** @var callable */
-    private $sorter;
 
     /** @var EntityManagerInterface|null */
     private $em;
@@ -96,6 +96,13 @@ class DependencyFactory
     private function getConnection() : Connection
     {
         return $this->connection;
+    }
+
+    public function getSorter() : ?callable
+    {
+        return $this->getDependency(self::MIGRATIONS_SORTER, static function () {
+            return null;
+        });
     }
 
     public function getEventDispatcher() : EventDispatcher
@@ -196,12 +203,6 @@ class DependencyFactory
         });
     }
 
-    public function setSorter(callable $sorter) : void
-    {
-        $this->assertNotFrozen();
-        $this->sorter = $sorter;
-    }
-
     public function getMigrationRepository() : MigrationRepository
     {
         return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
@@ -210,13 +211,13 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
                 new MigrationFactory($this->getConnection(), $this->getLogger()),
-                $this->sorter
+                $this->getSorter()
             );
         });
     }
 
     /**
-     * @param mixed $service
+     * @param object|callable $service
      */
     public function setService(string $id, $service) : void
     {
@@ -369,12 +370,12 @@ class DependencyFactory
     /**
      * @return mixed
      */
-    private function getDependency(string $className, callable $callback)
+    private function getDependency(string $id, callable $callback)
     {
-        if (! isset($this->dependencies[$className])) {
-            $this->dependencies[$className] = $callback();
+        if (! array_key_exists($id, $this->dependencies)) {
+            $this->dependencies[$id] = $callback();
         }
 
-        return $this->dependencies[$className];
+        return $this->dependencies[$id];
     }
 }
