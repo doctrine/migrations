@@ -332,9 +332,9 @@ final class DbalExecutor implements Executor
             $this->outputSqlQuery($key, $query);
 
             if (! isset($this->params[$key])) {
-                $this->connection->executeQuery($query);
+                $this->connection->executeUpdate($query);
             } else {
-                $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
+                $this->connection->executeUpdate($query, $this->params[$key], $this->types[$key]);
             }
 
             $stopwatchEvent->stop();
