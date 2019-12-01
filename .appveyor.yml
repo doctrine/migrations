@@ -15,7 +15,6 @@ environment:
   matrix:
     - php: 7.2.23
     - php: 7.3.10
-    - php: 7.1.32
 
 init:
   - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;C:\tools\composer;%PATH%
