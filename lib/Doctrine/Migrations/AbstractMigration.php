@@ -5,11 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
+use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Version\Version;
 use function sprintf;
@@ -100,24 +102,42 @@ abstract class AbstractMigration
         }
     }
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     public function preUp(Schema $schema) : void
     {
     }
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     public function postUp(Schema $schema) : void
     {
     }
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     public function preDown(Schema $schema) : void
     {
     }
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     public function postDown(Schema $schema) : void
     {
     }
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     abstract public function up(Schema $schema) : void;
 
+    /**
+     * @throws MigrationException|DBALException
+     */
     abstract public function down(Schema $schema) : void;
 
     /**
@@ -137,6 +157,9 @@ abstract class AbstractMigration
         $this->outputWriter->write($message);
     }
 
+    /**
+     * @throws IrreversibleMigration
+     */
     protected function throwIrreversibleMigrationException(?string $message = null) : void
     {
         if ($message === null) {
