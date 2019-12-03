@@ -22,6 +22,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
+use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchEvent;
@@ -325,6 +326,78 @@ class ExecutorTest extends TestCase
             self::assertSame(State::EXEC, $result->getState());
             self::assertTrue($this->migration->preUpExecuted);
             self::assertFalse($this->migration->postUpExecuted);
+            self::assertFalse($this->migration->preDownExecuted);
+            self::assertFalse($this->migration->postDownExecuted);
+        }
+        self::assertFalse($migrationSucceed);
+    }
+
+    public function testChangesNotCommittedIfMetadataFailure() : void
+    {
+        $this->metadataStorage
+            ->expects(self::once())
+            ->method('complete')
+            ->willThrowException(new Exception('foo'));
+
+        $this->connection
+            ->expects(self::never())
+            ->method('commit');
+
+        $this->connection
+            ->expects(self::once())
+            ->method('rollBack');
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
+        $listener = new class() {
+            /** @var bool */
+            public $onMigrationsVersionExecuting = false;
+            /** @var bool */
+            public $onMigrationsVersionExecuted = false;
+            /** @var bool */
+            public $onMigrationsVersionSkipped = false;
+
+            public function onMigrationsVersionExecuting() : void
+            {
+                $this->onMigrationsVersionExecuting = true;
+            }
+
+            public function onMigrationsVersionExecuted() : void
+            {
+                $this->onMigrationsVersionExecuted = true;
+            }
+
+            public function onMigrationsVersionSkipped() : void
+            {
+                $this->onMigrationsVersionSkipped = true;
+            }
+        };
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+
+        $migrationSucceed = false;
+        try {
+            $this->versionExecutor->execute(
+                $plan,
+                $migratorConfiguration
+            );
+            $migrationSucceed = true;
+        } catch (Throwable $e) {
+            self::assertFalse($listener->onMigrationsVersionExecuted);
+            self::assertTrue($listener->onMigrationsVersionSkipped);
+            self::assertTrue($listener->onMigrationsVersionExecuting);
+
+            $result = $plan->getResult();
+            self::assertNotNull($result);
+            self::assertSame([], $result->getSql());
+            self::assertSame([], $result->getSql());
+            self::assertSame(State::POST, $result->getState());
+            self::assertTrue($this->migration->preUpExecuted);
+            self::assertTrue($this->migration->postUpExecuted);
             self::assertFalse($this->migration->preDownExecuted);
             self::assertFalse($this->migration->postDownExecuted);
         }
