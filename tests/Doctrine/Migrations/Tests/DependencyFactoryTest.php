@@ -7,9 +7,11 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use PHPUnit\Framework\MockObject\MockObject;
+use stdClass;
 
 final class DependencyFactoryTest extends MigrationTestCase
 {
@@ -19,6 +21,19 @@ final class DependencyFactoryTest extends MigrationTestCase
     public function setUp() : void
     {
         $this->connection = $this->createMock(Connection::class);
+    }
+
+    public function testFreeze() : void
+    {
+        $conf = new Configuration();
+        $conf->addMigrationsDirectory('foo', 'bar');
+
+        $di = new DependencyFactory($conf, $this->connection);
+        $di->freeze();
+
+        $this->expectException(FrozenDependencies::class);
+        $this->expectExceptionMessage('The dependencies are frozen and cannot be edited anymore.');
+        $di->setService('foo', new stdClass());
     }
 
     public function testFinderForYearMonthStructure() : void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
 use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
@@ -53,7 +54,18 @@ class ConfigurationTest extends TestCase
         $this->expectExceptionMessage('There are no namespaces configured.');
 
         $config = new Configuration();
-        $config->validate();
+        $config->freeze();
+    }
+
+    public function testFreezeConfiguration() : void
+    {
+        $config = new Configuration();
+        $config->addMigrationsDirectory('foo', 'bar');
+        $config->freeze();
+
+        $this->expectException(FrozenConfiguration::class);
+        $this->expectExceptionMessage('The configuration is frozen and cannot be edited anymore.');
+        $config->setName('foo');
     }
 
     public function testMigrationOrganizationByYear() : void
