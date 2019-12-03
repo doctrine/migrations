@@ -4,10 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function array_map;
 use function count;
+use function implode;
 use function sprintf;
 
 /**
@@ -42,9 +45,9 @@ EOT
         $newMigrations                 = $planCalculator->getNewMigrations();
 
         $newMigrationsCount                 = count($newMigrations);
-        $executedUnavailableMigrationsCount =  count($executedUnavailableMigrations);
+        $executedUnavailableMigrationsCount = count($executedUnavailableMigrations);
 
-        if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {
+        if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount === 0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
 
             return 0;
@@ -68,6 +71,10 @@ EOT
                 $executedUnavailableMigrationsCount > 1 ? 'are not' : 'is not a',
                 $executedUnavailableMigrationsCount > 1 ? 's' : ''
             ));
+            $names = array_map(static function (ExecutedMigration $migration) : string {
+                return (string) $migration->getVersion();
+            }, $executedUnavailableMigrations->getItems());
+            $output->writeln('>>> ' . implode(', ', $names));
         }
 
         return $executedUnavailableMigrationsCount > 0 && $input->getOption('fail-on-unregistered') === true ? 2 : 0;
