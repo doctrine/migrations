@@ -13,6 +13,9 @@ parameters:
         - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
+            message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
+        -
             message: '~^Variable property access on mixed\.$~'
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Loader/XmlFileLoader.php
         -
