@@ -38,7 +38,7 @@ class MigrateCommand extends DoctrineCommand
             ->addArgument(
                 'version',
                 InputArgument::OPTIONAL,
-                'The version number (YYYYMMDDHHMMSS) or alias (first, prev, next, latest) to migrate to.',
+                'The version FQCN or alias (first, prev, next, latest) to migrate to.',
                 'latest'
             )
             ->addOption(
@@ -80,7 +80,7 @@ The <info>%command.name%</info> command executes a migration to a specified vers
 
 You can optionally manually specify the version you wish to migrate to:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% FQCN</info>
 
 You can specify the version you wish to migrate to using an alias:
 
@@ -93,11 +93,11 @@ You can specify the version you wish to migrate to using an number against the c
 
 You can also execute the migration as a <comment>--dry-run</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
+    <info>%command.full_name% FQCN --dry-run</info>
 
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+    <info>%command.full_name% FQCN --write-sql</info>
 
 Or you can also execute the migration without a warning message which you need to interact with:
 
