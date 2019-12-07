@@ -10,12 +10,13 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function array_map;
 use function getcwd;
 use function is_string;
 use function is_writable;
 
 /**
- * The ExecutCommand class is responsible for executing a single migration version up or down.
+ * The ExecutCommand class is responsible for executing migration versions up or down manually.
  */
 class ExecuteCommand extends DoctrineCommand
 {
@@ -27,12 +28,12 @@ class ExecuteCommand extends DoctrineCommand
         $this
             ->setAliases(['execute'])
             ->setDescription(
-                'Execute a single migration version up or down manually.'
+                'Execute one or more migration versions up or down manually.'
             )
             ->addArgument(
-                'version',
-                InputArgument::REQUIRED,
-                'The version to execute.',
+                'versions',
+                InputArgument::REQUIRED|InputArgument::IS_ARRAY,
+                'The versions to execute.',
                 null
             )
             ->addOption(
@@ -67,7 +68,7 @@ class ExecuteCommand extends DoctrineCommand
                 'Time all the queries individually.'
             )
             ->setHelp(<<<EOT
-The <info>%command.name%</info> command executes a single migration version up or down manually:
+The <info>%command.name%</info> command executes migration versions up or down manually:
 
     <info>%command.full_name% FQCN</info>
 
@@ -94,14 +95,17 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version   = $input->getArgument('version');
+        $versions  = $input->getArgument('versions');
         $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
-        $migrator = $this->getDependencyFactory()->getMigrator();
-        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+        $migrator       = $this->getDependencyFactory()->getMigrator();
+        $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
+        $plan           = $planCalculator->getPlanForVersions(array_map(static function (string $version) : Version {
+            return new Version($version);
+        }, $versions), $direction);
 
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
