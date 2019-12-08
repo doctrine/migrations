@@ -21,7 +21,7 @@ class LatestCommand extends DoctrineCommand
     {
         $this
             ->setAliases(['latest'])
-            ->setDescription('Outputs the latest version number');
+            ->setDescription('Outputs the latest version');
 
         parent::configure();
     }

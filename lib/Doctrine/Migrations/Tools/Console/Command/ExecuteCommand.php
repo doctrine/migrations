@@ -69,23 +69,23 @@ class ExecuteCommand extends DoctrineCommand
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% FQCN</info>
 
 If no <comment>--up</comment> or <comment>--down</comment> option is specified it defaults to up:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --down</info>
+    <info>%command.full_name% FQCN --down</info>
 
 You can also execute the migration as a <comment>--dry-run</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
+    <info>%command.full_name% FQCN --dry-run</info>
 
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+    <info>%command.full_name% FQCN --write-sql</info>
 
 Or you can also execute the migration without a warning message which you need to interact with:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --no-interaction</info>
+    <info>%command.full_name% FQCN --no-interaction</info>
 EOT
         );
 
