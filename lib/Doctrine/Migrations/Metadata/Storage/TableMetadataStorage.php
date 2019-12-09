@@ -108,6 +108,10 @@ final class TableMetadataStorage implements MetadataStorage
 
     public function reset() : void
     {
+        if (! $this->isInitialized()) {
+            $this->initialize();
+        }
+
         $this->connection->executeUpdate(
             sprintf(
                 'DELETE FROM %s WHERE 1 = 1',

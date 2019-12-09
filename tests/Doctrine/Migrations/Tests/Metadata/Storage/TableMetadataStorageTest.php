@@ -172,4 +172,15 @@ class TableMetadataStorageTest extends TestCase
 
         self::assertCount(0, $this->connection->fetchAll($sql));
     }
+
+    public function testResetWithEmptySchema() : void
+    {
+        $this->storage->reset();
+
+        $sql = sprintf(
+            'SELECT * FROM %s',
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+        );
+        self::assertCount(0, $this->connection->fetchAll($sql));
+    }
 }
