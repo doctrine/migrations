@@ -59,7 +59,7 @@ class StatusCommandTest extends MigrationTestCase
     public function testExecute() : void
     {
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
-        $result->setTime(10);
+        $result->setTime(10.0);
         $this->metadataStorage->complete($result);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
@@ -116,7 +116,7 @@ class StatusCommandTest extends MigrationTestCase
         $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
-        $result->setTime(10);
+        $result->setTime(10.0);
         $this->metadataStorage->complete($result);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);

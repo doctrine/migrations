@@ -80,7 +80,7 @@ class TableMetadataStorageTest extends TestCase
     public function testComplete() : void
     {
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
-        $result->setTime(31);
+        $result->setTime(31.0);
         $this->storage->complete($result);
 
         $sql  = sprintf(
@@ -93,7 +93,28 @@ class TableMetadataStorageTest extends TestCase
                 [
                     'version' => '1230',
                     'executed_at' => '2010-01-05 10:30:21',
-                    'execution_time' => '31',
+                    'execution_time' => '31000',
+                ],
+        ], $rows);
+    }
+
+    public function testCompleteWithFloatTime() : void
+    {
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
+        $result->setTime(31.49);
+        $this->storage->complete($result);
+
+        $sql  = sprintf(
+            'SELECT * FROM %s',
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+        );
+        $rows = $this->connection->fetchAll($sql);
+        self::assertSame([
+            0 =>
+                [
+                    'version' => '1230',
+                    'executed_at' => '2010-01-05 10:30:21',
+                    'execution_time' => '31490',
                 ],
         ], $rows);
     }
@@ -102,7 +123,7 @@ class TableMetadataStorageTest extends TestCase
     {
         $date    = new DateTimeImmutable('2010-01-05 10:30:21');
         $result1 = new ExecutionResult(new Version('1230'), Direction::UP, $date);
-        $result1->setTime(31);
+        $result1->setTime(31.0);
         $this->storage->complete($result1);
 
         $result2 = new ExecutionResult(new Version('1231'), Direction::UP);
@@ -119,7 +140,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertEquals($result1->getVersion(), $m1->getVersion());
         self::assertNotNull($m1->getExecutedAt());
         self::assertSame($date->format(DateTime::ISO8601), $m1->getExecutedAt()->format(DateTime::ISO8601));
-        self::assertSame(31, $m1->getExecutionTime());
+        self::assertSame(31.0, $m1->getExecutionTime());
 
         $m2 = $executedMigrations->getMigration($result2->getVersion());
 
@@ -131,16 +152,16 @@ class TableMetadataStorageTest extends TestCase
     public function testExecutedMigrationWithTiming() : void
     {
         $date = new DateTimeImmutable();
-        $m1   = new ExecutedMigration(new Version('A'), $date, 123);
+        $m1   = new ExecutedMigration(new Version('A'), $date, 123.0);
 
         self::assertSame($date, $m1->getExecutedAt());
-        self::assertSame(123, $m1->getExecutionTime());
+        self::assertSame(123.0, $m1->getExecutionTime());
     }
 
     public function testCompleteDownRemovesTheRow() : void
     {
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
-        $result->setTime(31);
+        $result->setTime(31.0);
         $this->storage->complete($result);
 
         $sql = sprintf(
@@ -150,7 +171,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertCount(1, $this->connection->fetchAll($sql));
 
         $result = new ExecutionResult(new Version('1230'), Direction::DOWN, new DateTimeImmutable('2010-01-05 10:30:21'));
-        $result->setTime(31);
+        $result->setTime(31.0);
         $this->storage->complete($result);
 
         self::assertCount(0, $this->connection->fetchAll($sql));
@@ -159,7 +180,7 @@ class TableMetadataStorageTest extends TestCase
     public function testReset() : void
     {
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
-        $result->setTime(31);
+        $result->setTime(31.0);
         $this->storage->complete($result);
 
         $sql = sprintf(
