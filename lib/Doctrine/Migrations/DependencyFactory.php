@@ -14,6 +14,7 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\ConcatenationFileBuilder;
 use Doctrine\Migrations\Generator\DiffGenerator;
+use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -31,6 +32,7 @@ use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
+use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -179,23 +181,23 @@ class DependencyFactory
         });
     }
 
-    public function getFileBuilder() : ConcatenationFileBuilder
+    public function getFileBuilder() : FileBuilder
     {
-        return $this->getDependency(ConcatenationFileBuilder::class, static function () : ConcatenationFileBuilder {
+        return $this->getDependency(FileBuilder::class, static function () : FileBuilder {
             return new ConcatenationFileBuilder();
         });
     }
 
     public function getParameterFormatter() : ParameterFormatter
     {
-        return $this->getDependency(InlineParameterFormatter::class, function () : InlineParameterFormatter {
+        return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
             return new InlineParameterFormatter($this->connection);
         });
     }
 
     public function getMigrationsFinder() : MigrationFinder
     {
-        return $this->getDependency(GlobFinder::class, function () : MigrationFinder {
+        return $this->getDependency(MigrationFinder::class, function () : MigrationFinder {
             $configs              = $this->getConfiguration();
             $needsRecursiveFinder = $configs->areMigrationsOrganizedByYear() || $configs->areMigrationsOrganizedByYearAndMonth();
 
@@ -234,7 +236,7 @@ class DependencyFactory
 
     public function getMetadataStorage() : MetadataStorage
     {
-        return $this->getDependency(TableMetadataStorage::class, function () : MetadataStorage {
+        return $this->getDependency(MetadataStorage::class, function () : MetadataStorage {
             return new TableMetadataStorage(
                 $this->connection,
                 $this->getMetadataStorageConfiguration()
@@ -252,9 +254,9 @@ class DependencyFactory
         return $this->logger;
     }
 
-    public function getVersionExecutor() : DbalExecutor
+    public function getVersionExecutor() : Executor
     {
-        return $this->getDependency(DbalExecutor::class, function () : DbalExecutor {
+        return $this->getDependency(Executor::class, function () : Executor {
             return new DbalExecutor(
                 $this->getMetadataStorage(),
                 $this->getEventDispatcher(),
