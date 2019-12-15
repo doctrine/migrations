@@ -93,7 +93,7 @@ class DependencyFactory
         return $this->configuration;
     }
 
-    private function getConnection() : Connection
+    public function getConnection() : Connection
     {
         return $this->connection;
     }

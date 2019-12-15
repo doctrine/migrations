@@ -66,4 +66,13 @@ final class DependencyFactoryTest extends MigrationTestCase
 
         self::assertInstanceOf(GlobFinder::class, $finder);
     }
+
+    public function testConnection() : void
+    {
+        $conf = new Configuration();
+        $di   = new DependencyFactory($conf, $this->connection);
+        $conn = $di->getConnection();
+
+        self::assertSame($this->connection, $conn);
+    }
 }
