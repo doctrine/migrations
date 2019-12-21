@@ -16,7 +16,7 @@ use function is_string;
 use function is_writable;
 
 /**
- * The ExecutCommand class is responsible for executing migration versions up or down manually.
+ * The ExecuteCommand class is responsible for executing migration versions up or down manually.
  */
 class ExecuteCommand extends DoctrineCommand
 {
@@ -71,7 +71,7 @@ class ExecuteCommand extends DoctrineCommand
 The <info>%command.name%</info> command executes migration versions up or down manually:
 
     <info>%command.full_name% FQCN</info>
-
+    
 If no <comment>--up</comment> or <comment>--down</comment> option is specified it defaults to up:
 
     <info>%command.full_name% FQCN --down</info>
@@ -87,6 +87,11 @@ You can output the would be executed SQL statements to a file with <comment>--wr
 Or you can also execute the migration without a warning message which you need to interact with:
 
     <info>%command.full_name% FQCN --no-interaction</info>
+
+All the previous commands accept multiple migration versions, allowing you run execute more than
+one migration at once:
+    <info>%command.full_name% FQCN-1 FQCN-2 ...FQCN-n </info>
+
 EOT
         );
 
