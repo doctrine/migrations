@@ -9,12 +9,12 @@ use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
-use const DIRECTORY_SEPARATOR;
 use function date;
 use function mkdir;
 use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
+use const DIRECTORY_SEPARATOR;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {

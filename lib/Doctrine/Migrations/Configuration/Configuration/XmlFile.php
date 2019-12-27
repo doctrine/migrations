@@ -10,8 +10,6 @@ use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use SimpleXMLElement;
-use const DIRECTORY_SEPARATOR;
-use const LIBXML_NOCDATA;
 use function assert;
 use function file_exists;
 use function file_get_contents;
@@ -19,6 +17,8 @@ use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_string;
 use function strtr;
+use const DIRECTORY_SEPARATOR;
+use const LIBXML_NOCDATA;
 
 final class XmlFile extends ConfigurationFile
 {
@@ -44,6 +44,7 @@ final class XmlFile extends ConfigurationFile
                 false
             );
         }
+
         if (isset($config['migrations_paths'])) {
             $config['migrations_paths'] = $this->getDirectoriesRelativeToFile(
                 $config['migrations_paths'],
@@ -66,6 +67,7 @@ final class XmlFile extends ConfigurationFile
         if (! ($itemsToCheck instanceof SimpleXMLElement)) {
             return $config;
         }
+
         foreach ($itemsToCheck as $node) {
             $nodeName = strtr($node->getName(), '-', '_');
             if ($nodeName === 'migrations_paths') {

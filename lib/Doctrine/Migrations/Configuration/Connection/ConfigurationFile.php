@@ -43,6 +43,7 @@ final class ConfigurationFile implements ConnectionLoader
         if (is_array($params)) {
             return DriverManager::getConnection($params);
         }
+
         throw InvalidConfiguration::invalidArrayConfiguration();
     }
 }

@@ -95,6 +95,7 @@ EOT
                     : null,
             ]);
         }
+
         $table->render();
     }
 
@@ -128,6 +129,7 @@ EOT
                 $description,
             ]);
         }
+
         $table->render();
     }
 }

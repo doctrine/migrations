@@ -10,8 +10,8 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
-use const DIRECTORY_SEPARATOR;
 use function dirname;
+use const DIRECTORY_SEPARATOR;
 
 abstract class LoaderTest extends TestCase
 {

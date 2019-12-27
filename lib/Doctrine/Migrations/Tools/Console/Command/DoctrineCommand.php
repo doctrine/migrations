@@ -40,6 +40,7 @@ abstract class DoctrineCommand extends Command
         if ($this->dependencyFactory !== null) {
             return;
         }
+
         $this->addOption(
             'configuration',
             null,

@@ -329,6 +329,7 @@ class ExecutorTest extends TestCase
             self::assertFalse($this->migration->preDownExecuted);
             self::assertFalse($this->migration->postDownExecuted);
         }
+
         self::assertFalse($migrationSucceed);
     }
 
@@ -401,6 +402,7 @@ class ExecutorTest extends TestCase
             self::assertFalse($this->migration->preDownExecuted);
             self::assertFalse($this->migration->postDownExecuted);
         }
+
         self::assertFalse($migrationSucceed);
     }
 

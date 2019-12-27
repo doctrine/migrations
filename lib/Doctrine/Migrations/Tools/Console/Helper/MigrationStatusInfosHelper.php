@@ -73,6 +73,7 @@ class MigrationStatusInfosHelper
                 new TableCell($v, ['colspan' => 2]),
             ]);
         }
+
         $dataGroup = [
             'Storage' => [
                 'Type' => $storage!== null ? get_class($storage) : null,
@@ -120,6 +121,7 @@ class MigrationStatusInfosHelper
                     $v,
                 ];
             }
+
             if (count($nsRows) <= 0) {
                 continue;
             }
@@ -153,9 +155,11 @@ class MigrationStatusInfosHelper
                 return 'Already at first version';
             }
         }
+
         if ($alias === 'latest' && $version!== null && $executedMigrationsSet->hasMigration($version)) {
             return 'Already at latest version';
         }
+
         // Before first version "virtual" version number
         if ((string) $version === '0') {
             return '<comment>0</comment>';

@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use const PATHINFO_EXTENSION;
 use function count;
 use function pathinfo;
+use const PATHINFO_EXTENSION;
 
 /**
  * @internal

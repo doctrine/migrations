@@ -157,6 +157,7 @@ EOT
                     $this->mark($input, $output, $availableMigration->getVersion(), false, $executedMigrations);
                 }
             }
+
             foreach ($availableVersions->getItems() as $availableMigration) {
                 $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
             }

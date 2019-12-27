@@ -11,8 +11,8 @@ use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
-use const COUNT_RECURSIVE;
 use function count;
+use const COUNT_RECURSIVE;
 
 /**
  * The DbalMigrator class is responsible for generating and executing the SQL for a migration.

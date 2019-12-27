@@ -11,7 +11,7 @@ class JsonLoaderTest extends LoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new JsonFile(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.json');
+        $loader = new JsonFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.json');
 
         return $loader->getConfiguration();
     }
