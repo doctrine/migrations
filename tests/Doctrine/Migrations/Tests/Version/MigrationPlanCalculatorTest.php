@@ -13,6 +13,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -21,7 +22,7 @@ use function count;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
-    /** @var SortedMigrationPlanCalculator */
+    /** @var MigrationPlanCalculator */
     private $migrationPlanCalculator;
 
     /** @var MockObject|MigrationRepository */

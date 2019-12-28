@@ -21,7 +21,7 @@ use function array_reverse;
  *
  * @internal
  */
-final class SortedMigrationPlanCalculator
+final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
 {
     /** @var MigrationRepository */
     private $migrationRepository;
