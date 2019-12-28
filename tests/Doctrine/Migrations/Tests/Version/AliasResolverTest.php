@@ -19,6 +19,7 @@ use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
@@ -34,7 +35,7 @@ final class AliasResolverTest extends TestCase
     /** @var TableMetadataStorage */
     private $metadataStorage;
 
-    /** @var CurrentMigrationStatusCalculator */
+    /** @var MigrationStatusCalculator */
     private $statusCalculator;
 
     /**

@@ -35,6 +35,7 @@ use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
@@ -292,9 +293,9 @@ class DependencyFactory
         });
     }
 
-    public function getMigrationStatusCalculator() : CurrentMigrationStatusCalculator
+    public function getMigrationStatusCalculator() : MigrationStatusCalculator
     {
-        return $this->getDependency(CurrentMigrationStatusCalculator::class, function () : CurrentMigrationStatusCalculator {
+        return $this->getDependency(MigrationStatusCalculator::class, function () : MigrationStatusCalculator {
             return new CurrentMigrationStatusCalculator(
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage()

@@ -15,10 +15,8 @@ use function array_filter;
 /**
  * The MigrationPlanCalculator is responsible for calculating the plan for migrating from the current
  * version to another version.
- *
- * @internal
  */
-final class CurrentMigrationStatusCalculator
+final class CurrentMigrationStatusCalculator implements MigrationStatusCalculator
 {
     /** @var MigrationRepository */
     private $migrationRepository;

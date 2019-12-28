@@ -31,13 +31,13 @@ final class DefaultAliasResolver implements AliasResolver
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /** @var CurrentMigrationStatusCalculator */
+    /** @var MigrationStatusCalculator */
     private $migrationStatusCalculator;
 
     public function __construct(
         MigrationRepository $migrationRepository,
         MetadataStorage $metadataStorage,
-        CurrentMigrationStatusCalculator $migrationStatusCalculator
+        MigrationStatusCalculator $migrationStatusCalculator
     ) {
         $this->migrationRepository       = $migrationRepository;
         $this->metadataStorage           = $metadataStorage;

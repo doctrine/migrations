@@ -12,13 +12,14 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationStatusCalculatorTest extends TestCase
 {
-    /** @var CurrentMigrationStatusCalculator */
+    /** @var MigrationStatusCalculator */
     private $migrationStatusCalculator;
 
     /** @var MockObject|MigrationRepository */
