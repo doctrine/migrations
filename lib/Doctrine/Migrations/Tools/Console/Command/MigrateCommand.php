@@ -130,7 +130,8 @@ EOT
         }
 
         $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
-        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+        $statusCalculator              = $this->getDependencyFactory()->getMigrationStatusCalculator();
+        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
 
         if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
             return 3;

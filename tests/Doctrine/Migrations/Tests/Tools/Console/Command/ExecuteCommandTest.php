@@ -11,12 +11,12 @@ use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -149,7 +149,7 @@ class ExecuteCommandTest extends TestCase
             ->method('getMigration')
             ->willReturn($m1);
 
-        $planCalculator = new MigrationPlanCalculator($migrationRepository, $storage);
+        $planCalculator = new SortedMigrationPlanCalculator($migrationRepository, $storage);
 
         $configuration = new Configuration();
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
