@@ -10,6 +10,7 @@ use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
@@ -24,7 +25,7 @@ use function sys_get_temp_dir;
 
 class MigrateCommandTest extends MigrationTestCase
 {
-    /** @var DependencyFactory|MockObject */
+    /** @var DependencyFactory */
     private $dependencyFactory;
 
     /** @var Configuration */
@@ -121,10 +122,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->storage->complete($result);
 
         $migrator = $this->createMock(DbalMigrator::class);
-
-        $this->dependencyFactory->expects(self::any())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $migrator->expects(self::never())
             ->method('migrate');
@@ -148,9 +146,7 @@ class MigrateCommandTest extends MigrationTestCase
     {
         $migrator = $this->createMock(DbalMigrator::class);
 
-        $this->dependencyFactory->expects(self::any())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $migrator->expects(self::once())
             ->method('migrate')
@@ -183,10 +179,7 @@ class MigrateCommandTest extends MigrationTestCase
     public function testExecuteMigrate() : void
     {
         $migrator = $this->createMock(DbalMigrator::class);
-
-        $this->dependencyFactory->expects(self::any())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $this->migrateCommand->expects(self::once())
             ->method('canExecute')
@@ -209,10 +202,7 @@ class MigrateCommandTest extends MigrationTestCase
     public function testExecuteMigrateAllOrNothing() : void
     {
         $migrator = $this->createMock(DbalMigrator::class);
-
-        $this->dependencyFactory->expects(self::any())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $migrator->expects(self::once())
             ->method('migrate')
@@ -242,9 +232,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator = $this->createMock(DbalMigrator::class);
 
-        $this->dependencyFactory->expects(self::once())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $migrator->expects(self::never())
             ->method('migrate');
@@ -267,10 +255,7 @@ class MigrateCommandTest extends MigrationTestCase
     public function testExecuteMigrateCancel() : void
     {
         $migrator = $this->createMock(DbalMigrator::class);
-
-        $this->dependencyFactory->expects(self::once())
-            ->method('getMigrator')
-            ->willReturn($migrator);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
 
         $migrator->expects(self::never())
             ->method('migrate');
@@ -292,15 +277,10 @@ class MigrateCommandTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
-            ->setConstructorArgs([$this->configuration, $connection])
-            ->onlyMethods(['getMigrator', 'getQueryWriter'])
-            ->getMock();
+        $this->dependencyFactory = DependencyFactory::fromConnection($this->configuration, $connection);
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
-        $this->dependencyFactory->expects(self::any())
-            ->method('getQueryWriter')
-            ->willReturn($this->queryWriter);
+        $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
         $migration = $this->createMock(AbstractMigration::class);
 

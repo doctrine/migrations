@@ -76,7 +76,7 @@ abstract class DoctrineCommand extends Command
             $dbConfig   = is_string($input->getOption('db-configuration')) ? $input->getOption('db-configuration'): null;
             $connection = self::getConnection($dbConfig);
 
-            $this->dependencyFactory = new DependencyFactory($configuration, $connection);
+            $this->dependencyFactory = DependencyFactory::fromConnection($configuration, $connection);
         }
 
         if ($this->dependencyFactory->isFrozen()) {

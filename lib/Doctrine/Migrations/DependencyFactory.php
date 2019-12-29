@@ -69,12 +69,27 @@ class DependencyFactory
     /** @var bool */
     private $frozen = false;
 
-    public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
+    public static function fromConnection(Configuration $configuration, Connection $connection, ?LoggerInterface $logger = null) : self
     {
-        $this->configuration = $configuration;
-        $this->logger        = $logger ?: new NullLogger();
-        $this->connection    = $connection;
-        $this->em            = $em;
+        $dependencyFactory = new self();
+
+        $dependencyFactory->configuration = $configuration;
+        $dependencyFactory->connection    = $connection;
+        $dependencyFactory->logger        = $logger ?: new NullLogger();
+
+        return $dependencyFactory;
+    }
+
+    public static function fromEntityManager(Configuration $configuration, EntityManagerInterface $em, ?LoggerInterface $logger = null) : self
+    {
+        $dependencyFactory = new self();
+
+        $dependencyFactory->configuration = $configuration;
+        $dependencyFactory->em            = $em;
+        $dependencyFactory->connection    = $em->getConnection();
+        $dependencyFactory->logger        = $logger ?: new NullLogger();
+
+        return $dependencyFactory;
     }
 
     public function isFrozen() : bool
@@ -179,8 +194,8 @@ class DependencyFactory
         return $this->getDependency(SchemaDiffProvider::class, function () : LazySchemaDiffProvider {
             return LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
                 new DBALSchemaDiffProvider(
-                    $this->connection->getSchemaManager(),
-                    $this->connection->getDatabasePlatform()
+                    $this->getConnection()->getSchemaManager(),
+                    $this->getConnection()->getDatabasePlatform()
                 )
             );
         });
@@ -196,7 +211,7 @@ class DependencyFactory
     public function getParameterFormatter() : ParameterFormatter
     {
         return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
-            return new InlineParameterFormatter($this->connection);
+            return new InlineParameterFormatter($this->getConnection());
         });
     }
 
@@ -243,7 +258,7 @@ class DependencyFactory
     {
         return $this->getDependency(MetadataStorage::class, function () : MetadataStorage {
             return new TableMetadataStorage(
-                $this->connection,
+                $this->getConnection(),
                 $this->getMetadataStorageConfiguration()
             );
         });
@@ -265,7 +280,7 @@ class DependencyFactory
             return new DbalExecutor(
                 $this->getMetadataStorage(),
                 $this->getEventDispatcher(),
-                $this->connection,
+                $this->getConnection(),
                 $this->getSchemaDiffProvider(),
                 $this->getLogger(),
                 $this->getParameterFormatter(),
@@ -317,7 +332,7 @@ class DependencyFactory
         return $this->getDependency(SqlGenerator::class, function () : SqlGenerator {
             return new SqlGenerator(
                 $this->getConfiguration(),
-                $this->connection->getDatabasePlatform()
+                $this->getConnection()->getDatabasePlatform()
             );
         });
     }
@@ -336,7 +351,7 @@ class DependencyFactory
         return $this->getDependency(MigrationStatusInfosHelper::class, function () : MigrationStatusInfosHelper {
             return new MigrationStatusInfosHelper(
                 $this->getConfiguration(),
-                $this->connection,
+                $this->getConnection(),
                 $this->getVersionAliasResolver()
             );
         });
@@ -346,7 +361,7 @@ class DependencyFactory
     {
         return $this->getDependency(Migrator::class, function () : Migrator {
             return new DbalMigrator(
-                $this->connection,
+                $this->getConnection(),
                 $this->getEventDispatcher(),
                 $this->getVersionExecutor(),
                 $this->logger,
