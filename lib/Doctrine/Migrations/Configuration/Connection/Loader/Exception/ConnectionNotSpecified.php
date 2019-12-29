@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tools\Console\Exception;
+namespace Doctrine\Migrations\Configuration\Connection\Loader\Exception;
 
 use InvalidArgumentException;
 
-final class ConnectionNotSpecified extends InvalidArgumentException implements ConsoleException
+final class ConnectionNotSpecified extends InvalidArgumentException implements LoaderException
 {
     public static function new() : self
     {

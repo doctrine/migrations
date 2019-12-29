@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Configuration\Connection\Loader;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
-use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
+use Doctrine\Migrations\Configuration\Connection\Loader\Exception\ConnectionNotSpecified;
 
 /**
  * @internal

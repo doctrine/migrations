@@ -77,6 +77,11 @@ class DependencyFactory
         $this->em            = $em;
     }
 
+    public function isFrozen() : bool
+    {
+        return $this->frozen;
+    }
+
     public function freeze() : void
     {
         $this->frozen = true;

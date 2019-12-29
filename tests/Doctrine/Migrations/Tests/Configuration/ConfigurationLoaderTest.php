@@ -4,54 +4,127 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Configuration;
 
+use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\ConfigurationFormatLoader;
 use Doctrine\Migrations\Configuration\ConfigurationLoader;
 use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
-use Doctrine\Migrations\Configuration\Loader\ArrayLoader;
-use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
 use Doctrine\Migrations\Configuration\Loader\Loader;
-use Doctrine\Migrations\Configuration\Loader\PhpFileLoader;
-use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
-use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
-use PHPUnit\Framework\TestCase;
+use Doctrine\Migrations\Tests\MigrationTestCase;
+use InvalidArgumentException;
+use PHPUnit\Framework\MockObject\MockObject;
+use function chdir;
+use function getcwd;
 
-class ConfigurationLoaderTest extends TestCase
+class ConfigurationLoaderTest extends MigrationTestCase
 {
-    /** @var ConfigurationLoader */
+    /** @var MockObject */
     private $loader;
 
-    public function setUp() : void
+    /** @var ConfigurationLoader */
+    private $configurationLoader;
+
+    protected function setUp() : void
     {
-        $this->loader = new ConfigurationLoader();
+        $this->loader              = $this->createMock(ConfigurationFormatLoader::class);
+        $this->configurationLoader = new ConfigurationLoader($this->loader);
     }
 
-    public function testAdd() : void
+    /**
+     * Test that unsupported file type throws exception
+     */
+    public function testNoAvailableConfigGivesBackEmptyConfig() : void
     {
-        $loader = $this->createMock(Loader::class);
-        $this->loader->addLoader('foo', $loader);
+        $confExpected = new Configuration();
 
-        self::assertSame($loader, $this->loader->getLoader('foo'));
-    }
+        $configLoader = $this->createMock(Loader::class);
 
-    public function testUnknownLoader() : void
-    {
-        $this->expectException(UnknownLoader::class);
-        $this->expectExceptionMessage('Unknown configuration loader "foo".');
-        $this->loader->getLoader('foo');
-    }
+        $configLoader
+            ->expects(self::once())
+            ->method('load')
+            ->with([])
+            ->willReturn($confExpected);
 
-    public function testDefaults() : void
-    {
-        $defaults = [
-            'array' =>  ArrayLoader::class,
-            'xml' =>  XmlFileLoader::class,
-            'yaml' => YamlFileLoader::class,
-            'yml' => YamlFileLoader::class,
-            'php' => PhpFileLoader::class,
-            'json' => JsonFileLoader::class,
-        ];
+        $this->loader
+            ->expects(self::once())
+            ->method('getLoader')
+            ->with('array')
+            ->willReturn($configLoader);
 
-        foreach ($defaults as $name => $class) {
-            self::assertInstanceOf($class, $this->loader->getLoader($name));
+        $dir = getcwd()?: '.';
+        try {
+            chdir(__DIR__);
+            $this->configurationLoader->getConfiguration(null);
+        } finally {
+            chdir($dir);
         }
+    }
+
+    public function testConfigurationLoaderFailsToLoadOtherFormat() : void
+    {
+        $this->loader
+            ->expects(self::once())
+            ->method('getLoader')
+            ->with('wrong')
+            ->willThrowException(UnknownLoader::new('dummy'));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Given config file type is not supported');
+
+        $dir = getcwd()?: '.';
+        try {
+            chdir(__DIR__);
+            $this->configurationLoader->getConfiguration('testconfig.wrong');
+        } finally {
+            chdir($dir);
+        }
+    }
+
+    public function testLoadsFile() : void
+    {
+        $confExpected = new Configuration();
+        $configLoader = $this->createMock(Loader::class);
+
+        $configLoader
+            ->expects(self::once())
+            ->method('load')
+            ->with('config.php')
+            ->willReturn($confExpected);
+
+        $this->loader
+            ->expects(self::once())
+            ->method('getLoader')
+            ->with('php')
+            ->willReturn($configLoader);
+
+        $config = $this->configurationLoader->getConfiguration('config.php');
+
+        self::assertSame($config, $confExpected);
+    }
+
+    public function testLoadsDefaultFile() : void
+    {
+        $confExpected = new Configuration();
+        $configLoader = $this->createMock(Loader::class);
+
+        $configLoader
+            ->expects(self::once())
+            ->method('load')
+            ->with('migrations.php')
+            ->willReturn($confExpected);
+
+        $this->loader
+            ->expects(self::once())
+            ->method('getLoader')
+            ->with('php')
+            ->willReturn($configLoader);
+
+        $dir = getcwd()?: '.';
+        try {
+            chdir(__DIR__ . '/_files_loader');
+            $config = $this->configurationLoader->getConfiguration(null);
+        } finally {
+            chdir($dir);
+        }
+        self::assertSame($config, $confExpected);
     }
 }

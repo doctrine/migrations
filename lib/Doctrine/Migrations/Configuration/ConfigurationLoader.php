@@ -5,49 +5,67 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration;
 
 use Doctrine\Migrations\Configuration\Exception\UnknownLoader;
-use Doctrine\Migrations\Configuration\Loader\ArrayLoader;
-use Doctrine\Migrations\Configuration\Loader\JsonFileLoader;
-use Doctrine\Migrations\Configuration\Loader\Loader;
-use Doctrine\Migrations\Configuration\Loader\PhpFileLoader;
-use Doctrine\Migrations\Configuration\Loader\XmlFileLoader;
-use Doctrine\Migrations\Configuration\Loader\YamlFileLoader;
-use function count;
+use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
+use const PATHINFO_EXTENSION;
+use function file_exists;
+use function pathinfo;
 
 /**
- * @internal
+ * The ConfigurationLoader class is responsible for getting the Configuration instance from one of the supported methods
+ * for defining the configuration for your migrations.
  */
-class ConfigurationLoader
+final class ConfigurationLoader
 {
-    /** @var Loader[] */
-    private $loaders = [];
+    /** @var ConfigurationFormatLoader */
+    private $loader;
 
-    public function addLoader(string $type, Loader $loader) : void
+    public function __construct(?ConfigurationFormatLoader $loader = null)
     {
-        $this->loaders[$type] = $loader;
+        $this->loader = $loader ?: new ConfigurationFormatLoader();
     }
 
-    private function setDefaultLoaders() : void
+    public function getConfiguration(?string $configurationFile) : Configuration
     {
-        $this->loaders = [
-            'array' => new ArrayLoader(),
-            'json' => new JsonFileLoader(),
-            'php' => new PhpFileLoader(),
-            'xml' => new XmlFileLoader(),
-            'yaml' => new YamlFileLoader(),
-            'yml' => new YamlFileLoader(),
+        if ($configurationFile !== null) {
+            return $this->loadConfig($configurationFile);
+        }
+
+        /**
+         * If no any other config has been found, look for default config file in the path.
+         */
+        $defaultConfig = [
+            'migrations.xml',
+            'migrations.yml',
+            'migrations.yaml',
+            'migrations.json',
+            'migrations.php',
         ];
+
+        foreach ($defaultConfig as $config) {
+            if ($this->configExists($config)) {
+                return $this->loadConfig($config);
+            }
+        }
+
+        return $this->loader->getLoader('array')->load([]);
     }
 
-    public function getLoader(string $type) : Loader
+    private function configExists(string $config) : bool
     {
-        if (count($this->loaders) === 0) {
-            $this->setDefaultLoaders();
-        }
+        return file_exists($config);
+    }
 
-        if (! isset($this->loaders[$type])) {
-            throw UnknownLoader::new($type);
-        }
+    /**
+     * @throws FileTypeNotSupported
+     */
+    private function loadConfig(string $configFile) : Configuration
+    {
+        $extension = pathinfo($configFile, PATHINFO_EXTENSION);
 
-        return $this->loaders[$type];
+        try {
+            return $this->loader->getLoader($extension)->load($configFile);
+        } catch (UnknownLoader $e) {
+            throw FileTypeNotSupported::new();
+        }
     }
 }
