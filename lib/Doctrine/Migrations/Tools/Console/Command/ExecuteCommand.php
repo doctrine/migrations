@@ -110,6 +110,10 @@ EOT
             return 0;
         }
 
+        if ($input->getOption(Direction::DOWN) && !$this->migrationRepository->hasVersionMigrated($version)) {
+            throw VersionDoesNotExist::new($version);
+        }
+
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
 
         if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
