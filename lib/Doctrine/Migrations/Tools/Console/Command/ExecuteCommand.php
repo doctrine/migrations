@@ -14,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
 use function is_string;
 use function is_writable;
+use function strval;
 
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.
@@ -95,7 +96,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version   = new Version($input->getArgument('version'));
+        $version = new Version(strval($input->getArgument('version')));
         $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
@@ -125,7 +126,7 @@ EOT
             return 0;
         }
 
-        if ($input->getOption(Direction::DOWN) && !$this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations()->hasMigration($version)) {
+        if ($input->getOption(Direction::DOWN) && ! $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations()->hasMigration($version)) {
             throw RolldownFailed::migrationNotExecuted($version);
         }
 

@@ -6,10 +6,12 @@ namespace Doctrine\Migrations\Exception;
 
 use Doctrine\Migrations\Version\Version;
 use RuntimeException;
+use function sprintf;
+use function strval;
 
 final class RolldownFailed extends RuntimeException implements MigrationException
 {
-    public static function migrationNotExecuted(Version $version): self
+    public static function migrationNotExecuted(Version $version) : self
     {
         return new self(
             sprintf(
