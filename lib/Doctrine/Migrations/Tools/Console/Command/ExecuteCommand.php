@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\RolldownFailed;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
@@ -94,14 +95,14 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version   = $input->getArgument('version');
+        $version   = new Version($input->getArgument('version'));
         $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
         $migrator = $this->getDependencyFactory()->getMigrator();
-        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion($version, $direction);
 
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
@@ -124,8 +125,8 @@ EOT
             return 0;
         }
 
-        if ($input->getOption(Direction::DOWN) && !$this->migrationRepository->hasVersionMigrated($version)) {
-            throw VersionDoesNotExist::new($version);
+        if ($input->getOption(Direction::DOWN) && !$this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations()->hasMigration($version)) {
+            throw RolldownFailed::migrationNotExecuted($version);
         }
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
