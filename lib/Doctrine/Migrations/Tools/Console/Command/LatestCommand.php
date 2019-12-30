@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sprintf;
@@ -11,7 +12,7 @@ use function sprintf;
 /**
  * The LatestCommand class is responsible for outputting what your latest version is.
  */
-class LatestCommand extends AbstractCommand
+class LatestCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:latest';
@@ -20,20 +21,27 @@ class LatestCommand extends AbstractCommand
     {
         $this
             ->setAliases(['latest'])
-            ->setDescription('Outputs the latest version number');
+            ->setDescription('Outputs the latest version');
 
         parent::configure();
     }
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $latestVersion = $this->migrationRepository->getLatestVersion();
-        $version       = $this->migrationRepository->getVersion($latestVersion);
-        $description   = $version->getMigration()->getDescription();
+        $aliasResolver = $this->getDependencyFactory()->getVersionAliasResolver();
+
+        try {
+            $version            = $aliasResolver->resolveVersionAlias('latest');
+            $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
+            $description        = $availableMigration->getMigration()->getDescription();
+        } catch (NoMigrationsToExecute $e) {
+            $version     = '0';
+            $description = '';
+        }
 
         $output->writeln(sprintf(
             '<info>%s</info>%s',
-            $latestVersion,
+            $version,
             $description !== '' ? ' - ' . $description : ''
         ));
 

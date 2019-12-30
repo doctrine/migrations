@@ -1,3 +1,73 @@
+# Upgrade to 3.0
+
+- The "version" is the FQCN of the migration class (existing entries in the migrations table will be automatically updated).
+- `MigrationsEventArgs` and `MigrationsVersionEventArgs` expose different API, 
+please refer to the [Code BC breaks](#code-bc-breaks) section.
+
+## Console
+- Console output changed. The commands use a different output style. If you were relying on specific output, 
+  please update your scripts. 
+  Console output is not covered by the BC promise, so please try not to rely on specific a output.
+  Different levels of verbosity are available now (`-v`, `-vv` and `-vvv` ).
+
+## Migrations table
+
+- The migrations table now has a new column named `execution_time`.
+
+
+## Configuration files
+
+*migrations.php Before*
+```php
+<?php
+
+return [
+    'name' => 'My Project Migrations',
+    'migrations_namespace' => 'MyProject\Migrations',
+    'table_name' => 'doctrine_migration_versions',
+    'column_name' => 'version',
+    'column_length' => 14,
+    'executed_at_column_name' => 'executed_at',
+    'migrations_directory' => '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations',
+    'all_or_nothing' => true,
+    'check_database_platform' => true,
+];
+```
+*migrations.php After*
+
+```php
+<?php
+
+return [
+    'name' => 'My Project Migrations',
+
+    'table_storage' => [
+        'table_name' => 'doctrine_migration_versions',
+        'version_column_name' => 'version',
+        'version_column_length' => 1024,
+        'executed_at_column_name' => 'executed_at',
+        'execution_time_column_name' => 'execution_time',
+    ],
+
+    'migrations_paths' => [
+        'MyProject\Migrations' => '/data/doctrine/migrations/lib/MyProject/Migrations',
+        'MyProject\Component\Migrations' => './Component/MyProject/Migrations',
+    ],
+
+    'all_or_nothing' => true,
+    'check_database_platform' => true,
+];
+```
+
+Files in XML, YAML or JSON also changed in a similar way. Please refer to the official documentation for more details.
+
+## Code BC breaks
+
+Most of the code is protected by the `@internal` declaration and in a very rare cases you might have dealt with the 
+internals of this library. 
+You can use [Roave/BackwardCompatibilityCheck](https://github.com/Roave/BackwardCompatibilityCheck) and get a list of 
+changed elements.
+
 # Upgrade to 2.0
 
 ## BC Break: Moved `Doctrine\DBAL\Migrations` to `Doctrine\Migrations`

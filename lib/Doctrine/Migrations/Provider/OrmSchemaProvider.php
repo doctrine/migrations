@@ -17,7 +17,7 @@ use function count;
  *
  * @internal
  */
-final class OrmSchemaProvider implements SchemaProviderInterface
+final class OrmSchemaProvider implements SchemaProvider
 {
     /** @var EntityManagerInterface */
     private $entityManager;

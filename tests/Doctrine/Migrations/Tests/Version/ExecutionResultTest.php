@@ -4,8 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Version;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
+use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -24,26 +27,10 @@ class ExecutionResultTest extends TestCase
     {
         self::assertSame(['SELECT 1'], $this->versionExecutionResult->getSql());
 
-        $this->versionExecutionResult->setSql(['SELECT 2']);
+        $this->versionExecutionResult->setSql(['SELECT 2'], [2], [3]);
 
         self::assertSame(['SELECT 2'], $this->versionExecutionResult->getSql());
-    }
-
-    public function testGetSetParams() : void
-    {
-        self::assertSame([1], $this->versionExecutionResult->getParams());
-
-        $this->versionExecutionResult->setParams([2]);
-
         self::assertSame([2], $this->versionExecutionResult->getParams());
-    }
-
-    public function testGetTypes() : void
-    {
-        self::assertSame([2], $this->versionExecutionResult->getTypes());
-
-        $this->versionExecutionResult->setTypes([3]);
-
         self::assertSame([3], $this->versionExecutionResult->getTypes());
     }
 
@@ -88,11 +75,24 @@ class ExecutionResultTest extends TestCase
         self::assertNull($this->versionExecutionResult->getException());
     }
 
+    public function testExecutedAt() : void
+    {
+        $date = new DateTimeImmutable();
+        $this->versionExecutionResult->setExecutedAt($date);
+
+        self::assertSame($date, $this->versionExecutionResult->getExecutedAt());
+    }
+
+    public function testGetVersion() : void
+    {
+        self::assertSame('foo', (string) $this->versionExecutionResult->getVersion());
+    }
+
     public function testException() : void
     {
         $exception = new InvalidArgumentException();
 
-        $this->versionExecutionResult->setException($exception);
+        $this->versionExecutionResult->setError(true, $exception);
 
         self::assertSame($exception, $this->versionExecutionResult->getException());
     }
@@ -117,6 +117,10 @@ class ExecutionResultTest extends TestCase
     protected function setUp() : void
     {
         $this->versionExecutionResult = new ExecutionResult(
+            new Version('foo'),
+            Direction::UP
+        );
+        $this->versionExecutionResult->setSql(
             ['SELECT 1'],
             [1],
             [2]

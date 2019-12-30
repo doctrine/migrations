@@ -16,7 +16,6 @@ use function ksort;
 use function realpath;
 use function strlen;
 use function strncmp;
-use function substr;
 
 /**
  * The Finder class is responsible for for finding migrations on disk at a given path.
@@ -64,13 +63,7 @@ abstract class Finder implements MigrationFinder
         $classes  = $this->loadMigrationClasses($includedFiles, $namespace);
         $versions = [];
         foreach ($classes as $class) {
-            $version = substr($class->getShortName(), 7);
-
-            if ($version === '0') {
-                throw NameIsReserved::new($version);
-            }
-
-            $versions[$version] = $class->getName();
+            $versions[] = $class->getName();
         }
 
         ksort($versions, SORT_STRING);
@@ -87,7 +80,7 @@ abstract class Finder implements MigrationFinder
      *
      * @return ReflectionClass[] the classes in `$files`
      */
-    protected function loadMigrationClasses(array $files, ?string $namespace) : array
+    protected function loadMigrationClasses(array $files, ?string $namespace = null) : array
     {
         $classes = [];
         foreach (get_declared_classes() as $class) {

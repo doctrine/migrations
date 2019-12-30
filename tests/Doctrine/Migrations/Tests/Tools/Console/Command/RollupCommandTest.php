@@ -21,7 +21,7 @@ final class RollupCommandTest extends TestCase
     /** @var Rollup|MockObject */
     private $rollup;
 
-    /** @var RollupCommand|MockObject */
+    /** @var RollupCommand */
     private $rollupCommand;
 
     public function testExecute() : void
@@ -29,14 +29,9 @@ final class RollupCommandTest extends TestCase
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
 
-        $version = $this->createMock(Version::class);
-        $version->expects(self::once())
-            ->method('getVersion')
-            ->willReturn('1234');
-
         $this->rollup->expects(self::once())
             ->method('rollup')
-            ->willReturn($version);
+            ->willReturn(new Version('1234'));
 
         $output->expects(self::once())
             ->method('writeln')
@@ -50,12 +45,11 @@ final class RollupCommandTest extends TestCase
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
+            ->expects(self::once())
             ->method('getRollup')
             ->willReturn($this->rollup);
 
-        $this->rollupCommand = $this->createPartialMock(RollupCommand::class, []);
-
-        $this->rollupCommand->setDependencyFactory($this->dependencyFactory);
+        $this->rollupCommand = new RollupCommand(null, $this->dependencyFactory);
     }
 }

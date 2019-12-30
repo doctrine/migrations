@@ -1,14 +1,31 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration"
-      xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-      xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration
-                    http://doctrine-project.org/schemas/migrations/configuration.xsd">
+<doctrine-migrations xmlns="http://doctrine-project.org/schemas/migrations/configuration/3.0"
+                     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                     xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration/3.0
+                    http://doctrine-project.org/schemas/migrations/configuration/3.0.xsd">
 
-    <name>Doctrine Sandbox Migrations</name>
-    <migrations-namespace>DoctrineMigrationsTest</migrations-namespace>
-    <table name="doctrine_migration_versions_test" column="doctrine_migration_column_test" column_length="200" executed_at_column="doctrine_migration_executed_at_column_test" />
-    <migrations-directory>.</migrations-directory>
-    <all-or-nothing>true</all-or-nothing>
-    <check-database-platform>true</check-database-platform>
+<name>Doctrine Sandbox Migrations</name>
 
+<migrations-paths>
+    <path namespace="DoctrineMigrationsTest">.</path>
+</migrations-paths>
+
+<storage>
+    <table-storage
+            table-name="doctrine_migration_versions_test"
+            version-column-name="doctrine_migration_column_test"
+            version-column-length="2000"
+            executed-at-column-name="doctrine_migration_executed_at_column_test"
+            execution-time-column-name="doctrine_migration_execution_time_column_test"
+    />
+</storage>
+<migrations>
+    <migration>Foo</migration>
+    <migration>Bar</migration>
+</migrations>
+
+<all-or-nothing>true</all-or-nothing>
+<check-database-platform>true</check-database-platform>
 </doctrine-migrations>
+
+

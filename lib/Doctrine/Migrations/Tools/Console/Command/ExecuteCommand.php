@@ -4,18 +4,20 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
+use function is_string;
+use function is_writable;
 
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.
  */
-class ExecuteCommand extends AbstractCommand
+class ExecuteCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:execute';
@@ -67,23 +69,23 @@ class ExecuteCommand extends AbstractCommand
             ->setHelp(<<<EOT
 The <info>%command.name%</info> command executes a single migration version up or down manually:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS</info>
+    <info>%command.full_name% FQCN</info>
 
 If no <comment>--up</comment> or <comment>--down</comment> option is specified it defaults to up:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --down</info>
+    <info>%command.full_name% FQCN --down</info>
 
 You can also execute the migration as a <comment>--dry-run</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --dry-run</info>
+    <info>%command.full_name% FQCN --dry-run</info>
 
 You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --write-sql</info>
+    <info>%command.full_name% FQCN --write-sql</info>
 
 Or you can also execute the migration without a warning message which you need to interact with:
 
-    <info>%command.full_name% YYYYMMDDHHMMSS --no-interaction</info>
+    <info>%command.full_name% FQCN --no-interaction</info>
 EOT
         );
 
@@ -92,20 +94,32 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version        = $input->getArgument('version');
-        $timeAllQueries = (bool) $input->getOption('query-time');
-        $dryRun         = (bool) $input->getOption('dry-run');
-        $path           = $input->getOption('write-sql');
-        $direction      = $input->getOption('down') !== false
+        $version   = $input->getArgument('version');
+        $path      = $input->getOption('write-sql');
+        $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
-        $version = $this->migrationRepository->getVersion($version);
+        $migrator = $this->getDependencyFactory()->getMigrator();
+        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
         if ($path !== false) {
-            $path = $path ?? getcwd();
+            $migratorConfiguration->setDryRun(true);
+            $sql = $migrator->migrate($plan, $migratorConfiguration);
 
-            $version->writeSqlFile($path, $direction);
+            $path = is_string($path) ? $path : getcwd();
+
+            if (! is_string($path) || ! is_writable($path)) {
+                $output->writeln('<error>Path not writeable!</error>');
+
+                return 1;
+            }
+
+            $writer = $this->getDependencyFactory()->getQueryWriter();
+            $writer->write($path, $direction, $sql);
 
             return 0;
         }
@@ -116,17 +130,13 @@ EOT
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
 
-        if (! $dryRun && ! $this->canExecute($question, $input, $output)) {
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 1;
         }
 
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setDryRun($dryRun)
-            ->setTimeAllQueries($timeAllQueries);
-
-        $version->execute($direction, $migratorConfiguration);
+        $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;
     }

@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Stub;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Version\Version;
 
 class AbstractMigrationStub extends AbstractMigration
 {
@@ -35,10 +34,5 @@ class AbstractMigrationStub extends AbstractMigration
     public function exposedAddSql(string $sql, array $params = [], array $types = []) : void
     {
         $this->addSql($sql, $params, $types);
-    }
-
-    public function getVersion() : Version
-    {
-        return $this->version;
     }
 }

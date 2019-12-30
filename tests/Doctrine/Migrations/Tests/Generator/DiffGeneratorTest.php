@@ -12,7 +12,7 @@ use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
-use Doctrine\Migrations\Provider\SchemaProviderInterface;
+use Doctrine\Migrations\Provider\SchemaProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -24,7 +24,7 @@ class DiffGeneratorTest extends TestCase
     /** @var AbstractSchemaManager|MockObject */
     private $schemaManager;
 
-    /** @var SchemaProviderInterface|MockObject */
+    /** @var SchemaProvider|MockObject */
     private $schemaProvider;
 
     /** @var AbstractPlatform|MockObject */
@@ -122,7 +122,7 @@ class DiffGeneratorTest extends TestCase
     {
         $this->dbalConfiguration      = $this->createMock(DBALConfiguration::class);
         $this->schemaManager          = $this->createMock(AbstractSchemaManager::class);
-        $this->schemaProvider         = $this->createMock(SchemaProviderInterface::class);
+        $this->schemaProvider         = $this->createMock(SchemaProvider::class);
         $this->platform               = $this->createMock(AbstractPlatform::class);
         $this->migrationGenerator     = $this->createMock(Generator::class);
         $this->migrationSqlGenerator  = $this->createMock(SqlGenerator::class);

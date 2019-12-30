@@ -14,7 +14,7 @@ use function sprintf;
  * The UpToDateCommand class outputs if your database is up to date or if there are new migrations
  * that need to be executed.
  */
-class UpToDateCommand extends AbstractCommand
+class UpToDateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:up-to-date';
@@ -37,36 +37,39 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $migrations          = count($this->migrationRepository->getMigrations());
-        $migratedVersions    = count($this->migrationRepository->getMigratedVersions());
-        $availableMigrations = $migrations - $migratedVersions;
+        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+        $newMigrations                 = $planCalculator->getNewMigrations();
 
-        if ($availableMigrations === 0) {
+        $newMigrationsCount                 = count($newMigrations);
+        $executedUnavailableMigrationsCount =  count($executedUnavailableMigrations);
+
+        if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount ===0) {
             $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
 
             return 0;
         }
 
-        if ($availableMigrations > 0) {
+        if ($newMigrationsCount > 0) {
             $output->writeln(sprintf(
                 '<error>Out-of-date! %u migration%s available to execute.</error>',
-                $availableMigrations,
-                $availableMigrations > 1 ? 's are' : ' is'
+                $newMigrationsCount,
+                $newMigrationsCount > 1 ? 's are' : ' is'
             ));
 
             return 1;
         }
 
         // negative number means that there are unregistered migrations in the database
+        if ($executedUnavailableMigrationsCount > 0) {
+            $output->writeln(sprintf(
+                '<error>You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.</error>',
+                $executedUnavailableMigrationsCount,
+                $executedUnavailableMigrationsCount > 1 ? 'are not' : 'is not a',
+                $executedUnavailableMigrationsCount > 1 ? 's' : ''
+            ));
+        }
 
-        $extraMigrations = -$availableMigrations;
-        $output->writeln(sprintf(
-            '<error>You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.</error>',
-            $extraMigrations,
-            $extraMigrations > 1 ? 'are not' : 'is not a',
-            $extraMigrations > 1 ? 's' : ''
-        ));
-
-        return $input->getOption('fail-on-unregistered') === true ? 2 : 0;
+        return $executedUnavailableMigrationsCount > 0 && $input->getOption('fail-on-unregistered') === true ? 2 : 0;
     }
 }

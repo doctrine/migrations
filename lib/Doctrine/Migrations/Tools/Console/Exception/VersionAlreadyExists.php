@@ -12,6 +12,6 @@ final class VersionAlreadyExists extends InvalidArgumentException implements Con
 {
     public static function new(Version $version) : self
     {
-        return new self(sprintf('The version "%s" already exists in the version table.', $version->getVersion()));
+        return new self(sprintf('The version "%s" already exists in the version table.', (string) $version));
     }
 }

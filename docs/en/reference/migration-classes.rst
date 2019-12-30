@@ -9,9 +9,9 @@ and ``down`` methods. You can easily generate a blank migration to modify with t
     $ ./vendor/bin/doctrine-migrations generate
     Generated new migration class to "/data/doctrine/migrations-docs-example/lib/MyProject/Migrations/Version20180601193057.php"
 
-    To run just this migration for testing purposes, you can use migrations:execute --up 20180601193057
+    To run just this migration for testing purposes, you can use migrations:execute --up 'MyProject\Migrations\Version20180601193057'
 
-    To revert the migration you can use migrations:execute --down 20180601193057
+    To revert the migration you can use migrations:execute --down 'MyProject\Migrations\Version20180601193057'
 
 The above command will generate a PHP class with the path to it visible like above. Here is what the blank
 migration looks like:
