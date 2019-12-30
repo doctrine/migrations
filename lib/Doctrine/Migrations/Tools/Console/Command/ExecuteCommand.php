@@ -96,7 +96,7 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version = new Version(strval($input->getArgument('version')));
+        $version   = new Version(strval($input->getArgument('version')));
         $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
