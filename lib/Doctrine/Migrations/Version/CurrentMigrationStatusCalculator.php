@@ -35,7 +35,7 @@ final class CurrentMigrationStatusCalculator implements MigrationStatusCalculato
         $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrationsSet = $this->migrationRepository->getMigrations();
 
-        return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
+        return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) : bool {
             return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
     }
@@ -45,7 +45,7 @@ final class CurrentMigrationStatusCalculator implements MigrationStatusCalculato
         $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrationsSet = $this->migrationRepository->getMigrations();
 
-        return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
+        return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) : bool {
             return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
         }));
     }
