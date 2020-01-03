@@ -37,9 +37,11 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
-        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
-        $newMigrations                 = $planCalculator->getNewMigrations();
+        $statusCalculator = $this->getDependencyFactory()->getMigrationStatusCalculator();
+
+        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
+
+        $newMigrations = $statusCalculator->getNewMigrations();
 
         $newMigrationsCount                 = count($newMigrations);
         $executedUnavailableMigrationsCount =  count($executedUnavailableMigrations);

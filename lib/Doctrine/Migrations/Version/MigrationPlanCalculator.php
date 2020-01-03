@@ -1,0 +1,18 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Doctrine\Migrations\Version;
+
+use Doctrine\Migrations\Metadata\MigrationPlanList;
+
+/**
+ * The MigrationPlanCalculator is responsible for calculating the plan for migrating from the current
+ * version to another version.
+ */
+interface MigrationPlanCalculator
+{
+    public function getPlanForExactVersion(Version $version, string $direction) : MigrationPlanList;
+
+    public function getPlanUntilVersion(?Version $to = null) : MigrationPlanList;
+}

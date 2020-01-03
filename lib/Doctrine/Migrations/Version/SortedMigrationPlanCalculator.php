@@ -2,20 +2,16 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations;
+namespace Doctrine\Migrations\Version;
 
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
+use Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\Version;
-use function array_filter;
+use Doctrine\Migrations\MigrationRepository;
 use function array_map;
 use function array_reverse;
 
@@ -25,7 +21,7 @@ use function array_reverse;
  *
  * @internal
  */
-final class MigrationPlanCalculator
+final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
 {
     /** @var MigrationRepository */
     private $migrationRepository;
@@ -112,25 +108,5 @@ final class MigrationPlanCalculator
         }
 
         return $toExecute;
-    }
-
-    public function getExecutedUnavailableMigrations() : ExecutedMigrationsSet
-    {
-        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrationsSet = $this->migrationRepository->getMigrations();
-
-        return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) {
-            return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
-        }));
-    }
-
-    public function getNewMigrations() : AvailableMigrationsList
-    {
-        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrationsSet = $this->migrationRepository->getMigrations();
-
-        return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) {
-            return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
-        }));
     }
 }

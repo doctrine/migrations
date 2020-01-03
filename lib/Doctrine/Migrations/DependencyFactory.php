@@ -30,10 +30,14 @@ use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\MigrationPlanCalculator;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
+use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
@@ -285,7 +289,17 @@ class DependencyFactory
             return new DefaultAliasResolver(
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage(),
-                $this->getMigrationPlanCalculator()
+                $this->getMigrationStatusCalculator()
+            );
+        });
+    }
+
+    public function getMigrationStatusCalculator() : MigrationStatusCalculator
+    {
+        return $this->getDependency(MigrationStatusCalculator::class, function () : MigrationStatusCalculator {
+            return new CurrentMigrationStatusCalculator(
+                $this->getMigrationRepository(),
+                $this->getMetadataStorage()
             );
         });
     }
@@ -293,7 +307,7 @@ class DependencyFactory
     public function getMigrationPlanCalculator() : MigrationPlanCalculator
     {
         return $this->getDependency(MigrationPlanCalculator::class, function () : MigrationPlanCalculator {
-            return new MigrationPlanCalculator(
+            return new SortedMigrationPlanCalculator(
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage()
             );

@@ -13,12 +13,13 @@ use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use function sys_get_temp_dir;
@@ -34,8 +35,8 @@ final class AliasResolverTest extends TestCase
     /** @var TableMetadataStorage */
     private $metadataStorage;
 
-    /** @var MigrationPlanCalculator */
-    private $planCalculator;
+    /** @var MigrationStatusCalculator */
+    private $statusCalculator;
 
     /**
      * @dataProvider getAliases
@@ -137,11 +138,11 @@ final class AliasResolverTest extends TestCase
             $versionFactory
         );
         $this->metadataStorage      = new TableMetadataStorage($conn);
-        $this->planCalculator       = new MigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
+        $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationRepository, $this->metadataStorage);
         $this->versionAliasResolver = new DefaultAliasResolver(
             $this->migrationRepository,
             $this->metadataStorage,
-            $this->planCalculator
+            $this->statusCalculator
         );
     }
 

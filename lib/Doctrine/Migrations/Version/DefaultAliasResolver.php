@@ -8,7 +8,6 @@ use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\MigrationRepository;
 use function count;
 use function substr;
@@ -32,14 +31,17 @@ final class DefaultAliasResolver implements AliasResolver
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    /** @var MigrationStatusCalculator */
+    private $migrationStatusCalculator;
 
-    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage, MigrationPlanCalculator $migrationPlanCalculator)
-    {
-        $this->migrationRepository     = $migrationRepository;
-        $this->metadataStorage         = $metadataStorage;
-        $this->migrationPlanCalculator = $migrationPlanCalculator;
+    public function __construct(
+        MigrationRepository $migrationRepository,
+        MetadataStorage $metadataStorage,
+        MigrationStatusCalculator $migrationStatusCalculator
+    ) {
+        $this->migrationRepository       = $migrationRepository;
+        $this->metadataStorage           = $metadataStorage;
+        $this->migrationStatusCalculator = $migrationStatusCalculator;
     }
 
     /**
@@ -82,7 +84,7 @@ final class DefaultAliasResolver implements AliasResolver
                 }
                 break;
             case self::ALIAS_NEXT:
-                $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
+                $newMigrations = $this->migrationStatusCalculator->getNewMigrations();
 
                 try {
                     return $newMigrations->getFirst()->getVersion();
@@ -106,7 +108,7 @@ final class DefaultAliasResolver implements AliasResolver
                     $val             = (int) substr($alias, 7);
                     $targetMigration = null;
                     if ($val > 0) {
-                        $newMigrations = $this->migrationPlanCalculator->getNewMigrations();
+                        $newMigrations = $this->migrationStatusCalculator->getNewMigrations();
 
                         return $newMigrations->getFirst($val - 1)->getVersion();
                     }

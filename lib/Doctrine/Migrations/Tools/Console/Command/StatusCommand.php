@@ -50,15 +50,15 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $storage        = $this->getDependencyFactory()->getMetadataStorage();
-        $migrationRepo  = $this->getDependencyFactory()->getMigrationRepository();
-        $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
+        $storage       = $this->getDependencyFactory()->getMetadataStorage();
+        $migrationRepo = $this->getDependencyFactory()->getMigrationRepository();
 
         $availableMigrations = $migrationRepo->getMigrations();
         $executedMigrations  = $storage->getExecutedMigrations();
 
-        $newMigrations                 = $planCalculator->getNewMigrations();
-        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+        $statusCalculator              = $this->getDependencyFactory()->getMigrationStatusCalculator();
+        $newMigrations                 = $statusCalculator->getNewMigrations();
+        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
 
         $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
         $infosHelper->showMigrationsInfo($output, $availableMigrations, $executedMigrations, $newMigrations, $executedUnavailableMigrations);
