@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\RolldownFailed;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputArgument;
@@ -13,6 +14,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function getcwd;
 use function is_string;
 use function is_writable;
+use function strval;
 
 /**
  * The ExecutCommand class is responsible for executing a single migration version up or down.
@@ -94,14 +96,14 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $version   = $input->getArgument('version');
+        $version   = new Version(strval($input->getArgument('version')));
         $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
         $migrator = $this->getDependencyFactory()->getMigrator();
-        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion(new Version($version), $direction);
+        $plan     = $this->getDependencyFactory()->getMigrationPlanCalculator()->getPlanForExactVersion($version, $direction);
 
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
@@ -122,6 +124,10 @@ EOT
             $writer->write($path, $direction, $sql);
 
             return 0;
+        }
+
+        if ($input->getOption(Direction::DOWN) && ! $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations()->hasMigration($version)) {
+            throw RolldownFailed::migrationNotExecuted($version);
         }
 
         $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
