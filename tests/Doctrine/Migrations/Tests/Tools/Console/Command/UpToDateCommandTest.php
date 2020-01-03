@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
@@ -33,18 +34,27 @@ class UpToDateCommandTest extends MigrationTestCase
     /** @var UpToDateCommand */
     private $command;
 
+    /** @var Connection */
+    private $conn;
+
+    /** @var TableMetadataStorageConfiguration */
+    private $metadataConfig;
+
     protected function setUp() : void
     {
+        $this->metadataConfig = new TableMetadataStorageConfiguration();
+
         $configuration = new Configuration();
-        $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
+        $configuration->setMetadataStorageConfiguration($this->metadataConfig);
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn = $this->getSqliteConnection();
+        $this->conn = $this->getSqliteConnection();
 
-        $dependencyFactory = new DependencyFactory($configuration, $conn);
+        $dependencyFactory = new DependencyFactory($configuration, $this->conn);
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
+        $this->metadataStorage->ensureInitialized();
 
         $this->command       = new UpToDateCommand(null, $dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
@@ -73,6 +83,19 @@ class UpToDateCommandTest extends MigrationTestCase
         $this->commandTester->execute(['--fail-on-unregistered' => $failOnUnregistered]);
 
         self::assertSame($exitCode, $this->commandTester->getStatusCode());
+    }
+
+    public function testNoMetadataStorage() : void
+    {
+        $this->conn->getSchemaManager()->dropTable($this->metadataConfig->getTableName());
+
+        $this->commandTester->execute([]);
+
+        self::assertStringContainsString(
+            'The metadata storage is not initialized, please run the sync-metadata-storage command to fix this issue.',
+            $this->commandTester->getDisplay()
+        );
+        self::assertSame(3, $this->commandTester->getStatusCode());
     }
 
     /**

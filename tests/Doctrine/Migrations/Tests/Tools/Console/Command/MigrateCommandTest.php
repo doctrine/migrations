@@ -315,5 +315,6 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester = new CommandTester($this->migrateCommand);
 
         $this->storage = $this->dependencyFactory->getMetadataStorage();
+        $this->storage->ensureInitialized();
     }
 }

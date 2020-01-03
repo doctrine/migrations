@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Exception\MetadataStorageError;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,7 +40,16 @@ EOT
     {
         $statusCalculator = $this->getDependencyFactory()->getMigrationStatusCalculator();
 
-        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
+        try {
+            $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
+        } catch (MetadataStorageError $metadataStorageError) {
+            $output->writeln(sprintf(
+                '<error>%s</error>',
+                $metadataStorageError->getMessage()
+            ));
+
+            return 3;
+        }
 
         $newMigrations = $statusCalculator->getNewMigrations();
 

@@ -9,6 +9,8 @@ use Doctrine\Migrations\Version\ExecutionResult;
 
 interface MetadataStorage
 {
+    public function ensureInitialized() : void;
+
     public function getExecutedMigrations() : ExecutedMigrationsSet;
 
     public function complete(ExecutionResult $migration) : void;
