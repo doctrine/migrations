@@ -143,6 +143,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testCompleteWithFloatTime() : void
     {
+        $this->storage->ensureInitialized();
+
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.49);
         $this->storage->complete($result);
@@ -245,6 +247,8 @@ class TableMetadataStorageTest extends TestCase
 
     public function testResetWithEmptySchema() : void
     {
+        $this->storage->ensureInitialized();
+
         $this->storage->reset();
 
         $sql = sprintf(

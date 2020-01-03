@@ -35,10 +35,17 @@ EOT
             );
     }
 
-    public function execute(
-        InputInterface $input,
-        OutputInterface $output
-    ) : ?int {
+    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    {
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
+
+        if (! $this->canExecute($question, $input, $output)) {
+            $output->writeln('<error>Migration cancelled!</error>');
+
+            return 3;
+        }
+
+        $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
         $version = $this->getDependencyFactory()->getRollup()->rollup();
 
         $output->writeln(sprintf(
