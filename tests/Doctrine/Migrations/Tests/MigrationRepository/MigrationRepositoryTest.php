@@ -8,8 +8,8 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsSorter;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\B\C;
@@ -17,7 +17,6 @@ use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use function strcmp;
 
 class MigrationRepositoryTest extends TestCase
 {
@@ -53,7 +52,8 @@ class MigrationRepositoryTest extends TestCase
             [A::class],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
+            new MigrationsSorter()
         );
 
         $migrations = $migrationRepository->getMigrations();
@@ -70,7 +70,8 @@ class MigrationRepositoryTest extends TestCase
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/NoMigrations',
             ],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
+            new MigrationsSorter()
         );
 
         $migrations = $migrationRepository->getMigrations();
@@ -87,9 +88,7 @@ class MigrationRepositoryTest extends TestCase
             ],
             new RecursiveRegexFinder('#.*\\.php$#i'),
             $this->versionFactory,
-            static function (AvailableMigration $m1, AvailableMigration $m2) {
-                return strcmp((string) $m1->getVersion(), (string) $m2->getVersion())*-1;
-            }
+            new CustomMigrationsSorter()
         );
 
         $migrations = $migrationRepository->getMigrations();
@@ -157,7 +156,8 @@ class MigrationRepositoryTest extends TestCase
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',
             ],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
+            new MigrationsSorter()
         );
     }
 }

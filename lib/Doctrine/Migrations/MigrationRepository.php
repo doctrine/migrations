@@ -13,8 +13,6 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
-use function strcmp;
-use function uasort;
 
 /**
  * The MigrationRepository class is responsible for retrieving migrations, determing what the current migration
@@ -39,7 +37,7 @@ class MigrationRepository
     /** @var AvailableMigration[] */
     private $migrations = [];
 
-    /** @var callable */
+    /** @var Sorter */
     private $sorter;
 
     /**
@@ -51,14 +49,12 @@ class MigrationRepository
         array $migrationDirectories,
         MigrationFinder $migrationFinder,
         MigrationFactory $versionFactory,
-        ?callable $sorter = null
+        Sorter $sorter
     ) {
         $this->migrationDirectories = $migrationDirectories;
         $this->migrationFinder      = $migrationFinder;
         $this->versionFactory       = $versionFactory;
-        $this->sorter               = $sorter ?: static function (AvailableMigration $m1, AvailableMigration $m2) {
-            return strcmp((string) $m1->getVersion(), (string) $m2->getVersion());
-        };
+        $this->sorter               = $sorter;
 
         $this->registerMigrations($classes);
     }
@@ -76,8 +72,6 @@ class MigrationRepository
         }
 
         $this->migrations[(string) $version] = new AvailableMigration($version, $migration);
-
-        uasort($this->migrations, $this->sorter);
 
         return $this->migrations[(string) $version];
     }
@@ -159,5 +153,7 @@ class MigrationRepository
                 );
                 $this->registerMigrations($migrations);
         }
+
+        $this->sorter->sort($this->migrations);
     }
 }

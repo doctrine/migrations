@@ -3,6 +3,8 @@
 - The "version" is the FQCN of the migration class (existing entries in the migrations table will be automatically updated).
 - `MigrationsEventArgs` and `MigrationsVersionEventArgs` expose different API, 
 please refer to the [Code BC breaks](#code-bc-breaks) section.
+- The `sorter` used in MigrationRepository is not callable anymore but a normal class. If you have custom sorting function 
+for sorting the migrations, please put this custom function in new class that implements the `Doctrine\Migrations\Sorter` interface.
 
 ## Console
 - Console output changed. The commands use a different output style. If you were relying on specific output, 

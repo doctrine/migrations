@@ -53,8 +53,6 @@ use function sprintf;
  */
 class DependencyFactory
 {
-    public const MIGRATIONS_SORTER = 'Doctrine\Migrations\MigrationsSorter';
-
     /** @var Configuration */
     private $configuration;
 
@@ -104,10 +102,10 @@ class DependencyFactory
         return $this->connection;
     }
 
-    public function getSorter() : ?callable
+    public function getSorter() : Sorter
     {
-        return $this->getDependency(self::MIGRATIONS_SORTER, static function () {
-            return null;
+        return $this->getDependency(MigrationsSorter::class, static function () : Sorter {
+            return new MigrationsSorter();
         });
     }
 
