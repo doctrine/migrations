@@ -18,7 +18,13 @@ use Doctrine\Migrations\Tools\Console\Command\SyncMetadataCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use PackageVersions\Versions;
+use RuntimeException;
 use Symfony\Component\Console\Application;
+use const DIRECTORY_SEPARATOR;
+use function file_exists;
+use function getcwd;
+use function is_readable;
+use function sprintf;
 
 /**
  * The ConsoleRunner class is used to create the Symfony Console application for the Doctrine Migrations console.
@@ -29,6 +35,42 @@ use Symfony\Component\Console\Application;
  */
 class ConsoleRunner
 {
+    public static function findDependencyFactory() : ?DependencyFactory
+    {
+        // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
+        $configurationDirectories = [
+            getcwd(),
+            getcwd() . DIRECTORY_SEPARATOR . 'config',
+        ];
+
+        $configurationFile = null;
+        foreach ($configurationDirectories as $configurationDirectory) {
+            $configurationFilePath = $configurationDirectory . DIRECTORY_SEPARATOR . 'cli-config.php';
+
+            if (! file_exists($configurationFilePath)) {
+                continue;
+            }
+
+            $configurationFile = $configurationFilePath;
+            break;
+        }
+
+        $dependencyFactory = null;
+        if ($configurationFile !== null) {
+            if (! is_readable($configurationFile)) {
+                throw new RuntimeException(sprintf('Configuration file [%s] does not have read permission.', $configurationFile));
+            }
+
+            $dependencyFactory = require $configurationFile;
+        }
+
+        if ($dependencyFactory !== null && ! ($dependencyFactory instanceof DependencyFactory)) {
+            throw new RuntimeException(sprintf('Configuration file "%s" must return an instance of "%s"', $configurationFile, DependencyFactory::class));
+        }
+
+        return $dependencyFactory;
+    }
+
     /** @param DoctrineCommand[] $commands */
     public static function run(array $commands = [], ?DependencyFactory $dependencyFactory = null) : void
     {
@@ -62,7 +104,7 @@ class ConsoleRunner
             new SyncMetadataCommand(null, $dependencyFactory),
         ]);
 
-        if ($dependencyFactory === null || $dependencyFactory->getEntityManager() === null) {
+        if ($dependencyFactory === null || ! $dependencyFactory->hasEntityManager()) {
             return;
         }
 
