@@ -139,6 +139,7 @@ Here are details about what each configuration option does:
 
 
 Here the possible options for ``table_storage``:
+
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | Name                       | Required   | Default                      | Description                                                                      |
 +============================+============+==============================+==================================================================================+
@@ -262,6 +263,23 @@ the following command:
 
     $ mysqladmin create migrations_docs_example
 
+
+If you have already a DBAL connection available in your application, ``migrations-db.php`` can return it directly:
+
+.. code-block:: php
+
+    <?php
+    use Doctrine\DBAL\DriverManager;
+
+    return DriverManager::getConnection([
+        'dbname' => 'migrations_docs_example',
+        'user' => 'root',
+        'password' => '',
+        'host' => 'localhost',
+        'driver' => 'pdo_mysql',
+    ]);
+
+
 Advanced
 ~~~~~~~~
 
@@ -279,16 +297,16 @@ out of the root of your project.
     require 'vendor/autoload.php';
 
     use Doctrine\DBAL\DriverManager;
-    use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-    use Symfony\Component\Console\Helper\HelperSet;
+    use Doctrine\Migrations\Configuration\Configuration\PhpFile;
+    use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+    use Doctrine\Migrations\DependencyFactory;
 
-    $dbParams = include 'migrations-db.php';
+    $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
-    $connection = DriverManager::getConnection($dbParams);
+    $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
-    return new HelperSet([
-        'db' => new ConnectionHelper($connection),
-    ]);
+    return DependencyFactory::fromConnection($config, new ExistingConnection($conn));
+
 
 The above setup assumes you are not using the ORM. If you want to use the ORM, first require it in your project
 with composer:
@@ -305,24 +323,20 @@ Now update your ``cli-config.php`` in the root of your project to look like the 
 
     require 'vendor/autoload.php';
 
-    use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
-    use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-    use Doctrine\ORM\Tools\Setup;
     use Doctrine\ORM\EntityManager;
-    use Symfony\Component\Console\Helper\HelperSet;
+    use Doctrine\ORM\Tools\Setup;
+    use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+    use Doctrine\Migrations\DependencyFactory;
+
+    $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
     $paths = [__DIR__.'/lib/MyProject/Entities'];
     $isDevMode = true;
 
-    $dbParams = include 'migrations-db.php';
-
     $config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
-    $entityManager = EntityManager::create($dbParams, $config);
+    $entityManager = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);
 
-    return new HelperSet([
-        'em' => new EntityManagerHelper($entityManager),
-        'db' => new ConnectionHelper($entityManager->getConnection()),
-    ]);
+    return DependencyFactory::fromEntityManager($config, new ExistingEntityManager($entityManager));
 
 Make sure to create the directory where your ORM entities will be located:
 

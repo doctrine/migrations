@@ -14,14 +14,13 @@ Once you have your custom integration setup, you can modify it to look like the 
     require_once __DIR__.'/vendor/autoload.php';
 
     use Doctrine\DBAL\DriverManager;
-    use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
     use Doctrine\Migrations\Configuration\Configuration;
+    use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+    use Doctrine\Migrations\Configuration\Configuration\ExistingConfiguration;
+    use Doctrine\Migrations\DependencyFactory;
     une Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
     use Doctrine\Migrations\Tools\Console\Command;
-    use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
     use Symfony\Component\Console\Application;
-    use Symfony\Component\Console\Helper\HelperSet;
-    use Symfony\Component\Console\Helper\QuestionHelper;
 
     $dbParams = [
         'dbname' => 'migrations_docs_example',
@@ -45,24 +44,23 @@ Once you have your custom integration setup, you can modify it to look like the 
 
     $configuration->setMetadataStorageConfiguration($storageConfiguration);
 
-    $helperSet = new HelperSet();
-    $helperSet->set(new QuestionHelper(), 'question');
-    $helperSet->set(new ConnectionHelper($connection), 'db');
-    $helperSet->set(new ConfigurationHelper($connection, $configuration));
+    $dependencyFactory = DependencyFactory::fromConnection(
+        new ExistingConfiguration($configuration),
+        new ExistingConnection($connection)
+    );
 
     $cli = new Application('Doctrine Migrations');
     $cli->setCatchExceptions(true);
-    $cli->setHelperSet($helperSet);
 
     $cli->addCommands(array(
-        new Command\DumpSchemaCommand(),
-        new Command\ExecuteCommand(),
-        new Command\GenerateCommand(),
-        new Command\LatestCommand(),
-        new Command\MigrateCommand(),
-        new Command\RollupCommand(),
-        new Command\StatusCommand(),
-        new Command\VersionCommand()
+        new Command\DumpSchemaCommand(null, $dependencyFactory),
+        new Command\ExecuteCommand(null, $dependencyFactory),
+        new Command\GenerateCommand(null, $dependencyFactory),
+        new Command\LatestCommand(null, $dependencyFactory),
+        new Command\MigrateCommand(null, $dependencyFactory),
+        new Command\RollupCommand(null, $dependencyFactory),
+        new Command\StatusCommand(null, $dependencyFactory),
+        new Command\VersionCommand(null, $dependencyFactory)
     ));
 
     $cli->run();

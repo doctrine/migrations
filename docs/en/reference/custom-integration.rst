@@ -20,14 +20,14 @@ Now place the following code in the ``migrations`` file:
     require_once __DIR__.'/vendor/autoload.php';
 
     use Doctrine\DBAL\DriverManager;
-    use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+    use Doctrine\Migrations\DependencyFactory;
+    use Doctrine\Migrations\Configuration\Configuration\PhpFile;
+    use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
     use Doctrine\Migrations\Tools\Console\Command;
     use Symfony\Component\Console\Application;
-    use Symfony\Component\Console\Helper\HelperSet;
-    use Symfony\Component\Console\Helper\QuestionHelper;
 
     $dbParams = [
-        'dbname' => 'migrations_test',
+        'dbname' => 'migrations_docs_example',
         'user' => 'root',
         'password' => '',
         'host' => 'localhost',
@@ -36,26 +36,26 @@ Now place the following code in the ``migrations`` file:
 
     $connection = DriverManager::getConnection($dbParams);
 
-    $helperSet = new HelperSet();
-    $helperSet->set(new QuestionHelper(), 'question');
-    $helperSet->set(new ConnectionHelper($connection), 'db');
+    $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
+
+    $dependencyFactory = DependencyFactory::fromConnection($config, new ExistingConnection($conn));
 
     $cli = new Application('Doctrine Migrations');
     $cli->setCatchExceptions(true);
-    $cli->setHelperSet($helperSet);
 
     $cli->addCommands(array(
-        new Command\DumpSchemaCommand(),
-        new Command\ExecuteCommand(),
-        new Command\GenerateCommand(),
-        new Command\LatestCommand(),
-        new Command\MigrateCommand(),
-        new Command\RollupCommand(),
-        new Command\StatusCommand(),
-        new Command\VersionCommand()
+        new Command\DumpSchemaCommand(null, $dependencyFactory),
+        new Command\ExecuteCommand(null, $dependencyFactory),
+        new Command\GenerateCommand(null, $dependencyFactory),
+        new Command\LatestCommand(null, $dependencyFactory),
+        new Command\MigrateCommand(null, $dependencyFactory),
+        new Command\RollupCommand(null, $dependencyFactory),
+        new Command\StatusCommand(null, $dependencyFactory),
+        new Command\VersionCommand(null, $dependencyFactory)
     ));
 
     $cli->run();
+
 
 Now you can execute the migrations console application like this:
 
