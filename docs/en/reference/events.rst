@@ -8,6 +8,8 @@ there are no versions to be executed.
 - ``onMigrationsVersionExecuting``: dispatched before a single version executes.
 - ``onMigrationsVersionExecuted``: dispatched after a single version executes.
 - ``onMigrationsVersionSkipped``: dispatched when a single version is skipped.
+- ``onMigrationsQueryExecuting``: dispatched before a single query executes.
+- ``onMigrationsQueryExecuted``: dispatched after a single query executes.
 - ``onMigrationsMigrated``: dispatched when all versions have been executed.
 
 All of these events are emitted via the DBAL connection's event manager. Here's an example event subscriber that
@@ -19,6 +21,7 @@ listens for all possible migrations events.
 
     use Doctrine\Common\EventSubscriber;
     use Doctrine\Migrations\Event\MigrationsEventArgs;
+    use Doctrine\Migrations\Event\MigrationsQueryEventArgs;
     use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
     use Doctrine\Migrations\Events;
 
@@ -32,6 +35,8 @@ listens for all possible migrations events.
                 Events::onMigrationsVersionExecuting,
                 Events::onMigrationsVersionExecuted,
                 Events::onMigrationsVersionSkipped,
+                Events::onMigrationsQueryExecuting,
+                Events::onMigrationsQueryExecuted,
             ];
         }
 
@@ -56,6 +61,16 @@ listens for all possible migrations events.
         }
 
         public function onMigrationsVersionSkipped(MigrationsVersionEventArgs $args) : void
+        {
+            // ...
+        }
+
+        public function onMigrationsQueryExecuting(MigrationsQueryEventArgs $args) : void
+        {
+            // ...
+        }
+
+        public function onMigrationsQueryExecuted(MigrationsQueryEventArgs $args) : void
         {
             // ...
         }

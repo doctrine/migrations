@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Psr\Log\LoggerInterface;
@@ -206,7 +207,7 @@ final class DbalExecutor implements Executor
 
         if (count($this->sql) !== 0) {
             if (! $configuration->isDryRun()) {
-                $this->executeResult($configuration);
+                $this->executeResult($configuration, $plan);
             } else {
                 foreach ($this->sql as $idx => $query) {
                     $this->outputSqlQuery($idx, $query);
@@ -324,9 +325,16 @@ final class DbalExecutor implements Executor
         }
     }
 
-    private function executeResult(MigratorConfiguration $configuration) : void
+    private function executeResult(MigratorConfiguration $configuration, MigrationPlan $plan) : void
     {
         foreach ($this->sql as $key => $query) {
+            $migrationQuery = new Query($query, $this->params[$key] ?? [], $this->types[$key] ?? []);
+            $this->dispatcher->dispatchQueryExecuteEvent(
+                Events::onMigrationsQueryExecuting,
+                $plan,
+                $configuration,
+                $migrationQuery
+            );
             $stopwatchEvent = $this->stopwatch->start('query');
 
             $this->outputSqlQuery($key, $query);
@@ -338,6 +346,13 @@ final class DbalExecutor implements Executor
             }
 
             $stopwatchEvent->stop();
+
+            $this->dispatcher->dispatchQueryExecuteEvent(
+                Events::onMigrationsQueryExecuted,
+                $plan,
+                $configuration,
+                $migrationQuery
+            );
 
             if (! $configuration->getTimeAllQueries()) {
                 continue;

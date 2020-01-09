@@ -11,6 +11,8 @@ final class Events
 {
     public const onMigrationsMigrating        = 'onMigrationsMigrating';
     public const onMigrationsMigrated         = 'onMigrationsMigrated';
+    public const onMigrationsQueryExecuting   = 'onMigrationsQueryExecuting';
+    public const onMigrationsQueryExecuted    = 'onMigrationsQueryExecuted';
     public const onMigrationsVersionExecuting = 'onMigrationsVersionExecuting';
     public const onMigrationsVersionExecuted  = 'onMigrationsVersionExecuted';
     public const onMigrationsVersionSkipped   = 'onMigrationsVersionSkipped';

@@ -7,10 +7,12 @@ namespace Doctrine\Migrations\Tests\Event;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
+use Doctrine\Migrations\Event\MigrationsQueryEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\MigratorConfiguration;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -42,6 +44,17 @@ class EventArgsTest extends TestCase
         self::assertSame($this->connection, $event->getConnection());
         self::assertSame($this->config, $event->getMigratorConfiguration());
         self::assertSame($this->plan, $event->getPlan());
+    }
+
+    public function testMigrationsQueryEventArgs() : void
+    {
+        $query = new Query('SELECT 1');
+        $event = new MigrationsQueryEventArgs($this->connection, $this->plan, $this->config, $query);
+
+        self::assertSame($this->connection, $event->getConnection());
+        self::assertSame($this->config, $event->getMigratorConfiguration());
+        self::assertSame($this->plan, $event->getPlan());
+        self::assertSame($query, $event->getQuery());
     }
 
     public function testMigrationsEventArgs() : void

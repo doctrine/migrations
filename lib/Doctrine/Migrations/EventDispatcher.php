@@ -8,9 +8,11 @@ use Doctrine\Common\EventArgs;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
+use Doctrine\Migrations\Event\MigrationsQueryEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\Query\Query;
 
 /**
  * The EventDispatcher class is responsible for dispatching events internally that a user can listen for.
@@ -54,6 +56,21 @@ final class EventDispatcher
         $this->dispatchEvent($eventName, $event);
     }
 
+    public function dispatchQueryExecuteEvent(
+        string $eventName,
+        MigrationPlan $plan,
+        MigratorConfiguration $migratorConfiguration,
+        Query $query
+    ) : void {
+        $event = $this->createMigrationsQueryEventArgs(
+            $plan,
+            $migratorConfiguration,
+            $query
+        );
+
+        $this->dispatchEvent($eventName, $event);
+    }
+
     private function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
     {
         $this->eventManager->dispatchEvent($eventName, $args);
@@ -74,6 +91,19 @@ final class EventDispatcher
             $this->connection,
             $plan,
             $migratorConfiguration
+        );
+    }
+
+    private function createMigrationsQueryEventArgs(
+        MigrationPlan $plan,
+        MigratorConfiguration $migratorConfiguration,
+        Query $query
+    ) : MigrationsQueryEventArgs {
+        return new MigrationsQueryEventArgs(
+            $this->connection,
+            $plan,
+            $migratorConfiguration,
+            $query
         );
     }
 }
