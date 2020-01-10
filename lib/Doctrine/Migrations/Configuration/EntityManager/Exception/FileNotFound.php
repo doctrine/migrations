@@ -1,0 +1,16 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Doctrine\Migrations\Configuration\EntityManager\Exception;
+
+use InvalidArgumentException;
+use function sprintf;
+
+final class FileNotFound extends InvalidArgumentException implements LoaderException
+{
+    public static function new(string $file) : self
+    {
+        return new self(sprintf('The database configuration file "%s" does not exist.', $file));
+    }
+}

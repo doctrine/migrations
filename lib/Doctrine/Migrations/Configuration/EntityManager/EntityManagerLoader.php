@@ -1,0 +1,19 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Doctrine\Migrations\Configuration\EntityManager;
+
+use Doctrine\Migrations\Configuration\EntityManager\Exception\EntityManagerNotSpecified;
+use Doctrine\ORM\EntityManager;
+
+/**
+ * The EntityManagerLoader defines the interface used to load the Doctrine\DBAL\EntityManager instance to use
+ * for migrations.
+ *
+ * @internal
+ */
+interface EntityManagerLoader
+{
+    public function getEntityManager() : EntityManager;
+}
