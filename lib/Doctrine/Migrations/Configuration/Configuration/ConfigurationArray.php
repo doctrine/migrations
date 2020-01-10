@@ -2,12 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Loader;
+namespace Doctrine\Migrations\Configuration\Configuration;
 
 use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
-use Doctrine\Migrations\Configuration\Exception\UnableToLoadResource;
+use Doctrine\Migrations\Configuration\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;
@@ -16,20 +15,21 @@ use function is_array;
 use function is_bool;
 use function is_callable;
 
-/**
- * @internal
- */
-final class ArrayLoader implements Loader
+final class ConfigurationArray implements ConfigurationLoader
 {
-    /**
-     * @param mixed $array
-     */
-    public function load($array) : Configuration
-    {
-        if (! is_array($array)) {
-            throw UnableToLoadResource::with(static::class);
-        }
+    /** @var array<string,mixed> */
+    private $configurations;
 
+    /**
+     * @param array<string,mixed> $configurations
+     */
+    public function __construct(array $configurations)
+    {
+        $this->configurations = $configurations;
+    }
+
+    public function getConfiguration() : Configuration
+    {
         $configMap = [
             'migrations_paths' => static function ($paths, Configuration $configuration) : void {
                 foreach ($paths as $namespace => $path) {
@@ -63,7 +63,7 @@ final class ArrayLoader implements Loader
         ];
 
         $object = new Configuration();
-        self::applyConfigs($configMap, $object, $array);
+        self::applyConfigs($configMap, $object, $this->configurations);
 
         if ($object->getMetadataStorageConfiguration() === null) {
             $object->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());

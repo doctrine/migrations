@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Loader;
+namespace Doctrine\Migrations\Configuration\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Configuration\Exception\YamlNotAvailable;
+use Doctrine\Migrations\Configuration\Configuration\Exception\YamlNotValid;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
-use Doctrine\Migrations\Configuration\Exception\YamlNotAvailable;
-use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use function assert;
@@ -16,33 +16,19 @@ use function file_exists;
 use function file_get_contents;
 use function is_array;
 
-/**
- * @internal
- */
-final class YamlFileLoader extends AbstractFileLoader
+final class YamlFile extends ConfigurationFile
 {
-    /** @var ArrayLoader */
-    private $arrayLoader;
-
-    public function __construct()
-    {
-        $this->arrayLoader = new ArrayLoader();
-    }
-
-    /**
-     * @param mixed $file
-     */
-    public function load($file) : Configuration
+    public function getConfiguration() : Configuration
     {
         if (! class_exists(Yaml::class)) {
             throw YamlNotAvailable::new();
         }
 
-        if (! file_exists($file)) {
+        if (! file_exists($this->file)) {
             throw FileNotFound::new();
         }
 
-        $content = file_get_contents($file);
+        $content = file_get_contents($this->file);
 
         assert($content !== false);
 
@@ -57,12 +43,12 @@ final class YamlFileLoader extends AbstractFileLoader
         }
 
         if (isset($config['migrations_paths'])) {
-            $config['migrations_paths'] = $this->getDirectoryRelativeToFile(
-                $file,
-                $config['migrations_paths']
+            $config['migrations_paths'] = $this->getDirectoriesRelativeToFile(
+                $config['migrations_paths'],
+                $this->file
             );
         }
 
-        return $this->arrayLoader->load($config);
+        return (new ConfigurationArray($config))->getConfiguration();
     }
 }

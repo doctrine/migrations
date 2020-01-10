@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Exception;
+namespace Doctrine\Migrations\Configuration\Configuration\Exception;
 
+use Doctrine\Migrations\Configuration\Exception\ConfigurationException;
 use LogicException;
 
 final class YamlNotValid extends LogicException implements ConfigurationException
