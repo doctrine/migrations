@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Exception;
 
 use LogicException;
 
-final class FrozenDependencies extends LogicException implements MigrationException
+final class FrozenDependencies extends LogicException implements DependencyException
 {
     public static function new() : self
     {

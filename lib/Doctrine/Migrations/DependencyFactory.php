@@ -6,6 +6,8 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
+use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
 use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
@@ -48,8 +50,6 @@ use function sprintf;
 
 /**
  * The DependencyFactory is responsible for wiring up and managing internal class dependencies.
- *
- * @internal
  */
 class DependencyFactory
 {
@@ -67,24 +67,54 @@ class DependencyFactory
     /** @var Connection */
     private $connection;
 
+
     /** @var EntityManagerInterface|null */
     private $em;
 
     /** @var bool */
     private $frozen = false;
 
-    public function __construct(Configuration $configuration, Connection $connection, ?EntityManagerInterface $em = null, ?LoggerInterface $logger = null)
+    /** @var Configuration\ConfigurationLoader */
+    private $configurationLoader;
+
+    /** @var ConnectionLoader */
+    private $connectionLoader;
+
+    /** @var EntityManagerLoader|null */
+    private $emLoader;
+
+    public static function fromConnection(Configuration\ConfigurationLoader $configurationLoader, ConnectionLoader $connectionLoader, ?LoggerInterface $logger = null) : self
     {
-        $this->configuration = $configuration;
-        $this->logger        = $logger ?: new NullLogger();
-        $this->connection    = $connection;
-        $this->em            = $em;
+        $dependencyFactory                      = new self($logger);
+        $dependencyFactory->configurationLoader = $configurationLoader;
+        $dependencyFactory->connectionLoader    = $connectionLoader;
+
+        return $dependencyFactory;
+    }
+
+    public static function fromEntityManager(Configuration\ConfigurationLoader $configurationLoader, EntityManagerLoader $emLoader, ?LoggerInterface $logger = null) : self
+    {
+        $dependencyFactory                      = new self($logger);
+        $dependencyFactory->configurationLoader = $configurationLoader;
+        $dependencyFactory->emLoader            = $emLoader;
+
+        return $dependencyFactory;
+    }
+
+    private function __construct(?LoggerInterface $logger = null)
+    {
+        $this->logger = $logger ?: new NullLogger();
+    }
+
+    public function isFrozen() : bool
+    {
+        return $this->frozen;
     }
 
     public function freeze() : void
     {
         $this->frozen = true;
-        $this->configuration->freeze();
+        $this->getConfiguration()->freeze();
     }
 
     private function assertNotFrozen() : void
@@ -94,14 +124,46 @@ class DependencyFactory
         }
     }
 
+    public function hasEntityManager() : bool
+    {
+        return $this->emLoader !== null;
+    }
+
     public function getConfiguration() : Configuration
     {
+        if ($this->configuration === null) {
+            $this->configuration = $this->configurationLoader->getConfiguration();
+        }
+
         return $this->configuration;
     }
 
     public function getConnection() : Connection
     {
+        if ($this->connection === null) {
+            $this->connection = $this->hasEntityManager()
+                ? $this->getEntityManager()->getConnection()
+                : $this->connectionLoader->getConnection();
+        }
+
         return $this->connection;
+    }
+
+    public function getEntityManager() : EntityManagerInterface
+    {
+        if ($this->em === null) {
+            if ($this->emLoader === null) {
+                throw MissingDependency::noEntityManager();
+            }
+            $this->em = $this->emLoader->getEntityManager();
+        }
+
+        return $this->em;
+    }
+
+    public function getLogger() : LoggerInterface
+    {
+        return $this->logger;
     }
 
     public function getSorter() : ?callable
@@ -133,7 +195,7 @@ class DependencyFactory
         return $this->getDependency(SchemaDumper::class, function () : SchemaDumper {
             $excludedTables = [];
 
-            $metadataConfig = $this->configuration->getMetadataStorageConfiguration();
+            $metadataConfig = $this->getConfiguration()->getMetadataStorageConfiguration();
             if ($metadataConfig instanceof TableMetadataStorageConfiguration) {
                 $excludedTables[] = sprintf('/^%s$/', preg_quote($metadataConfig->getTableName(), '/'));
             }
@@ -151,11 +213,11 @@ class DependencyFactory
     private function getSchemaProvider() : SchemaProvider
     {
         return $this->getDependency(SchemaProvider::class, function () : SchemaProvider {
-            if ($this->em === null) {
-                throw new MissingDependency('The doctrine entity manager should be provided in order to be able to instantiate SchemaProvider');
+            if (! $this->hasEntityManager()) {
+                throw MissingDependency::noEntityManager();
             }
 
-            return new OrmSchemaProvider($this->em);
+            return new OrmSchemaProvider($this->getEntityManager());
         });
     }
 
@@ -178,8 +240,8 @@ class DependencyFactory
         return $this->getDependency(SchemaDiffProvider::class, function () : LazySchemaDiffProvider {
             return LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
                 new DBALSchemaDiffProvider(
-                    $this->connection->getSchemaManager(),
-                    $this->connection->getDatabasePlatform()
+                    $this->getConnection()->getSchemaManager(),
+                    $this->getConnection()->getDatabasePlatform()
                 )
             );
         });
@@ -195,7 +257,7 @@ class DependencyFactory
     public function getParameterFormatter() : ParameterFormatter
     {
         return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
-            return new InlineParameterFormatter($this->connection);
+            return new InlineParameterFormatter($this->getConnection());
         });
     }
 
@@ -242,20 +304,10 @@ class DependencyFactory
     {
         return $this->getDependency(MetadataStorage::class, function () : MetadataStorage {
             return new TableMetadataStorage(
-                $this->connection,
+                $this->getConnection(),
                 $this->getMetadataStorageConfiguration()
             );
         });
-    }
-
-    public function getEntityManager() : ?EntityManagerInterface
-    {
-        return $this->em;
-    }
-
-    public function getLogger() : LoggerInterface
-    {
-        return $this->logger;
     }
 
     public function getVersionExecutor() : Executor
@@ -264,7 +316,7 @@ class DependencyFactory
             return new DbalExecutor(
                 $this->getMetadataStorage(),
                 $this->getEventDispatcher(),
-                $this->connection,
+                $this->getConnection(),
                 $this->getSchemaDiffProvider(),
                 $this->getLogger(),
                 $this->getParameterFormatter(),
@@ -326,7 +378,7 @@ class DependencyFactory
         return $this->getDependency(SqlGenerator::class, function () : SqlGenerator {
             return new SqlGenerator(
                 $this->getConfiguration(),
-                $this->connection->getDatabasePlatform()
+                $this->getConnection()->getDatabasePlatform()
             );
         });
     }
@@ -345,7 +397,7 @@ class DependencyFactory
         return $this->getDependency(MigrationStatusInfosHelper::class, function () : MigrationStatusInfosHelper {
             return new MigrationStatusInfosHelper(
                 $this->getConfiguration(),
-                $this->connection,
+                $this->getConnection(),
                 $this->getVersionAliasResolver()
             );
         });
@@ -355,7 +407,7 @@ class DependencyFactory
     {
         return $this->getDependency(Migrator::class, function () : Migrator {
             return new DbalMigrator(
-                $this->connection,
+                $this->getConnection(),
                 $this->getEventDispatcher(),
                 $this->getVersionExecutor(),
                 $this->logger,

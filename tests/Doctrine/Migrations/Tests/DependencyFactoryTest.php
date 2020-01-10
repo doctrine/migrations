@@ -6,10 +6,14 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\FrozenDependencies;
+use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
 
@@ -18,17 +22,29 @@ final class DependencyFactoryTest extends MigrationTestCase
     /** @var MockObject|Connection */
     private $connection;
 
+    /** @var Configuration */
+    private $configuration;
+
+    /** @var EntityManager|MockObject */
+    private $entityManager;
+
     public function setUp() : void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $this->connection    = $this->createMock(Connection::class);
+        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->entityManager
+            ->expects(self::any())
+            ->method('getConnection')
+            ->willReturn($this->connection);
+
+        $this->configuration = new Configuration();
     }
 
     public function testFreeze() : void
     {
-        $conf = new Configuration();
-        $conf->addMigrationsDirectory('foo', 'bar');
+        $this->configuration->addMigrationsDirectory('foo', 'bar');
 
-        $di = new DependencyFactory($conf, $this->connection);
+        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $di->freeze();
 
         $this->expectException(FrozenDependencies::class);
@@ -38,10 +54,9 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testFinderForYearMonthStructure() : void
     {
-        $conf = new Configuration();
-        $conf->setMigrationsAreOrganizedByYearAndMonth(true);
+        $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
-        $di     = new DependencyFactory($conf, $this->connection);
+        $di     = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $finder = $di->getMigrationsFinder();
 
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
@@ -49,10 +64,9 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testFinderForYearStructure() : void
     {
-        $conf = new Configuration();
-        $conf->setMigrationsAreOrganizedByYear(true);
+        $this->configuration->setMigrationsAreOrganizedByYear(true);
 
-        $di     = new DependencyFactory($conf, $this->connection);
+        $di     = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $finder = $di->getMigrationsFinder();
 
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
@@ -60,19 +74,35 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testFinder() : void
     {
-        $conf   = new Configuration();
-        $di     = new DependencyFactory($conf, $this->connection);
-        $finder = $di->getMigrationsFinder();
+        $this->configuration = new Configuration();
+        $di                  = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $finder              = $di->getMigrationsFinder();
 
         self::assertInstanceOf(GlobFinder::class, $finder);
     }
 
     public function testConnection() : void
     {
-        $conf = new Configuration();
-        $di   = new DependencyFactory($conf, $this->connection);
-        $conn = $di->getConnection();
+        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
 
-        self::assertSame($this->connection, $conn);
+        self::assertSame($this->connection, $di->getConnection());
+        self::assertFalse($di->hasEntityManager());
+    }
+
+    public function testNoEntityManagerRaiseException() : void
+    {
+        $this->expectException(MissingDependency::class);
+
+        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di->getEntityManager();
+    }
+
+    public function testEntityManager() : void
+    {
+        $di = DependencyFactory::fromEntityManager(new Configuration\ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
+
+        self::assertTrue($di->hasEntityManager());
+        self::assertSame($this->entityManager, $di->getEntityManager());
+        self::assertSame($this->connection, $di->getConnection());
     }
 }
