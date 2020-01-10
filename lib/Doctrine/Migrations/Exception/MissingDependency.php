@@ -6,6 +6,10 @@ namespace Doctrine\Migrations\Exception;
 
 use RuntimeException;
 
-final class MissingDependency extends RuntimeException implements MigrationException
+final class MissingDependency extends RuntimeException implements DependencyException
 {
+    public static function noEntityManager() : self
+    {
+        return new self('The doctrine entity manager is not available.');
+    }
 }

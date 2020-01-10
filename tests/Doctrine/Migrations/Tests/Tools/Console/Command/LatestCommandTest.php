@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -42,7 +43,7 @@ class LatestCommandTest extends MigrationTestCase
 
         $conn = $this->getSqliteConnection();
 
-        $dependencyFactory = new DependencyFactory($configuration, $conn);
+        $dependencyFactory = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($configuration), new ExistingConnection($conn));
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
