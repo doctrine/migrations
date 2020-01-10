@@ -4,9 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
-use PHPUnit\Framework\MockObject\MockObject;
+use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
@@ -17,16 +17,11 @@ use Symfony\Component\Console\Helper\HelperSet;
  */
 class ConsoleRunnerTest extends TestCase
 {
-    /** @var MockObject|EntityManagerHelper */
-    private $entityManagerHelper;
-
     /** @var Application */
     private $application;
 
     public function testRun() : void
     {
-        $helperSet = new HelperSet([]);
-
         $application = $this->createMock(Application::class);
 
         ConsoleRunnerStub::$application = $application;
@@ -34,7 +29,7 @@ class ConsoleRunnerTest extends TestCase
         $application->expects(self::once())
             ->method('run');
 
-        ConsoleRunnerStub::run($helperSet, []);
+        ConsoleRunnerStub::run([]);
     }
 
     public function testHasExecuteCommand() : void
@@ -88,11 +83,15 @@ class ConsoleRunnerTest extends TestCase
 
     public function testHasDiffCommand() : void
     {
-        $this->application->setHelperSet(new HelperSet([
-            'em' => $this->entityManagerHelper,
-        ]));
+        $em = $this->createMock(EntityManager::class);
 
-        ConsoleRunner::addCommands($this->application);
+        $dependencyFactory = $this->createMock(DependencyFactory::class);
+        $dependencyFactory
+            ->expects(self::atLeastOnce())
+            ->method('getEntityManager')
+            ->willReturn($em);
+
+        ConsoleRunner::addCommands($this->application, $dependencyFactory);
 
         self::assertTrue($this->application->has('migrations:diff'));
     }
@@ -108,21 +107,30 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateApplication() : void
     {
-        $helperSet = new HelperSet();
+        $application = ConsoleRunner::createApplication();
+        $commands    = $application->all('migrations');
+        self::assertCount(10, $commands);
+    }
 
-        $application = ConsoleRunner::createApplication($helperSet);
+    public function testCreateApplicationWithEntityManager() : void
+    {
+        $em = $this->createMock(EntityManager::class);
 
-        self::assertSame($helperSet, $application->getHelperSet());
+        $dependencyFactory = $this->createMock(DependencyFactory::class);
+        $dependencyFactory
+            ->expects(self::atLeastOnce())
+            ->method('getEntityManager')
+            ->willReturn($em);
+
+        $application = ConsoleRunner::createApplication([], $dependencyFactory);
+        $commands    = $application->all('migrations');
+        self::assertCount(11, $commands);
     }
 
     protected function setUp() : void
     {
         parent::setUp();
-
-        $this->application         = new Application();
-        $this->entityManagerHelper = $this->getMockBuilder(EntityManagerHelper::class)
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->application = new Application();
     }
 }
 
@@ -134,7 +142,7 @@ class ConsoleRunnerStub extends ConsoleRunner
     /**
      * @param Command[] $commands
      */
-    public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
+    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null) : Application
     {
         return static::$application;
     }

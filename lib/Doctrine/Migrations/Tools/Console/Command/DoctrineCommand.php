@@ -4,15 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Configuration\Configuration\ConfigurationFileWithFallback;
+use Doctrine\Migrations\Configuration\Connection\ConfigurationFile;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
-use Doctrine\Migrations\Tools\Console\Helper\ConfigurationHelper;
-use Doctrine\Migrations\Tools\Console\Helper\MigrationsConfigurationHelper;
-use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
-use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -39,18 +37,22 @@ abstract class DoctrineCommand extends Command
 
     protected function configure() : void
     {
+        if ($this->dependencyFactory !== null) {
+            return;
+        }
         $this->addOption(
             'configuration',
             null,
-            InputOption::VALUE_OPTIONAL,
-            'The path to a migrations configuration file.'
+            InputOption::VALUE_REQUIRED,
+            'The path to a migrations configuration file. <comment>[default: any of migrations.{php,xml,json,yml,yaml}]</comment>'
         );
 
         $this->addOption(
             'db-configuration',
             null,
-            InputOption::VALUE_OPTIONAL,
-            'The path to a database connection configuration file.'
+            InputOption::VALUE_REQUIRED,
+            'The path to a database connection configuration file.',
+            'migrations-db.php'
         );
     }
 
@@ -68,35 +70,22 @@ abstract class DoctrineCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output) : void
     {
-        if ($this->dependencyFactory !== null) {
-            $this->dependencyFactory->freeze();
+        if ($this->dependencyFactory === null) {
+            $configurationLoader     = new ConfigurationFileWithFallback(
+                is_string($input->getOption('configuration'))
+                    ? $input->getOption('configuration')
+                    : null
+            );
+            $connectionLoader        = new ConfigurationFile((string) $input->getOption('db-configuration'));
+            $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);
+        }
 
+        if ($this->dependencyFactory->isFrozen()) {
             return;
         }
 
-        $helperSet = $this->getHelperSet() ?: new HelperSet();
-
-        if ($helperSet->has('configuration') && $helperSet->get('configuration') instanceof ConfigurationHelper) {
-            /** @var MigrationsConfigurationHelper $configHelper */
-            $configHelper = $helperSet->get('configuration');
-        } else {
-            $configHelper = new MigrationsConfigurationHelper();
-        }
-
-        $configuration = $configHelper->getConfiguration($input);
-
-        $dbConfig = is_string($input->getOption('db-configuration')) ? $input->getOption('db-configuration'): null;
-
-        $connection = (new ConnectionLoader())
-            ->getConnection($dbConfig, $helperSet);
-
-        $em = null;
-        if ($helperSet->has('em') && $helperSet->get('em') instanceof EntityManagerHelper) {
-            $em = $helperSet->get('em')->getEntityManager();
-        }
-
-        $logger                  = new ConsoleLogger($output);
-        $this->dependencyFactory = new DependencyFactory($configuration, $connection, $em, $logger);
+        $logger = new ConsoleLogger($output);
+        $this->dependencyFactory->setService(LoggerInterface::class, $logger);
         $this->dependencyFactory->freeze();
     }
 

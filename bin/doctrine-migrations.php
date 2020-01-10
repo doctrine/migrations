@@ -6,8 +6,6 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Phar;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use const DIRECTORY_SEPARATOR;
 use const E_USER_ERROR;
 use const PHP_EOL;
@@ -62,31 +60,15 @@ use function trigger_error;
         break;
     }
 
-    $helperSet = null;
+    $dependencyFactory = null;
     if ($configurationFile !== null) {
         if (! is_readable($configurationFile)) {
             trigger_error('Configuration file [' . $configurationFile . '] does not have read permission.', E_USER_ERROR);
             exit(1);
         }
 
-        $helperSet = require $configurationFile;
-
-        if (! $helperSet instanceof HelperSet) {
-            foreach ($GLOBALS as $helperSetCandidate) {
-                if (! $helperSetCandidate instanceof HelperSet) {
-                    continue;
-                }
-
-                $helperSet = $helperSetCandidate;
-                break;
-            }
-        }
+        $dependencyFactory = require $configurationFile;
     }
 
-    $helperSet = $helperSet ?? new HelperSet();
-    $helperSet->set(new QuestionHelper(), 'question');
-
-    $commands = [];
-
-    ConsoleRunner::run($helperSet, $commands);
+    ConsoleRunner::run([], $dependencyFactory);
 })();
