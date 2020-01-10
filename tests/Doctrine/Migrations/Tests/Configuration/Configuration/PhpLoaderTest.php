@@ -2,18 +2,18 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Loader;
+namespace Doctrine\Migrations\Tests\Configuration\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Loader\PhpFileLoader;
+use Doctrine\Migrations\Configuration\Configuration\PhpFile;
 
-class PhpLoaderTest extends AbstractLoaderTest
+class PhpLoaderTest extends LoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new PhpFileLoader();
+        $loader = new PhpFile(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.php');
 
-        return $loader->load(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.php');
+        return $loader->getConfiguration();
     }
 
     public function testLoadInline() : void

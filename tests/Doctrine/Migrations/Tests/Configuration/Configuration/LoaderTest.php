@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Loader;
+namespace Doctrine\Migrations\Tests\Configuration\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
+use Doctrine\Migrations\Configuration\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use InvalidArgumentException;
@@ -13,7 +13,7 @@ use PHPUnit\Framework\TestCase;
 use const DIRECTORY_SEPARATOR;
 use function dirname;
 
-abstract class AbstractLoaderTest extends TestCase
+abstract class LoaderTest extends TestCase
 {
     abstract public function load(string $prefix = '') : Configuration;
 

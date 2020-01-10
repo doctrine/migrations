@@ -10,6 +10,6 @@ final class FileNotFound extends InvalidArgumentException implements Configurati
 {
     public static function new() : self
     {
-        return new self('Given config file does not exist');
+        return new self('Given configuration file does not exist');
     }
 }

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Loader;
+namespace Doctrine\Migrations\Configuration\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
-use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use SimpleXMLElement;
@@ -20,31 +20,17 @@ use function libxml_use_internal_errors;
 use function simplexml_load_string;
 use function strtr;
 
-/**
- * @internal
- */
-final class XmlFileLoader extends AbstractFileLoader
+final class XmlFile extends ConfigurationFile
 {
-    /** @var ArrayLoader */
-    private $arrayLoader;
-
-    public function __construct()
+    public function getConfiguration() : Configuration
     {
-        $this->arrayLoader = new ArrayLoader();
-    }
-
-    /**
-     * @param mixed|string $file
-     */
-    public function load($file) : Configuration
-    {
-        if (! file_exists($file)) {
+        if (! file_exists($this->file)) {
             throw FileNotFound::new();
         }
 
-        $this->validateXml($file);
+        $this->validateXml($this->file);
 
-        $rawXML = file_get_contents($file);
+        $rawXML = file_get_contents($this->file);
         assert($rawXML !== false);
 
         $root = simplexml_load_string($rawXML, SimpleXMLElement::class, LIBXML_NOCDATA);
@@ -59,13 +45,13 @@ final class XmlFileLoader extends AbstractFileLoader
             );
         }
         if (isset($config['migrations_paths'])) {
-            $config['migrations_paths'] = $this->getDirectoryRelativeToFile(
-                $file,
-                $config['migrations_paths']
+            $config['migrations_paths'] = $this->getDirectoriesRelativeToFile(
+                $config['migrations_paths'],
+                $this->file
             );
         }
 
-        return $this->arrayLoader->load($config);
+        return (new ConfigurationArray($config))->getConfiguration();
     }
 
     /**
