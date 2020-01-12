@@ -10,8 +10,7 @@ use Doctrine\ORM\EntityManager;
 use function file_exists;
 
 /**
- * The ConfigurationFileLoader class is responsible for loading a Doctrine\DBAL\EntityManager from a PHP file
- * that returns an array of EntityManager information which is used to instantiate a EntityManager with DriverManager::getConnection()
+ * This class will return an EntityManager instance, loaded from a configuration file provided as argument.
  */
 final class ConfigurationFile implements EntityManagerLoader
 {
