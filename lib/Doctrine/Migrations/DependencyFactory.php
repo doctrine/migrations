@@ -213,10 +213,6 @@ class DependencyFactory
     private function getSchemaProvider() : SchemaProvider
     {
         return $this->getDependency(SchemaProvider::class, function () : SchemaProvider {
-            if (! $this->hasEntityManager()) {
-                throw MissingDependency::noEntityManager();
-            }
-
             return new OrmSchemaProvider($this->getEntityManager());
         });
     }
