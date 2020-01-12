@@ -6,14 +6,11 @@ namespace Doctrine\Migrations\Tests\Configuration\EntityManager;
 
 use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\Migrations\Configuration\EntityManager\ConfigurationFile;
-use Doctrine\Migrations\Configuration\EntityManager\ConfiguredEntityManager;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\InvalidConfiguration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
-use function chdir;
-use function getcwd;
 
 final class EntityManagerTest extends TestCase
 {
@@ -55,47 +52,5 @@ final class EntityManagerTest extends TestCase
         $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');
         $loader->getEntityManager();
-    }
-
-    public function testGetEntityManagerFromLoader() : void
-    {
-        $dir = getcwd() ?: '.';
-        chdir(__DIR__);
-        $loader = new ConfiguredEntityManager('_files/em-loader.php');
-        try {
-            $em = $loader->getEntityManager();
-            self::assertSame('Foo', $em->getConfiguration()->getProxyNamespace());
-            self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
-        } finally {
-            chdir($dir);
-        }
-    }
-
-    public function testGetEntityManagerNotFound() : void
-    {
-        $this->expectException(FileNotFound::class);
-
-        $dir = getcwd()?: '.';
-        chdir(__DIR__);
-        $loader = new ConfiguredEntityManager(__DIR__ . '/_files/wrong.php');
-        try {
-            $loader->getEntityManager();
-        } finally {
-            chdir($dir);
-        }
-    }
-
-    public function testGetEntityManager() : void
-    {
-        $dir = getcwd()?: '.';
-        chdir(__DIR__ . '/_files');
-        $loader = new ConfiguredEntityManager();
-        try {
-            $em = $loader->getEntityManager();
-            self::assertSame('Foo', $em->getConfiguration()->getProxyNamespace());
-            self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
-        } finally {
-            chdir($dir);
-        }
     }
 }
