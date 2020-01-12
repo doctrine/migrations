@@ -289,7 +289,7 @@ class MigrateCommandTest extends MigrationTestCase
         $repo->registerMigrationInstance(new Version('A'), $migration);
 
         $this->migrateCommand = $this->getMockBuilder(MigrateCommand::class)
-            ->setConstructorArgs([null, $this->dependencyFactory])
+            ->setConstructorArgs([$this->dependencyFactory])
             ->onlyMethods(['canExecute'])
             ->getMock();
 

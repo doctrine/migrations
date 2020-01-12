@@ -118,7 +118,7 @@ final class DiffCommandTest extends TestCase
             ->willReturn($this->migrationDiffGenerator);
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setConstructorArgs([null, $this->dependencyFactory])
+            ->setConstructorArgs([$this->dependencyFactory])
             ->onlyMethods(['procOpen'])
             ->getMock();
     }

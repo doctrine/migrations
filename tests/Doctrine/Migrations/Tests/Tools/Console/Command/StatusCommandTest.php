@@ -55,7 +55,7 @@ class StatusCommandTest extends MigrationTestCase
 
         $this->metadataStorage->ensureInitialized();
 
-        $this->command       = new StatusCommand(null, $dependencyFactory);
+        $this->command       = new StatusCommand($dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
     }
 

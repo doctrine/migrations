@@ -139,6 +139,6 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getMigrationRepository')
             ->willReturn($this->migrationRepository);
 
-        $this->dumpSchemaCommand = new DumpSchemaCommand(null, $this->dependencyFactory);
+        $this->dumpSchemaCommand = new DumpSchemaCommand($this->dependencyFactory);
     }
 }

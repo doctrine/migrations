@@ -92,22 +92,22 @@ class ConsoleRunner
     public static function addCommands(Application $cli, ?DependencyFactory $dependencyFactory = null) : void
     {
         $cli->addCommands([
-            new DumpSchemaCommand(null, $dependencyFactory),
-            new ExecuteCommand(null, $dependencyFactory),
-            new GenerateCommand(null, $dependencyFactory),
-            new LatestCommand(null, $dependencyFactory),
-            new MigrateCommand(null, $dependencyFactory),
-            new RollupCommand(null, $dependencyFactory),
-            new StatusCommand(null, $dependencyFactory),
-            new VersionCommand(null, $dependencyFactory),
-            new UpToDateCommand(null, $dependencyFactory),
-            new SyncMetadataCommand(null, $dependencyFactory),
+            new DumpSchemaCommand($dependencyFactory),
+            new ExecuteCommand($dependencyFactory),
+            new GenerateCommand($dependencyFactory),
+            new LatestCommand($dependencyFactory),
+            new MigrateCommand($dependencyFactory),
+            new RollupCommand($dependencyFactory),
+            new StatusCommand($dependencyFactory),
+            new VersionCommand($dependencyFactory),
+            new UpToDateCommand($dependencyFactory),
+            new SyncMetadataCommand($dependencyFactory),
         ]);
 
         if ($dependencyFactory === null || ! $dependencyFactory->hasEntityManager()) {
             return;
         }
 
-        $cli->add(new DiffCommand(null, $dependencyFactory));
+        $cli->add(new DiffCommand($dependencyFactory));
     }
 }

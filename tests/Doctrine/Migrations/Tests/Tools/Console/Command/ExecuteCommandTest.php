@@ -176,7 +176,7 @@ class ExecuteCommandTest extends TestCase
             ->willReturn($migrationRepository);
 
         $this->executeCommand = $this->getMockBuilder(ExecuteCommand::class)
-            ->setConstructorArgs([null, $this->dependencyFactory])
+            ->setConstructorArgs([$this->dependencyFactory])
             ->onlyMethods(['canExecute'])
             ->getMock();
 
