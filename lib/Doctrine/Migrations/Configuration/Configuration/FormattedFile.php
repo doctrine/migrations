@@ -46,7 +46,7 @@ final class FormattedFile extends ConfigurationFile
 
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
         if (! isset($this->loaders[$extension])) {
-            throw Configuration\Exception\InvalidConfigurationFormat::new();
+            throw Configuration\Exception\InvalidConfigurationFormat::new($this->file);
         }
 
         return $this->loaders[$extension]($this->file)->getConfiguration();

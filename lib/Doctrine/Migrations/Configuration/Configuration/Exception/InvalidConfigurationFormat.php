@@ -6,11 +6,12 @@ namespace Doctrine\Migrations\Configuration\Configuration\Exception;
 
 use Doctrine\Migrations\Configuration\Exception\ConfigurationException;
 use LogicException;
+use function sprintf;
 
 final class InvalidConfigurationFormat extends LogicException implements ConfigurationException
 {
-    public static function new() : self
+    public static function new(string $file) : self
     {
-        return new self('The provided configuration file can not be parsed.');
+        return new self(sprintf('The configuration file "%s" can not be parsed.', $file));
     }
 }

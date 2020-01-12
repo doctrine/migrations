@@ -19,7 +19,7 @@ final class JsonFile extends ConfigurationFile
     public function getConfiguration() : Configuration
     {
         if (! file_exists($this->file)) {
-            throw FileNotFound::new();
+            throw FileNotFound::new($this->file);
         }
 
         $contents = file_get_contents($this->file);

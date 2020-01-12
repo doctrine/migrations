@@ -25,7 +25,7 @@ final class YamlFile extends ConfigurationFile
         }
 
         if (! file_exists($this->file)) {
-            throw FileNotFound::new();
+            throw FileNotFound::new($this->file);
         }
 
         $content = file_get_contents($this->file);
