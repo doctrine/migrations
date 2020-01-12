@@ -12,8 +12,7 @@ use function file_exists;
 use function is_array;
 
 /**
- * The ConfigurationFileLoader class is responsible for loading a Doctrine\DBAL\Connection from a PHP file
- * that returns an array of connection information which is used to instantiate a connection with DriverManager::getConnection()
+ * This class will return an Connection instance, loaded from a configuration file provided as argument.
  */
 final class ConfigurationFile implements ConnectionLoader
 {
@@ -25,12 +24,6 @@ final class ConfigurationFile implements ConnectionLoader
         $this->filename = $filename;
     }
 
-    /**
-     * Read the input and return a Configuration, returns null if the config
-     * is not supported.
-     *
-     * @throws InvalidConfiguration
-     */
     public function getConnection() : Connection
     {
         if (! file_exists($this->filename)) {

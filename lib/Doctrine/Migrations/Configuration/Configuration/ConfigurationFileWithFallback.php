@@ -10,8 +10,8 @@ use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use function file_exists;
 
 /**
- * The ConfigurationLoader class is responsible for getting the Configuration instance from one of the supported methods
- * for defining the configuration for your migrations.
+ * This class creates a configuration instance from a configuration file passed as argument.
+ * If no arguments are provided, will try to load one of migrations.{xml, yml, yaml, json, php} files.
  *
  * @internal
  */
