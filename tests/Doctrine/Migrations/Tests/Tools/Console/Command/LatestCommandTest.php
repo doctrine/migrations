@@ -49,7 +49,7 @@ class LatestCommandTest extends MigrationTestCase
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
         $this->metadataStorage->ensureInitialized();
 
-        $this->command       = new LatestCommand(null, $dependencyFactory);
+        $this->command       = new LatestCommand($dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
     }
 

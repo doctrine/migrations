@@ -93,7 +93,7 @@ final class GenerateCommandTest extends TestCase
             ->willReturn($this->migrationGenerator);
 
         $this->generateCommand = $this->getMockBuilder(GenerateCommand::class)
-            ->setConstructorArgs([null, $this->dependencyFactory])
+            ->setConstructorArgs([$this->dependencyFactory])
             ->onlyMethods(['procOpen'])
             ->getMock();
     }

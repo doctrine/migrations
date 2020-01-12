@@ -57,7 +57,7 @@ class UpToDateCommandTest extends MigrationTestCase
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
         $this->metadataStorage->ensureInitialized();
 
-        $this->command       = new UpToDateCommand(null, $dependencyFactory);
+        $this->command       = new UpToDateCommand($dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
     }
 

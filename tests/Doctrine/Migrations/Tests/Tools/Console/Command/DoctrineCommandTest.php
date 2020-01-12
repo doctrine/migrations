@@ -23,7 +23,7 @@ class DoctrineCommandTest extends MigrationTestCase
             ->method('freeze');
 
         $command = $this->getMockBuilder(DoctrineCommand::class)
-            ->setConstructorArgs(['foo', $dependencyFactory])
+            ->setConstructorArgs([$dependencyFactory])
             ->onlyMethods(['execute'])
             ->getMockForAbstractClass();
 

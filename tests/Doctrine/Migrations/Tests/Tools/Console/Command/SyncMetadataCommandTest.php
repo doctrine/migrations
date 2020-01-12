@@ -48,6 +48,6 @@ final class SyncMetadataCommandTest extends TestCase
             ->method('getMetadataStorage')
             ->willReturn($this->storage);
 
-        $this->storageCommand = new SyncMetadataCommand(null, $this->dependencyFactory);
+        $this->storageCommand = new SyncMetadataCommand($this->dependencyFactory);
     }
 }

@@ -44,14 +44,14 @@ Now place the following code in the ``migrations`` file:
     $cli->setCatchExceptions(true);
 
     $cli->addCommands(array(
-        new Command\DumpSchemaCommand(null, $dependencyFactory),
-        new Command\ExecuteCommand(null, $dependencyFactory),
-        new Command\GenerateCommand(null, $dependencyFactory),
-        new Command\LatestCommand(null, $dependencyFactory),
-        new Command\MigrateCommand(null, $dependencyFactory),
-        new Command\RollupCommand(null, $dependencyFactory),
-        new Command\StatusCommand(null, $dependencyFactory),
-        new Command\VersionCommand(null, $dependencyFactory)
+        new Command\DumpSchemaCommand($dependencyFactory),
+        new Command\ExecuteCommand($dependencyFactory),
+        new Command\GenerateCommand($dependencyFactory),
+        new Command\LatestCommand($dependencyFactory),
+        new Command\MigrateCommand($dependencyFactory),
+        new Command\RollupCommand($dependencyFactory),
+        new Command\StatusCommand($dependencyFactory),
+        new Command\VersionCommand($dependencyFactory)
     ));
 
     $cli->run();

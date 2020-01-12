@@ -50,7 +50,7 @@ class MigrationVersionTest extends MigrationTestCase
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();
         $this->metadataStorage->ensureInitialized();
 
-        $this->command       = new VersionCommand(null, $dependencyFactory);
+        $this->command       = new VersionCommand($dependencyFactory);
         $this->commandTester = new CommandTester($this->command);
     }
 

@@ -112,6 +112,6 @@ final class RollupCommandTest extends TestCase
     {
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
-        $this->rollupCommand     = new RollupCommand(null, $this->dependencyFactory);
+        $this->rollupCommand     = new RollupCommand($this->dependencyFactory);
     }
 }

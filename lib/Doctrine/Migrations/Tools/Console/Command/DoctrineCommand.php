@@ -29,7 +29,7 @@ abstract class DoctrineCommand extends Command
     /** @var DependencyFactory|null */
     private $dependencyFactory;
 
-    public function __construct(?string $name = null, ?DependencyFactory $dependencyFactory = null)
+    public function __construct(?DependencyFactory $dependencyFactory = null, ?string $name = null)
     {
         parent::__construct($name);
         $this->dependencyFactory = $dependencyFactory;
