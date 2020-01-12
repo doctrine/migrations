@@ -101,7 +101,7 @@ class DependencyFactory
         return $dependencyFactory;
     }
 
-    private function __construct(?LoggerInterface $logger = null)
+    private function __construct(?LoggerInterface $logger)
     {
         $this->logger = $logger ?: new NullLogger();
     }
