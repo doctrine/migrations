@@ -25,7 +25,7 @@ final class XmlFile extends ConfigurationFile
     public function getConfiguration() : Configuration
     {
         if (! file_exists($this->file)) {
-            throw FileNotFound::new();
+            throw FileNotFound::new($this->file);
         }
 
         $this->validateXml($this->file);
