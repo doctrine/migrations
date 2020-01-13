@@ -43,7 +43,10 @@ class LatestCommandTest extends MigrationTestCase
 
         $conn = $this->getSqliteConnection();
 
-        $dependencyFactory = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($configuration), new ExistingConnection($conn));
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new Configuration\ExistingConfiguration($configuration),
+            new ExistingConnection($conn)
+        );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();

@@ -47,7 +47,11 @@ class ConsoleRunnerTest extends TestCase
 
         try {
             $this->expectException(RuntimeException::class);
-            $this->expectExceptionMessage(sprintf('Configuration file "%s" must return an instance of "%s"', realpath(__DIR__ . '/_wrong-config/cli-config.php'), DependencyFactory::class));
+            $this->expectExceptionMessage(sprintf(
+                'Configuration file "%s" must return an instance of "%s"',
+                realpath(__DIR__ . '/_wrong-config/cli-config.php'),
+                DependencyFactory::class
+            ));
 
             chdir(__DIR__ . '/_wrong-config');
 
