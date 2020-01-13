@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration\EntityManager;
 
-use Doctrine\Migrations\Configuration\EntityManager\Exception\EntityManagerNotSpecified;
 use Doctrine\ORM\EntityManager;
 
 /**
