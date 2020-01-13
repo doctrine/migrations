@@ -16,7 +16,7 @@ final class ConnectionLoaderTest extends TestCase
 {
     public function testExistingConnectionLoader() : void
     {
-        $conn   = $this->createStub(Connection::class);
+        $conn   = $this->createMock(Connection::class);
         $loader = new ExistingConnection($conn);
 
         self::assertSame($conn, $loader->getConnection());

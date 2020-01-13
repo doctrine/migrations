@@ -51,7 +51,10 @@ class UpToDateCommandTest extends MigrationTestCase
 
         $this->conn = $this->getSqliteConnection();
 
-        $dependencyFactory = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($configuration), new ExistingConnection($this->conn));
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new Configuration\ExistingConfiguration($configuration),
+            new ExistingConnection($this->conn)
+        );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
         $this->metadataStorage     = $dependencyFactory->getMetadataStorage();

@@ -67,7 +67,6 @@ class DependencyFactory
     /** @var Connection */
     private $connection;
 
-
     /** @var EntityManagerInterface|null */
     private $em;
 
@@ -83,8 +82,11 @@ class DependencyFactory
     /** @var EntityManagerLoader|null */
     private $emLoader;
 
-    public static function fromConnection(Configuration\ConfigurationLoader $configurationLoader, ConnectionLoader $connectionLoader, ?LoggerInterface $logger = null) : self
-    {
+    public static function fromConnection(
+        Configuration\ConfigurationLoader $configurationLoader,
+        ConnectionLoader $connectionLoader,
+        ?LoggerInterface $logger = null
+    ) : self {
         $dependencyFactory                      = new self($logger);
         $dependencyFactory->configurationLoader = $configurationLoader;
         $dependencyFactory->connectionLoader    = $connectionLoader;
@@ -92,8 +94,11 @@ class DependencyFactory
         return $dependencyFactory;
     }
 
-    public static function fromEntityManager(Configuration\ConfigurationLoader $configurationLoader, EntityManagerLoader $emLoader, ?LoggerInterface $logger = null) : self
-    {
+    public static function fromEntityManager(
+        Configuration\ConfigurationLoader $configurationLoader,
+        EntityManagerLoader $emLoader,
+        ?LoggerInterface $logger = null
+    ) : self {
         $dependencyFactory                      = new self($logger);
         $dependencyFactory->configurationLoader = $configurationLoader;
         $dependencyFactory->emLoader            = $emLoader;

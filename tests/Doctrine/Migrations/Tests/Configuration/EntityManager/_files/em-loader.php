@@ -8,7 +8,7 @@ use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 
-return new class() implements EntityManagerLoader{
+return new class() implements EntityManagerLoader {
     public function getEntityManager() : EntityManager
     {
         $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
