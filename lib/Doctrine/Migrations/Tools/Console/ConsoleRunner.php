@@ -11,6 +11,7 @@ use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
+use Doctrine\Migrations\Tools\Console\Command\ListCommand;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
@@ -109,6 +110,7 @@ class ConsoleRunner
             new VersionCommand($dependencyFactory),
             new UpToDateCommand($dependencyFactory),
             new SyncMetadataCommand($dependencyFactory),
+            new ListCommand($dependencyFactory),
         ]);
 
         if ($dependencyFactory === null || ! $dependencyFactory->hasEntityManager()) {
