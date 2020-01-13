@@ -32,6 +32,8 @@ use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
+use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
@@ -53,8 +55,6 @@ use function sprintf;
  */
 class DependencyFactory
 {
-    public const MIGRATIONS_SORTER = 'Doctrine\Migrations\MigrationsSorter';
-
     /** @var Configuration */
     private $configuration;
 
@@ -166,16 +166,16 @@ class DependencyFactory
         return $this->em;
     }
 
+    public function getVersionComparator() : Comparator
+    {
+        return $this->getDependency(Comparator::class, static function () {
+            return new AlphabeticalComparator();
+        });
+    }
+
     public function getLogger() : LoggerInterface
     {
         return $this->logger;
-    }
-
-    public function getSorter() : ?callable
-    {
-        return $this->getDependency(self::MIGRATIONS_SORTER, static function () {
-            return null;
-        });
     }
 
     public function getEventDispatcher() : EventDispatcher
@@ -280,7 +280,7 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
                 new MigrationFactory($this->getConnection(), $this->getLogger()),
-                $this->getSorter()
+                $this->getVersionComparator()
             );
         });
     }

@@ -10,10 +10,10 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
-use function strcmp;
 use function uasort;
 
 /**
@@ -39,7 +39,7 @@ class MigrationRepository
     /** @var AvailableMigration[] */
     private $migrations = [];
 
-    /** @var callable */
+    /** @var Comparator */
     private $sorter;
 
     /**
@@ -51,14 +51,12 @@ class MigrationRepository
         array $migrationDirectories,
         MigrationFinder $migrationFinder,
         MigrationFactory $versionFactory,
-        ?callable $sorter = null
+        Comparator $sorter
     ) {
         $this->migrationDirectories = $migrationDirectories;
         $this->migrationFinder      = $migrationFinder;
         $this->versionFactory       = $versionFactory;
-        $this->sorter               = $sorter ?: static function (AvailableMigration $m1, AvailableMigration $m2) {
-            return strcmp((string) $m1->getVersion(), (string) $m2->getVersion());
-        };
+        $this->sorter               = $sorter;
 
         $this->registerMigrations($classes);
     }
@@ -76,8 +74,6 @@ class MigrationRepository
         }
 
         $this->migrations[(string) $version] = new AvailableMigration($version, $migration);
-
-        uasort($this->migrations, $this->sorter);
 
         return $this->migrations[(string) $version];
     }
@@ -159,5 +155,9 @@ class MigrationRepository
                 );
                 $this->registerMigrations($migrations);
         }
+
+        uasort($this->migrations, function (AvailableMigration $a, AvailableMigration $b) : int {
+            return $this->sorter->compare($a->getVersion(), $b->getVersion());
+        });
     }
 }

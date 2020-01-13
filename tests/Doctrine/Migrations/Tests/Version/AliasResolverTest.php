@@ -14,6 +14,7 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Direction;
@@ -135,7 +136,8 @@ final class AliasResolverTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory
+            $versionFactory,
+            new AlphabeticalComparator()
         );
         $this->metadataStorage     = new TableMetadataStorage($conn);
         $this->metadataStorage->ensureInitialized();

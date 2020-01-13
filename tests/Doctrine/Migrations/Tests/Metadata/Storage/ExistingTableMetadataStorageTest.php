@@ -13,6 +13,7 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
@@ -53,7 +54,8 @@ class ExistingTableMetadataStorageTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory
+            $versionFactory,
+            new AlphabeticalComparator()
         );
         $this->migrationRepository->registerMigrationInstance(new Version('Foo\\5678'), $migration);
 
