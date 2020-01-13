@@ -12,7 +12,7 @@ use function file_exists;
 use function is_array;
 
 /**
- * This class will return an Connection instance, loaded from a configuration file provided as argument.
+ * This class will return a Connection instance, loaded from a configuration file provided as argument.
  */
 final class ConfigurationFile implements ConnectionLoader
 {
