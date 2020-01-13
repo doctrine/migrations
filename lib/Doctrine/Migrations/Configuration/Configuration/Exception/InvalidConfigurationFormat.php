@@ -12,6 +12,6 @@ final class InvalidConfigurationFormat extends LogicException implements Configu
 {
     public static function new(string $file) : self
     {
-        return new self(sprintf('The configuration file "%s" can not be parsed.', $file));
+        return new self(sprintf('Configuration file "%s" cannot be parsed.', $file));
     }
 }

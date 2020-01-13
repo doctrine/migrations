@@ -10,6 +10,6 @@ final class MissingDependency extends RuntimeException implements DependencyExce
 {
     public static function noEntityManager() : self
     {
-        return new self('The doctrine entity manager is not available.');
+        return new self('The entity manager is not available.');
     }
 }

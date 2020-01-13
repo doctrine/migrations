@@ -11,6 +11,6 @@ final class FileNotFound extends InvalidArgumentException implements LoaderExcep
 {
     public static function new(string $file) : self
     {
-        return new self(sprintf('The database configuration file "%s" does not exist.', $file));
+        return new self(sprintf('Database configuration file "%s" does not exist.', $file));
     }
 }

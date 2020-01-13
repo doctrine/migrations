@@ -58,14 +58,21 @@ class ConsoleRunner
         $dependencyFactory = null;
         if ($configurationFile !== null) {
             if (! is_readable($configurationFile)) {
-                throw new RuntimeException(sprintf('Configuration file [%s] does not have read permission.', $configurationFile));
+                throw new RuntimeException(sprintf(
+                    'Configuration file "%s" cannot be read.',
+                    $configurationFile
+                ));
             }
 
             $dependencyFactory = require $configurationFile;
         }
 
         if ($dependencyFactory !== null && ! ($dependencyFactory instanceof DependencyFactory)) {
-            throw new RuntimeException(sprintf('Configuration file "%s" must return an instance of "%s"', $configurationFile, DependencyFactory::class));
+            throw new RuntimeException(sprintf(
+                'Configuration file "%s" must return an instance of "%s"',
+                $configurationFile,
+                DependencyFactory::class
+            ));
         }
 
         return $dependencyFactory;
