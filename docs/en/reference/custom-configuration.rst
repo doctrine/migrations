@@ -57,10 +57,12 @@ Once you have your custom integration setup, you can modify it to look like the 
         new Command\ExecuteCommand($dependencyFactory),
         new Command\GenerateCommand($dependencyFactory),
         new Command\LatestCommand($dependencyFactory),
+        new Command\ListCommand($dependencyFactory),
         new Command\MigrateCommand($dependencyFactory),
         new Command\RollupCommand($dependencyFactory),
         new Command\StatusCommand($dependencyFactory),
-        new Command\VersionCommand($dependencyFactory)
+        new Command\VersionCommand($dependencyFactory),
+        new Command\SyncMetadataCommand($dependencyFactory),
     ));
 
     $cli->run();

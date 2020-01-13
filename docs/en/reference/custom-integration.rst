@@ -48,10 +48,12 @@ Now place the following code in the ``migrations`` file:
         new Command\ExecuteCommand($dependencyFactory),
         new Command\GenerateCommand($dependencyFactory),
         new Command\LatestCommand($dependencyFactory),
+        new Command\ListCommand($dependencyFactory),
         new Command\MigrateCommand($dependencyFactory),
         new Command\RollupCommand($dependencyFactory),
         new Command\StatusCommand($dependencyFactory),
-        new Command\VersionCommand($dependencyFactory)
+        new Command\VersionCommand($dependencyFactory),
+        new Command\ListCommand($dependencyFactory),
     ));
 
     $cli->run();
