@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use function dirname;
 use function realpath;

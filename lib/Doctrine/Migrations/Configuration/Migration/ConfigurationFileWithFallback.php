@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\Exception\MissingConfigurationFile;
+use Doctrine\Migrations\Configuration\Migration\Exception\MissingConfigurationFile;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use function file_exists;
 

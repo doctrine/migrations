@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationLoader;
 use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
@@ -73,7 +74,7 @@ class DependencyFactory
     /** @var bool */
     private $frozen = false;
 
-    /** @var Configuration\ConfigurationLoader */
+    /** @var ConfigurationLoader */
     private $configurationLoader;
 
     /** @var ConnectionLoader */
@@ -83,7 +84,7 @@ class DependencyFactory
     private $emLoader;
 
     public static function fromConnection(
-        Configuration\ConfigurationLoader $configurationLoader,
+        ConfigurationLoader $configurationLoader,
         ConnectionLoader $connectionLoader,
         ?LoggerInterface $logger = null
     ) : self {
@@ -95,7 +96,7 @@ class DependencyFactory
     }
 
     public static function fromEntityManager(
-        Configuration\ConfigurationLoader $configurationLoader,
+        ConfigurationLoader $configurationLoader,
         EntityManagerLoader $emLoader,
         ?LoggerInterface $logger = null
     ) : self {

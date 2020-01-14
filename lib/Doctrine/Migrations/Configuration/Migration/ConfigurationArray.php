@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use Closure;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\Exception\InvalidConfigurationKey;
+use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use function assert;

@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\Exception\YamlNotAvailable;
-use Doctrine\Migrations\Configuration\Configuration\Exception\YamlNotValid;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
+use Doctrine\Migrations\Configuration\Migration\Exception\YamlNotAvailable;
+use Doctrine\Migrations\Configuration\Migration\Exception\YamlNotValid;
 use Symfony\Component\Yaml\Exception\ParseException;
 use Symfony\Component\Yaml\Yaml;
 use function assert;

@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use Doctrine\Common\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\Migrations\Configuration\Configuration\ConfigurationArray;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;

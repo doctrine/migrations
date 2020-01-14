@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Doctrine\Migrations\Configuration\Configuration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\Configuration\Connection\ConfigurationFile;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
