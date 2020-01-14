@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Version;
 
 use function strcmp;
 
-class AlphabeticalComparator implements Comparator
+final class AlphabeticalComparator implements Comparator
 {
     public function compare(Version $a, Version $b) : int
     {
