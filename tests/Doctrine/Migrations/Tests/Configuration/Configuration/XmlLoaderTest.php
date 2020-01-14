@@ -11,7 +11,7 @@ class XmlLoaderTest extends LoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new XmlFile(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.xml');
+        $loader = new XmlFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.xml');
 
         return $loader->getConfiguration();
     }

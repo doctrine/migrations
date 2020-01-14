@@ -8,8 +8,8 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use const DIRECTORY_SEPARATOR;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * The RecursiveRegexFinder class recursively searches the given directory for migrations.

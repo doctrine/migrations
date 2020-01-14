@@ -61,6 +61,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
                 return $migrationPlan->getVersion();
             }, $planItems);
             $diff            = array_diff($versions, $plannedVersions);
+
             throw MigrationClassNotFound::new((string) reset($diff));
         }
 

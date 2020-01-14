@@ -20,11 +20,11 @@ use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use PackageVersions\Versions;
 use RuntimeException;
 use Symfony\Component\Console\Application;
-use const DIRECTORY_SEPARATOR;
 use function file_exists;
 use function getcwd;
 use function is_readable;
 use function sprintf;
+use const DIRECTORY_SEPARATOR;
 
 /**
  * The ConsoleRunner class is used to create the Symfony Console application for the Doctrine Migrations console.

@@ -58,6 +58,7 @@ final class Configuration
         if (! $this->frozen) {
             $this->validate();
         }
+
         $this->frozen = true;
     }
 

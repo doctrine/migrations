@@ -6,11 +6,11 @@ namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use InvalidArgumentException;
-use const PHP_OS;
 use function count;
 use function in_array;
 use function sort;
 use function stripos;
+use const PHP_OS;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {

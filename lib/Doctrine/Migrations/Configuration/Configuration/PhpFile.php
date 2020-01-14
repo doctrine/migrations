@@ -17,6 +17,7 @@ final class PhpFile extends ConfigurationFile
         if (! file_exists($this->file)) {
             throw FileNotFound::new($this->file);
         }
+
         $config = require $this->file;
         if ($config instanceof Configuration) {
             return $config;

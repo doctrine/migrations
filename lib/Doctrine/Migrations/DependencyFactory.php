@@ -160,6 +160,7 @@ class DependencyFactory
             if ($this->emLoader === null) {
                 throw MissingDependency::noEntityManager();
             }
+
             $this->em = $this->emLoader->getEntityManager();
         }
 

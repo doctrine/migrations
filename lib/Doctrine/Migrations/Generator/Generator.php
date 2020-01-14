@@ -82,6 +82,7 @@ TEMPLATE;
         if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
             throw new InvalidArgumentException(sprintf('Invalid FQCN'));
         }
+
         [$fqcn, $namespace, $className] = $mch;
 
         $dirs = $this->configuration->getMigrationDirectories();

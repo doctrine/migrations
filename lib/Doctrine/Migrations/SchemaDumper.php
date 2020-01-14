@@ -11,11 +11,6 @@ use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use InvalidArgumentException;
-use const PREG_BACKTRACK_LIMIT_ERROR;
-use const PREG_BAD_UTF8_ERROR;
-use const PREG_BAD_UTF8_OFFSET_ERROR;
-use const PREG_INTERNAL_ERROR;
-use const PREG_RECURSION_LIMIT_ERROR;
 use function array_merge;
 use function count;
 use function implode;
@@ -24,6 +19,11 @@ use function preg_match;
 use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
+use const PREG_BACKTRACK_LIMIT_ERROR;
+use const PREG_BAD_UTF8_ERROR;
+use const PREG_BAD_UTF8_OFFSET_ERROR;
+use const PREG_INTERNAL_ERROR;
+use const PREG_RECURSION_LIMIT_ERROR;
 
 /**
  * The SchemaDumper class is responsible for dumping the current state of your database schema to a migration. This
@@ -186,6 +186,7 @@ class SchemaDumper
                 default:
                     $error = 'Error.';
             }
+
             throw new InvalidArgumentException($error);
         }
 

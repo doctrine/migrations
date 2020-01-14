@@ -103,6 +103,7 @@ EOT
             $dirs      = $configuration->getMigrationDirectories();
             $namespace = key($dirs);
         }
+
         assert(is_string($namespace));
 
         $this->checkNoPreviousDumpExistsForNamespace($namespace);

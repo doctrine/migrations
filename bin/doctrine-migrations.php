@@ -6,11 +6,11 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Phar;
-use const PHP_EOL;
-use const STDERR;
 use function extension_loaded;
 use function file_exists;
 use function fwrite;
+use const PHP_EOL;
+use const STDERR;
 
 (static function () : void {
     $autoloadFiles = [

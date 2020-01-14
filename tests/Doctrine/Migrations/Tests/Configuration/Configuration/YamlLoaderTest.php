@@ -11,7 +11,7 @@ class YamlLoaderTest extends LoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new YamlFile(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.yml');
+        $loader = new YamlFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.yml');
 
         return $loader->getConfiguration();
     }

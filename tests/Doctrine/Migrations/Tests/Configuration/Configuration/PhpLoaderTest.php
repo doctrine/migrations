@@ -11,7 +11,7 @@ class PhpLoaderTest extends LoaderTest
 {
     public function load(string $prefix = '') : Configuration
     {
-        $loader = new PhpFile(__DIR__ . '/../_files/config' . ($prefix!==''? ('_' . $prefix) : '') . '.php');
+        $loader = new PhpFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.php');
 
         return $loader->getConfiguration();
     }

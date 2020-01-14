@@ -66,6 +66,7 @@ EOT
         } elseif (! isset($dirs[$namespace])) {
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
+
         assert(is_string($namespace));
 
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);

@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Finder;
 use Doctrine\Migrations\Finder\Exception\InvalidDirectory;
 use Doctrine\Migrations\Finder\Exception\NameIsReserved;
 use ReflectionClass;
-use const SORT_STRING;
 use function assert;
 use function get_declared_classes;
 use function in_array;
@@ -16,6 +15,7 @@ use function ksort;
 use function realpath;
 use function strlen;
 use function strncmp;
+use const SORT_STRING;
 
 /**
  * The Finder class is responsible for for finding migrations on disk at a given path.

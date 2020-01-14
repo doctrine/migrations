@@ -10,7 +10,6 @@ use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use const FILTER_VALIDATE_BOOLEAN;
 use function addslashes;
 use function assert;
 use function class_exists;
@@ -18,6 +17,7 @@ use function filter_var;
 use function is_string;
 use function key;
 use function sprintf;
+use const FILTER_VALIDATE_BOOLEAN;
 
 /**
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
@@ -120,6 +120,7 @@ EOT
         } elseif (! isset($dirs[$namespace])) {
             throw new OutOfBoundsException(sprintf('Path not defined for the namespace %s', $namespace));
         }
+
         assert(is_string($namespace));
 
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
@@ -140,6 +141,7 @@ EOT
 
                 return 0;
             }
+
             throw $exception;
         }
 
