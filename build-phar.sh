@@ -10,7 +10,7 @@ function restorePlatform {
 }
 
 # lock PHP to minimum allowed version
-composer config platform.php 7.1.0
+composer config platform.php 7.2.0
 cp composer.lock composer.lock.back || true
 composer update
 
