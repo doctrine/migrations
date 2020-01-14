@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Configuration\EntityManager;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 
 /**
  * The EntityManagerLoader defines the interface used to load the Doctrine\DBAL\EntityManager instance to use
@@ -14,5 +14,5 @@ use Doctrine\ORM\EntityManager;
  */
 interface EntityManagerLoader
 {
-    public function getEntityManager() : EntityManager;
+    public function getEntityManager() : EntityManagerInterface;
 }
