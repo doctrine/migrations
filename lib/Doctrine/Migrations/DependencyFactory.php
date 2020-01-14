@@ -168,7 +168,7 @@ class DependencyFactory
 
     public function getVersionComparator() : Comparator
     {
-        return $this->getDependency(Comparator::class, static function () {
+        return $this->getDependency(Comparator::class, static function () : AlphabeticalComparator {
             return new AlphabeticalComparator();
         });
     }
