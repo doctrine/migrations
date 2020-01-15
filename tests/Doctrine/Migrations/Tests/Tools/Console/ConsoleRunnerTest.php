@@ -172,7 +172,7 @@ class ConsoleRunnerTest extends TestCase
     {
         $application = ConsoleRunner::createApplication();
         $commands    = $application->all('migrations');
-        self::assertCount(10, $commands);
+        self::assertCount(11, $commands);
     }
 
     public function testCreateApplicationWithEntityManager() : void
@@ -185,7 +185,7 @@ class ConsoleRunnerTest extends TestCase
 
         $application = ConsoleRunner::createApplication([], $dependencyFactory);
         $commands    = $application->all('migrations');
-        self::assertCount(11, $commands);
+        self::assertCount(12, $commands);
     }
 
     protected function setUp() : void
