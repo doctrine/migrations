@@ -8,6 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -46,7 +47,7 @@ class ListCommandTest extends MigrationTestCase
         $conn = $this->getSqliteConnection();
 
         $dependencyFactory = DependencyFactory::fromConnection(
-            new Configuration\ExistingConfiguration($configuration),
+            new ExistingConfiguration($configuration),
             new ExistingConnection($conn)
         );
 
