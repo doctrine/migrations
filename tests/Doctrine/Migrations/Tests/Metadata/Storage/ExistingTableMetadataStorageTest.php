@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -13,6 +14,7 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
@@ -57,7 +59,7 @@ class ExistingTableMetadataStorageTest extends TestCase
             $versionFactory,
             new AlphabeticalComparator()
         );
-        $this->migrationRepository->registerMigrationInstance(new Version('Foo\\5678'), $migration);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Foo\\5678'), $migration);
 
         $this->config = new TableMetadataStorageConfiguration();
 
@@ -68,6 +70,28 @@ class ExistingTableMetadataStorageTest extends TestCase
         $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
         $table->setPrimaryKey([ $this->config->getVersionColumnName()]);
         $this->schemaManager->createTable($table);
+    }
+
+    public function testMasterSlaveConnectionGetsConnected() : void
+    {
+        $connection = $this->createMock(MasterSlaveConnection::class);
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('connect')
+            ->with('master');
+
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('getSchemaManager')
+            ->willReturn($this->connection->getSchemaManager());
+
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('getDatabasePlatform')
+            ->willReturn($this->connection->getDatabasePlatform());
+
+        $storage = new TableMetadataStorage($connection, $this->config);
+        $storage->ensureInitialized();
     }
 
     public function testMigratedVersionUpdate() : void

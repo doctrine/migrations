@@ -12,6 +12,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
 use Doctrine\Migrations\Version\ExecutionResult;
@@ -60,8 +61,8 @@ class LatestCommandTest extends MigrationTestCase
     public function testExecute() : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1230'), $migrationClass);
 
         $this->metadataStorage->complete(new ExecutionResult(new Version('1231')));
 

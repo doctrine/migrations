@@ -175,7 +175,7 @@ final class TableMetadataStorage implements MetadataStorage
             throw MetadataStorageError::notInitialized();
         }
 
-        if ($this->needsUpdate($expectedTable)!== null) {
+        if ($this->needsUpdate($expectedTable) !== null) {
             throw MetadataStorageError::notUpToDate();
         }
     }

@@ -14,6 +14,7 @@ use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
@@ -50,7 +51,7 @@ final class AliasResolverTest extends TestCase
 
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
-            $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
+            Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
 
         foreach (['A', 'B'] as $version) {
@@ -77,7 +78,7 @@ final class AliasResolverTest extends TestCase
 
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
-            $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
+            Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
 
         $resolvedAlias = $this->versionAliasResolver->resolveVersionAlias($alias);
