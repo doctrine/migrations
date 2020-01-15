@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -278,7 +279,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        $this->dependencyFactory = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($connection));
+        $this->dependencyFactory = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($connection));
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);

@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\XmlFile;
+use Doctrine\Migrations\Configuration\Migration\Exception\XmlNotValid;
+use Doctrine\Migrations\Configuration\Migration\XmlFile;
 
 class XmlLoaderTest extends LoaderTest
 {
@@ -18,14 +19,14 @@ class XmlLoaderTest extends LoaderTest
 
     public function testConfigurationWithInvalidOption() : void
     {
-        $this->expectException(Configuration\Exception\XmlNotValid::class);
+        $this->expectException(XmlNotValid::class);
 
         $this->load('invalid');
     }
 
     public function testMalformed() : void
     {
-        $this->expectException(Configuration\Exception\XmlNotValid::class);
+        $this->expectException(XmlNotValid::class);
 
         $this->load('malformed');
     }

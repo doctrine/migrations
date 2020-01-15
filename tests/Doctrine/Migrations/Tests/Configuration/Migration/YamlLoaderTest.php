@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\YamlFile;
+use Doctrine\Migrations\Configuration\Migration\Exception\YamlNotValid;
+use Doctrine\Migrations\Configuration\Migration\YamlFile;
 
 class YamlLoaderTest extends LoaderTest
 {
@@ -18,7 +19,7 @@ class YamlLoaderTest extends LoaderTest
 
     public function testMalformed() : void
     {
-        $this->expectException(Configuration\Exception\YamlNotValid::class);
+        $this->expectException(YamlNotValid::class);
 
         $this->load('malformed');
     }

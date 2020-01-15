@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
@@ -44,7 +45,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     {
         $this->configuration->addMigrationsDirectory('foo', 'bar');
 
-        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $di->freeze();
 
         $this->expectException(FrozenDependencies::class);
@@ -56,7 +57,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     {
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
-        $di     = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di     = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $finder = $di->getMigrationsFinder();
 
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
@@ -66,7 +67,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     {
         $this->configuration->setMigrationsAreOrganizedByYear(true);
 
-        $di     = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di     = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $finder = $di->getMigrationsFinder();
 
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
@@ -75,7 +76,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     public function testFinder() : void
     {
         $this->configuration = new Configuration();
-        $di                  = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di                  = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $finder              = $di->getMigrationsFinder();
 
         self::assertInstanceOf(GlobFinder::class, $finder);
@@ -83,7 +84,7 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testConnection() : void
     {
-        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
 
         self::assertSame($this->connection, $di->getConnection());
         self::assertFalse($di->hasEntityManager());
@@ -93,13 +94,13 @@ final class DependencyFactoryTest extends MigrationTestCase
     {
         $this->expectException(MissingDependency::class);
 
-        $di = DependencyFactory::fromConnection(new Configuration\ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $di->getEntityManager();
     }
 
     public function testEntityManager() : void
     {
-        $di = DependencyFactory::fromEntityManager(new Configuration\ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
+        $di = DependencyFactory::fromEntityManager(new ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
 
         self::assertTrue($di->hasEntityManager());
         self::assertSame($this->entityManager, $di->getEntityManager());

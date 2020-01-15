@@ -2,9 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationFormat;
 use function count;
 use function pathinfo;
 use const PATHINFO_EXTENSION;
@@ -46,7 +47,7 @@ final class FormattedFile extends ConfigurationFile
 
         $extension = pathinfo($this->file, PATHINFO_EXTENSION);
         if (! isset($this->loaders[$extension])) {
-            throw Configuration\Exception\InvalidConfigurationFormat::new($this->file);
+            throw InvalidConfigurationFormat::new($this->file);
         }
 
         return $this->loaders[$extension]($this->file)->getConfiguration();

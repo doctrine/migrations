@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
-use Doctrine\Migrations\Configuration\Configuration\ConfigurationArray;
-use Doctrine\Migrations\Configuration\Configuration\Exception\InvalidConfigurationKey;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationArray;
+use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationKey;
 use PHPUnit\Framework\TestCase;
 
 class ArrayLoaderTest extends TestCase

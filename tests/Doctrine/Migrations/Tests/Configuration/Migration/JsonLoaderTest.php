@@ -2,10 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\JsonFile;
+use Doctrine\Migrations\Configuration\Migration\Exception\JsonNotValid;
+use Doctrine\Migrations\Configuration\Migration\JsonFile;
 
 class JsonLoaderTest extends LoaderTest
 {
@@ -18,7 +19,7 @@ class JsonLoaderTest extends LoaderTest
 
     public function testMalformed() : void
     {
-        $this->expectException(Configuration\Exception\JsonNotValid::class);
+        $this->expectException(JsonNotValid::class);
         $this->load('malformed');
     }
 }

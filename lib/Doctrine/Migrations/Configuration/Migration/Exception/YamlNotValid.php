@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration\Exception;
+namespace Doctrine\Migrations\Configuration\Migration\Exception;
 
 use Doctrine\Migrations\Configuration\Exception\ConfigurationException;
 use LogicException;

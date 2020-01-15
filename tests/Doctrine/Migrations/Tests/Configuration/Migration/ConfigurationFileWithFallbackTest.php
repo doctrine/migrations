@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
-use Doctrine\Migrations\Configuration\Configuration\ConfigurationFileWithFallback;
-use Doctrine\Migrations\Configuration\Configuration\Exception\MissingConfigurationFile;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
+use Doctrine\Migrations\Configuration\Migration\Exception\MissingConfigurationFile;
 use PHPUnit\Framework\TestCase;
 use function chdir;
 use function getcwd;

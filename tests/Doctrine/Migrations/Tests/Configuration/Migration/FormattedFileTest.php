@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
-use Doctrine\Migrations\Configuration\Configuration\Exception\InvalidConfigurationFormat;
-use Doctrine\Migrations\Configuration\Configuration\FormattedFile;
+use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationFormat;
+use Doctrine\Migrations\Configuration\Migration\FormattedFile;
 use PHPUnit\Framework\TestCase;
 
 class FormattedFileTest extends TestCase

@@ -2,11 +2,11 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Configuration\Configuration;
+namespace Doctrine\Migrations\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
+use Doctrine\Migrations\Configuration\Migration\Exception\XmlNotValid;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use SimpleXMLElement;

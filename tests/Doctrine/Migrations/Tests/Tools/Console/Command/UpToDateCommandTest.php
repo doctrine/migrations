@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -52,7 +53,7 @@ class UpToDateCommandTest extends MigrationTestCase
         $this->conn = $this->getSqliteConnection();
 
         $dependencyFactory = DependencyFactory::fromConnection(
-            new Configuration\ExistingConfiguration($configuration),
+            new ExistingConfiguration($configuration),
             new ExistingConnection($this->conn)
         );
 

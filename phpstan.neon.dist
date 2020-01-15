@@ -17,7 +17,7 @@ parameters:
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
         -
             message: '~^Variable property access on mixed\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Configuration/XmlFile.php
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Migration/XmlFile.php
         -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/InlineParameterFormatter.php

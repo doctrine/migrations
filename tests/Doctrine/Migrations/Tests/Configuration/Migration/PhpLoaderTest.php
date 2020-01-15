@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-namespace Doctrine\Migrations\Tests\Configuration\Configuration;
+namespace Doctrine\Migrations\Tests\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Configuration\Configuration\PhpFile;
+use Doctrine\Migrations\Configuration\Migration\PhpFile;
 
 class PhpLoaderTest extends LoaderTest
 {
