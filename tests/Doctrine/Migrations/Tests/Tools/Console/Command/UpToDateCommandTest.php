@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -21,7 +22,10 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
+use function array_map;
+use function explode;
 use function sys_get_temp_dir;
+use function trim;
 
 class UpToDateCommandTest extends MigrationTestCase
 {
@@ -91,17 +95,45 @@ class UpToDateCommandTest extends MigrationTestCase
         self::assertSame($exitCode, $this->commandTester->getStatusCode());
     }
 
-    public function testNoMetadataStorage() : void
+    public function testMigrationList() : void
     {
-        $this->conn->getSchemaManager()->dropTable($this->metadataConfig->getTableName());
+        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass
+            ->expects(self::atLeastOnce())
+            ->method('getDescription')
+            ->willReturn('foo');
+
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1230'), $migrationClass);
+
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
+        $result->setTime(10.0);
+        $this->metadataStorage->complete($result);
+
+        $result = new ExecutionResult(new Version('1229'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
+        $this->metadataStorage->complete($result);
 
         $this->commandTester->execute([]);
 
-        self::assertStringContainsString(
-            'The metadata storage is not initialized, please run the sync-metadata-storage command to fix this issue.',
-            $this->commandTester->getDisplay()
+        $this->commandTester->execute(['--list-migrations' => true]);
+
+        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+
+        self::assertSame(
+            [
+                'Out-of-date! 1 migration is available to execute.',
+                'You have 1 previously executed migration in the database that is not a registered migration.',
+                '+-----------+-------------------------+---------------------+----------------+-------------+',
+                '| Migration Versions                                                         |             |',
+                '+-----------+-------------------------+---------------------+----------------+-------------+',
+                '| Migration | Status                  | Migrated At         | Execution Time | Description |',
+                '+-----------+-------------------------+---------------------+----------------+-------------+',
+                '| 1229      | migrated, not available | 2010-01-01 02:03:04 |                |             |',
+                '| 1231      | not migrated            |                     |                | foo         |',
+                '+-----------+-------------------------+---------------------+----------------+-------------+',
+            ],
+            $lines
         );
-        self::assertSame(3, $this->commandTester->getStatusCode());
     }
 
     /**

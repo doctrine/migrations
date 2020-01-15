@@ -401,7 +401,9 @@ class DependencyFactory
             return new MigrationStatusInfosHelper(
                 $this->getConfiguration(),
                 $this->getConnection(),
-                $this->getVersionAliasResolver()
+                $this->getVersionAliasResolver(),
+                $this->getMigrationRepository(),
+                $this->getMetadataStorage()
             );
         });
     }

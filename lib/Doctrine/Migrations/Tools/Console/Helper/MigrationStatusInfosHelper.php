@@ -4,12 +4,16 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
+use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
@@ -39,14 +43,76 @@ class MigrationStatusInfosHelper
     /** @var AliasResolver */
     private $aliasResolver;
 
+    /** @var MetadataStorage */
+    private $metadataStorage;
+
+    /** @var MigrationRepository */
+    private $migrationRepository;
+
     public function __construct(
         Configuration $configuration,
         Connection $connection,
-        AliasResolver $aliasResolver
+        AliasResolver $aliasResolver,
+        MigrationRepository $migrationRepository,
+        MetadataStorage $metadataStorage
     ) {
-        $this->configuration = $configuration;
-        $this->connection    = $connection;
-        $this->aliasResolver = $aliasResolver;
+        $this->configuration       = $configuration;
+        $this->connection          = $connection;
+        $this->aliasResolver       = $aliasResolver;
+        $this->migrationRepository = $migrationRepository;
+        $this->metadataStorage     = $metadataStorage;
+    }
+
+    /**
+     * @param Version[] $versions
+     */
+    public function listVersions(array $versions, OutputInterface $output) : void
+    {
+        $table = new Table($output);
+        $table->setHeaders(
+            [
+                [new TableCell('Migration Versions', ['colspan' => 4])],
+                ['Migration', 'Status', 'Migrated At', 'Execution Time', 'Description'],
+            ]
+        );
+        $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
+        $availableMigrations = $this->migrationRepository->getMigrations();
+
+        foreach ($versions as $version) {
+            $description   = null;
+            $executedAt    = null;
+            $executionTime = null;
+
+            if ($executedMigrations->hasMigration($version)) {
+                $executedMigration = $executedMigrations->getMigration($version);
+                $executionTime     = $executedMigration->getExecutionTime();
+                $executedAt        = $executedMigration->getExecutedAt() instanceof DateTimeInterface
+                    ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                    : null;
+            }
+
+            if ($availableMigrations->hasMigration($version)) {
+                $description = $availableMigrations->getMigration($version)->getMigration()->getDescription();
+            }
+
+            if ($executedMigrations->hasMigration($version) && $availableMigrations->hasMigration($version)) {
+                $status = '<info>migrated</info>';
+            } elseif ($executedMigrations->hasMigration($version)) {
+                $status = '<error>migrated, not available</error>';
+            } else {
+                $status = '<comment>not migrated</comment>';
+            }
+
+            $table->addRow([
+                (string) $version,
+                $status,
+                (string) $executedAt,
+                $executionTime !== null ? $executionTime . 's': '',
+                $description,
+            ]);
+        }
+
+        $table->render();
     }
 
     public function showMigrationsInfo(
