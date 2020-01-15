@@ -12,6 +12,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\ListCommand;
 use Doctrine\Migrations\Version\Direction;
@@ -67,8 +68,8 @@ class ListCommandTest extends MigrationTestCase
             ->method('getDescription')
             ->willReturn('foo');
 
-        $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1230'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1230'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
         $result->setTime(10.0);

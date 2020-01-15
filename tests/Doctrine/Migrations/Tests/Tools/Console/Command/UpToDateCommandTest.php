@@ -13,6 +13,7 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Version\Direction;
@@ -76,7 +77,7 @@ class UpToDateCommandTest extends MigrationTestCase
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach ($migrations as $version) {
-            $this->migrationRepository->registerMigrationInstance(new Version($version), $migrationClass);
+            Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
 
         foreach ($migratedVersions as $version) {

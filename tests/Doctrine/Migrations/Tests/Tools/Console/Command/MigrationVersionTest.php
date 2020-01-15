@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
@@ -64,11 +65,11 @@ class MigrationVersionTest extends MigrationTestCase
     public function testAddRangeOption() : void
     {
         $mock = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1235'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1239'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1240'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1239'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1240'), $mock);
 
         $this->commandTester->execute(
             [
@@ -163,11 +164,11 @@ class MigrationVersionTest extends MigrationTestCase
     public function testDeleteRangeOption() : void
     {
         $mock = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1235'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1239'), $mock);
-        $this->migrationRepository->registerMigrationInstance(new Version('1240'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1239'), $mock);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1240'), $mock);
 
         foreach (['1233', '1234', '1239', '1240'] as $v) {
             $r = new ExecutionResult(new Version($v));
@@ -198,9 +199,9 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
 
-        $this->migrationRepository->registerMigrationInstance(new Version('1231'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1232'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1234'), Direction::UP);
         $this->metadataStorage->complete($result);
@@ -226,7 +227,7 @@ class MigrationVersionTest extends MigrationTestCase
     public function testDeleteAllOption() : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);
@@ -256,8 +257,8 @@ class MigrationVersionTest extends MigrationTestCase
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
 
-        $this->migrationRepository->registerMigrationInstance(new Version('1232'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
         $this->commandTester->execute(
             [
@@ -279,8 +280,8 @@ class MigrationVersionTest extends MigrationTestCase
     public function testDeleteOption() : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);
@@ -312,8 +313,8 @@ class MigrationVersionTest extends MigrationTestCase
 
         $migrationClass = $this->createMock(AbstractMigration::class);
 
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $migrationClass);
-        $this->migrationRepository->registerMigrationInstance(new Version('1234'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);
@@ -333,7 +334,7 @@ class MigrationVersionTest extends MigrationTestCase
     public function testDeleteOptionIfVersionNotMigrated() : void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('1233'), $migrationClass);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" does not exist in the version table.');

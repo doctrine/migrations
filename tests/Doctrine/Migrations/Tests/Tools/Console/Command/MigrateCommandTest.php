@@ -14,6 +14,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
 use Doctrine\Migrations\Version\ExecutionResult;
@@ -285,8 +286,8 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migration = $this->createMock(AbstractMigration::class);
 
-        $repo = $this->dependencyFactory->getMigrationRepository();
-        $repo->registerMigrationInstance(new Version('A'), $migration);
+        $migrationRepository = $this->dependencyFactory->getMigrationRepository();
+        Helper::registerMigrationInstance($migrationRepository, new Version('A'), $migration);
 
         $this->migrateCommand = $this->getMockBuilder(MigrateCommand::class)
             ->setConstructorArgs([$this->dependencyFactory])

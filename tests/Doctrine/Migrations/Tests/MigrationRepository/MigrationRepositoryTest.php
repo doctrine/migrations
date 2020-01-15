@@ -9,6 +9,7 @@ use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\B\C;
@@ -111,7 +112,7 @@ class MigrationRepositoryTest extends TestCase
 
     public function testLoadMigrationInstance() : void
     {
-        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
 
         $migrations = $this->migrationRepository->getMigrations();
 
@@ -122,8 +123,8 @@ class MigrationRepositoryTest extends TestCase
     public function testDuplicateLoadMigrationInstance() : void
     {
         $this->expectException(DuplicateMigrationVersion::class);
-        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
-        $this->migrationRepository->registerMigrationInstance(new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
     }
 
     public function testFindMigrations() : void
