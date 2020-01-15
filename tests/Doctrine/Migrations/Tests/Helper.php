@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\Version\Version;
+use ReflectionMethod;
 use function array_map;
 use function glob;
 use function is_file;
@@ -12,6 +16,13 @@ use function unlink;
 
 class Helper
 {
+    public static function registerMigrationInstance(MigrationRepository $repository, Version $version, AbstractMigration $migration) : void
+    {
+        $reflection = new ReflectionMethod(MigrationRepository::class, 'registerMigrationInstance');
+        $reflection->setAccessible(true);
+        $reflection->invoke($repository, $version, $migration);
+    }
+
     /**
      * Delete a directory.
      *
