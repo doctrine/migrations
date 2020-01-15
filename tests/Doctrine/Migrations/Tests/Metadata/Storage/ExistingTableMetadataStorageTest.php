@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Connections\MasterSlaveConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -69,6 +70,28 @@ class ExistingTableMetadataStorageTest extends TestCase
         $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
         $table->setPrimaryKey([ $this->config->getVersionColumnName()]);
         $this->schemaManager->createTable($table);
+    }
+
+    public function testMasterSlaveConnectionGetsConnected() : void
+    {
+        $connection = $this->createMock(MasterSlaveConnection::class);
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('connect')
+            ->with('master');
+
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('getSchemaManager')
+            ->willReturn($this->connection->getSchemaManager());
+
+        $connection
+            ->expects(self::atLeastOnce())
+            ->method('getDatabasePlatform')
+            ->willReturn($this->connection->getDatabasePlatform());
+
+        $storage = new TableMetadataStorage($connection, $this->config);
+        $storage->ensureInitialized();
     }
 
     public function testMigratedVersionUpdate() : void
