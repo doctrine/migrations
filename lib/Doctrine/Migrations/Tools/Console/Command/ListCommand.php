@@ -4,14 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use DateTimeInterface;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Version\Version;
-use Symfony\Component\Console\Helper\Table;
-use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_map;
@@ -44,63 +41,14 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $this->showVersions(
+        $versions = $this->getSortedVersions(
             $this->getDependencyFactory()->getMigrationRepository()->getMigrations(), // available migrations
-            $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations(), // executed migrations
-            $output
+            $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations() // executed migrations
         );
+
+        $this->getDependencyFactory()->getMigrationStatusInfosHelper()->listVersions($versions, $output);
 
         return 0;
-    }
-
-    private function showVersions(
-        AvailableMigrationsList $availableMigrations,
-        ExecutedMigrationsSet $executedMigrations,
-        OutputInterface $output
-    ) : void {
-        $table = new Table($output);
-        $table->setHeaders(
-            [
-                [new TableCell('Migration Versions', ['colspan' => 4])],
-                ['Migration', 'Status', 'Migrated At', 'Execution Time', 'Description'],
-            ]
-        );
-
-        foreach ($this->getSortedVersions($availableMigrations, $executedMigrations) as $version) {
-            $description   = null;
-            $executedAt    = null;
-            $executionTime = null;
-
-            if ($executedMigrations->hasMigration($version)) {
-                $executedMigration = $executedMigrations->getMigration($version);
-                $executionTime     = $executedMigration->getExecutionTime();
-                $executedAt        = $executedMigration->getExecutedAt() instanceof DateTimeInterface
-                    ? $executedMigration->getExecutedAt()->format('Y-m-d H:i:s')
-                    : null;
-            }
-
-            if ($availableMigrations->hasMigration($version)) {
-                $description = $availableMigrations->getMigration($version)->getMigration()->getDescription();
-            }
-
-            if ($executedMigrations->hasMigration($version) && $availableMigrations->hasMigration($version)) {
-                $status = '<info>migrated</info>';
-            } elseif ($executedMigrations->hasMigration($version)) {
-                $status = '<error>migrated, not available</error>';
-            } else {
-                $status = '<comment>not migrated</comment>';
-            }
-
-            $table->addRow([
-                (string) $version,
-                $status,
-                (string) $executedAt,
-                $executionTime !== null ? $executionTime . 's': '',
-                $description,
-            ]);
-        }
-
-        $table->render();
     }
 
     /**
