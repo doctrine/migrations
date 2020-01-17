@@ -10,7 +10,7 @@ use function rtrim;
 /**
  * The GlobFinder class finds migrations in a directory using the PHP glob() function.
  */
-final class GlobFinder extends Finder
+class GlobFinder extends Finder
 {
     /**
      * @return string[]
