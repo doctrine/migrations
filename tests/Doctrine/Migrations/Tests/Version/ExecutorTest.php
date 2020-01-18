@@ -8,6 +8,7 @@ use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\Event\MigrationsQueryEventArgs;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -27,6 +28,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
+use function implode;
 
 class ExecutorTest extends TestCase
 {
@@ -62,6 +64,9 @@ class ExecutorTest extends TestCase
 
     /** @var MockObject */
     private $metadataStorage;
+
+    /** @var Listener */
+    private $listener;
 
     public function testAddSql() : void
     {
@@ -200,32 +205,9 @@ class ExecutorTest extends TestCase
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
-        $listener = new class() {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
-
-            public function onMigrationsVersionExecuting() : void
-            {
-                $this->onMigrationsVersionExecuting = true;
-            }
-
-            public function onMigrationsVersionExecuted() : void
-            {
-                $this->onMigrationsVersionExecuted = true;
-            }
-
-            public function onMigrationsVersionSkipped() : void
-            {
-                $this->onMigrationsVersionSkipped = true;
-            }
-        };
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $this->listener);
 
         $plan                  = new MigrationPlan($this->version, $this->migration, Direction::UP);
         $this->migration->skip = true;
@@ -243,9 +225,11 @@ class ExecutorTest extends TestCase
         self::assertFalse($this->migration->preDownExecuted);
         self::assertFalse($this->migration->postDownExecuted);
 
-        self::assertFalse($listener->onMigrationsVersionExecuted);
-        self::assertTrue($listener->onMigrationsVersionSkipped);
-        self::assertTrue($listener->onMigrationsVersionExecuting);
+        self::assertFalse($this->listener->onMigrationsVersionExecuted);
+        self::assertTrue($this->listener->onMigrationsVersionSkipped);
+        self::assertTrue($this->listener->onMigrationsVersionExecuting);
+        self::assertFalse($this->listener->onMigrationsQueryExecuting);
+        self::assertFalse($this->listener->onMigrationsQueryExecuted);
     }
 
     /**
@@ -258,31 +242,21 @@ class ExecutorTest extends TestCase
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
-        $listener = new class() {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-
-            public function onMigrationsVersionExecuting() : void
-            {
-                $this->onMigrationsVersionExecuting = true;
-            }
-
-            public function onMigrationsVersionExecuted() : void
-            {
-                $this->onMigrationsVersionExecuted = true;
-            }
-        };
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuted, $this->listener);
 
         $this->versionExecutor->execute(
             $plan,
             $migratorConfiguration
         );
-        self::assertTrue($listener->onMigrationsVersionExecuted);
-        self::assertTrue($listener->onMigrationsVersionExecuting);
+        self::assertTrue($this->listener->onMigrationsVersionExecuted);
+        self::assertTrue($this->listener->onMigrationsVersionExecuting);
+        self::assertTrue($this->listener->onMigrationsQueryExecuting);
+        self::assertTrue($this->listener->onMigrationsQueryExecuted);
+        self::assertSame('SELECT 1;SELECT 2', implode(';', $this->listener->executingQueries));
+        self::assertSame('SELECT 1;SELECT 2', implode(';', $this->listener->executedQueries));
     }
 
     /**
@@ -300,32 +274,11 @@ class ExecutorTest extends TestCase
         $plan                   = new MigrationPlan($this->version, $this->migration, Direction::UP);
         $this->migration->error = true;
 
-        $listener = new class() {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
-
-            public function onMigrationsVersionExecuting() : void
-            {
-                $this->onMigrationsVersionExecuting = true;
-            }
-
-            public function onMigrationsVersionExecuted() : void
-            {
-                $this->onMigrationsVersionExecuted = true;
-            }
-
-            public function onMigrationsVersionSkipped() : void
-            {
-                $this->onMigrationsVersionSkipped = true;
-            }
-        };
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuted, $this->listener);
 
         $migrationSucceed = false;
         try {
@@ -335,9 +288,11 @@ class ExecutorTest extends TestCase
             );
             $migrationSucceed = true;
         } catch (Throwable $e) {
-            self::assertFalse($listener->onMigrationsVersionExecuted);
-            self::assertTrue($listener->onMigrationsVersionSkipped);
-            self::assertTrue($listener->onMigrationsVersionExecuting);
+            self::assertFalse($this->listener->onMigrationsVersionExecuted);
+            self::assertTrue($this->listener->onMigrationsVersionSkipped);
+            self::assertTrue($this->listener->onMigrationsVersionExecuting);
+            self::assertFalse($this->listener->onMigrationsQueryExecuting);
+            self::assertFalse($this->listener->onMigrationsQueryExecuted);
 
             $result = $plan->getResult();
             self::assertNotNull($result);
@@ -373,32 +328,11 @@ class ExecutorTest extends TestCase
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
-        $listener = new class() {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
-
-            public function onMigrationsVersionExecuting() : void
-            {
-                $this->onMigrationsVersionExecuting = true;
-            }
-
-            public function onMigrationsVersionExecuted() : void
-            {
-                $this->onMigrationsVersionExecuted = true;
-            }
-
-            public function onMigrationsVersionSkipped() : void
-            {
-                $this->onMigrationsVersionSkipped = true;
-            }
-        };
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
-        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuting, $this->listener);
+        $this->eventManager->addEventListener(Events::onMigrationsQueryExecuted, $this->listener);
 
         $migrationSucceed = false;
         try {
@@ -408,9 +342,13 @@ class ExecutorTest extends TestCase
             );
             $migrationSucceed = true;
         } catch (Throwable $e) {
-            self::assertFalse($listener->onMigrationsVersionExecuted);
-            self::assertTrue($listener->onMigrationsVersionSkipped);
-            self::assertTrue($listener->onMigrationsVersionExecuting);
+            self::assertFalse($this->listener->onMigrationsVersionExecuted);
+            self::assertTrue($this->listener->onMigrationsVersionSkipped);
+            self::assertTrue($this->listener->onMigrationsVersionExecuting);
+            self::assertTrue($this->listener->onMigrationsQueryExecuting);
+            self::assertTrue($this->listener->onMigrationsQueryExecuted);
+            self::assertSame('SELECT 1;SELECT 2', implode(';', $this->listener->executingQueries));
+            self::assertSame('SELECT 1;SELECT 2', implode(';', $this->listener->executedQueries));
 
             $result = $plan->getResult();
             self::assertNotNull($result);
@@ -487,6 +425,55 @@ class ExecutorTest extends TestCase
         $stopwatchEvent->expects(self::any())
             ->method('getMemory')
             ->willReturn(100);
+
+        $this->listener = new Listener();
+    }
+}
+
+class Listener
+{
+    /** @var bool */
+    public $onMigrationsVersionExecuting = false;
+    /** @var bool */
+    public $onMigrationsVersionExecuted = false;
+    /** @var bool */
+    public $onMigrationsVersionSkipped = false;
+    /** @var bool */
+    public $onMigrationsQueryExecuting = false;
+    /** @var bool */
+    public $onMigrationsQueryExecuted = false;
+    /** @var string[] */
+    public $executingQueries = [];
+    /** @var string[] */
+    public $executedQueries = [];
+
+    public function onMigrationsVersionExecuting() : void
+    {
+        $this->onMigrationsVersionExecuting = true;
+    }
+
+    public function onMigrationsVersionExecuted() : void
+    {
+        $this->onMigrationsVersionExecuted = true;
+    }
+
+    public function onMigrationsVersionSkipped() : void
+    {
+        $this->onMigrationsVersionSkipped = true;
+    }
+
+    public function onMigrationsQueryExecuting(MigrationsQueryEventArgs $migrationsQueryEventArgs) : void
+    {
+        $this->onMigrationsQueryExecuting = true;
+
+        $this->executingQueries[] = $migrationsQueryEventArgs->getQuery()->getStatement();
+    }
+
+    public function onMigrationsQueryExecuted(MigrationsQueryEventArgs $migrationsQueryEventArgs) : void
+    {
+        $this->onMigrationsQueryExecuted = true;
+
+        $this->executedQueries[] = $migrationsQueryEventArgs->getQuery()->getStatement();
     }
 }
 
