@@ -8,6 +8,7 @@ use DateTime;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Generator\ConcatenationFileBuilder;
 use Doctrine\Migrations\Generator\FileBuilder;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -23,17 +24,17 @@ class ConcatenationFileBuilderTest extends TestCase
     public function testBuildMigrationFile() : void
     {
         $queriesByVersion = [
-            '1' => [
-                'SELECT 1',
-                'SELECT 2',
+            'foo' => [
+                new Query('SELECT 1'),
+                new Query('SELECT 2'),
             ],
-            '2' => [
-                'SELECT 3',
-                'SELECT 4',
+            'bar' => [
+                new Query('SELECT 3'),
+                new Query('SELECT 4'),
             ],
-            '3' => [
-                'SELECT 5',
-                'SELECT 6',
+            'baz' => [
+                new Query('SELECT 5'),
+                new Query('SELECT 6'),
             ],
         ];
 
@@ -48,15 +49,15 @@ class ConcatenationFileBuilderTest extends TestCase
         $expected = <<<'FILE'
 -- Doctrine Migration File Generated on 2018-09-01 00:00:00
 
--- Version 1
+-- Version foo
 SELECT 1;
 SELECT 2;
 
--- Version 2
+-- Version bar
 SELECT 3;
 SELECT 4;
 
--- Version 3
+-- Version baz
 SELECT 5;
 SELECT 6;
 

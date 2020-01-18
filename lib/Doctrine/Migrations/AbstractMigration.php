@@ -13,8 +13,8 @@ use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\Migrations\Query\Query;
 use Psr\Log\LoggerInterface;
-use function func_get_args;
 
 /**
  * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
@@ -34,7 +34,7 @@ abstract class AbstractMigration
     /** @var LoggerInterface */
     private $logger;
 
-    /** @var mixed[] */
+    /** @var Query[] */
     private $plannedSql = [];
 
     public function __construct(Connection $connection, LoggerInterface $logger)
@@ -142,11 +142,11 @@ abstract class AbstractMigration
         array $params = [],
         array $types = []
     ) : void {
-        $this->plannedSql[] = func_get_args();
+        $this->plannedSql[] = new Query($sql, $params, $types);
     }
 
     /**
-     * @return mixed[]
+     * @return Query[]
      */
     public function getSql() : array
     {

@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
 
 class AbstractMigrationTest extends MigrationTestCase
@@ -33,7 +34,7 @@ class AbstractMigrationTest extends MigrationTestCase
     {
         $this->migration->exposedAddSql('SELECT 1', [1], [2]);
 
-        self::assertSame([['SELECT 1', [1], [2]]], $this->migration->getSql());
+        self::assertEquals([new Query('SELECT 1', [1], [2])], $this->migration->getSql());
     }
 
     public function testWarnIfOutputMessage() : void

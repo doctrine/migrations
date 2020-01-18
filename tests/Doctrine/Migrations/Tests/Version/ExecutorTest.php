@@ -15,6 +15,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Version\DbalExecutor;
@@ -65,11 +66,11 @@ class ExecutorTest extends TestCase
 
     public function testAddSql() : void
     {
-        $this->versionExecutor->addSql('SELECT 1', [1], [2]);
+        $query = new Query('SELECT 1', [1], [2]);
+        $this->versionExecutor->addSql($query);
 
-        self::assertSame(['SELECT 1'], $this->versionExecutor->getSql());
-        self::assertSame([[1]], $this->versionExecutor->getParams());
-        self::assertSame([[2]], $this->versionExecutor->getTypes());
+        self::assertCount(1, $this->versionExecutor->getSql());
+        self::assertSame($query, $this->versionExecutor->getSql()[0]);
     }
 
     public function testExecuteUp() : void
@@ -92,9 +93,16 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 1', 'SELECT 2'], $result->getSql());
-        self::assertSame([[1]], $result->getParams());
-        self::assertSame([[3]], $result->getTypes());
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 1', $queries[0]->getStatement());
+        self::assertSame([1], $queries[0]->getParameters());
+        self::assertSame([3], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 2', $queries[1]->getStatement());
+        self::assertSame([], $queries[1]->getParameters());
+        self::assertSame([], $queries[1]->getTypes());
+
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());
         self::assertTrue($this->migration->preUpExecuted);
@@ -168,9 +176,16 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 3', 'SELECT 4'], $result->getSql());
-        self::assertSame([[5], [6]], $result->getParams());
-        self::assertSame([[7], [8]], $result->getTypes());
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 3', $queries[0]->getStatement());
+        self::assertSame([5], $queries[0]->getParameters());
+        self::assertSame([7], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 4', $queries[1]->getStatement());
+        self::assertSame([6], $queries[1]->getParameters());
+        self::assertSame([8], $queries[1]->getTypes());
+
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());
         self::assertFalse($this->migration->preUpExecuted);

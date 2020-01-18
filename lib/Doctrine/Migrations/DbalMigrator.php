@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
@@ -51,7 +52,7 @@ class DbalMigrator implements Migrator
     }
 
     /**
-     * @return string[][]
+     * @return array<string, Query[]>
      */
     private function executeMigrations(
         MigrationPlanList $migrationsPlan,
@@ -85,7 +86,7 @@ class DbalMigrator implements Migrator
     }
 
     /**
-     * @return array<string, string[]>
+     * @return array<string, Query[]>
      */
     private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
     {
@@ -110,7 +111,7 @@ class DbalMigrator implements Migrator
     }
 
     /**
-     * @param string[][] $sql
+     * @param array<string, Query[]> $sql
      */
     private function endMigrations(
         StopwatchEvent $stopwatchEvent,
