@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Query;
 
+use Doctrine\Migrations\Query\Exception\InvalidArguments;
+use function count;
+
 /**
  * The Query wraps the sql query, parameters and types.
  */
@@ -24,6 +27,10 @@ final class Query
      */
     public function __construct(string $statement, array $parameters = [], array $types = [])
     {
+        if (count($types) > count($parameters)) {
+            throw InvalidArguments::wrongTypesArgumentCount($statement, count($parameters), count($types));
+        }
+
         $this->statement  = $statement;
         $this->parameters = $parameters;
         $this->types      = $types;
