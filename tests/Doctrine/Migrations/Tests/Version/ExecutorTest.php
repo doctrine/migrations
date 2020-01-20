@@ -6,8 +6,6 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -18,6 +16,8 @@ use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
+use Doctrine\Migrations\Tests\Version\Fixture\EmptyTestMigration;
+use Doctrine\Migrations\Tests\Version\Fixture\VersionExecutorTestMigration;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
@@ -71,6 +71,32 @@ class ExecutorTest extends TestCase
 
         self::assertCount(1, $this->versionExecutor->getSql());
         self::assertSame($query, $this->versionExecutor->getSql()[0]);
+    }
+
+    public function testExecuteWithNoQueries() : void
+    {
+        $migratorConfiguration = new MigratorConfiguration();
+
+        $migration = new EmptyTestMigration($this->connection, $this->logger);
+        $version   = new Version('xx');
+        $plan      = new MigrationPlan($version, $migration, Direction::UP);
+
+        $result = $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+
+        $queries = $result->getSql();
+        self::assertCount(0, $queries);
+
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
+
+        self::assertSame([
+            '++ migrating xx',
+            'Migration xx was executed but did not result in any SQL statements.',
+            'Migration xx migrated (took 100ms, used 100 memory)',
+        ], $this->logger->logs);
     }
 
     public function testExecuteUp() : void
@@ -502,77 +528,5 @@ class ExecutorTest extends TestCase
         $stopwatchEvent->expects(self::any())
             ->method('getMemory')
             ->willReturn(100);
-    }
-}
-
-class VersionExecutorTestMigration extends AbstractMigration
-{
-    /** @var bool */
-    public $preUpExecuted = false;
-
-    /** @var bool */
-    public $preDownExecuted = false;
-
-    /** @var bool */
-    public $postUpExecuted = false;
-
-    /** @var bool */
-    public $postDownExecuted = false;
-
-    /** @var string */
-    private $description = '';
-
-    /** @var bool */
-    public $skip = false;
-    /** @var bool */
-    public $error = false;
-
-    public function getDescription() : string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description) : void
-    {
-        $this->description = $description;
-    }
-
-    public function preUp(Schema $fromSchema) : void
-    {
-        $this->preUpExecuted = true;
-        parent::preUp($fromSchema);
-    }
-
-    public function up(Schema $schema) : void
-    {
-        $this->skipIf($this->skip);
-        $this->abortIf($this->error);
-
-        $this->addSql('SELECT 1', [1], [3]);
-        $this->addSql('SELECT 2');
-    }
-
-    public function postUp(Schema $toSchema) : void
-    {
-        $this->postUpExecuted = true;
-        parent::postUp($toSchema);
-    }
-
-    public function preDown(Schema $fromSchema) : void
-    {
-        $this->preDownExecuted = true;
-        parent::preDown($fromSchema);
-    }
-
-    public function down(Schema $schema) : void
-    {
-        $this->addSql('SELECT 3', [5], [7]);
-        $this->addSql('SELECT 4', [6], [8]);
-    }
-
-    public function postDown(Schema $toSchema) : void
-    {
-        $this->postDownExecuted = true;
-        parent::postDown($toSchema);
     }
 }
