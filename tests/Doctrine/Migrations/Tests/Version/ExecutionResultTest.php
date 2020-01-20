@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -25,13 +26,19 @@ class ExecutionResultTest extends TestCase
 
     public function testGetSetSql() : void
     {
-        self::assertSame(['SELECT 1'], $this->versionExecutionResult->getSql());
+         $queries = $this->versionExecutionResult->getSql();
+        self::assertCount(1, $queries);
+        self::assertSame('SELECT 1', $queries[0]->getStatement());
+        self::assertSame([1], $queries[0]->getParameters());
+        self::assertSame([2], $queries[0]->getTypes());
 
-        $this->versionExecutionResult->setSql(['SELECT 2'], [2], [3]);
+        $this->versionExecutionResult->setSql([new Query('SELECT 2', [2], [3])]);
 
-        self::assertSame(['SELECT 2'], $this->versionExecutionResult->getSql());
-        self::assertSame([2], $this->versionExecutionResult->getParams());
-        self::assertSame([3], $this->versionExecutionResult->getTypes());
+        $queries = $this->versionExecutionResult->getSql();
+        self::assertCount(1, $queries);
+        self::assertSame('SELECT 2', $queries[0]->getStatement());
+        self::assertSame([2], $queries[0]->getParameters());
+        self::assertSame([3], $queries[0]->getTypes());
     }
 
     public function testGetSetTime() : void
@@ -120,10 +127,6 @@ class ExecutionResultTest extends TestCase
             new Version('foo'),
             Direction::UP
         );
-        $this->versionExecutionResult->setSql(
-            ['SELECT 1'],
-            [1],
-            [2]
-        );
+        $this->versionExecutionResult->setSql([new Query('SELECT 1', [1], [2])]);
     }
 }

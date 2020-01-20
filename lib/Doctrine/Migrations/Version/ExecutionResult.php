@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Version;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\Migrations\Query\Query;
 use RuntimeException;
 use Throwable;
 use function count;
@@ -17,14 +18,8 @@ use function count;
  */
 final class ExecutionResult
 {
-    /** @var string[] */
+    /** @var Query[] */
     private $sql = [];
-
-    /** @var mixed[] */
-    private $params = [];
-
-    /** @var mixed[] */
-    private $types = [];
 
     /** @var float|null */
     private $time;
@@ -89,7 +84,7 @@ final class ExecutionResult
     }
 
     /**
-     * @return string[]
+     * @return Query[]
      */
     public function getSql() : array
     {
@@ -97,31 +92,11 @@ final class ExecutionResult
     }
 
     /**
-     * @param string[] $sql
-     * @param mixed[]  $params
-     * @param int[]    $types
+     * @param Query[] $sql
      */
-    public function setSql(array $sql, array $params = [], array $types = []) : void
+    public function setSql(array $sql) : void
     {
-        $this->sql    = $sql;
-        $this->params = $params;
-        $this->types  = $types;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getParams() : array
-    {
-        return $this->params;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getTypes() : array
-    {
-        return $this->types;
+        $this->sql = $sql;
     }
 
     public function getTime() : ?float

@@ -7,6 +7,7 @@ namespace Doctrine\Migrations;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Migrations\Generator\FileBuilder;
+use Doctrine\Migrations\Query\Query;
 use Psr\Log\LoggerInterface;
 use function file_put_contents;
 use function is_dir;
@@ -34,7 +35,7 @@ final class FileQueryWriter implements QueryWriter
     }
 
     /**
-     * @param mixed[] $queriesByVersion
+     * @param array<string,Query[]> $queriesByVersion
      */
     public function write(
         string $path,

@@ -6,8 +6,6 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Schema;
-use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -15,8 +13,11 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
+use Doctrine\Migrations\Tests\Version\Fixture\EmptyTestMigration;
+use Doctrine\Migrations\Tests\Version\Fixture\VersionExecutorTestMigration;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
@@ -65,11 +66,37 @@ class ExecutorTest extends TestCase
 
     public function testAddSql() : void
     {
-        $this->versionExecutor->addSql('SELECT 1', [1], [2]);
+        $query = new Query('SELECT 1', [1], [2]);
+        $this->versionExecutor->addSql($query);
 
-        self::assertSame(['SELECT 1'], $this->versionExecutor->getSql());
-        self::assertSame([[1]], $this->versionExecutor->getParams());
-        self::assertSame([[2]], $this->versionExecutor->getTypes());
+        self::assertCount(1, $this->versionExecutor->getSql());
+        self::assertSame($query, $this->versionExecutor->getSql()[0]);
+    }
+
+    public function testExecuteWithNoQueries() : void
+    {
+        $migratorConfiguration = new MigratorConfiguration();
+
+        $migration = new EmptyTestMigration($this->connection, $this->logger);
+        $version   = new Version('xx');
+        $plan      = new MigrationPlan($version, $migration, Direction::UP);
+
+        $result = $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+
+        $queries = $result->getSql();
+        self::assertCount(0, $queries);
+
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
+
+        self::assertSame([
+            '++ migrating xx',
+            'Migration xx was executed but did not result in any SQL statements.',
+            'Migration xx migrated (took 100ms, used 100 memory)',
+        ], $this->logger->logs);
     }
 
     public function testExecuteUp() : void
@@ -92,9 +119,16 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 1', 'SELECT 2'], $result->getSql());
-        self::assertSame([[1]], $result->getParams());
-        self::assertSame([[3]], $result->getTypes());
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 1', $queries[0]->getStatement());
+        self::assertSame([1], $queries[0]->getParameters());
+        self::assertSame([3], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 2', $queries[1]->getStatement());
+        self::assertSame([], $queries[1]->getParameters());
+        self::assertSame([], $queries[1]->getTypes());
+
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());
         self::assertTrue($this->migration->preUpExecuted);
@@ -168,9 +202,16 @@ class ExecutorTest extends TestCase
             $migratorConfiguration
         );
 
-        self::assertSame(['SELECT 3', 'SELECT 4'], $result->getSql());
-        self::assertSame([[5], [6]], $result->getParams());
-        self::assertSame([[7], [8]], $result->getTypes());
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 3', $queries[0]->getStatement());
+        self::assertSame([5], $queries[0]->getParameters());
+        self::assertSame([7], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 4', $queries[1]->getStatement());
+        self::assertSame([6], $queries[1]->getParameters());
+        self::assertSame([8], $queries[1]->getTypes());
+
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());
         self::assertFalse($this->migration->preUpExecuted);
@@ -185,6 +226,56 @@ class ExecutorTest extends TestCase
             3 => 'SELECT 4 ',
             4 => '100ms',
             5 => 'Migration test reverted (took 100ms, used 100 memory)',
+        ], $this->logger->logs);
+    }
+
+    public function testExecuteDryRun() : void
+    {
+        $this->metadataStorage
+            ->expects(self::never())
+            ->method('complete');
+
+        $this->connection
+            ->expects(self::never())
+            ->method('executeQuery');
+
+        $this->connection
+            ->expects(self::never())
+            ->method('executeUpdate');
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setDryRun(true)
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
+        $result = $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 1', $queries[0]->getStatement());
+        self::assertSame([1], $queries[0]->getParameters());
+        self::assertSame([3], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 2', $queries[1]->getStatement());
+        self::assertSame([], $queries[1]->getParameters());
+        self::assertSame([], $queries[1]->getTypes());
+
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
+        self::assertTrue($this->migration->preUpExecuted);
+        self::assertTrue($this->migration->postUpExecuted);
+        self::assertFalse($this->migration->preDownExecuted);
+        self::assertFalse($this->migration->postDownExecuted);
+
+        self::assertSame([
+            '++ migrating test',
+            'SELECT 1 ',
+            'SELECT 2 ',
+            'Migration test migrated (took 100ms, used 100 memory)',
         ], $this->logger->logs);
     }
 
@@ -487,77 +578,5 @@ class ExecutorTest extends TestCase
         $stopwatchEvent->expects(self::any())
             ->method('getMemory')
             ->willReturn(100);
-    }
-}
-
-class VersionExecutorTestMigration extends AbstractMigration
-{
-    /** @var bool */
-    public $preUpExecuted = false;
-
-    /** @var bool */
-    public $preDownExecuted = false;
-
-    /** @var bool */
-    public $postUpExecuted = false;
-
-    /** @var bool */
-    public $postDownExecuted = false;
-
-    /** @var string */
-    private $description = '';
-
-    /** @var bool */
-    public $skip = false;
-    /** @var bool */
-    public $error = false;
-
-    public function getDescription() : string
-    {
-        return $this->description;
-    }
-
-    public function setDescription(string $description) : void
-    {
-        $this->description = $description;
-    }
-
-    public function preUp(Schema $fromSchema) : void
-    {
-        $this->preUpExecuted = true;
-        parent::preUp($fromSchema);
-    }
-
-    public function up(Schema $schema) : void
-    {
-        $this->skipIf($this->skip);
-        $this->abortIf($this->error);
-
-        $this->addSql('SELECT 1', [1], [3]);
-        $this->addSql('SELECT 2');
-    }
-
-    public function postUp(Schema $toSchema) : void
-    {
-        $this->postUpExecuted = true;
-        parent::postUp($toSchema);
-    }
-
-    public function preDown(Schema $fromSchema) : void
-    {
-        $this->preDownExecuted = true;
-        parent::preDown($fromSchema);
-    }
-
-    public function down(Schema $schema) : void
-    {
-        $this->addSql('SELECT 3', [5], [7]);
-        $this->addSql('SELECT 4', [6], [8]);
-    }
-
-    public function postDown(Schema $toSchema) : void
-    {
-        $this->postDownExecuted = true;
-        parent::postDown($toSchema);
     }
 }

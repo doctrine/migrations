@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Psr\Log\LoggerInterface;
@@ -42,14 +43,8 @@ final class DbalExecutor implements Executor
     /** @var Stopwatch */
     private $stopwatch;
 
-    /** @var array<int, string> */
+    /** @var Query[] */
     private $sql = [];
-
-    /** @var mixed[] */
-    private $params = [];
-
-    /** @var mixed[] */
-    private $types = [];
 
     /** @var MetadataStorage */
     private $metadataStorage;
@@ -79,42 +74,16 @@ final class DbalExecutor implements Executor
     }
 
     /**
-     * @return string[]
+     * @return Query[]
      */
     public function getSql() : array
     {
         return $this->sql;
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getParams() : array
+    public function addSql(Query $sqlQuery) : void
     {
-        return $this->params;
-    }
-
-    /**
-     * @return mixed[]
-     */
-    public function getTypes() : array
-    {
-        return $this->types;
-    }
-
-    /**
-     * @param mixed[] $params
-     * @param mixed[] $types
-     */
-    public function addSql(string $sql, array $params = [], array $types = []) : void
-    {
-        $this->sql[] = $sql;
-
-        if (count($params) === 0) {
-            return;
-        }
-
-        $this->addQueryParams($params, $types);
+        $this->sql[] = $sqlQuery;
     }
 
     public function execute(
@@ -132,7 +101,7 @@ final class DbalExecutor implements Executor
                 $configuration
             );
 
-            $result->setSql($this->sql, $this->params, $this->types);
+            $result->setSql($this->sql);
         } catch (SkipMigration $e) {
             $result->setSkipped(true);
 
@@ -152,9 +121,7 @@ final class DbalExecutor implements Executor
         MigrationPlan $plan,
         MigratorConfiguration $configuration
     ) : void {
-        $this->sql    = [];
-        $this->params = [];
-        $this->types  = [];
+        $this->sql = [];
 
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionExecuting,
@@ -196,20 +163,20 @@ final class DbalExecutor implements Executor
 
         $migration->$direction($toSchema);
 
-        foreach ($migration->getSql() as $sqlData) {
-            $this->addSql(...$sqlData);
+        foreach ($migration->getSql() as $sqlQuery) {
+            $this->addSql($sqlQuery);
         }
 
         foreach ($this->schemaProvider->getSqlDiffToMigrate($fromSchema, $toSchema) as $sql) {
-            $this->addSql($sql);
+            $this->addSql(new Query($sql));
         }
 
         if (count($this->sql) !== 0) {
             if (! $configuration->isDryRun()) {
                 $this->executeResult($configuration);
             } else {
-                foreach ($this->sql as $idx => $query) {
-                    $this->outputSqlQuery($idx, $query);
+                foreach ($this->sql as $query) {
+                    $this->outputSqlQuery($query);
                 }
             }
         } else {
@@ -293,12 +260,6 @@ final class DbalExecutor implements Executor
             $plan,
             $configuration
         );
-
-        if ($configuration->isDryRun() || $result->isSkipped() || $result->hasError()) {
-            return;
-        }
-
-        $this->metadataStorage->complete($result);
     }
 
     private function logResult(Throwable $e, ExecutionResult $result, MigrationPlan $plan) : void
@@ -329,12 +290,12 @@ final class DbalExecutor implements Executor
         foreach ($this->sql as $key => $query) {
             $stopwatchEvent = $this->stopwatch->start('query');
 
-            $this->outputSqlQuery($key, $query);
+            $this->outputSqlQuery($query);
 
-            if (! isset($this->params[$key])) {
-                $this->connection->executeUpdate($query);
+            if (count($query->getParameters()) === 0) {
+                $this->connection->executeUpdate($query->getStatement());
             } else {
-                $this->connection->executeUpdate($query, $this->params[$key], $this->types[$key]);
+                $this->connection->executeUpdate($query->getStatement(), $query->getParameters(), $query->getTypes());
             }
 
             $stopwatchEvent->stop();
@@ -349,26 +310,15 @@ final class DbalExecutor implements Executor
         }
     }
 
-    /**
-     * @param mixed[]|int $params
-     * @param mixed[]|int $types
-     */
-    private function addQueryParams($params, $types) : void
-    {
-        $index                = count($this->sql) - 1;
-        $this->params[$index] = $params;
-        $this->types[$index]  = $types;
-    }
-
-    private function outputSqlQuery(int $idx, string $query) : void
+    private function outputSqlQuery(Query $query) : void
     {
         $params = $this->parameterFormatter->formatParameters(
-            $this->params[$idx] ?? [],
-            $this->types[$idx] ?? []
+            $query->getParameters(),
+            $query->getTypes()
         );
 
         $this->logger->debug('{query} {params}', [
-            'query' => $query,
+            'query' => $query->getStatement(),
             'params' => $params,
         ]);
     }

@@ -26,6 +26,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
+use function array_map;
 use const DIRECTORY_SEPARATOR;
 
 class MigratorTest extends MigrationTestCase
@@ -72,9 +73,12 @@ class MigratorTest extends MigrationTestCase
 
         $sql = $migrator->migrate($planList, $this->migratorConfiguration);
 
-        self::assertSame([
-            'Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema' => ['SELECT 1'],
-        ], $sql);
+        self::assertCount(1, $sql);
+        self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
+        self::assertSame(
+            ['SELECT 1'],
+            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+        );
     }
 
     public function testEmptyPlanShowsMessage() : void
@@ -130,9 +134,13 @@ class MigratorTest extends MigrationTestCase
         $planList  = new MigrationPlanList([$plan], Direction::UP);
 
         $sql = $migrator->migrate($planList, $this->migratorConfiguration);
-        self::assertSame([
-            'Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema' => ['SELECT 1'],
-        ], $sql);
+
+        self::assertCount(1, $sql);
+        self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
+        self::assertSame(
+            ['SELECT 1'],
+            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+        );
     }
 
     public function testMigrateAllOrNothingRollback() : void

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\Generator\FileBuilder;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Direction;
 use Psr\Log\LoggerInterface;
 use function file_get_contents;
@@ -39,7 +40,7 @@ final class FileQueryWriterTest extends MigrationTestCase
         $migrationFileBuilder
             ->expects(self::atLeastOnce())
             ->method('buildMigrationFile')
-            ->with(['A'], Direction::UP)
+            ->with(['Foo' => [new Query('A')]], Direction::UP)
             ->willReturn('foo');
 
         $logger = $this->createMock(LoggerInterface::class);
@@ -52,7 +53,7 @@ final class FileQueryWriterTest extends MigrationTestCase
             $logger
         );
 
-        self::assertTrue($writer->write($path, Direction::UP, ['A']));
+        self::assertTrue($writer->write($path, Direction::UP, ['Foo' => [new Query('A')]]));
 
         $files = $this->getSqlFilesList($path);
 
