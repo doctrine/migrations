@@ -260,12 +260,6 @@ final class DbalExecutor implements Executor
             $plan,
             $configuration
         );
-
-        if ($configuration->isDryRun() || $result->isSkipped() || $result->hasError()) {
-            return;
-        }
-
-        $this->metadataStorage->complete($result);
     }
 
     private function logResult(Throwable $e, ExecutionResult $result, MigrationPlan $plan) : void
