@@ -229,6 +229,56 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
+    public function testExecuteDryRun() : void
+    {
+        $this->metadataStorage
+            ->expects(self::never())
+            ->method('complete');
+
+        $this->connection
+            ->expects(self::never())
+            ->method('executeQuery');
+
+        $this->connection
+            ->expects(self::never())
+            ->method('executeUpdate');
+
+        $migratorConfiguration = (new MigratorConfiguration())
+            ->setDryRun(true)
+            ->setTimeAllQueries(true);
+
+        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
+
+        $result = $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 1', $queries[0]->getStatement());
+        self::assertSame([1], $queries[0]->getParameters());
+        self::assertSame([3], $queries[0]->getTypes());
+
+        self::assertSame('SELECT 2', $queries[1]->getStatement());
+        self::assertSame([], $queries[1]->getParameters());
+        self::assertSame([], $queries[1]->getTypes());
+
+        self::assertNotNull($result->getTime());
+        self::assertSame(State::NONE, $result->getState());
+        self::assertTrue($this->migration->preUpExecuted);
+        self::assertTrue($this->migration->postUpExecuted);
+        self::assertFalse($this->migration->preDownExecuted);
+        self::assertFalse($this->migration->postDownExecuted);
+
+        self::assertSame([
+            '++ migrating test',
+            'SELECT 1 ',
+            'SELECT 2 ',
+            'Migration test migrated (took 100ms, used 100 memory)',
+        ], $this->logger->logs);
+    }
+
     /**
      * @test
      */
