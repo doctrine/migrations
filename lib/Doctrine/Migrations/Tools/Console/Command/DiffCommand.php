@@ -94,7 +94,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    public function execute(
+    protected function execute(
         InputInterface $input,
         OutputInterface $output
     ) : ?int {

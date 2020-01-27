@@ -114,7 +114,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $this->outputHeader($output);
         $allowNoMigration = $input->getOption('allow-no-migration');
