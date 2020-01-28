@@ -9,8 +9,6 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use SqlFormatter;
-use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
 {
@@ -30,15 +28,18 @@ final class SqlGeneratorTest extends TestCase
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
 
-        $expectedCode = $this->prepareGeneratedCode(
-            <<<'CODE'
-$this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+        $expectedCode = <<<'REGEXP'
+/^\$this->abortIf\(\$this->connection->getDatabasePlatform\(\)->getName\(\) !== 'mysql', 'Migration can only be executed safely on \\'mysql\\'.'\);
 
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE
-        );
+\$this->addSql\('SELECT 1'\);
+\$this->addSql\('SELECT 2'\);
+\$this->addSql\('UPDATE
+  table
+SET
+  value = 1
+WHERE
+  name = 2(\n )? and value = 1(\n )? and field = 2(\n )? and active = 1'\);$/
+REGEXP;
 
         $this->platform->expects(self::once())
             ->method('getName')
@@ -46,71 +47,68 @@ CODE
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
 
-        self::assertSame($expectedCode, $code);
+        self::assertRegExp($expectedCode, $code);
     }
 
     public function testGenerationWithoutCheckingDatabasePlatform() : void
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
 
-        $expectedCode = $this->prepareGeneratedCode(
-            <<<'CODE'
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE
-        );
+        $expectedCode = <<<'REGEXP'
+/^\$this->addSql\('SELECT 1'\);
+\$this->addSql\('SELECT 2'\);
+\$this->addSql\('UPDATE
+  table
+SET
+  value = 1
+WHERE
+  name = 2(\n )? and value = 1(\n )? and field = 2(\n )? and active = 1'\);$/
+REGEXP;
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
 
-        self::assertSame($expectedCode, $code);
+        self::assertRegExp($expectedCode, $code);
     }
 
     public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration() : void
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(false);
 
-        $expectedCode = $this->prepareGeneratedCode(
-            <<<'CODE'
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE
-        );
+        $expectedCode = <<<'REGEXP'
+/^\$this->addSql\('SELECT 1'\);
+\$this->addSql\('SELECT 2'\);
+\$this->addSql\('UPDATE
+  table
+SET
+  value = 1
+WHERE
+  name = 2(\n )? and value = 1(\n )? and field = 2(\n )? and active = 1'\);$/
+REGEXP;
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
 
-        self::assertSame($expectedCode, $code);
+        self::assertRegExp($expectedCode, $code);
     }
 
     protected function setUp() : void
     {
         $this->configuration = $this->createMock(Configuration::class);
-        $this->platform      = $this->createMock(AbstractPlatform::class);
+        $this->configuration->expects(self::any())
+            ->method('getMigrationsTableName')
+            ->willReturn('migrations_table_name');
+
+        $this->platform = $this->createMock(AbstractPlatform::class);
 
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
             $this->platform
         );
-    }
 
-    private function prepareGeneratedCode(string $expectedCode) : string
-    {
         $this->sql = [
             'SELECT 1',
             'SELECT 2',
             'UPDATE table SET value = 1 WHERE name = 2 and value = 1 and field = 2 and active = 1',
             'SELECT * FROM migrations_table_name',
         ];
-
-        $formattedUpdate = SqlFormatter::format($this->sql[2], false);
-
-        $expectedCode = sprintf($expectedCode, $formattedUpdate);
-
-        $this->configuration->expects(self::any())
-            ->method('getMigrationsTableName')
-            ->willReturn('migrations_table_name');
-
-        return $expectedCode;
     }
 }

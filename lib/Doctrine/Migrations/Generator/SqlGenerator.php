@@ -10,6 +10,7 @@ use SqlFormatter;
 use function array_unshift;
 use function count;
 use function implode;
+use function preg_replace;
 use function sprintf;
 use function stripos;
 use function strlen;
@@ -74,6 +75,6 @@ class SqlGenerator
             );
         }
 
-        return implode("\n", $code);
+        return preg_replace('/ +$/m', '', implode("\n", $code));
     }
 }
