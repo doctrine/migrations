@@ -14,6 +14,8 @@ use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Version\Comparator;
+use Doctrine\Migrations\Version\Version;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use stdClass;
@@ -39,6 +41,57 @@ final class DependencyFactoryTest extends MigrationTestCase
             ->willReturn($this->connection);
 
         $this->configuration = new Configuration();
+    }
+
+    public function testTwoLevelDecorator() : void
+    {
+        $this->configuration->addMigrationsDirectory('foo', 'bar');
+
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+
+        $di->decorateService(Comparator::class, function (DependencyFactory $dependencyFactory) : Comparator {
+            $oldComparator = $dependencyFactory->getVersionComparator();
+
+            return new class($oldComparator) implements Comparator
+            {
+                /** @var Comparator */
+                private $comparator;
+
+                public function __construct(Comparator $comparator)
+                {
+                    $this->comparator = $comparator;
+                }
+
+                public function compare(Version $a, Version $b) : int
+                {
+                    return $this->comparator->compare($a, $b) * 10;
+                }
+            };
+        });
+
+        $di->decorateService(Comparator::class, function (DependencyFactory $dependencyFactory) : Comparator {
+            $oldComparator = $dependencyFactory->getVersionComparator();
+
+            return new class($oldComparator) implements Comparator
+            {
+                /** @var Comparator */
+                private $comparator;
+
+                public function __construct(Comparator $comparator)
+                {
+                    $this->comparator = $comparator;
+                }
+
+                public function compare(Version $a, Version $b) : int
+                {
+                    return $this->comparator->compare($a, $b) * -10;
+                }
+            };
+        });
+
+        $comparator = $di->getVersionComparator();
+
+        self::assertSame(100, $comparator->compare(new Version('1'), new Version('2')));
     }
 
     public function testFreeze() : void

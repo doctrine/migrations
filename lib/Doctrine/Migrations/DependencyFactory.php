@@ -296,6 +296,12 @@ class DependencyFactory
         $this->dependencies[$id] = $service;
     }
 
+    public function decorateService(string $id, callable $callback) : void
+    {
+        $this->assertNotFrozen();
+        $this->dependencies[$id] = $callback($this);
+    }
+
     private function getMetadataStorageConfiguration() : MetadataStorageConfiguration
     {
         return $this->getDependency(MetadataStorageConfiguration::class, static function () : MetadataStorageConfiguration {
