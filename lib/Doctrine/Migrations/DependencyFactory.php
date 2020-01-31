@@ -37,6 +37,7 @@ use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DbalExecutor;
+use Doctrine\Migrations\Version\DbalMigrationFactory;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
@@ -281,9 +282,16 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                new MigrationFactory($this->getConnection(), $this->getLogger()),
+                $this->getMigrationFactory(),
                 $this->getVersionComparator()
             );
+        });
+    }
+
+    public function getMigrationFactory() : MigrationFactory
+    {
+        return $this->getDependency(MigrationFactory::class, function () : MigrationFactory {
+            return new DbalMigrationFactory($this->getConnection(), $this->getLogger());
         });
     }
 

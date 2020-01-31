@@ -7,20 +7,20 @@ namespace Doctrine\Migrations\Tests\Version;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\DbalMigrationFactory;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionProperty;
 
-final class FactoryTest extends TestCase
+final class DbalFactoryTest extends TestCase
 {
     /** @var MockObject|Connection */
     private $connection;
     /** @var MockObject|LoggerInterface */
     private $logger;
 
-    /** @var MigrationFactory */
+    /** @var DbalMigrationFactory */
     private $versionFactory;
 
     public function testCreateVersion() : void
@@ -42,7 +42,7 @@ final class FactoryTest extends TestCase
         $this->connection = $this->createMock(Connection::class);
         $this->logger     = $this->createMock(LoggerInterface::class);
 
-        $this->versionFactory = new MigrationFactory(
+        $this->versionFactory = new DbalMigrationFactory(
             $this->connection,
             $this->logger
         );
