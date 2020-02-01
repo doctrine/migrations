@@ -37,6 +37,7 @@ use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DbalExecutor;
+use Doctrine\Migrations\Version\DbalMigrationFactory;
 use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\MigrationFactory;
@@ -250,14 +251,14 @@ class DependencyFactory
         });
     }
 
-    public function getFileBuilder() : FileBuilder
+    private function getFileBuilder() : FileBuilder
     {
         return $this->getDependency(FileBuilder::class, static function () : FileBuilder {
             return new ConcatenationFileBuilder();
         });
     }
 
-    public function getParameterFormatter() : ParameterFormatter
+    private function getParameterFormatter() : ParameterFormatter
     {
         return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
             return new InlineParameterFormatter($this->getConnection());
@@ -281,9 +282,16 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                new MigrationFactory($this->getConnection(), $this->getLogger()),
+                $this->getMigrationFactory(),
                 $this->getVersionComparator()
             );
+        });
+    }
+
+    public function getMigrationFactory() : MigrationFactory
+    {
+        return $this->getDependency(MigrationFactory::class, function () : MigrationFactory {
+            return new DbalMigrationFactory($this->getConnection(), $this->getLogger());
         });
     }
 
@@ -313,7 +321,7 @@ class DependencyFactory
         });
     }
 
-    public function getVersionExecutor() : Executor
+    private function getVersionExecutor() : Executor
     {
         return $this->getDependency(Executor::class, function () : Executor {
             return new DbalExecutor(
