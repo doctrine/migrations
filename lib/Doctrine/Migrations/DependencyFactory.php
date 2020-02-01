@@ -251,14 +251,14 @@ class DependencyFactory
         });
     }
 
-    public function getFileBuilder() : FileBuilder
+    private function getFileBuilder() : FileBuilder
     {
         return $this->getDependency(FileBuilder::class, static function () : FileBuilder {
             return new ConcatenationFileBuilder();
         });
     }
 
-    public function getParameterFormatter() : ParameterFormatter
+    private function getParameterFormatter() : ParameterFormatter
     {
         return $this->getDependency(ParameterFormatter::class, function () : ParameterFormatter {
             return new InlineParameterFormatter($this->getConnection());
@@ -321,7 +321,7 @@ class DependencyFactory
         });
     }
 
-    public function getVersionExecutor() : Executor
+    private function getVersionExecutor() : Executor
     {
         return $this->getDependency(Executor::class, function () : Executor {
             return new DbalExecutor(
