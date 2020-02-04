@@ -63,9 +63,6 @@ class DependencyFactory
     /** @var object[]|callable[] */
     private $dependencies = [];
 
-    /** @var LoggerInterface */
-    private $logger;
-
     /** @var Connection */
     private $connection;
 
@@ -110,7 +107,11 @@ class DependencyFactory
 
     private function __construct(?LoggerInterface $logger)
     {
-        $this->logger = $logger ?: new NullLogger();
+        if ($logger === null) {
+            return;
+        }
+
+        $this->setService(LoggerInterface::class, $logger);
     }
 
     public function isFrozen() : bool
@@ -178,7 +179,9 @@ class DependencyFactory
 
     public function getLogger() : LoggerInterface
     {
-        return $this->logger;
+        return $this->getDependency(LoggerInterface::class, static function () : LoggerInterface {
+            return new NullLogger();
+        });
     }
 
     public function getEventDispatcher() : EventDispatcher
@@ -341,7 +344,7 @@ class DependencyFactory
         return $this->getDependency(QueryWriter::class, function () : QueryWriter {
             return new FileQueryWriter(
                 $this->getFileBuilder(),
-                $this->logger
+                $this->getLogger()
             );
         });
     }
@@ -423,7 +426,7 @@ class DependencyFactory
                 $this->getConnection(),
                 $this->getEventDispatcher(),
                 $this->getVersionExecutor(),
-                $this->logger,
+                $this->getLogger(),
                 $this->getStopwatch()
             );
         });
