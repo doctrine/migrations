@@ -16,6 +16,7 @@ use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\LoggerInterface;
 use stdClass;
 
 final class DependencyFactoryTest extends MigrationTestCase
@@ -105,5 +106,21 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertTrue($di->hasEntityManager());
         self::assertSame($this->entityManager, $di->getEntityManager());
         self::assertSame($this->connection, $di->getConnection());
+    }
+
+    public function testCustomLogger() : void
+    {
+        $logger = $this->createMock(LoggerInterface::class);
+        $di     = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
+        self::assertSame($logger, $di->getLogger());
+    }
+
+    public function testOverrideCustomLogger() : void
+    {
+        $logger        = $this->createMock(LoggerInterface::class);
+        $anotherLogger = $this->createMock(LoggerInterface::class);
+        $di            = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
+        $di->setService(LoggerInterface::class, $anotherLogger);
+        self::assertSame($anotherLogger, $di->getLogger());
     }
 }
