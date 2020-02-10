@@ -62,9 +62,6 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testExecuteAlreadyAtFirstVersion() : void
     {
-        $result = new ExecutionResult(new Version('A'));
-        $this->storage->complete($result);
-
         $this->migrateCommandTester->execute(
             [
                 'version' => 'first',
