@@ -52,7 +52,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->storage->complete($result);
 
         $this->migrateCommandTester->execute(
-            ['version' => 'first'],
+            ['version' => 'A'],
             ['interactive' => false]
         );
 

@@ -17,5 +17,5 @@ interface MigrationPlanCalculator
      */
     public function getPlanForVersions(array $versions, string $direction) : MigrationPlanList;
 
-    public function getPlanUntilVersion(?Version $to = null) : MigrationPlanList;
+    public function getPlanUntilVersion(Version $to) : MigrationPlanList;
 }
