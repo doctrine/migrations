@@ -95,7 +95,7 @@ final class AliasResolverTest extends TestCase
     public function getAliasesWithNoExecuted() : array
     {
         return [
-            ['first', 'A'],
+            ['first', '0'],
             ['current', '0'],
             ['prev', '0'],
             ['next', 'A'],
@@ -113,7 +113,7 @@ final class AliasResolverTest extends TestCase
     public function getAliases() : array
     {
         return [
-            ['first', 'A'],
+            ['first', '0'],
             ['current', 'B'],
             ['prev', 'A'],
             ['next', 'C'],

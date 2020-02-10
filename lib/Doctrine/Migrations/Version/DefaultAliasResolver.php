@@ -9,7 +9,6 @@ use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
-use function count;
 use function substr;
 
 /**
@@ -64,11 +63,9 @@ final class DefaultAliasResolver implements AliasResolver
 
         switch ($alias) {
             case self::ALIAS_FIRST:
-                if (count($availableMigrations) === 0) {
-                    throw NoMigrationsToExecute::new();
-                }
+                return new Version('0');
 
-                return $availableMigrations->getFirst()->getVersion();
+                break;
             case self::ALIAS_CURRENT:
                 try {
                     return $executedMigrations->getLast()->getVersion();
