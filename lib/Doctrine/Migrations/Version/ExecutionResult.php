@@ -21,7 +21,11 @@ final class ExecutionResult
     /** @var Query[] */
     private $sql = [];
 
-    /** @var float|null */
+    /**
+     * Seconds
+     *
+     * @var float|null
+     */
     private $time;
 
     /** @var float|null */

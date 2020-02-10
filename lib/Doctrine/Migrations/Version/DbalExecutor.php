@@ -190,7 +190,7 @@ final class DbalExecutor implements Executor
         $migration->{'post' . ucfirst($direction)}($toSchema);
         $stopwatchEvent->stop();
 
-        $result->setTime((float) $stopwatchEvent->getDuration());
+        $result->setTime((float) $stopwatchEvent->getDuration()/1000);
         $result->setMemory($stopwatchEvent->getMemory());
 
         $params = [
