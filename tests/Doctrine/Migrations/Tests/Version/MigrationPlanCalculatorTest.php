@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
-use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
@@ -42,21 +41,29 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationRepository     = $this->createMock(MigrationRepository::class);
         $this->metadataStorage         = $this->createMock(MetadataStorage::class);
         $this->migrationPlanCalculator = new SortedMigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
-    }
 
-    public function testPlanForVersionsWhenNoMigrations() : void
-    {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
+        $m = [
+            'A' => new AvailableMigration(new Version('A'), $this->abstractMigration),
+            'B' => new AvailableMigration(new Version('B'), $this->abstractMigration),
+            'C' => new AvailableMigration(new Version('C'), $this->abstractMigration),
+        ];
 
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
+        $migrationList = new AvailableMigrationsList($m);
+        $this->migrationRepository
+            ->expects(self::any())
+            ->method('hasMigration')
+            ->willReturnCallback(static function ($version) use ($m) {
+                return isset($m[$version]);
+            });
 
         $this->migrationRepository
             ->expects(self::any())
             ->method('getMigrations')
             ->willReturn($migrationList);
+    }
 
+    public function testPlanForVersionsWhenNoMigrations() : void
+    {
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C')], Direction::UP);
 
         self::assertCount(1, $plan);
@@ -67,16 +74,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     public function testPlanForMultipleVersionsAreSortedUp() : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
-
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C'), new Version('A')], Direction::UP);
 
         self::assertCount(2, $plan);
@@ -89,16 +86,6 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     public function testPlanForMultipleVersionsAreSortedDown() : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
-
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C'), new Version('A')], Direction::UP);
 
         self::assertCount(2, $plan);
@@ -112,31 +99,13 @@ final class MigrationPlanCalculatorTest extends TestCase
     public function testPlanForNoMigration() : void
     {
         $this->expectException(MigrationClassNotFound::class);
-        $this->expectExceptionMessage('Migration class "B" was not found?');
+        $this->expectExceptionMessage('Migration class "D" was not found?');
 
-        $this->migrationRepository
-            ->expects(self::once())
-            ->method('getMigrations')
-            ->willReturn(new AvailableMigrationsList([]));
-
-        $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('B')], Direction::UP);
-
-        self::assertCount(0, $plan);
-        self::assertSame(Direction::UP, $plan->getDirection());
+        $this->migrationPlanCalculator->getPlanForVersions([new Version('D')], Direction::UP);
     }
 
     public function testPlanForNoVersions() : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
-
         $plan = $this->migrationPlanCalculator->getPlanForVersions([], Direction::UP);
 
         self::assertCount(0, $plan);
@@ -148,24 +117,14 @@ final class MigrationPlanCalculatorTest extends TestCase
      *
      * @dataProvider getPlanUpWhenNoMigrations
      */
-    public function testPlanWhenNoMigrations(?string $to, array $expectedPlan, string $direction) : void
+    public function testPlanWhenNoMigrations(string $to, array $expectedPlan, string $direction) : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
-
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([]));
 
-        $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
+        $plan = $this->migrationPlanCalculator->getPlanUntilVersion(new Version($to));
 
         self::assertSame($direction, $plan->getDirection());
         self::assertCount(count($expectedPlan), $plan);
@@ -185,8 +144,6 @@ final class MigrationPlanCalculatorTest extends TestCase
             ['A', ['A'], Direction::UP],
             ['B', ['A', 'B'], Direction::UP],
             ['C', ['A', 'B', 'C'], Direction::UP],
-            ['C', ['A', 'B', 'C'], Direction::UP],
-            [null, ['A', 'B', 'C'], Direction::UP],
         ];
     }
 
@@ -195,27 +152,17 @@ final class MigrationPlanCalculatorTest extends TestCase
      *
      * @dataProvider getPlanUpWhenMigrations
      */
-    public function testPlanWhenMigrations(?string $to, array $expectedPlan, ?string $direction) : void
+    public function testPlanWhenMigrations(string $to, array $expectedPlan, string $direction) : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
-        $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
-        $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
-
         $e1 = new ExecutedMigration(new Version('A'));
         $e2 = new ExecutedMigration(new Version('B'));
-
-        $migrationList = new AvailableMigrationsList([$m1, $m2, $m3]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
 
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
 
-        $plan = $this->migrationPlanCalculator->getPlanUntilVersion($to !== null ? new Version($to) : null);
+        $plan = $this->migrationPlanCalculator->getPlanUntilVersion(new Version($to));
 
         self::assertCount(count($expectedPlan), $plan);
 
@@ -227,24 +174,11 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    public function testNoAvailableMigrations() : void
+    public function testTargetMigrationNotFound() : void
     {
-        $this->expectException(NoMigrationsToExecute::class);
-        $e1 = new ExecutedMigration(new Version('A'));
-        $e2 = new ExecutedMigration(new Version('B'));
-
-        $migrationList = new AvailableMigrationsList([]);
-        $this->migrationRepository
-            ->expects(self::any())
-            ->method('getMigrations')
-            ->willReturn($migrationList);
-
-        $this->metadataStorage
-            ->expects(self::atLeastOnce())
-            ->method('getExecutedMigrations')
-            ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
-
-        $this->migrationPlanCalculator->getPlanUntilVersion();
+        $this->expectException(MigrationClassNotFound::class);
+        $this->expectExceptionMessage('ss');
+        $this->migrationPlanCalculator->getPlanUntilVersion(new Version('D'));
     }
 
     /**
@@ -257,7 +191,6 @@ final class MigrationPlanCalculatorTest extends TestCase
             ['A', ['B'], Direction::DOWN],
             ['B', [], Direction::UP],
             ['C', ['C'], Direction::UP],
-            [null, ['C'], Direction::UP],
         ];
     }
 }

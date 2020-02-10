@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
-use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
-use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -68,16 +66,14 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         return new MigrationPlanList($planItems, $direction);
     }
 
-    public function getPlanUntilVersion(?Version $to = null) : MigrationPlanList
+    public function getPlanUntilVersion(Version $to) : MigrationPlanList
     {
+        if ((string) $to !== '0' && ! $this->migrationRepository->hasMigration((string) $to)) {
+            throw MigrationClassNotFound::new((string) $to);
+        }
+
         $availableMigrations = $this->migrationRepository->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-
-        try {
-            $to = $to ?: $availableMigrations->getLast()->getVersion();
-        } catch (NoMigrationsFoundWithCriteria $e) {
-            throw NoMigrationsToExecute::new($e);
-        }
 
         $direction = $this->findDirection($to, $executedMigrations);
 
