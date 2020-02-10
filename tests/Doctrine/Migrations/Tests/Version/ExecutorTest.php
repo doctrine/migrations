@@ -89,7 +89,7 @@ class ExecutorTest extends TestCase
         $queries = $result->getSql();
         self::assertCount(0, $queries);
 
-        self::assertNotNull($result->getTime());
+        self::assertSame(0.1, $result->getTime());
         self::assertSame(State::NONE, $result->getState());
 
         self::assertSame([
