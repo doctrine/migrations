@@ -20,7 +20,7 @@ $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true
 $em = EntityManager::create($conn, $conf);
 
 $config = new ConfigurationArray([
-    'name' => 'Doctrine Sandbox Migrations Cli',
+    'custom_template' => 'foo',
     'migrations_paths' => ['DoctrineMigrationsTest' => '.'],
 ]);
 

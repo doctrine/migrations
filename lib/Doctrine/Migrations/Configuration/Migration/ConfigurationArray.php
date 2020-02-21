@@ -52,7 +52,6 @@ final class ConfigurationArray implements ConfigurationLoader
             ],
 
             'organize_migrations' => 'setMigrationOrganization',
-            'name' => 'setName',
             'custom_template' => 'setCustomTemplate',
             'all_or_nothing' => static function ($value, Configuration $configuration) : void {
                 $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));

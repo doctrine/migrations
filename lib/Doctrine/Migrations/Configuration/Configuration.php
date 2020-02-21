@@ -20,9 +20,6 @@ final class Configuration
     public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
 
-    /** @var string|null */
-    private $name;
-
     /** @var array<string, string> */
     private $migrationsDirectories = [];
 
@@ -106,17 +103,6 @@ final class Configuration
     public function getMigrationDirectories() : array
     {
         return $this->migrationsDirectories;
-    }
-
-    public function setName(string $name) : void
-    {
-        $this->assertNotFrozen();
-        $this->name = $name;
-    }
-
-    public function getName() : ?string
-    {
-        return $this->name;
     }
 
     public function setCustomTemplate(?string $customTemplate) : void

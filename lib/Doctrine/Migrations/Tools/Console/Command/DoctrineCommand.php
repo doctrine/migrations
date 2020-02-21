@@ -18,8 +18,6 @@ use Symfony\Component\Console\Question\ConfirmationQuestion;
 use function escapeshellarg;
 use function is_string;
 use function proc_open;
-use function str_repeat;
-use function strlen;
 
 /**
  * The DoctrineCommand class provides base functionality for the other migrations commands to extend from.
@@ -55,18 +53,6 @@ abstract class DoctrineCommand extends Command
             'The path to a database connection configuration file.',
             'migrations-db.php'
         );
-    }
-
-    protected function outputHeader(
-        OutputInterface $output
-    ) : void {
-        $name = $this->getDependencyFactory()->getConfiguration()->getName();
-        $name = $name ?? 'Doctrine Database Migrations';
-        $name = str_repeat(' ', 20) . $name . str_repeat(' ', 20);
-        $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
-        $output->writeln('<question>' . $name . '</question>');
-        $output->writeln('<question>' . str_repeat(' ', strlen($name)) . '</question>');
-        $output->writeln('');
     }
 
     protected function initialize(InputInterface $input, OutputInterface $output) : void

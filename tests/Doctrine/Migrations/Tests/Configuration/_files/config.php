@@ -3,8 +3,6 @@
 declare(strict_types=1);
 
 return [
-    'name'                      => 'Doctrine Sandbox Migrations',
-
     'table_storage' => [
         'table_name'                => 'doctrine_migration_versions_test',
         'version_column_name'               => 'doctrine_migration_column_test',

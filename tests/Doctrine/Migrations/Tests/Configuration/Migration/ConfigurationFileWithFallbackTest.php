@@ -21,7 +21,7 @@ class ConfigurationFileWithFallbackTest extends TestCase
             $loader        = new ConfigurationFileWithFallback(__DIR__ . '/../_files/config.php');
             $configuration = $loader->getConfiguration();
 
-            self::assertSame('Doctrine Sandbox Migrations', $configuration->getName());
+            self::assertNull($configuration->getCustomTemplate());
         } finally {
             chdir($dir);
         }
@@ -36,7 +36,7 @@ class ConfigurationFileWithFallbackTest extends TestCase
             $loader        = new ConfigurationFileWithFallback();
             $configuration = $loader->getConfiguration();
 
-            self::assertSame('Doctrine Sandbox Migrations FilesLoader', $configuration->getName());
+            self::assertSame('foo', $configuration->getCustomTemplate());
         } finally {
             chdir($dir);
         }

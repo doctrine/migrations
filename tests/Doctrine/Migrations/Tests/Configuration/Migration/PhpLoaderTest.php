@@ -20,6 +20,6 @@ class PhpLoaderTest extends LoaderTest
     {
         $config = $this->load('instance');
 
-        self::assertSame('inline', $config->getName());
+        self::assertSame('foo', $config->getCustomTemplate());
     }
 }
