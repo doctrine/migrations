@@ -24,7 +24,6 @@ class ConfigurationTest extends TestCase
         $config->addMigrationClass('Foo');
         $config->addMigrationClass('Bar');
 
-        $config->setName('test migration');
         $config->setAllOrNothing(false);
         $config->setCheckDatabasePlatform(false);
         $config->setMetadataStorageConfiguration($storage);
@@ -37,7 +36,6 @@ class ConfigurationTest extends TestCase
         ], $config->getMigrationDirectories());
 
         self::assertSame(['Foo', 'Bar'], $config->getMigrationClasses());
-        self::assertSame('test migration', $config->getName());
         self::assertSame($storage, $config->getMetadataStorageConfiguration());
         self::assertFalse($config->isAllOrNothing());
         self::assertFalse($config->isDatabasePlatformChecked());
@@ -65,7 +63,7 @@ class ConfigurationTest extends TestCase
 
         $this->expectException(FrozenConfiguration::class);
         $this->expectExceptionMessage('The configuration is frozen and cannot be edited anymore.');
-        $config->setName('foo');
+        $config->setAllOrNothing(false);
     }
 
     public function testMigrationOrganizationByYear() : void

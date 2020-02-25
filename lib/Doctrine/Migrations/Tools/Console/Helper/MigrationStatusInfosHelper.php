@@ -130,15 +130,6 @@ class MigrationStatusInfosHelper
                 [new TableCell('Configuration', ['colspan' => 3])],
             ]
         );
-        $data = [
-            'Project' => $this->configuration->getName() ?? 'Doctrine Database Migrations',
-        ];
-        foreach ($data as $k => $v) {
-            $table->addRow([
-                '<info>' . $k . '</info>',
-                new TableCell($v, ['colspan' => 2]),
-            ]);
-        }
 
         $dataGroup = [
             'Storage' => [
@@ -170,15 +161,9 @@ class MigrationStatusInfosHelper
                 'Table Name' => $storage->getTableName(),
                 'Column Name' => $storage->getVersionColumnName(),
             ];
-            $table->addRow([new TableSeparator(['colspan' => 3])]);
-            foreach ($data as $k => $v) {
-                $table->addRow([
-                    '<info>' . $k . '</info>',
-                    new TableCell($v, ['colspan' => 2]),
-                ]);
-            }
         }
 
+        $first = true;
         foreach ($dataGroup as $group => $dataValues) {
             $nsRows = [];
             foreach ($dataValues as $k => $v) {
@@ -192,7 +177,11 @@ class MigrationStatusInfosHelper
                 continue;
             }
 
-            $table->addRow([new TableSeparator(['colspan' => 3])]);
+            if (! $first) {
+                $table->addRow([new TableSeparator(['colspan' => 3])]);
+            }
+
+            $first = false;
             array_unshift(
                 $nsRows[0],
                 new TableCell('<info>' . $group . '</info>', ['rowspan' => count($dataValues)])

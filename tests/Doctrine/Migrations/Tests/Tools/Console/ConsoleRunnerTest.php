@@ -35,7 +35,7 @@ class ConsoleRunnerTest extends TestCase
         try {
             $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
             self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
-            self::assertSame('Doctrine Sandbox Migrations Cli', $dependencyFactory->getConfiguration()->getName());
+            self::assertSame('foo', $dependencyFactory->getConfiguration()->getCustomTemplate());
         } finally {
             chdir($dir);
         }

@@ -21,7 +21,6 @@ abstract class LoaderTest extends TestCase
     {
         $config = $this->load();
 
-        self::assertSame('Doctrine Sandbox Migrations', $config->getName());
         self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
 
         self::assertSame(['Foo', 'Bar'], $config->getMigrationClasses());
@@ -40,7 +39,6 @@ abstract class LoaderTest extends TestCase
     {
         $config = $this->load('basic');
 
-        self::assertNull($config->getName());
         self::assertSame(['DoctrineMigrationsTest' => dirname(__DIR__) . DIRECTORY_SEPARATOR . '_files'], $config->getMigrationDirectories());
 
         self::assertSame([], $config->getMigrationClasses());

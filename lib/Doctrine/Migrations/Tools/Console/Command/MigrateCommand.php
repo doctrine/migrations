@@ -116,7 +116,6 @@ EOT
 
     public function execute(InputInterface $input, OutputInterface $output) : ?int
     {
-        $this->outputHeader($output);
         $allowNoMigration = $input->getOption('allow-no-migration');
         $versionAlias     = $input->getArgument('version');
         $path             = $input->getOption('write-sql');

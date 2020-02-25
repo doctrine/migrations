@@ -5,6 +5,6 @@ declare(strict_types=1);
 use Doctrine\Migrations\Configuration\Configuration;
 
 $c = new Configuration();
-$c->setName('inline');
+$c->setCustomTemplate('foo');
 
 return $c;

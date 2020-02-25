@@ -1,5 +1,4 @@
 {
-    "name"                      : "Doctrine Sandbox Migrations",
     "migrations_paths" : {
         "DoctrineMigrationsTest": "."
     },
