@@ -10,6 +10,7 @@ use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
 use function count;

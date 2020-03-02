@@ -14,7 +14,6 @@ use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
-use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tests\Version\Fixture\EmptyTestMigration;
 use Doctrine\Migrations\Tests\Version\Fixture\VersionExecutorTestMigration;
@@ -26,6 +25,7 @@ use Doctrine\Migrations\Version\Version;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
 
