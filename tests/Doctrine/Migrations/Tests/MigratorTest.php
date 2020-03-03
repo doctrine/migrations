@@ -15,7 +15,6 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
-use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\DbalExecutor;
@@ -24,7 +23,7 @@ use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
-use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use function array_map;
 use const DIRECTORY_SEPARATOR;
@@ -99,11 +98,10 @@ class MigratorTest extends MigrationTestCase
 
         $this->logger = new TestLogger();
 
-        $symfonyStopwatch = new SymfonyStopwatch();
-        $stopwatch        = new Stopwatch($symfonyStopwatch);
-        $paramFormatter   = $this->createMock(ParameterFormatter::class);
-        $storage          = $this->createMock(MetadataStorage::class);
-        $schemaDiff       = $this->createMock(SchemaDiffProvider::class);
+        $stopwatch      = new Stopwatch();
+        $paramFormatter = $this->createMock(ParameterFormatter::class);
+        $storage        = $this->createMock(MetadataStorage::class);
+        $schemaDiff     = $this->createMock(SchemaDiffProvider::class);
 
         $this->executor = new DbalExecutor($storage, $eventDispatcher, $this->conn, $schemaDiff, $this->logger, $paramFormatter, $stopwatch);
 

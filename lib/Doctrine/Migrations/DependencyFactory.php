@@ -47,7 +47,7 @@ use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
-use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+use Symfony\Component\Stopwatch\Stopwatch;
 use function array_key_exists;
 use function preg_quote;
 use function sprintf;
@@ -436,9 +436,7 @@ class DependencyFactory
     public function getStopwatch() : Stopwatch
     {
         return $this->getDependency(Stopwatch::class, static function () : Stopwatch {
-            $symfonyStopwatch = new SymfonyStopwatch(true);
-
-            return new Stopwatch($symfonyStopwatch);
+            return new Stopwatch(true);
         });
     }
 
