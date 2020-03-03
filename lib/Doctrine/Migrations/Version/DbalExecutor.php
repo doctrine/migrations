@@ -188,15 +188,18 @@ final class DbalExecutor implements Executor
         $result->setState(State::POST);
 
         $migration->{'post' . ucfirst($direction)}($toSchema);
-        $stopwatchEvent->stop();
 
-        $result->setTime((float) $stopwatchEvent->getDuration()/1000);
-        $result->setMemory($stopwatchEvent->getMemory());
+        $stopwatchEvent->stop();
+        $periods    = $stopwatchEvent->getPeriods();
+        $lastPeriod = $periods[count($periods) -1];
+
+        $result->setTime((float) $lastPeriod->getDuration()/1000);
+        $result->setMemory($lastPeriod->getMemory());
 
         $params = [
             'version' => (string) $plan->getVersion(),
-            'time' => $stopwatchEvent->getDuration(),
-            'memory' => BytesFormatter::formatBytes($stopwatchEvent->getMemory()),
+            'time' => $lastPeriod->getDuration(),
+            'memory' => BytesFormatter::formatBytes($lastPeriod->getMemory()),
             'direction' => $direction === Direction::UP ? 'migrated' : 'reverted',
         ];
 
