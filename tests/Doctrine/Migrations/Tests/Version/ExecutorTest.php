@@ -21,6 +21,7 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Stopwatch\StopwatchEvent;
+use Symfony\Component\Stopwatch\StopwatchPeriod;
 
 class ExecutorTest extends TestCase
 {
@@ -232,12 +233,10 @@ class ExecutorTest extends TestCase
             $this->stopwatch
         );
 
-        $this->configuration->expects(self::any())
-            ->method('getConnection')
+        $this->configuration->method('getConnection')
             ->willReturn($this->connection);
 
-        $this->connection->expects(self::any())
-            ->method('getDatabasePlatform')
+        $this->connection->method('getDatabasePlatform')
             ->willReturn($this->createMock(AbstractPlatform::class));
 
         $this->version = new Version(
@@ -251,20 +250,25 @@ class ExecutorTest extends TestCase
 
         $stopwatchEvent = $this->createMock(StopwatchEvent::class);
 
-        $this->stopwatch->expects(self::any())
-            ->method('start')
+        $this->stopwatch->method('start')
             ->willReturn($stopwatchEvent);
 
-        $stopwatchEvent->expects(self::any())
-            ->method('stop');
+        $stopwatchEvent->method('stop');
 
-        $stopwatchEvent->expects(self::any())
-            ->method('getDuration')
+        $stopwatchEvent->method('getDuration')
             ->willReturn(100);
 
-        $stopwatchEvent->expects(self::any())
-            ->method('getMemory')
+        $stopwatchEvent->method('getMemory')
             ->willReturn(100);
+
+        $stopWatchPeriod = $this->createMock(StopwatchPeriod::class);
+        $stopWatchPeriod->method('getDuration')
+            ->willReturn(100);
+        $stopWatchPeriod->method('getMemory')
+            ->willReturn(100);
+
+        $stopwatchEvent->method('getPeriods')
+            ->willReturn([$stopWatchPeriod]);
     }
 }
 
