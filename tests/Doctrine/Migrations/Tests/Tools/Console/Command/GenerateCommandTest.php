@@ -11,9 +11,10 @@ use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
+use function explode;
 use function sys_get_temp_dir;
+use function trim;
 
 final class GenerateCommandTest extends TestCase
 {
@@ -29,21 +30,11 @@ final class GenerateCommandTest extends TestCase
     /** @var GenerateCommand|MockObject */
     private $generateCommand;
 
+    /** @var CommandTester */
+    private $generateCommandTest;
+
     public function testExecute() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
-
-        $input->expects(self::at(0))
-            ->method('getOption')
-            ->with('namespace')
-            ->willReturn(null);
-
-        $input->expects(self::at(1))
-            ->method('getOption')
-            ->with('editor-cmd')
-            ->willReturn('mate');
-
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
             ->with('FooNs\\Version1234')
@@ -53,17 +44,16 @@ final class GenerateCommandTest extends TestCase
             ->method('procOpen')
             ->with('mate', '/path/to/migration.php');
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with([
-                'Generated new migration class to "<info>/path/to/migration.php</info>"',
-                '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\Version1234\'</info>',
-                '',
-                'To revert the migration you can use <info>migrations:execute --down \'FooNs\Version1234\'</info>',
-            ]);
+        $this->generateCommandTest->execute(['--editor-cmd' => 'mate']);
+        $output = $this->generateCommandTest->getDisplay(true);
 
-        $this->generateCommand->execute($input, $output);
+        self::assertSame([
+            'Generated new migration class to "/path/to/migration.php"',
+            '',
+            'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\Version1234\'',
+            '',
+            'To revert the migration you can use migrations:execute --down \'FooNs\Version1234\'',
+        ], explode("\n", trim($output)));
     }
 
     protected function setUp() : void
@@ -92,9 +82,10 @@ final class GenerateCommandTest extends TestCase
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
 
-        $this->generateCommand = $this->getMockBuilder(GenerateCommand::class)
+        $this->generateCommand     = $this->getMockBuilder(GenerateCommand::class)
             ->setConstructorArgs([$this->dependencyFactory])
             ->onlyMethods(['procOpen'])
             ->getMock();
+        $this->generateCommandTest = new CommandTester($this->generateCommand);
     }
 }
