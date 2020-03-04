@@ -12,8 +12,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
+use function trim;
 
 final class RollupCommandTest extends TestCase
 {
@@ -26,6 +26,9 @@ final class RollupCommandTest extends TestCase
     /** @var RollupCommand */
     private $rollupCommand;
 
+    /** @var CommandTester */
+    private $rollupCommandTest;
+
     public function testExecute() : void
     {
         $this->dependencyFactory
@@ -37,14 +40,10 @@ final class RollupCommandTest extends TestCase
             ->method('rollup')
             ->willReturn(new Version('1234'));
 
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $this->rollupCommandTest->execute([], ['interactive' => false]);
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with('Rolled up migrations to version <info>1234</info>');
-
-        $this->rollupCommand->execute($input, $output);
+        $output = $this->rollupCommandTest->getDisplay(true);
+        self::assertSame('Rolled up migrations to version 1234', trim($output));
     }
 
     public function testExecutionContinuesWhenAnsweringYes() : void
@@ -56,14 +55,6 @@ final class RollupCommandTest extends TestCase
 
         $this->rollupCommand->setHelperSet(new HelperSet(['question' => $questions]));
 
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->expects(self::atLeastOnce())
-            ->method('isInteractive')
-            ->willReturn(true);
-
-        $output = $this->createMock(OutputInterface::class);
-
         $this->dependencyFactory
             ->expects(self::once())
             ->method('getRollup')
@@ -73,11 +64,10 @@ final class RollupCommandTest extends TestCase
             ->method('rollup')
             ->willReturn(new Version('1234'));
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with('Rolled up migrations to version <info>1234</info>');
+        $this->rollupCommandTest->execute([]);
 
-        $this->rollupCommand->execute($input, $output);
+        $output = $this->rollupCommandTest->getDisplay(true);
+        self::assertSame('Rolled up migrations to version 1234', trim($output));
     }
 
     public function testExecutionStoppedWhenAnsweringNo() : void
@@ -87,14 +77,6 @@ final class RollupCommandTest extends TestCase
             ->method('ask')
             ->willReturn(false);
 
-        $input = $this->createMock(InputInterface::class);
-        $input
-            ->expects(self::atLeastOnce())
-            ->method('isInteractive')
-            ->willReturn(true);
-
-        $output = $this->createMock(OutputInterface::class);
-
         $this->dependencyFactory
             ->expects(self::never())
             ->method('getRollup');
@@ -103,9 +85,12 @@ final class RollupCommandTest extends TestCase
             ->method('rollup');
 
         $this->rollupCommand->setHelperSet(new HelperSet(['question' => $questions]));
-        $exitCode = $this->rollupCommand->execute($input, $output);
+        $exitCode = $this->rollupCommandTest->execute([]);
 
         self::assertSame(3, $exitCode);
+
+        $output = $this->rollupCommandTest->getDisplay(true);
+        self::assertSame('Migration cancelled!', trim($output));
     }
 
     protected function setUp() : void
@@ -113,5 +98,6 @@ final class RollupCommandTest extends TestCase
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
         $this->rollupCommand     = new RollupCommand($this->dependencyFactory);
+        $this->rollupCommandTest = new CommandTester($this->rollupCommand);
     }
 }

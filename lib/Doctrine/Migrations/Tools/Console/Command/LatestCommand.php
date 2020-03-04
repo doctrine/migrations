@@ -26,7 +26,7 @@ class LatestCommand extends DoctrineCommand
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : ?int
     {
         $aliasResolver = $this->getDependencyFactory()->getVersionAliasResolver();
 
