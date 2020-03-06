@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
@@ -14,6 +15,7 @@ use Doctrine\Migrations\Exception\FrozenDependencies;
 use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -122,5 +124,19 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di            = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
         $di->setService(LoggerInterface::class, $anotherLogger);
         self::assertSame($anotherLogger, $di->getLogger());
+    }
+
+    public function testMetadataConfigurationIsPassedToTableStorage() : void
+    {
+        $connection     = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
+        $metadataConfig = new TableMetadataStorageConfiguration();
+        $metadataConfig->setTableName('foo');
+        $configuration = new Configuration();
+        $configuration->setMetadataStorageConfiguration($metadataConfig);
+
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($configuration), new ExistingConnection($connection));
+        $di->getMetadataStorage()->ensureInitialized();
+
+        self::assertTrue($connection->getSchemaManager()->tablesExist(['foo']));
     }
 }
