@@ -66,11 +66,12 @@ class TableMetadataStorageTest extends TestCase
         $this->storage->getExecutedMigrations();
     }
 
-    public function testTableNotCreatedOnRead() : void
+    public function testTableNotCreatedOnReadButReadingWorks() : void
     {
-        $this->expectException(MetadataStorageError::class);
-        $this->expectExceptionMessage('The metadata storage is not initialized, please run the sync-metadata-storage command to fix this issue.');
-        $this->storage->getExecutedMigrations();
+        $executedMigrations = $this->storage->getExecutedMigrations();
+
+        self::assertSame([], $executedMigrations->getItems());
+        self::assertFalse($this->schemaManager->tablesExist([$this->config->getTableName()]));
     }
 
     public function testTableStructureUpdate() : void
@@ -96,6 +97,27 @@ class TableMetadataStorageTest extends TestCase
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+    }
+
+    public function testTableNotUpToDateTriggersExcepton() : void
+    {
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
+
+        $config = new TableMetadataStorageConfiguration();
+        $config->setTableName('a');
+        $config->setVersionColumnName('b');
+        $config->setVersionColumnLength(199);
+        $config->setExecutedAtColumnName('c');
+        $config->setExecutionTimeColumnName('d');
+
+        $table = new Table($config->getTableName());
+        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+        $table->setPrimaryKey([$config->getVersionColumnName()]);
+        $this->schemaManager->createTable($table);
+
+        $storage = new TableMetadataStorage($this->connection, $config);
+        $storage->getExecutedMigrations();
     }
 
     public function testTableStructure() : void

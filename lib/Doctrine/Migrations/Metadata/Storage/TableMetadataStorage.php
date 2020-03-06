@@ -67,6 +67,10 @@ final class TableMetadataStorage implements MetadataStorage
 
     public function getExecutedMigrations() : ExecutedMigrationsSet
     {
+        if (! $this->isInitialized()) {
+            return new ExecutedMigrationsSet([]);
+        }
+
         $this->checkInitialization();
         $rows = $this->connection->fetchAll(sprintf('SELECT * FROM %s', $this->configuration->getTableName()));
 
@@ -132,15 +136,15 @@ final class TableMetadataStorage implements MetadataStorage
 
     public function ensureInitialized() : void
     {
-        $expectedSchemaChangelog = $this->getExpectedTable();
-
-        if (! $this->isInitialized($expectedSchemaChangelog)) {
+        if (! $this->isInitialized()) {
+            $expectedSchemaChangelog = $this->getExpectedTable();
             $this->schemaManager->createTable($expectedSchemaChangelog);
 
             return;
         }
 
-        $diff = $this->needsUpdate($expectedSchemaChangelog);
+        $expectedSchemaChangelog = $this->getExpectedTable();
+        $diff                    = $this->needsUpdate($expectedSchemaChangelog);
         if ($diff === null) {
             return;
         }
@@ -158,22 +162,22 @@ final class TableMetadataStorage implements MetadataStorage
         return $diff instanceof TableDiff ? $diff : null;
     }
 
-    private function isInitialized(Table $expectedTable) : bool
+    private function isInitialized() : bool
     {
         if ($this->connection instanceof MasterSlaveConnection) {
             $this->connection->connect('master');
         }
 
-        return $this->schemaManager->tablesExist([$expectedTable->getName()]);
+        return $this->schemaManager->tablesExist([$this->configuration->getTableName()]);
     }
 
     private function checkInitialization() : void
     {
-        $expectedTable = $this->getExpectedTable();
-
-        if (! $this->isInitialized($expectedTable)) {
+        if (! $this->isInitialized()) {
             throw MetadataStorageError::notInitialized();
         }
+
+        $expectedTable = $this->getExpectedTable();
 
         if ($this->needsUpdate($expectedTable) !== null) {
             throw MetadataStorageError::notUpToDate();
