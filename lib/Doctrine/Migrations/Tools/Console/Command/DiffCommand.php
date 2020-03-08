@@ -5,6 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Provider\OrmSchemaProvider;
+use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -123,6 +127,17 @@ EOT
 
         assert(is_string($namespace));
 
+        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
+        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
+        $newMigrations                 = $planCalculator->getNewMigrations();
+
+        if ($this->checkNewMigrations($newMigrations, $input, $output) === false) {
+            return 3;
+        }
+        if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
+            return 3;
+        }
+
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
         $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
@@ -167,5 +182,61 @@ EOT
         ]);
 
         return 0;
+    }
+
+    private function checkNewMigrations(
+        AvailableMigrationsList $newMigrations,
+        InputInterface $input,
+        OutputInterface $output
+    ) : bool {
+        if (count($newMigrations) !== 0) {
+            $output->writeln(sprintf(
+                '<error>WARNING! You have %s available migrations to execute.</error>',
+                count($newMigrations)
+            ));
+
+            $question = 'Are you sure you wish to continue? (y/n)';
+
+            if (! $this->canExecute($question, $input, $output)) {
+                $output->writeln('<error>Migration cancelled!</error>');
+
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    private function checkExecutedUnavailableMigrations(
+        ExecutedMigrationsSet $executedUnavailableMigrations,
+        InputInterface $input,
+        OutputInterface $output
+    ) : bool {
+        if (count($executedUnavailableMigrations) !== 0) {
+            $output->writeln(sprintf(
+                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
+                count($executedUnavailableMigrations)
+            ));
+
+            foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
+                $output->writeln(sprintf(
+                    '    <comment>>></comment> %s (<comment>%s</comment>)',
+                    $executedUnavailableMigration->getExecutedAt() !== null
+                        ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
+                        : null,
+                    $executedUnavailableMigration->getVersion()
+                ));
+            }
+
+            $question = 'Are you sure you wish to continue? (y/n)';
+
+            if (! $this->canExecute($question, $input, $output)) {
+                $output->writeln('<error>Migration cancelled!</error>');
+
+                return false;
+            }
+        }
+
+        return true;
     }
 }
