@@ -97,9 +97,9 @@ final class DiffCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
+        $this->migrationDiffGenerator  = $this->createMock(DiffGenerator::class);
         $this->migrationPlanCalculator = $this->createMock(MigrationPlanCalculator::class);
-        $this->configuration          = new Configuration();
+        $this->configuration           = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);

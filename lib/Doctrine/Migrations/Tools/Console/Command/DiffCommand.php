@@ -7,8 +7,6 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
-use Doctrine\Migrations\Provider\OrmSchemaProvider;
-use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
@@ -17,6 +15,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use function addslashes;
 use function assert;
 use function class_exists;
+use function count;
 use function filter_var;
 use function is_string;
 use function key;
@@ -134,6 +133,7 @@ EOT
         if ($this->checkNewMigrations($newMigrations, $input, $output) === false) {
             return 3;
         }
+
         if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
             return 3;
         }
