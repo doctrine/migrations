@@ -126,9 +126,9 @@ EOT
 
         assert(is_string($namespace));
 
-        $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
-        $executedUnavailableMigrations = $planCalculator->getExecutedUnavailableMigrations();
-        $newMigrations                 = $planCalculator->getNewMigrations();
+        $statusCalculator              = $this->getDependencyFactory()->getMigrationStatusCalculator();
+        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
+        $newMigrations                 = $statusCalculator->getNewMigrations();
 
         if ($this->checkNewMigrations($newMigrations, $input, $output) === false) {
             return 3;

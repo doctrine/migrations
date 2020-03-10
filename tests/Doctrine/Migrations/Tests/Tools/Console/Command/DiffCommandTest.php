@@ -8,8 +8,8 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\DiffGenerator;
-use Doctrine\Migrations\MigrationPlanCalculator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -21,8 +21,8 @@ final class DiffCommandTest extends TestCase
     /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
 
-    /** @var MigrationPlanCalculator|MockObject */
-    private $migrationPlanCalculator;
+    /** @var MigrationStatusCalculator|MockObject */
+    private $migrationStatusCalculator;
 
     /** @var Configuration */
     private $configuration;
@@ -97,9 +97,9 @@ final class DiffCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->migrationDiffGenerator  = $this->createMock(DiffGenerator::class);
-        $this->migrationPlanCalculator = $this->createMock(MigrationPlanCalculator::class);
-        $this->configuration           = new Configuration();
+        $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);
+        $this->migrationStatusCalculator = $this->createMock(MigrationStatusCalculator::class);
+        $this->configuration             = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
@@ -123,8 +123,8 @@ final class DiffCommandTest extends TestCase
             ->willReturn($this->migrationDiffGenerator);
 
         $this->dependencyFactory->expects(self::any())
-            ->method('getMigrationPlanCalculator')
-            ->willReturn($this->migrationPlanCalculator);
+            ->method('getMigrationStatusCalculator')
+            ->willReturn($this->migrationStatusCalculator);
 
         $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
             ->setConstructorArgs([$this->dependencyFactory])
