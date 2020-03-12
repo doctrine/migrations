@@ -16,7 +16,7 @@ use function sprintf;
 /**
  * The GenerateCommand class is responsible for generating a blank migration class for you to modify to your needs.
  */
-class GenerateCommand extends DoctrineCommand
+final class GenerateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:generate';
@@ -77,7 +77,7 @@ EOT
 
         if ($editorCommand !== null) {
             assert(is_string($editorCommand));
-            $this->procOpen($editorCommand, $path);
+            $this->procOpen($output, $editorCommand, $path);
         }
 
         $output->writeln([

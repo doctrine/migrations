@@ -11,8 +11,12 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\ProcessHelper;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Process\Process;
 use function sys_get_temp_dir;
 
 final class DiffCommandTest extends TestCase
@@ -23,11 +27,17 @@ final class DiffCommandTest extends TestCase
     /** @var Configuration */
     private $configuration;
 
-    /** @var DiffCommand|MockObject */
+    /** @var DiffCommand */
     private $diffCommand;
 
-    /** @var MockObject */
+    /** @var MockObject|DependencyFactory */
     private $dependencyFactory;
+
+    /** @var MockObject|QuestionHelper */
+    private $questions;
+
+    /** @var MockObject|ProcessHelper */
+    private $process;
 
     public function testExecute() : void
     {
@@ -74,9 +84,12 @@ final class DiffCommandTest extends TestCase
             ->with('FooNs\\Version1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
-        $this->diffCommand->expects(self::once())
-            ->method('procOpen')
-            ->with('mate', '/path/to/migration.php');
+        $this->process->expects(self::once())
+            ->method('mustRun')
+            ->willReturnCallback(static function ($output, Process $process, $err, $callback) : void {
+                self::assertSame("'mate' '/path/to/migration.php'", $process->getCommandLine());
+                self::assertNotNull($callback);
+            });
 
         $output->expects(self::once())
             ->method('writeln')
@@ -117,9 +130,11 @@ final class DiffCommandTest extends TestCase
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 
-        $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setConstructorArgs([$this->dependencyFactory])
-            ->onlyMethods(['procOpen'])
-            ->getMock();
+        $this->diffCommand = new DiffCommand($this->dependencyFactory);
+
+        $this->process   = $this->createMock(ProcessHelper::class);
+        $this->questions = $this->createMock(QuestionHelper::class);
+
+        $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions, 'process' => $this->process]));
     }
 }

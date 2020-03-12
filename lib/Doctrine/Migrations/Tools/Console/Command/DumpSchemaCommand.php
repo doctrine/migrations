@@ -23,7 +23,7 @@ use function strpos;
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
-class DumpSchemaCommand extends DoctrineCommand
+final class DumpSchemaCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';
@@ -121,7 +121,7 @@ EOT
 
         if ($editorCommand !== null) {
             assert(is_string($editorCommand));
-            $this->procOpen($editorCommand, $path);
+            $this->procOpen($output, $editorCommand, $path);
         }
 
         $output->writeln([

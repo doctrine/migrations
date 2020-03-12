@@ -17,9 +17,12 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\ProcessHelper;
+use Symfony\Component\Console\Tester\CommandTester;
+use function explode;
 use function sys_get_temp_dir;
+use function trim;
 
 final class DumpSchemaCommandTest extends TestCase
 {
@@ -38,13 +41,16 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var DumpSchemaCommand */
     private $dumpSchemaCommand;
 
+    /** @var MockObject|ProcessHelper */
+    private $process;
+
+    /** @var CommandTester */
+    private $dumpSchemaCommandTester;
+
     public function testExecuteThrowsRuntimeException() : void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
-
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
 
         $migration = new AvailableMigration(new Version('FooNs\Abc'), $this->createMock(AbstractMigration::class));
 
@@ -52,39 +58,11 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$migration]));
 
-        $this->dumpSchemaCommand->execute($input, $output);
+        $this->dumpSchemaCommandTester->execute([]);
     }
 
     public function testExecute() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
-
-        $input->expects(self::at(0))
-            ->method('getOption')
-            ->with('formatted')
-            ->willReturn(true);
-
-        $input->expects(self::at(1))
-            ->method('getOption')
-            ->with('line-length')
-            ->willReturn(80);
-
-        $input->expects(self::at(2))
-            ->method('getOption')
-            ->with('namespace')
-            ->willReturn(null);
-
-        $input->expects(self::at(3))
-            ->method('getOption')
-            ->with('filter-tables')
-            ->willReturn(['/foo/']);
-
-        $input->expects(self::at(4))
-            ->method('getOption')
-            ->with('editor-cmd')
-            ->willReturn('test');
-
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([]));
@@ -93,19 +71,27 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('dump')
             ->with('FooNs\\Version1234', ['/foo/'], true, 80);
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with([
-                'Dumped your schema to a new migration class at "<info></info>"',
-                '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\\\\Version1234\'</info>',
-                '',
-                'To revert the migration you can use <info>migrations:execute --down \'FooNs\\\\Version1234\'</info>',
-                '',
-                'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',
-            ]);
+        $this->dumpSchemaCommandTester->execute([
+            '--editor-cmd' => 'test',
+            '--filter-tables' => ['/foo/'],
+            '--line-length' => 80,
+            '--formatted' => true,
+        ]);
 
-        $this->dumpSchemaCommand->execute($input, $output);
+        $output = $this->dumpSchemaCommandTester->getDisplay(true);
+
+        self::assertSame(
+            [
+                'Dumped your schema to a new migration class at ""',
+                '',
+                'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\\\\Version1234\'',
+                '',
+                'To revert the migration you can use migrations:execute --down \'FooNs\\\\Version1234\'',
+                '',
+                'To use this as a rollup migration you can use the migrations:rollup command.',
+            ],
+            explode("\n", trim($output))
+        );
     }
 
     protected function setUp() : void
@@ -140,5 +126,10 @@ final class DumpSchemaCommandTest extends TestCase
             ->willReturn($this->migrationRepository);
 
         $this->dumpSchemaCommand = new DumpSchemaCommand($this->dependencyFactory);
+
+        $this->process = $this->createMock(ProcessHelper::class);
+        $this->dumpSchemaCommand->setHelperSet(new HelperSet(['process' => $this->process]));
+
+        $this->dumpSchemaCommandTester = new CommandTester($this->dumpSchemaCommand);
     }
 }

@@ -23,7 +23,7 @@ use const FILTER_VALIDATE_BOOLEAN;
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
  * your mapping information.
  */
-class DiffCommand extends DoctrineCommand
+final class DiffCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:diff';
@@ -149,7 +149,7 @@ EOT
 
         if ($editorCommand !== null) {
             assert(is_string($editorCommand));
-            $this->procOpen($editorCommand, $path);
+            $this->procOpen($output, $editorCommand, $path);
         }
 
         $output->writeln([

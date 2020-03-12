@@ -23,7 +23,7 @@ use function substr;
  * The MigrateCommand class is responsible for executing a migration from the current version to another
  * version up or down. It will calculate all the migration versions that need to be executed and execute them.
  */
-class MigrateCommand extends DoctrineCommand
+final class MigrateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:migrate';

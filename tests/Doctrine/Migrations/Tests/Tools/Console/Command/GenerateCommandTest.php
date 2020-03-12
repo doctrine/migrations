@@ -11,7 +11,10 @@ use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Tester\CommandTester;
+use Symfony\Component\Process\Process;
 use function explode;
 use function sys_get_temp_dir;
 use function trim;
@@ -27,11 +30,14 @@ final class GenerateCommandTest extends TestCase
     /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var GenerateCommand|MockObject */
+    /** @var GenerateCommand */
     private $generateCommand;
 
     /** @var CommandTester */
     private $generateCommandTest;
+
+    /** @var MockObject|ProcessHelper */
+    private $process;
 
     public function testExecute() : void
     {
@@ -40,9 +46,12 @@ final class GenerateCommandTest extends TestCase
             ->with('FooNs\\Version1234')
             ->willReturn('/path/to/migration.php');
 
-        $this->generateCommand->expects(self::once())
-            ->method('procOpen')
-            ->with('mate', '/path/to/migration.php');
+        $this->process->expects(self::once())
+            ->method('mustRun')
+            ->willReturnCallback(static function ($output, Process $process, $err, $callback) : void {
+                self::assertSame("'mate' '/path/to/migration.php'", $process->getCommandLine());
+                self::assertNotNull($callback);
+            });
 
         $this->generateCommandTest->execute(['--editor-cmd' => 'mate']);
         $output = $this->generateCommandTest->getDisplay(true);
@@ -82,10 +91,11 @@ final class GenerateCommandTest extends TestCase
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
 
-        $this->generateCommand     = $this->getMockBuilder(GenerateCommand::class)
-            ->setConstructorArgs([$this->dependencyFactory])
-            ->onlyMethods(['procOpen'])
-            ->getMock();
+        $this->generateCommand = new GenerateCommand($this->dependencyFactory);
+
+        $this->process = $this->createMock(ProcessHelper::class);
+        $this->generateCommand->setHelperSet(new HelperSet(['process' => $this->process]));
+
         $this->generateCommandTest = new CommandTester($this->generateCommand);
     }
 }
