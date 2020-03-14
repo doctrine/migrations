@@ -67,8 +67,157 @@ Files in XML, YAML or JSON also changed in a similar way. Please refer to the of
 
 Most of the code is protected by the `@internal` declaration and in a very rare cases you might have dealt with the 
 internals of this library. 
-You can use [Roave/BackwardCompatibilityCheck](https://github.com/Roave/BackwardCompatibilityCheck) and get a list of 
-changed elements.
+
+The most important BC breaks are in the `Doctrine\Migrations\Configuration\Configuration` class and in the helper 
+system that now has been replaced by the `Doctrine\Migrations\DependencyFactory` functionalities.
+
+Here is a list of the most important changes:
+
+- Namespace `Doctrine\Migrations\Configuration\Configuration` 
+     - CHANGED: Class `Doctrine\Migrations\Configuration\Configuration` became final
+     - REMOVED: Constant `Doctrine\Migrations\Configuration\Configuration::VERSION_FORMAT` was removed, there is not more limitation on the version format
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#__construct()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setName()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getName()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getConnection()` was removed, 
+     use `Doctrine\Migrations\DependencyFactory#getConnection()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsTableName()` was removed, 
+     use `Doctrine\Migrations\Configuration\Configuration#setMetadataStorageConfiguration` with an instance of `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsTableName()` was removed, 
+     use `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration#getMetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsColumnName()` was removed, 
+     use `Doctrine\Migrations\Configuration\Configuration#setMetadataStorageConfiguration` with an instance of `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsColumnName()` was removed,
+     use `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration#getMetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getQuotedMigrationsColumnName()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsColumnLength()` was removed, 
+     use `Doctrine\Migrations\Configuration\Configuration#setMetadataStorageConfiguration` with an instance of `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsColumnLength()` was removed,
+     use `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration#getMetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsExecutedAtColumnName()` was removed, 
+     use `Doctrine\Migrations\Configuration\Configuration#setMetadataStorageConfiguration` with an instance of `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsExecutedAtColumnName()` was removed,
+     use `Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration#getMetadataStorageConfiguration`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getQuotedMigrationsExecutedAtColumnName()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsDirectory()` was removed, 
+     use `Doctrine\Migrations\Configuration\Configuration#addMigrationsDirectory()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsDirectory()` was removed,
+     use `Doctrine\Migrations\Configuration\Configuration#getMigrationDirectories()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsNamespace()` was removed,
+     use `Doctrine\Migrations\Configuration\Configuration#addMigrationsDirectory()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsNamespace()` was removed,
+     use `Doctrine\Migrations\Configuration\Configuration#getMigrationDirectories()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setMigrationsFinder()` was removed, 
+     use the dependency factory instead  
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsFinder()` was removed,
+     use the dependency factory instead
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#hasVersionMigrated()` was removed,
+     use the dependency factory instead
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getVersionData()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#resolveVersionAlias()` was removed,
+     use `Doctrine\Migrations\Version\AliasResolver#resolveVersionAlias()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#isMigrationTableCreated()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#createMigrationTable()` was removed,
+     use `Doctrine\Migrations\Metadata\Storage\MetadataStorage#ensureInitialized()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getDateTime()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#generateVersionNumber()` was removed,
+     use `Doctrine\Migrations\Generator\ClassNameGenerator#generateClassName()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#connect()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#dispatchMigrationEvent()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#dispatchVersionEvent()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#dispatchEvent()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getNumberOfExecutedMigrations()` was removed,
+     use `Doctrine\Migrations\DependencyFactory#getMetadataStorage()->getExecutedMigrations()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getNumberOfAvailableMigrations()` was removed, 
+     use `Doctrine\Migrations\DependencyFactory#getMigrationRepository()->getMigrations()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getLatestVersion()` was removed, 
+     use `Doctrine\Migrations\Version\AliasResolver#resolveVersionAlias()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigratedVersions()` was removed, 
+     use `Doctrine\Migrations\DependencyFactory#getMetadataStorage()->getExecutedMigrations()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getAvailableVersions()` was removed
+     use `Doctrine\Migrations\DependencyFactory#getMigrationRepository()->getMigrations()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getCurrentVersion()` was removed,
+     use `Doctrine\Migrations\Version\AliasResolver#resolveVersionAlias()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#registerMigrationsFromDirectory()` was removed,
+     use `Doctrine\Migrations\Configuration\Configuration#addMigrationsDirectory()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#registerMigration()` was removed,
+     use `Doctrine\Migrations\Configuration\Configuration#addMigrationClass()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#registerMigrations()` was removed
+     use `Doctrine\Migrations\Configuration\Configuration#addMigrationClass()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrations()` was removed,
+     use `Doctrine\Migrations\DependencyFactory#getMigrationRepository()->getMigrations()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getVersion()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getMigrationsToExecute()` was removed,
+     use `Doctrine\Migrations\Version\MigrationPlanCalculator#getPlanUntilVersion()` to create a migration plan
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getPrevVersion()` was removed,
+     use `Doctrine\Migrations\Version\AliasResolver#resolveVersionAlias()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getNextVersion()` was removed,
+     use `Doctrine\Migrations\Version\AliasResolver#resolveVersionAlias()`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getRelativeVersion()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getDeltaVersion()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#setOutputWriter()` was removed, 
+        set the `Psr\Log\LoggerInterface` service in `Doctrine\Migrations\DependencyFactory` 
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getOutputWriter()` was removed,
+     get the `Psr\Log\LoggerInterface` service from `Doctrine\Migrations\DependencyFactory`
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getQueryWriter()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#getDependencyFactory()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Configuration\Configuration#validate()` was removed
+     - Namespace `Doctrine\Migrations\Configuration\Connection\Loader\Exception`
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Connection\Loader\Exception\LoaderException` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Connection\Loader\Exception\InvalidConfiguration` has been deleted
+     - Namespace `Doctrine\Migrations\Configuration\Exception`
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\XmlNotValid` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\YamlNotAvailable` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\FileAlreadyLoaded` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\JsonNotValid` has been deleted
+         - REMOVED: Class `Doctrine\Migrations\Configuration\Exception\YamlNotValid` has been deleted
+         - CHANGED: The number of required arguments for `Doctrine\Migrations\Configuration\Exception\FileNotFound::new()` increased from 0 to 1
+ - Namespace `Doctrine\Migrations\Event\MigrationsEventArgs`
+     - CHANGED: Class `Doctrine\Migrations\Event\MigrationsEventArgs` became final
+     - REMOVED: Method `Doctrine\Migrations\Event\MigrationsEventArgs#getConfiguration()` was removed
+     - REMOVED: Method `Doctrine\Migrations\Event\MigrationsEventArgs#getDirection()` was removed,
+     use `Doctrine\Migrations\Event\MigrationsEventArgs#getPlan()`
+     - REMOVED: Method `Doctrine\Migrations\Event\MigrationsEventArgs#isDryRun()` was removed, 
+     use `Doctrine\Migrations\Event\MigrationsEventArgs#getMigratorConfiguration()`
+     - CHANGED: `Doctrine\Migrations\Event\MigrationsEventArgs#__construct()` arguments have been updated
+    - Namespace `Doctrine\Migrations\Event\MigrationsVersionEventArgs`    
+         - CHANGED: Class `Doctrine\Migrations\Event\MigrationsVersionEventArgs` became final
+         - REMOVED: Method `Doctrine\Migrations\Event\MigrationsVersionEventArgs#getVersion()` was removed
+         use `Doctrine\Migrations\Event\MigrationsEventArgs#getPlan()`
+ - Namespace `Doctrine\Migrations\Finder`
+     - REMOVED: These ancestors of `Doctrine\Migrations\Finder\RecursiveRegexFinder` have been removed: ["Doctrine\\Migrations\\Finder\\MigrationDeepFinder"]
+     - REMOVED: Class `Doctrine\Migrations\Finder\MigrationDeepFinder` has been deleted
+ - Namespace `Doctrine\Migrations\Tools\Console\Command` 
+     - CHANGED: All non abstract classes in `Doctrine\Migrations\Tools\Console\Command\*` became final
+     - REMOVED: Class `Doctrine\Migrations\Tools\Console\Command\AbstractCommand` has been renamed into `Doctrine\Migrations\Tools\Console\Command\DoctrineCommand` and has been marked as internal 
+     - CHANGED: Method `Doctrine\Migrations\Tools\Console\Command\*Command#__construct()` changed signature into  `(?Doctrine\Migrations\DependencyFactory $di, ?string $name)`
+     - CHANGED: Method `initialize()` of Class `Doctrine\Migrations\Tools\Console\Command\AbstractCommand` visibility reduced from `public` to `protected`
+     - CHANGED: Method `execute()` of Class `Doctrine\Migrations\Tools\Console\Command\*Command` visibility reduced from `public` to `protected`
+     - REMOVED: Method `Doctrine\Migrations\Tools\Console\Command\DiffCommand#createMigrationDiffGenerator()` was removed
+     - Namespace `Doctrine\Migrations\Tools\Console\Exception`
+         - CHANGED: The number of required arguments for `Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations::new()` increased from 0 to 1
+         - REMOVED: Class `Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified` has been deleted
+     - Namespace `Migrations\Tools\Console\Helper`
+         - REMOVED: All classes and namespaces are marked as internal or have been removed, 
+         use `Doctrine\Migrations\DependencyFactory` instead
+ - Namespace `Doctrine\Migrations\AbstractMigration`       
+     - CHANGED: The method `Doctrine\Migrations\AbstractMigration#__construct()` changed signature into `(Doctrine\DBAL\Connection $conn, PSR\Log\LoggerInterface $logger)`
+     - REMOVED: Property `Doctrine\Migrations\AbstractMigration#$version` was removed 
+ - Namespace `Doctrine\Migrations\Provider`
+     - REMOVED: Class `Doctrine\Migrations\Provider\SchemaProviderInterface` has been deleted
+     - REMOVED: These ancestors of `Doctrine\Migrations\Provider\StubSchemaProvider` have been removed: ["Doctrine\\Migrations\\Provider\\SchemaProviderInterface"]
+ - Namespace `Doctrine\Migrations\Exception`        
+     - REMOVED: Class `Doctrine\Migrations\Exception\MigrationNotConvertibleToSql` has been deleted
+     - REMOVED: Class `Doctrine\Migrations\Exception\MigrationsDirectoryRequired` has been deleted
+ - REMOVED: Class `Doctrine\Migrations\Version\Factory` became the interface `Doctrine\Migrations\Version\MigrationFactory`
+ - REMOVED: Class `Doctrine\Migrations\OutputWriter` has been deleted, 
+ use `Psr\Log\Loggerinterface` 
+
+
+
 
 # Upgrade to 2.0
 
