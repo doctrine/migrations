@@ -4,12 +4,18 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\DiffGenerator;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
@@ -93,6 +99,52 @@ final class DiffCommandTest extends TestCase
             ]);
 
         $this->diffCommand->execute($input, $output);
+    }
+
+    public function testAvailableMigrationsCancel() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $m1 = new AvailableMigration(new Version('A'), $this->createMock(AbstractMigration::class));
+
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1]));
+
+        $this->diffCommand->expects(self::once())
+            ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(false);
+
+        $this->migrationDiffGenerator->expects(self::never())->method('generate');
+
+        $statusCode = $this->diffCommand->execute($input, $output);
+
+        self::assertSame(3, $statusCode);
+    }
+
+    public function testExecutedUnavailableMigrationsCancel() : void
+    {
+        $input  = $this->createMock(InputInterface::class);
+        $output = $this->createMock(OutputInterface::class);
+
+        $e1 = new ExecutedMigration(new Version('A'));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1]));
+
+        $this->diffCommand->expects(self::once())
+            ->method('canExecute')
+            ->with('Are you sure you wish to continue? (y/n)')
+            ->willReturn(false);
+
+        $this->migrationDiffGenerator->expects(self::never())->method('generate');
+
+        $statusCode = $this->diffCommand->execute($input, $output);
+
+        self::assertSame(3, $statusCode);
     }
 
     protected function setUp() : void
