@@ -3,7 +3,7 @@ build:
         analysis:
             environment:
                 php:
-                    version: 7.1
+                    version: 7.2
             cache:
                 disabled: false
                 directories:
@@ -16,7 +16,7 @@ build:
                     - phpcs-run
     dependencies:
         override:
-            - composer install --ignore-platform-reqs --no-interaction
+            - composer install --no-interaction
 
 tools:
     external_code_coverage:
