@@ -12,7 +12,7 @@ use Symfony\Component\Console\Output\OutputInterface;
  * The StatusCommand class is responsible for outputting what the current state is of all your migrations. It shows
  * what your current version is, how many new versions you have to execute, etc. and details about each of your migrations.
  */
-class StatusCommand extends DoctrineCommand
+final class StatusCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:status';

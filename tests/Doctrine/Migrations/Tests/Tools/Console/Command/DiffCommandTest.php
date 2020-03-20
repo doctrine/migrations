@@ -11,6 +11,8 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use function sys_get_temp_dir;
@@ -23,11 +25,14 @@ final class DiffCommandTest extends TestCase
     /** @var Configuration */
     private $configuration;
 
-    /** @var DiffCommand|MockObject */
+    /** @var DiffCommand */
     private $diffCommand;
 
-    /** @var MockObject */
+    /** @var MockObject|DependencyFactory */
     private $dependencyFactory;
+
+    /** @var MockObject|QuestionHelper */
+    private $questions;
 
     public function testExecute() : void
     {
@@ -64,19 +69,10 @@ final class DiffCommandTest extends TestCase
             ->with('namespace')
             ->willReturn('FooNs');
 
-        $input->expects(self::at(6))
-            ->method('getOption')
-            ->with('editor-cmd')
-            ->willReturn('mate');
-
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('FooNs\\Version1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
-
-        $this->diffCommand->expects(self::once())
-            ->method('procOpen')
-            ->with('mate', '/path/to/migration.php');
 
         $output->expects(self::once())
             ->method('writeln')
@@ -117,9 +113,10 @@ final class DiffCommandTest extends TestCase
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 
-        $this->diffCommand = $this->getMockBuilder(DiffCommand::class)
-            ->setConstructorArgs([$this->dependencyFactory])
-            ->onlyMethods(['procOpen'])
-            ->getMock();
+        $this->diffCommand = new DiffCommand($this->dependencyFactory);
+
+        $this->questions = $this->createMock(QuestionHelper::class);
+
+        $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
     }
 }

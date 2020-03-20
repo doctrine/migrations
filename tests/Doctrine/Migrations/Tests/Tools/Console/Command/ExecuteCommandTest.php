@@ -19,13 +19,15 @@ use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function sys_get_temp_dir;
 
 class ExecuteCommandTest extends TestCase
 {
-    /** @var ExecuteCommand|MockObject */
+    /** @var ExecuteCommand */
     private $executeCommand;
 
     /** @var MockObject|DependencyFactory */
@@ -42,6 +44,9 @@ class ExecuteCommandTest extends TestCase
 
     /** @var MigrationPlanCalculator|MockObject */
     private $planCalculator;
+
+    /** @var MockObject|QuestionHelper */
+    private $questions;
 
     /**
      * @param mixed $arg
@@ -85,8 +90,8 @@ class ExecuteCommandTest extends TestCase
 
     public function testExecute() : void
     {
-        $this->executeCommand->expects(self::once())
-            ->method('canExecute')
+        $this->questions->expects(self::once())
+            ->method('ask')
             ->willReturn(true);
 
         $this->migrator
@@ -118,8 +123,8 @@ class ExecuteCommandTest extends TestCase
             ->with([new Version('1'), new Version('2')])
             ->willReturn($pl);
 
-        $this->executeCommand->expects(self::once())
-            ->method('canExecute')
+        $this->questions->expects(self::once())
+            ->method('ask')
             ->willReturn(true);
 
         $this->migrator
@@ -141,8 +146,8 @@ class ExecuteCommandTest extends TestCase
 
     public function testExecuteCancel() : void
     {
-        $this->executeCommand->expects(self::once())
-            ->method('canExecute')
+        $this->questions->expects(self::once())
+            ->method('ask')
             ->willReturn(false);
 
         $this->migrator
@@ -204,10 +209,10 @@ class ExecuteCommandTest extends TestCase
             ->method('getQueryWriter')
             ->willReturn($this->queryWriter);
 
-        $this->executeCommand = $this->getMockBuilder(ExecuteCommand::class)
-            ->setConstructorArgs([$this->dependencyFactory])
-            ->onlyMethods(['canExecute'])
-            ->getMock();
+        $this->executeCommand = new ExecuteCommand($this->dependencyFactory);
+
+        $this->questions = $this->createMock(QuestionHelper::class);
+        $this->executeCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
 
         $this->executeCommandTester = new CommandTester($this->executeCommand);
     }

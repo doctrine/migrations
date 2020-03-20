@@ -16,7 +16,7 @@ use function sprintf;
 /**
  * The GenerateCommand class is responsible for generating a blank migration class for you to modify to your needs.
  */
-class GenerateCommand extends DoctrineCommand
+final class GenerateCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:generate';
@@ -26,12 +26,6 @@ class GenerateCommand extends DoctrineCommand
         $this
             ->setAliases(['generate'])
             ->setDescription('Generate a blank migration class.')
-            ->addOption(
-                'editor-cmd',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Open file with this command upon creation.'
-            )
             ->addOption(
                 'namespace',
                 null,
@@ -43,9 +37,6 @@ The <info>%command.name%</info> command generates a blank migration class:
 
     <info>%command.full_name%</info>
 
-You can optionally specify a <comment>--editor-cmd</comment> option to open the generated file in your favorite editor:
-
-    <info>%command.full_name% --editor-cmd=mate</info>
 EOT
             );
 
@@ -72,13 +63,6 @@ EOT
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
         $path = $migrationGenerator->generateMigration($fqcn);
-
-        $editorCommand = $input->getOption('editor-cmd');
-
-        if ($editorCommand !== null) {
-            assert(is_string($editorCommand));
-            $this->procOpen($editorCommand, $path);
-        }
 
         $output->writeln([
             sprintf('Generated new migration class to "<info>%s</info>"', $path),

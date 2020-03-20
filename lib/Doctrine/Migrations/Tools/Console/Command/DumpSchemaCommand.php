@@ -23,7 +23,7 @@ use function strpos;
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
-class DumpSchemaCommand extends DoctrineCommand
+final class DumpSchemaCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';
@@ -42,12 +42,6 @@ The <info>%command.name%</info> command dumps the schema for your database to a 
 
 After dumping your schema to a migration, you can rollup your migrations using the <info>migrations:rollup</info> command.
 EOT
-            )
-            ->addOption(
-                'editor-cmd',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Open file with this command upon creation.'
             )
             ->addOption(
                 'formatted',
@@ -116,13 +110,6 @@ EOT
             $formatted,
             $lineLength
         );
-
-        $editorCommand = $input->getOption('editor-cmd');
-
-        if ($editorCommand !== null) {
-            assert(is_string($editorCommand));
-            $this->procOpen($editorCommand, $path);
-        }
 
         $output->writeln([
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),

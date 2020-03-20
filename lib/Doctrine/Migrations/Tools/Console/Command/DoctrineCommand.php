@@ -15,9 +15,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use function escapeshellarg;
 use function is_string;
-use function proc_open;
 
 /**
  * The DoctrineCommand class provides base functionality for the other migrations commands to extend from.
@@ -103,10 +101,5 @@ abstract class DoctrineCommand extends Command
         OutputInterface $output
     ) : bool {
         return ! $input->isInteractive() || $this->askConfirmation($question, $input, $output);
-    }
-
-    protected function procOpen(string $editorCommand, string $path) : void
-    {
-        proc_open($editorCommand . ' ' . escapeshellarg($path), [], $pipes);
     }
 }

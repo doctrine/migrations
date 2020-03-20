@@ -27,7 +27,7 @@ final class GenerateCommandTest extends TestCase
     /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var GenerateCommand|MockObject */
+    /** @var GenerateCommand */
     private $generateCommand;
 
     /** @var CommandTester */
@@ -40,11 +40,7 @@ final class GenerateCommandTest extends TestCase
             ->with('FooNs\\Version1234')
             ->willReturn('/path/to/migration.php');
 
-        $this->generateCommand->expects(self::once())
-            ->method('procOpen')
-            ->with('mate', '/path/to/migration.php');
-
-        $this->generateCommandTest->execute(['--editor-cmd' => 'mate']);
+        $this->generateCommandTest->execute([]);
         $output = $this->generateCommandTest->getDisplay(true);
 
         self::assertSame([
@@ -82,10 +78,8 @@ final class GenerateCommandTest extends TestCase
             ->method('getMigrationGenerator')
             ->willReturn($this->migrationGenerator);
 
-        $this->generateCommand     = $this->getMockBuilder(GenerateCommand::class)
-            ->setConstructorArgs([$this->dependencyFactory])
-            ->onlyMethods(['procOpen'])
-            ->getMock();
+        $this->generateCommand = new GenerateCommand($this->dependencyFactory);
+
         $this->generateCommandTest = new CommandTester($this->generateCommand);
     }
 }

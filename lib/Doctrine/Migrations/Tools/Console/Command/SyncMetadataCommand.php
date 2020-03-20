@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-class SyncMetadataCommand extends DoctrineCommand
+final class SyncMetadataCommand extends DoctrineCommand
 {
     /** @var string */
     protected static $defaultName = 'migrations:sync-metadata-storage';
