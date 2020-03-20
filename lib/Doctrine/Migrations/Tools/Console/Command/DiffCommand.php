@@ -40,9 +40,6 @@ The <info>%command.name%</info> command generates a migration by comparing your 
 
     <info>%command.full_name%</info>
 
-You can optionally specify a <comment>--editor-cmd</comment> option to open the generated file in your favorite editor:
-
-    <info>%command.full_name% --editor-cmd=mate</info>
 EOT
             )
             ->addOption(
@@ -50,12 +47,6 @@ EOT
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The namespace to use for the migration (must be in the list of configured namespaces)'
-            )
-            ->addOption(
-                'editor-cmd',
-                null,
-                InputOption::VALUE_REQUIRED,
-                'Open file with this command upon creation.'
             )
             ->addOption(
                 'filter-expression',
@@ -143,13 +134,6 @@ EOT
             }
 
             throw $exception;
-        }
-
-        $editorCommand = $input->getOption('editor-cmd');
-
-        if ($editorCommand !== null) {
-            assert(is_string($editorCommand));
-            $this->procOpen($output, $editorCommand, $path);
         }
 
         $output->writeln([

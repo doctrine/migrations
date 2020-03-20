@@ -15,7 +15,6 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
-use Symfony\Component\Process\Process;
 use function is_string;
 
 /**
@@ -102,14 +101,5 @@ abstract class DoctrineCommand extends Command
         OutputInterface $output
     ) : bool {
         return ! $input->isInteractive() || $this->askConfirmation($question, $input, $output);
-    }
-
-    protected function procOpen(OutputInterface $output, string $editorCommand, string $path) : void
-    {
-        $process = new Process([$editorCommand, $path]);
-        $process->setTty(true);
-        $this->getHelper('process')->mustRun($output, $process, null, static function ($type, $buffer) : void {
-            echo $buffer;
-        });
     }
 }

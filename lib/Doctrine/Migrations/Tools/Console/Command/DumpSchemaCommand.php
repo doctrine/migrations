@@ -44,12 +44,6 @@ After dumping your schema to a migration, you can rollup your migrations using t
 EOT
             )
             ->addOption(
-                'editor-cmd',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Open file with this command upon creation.'
-            )
-            ->addOption(
                 'formatted',
                 null,
                 InputOption::VALUE_NONE,
@@ -116,13 +110,6 @@ EOT
             $formatted,
             $lineLength
         );
-
-        $editorCommand = $input->getOption('editor-cmd');
-
-        if ($editorCommand !== null) {
-            assert(is_string($editorCommand));
-            $this->procOpen($output, $editorCommand, $path);
-        }
 
         $output->writeln([
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),

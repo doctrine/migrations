@@ -17,8 +17,6 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\ProcessHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function explode;
 use function sys_get_temp_dir;
@@ -40,9 +38,6 @@ final class DumpSchemaCommandTest extends TestCase
 
     /** @var DumpSchemaCommand */
     private $dumpSchemaCommand;
-
-    /** @var MockObject|ProcessHelper */
-    private $process;
 
     /** @var CommandTester */
     private $dumpSchemaCommandTester;
@@ -72,7 +67,6 @@ final class DumpSchemaCommandTest extends TestCase
             ->with('FooNs\\Version1234', ['/foo/'], true, 80);
 
         $this->dumpSchemaCommandTester->execute([
-            '--editor-cmd' => 'test',
             '--filter-tables' => ['/foo/'],
             '--line-length' => 80,
             '--formatted' => true,
@@ -126,9 +120,6 @@ final class DumpSchemaCommandTest extends TestCase
             ->willReturn($this->migrationRepository);
 
         $this->dumpSchemaCommand = new DumpSchemaCommand($this->dependencyFactory);
-
-        $this->process = $this->createMock(ProcessHelper::class);
-        $this->dumpSchemaCommand->setHelperSet(new HelperSet(['process' => $this->process]));
 
         $this->dumpSchemaCommandTester = new CommandTester($this->dumpSchemaCommand);
     }
