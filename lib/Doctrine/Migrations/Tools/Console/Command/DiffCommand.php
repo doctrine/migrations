@@ -88,7 +88,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    public function execute(
+    protected function execute(
         InputInterface $input,
         OutputInterface $output
     ) : int {
@@ -129,11 +129,9 @@ EOT
         $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
         $newMigrations                 = $statusCalculator->getNewMigrations();
 
-        if ($this->checkNewMigrations($newMigrations, $input, $output) === false) {
-            return 3;
-        }
+        if ($this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input, $output) === false) {
+            $output->writeln('<error>Migration cancelled!</error>');
 
-        if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
             return 3;
         }
 
@@ -176,59 +174,30 @@ EOT
         return 0;
     }
 
-    private function checkNewMigrations(
+    private function checkNewMigrationsOrExecutedUnavailable(
         AvailableMigrationsList $newMigrations,
+        ExecutedMigrationsSet $executedUnavailableMigrations,
         InputInterface $input,
         OutputInterface $output
     ) : bool {
+        if (count($newMigrations) === 0 && count($executedUnavailableMigrations) === 0) {
+            return true;
+        }
+
         if (count($newMigrations) !== 0) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s available migrations to execute.</error>',
                 count($newMigrations)
             ));
-
-            $question = 'Are you sure you wish to continue? (y/n)';
-
-            if (! $this->canExecute($question, $input, $output)) {
-                $output->writeln('<error>Migration cancelled!</error>');
-
-                return false;
-            }
         }
 
-        return true;
-    }
-
-    private function checkExecutedUnavailableMigrations(
-        ExecutedMigrationsSet $executedUnavailableMigrations,
-        InputInterface $input,
-        OutputInterface $output
-    ) : bool {
         if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
                 '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
                 count($executedUnavailableMigrations)
             ));
-
-            foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
-                $output->writeln(sprintf(
-                    '    <comment>>></comment> %s (<comment>%s</comment>)',
-                    $executedUnavailableMigration->getExecutedAt() !== null
-                        ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
-                        : null,
-                    $executedUnavailableMigration->getVersion()
-                ));
-            }
-
-            $question = 'Are you sure you wish to continue? (y/n)';
-
-            if (! $this->canExecute($question, $input, $output)) {
-                $output->writeln('<error>Migration cancelled!</error>');
-
-                return false;
-            }
         }
 
-        return true;
+        return $this->canExecute('Are you sure you wish to continue? (y/n)', $input, $output);
     }
 }

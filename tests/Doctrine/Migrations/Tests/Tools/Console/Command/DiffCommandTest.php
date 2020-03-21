@@ -20,9 +20,10 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
+use function explode;
 use function sys_get_temp_dir;
+use function trim;
 
 final class DiffCommandTest extends TestCase
 {
@@ -44,101 +45,108 @@ final class DiffCommandTest extends TestCase
     /** @var MockObject|QuestionHelper */
     private $questions;
 
+    /** @var CommandTester */
+    private $diffCommandTester;
+
+    /** @var ClassNameGenerator|MockObject */
+    private $classNameGenerator;
+
     public function testExecute() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
 
-        $input->expects(self::at(0))
-            ->method('getOption')
-            ->with('filter-expression')
-            ->willReturn('filter expression');
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([]));
 
-        $input->expects(self::at(1))
-            ->method('getOption')
-            ->with('formatted')
-            ->willReturn(true);
-
-        $input->expects(self::at(2))
-            ->method('getOption')
-            ->with('line-length')
-            ->willReturn(80);
-
-        $input->expects(self::at(3))
-            ->method('getOption')
-            ->with('allow-empty-diff')
-            ->willReturn(true);
-
-        $input->expects(self::at(4))
-            ->method('getOption')
-            ->with('check-database-platform')
-            ->willReturn(true);
-
-        $input->expects(self::at(5))
-            ->method('getOption')
-            ->with('namespace')
-            ->willReturn('FooNs');
+        $this->classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
 
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('FooNs\\Version1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with([
-                'Generated new migration class to "<info>/path/to/migration.php</info>"',
-                '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\\\\Version1234\'</info>',
-                '',
-                'To revert the migration you can use <info>migrations:execute --down \'FooNs\\\\Version1234\'</info>',
-            ]);
+        $this->diffCommandTester->execute([
+            '--filter-expression' => 'filter expression',
+            '--formatted' => true,
+            '--line-length' => 80,
+            '--allow-empty-diff' => true,
+            '--check-database-platform' => true,
+            '--namespace' => 'FooNs',
+        ]);
 
-        $this->diffCommand->execute($input, $output);
+        $output = $this->diffCommandTester->getDisplay(true);
+
+        self::assertSame([
+            'Generated new migration class to "/path/to/migration.php"',
+            '',
+            'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\\\\Version1234\'',
+            '',
+            'To revert the migration you can use migrations:execute --down \'FooNs\\\\Version1234\'',
+        ], explode("\n", trim($output)));
     }
 
     public function testAvailableMigrationsCancel() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
-
         $m1 = new AvailableMigration(new Version('A'), $this->createMock(AbstractMigration::class));
 
         $this->migrationStatusCalculator
             ->method('getNewMigrations')
             ->willReturn(new AvailableMigrationsList([$m1]));
 
-        $this->diffCommand->expects(self::once())
-            ->method('canExecute')
-            ->with('Are you sure you wish to continue? (y/n)')
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([]));
+
+        $this->questions->expects(self::once())
+            ->method('ask')
             ->willReturn(false);
 
         $this->migrationDiffGenerator->expects(self::never())->method('generate');
 
-        $statusCode = $this->diffCommand->execute($input, $output);
+        $statusCode = $this->diffCommandTester->execute([]);
+
+        $output = $this->diffCommandTester->getDisplay(true);
+        self::assertSame([
+            'WARNING! You have 1 available migrations to execute.',
+            'Migration cancelled!',
+        ], explode("\n", trim($output)));
 
         self::assertSame(3, $statusCode);
     }
 
     public function testExecutedUnavailableMigrationsCancel() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $e1 = new ExecutedMigration(new Version('B'));
+        $m1 = new AvailableMigration(new Version('A'), $this->createMock(AbstractMigration::class));
 
-        $e1 = new ExecutedMigration(new Version('A'));
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1]));
 
         $this->migrationStatusCalculator
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1]));
 
-        $this->diffCommand->expects(self::once())
-            ->method('canExecute')
-            ->with('Are you sure you wish to continue? (y/n)')
+        $this->questions->expects(self::once())
+            ->method('ask')
             ->willReturn(false);
 
         $this->migrationDiffGenerator->expects(self::never())->method('generate');
 
-        $statusCode = $this->diffCommand->execute($input, $output);
+        $statusCode = $this->diffCommandTester->execute([]);
+
+        $output = $this->diffCommandTester->getDisplay(true);
+        self::assertSame([
+            'WARNING! You have 1 available migrations to execute.',
+            'WARNING! You have 1 previously executed migrations in the database that are not registered migrations.',
+            'Migration cancelled!',
+        ], explode("\n", trim($output)));
 
         self::assertSame(3, $statusCode);
     }
@@ -152,15 +160,11 @@ final class DiffCommandTest extends TestCase
 
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 
-        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
-        $classNameGenerator->expects(self::once())
-            ->method('generateClassName')
-            ->with('FooNs')
-            ->willReturn('FooNs\\Version1234');
+        $this->classNameGenerator = $this->createMock(ClassNameGenerator::class);
 
-        $this->dependencyFactory->expects(self::once())
+        $this->dependencyFactory->expects(self::any())
             ->method('getClassNameGenerator')
-            ->willReturn($classNameGenerator);
+            ->willReturn($this->classNameGenerator);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getConfiguration')
@@ -174,10 +178,10 @@ final class DiffCommandTest extends TestCase
             ->method('getMigrationStatusCalculator')
             ->willReturn($this->migrationStatusCalculator);
 
-        $this->diffCommand = new DiffCommand($this->dependencyFactory);
+        $this->diffCommand       = new DiffCommand($this->dependencyFactory);
+        $this->diffCommandTester = new CommandTester($this->diffCommand);
 
         $this->questions = $this->createMock(QuestionHelper::class);
-
         $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
     }
 }
