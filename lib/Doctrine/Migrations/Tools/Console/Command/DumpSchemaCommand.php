@@ -76,7 +76,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : ?int {
+    ) : int {
         $formatted  = $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 

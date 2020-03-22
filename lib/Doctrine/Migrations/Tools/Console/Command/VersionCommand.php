@@ -102,7 +102,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw InvalidOptionUsage::new('You must specify whether you want to --add or --delete the specified version.');

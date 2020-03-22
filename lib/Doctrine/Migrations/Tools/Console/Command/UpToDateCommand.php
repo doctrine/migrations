@@ -45,7 +45,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $statusCalculator = $this->getDependencyFactory()->getMigrationStatusCalculator();
 
