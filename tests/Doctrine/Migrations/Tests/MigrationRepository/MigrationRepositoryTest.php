@@ -131,10 +131,7 @@ class MigrationRepositoryTest extends TestCase
     {
         $this->versionFactory
             ->expects(self::exactly(3))
-            ->method('createVersion')
-            ->willReturnCallback(function ($class) : MockObject {
-                return $this->createMock($class);
-            });
+            ->method('createVersion');
 
         $migrations = $this->migrationRepository->getMigrations();
 
