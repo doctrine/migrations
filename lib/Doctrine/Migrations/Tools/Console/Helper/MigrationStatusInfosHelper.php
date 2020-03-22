@@ -136,8 +136,7 @@ class MigrationStatusInfosHelper
                 'Type' => $storage!== null ? get_class($storage) : null,
             ],
             'Database' => [
-                'Driver' => $this->connection->getDriver()->getName(),
-                'Host' => $this->connection->getHost(),
+                'Driver' => get_class($this->connection->getDriver()),
                 'Name' => $this->connection->getDatabase(),
             ],
             'Versions' => [

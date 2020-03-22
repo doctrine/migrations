@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\InlineParameterFormatter;
 use PHPUnit\Framework\TestCase;
 
@@ -38,11 +38,11 @@ class InlineParameterFormatterTest extends TestCase
         ];
 
         $types = [
-            Type::STRING,
-            Type::INTEGER,
-            Type::SIMPLE_ARRAY,
-            Type::BOOLEAN,
-            Type::BOOLEAN,
+            Types::STRING,
+            Types::INTEGER,
+            Types::SIMPLE_ARRAY,
+            Types::BOOLEAN,
+            Types::BOOLEAN,
             'unknown',
             'unknown',
             'unknown',
