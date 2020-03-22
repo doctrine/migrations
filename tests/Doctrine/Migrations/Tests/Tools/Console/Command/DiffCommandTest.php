@@ -162,7 +162,7 @@ final class DiffCommandTest extends TestCase
 
         $this->classNameGenerator = $this->createMock(ClassNameGenerator::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getClassNameGenerator')
             ->willReturn($this->classNameGenerator);
 
@@ -174,8 +174,7 @@ final class DiffCommandTest extends TestCase
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 
-        $this->dependencyFactory->expects(self::any())
-            ->method('getMigrationStatusCalculator')
+        $this->dependencyFactory->method('getMigrationStatusCalculator')
             ->willReturn($this->migrationStatusCalculator);
 
         $this->diffCommand       = new DiffCommand($this->dependencyFactory);
