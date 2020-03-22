@@ -58,7 +58,7 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertTrue($configuration->isDryRun());
 
                 return ['A'];
@@ -97,7 +97,7 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];
@@ -130,7 +130,7 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];
@@ -153,7 +153,7 @@ class ExecuteCommandTest extends TestCase
         $this->migrator
             ->expects(self::never())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];

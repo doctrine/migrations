@@ -52,7 +52,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationRepository
             ->expects(self::any())
             ->method('hasMigration')
-            ->willReturnCallback(static function ($version) use ($m) {
+            ->willReturnCallback(static function ($version) use ($m) : bool {
                 return isset($m[$version]);
             });
 
