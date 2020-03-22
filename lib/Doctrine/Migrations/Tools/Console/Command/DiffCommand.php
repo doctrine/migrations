@@ -186,14 +186,14 @@ EOT
 
         if (count($newMigrations) !== 0) {
             $output->writeln(sprintf(
-                '<error>WARNING! You have %s available migrations to execute.</error>',
+                '<error>WARNING! You have %d available migrations to execute.</error>',
                 count($newMigrations)
             ));
         }
 
         if (count($executedUnavailableMigrations) !== 0) {
             $output->writeln(sprintf(
-                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
+                '<error>WARNING! You have %d previously executed migrations in the database that are not registered migrations.</error>',
                 count($executedUnavailableMigrations)
             ));
         }
