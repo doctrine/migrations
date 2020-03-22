@@ -23,7 +23,12 @@ final class FileQueryWriterTest extends MigrationTestCase
     private function getSqlFilesList(string $path) : array
     {
         if (is_dir($path)) {
-            return glob(realpath($path) . '/*.sql') ?: [];
+            $list = glob(realpath($path) . '/*.sql');
+            if ($list === false) {
+                return [];
+            }
+
+            return $list;
         }
 
         if (is_file($path)) {

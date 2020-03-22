@@ -31,7 +31,8 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
     {
         $this->mirationDirectoryHelper = new MigrationDirectoryHelper();
         $this->configuration           = new Configuration();
-        $this->tempDir                 = tempnam(sys_get_temp_dir(), 'DoctrineMigrations-tests') ?: '/tmp';
+        $tempDir                       = tempnam(sys_get_temp_dir(), 'DoctrineMigrations-tests');
+        $this->tempDir                 = $tempDir === false ? '/tmp' : $tempDir;
         @unlink($this->tempDir);
         mkdir($this->tempDir);
         $this->configuration->addMigrationsDirectory('DoctrineMigrations', $this->tempDir);

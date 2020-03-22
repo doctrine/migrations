@@ -14,7 +14,11 @@ class ConfigurationFileWithFallbackTest extends TestCase
 {
     public function testFileLoader() : void
     {
-        $dir = getcwd() ?: '.';
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
         chdir(__DIR__ . '/../_files_loader');
 
         try {
@@ -29,7 +33,11 @@ class ConfigurationFileWithFallbackTest extends TestCase
 
     public function testFileLoaderFallback() : void
     {
-        $dir = getcwd() ?: '.';
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
         chdir(__DIR__ . '/../_files_loader');
 
         try {

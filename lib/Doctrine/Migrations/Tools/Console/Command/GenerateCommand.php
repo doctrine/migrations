@@ -49,7 +49,10 @@ EOT
 
         $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 
-        $namespace = $input->getOption('namespace') ?: null;
+        $namespace = $input->getOption('namespace');
+        if ($namespace === '') {
+            $namespace = null;
+        }
 
         $dirs = $configuration->getMigrationDirectories();
         if ($namespace === null) {

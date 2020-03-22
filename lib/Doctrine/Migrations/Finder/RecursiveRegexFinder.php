@@ -21,7 +21,7 @@ final class RecursiveRegexFinder extends Finder
 
     public function __construct(?string $pattern = null)
     {
-        $this->pattern = $pattern ?: sprintf(
+        $this->pattern = $pattern ?? sprintf(
             '#^.+\\%s[^\\%s]+\\.php$#i',
             DIRECTORY_SEPARATOR,
             DIRECTORY_SEPARATOR

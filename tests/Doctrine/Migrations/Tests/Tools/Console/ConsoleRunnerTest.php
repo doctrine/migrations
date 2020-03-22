@@ -29,7 +29,11 @@ class ConsoleRunnerTest extends TestCase
      */
     public function testDependencyFactory(string $directory) : void
     {
-        $dir = getcwd() ?: '.';
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
         chdir($directory);
 
         try {
@@ -43,7 +47,10 @@ class ConsoleRunnerTest extends TestCase
 
     public function testInvalidCliConfigTriggersException() : void
     {
-        $dir = getcwd() ?: '.';
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
 
         try {
             $this->expectException(RuntimeException::class);
@@ -63,7 +70,11 @@ class ConsoleRunnerTest extends TestCase
 
     public function testNoDependencyFactoryWhenNoCliConfig() : void
     {
-        $dir = getcwd() ?: '.';
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
         chdir(__DIR__ . '/../');
 
         try {
