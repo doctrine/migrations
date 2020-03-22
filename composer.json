@@ -30,7 +30,7 @@
         "phpstan/phpstan-phpunit": "^0.12",
         "phpstan/phpstan-strict-rules": "^0.12",
         "phpstan/phpstan-symfony": "^0.12",
-        "phpunit/phpunit": "^8.3",
+        "phpunit/phpunit": "^8.4",
         "symfony/process": "^3.4||^4.0||^5.0",
         "symfony/yaml": "^3.4||^4.0||^5.0"
     },
