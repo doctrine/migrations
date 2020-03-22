@@ -24,6 +24,7 @@ use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
+use Throwable;
 use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
@@ -41,6 +42,8 @@ final class AliasResolverTest extends TestCase
     private $statusCalculator;
 
     /**
+     * @param class-string<Throwable>|null $expectedException
+     *
      * @dataProvider getAliases
      */
     public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
@@ -68,6 +71,8 @@ final class AliasResolverTest extends TestCase
     }
 
     /**
+     * @param class-string<Throwable>|null $expectedException
+     *
      * @dataProvider getAliasesWithNoExecuted
      */
     public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
