@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\MigrationRepository;
 
+use Closure;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
@@ -150,11 +151,8 @@ class MigrationRepositoryTest extends TestCase
     {
         $this->versionFactory = $this->createMock(MigrationFactory::class);
         $this->versionFactory
-            ->expects(self::any())
             ->method('createVersion')
-            ->willReturnCallback(function ($class) : MockObject {
-                return $this->createMock($class);
-            });
+            ->willReturnCallback(Closure::fromCallable([$this, 'createStub']));
 
         $this->migrationRepository = new MigrationRepository(
             [],
