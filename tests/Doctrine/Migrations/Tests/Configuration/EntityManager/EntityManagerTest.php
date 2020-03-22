@@ -27,7 +27,6 @@ final class EntityManagerTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-loader.php');
         $em     = $loader->getEntityManager();
 
-        self::assertSame('Foo', $em->getConfiguration()->getProxyNamespace());
         self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 
@@ -36,7 +35,6 @@ final class EntityManagerTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/migrations-em.php');
         $em     = $loader->getEntityManager();
 
-        self::assertSame('Foo', $em->getConfiguration()->getProxyNamespace());
         self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 

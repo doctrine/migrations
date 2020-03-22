@@ -12,7 +12,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
-use Doctrine\DBAL\Types\Type;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
@@ -127,9 +127,9 @@ final class TableMetadataStorage implements MetadataStorage
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : round($result->getTime()*1000),
             ], [
-                Type::STRING,
-                Type::DATETIME,
-                Type::INTEGER,
+                Types::STRING,
+                Types::DATETIME_MUTABLE,
+                Types::INTEGER,
             ]);
         }
     }
