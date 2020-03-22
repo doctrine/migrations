@@ -38,7 +38,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $storage       = $this->getDependencyFactory()->getMetadataStorage();
         $migrationRepo = $this->getDependencyFactory()->getMigrationRepository();

@@ -98,7 +98,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : ?int
+    protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $versions  = $input->getArgument('versions');
         $path      = $input->getOption('write-sql');
