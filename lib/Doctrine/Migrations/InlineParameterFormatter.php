@@ -91,7 +91,5 @@ final class InlineParameterFormatter implements ParameterFormatter
         if (is_bool($value)) {
             return $value === true ? 'true' : 'false';
         }
-
-        return '?';
     }
 }
