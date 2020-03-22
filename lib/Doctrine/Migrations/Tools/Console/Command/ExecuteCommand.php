@@ -71,7 +71,7 @@ final class ExecuteCommand extends DoctrineCommand
 The <info>%command.name%</info> command executes migration versions up or down manually:
 
     <info>%command.full_name% FQCN</info>
-    
+
 If no <comment>--up</comment> or <comment>--down</comment> option is specified it defaults to up:
 
     <info>%command.full_name% FQCN --down</info>
