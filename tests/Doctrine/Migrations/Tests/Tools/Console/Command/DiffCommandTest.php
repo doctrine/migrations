@@ -93,7 +93,7 @@ final class DiffCommandTest extends TestCase
 
     public function testAvailableMigrationsCancel() : void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->createMock(AbstractMigration::class));
+        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
 
         $this->migrationStatusCalculator
             ->method('getNewMigrations')
@@ -123,7 +123,7 @@ final class DiffCommandTest extends TestCase
     public function testExecutedUnavailableMigrationsCancel() : void
     {
         $e1 = new ExecutedMigration(new Version('B'));
-        $m1 = new AvailableMigration(new Version('A'), $this->createMock(AbstractMigration::class));
+        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
 
         $this->migrationStatusCalculator
             ->method('getNewMigrations')
@@ -153,8 +153,8 @@ final class DiffCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);
-        $this->migrationStatusCalculator = $this->createMock(MigrationStatusCalculator::class);
+        $this->migrationDiffGenerator    = $this->createStub(DiffGenerator::class);
+        $this->migrationStatusCalculator = $this->createStub(MigrationStatusCalculator::class);
         $this->configuration             = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
@@ -180,7 +180,7 @@ final class DiffCommandTest extends TestCase
         $this->diffCommand       = new DiffCommand($this->dependencyFactory);
         $this->diffCommandTester = new CommandTester($this->diffCommand);
 
-        $this->questions = $this->createMock(QuestionHelper::class);
+        $this->questions = $this->createStub(QuestionHelper::class);
         $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
     }
 }
