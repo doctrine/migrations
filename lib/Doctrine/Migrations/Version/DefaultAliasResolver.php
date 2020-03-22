@@ -64,8 +64,6 @@ final class DefaultAliasResolver implements AliasResolver
         switch ($alias) {
             case self::ALIAS_FIRST:
                 return new Version('0');
-
-                break;
             case self::ALIAS_CURRENT:
                 try {
                     return $executedMigrations->getLast()->getVersion();
@@ -73,7 +71,7 @@ final class DefaultAliasResolver implements AliasResolver
                     return new Version('0');
                 }
 
-                break;
+                // no break because of return
             case self::ALIAS_PREV:
                 try {
                     return $executedMigrations->getLast(-1)->getVersion();
@@ -81,7 +79,7 @@ final class DefaultAliasResolver implements AliasResolver
                     return new Version('0');
                 }
 
-                break;
+                // no break because of return
             case self::ALIAS_NEXT:
                 $newMigrations = $this->migrationStatusCalculator->getNewMigrations();
 
@@ -91,7 +89,7 @@ final class DefaultAliasResolver implements AliasResolver
                     throw NoMigrationsToExecute::new($e);
                 }
 
-                break;
+                // no break because of return
             case self::ALIAS_LATEST:
                 try {
                     return $availableMigrations->getLast()->getVersion();
@@ -99,7 +97,7 @@ final class DefaultAliasResolver implements AliasResolver
                     throw NoMigrationsToExecute::new($e);
                 }
 
-                break;
+                // no break because of return
             default:
                 if ($availableMigrations->hasMigration(new Version($alias))) {
                     return $availableMigrations->getMigration(new Version($alias))->getVersion();
