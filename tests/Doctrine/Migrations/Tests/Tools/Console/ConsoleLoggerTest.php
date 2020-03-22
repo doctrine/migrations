@@ -61,7 +61,7 @@ class ConsoleLoggerTest extends TestCase
         $logger = new ConsoleLogger($this->output);
         $logger->error('foo {number} {date} {object} {resource} {missing}  bar', [
             'number' => 1,
-            'date' => new DateTime('2010-01-01 00:08:09'),
+            'date' => new DateTime('2010-01-01 00:08:09+00:00'),
             'object' => new stdClass(),
             'resource'=> fopen('php://output', 'w'),
         ]);
