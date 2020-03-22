@@ -25,6 +25,14 @@ parameters:
             message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
 
+        # See https://github.com/php-fig/log/pull/70
+        -
+            message: '~^Method Doctrine\\Migrations\\Tools\\Console\\ConsoleLogger::log\(\) has parameter \$context with no value type specified in iterable type array\.$~'
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
+        -
+            message: '~^Method Doctrine\\Migrations\\Tests\\TestLogger::log\(\) has parameter \$context with no value type specified in iterable type array\.$~'
+            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/TestLogger.php
+
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
