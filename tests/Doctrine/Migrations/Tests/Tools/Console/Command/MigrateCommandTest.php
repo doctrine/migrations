@@ -135,7 +135,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->questions->expects(self::at(0))
             ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) {
+            ->willReturnCallback(static function ($input, $output, $question) : bool {
                 self::assertEquals(new ConfirmationQuestion('Are you sure you wish to continue? (y/n)'), $question);
 
                 return false;
@@ -159,7 +159,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 return ['A'];
             });
 
@@ -196,7 +196,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertCount(1, $planList);
                 self::assertEquals(new Version('A'), $planList->getFirst()->getVersion());
 
@@ -215,7 +215,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
                 self::assertTrue($configuration->isAllOrNothing());
                 self::assertCount(1, $planList);
 
@@ -244,7 +244,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->questions->expects(self::at(0))
             ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) {
+            ->willReturnCallback(static function ($input, $output, $question) : bool {
                 self::assertEquals(new ConfirmationQuestion('Are you sure you wish to continue? (y/n)'), $question);
 
                 return true;
@@ -252,7 +252,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->questions->expects(self::at(1))
             ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) {
+            ->willReturnCallback(static function ($input, $output, $question) : bool {
                 self::assertEquals(new ConfirmationQuestion('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)'), $question);
 
                 return false;
@@ -273,7 +273,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->questions->expects(self::once())
             ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) {
+            ->willReturnCallback(static function ($input, $output, $question) : bool {
                 self::assertEquals(new ConfirmationQuestion('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)'), $question);
 
                 return false;

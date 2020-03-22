@@ -50,7 +50,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
             ->willReturn(
-                static function ($name) {
+                static function ($name) : bool {
                     return $name === 'table_name1';
                 }
             );

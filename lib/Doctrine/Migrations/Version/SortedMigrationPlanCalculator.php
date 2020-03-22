@@ -81,7 +81,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
 
         $toExecute = $this->findMigrationsToExecute($to, $migrationsToCheck, $direction, $executedMigrations);
 
-        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) {
+        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) : MigrationPlan {
             return new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
         }, $toExecute), $direction);
     }
