@@ -4,23 +4,34 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\DiffGenerator;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
+use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
+use function explode;
 use function sys_get_temp_dir;
+use function trim;
 
 final class DiffCommandTest extends TestCase
 {
     /** @var DiffGenerator|MockObject */
     private $migrationDiffGenerator;
+
+    /** @var MigrationStatusCalculator|MockObject */
+    private $migrationStatusCalculator;
 
     /** @var Configuration */
     private $configuration;
@@ -34,78 +45,128 @@ final class DiffCommandTest extends TestCase
     /** @var MockObject|QuestionHelper */
     private $questions;
 
+    /** @var CommandTester */
+    private $diffCommandTester;
+
+    /** @var ClassNameGenerator|MockObject */
+    private $classNameGenerator;
+
     public function testExecute() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
 
-        $input->expects(self::at(0))
-            ->method('getOption')
-            ->with('filter-expression')
-            ->willReturn('filter expression');
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([]));
 
-        $input->expects(self::at(1))
-            ->method('getOption')
-            ->with('formatted')
-            ->willReturn(true);
-
-        $input->expects(self::at(2))
-            ->method('getOption')
-            ->with('line-length')
-            ->willReturn(80);
-
-        $input->expects(self::at(3))
-            ->method('getOption')
-            ->with('allow-empty-diff')
-            ->willReturn(true);
-
-        $input->expects(self::at(4))
-            ->method('getOption')
-            ->with('check-database-platform')
-            ->willReturn(true);
-
-        $input->expects(self::at(5))
-            ->method('getOption')
-            ->with('namespace')
-            ->willReturn('FooNs');
+        $this->classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
 
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
             ->with('FooNs\\Version1234', 'filter expression', true, 80)
             ->willReturn('/path/to/migration.php');
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with([
-                'Generated new migration class to "<info>/path/to/migration.php</info>"',
-                '',
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'FooNs\\\\Version1234\'</info>',
-                '',
-                'To revert the migration you can use <info>migrations:execute --down \'FooNs\\\\Version1234\'</info>',
-            ]);
+        $this->diffCommandTester->execute([
+            '--filter-expression' => 'filter expression',
+            '--formatted' => true,
+            '--line-length' => 80,
+            '--allow-empty-diff' => true,
+            '--check-database-platform' => true,
+            '--namespace' => 'FooNs',
+        ]);
 
-        $this->diffCommand->execute($input, $output);
+        $output = $this->diffCommandTester->getDisplay(true);
+
+        self::assertSame([
+            'Generated new migration class to "/path/to/migration.php"',
+            '',
+            'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\\\\Version1234\'',
+            '',
+            'To revert the migration you can use migrations:execute --down \'FooNs\\\\Version1234\'',
+        ], explode("\n", trim($output)));
+    }
+
+    public function testAvailableMigrationsCancel() : void
+    {
+        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
+
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([]));
+
+        $this->questions->expects(self::once())
+            ->method('ask')
+            ->willReturn(false);
+
+        $this->migrationDiffGenerator->expects(self::never())->method('generate');
+
+        $statusCode = $this->diffCommandTester->execute([]);
+
+        $output = $this->diffCommandTester->getDisplay(true);
+        self::assertSame([
+            'WARNING! You have 1 available migrations to execute.',
+            'Migration cancelled!',
+        ], explode("\n", trim($output)));
+
+        self::assertSame(3, $statusCode);
+    }
+
+    public function testExecutedUnavailableMigrationsCancel() : void
+    {
+        $e1 = new ExecutedMigration(new Version('B'));
+        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
+
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([$m1]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsSet([$e1]));
+
+        $this->questions->expects(self::once())
+            ->method('ask')
+            ->willReturn(false);
+
+        $this->migrationDiffGenerator->expects(self::never())->method('generate');
+
+        $statusCode = $this->diffCommandTester->execute([]);
+
+        $output = $this->diffCommandTester->getDisplay(true);
+        self::assertSame([
+            'WARNING! You have 1 available migrations to execute.',
+            'WARNING! You have 1 previously executed migrations in the database that are not registered migrations.',
+            'Migration cancelled!',
+        ], explode("\n", trim($output)));
+
+        self::assertSame(3, $statusCode);
     }
 
     protected function setUp() : void
     {
-        $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
-        $this->configuration          = new Configuration();
+        $this->migrationDiffGenerator    = $this->createStub(DiffGenerator::class);
+        $this->migrationStatusCalculator = $this->createStub(MigrationStatusCalculator::class);
+        $this->configuration             = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);
 
-        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
-        $classNameGenerator->expects(self::once())
-            ->method('generateClassName')
-            ->with('FooNs')
-            ->willReturn('FooNs\\Version1234');
+        $this->classNameGenerator = $this->createMock(ClassNameGenerator::class);
 
-        $this->dependencyFactory->expects(self::once())
+        $this->dependencyFactory
             ->method('getClassNameGenerator')
-            ->willReturn($classNameGenerator);
+            ->willReturn($this->classNameGenerator);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
@@ -113,10 +174,13 @@ final class DiffCommandTest extends TestCase
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 
-        $this->diffCommand = new DiffCommand($this->dependencyFactory);
+        $this->dependencyFactory->method('getMigrationStatusCalculator')
+            ->willReturn($this->migrationStatusCalculator);
 
-        $this->questions = $this->createMock(QuestionHelper::class);
+        $this->diffCommand       = new DiffCommand($this->dependencyFactory);
+        $this->diffCommandTester = new CommandTester($this->diffCommand);
 
+        $this->questions = $this->createStub(QuestionHelper::class);
         $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
     }
 }
