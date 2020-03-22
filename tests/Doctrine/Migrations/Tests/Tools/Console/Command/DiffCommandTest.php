@@ -166,7 +166,7 @@ final class DiffCommandTest extends TestCase
             ->method('getClassNameGenerator')
             ->willReturn($this->classNameGenerator);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
