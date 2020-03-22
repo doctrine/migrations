@@ -129,7 +129,7 @@ EOT
         $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
         $newMigrations                 = $statusCalculator->getNewMigrations();
 
-        if ($this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input, $output) === false) {
+        if (! $this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input, $output)) {
             $output->writeln('<error>Migration cancelled!</error>');
 
             return 3;
