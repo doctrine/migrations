@@ -6,6 +6,7 @@ dist/
 tests/phpunit.xml
 vendor/
 phpunit.xml
+/.phpunit.result.cache
 /phpcs.xml
 /phpstan.neon
 /.phpcs-cache
