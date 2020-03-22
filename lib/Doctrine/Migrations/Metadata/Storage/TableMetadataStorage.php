@@ -62,7 +62,7 @@ final class TableMetadataStorage implements MetadataStorage
             throw new InvalidArgumentException(sprintf('%s accepts only %s as configuration', self::class, TableMetadataStorageConfiguration::class));
         }
 
-        $this->configuration = $configuration ?: new TableMetadataStorageConfiguration();
+        $this->configuration = $configuration ?? new TableMetadataStorageConfiguration();
     }
 
     public function getExecutedMigrations() : ExecutedMigrationsSet

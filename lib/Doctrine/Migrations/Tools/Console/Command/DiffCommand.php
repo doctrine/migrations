@@ -88,13 +88,21 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : ?int {
-        $filterExpression = (string) $input->getOption('filter-expression') ?: null;
-        $formatted        = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
-        $lineLength       = (int) $input->getOption('line-length');
-        $allowEmptyDiff   = $input->getOption('allow-empty-diff');
-        $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
-        $namespace        = $input->getOption('namespace') ?: null;
+    ) : int {
+        $filterExpression = (string) $input->getOption('filter-expression');
+        if ($filterExpression === '') {
+            $filterExpression = null;
+        }
+
+        $formatted       = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
+        $lineLength      = (int) $input->getOption('line-length');
+        $allowEmptyDiff  = $input->getOption('allow-empty-diff');
+        $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
+        $namespace       = $input->getOption('namespace');
+        if ($namespace === '') {
+            $namespace = null;
+        }
+
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
                 throw InvalidOptionUsage::new(

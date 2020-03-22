@@ -19,7 +19,10 @@ final class GlobFinder extends Finder
     {
         $dir = $this->getRealPath($directory);
 
-        $files = glob(rtrim($dir, '/') . '/Version*.php') ?: [];
+        $files = glob(rtrim($dir, '/') . '/Version*.php');
+        if ($files === false) {
+            $files = [];
+        }
 
         return $this->loadMigrations($files, $namespace);
     }
