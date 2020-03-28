@@ -205,6 +205,7 @@ Here is a list of the most important changes:
          use `Doctrine\Migrations\DependencyFactory` instead
  - Namespace `Doctrine\Migrations\AbstractMigration`       
      - CHANGED: The method `Doctrine\Migrations\AbstractMigration#__construct()` changed signature into `(Doctrine\DBAL\Connection $conn, PSR\Log\LoggerInterface $logger)`
+     - CHANGED: The method `Doctrine\Migrations\AbstractMigration#down()` is not abstract anymore, the default implementation will abort the migration process
      - REMOVED: Property `Doctrine\Migrations\AbstractMigration#$version` was removed 
  - Namespace `Doctrine\Migrations\Provider`
      - REMOVED: Class `Doctrine\Migrations\Provider\SchemaProviderInterface` has been deleted

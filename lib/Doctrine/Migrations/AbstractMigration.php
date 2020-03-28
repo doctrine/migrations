@@ -15,6 +15,7 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Query\Query;
 use Psr\Log\LoggerInterface;
+use function sprintf;
 
 /**
  * The AbstractMigration class is for end users to extend from when creating migrations. Extend this class
@@ -129,7 +130,10 @@ abstract class AbstractMigration
     /**
      * @throws MigrationException|DBALException
      */
-    abstract public function down(Schema $schema) : void;
+    public function down(Schema $schema) : void
+    {
+        $this->abortIf(true, sprintf('No down() migration implemented for "%s"', static::class));
+    }
 
     /**
      * @param mixed[] $params

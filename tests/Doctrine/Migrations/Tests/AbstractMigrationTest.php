@@ -4,11 +4,13 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
+use Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
@@ -23,6 +25,16 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->logger = new TestLogger();
 
         $this->migration = new AbstractMigrationStub($this->getSqliteConnection(), $this->logger);
+    }
+
+    public function testDownMigrationIsOptional() : void
+    {
+        $this->expectException(AbortMigration::class);
+        $this->expectExceptionMessage('No down() migration implemented for "Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub"');
+
+        $migration = new AbstractMigrationWithoutDownStub($this->getSqliteConnection(), $this->logger);
+        $schema    = $this->createStub(Schema::class);
+        $migration->down($schema);
     }
 
     public function testGetDescriptionReturnsEmptyString() : void
