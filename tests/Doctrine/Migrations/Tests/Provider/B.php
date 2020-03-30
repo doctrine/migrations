@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Provider;
 
-class SampleEntity
+class B
 {
     /** @var int|null */
     private $id;
