@@ -33,16 +33,16 @@ abstract class DoctrineCommand extends Command
 
     protected function configure() : void
     {
-        if ($this->dependencyFactory !== null) {
-            return;
-        }
-
         $this->addOption(
             'configuration',
             null,
             InputOption::VALUE_REQUIRED,
             'The path to a migrations configuration file. <comment>[default: any of migrations.{php,xml,json,yml,yaml}]</comment>'
         );
+
+        if ($this->dependencyFactory !== null) {
+            return;
+        }
 
         $this->addOption(
             'db-configuration',
@@ -63,6 +63,9 @@ abstract class DoctrineCommand extends Command
             );
             $connectionLoader        = new ConfigurationFile((string) $input->getOption('db-configuration'));
             $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);
+        } elseif (is_string($input->getOption('configuration'))) {
+            $configurationLoader = new ConfigurationFileWithFallback($input->getOption('configuration'));
+            $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
 
         if ($this->dependencyFactory->isFrozen()) {

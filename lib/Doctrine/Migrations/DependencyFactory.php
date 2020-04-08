@@ -136,6 +136,12 @@ class DependencyFactory
         return $this->emLoader !== null;
     }
 
+    public function setConfigurationLoader(ConfigurationLoader $configurationLoader) : void
+    {
+        $this->assertNotFrozen();
+        $this->configurationLoader = $configurationLoader;
+    }
+
     public function getConfiguration() : Configuration
     {
         if ($this->configuration === null) {
