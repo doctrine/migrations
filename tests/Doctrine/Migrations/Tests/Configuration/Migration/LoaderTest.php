@@ -48,7 +48,7 @@ abstract class LoaderTest extends TestCase
 
         self::assertSame('doctrine_migration_versions', $storage->getTableName());
         self::assertSame('version', $storage->getVersionColumnName());
-        self::assertSame(1024, $storage->getVersionColumnLength());
+        self::assertSame(191, $storage->getVersionColumnLength());
         self::assertSame('execution_time', $storage->getExecutionTimeColumnName());
         self::assertSame('executed_at', $storage->getExecutedAtColumnName());
     }
