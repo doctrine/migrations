@@ -13,7 +13,7 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
     private $versionColumnName = 'version';
 
     /** @var int */
-    private $versionColumnLength = 1024;
+    private $versionColumnLength = 191;
 
     /** @var string */
     private $executedAtColumnName = 'executed_at';
