@@ -6,6 +6,8 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -13,24 +15,25 @@ use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
+use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
-use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function sys_get_temp_dir;
+use function trim;
 
-class ExecuteCommandTest extends TestCase
+class ExecuteCommandTest extends MigrationTestCase
 {
     /** @var ExecuteCommand */
     private $executeCommand;
 
-    /** @var MockObject|DependencyFactory */
+    /** @var DependencyFactory */
     private $dependencyFactory;
 
     /** @var CommandTester */
@@ -109,6 +112,7 @@ class ExecuteCommandTest extends TestCase
         ]);
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
+        self::assertSame('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMultiple() : void
@@ -142,6 +146,7 @@ class ExecuteCommandTest extends TestCase
         ]);
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
+        self::assertSame('[notice] Executing 1, 2 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteCancel() : void
@@ -169,16 +174,11 @@ class ExecuteCommandTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
-            ->disableOriginalConstructor()
-            ->setMethodsExcept(['getConsoleInputMigratorConfigurationFactory'])
-            ->getMock();
+        $connection = $this->getSqliteConnection();
 
-        $this->migrator = $this->createMock(Migrator::class);
-
+        $this->migrator    = $this->createMock(Migrator::class);
         $this->queryWriter = $this->createMock(QueryWriter::class);
-
-        $migration = $this->createMock(AbstractMigration::class);
+        $migration         = $this->createMock(AbstractMigration::class);
 
         $p1 = new MigrationPlan(new Version('1'), $migration, Direction::UP);
         $pl = new MigrationPlanList([$p1], Direction::UP);
@@ -193,21 +193,11 @@ class ExecuteCommandTest extends TestCase
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $this->dependencyFactory->expects(self::any())
-            ->method('getConfiguration')
-            ->willReturn($configuration);
+        $this->dependencyFactory = DependencyFactory::fromConnection(new ExistingConfiguration($configuration), new ExistingConnection($connection));
 
-        $this->dependencyFactory->expects(self::once())
-            ->method('getMigrator')
-            ->willReturn($this->migrator);
-
-        $this->dependencyFactory->expects(self::once())
-            ->method('getMigrationPlanCalculator')
-            ->willReturn($this->planCalculator);
-
-        $this->dependencyFactory->expects(self::any())
-            ->method('getQueryWriter')
-            ->willReturn($this->queryWriter);
+        $this->dependencyFactory->setService(Migrator::class, $this->migrator);
+        $this->dependencyFactory->setService(MigrationPlanCalculator::class, $this->planCalculator);
+        $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
         $this->executeCommand = new ExecuteCommand($this->dependencyFactory);
 

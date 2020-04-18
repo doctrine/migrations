@@ -12,6 +12,7 @@ use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
@@ -28,6 +29,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function strpos;
 use function sys_get_temp_dir;
+use function trim;
 
 class MigrateCommandTest extends MigrationTestCase
 {
@@ -51,6 +53,9 @@ class MigrateCommandTest extends MigrationTestCase
 
     /** @var MockObject|QuestionHelper */
     private $questions;
+
+    /** @var MigrationRepository */
+    private $migrationRepository;
 
     public function testExecuteEmptyMigrationPlanCausesException() : void
     {
@@ -206,6 +211,40 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute([]);
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
+        self::assertSame('[notice] Migrating up to A', trim($this->migrateCommandTester->getDisplay(true)));
+    }
+
+    public function testExecuteMigrateDown() : void
+    {
+        $migration = $this->createMock(AbstractMigration::class);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('B'), $migration);
+
+        $result = new ExecutionResult(new Version('A'));
+        $this->storage->complete($result);
+
+        $result = new ExecutionResult(new Version('B'));
+        $this->storage->complete($result);
+
+        $migrator = $this->createMock(DbalMigrator::class);
+        $this->dependencyFactory->setService(Migrator::class, $migrator);
+
+        $this->questions->expects(self::once())
+            ->method('ask')
+            ->willReturn(true);
+
+        $migrator->expects(self::once())
+            ->method('migrate')
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
+                self::assertCount(1, $planList);
+                self::assertEquals(new Version('B'), $planList->getFirst()->getVersion());
+
+                return ['A'];
+            });
+
+        $this->migrateCommandTester->execute(['version' => 'prev']);
+
+        self::assertSame(0, $this->migrateCommandTester->getStatusCode());
+        self::assertSame('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMigrateAllOrNothing() : void
@@ -298,8 +337,8 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migration = $this->createMock(AbstractMigration::class);
 
-        $migrationRepository = $this->dependencyFactory->getMigrationRepository();
-        Helper::registerMigrationInstance($migrationRepository, new Version('A'), $migration);
+        $this->migrationRepository = $this->dependencyFactory->getMigrationRepository();
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('A'), $migration);
 
         $this->migrateCommand = new MigrateCommand($this->dependencyFactory);
 

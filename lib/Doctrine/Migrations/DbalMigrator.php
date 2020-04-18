@@ -143,15 +143,6 @@ class DbalMigrator implements Migrator
             return [];
         }
 
-        $dryRun = $migratorConfiguration->isDryRun();
-        $this->logger->notice(
-            ($dryRun ? 'Executing dry run of migration' : 'Migrating') . ' {direction} to {to}',
-            [
-                'direction' => $migrationsPlan->getDirection(),
-                'to' => (string) $migrationsPlan->getLast()->getVersion(),
-            ]
-        );
-
         $stopwatchEvent = $this->stopwatch->start('migrate');
 
         $sql = $this->executeMigrations($migrationsPlan, $migratorConfiguration);
