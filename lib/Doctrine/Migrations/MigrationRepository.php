@@ -17,7 +17,7 @@ use function class_exists;
 use function uasort;
 
 /**
- * The MigrationRepository class is responsible for retrieving migrations, determing what the current migration
+ * The MigrationRepository class is responsible for retrieving migrations, determining what the current migration
  * version, etc.
  *
  * @internal

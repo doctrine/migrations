@@ -176,7 +176,7 @@ addSql
 
 You can use the ``addSql`` method within the ``up`` and ``down`` methods. Internally the ``addSql`` calls are passed
 to the executeQuery method in the DBAL. This means that you can use the power of prepared statements easily and that
-you don't need to copy paste the same query with different parameters. You can just pass those differents parameters
+you don't need to copy paste the same query with different parameters. You can just pass those different parameters
 to the addSql method as parameters.
 
 .. code-block:: php

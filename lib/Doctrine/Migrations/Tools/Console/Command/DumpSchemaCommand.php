@@ -19,7 +19,7 @@ use function strpos;
 
 /**
  * The DumpSchemaCommand class is responsible for dumping your current database schema to a migration class. This is
- * intended to be used in conjuction with the RollupCommand.
+ * intended to be used in conjunction with the RollupCommand.
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
