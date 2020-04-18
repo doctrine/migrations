@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function array_map;
 use function getcwd;
+use function implode;
 use function is_string;
 use function is_writable;
 
@@ -142,6 +143,14 @@ EOT
         }
 
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
+
+        $this->getDependencyFactory()->getLogger()->notice(
+            'Executing' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {versions} {direction}',
+            [
+                'direction' => $plan->getDirection(),
+                'versions' => implode(', ', $versions),
+            ]
+        );
         $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;

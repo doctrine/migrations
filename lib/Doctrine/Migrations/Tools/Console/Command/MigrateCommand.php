@@ -181,6 +181,15 @@ EOT
         }
 
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
+
+        $this->getDependencyFactory()->getLogger()->notice(
+            'Migrating' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {direction} to {to}',
+            [
+                'direction' => $plan->getDirection(),
+                'to' => (string) $version,
+            ]
+        );
+
         $migrator->migrate($plan, $migratorConfiguration);
 
         return 0;
