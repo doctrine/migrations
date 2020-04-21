@@ -91,6 +91,7 @@ final class DependencyFactoryTest extends MigrationTestCase
 
         self::assertSame($this->connection, $di->getConnection());
         self::assertFalse($di->hasEntityManager());
+        self::assertTrue($di->isFrozen());
     }
 
     public function testNoEntityManagerRaiseException() : void
@@ -108,6 +109,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertTrue($di->hasEntityManager());
         self::assertSame($this->entityManager, $di->getEntityManager());
         self::assertSame($this->connection, $di->getConnection());
+        self::assertTrue($di->isFrozen());
     }
 
     public function testCustomLogger() : void

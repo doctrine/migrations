@@ -146,6 +146,7 @@ class DependencyFactory
     {
         if ($this->configuration === null) {
             $this->configuration = $this->configurationLoader->getConfiguration();
+            $this->freeze();
         }
 
         return $this->configuration;
@@ -157,6 +158,7 @@ class DependencyFactory
             $this->connection = $this->hasEntityManager()
                 ? $this->getEntityManager()->getConnection()
                 : $this->connectionLoader->getConnection();
+            $this->freeze();
         }
 
         return $this->connection;
@@ -170,6 +172,7 @@ class DependencyFactory
             }
 
             $this->em = $this->emLoader->getEntityManager();
+            $this->freeze();
         }
 
         return $this->em;
