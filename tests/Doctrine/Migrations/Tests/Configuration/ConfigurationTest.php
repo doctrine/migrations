@@ -46,15 +46,6 @@ class ConfigurationTest extends TestCase
         self::assertFalse($config->areMigrationsOrganizedByYear());
     }
 
-    public function testNoNamespaceConfigured() : void
-    {
-        $this->expectException(MissingNamespaceConfiguration::class);
-        $this->expectExceptionMessage('There are no namespaces configured.');
-
-        $config = new Configuration();
-        $config->freeze();
-    }
-
     public function testFreezeConfiguration() : void
     {
         $config = new Configuration();
