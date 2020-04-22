@@ -33,7 +33,7 @@ EOT
     ) : int {
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 
-        $output->writeln('Metadata storage synchronized');
+        $this->io->success('Metadata storage synchronized');
 
         return 0;
     }

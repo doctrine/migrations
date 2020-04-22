@@ -37,10 +37,10 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?';
 
-        if (! $this->canExecute($question, $input, $output)) {
-            $output->writeln('<error>Migration cancelled!</error>');
+        if (! $this->canExecute($question, $input)) {
+            $this->io->error('Migration cancelled!');
 
             return 3;
         }
@@ -48,8 +48,8 @@ EOT
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
         $version = $this->getDependencyFactory()->getRollup()->rollup();
 
-        $output->writeln(sprintf(
-            'Rolled up migrations to version <info>%s</info>',
+        $this->io->success(sprintf(
+            'Rolled up migrations to version %s',
             (string) $version
         ));
 

@@ -67,7 +67,7 @@ EOT
 
         $path = $migrationGenerator->generateMigration($fqcn);
 
-        $output->writeln([
+        $this->io->text([
             sprintf('Generated new migration class to "<info>%s</info>"', $path),
             '',
             sprintf(
@@ -79,6 +79,7 @@ EOT
                 'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
                 $fqcn
             ),
+            '',
         ]);
 
         return 0;
