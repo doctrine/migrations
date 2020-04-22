@@ -8,7 +8,7 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\RollupFailed;
 use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Rollup;
@@ -47,7 +47,7 @@ class RollupTest extends TestCase
         $this->repository
            ->expects(self::once())
            ->method('getMigrations')
-           ->willReturn(new AvailableMigrationsList([$m1]));
+           ->willReturn(new AvailableMigrationsSet([$m1]));
 
         $this->storage
            ->expects(self::at(0))->method('reset')->with();
@@ -69,7 +69,7 @@ class RollupTest extends TestCase
         $this->repository
             ->expects(self::once())
             ->method('getMigrations')
-            ->willReturn(new AvailableMigrationsList([$m1, $m2]));
+            ->willReturn(new AvailableMigrationsSet([$m1, $m2]));
 
         $this->storage->expects(self::never())->method('reset');
         $this->storage->expects(self::never())->method('complete');
@@ -84,7 +84,7 @@ class RollupTest extends TestCase
         $this->repository
             ->expects(self::any())
             ->method('getMigrations')
-            ->willReturn(new AvailableMigrationsList([]));
+            ->willReturn(new AvailableMigrationsSet([]));
 
         $this->storage->expects(self::never())->method('reset');
         $this->storage->expects(self::never())->method('complete');

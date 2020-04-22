@@ -9,15 +9,13 @@ use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Version\Comparator;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use function class_exists;
-use function uasort;
 
 /**
- * The MigrationRepository class is responsible for retrieving migrations, determining what the current migration
+ * The FilesystemMigrationsRepository class is responsible for retrieving migrations, determining what the current migration
  * version, etc.
  *
  * @internal
@@ -39,24 +37,19 @@ class FilesystemMigrationsRepository implements MigrationsRepository
     /** @var AvailableMigration[] */
     private $migrations = [];
 
-    /** @var Comparator */
-    private $sorter;
-
     /**
-     * @param array<string, string> $migrationDirectories
      * @param string[]              $classes
+     * @param array<string, string> $migrationDirectories
      */
     public function __construct(
         array $classes,
         array $migrationDirectories,
         MigrationFinder $migrationFinder,
-        MigrationFactory $versionFactory,
-        Comparator $sorter
+        MigrationFactory $versionFactory
     ) {
         $this->migrationDirectories = $migrationDirectories;
         $this->migrationFinder      = $migrationFinder;
         $this->versionFactory       = $versionFactory;
-        $this->sorter               = $sorter;
 
         $this->registerMigrations($classes);
     }
@@ -120,11 +113,14 @@ class FilesystemMigrationsRepository implements MigrationsRepository
         return $this->migrations[(string) $version];
     }
 
-    public function getMigrations() : AvailableMigrationsList
+    /**
+     * Returns a non-sorted set of migrations.
+     */
+    public function getMigrations() : AvailableMigrationsSet
     {
         $this->loadMigrationsFromDirectories();
 
-        return new AvailableMigrationsList($this->migrations);
+        return new AvailableMigrationsSet($this->migrations);
     }
 
     /** @throws MigrationException */
@@ -152,9 +148,5 @@ class FilesystemMigrationsRepository implements MigrationsRepository
                 );
                 $this->registerMigrations($migrations);
         }
-
-        uasort($this->migrations, function (AvailableMigration $a, AvailableMigration $b) : int {
-            return $this->sorter->compare($a->getVersion(), $b->getVersion());
-        });
     }
 }

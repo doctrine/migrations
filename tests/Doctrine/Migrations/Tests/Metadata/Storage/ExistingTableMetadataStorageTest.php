@@ -57,8 +57,7 @@ class ExistingTableMetadataStorageTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory,
-            new AlphabeticalComparator()
+            $versionFactory
         );
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Foo\\5678'), $migration);
 

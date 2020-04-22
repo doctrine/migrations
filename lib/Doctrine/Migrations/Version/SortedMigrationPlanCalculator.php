@@ -7,6 +7,8 @@ namespace Doctrine\Migrations\Version;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -18,6 +20,7 @@ use function array_reverse;
 use function count;
 use function in_array;
 use function reset;
+use function uasort;
 
 /**
  * The MigrationPlanCalculator is responsible for calculating the plan for migrating from the current
@@ -33,10 +36,17 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    public function __construct(MigrationsRepository $migrationRepository, MetadataStorage $metadataStorage)
-    {
+    /** @var Comparator */
+    private $sorter;
+
+    public function __construct(
+        MigrationsRepository $migrationRepository,
+        MetadataStorage $metadataStorage,
+        Comparator $sorter
+    ) {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;
+        $this->sorter              = $sorter;
     }
 
     /**
@@ -44,7 +54,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
      */
     public function getPlanForVersions(array $versions, string $direction) : MigrationPlanList
     {
-        $migrationsToCheck   = $this->arrangeMigrationsForDirection($direction, $this->migrationRepository->getMigrations());
+        $migrationsToCheck   = $this->arrangeMigrationsForDirection($direction, $this->getMigrations());
         $availableMigrations = array_filter($migrationsToCheck, static function (AvailableMigration $availableMigration) use ($versions) : bool {
             // in_array third parameter is intentionally false to force object to string casting
             return in_array($availableMigration->getVersion(), $versions, false);
@@ -72,7 +82,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
             throw MigrationClassNotFound::new((string) $to);
         }
 
-        $availableMigrations = $this->migrationRepository->getMigrations();
+        $availableMigrations = $this->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
         $direction = $this->findDirection($to, $executedMigrations);
@@ -86,7 +96,17 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         }, $toExecute), $direction);
     }
 
-    private function findDirection(Version $to, Metadata\ExecutedMigrationsList $executedMigrations) : string
+    public function getMigrations() : AvailableMigrationsList
+    {
+        $availableMigrations = $this->migrationRepository->getMigrations()->getItems();
+        uasort($availableMigrations, function (AvailableMigration $a, AvailableMigration $b) : int {
+            return $this->sorter->compare($a->getVersion(), $b->getVersion());
+        });
+
+        return new AvailableMigrationsList($availableMigrations);
+    }
+
+    private function findDirection(Version $to, ExecutedMigrationsList $executedMigrations) : string
     {
         if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && ! $executedMigrations->getLast()->getVersion()->equals($to))) {
             return Direction::DOWN;
@@ -108,7 +128,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
      *
      * @return AvailableMigration[]
      */
-    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsList $executedMigrations) : array
+    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, ExecutedMigrationsList $executedMigrations) : array
     {
         $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {

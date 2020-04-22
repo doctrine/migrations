@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 
 /**
@@ -18,4 +19,9 @@ interface MigrationPlanCalculator
     public function getPlanForVersions(array $versions, string $direction) : MigrationPlanList;
 
     public function getPlanUntilVersion(Version $to) : MigrationPlanList;
+
+    /**
+     * Returns a sorted list of migrations.
+     */
+    public function getMigrations() : AvailableMigrationsList;
 }

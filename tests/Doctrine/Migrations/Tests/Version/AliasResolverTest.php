@@ -22,7 +22,9 @@ use Doctrine\Migrations\Version\DefaultAliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
+use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
+use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use Throwable;
@@ -32,6 +34,9 @@ final class AliasResolverTest extends TestCase
 {
     /** @var MigrationsRepository */
     private $migrationRepository;
+
+    /** @var MigrationPlanCalculator */
+    private $migrationPlanCalculator;
 
     /** @var DefaultAliasResolver */
     private $versionAliasResolver;
@@ -145,16 +150,21 @@ final class AliasResolverTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory,
-            new AlphabeticalComparator()
+            $versionFactory
         );
 
         $this->metadataStorage = new TableMetadataStorage($conn, new AlphabeticalComparator());
         $this->metadataStorage->ensureInitialized();
 
-        $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationRepository, $this->metadataStorage);
-        $this->versionAliasResolver = new DefaultAliasResolver(
+        $this->migrationPlanCalculator = new SortedMigrationPlanCalculator(
             $this->migrationRepository,
+            $this->metadataStorage,
+            new AlphabeticalComparator()
+        );
+
+        $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
+        $this->versionAliasResolver = new DefaultAliasResolver(
+            $this->migrationPlanCalculator,
             $this->metadataStorage,
             $this->statusCalculator
         );

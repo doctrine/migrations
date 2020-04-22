@@ -10,7 +10,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
@@ -53,7 +53,7 @@ final class DumpSchemaCommandTest extends TestCase
 
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
-            ->willReturn(new AvailableMigrationsList([$migration]));
+            ->willReturn(new AvailableMigrationsSet([$migration]));
 
         $this->dumpSchemaCommandTester->execute([]);
     }
@@ -62,7 +62,7 @@ final class DumpSchemaCommandTest extends TestCase
     {
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
-            ->willReturn(new AvailableMigrationsList([]));
+            ->willReturn(new AvailableMigrationsSet([]));
 
         $this->schemaDumper->expects(self::once())
             ->method('dump')

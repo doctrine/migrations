@@ -8,7 +8,6 @@ use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationsRepository;
 use function substr;
 
 /**
@@ -24,8 +23,8 @@ final class DefaultAliasResolver implements AliasResolver
     private const ALIAS_NEXT    = 'next';
     private const ALIAS_LATEST  = 'latest';
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    /** @var MigrationPlanCalculator */
+    private $migrationPlanCalculator;
 
     /** @var MetadataStorage */
     private $metadataStorage;
@@ -34,11 +33,11 @@ final class DefaultAliasResolver implements AliasResolver
     private $migrationStatusCalculator;
 
     public function __construct(
-        MigrationsRepository $migrationRepository,
+        MigrationPlanCalculator $migrationPlanCalculator,
         MetadataStorage $metadataStorage,
         MigrationStatusCalculator $migrationStatusCalculator
     ) {
-        $this->migrationRepository       = $migrationRepository;
+        $this->migrationPlanCalculator   = $migrationPlanCalculator;
         $this->metadataStorage           = $metadataStorage;
         $this->migrationStatusCalculator = $migrationStatusCalculator;
     }
@@ -58,7 +57,7 @@ final class DefaultAliasResolver implements AliasResolver
      */
     public function resolveVersionAlias(string $alias) : Version
     {
-        $availableMigrations = $this->migrationRepository->getMigrations();
+        $availableMigrations = $this->migrationPlanCalculator->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
 
         switch ($alias) {
