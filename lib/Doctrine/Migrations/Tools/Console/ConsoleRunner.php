@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console;
 
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Tools\Console\Command\CurrentCommand;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
@@ -100,6 +101,7 @@ class ConsoleRunner
     public static function addCommands(Application $cli, ?DependencyFactory $dependencyFactory = null) : void
     {
         $cli->addCommands([
+            new CurrentCommand($dependencyFactory),
             new DumpSchemaCommand($dependencyFactory),
             new ExecuteCommand($dependencyFactory),
             new GenerateCommand($dependencyFactory),
