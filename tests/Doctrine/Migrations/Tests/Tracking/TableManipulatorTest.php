@@ -47,10 +47,6 @@ class TableManipulatorTest extends TestCase
             ->method('isCreated')
             ->willReturn(true);
 
-        $this->migrationTableStatus->expects(self::once())
-            ->method('isUpToDate')
-            ->willReturn(true);
-
         self::assertFalse($this->migrationTableManipulator->createMigrationTable());
     }
 
@@ -78,16 +74,8 @@ class TableManipulatorTest extends TestCase
             ->method('isCreated')
             ->willReturn(true);
 
-        $this->migrationTableStatus->expects(self::once())
-            ->method('isUpToDate')
-            ->willReturn(false);
-
         $this->migrationTableUpdater->expects(self::once())
             ->method('updateMigrationTable');
-
-        $this->migrationTableStatus->expects(self::once())
-            ->method('setUpToDate')
-            ->with(true);
 
         self::assertTrue($migrationTableManipulator->createMigrationTable());
     }

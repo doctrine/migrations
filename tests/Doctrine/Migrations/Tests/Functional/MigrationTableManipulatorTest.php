@@ -31,7 +31,6 @@ class MigrationTableManipulatorTest extends MigrationTestCase
 
         self::assertTrue($schemaManager->tablesExist(['doctrine_migration_versions']));
         self::assertTrue($this->trackingTableStatus->isCreated());
-        self::assertTrue($this->trackingTableStatus->isUpToDate());
 
         $table = $schemaManager->listTableDetails('doctrine_migration_versions');
 
@@ -58,11 +57,8 @@ class MigrationTableManipulatorTest extends MigrationTestCase
         }
 
         self::assertTrue($this->trackingTableStatus->isCreated());
-        self::assertFalse($this->trackingTableStatus->isUpToDate());
 
         self::assertTrue($this->trackingTableManipulator->createMigrationTable());
-
-        self::assertTrue($this->trackingTableStatus->isUpToDate());
 
         $schemaManager = $this->connection->getSchemaManager();
 

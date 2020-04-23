@@ -22,9 +22,6 @@ class TableStatus
     /** @var bool|null */
     private $created;
 
-    /** @var bool|null */
-    private $upToDate;
-
     public function __construct(
         AbstractSchemaManager $schemaManager,
         TableDefinition $migrationTable
@@ -47,32 +44,5 @@ class TableStatus
         $this->created = $this->schemaManager->tablesExist([$this->migrationTable->getName()]);
 
         return $this->created;
-    }
-
-    public function setUpToDate(bool $upToDate) : void
-    {
-        $this->upToDate = $upToDate;
-    }
-
-    public function isUpToDate() : bool
-    {
-        if ($this->upToDate !== null) {
-            return $this->upToDate;
-        }
-
-        $table = $this->schemaManager->listTableDetails($this->migrationTable->getName());
-
-        $this->upToDate = true;
-
-        foreach ($this->migrationTable->getColumnNames() as $columnName) {
-            if ($table->hasColumn($columnName)) {
-                continue;
-            }
-
-            $this->upToDate = false;
-            break;
-        }
-
-        return $this->upToDate;
     }
 }
