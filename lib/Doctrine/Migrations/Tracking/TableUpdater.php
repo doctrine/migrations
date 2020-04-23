@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Throwable;
+use function count;
 use function in_array;
 
 /**
@@ -43,7 +44,7 @@ class TableUpdater
         $this->platform       = $platform;
     }
 
-    public function updateMigrationTable() : void
+    public function updateMigrationTable() : bool
     {
         $fromTable = $this->getFromTable();
         $toTable   = $this->migrationTable->getDBALTable();
@@ -66,6 +67,8 @@ class TableUpdater
         }
 
         $this->connection->commit();
+
+        return count($queries) !== 0;
     }
 
     /**

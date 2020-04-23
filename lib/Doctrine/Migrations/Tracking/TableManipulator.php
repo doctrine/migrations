@@ -53,15 +53,7 @@ class TableManipulator
         }
 
         if ($this->migrationTableStatus->isCreated()) {
-            if (! $this->migrationTableStatus->isUpToDate()) {
-                $this->migrationTableUpdater->updateMigrationTable();
-
-                $this->migrationTableStatus->setUpToDate(true);
-
-                return true;
-            }
-
-            return false;
+            return $this->migrationTableUpdater->updateMigrationTable();
         }
 
         $table = $this->migrationTable->getNewDBALTable();
