@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tracking;
 
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Tracking\TableDefinition;
 use Doctrine\Migrations\Tracking\TableStatus;
 use PHPUnit\Framework\MockObject\MockObject;

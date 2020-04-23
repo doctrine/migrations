@@ -67,7 +67,7 @@ class TableUpdater
 
         $this->connection->commit();
 
-        return !empty($queries);
+        return 0 !== count($queries);
     }
 
     /**
