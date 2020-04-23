@@ -55,16 +55,17 @@ abstract class DoctrineCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output) : void
     {
+        $configurationParameter = $input->getOption('configuration');
         if ($this->dependencyFactory === null) {
             $configurationLoader     = new ConfigurationFileWithFallback(
-                is_string($input->getOption('configuration'))
-                    ? $input->getOption('configuration')
+                is_string($configurationParameter)
+                    ? $configurationParameter
                     : null
             );
             $connectionLoader        = new ConfigurationFile((string) $input->getOption('db-configuration'));
             $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);
-        } elseif (is_string($input->getOption('configuration'))) {
-            $configurationLoader = new ConfigurationFileWithFallback($input->getOption('configuration'));
+        } elseif (is_string($configurationParameter)) {
+            $configurationLoader = new ConfigurationFileWithFallback($configurationParameter);
             $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
 
