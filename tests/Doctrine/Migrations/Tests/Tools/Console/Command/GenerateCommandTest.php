@@ -12,6 +12,7 @@ use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+use function array_map;
 use function explode;
 use function sys_get_temp_dir;
 use function trim;
@@ -49,7 +50,7 @@ final class GenerateCommandTest extends TestCase
             'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\Version1234\'',
             '',
             'To revert the migration you can use migrations:execute --down \'FooNs\Version1234\'',
-        ], explode("\n", trim($output)));
+        ], array_map('trim', explode("\n", trim($output))));
     }
 
     protected function setUp() : void

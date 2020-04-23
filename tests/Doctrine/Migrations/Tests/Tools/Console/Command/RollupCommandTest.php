@@ -10,8 +10,6 @@ use Doctrine\Migrations\Tools\Console\Command\RollupCommand;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function trim;
 
@@ -43,17 +41,12 @@ final class RollupCommandTest extends TestCase
         $this->rollupCommandTest->execute([], ['interactive' => false]);
 
         $output = $this->rollupCommandTest->getDisplay(true);
-        self::assertSame('Rolled up migrations to version 1234', trim($output));
+        self::assertSame('[OK] Rolled up migrations to version 1234', trim($output));
     }
 
     public function testExecutionContinuesWhenAnsweringYes() : void
     {
-        $questions = $this->createMock(QuestionHelper::class);
-        $questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(true);
-
-        $this->rollupCommand->setHelperSet(new HelperSet(['question' => $questions]));
+        $this->rollupCommandTest->setInputs(['yes']);
 
         $this->dependencyFactory
             ->expects(self::once())
@@ -67,15 +60,12 @@ final class RollupCommandTest extends TestCase
         $this->rollupCommandTest->execute([]);
 
         $output = $this->rollupCommandTest->getDisplay(true);
-        self::assertSame('Rolled up migrations to version 1234', trim($output));
+        self::assertStringContainsString('[OK] Rolled up migrations to version 1234', trim($output));
     }
 
     public function testExecutionStoppedWhenAnsweringNo() : void
     {
-        $questions = $this->createMock(QuestionHelper::class);
-        $questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(false);
+        $this->rollupCommandTest->setInputs(['no']);
 
         $this->dependencyFactory
             ->expects(self::never())
@@ -84,13 +74,12 @@ final class RollupCommandTest extends TestCase
         $this->rollup->expects(self::never())
             ->method('rollup');
 
-        $this->rollupCommand->setHelperSet(new HelperSet(['question' => $questions]));
         $exitCode = $this->rollupCommandTest->execute([]);
 
         self::assertSame(3, $exitCode);
 
         $output = $this->rollupCommandTest->getDisplay(true);
-        self::assertSame('Migration cancelled!', trim($output));
+        self::assertStringContainsString('[ERROR] Migration cancelled!', trim($output));
     }
 
     protected function setUp() : void

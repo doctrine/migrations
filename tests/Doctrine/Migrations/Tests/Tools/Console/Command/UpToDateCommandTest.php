@@ -121,8 +121,10 @@ class UpToDateCommandTest extends MigrationTestCase
 
         self::assertSame(
             [
-                'Out-of-date! 1 migration is available to execute.',
-                'You have 1 previously executed migration in the database that is not a registered migration.',
+                '[ERROR] Out-of-date! 1 migration is available to execute.',
+                '',
+                '[ERROR] You have 1 previously executed migration in the database that is not a registered migration.',
+                '',
                 '+-----------+-------------------------+---------------------+----------------+-------------+',
                 '| Migration Versions                                                         |             |',
                 '+-----------+-------------------------+---------------------+----------------+-------------+',
