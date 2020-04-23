@@ -75,7 +75,8 @@ class TableManipulatorTest extends TestCase
             ->willReturn(true);
 
         $this->migrationTableUpdater->expects(self::once())
-            ->method('updateMigrationTable');
+            ->method('updateMigrationTable')
+            ->willReturn(true);
 
         self::assertTrue($migrationTableManipulator->createMigrationTable());
     }

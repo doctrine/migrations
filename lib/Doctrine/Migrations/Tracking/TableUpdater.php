@@ -43,7 +43,7 @@ class TableUpdater
         $this->platform       = $platform;
     }
 
-    public function updateMigrationTable() : void
+    public function updateMigrationTable() : bool
     {
         $fromTable = $this->getFromTable();
         $toTable   = $this->migrationTable->getDBALTable();
@@ -66,6 +66,8 @@ class TableUpdater
         }
 
         $this->connection->commit();
+
+        return !empty($queries);
     }
 
     /**
