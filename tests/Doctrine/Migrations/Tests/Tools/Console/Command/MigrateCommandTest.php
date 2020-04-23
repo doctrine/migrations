@@ -10,8 +10,10 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Finder\Finder;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
@@ -19,7 +21,9 @@ use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\ExecutionResult;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -335,10 +339,14 @@ class MigrateCommandTest extends MigrationTestCase
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
-        $migration = $this->createMock(AbstractMigration::class);
+        $finder                    = $this->createMock(Finder::class);
+        $factory                   = $this->createMock(MigrationFactory::class);
+        $this->migrationRepository = new MigrationRepository([], [], $finder, $factory, new AlphabeticalComparator());
 
-        $this->migrationRepository = $this->dependencyFactory->getMigrationRepository();
+        $migration = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('A'), $migration);
+
+        $this->dependencyFactory->setService(MigrationRepository::class, $this->migrationRepository);
 
         $this->migrateCommand = new MigrateCommand($this->dependencyFactory);
 
@@ -347,7 +355,9 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester = new CommandTester($this->migrateCommand);
 
-        $this->storage = $this->dependencyFactory->getMetadataStorage();
+        $this->storage = new TableMetadataStorage($connection, $this->configuration->getMetadataStorageConfiguration(), $this->migrationRepository);
         $this->storage->ensureInitialized();
+
+        $this->dependencyFactory->setService(MetadataStorage::class, $this->storage);
     }
 }

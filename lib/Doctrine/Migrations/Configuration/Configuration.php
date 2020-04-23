@@ -5,11 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Configuration;
 
 use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
-use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
-use function count;
 use function strcasecmp;
 
 /**
@@ -52,10 +50,6 @@ final class Configuration
 
     public function freeze() : void
     {
-        if (! $this->frozen) {
-            $this->validate();
-        }
-
         $this->frozen = true;
     }
 
@@ -145,13 +139,6 @@ final class Configuration
     public function areMigrationsOrganizedByYearAndMonth() : bool
     {
         return $this->migrationsAreOrganizedByYearAndMonth;
-    }
-
-    private function validate() : void
-    {
-        if (count($this->migrationsDirectories) === 0) {
-            throw MissingNamespaceConfiguration::new();
-        }
     }
 
     public function setIsDryRun(bool $isDryRun) : void

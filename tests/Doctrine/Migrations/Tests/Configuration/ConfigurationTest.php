@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Configuration;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
-use Doctrine\Migrations\Configuration\Exception\MissingNamespaceConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 use PHPUnit\Framework\TestCase;
@@ -44,15 +43,6 @@ class ConfigurationTest extends TestCase
 
         self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
         self::assertFalse($config->areMigrationsOrganizedByYear());
-    }
-
-    public function testNoNamespaceConfigured() : void
-    {
-        $this->expectException(MissingNamespaceConfiguration::class);
-        $this->expectExceptionMessage('There are no namespaces configured.');
-
-        $config = new Configuration();
-        $config->freeze();
     }
 
     public function testFreezeConfiguration() : void
