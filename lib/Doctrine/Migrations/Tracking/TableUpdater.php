@@ -10,8 +10,8 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Throwable;
-use function in_array;
 use function count;
+use function in_array;
 
 /**
  * The TableUpdater class is responsible for updating the tracking table schema if it needs to be updated.
