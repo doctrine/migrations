@@ -126,6 +126,19 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di            = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
         $di->setService(LoggerInterface::class, $anotherLogger);
         self::assertSame($anotherLogger, $di->getLogger());
+        self::assertFalse($di->isFrozen());
+    }
+
+    public function testChangingConfigurationsDoesNotFreezeTheFactory() : void
+    {
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+
+        $newConfiguration = new Configuration();
+        $di->setConfigurationLoader(new ExistingConfiguration($newConfiguration));
+        self::assertFalse($di->isFrozen());
+
+        self::assertSame($newConfiguration, $di->getConfiguration());
+        self::assertTrue($di->isFrozen());
     }
 
     public function testMetadataConfigurationIsPassedToTableStorage() : void
@@ -140,5 +153,6 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di->getMetadataStorage()->ensureInitialized();
 
         self::assertTrue($connection->getSchemaManager()->tablesExist(['foo']));
+        self::assertTrue($di->isFrozen());
     }
 }
