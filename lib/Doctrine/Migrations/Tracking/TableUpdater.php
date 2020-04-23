@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Throwable;
 use function in_array;
+use function count;
 
 /**
  * The TableUpdater class is responsible for updating the tracking table schema if it needs to be updated.
@@ -67,7 +68,7 @@ class TableUpdater
 
         $this->connection->commit();
 
-        return 0 !== count($queries);
+        return count($queries) !== 0;
     }
 
     /**
