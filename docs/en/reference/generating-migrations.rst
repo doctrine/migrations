@@ -243,11 +243,11 @@ Formatted SQL
 -------------
 
 You can optionally pass the ``--formatted`` option if you want the dumped SQL to be formatted. This option uses
-the ``jdorn/sql-formatter`` package so you will need to install this package for it to work:
+the ``doctrine/sql-formatter`` package so you will need to install this package for it to work:
 
 .. code-block:: sh
 
-    $ composer require jdorn/sql-formatter
+    $ composer require doctrine/sql-formatter
 
 Ignoring Custom Tables
 ----------------------

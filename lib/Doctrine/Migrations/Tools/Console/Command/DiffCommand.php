@@ -8,6 +8,7 @@ use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
+use Doctrine\SqlFormatter\SqlFormatter;
 use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -107,9 +108,9 @@ EOT
         }
 
         if ($formatted) {
-            if (! class_exists('SqlFormatter')) {
+            if (! class_exists(SqlFormatter::class)) {
                 throw InvalidOptionUsage::new(
-                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require jdorn/sql-formatter".'
+                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".'
                 );
             }
         }

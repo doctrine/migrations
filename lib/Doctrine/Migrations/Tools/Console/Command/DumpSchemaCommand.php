@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
+use Doctrine\SqlFormatter\SqlFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -83,9 +84,9 @@ EOT
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
 
         if ($formatted) {
-            if (! class_exists('SqlFormatter')) {
+            if (! class_exists(SqlFormatter::class)) {
                 throw InvalidOptionUsage::new(
-                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require jdorn/sql-formatter".'
+                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".'
                 );
             }
         }
