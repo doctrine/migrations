@@ -8,9 +8,10 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\SqlFormatter\NullHighlighter;
+use Doctrine\SqlFormatter\SqlFormatter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use SqlFormatter;
 use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
@@ -109,12 +110,11 @@ CODE
             'SELECT * FROM migrations_table_name',
         ];
 
-        $formattedUpdate = SqlFormatter::format($this->sql[2], false);
-
-        $expectedCode = sprintf($expectedCode, $formattedUpdate);
-
         $this->metadataConfig->setTableName('migrations_table_name');
 
-        return $expectedCode;
+        return sprintf(
+            $expectedCode,
+            (new SqlFormatter(new NullHighlighter()))->format($this->sql[2])
+        );
     }
 }

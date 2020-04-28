@@ -24,7 +24,7 @@
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^7.0",
         "doctrine/orm": "^2.6",
-        "jdorn/sql-formatter": "^1.1",
+        "doctrine/sql-formatter": "^1.0",
         "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-deprecation-rules": "^0.12",
         "phpstan/phpstan-phpunit": "^0.12",
@@ -35,7 +35,7 @@
         "symfony/yaml": "^3.4||^4.0||^5.0"
     },
     "suggest": {
-        "jdorn/sql-formatter": "Allows to generate formatted SQL with the diff command.",
+        "doctrine/sql-formatter": "Allows to generate formatted SQL with the diff command.",
         "symfony/yaml": "Allows the use of yaml for migration configuration files."
     },
     "autoload": {
