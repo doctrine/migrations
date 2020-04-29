@@ -10,6 +10,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Rollup;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -21,7 +22,7 @@ class RollupTest extends TestCase
     /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    /** @var FilesystemMigrationsRepository|MockObject */
+    /** @var MigrationsRepository|MockObject */
     private $repository;
 
     /** @var MetadataStorage|MockObject */

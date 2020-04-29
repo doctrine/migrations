@@ -10,6 +10,7 @@ use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
@@ -27,7 +28,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
     /** @var MigrationFactory|MockObject */
     private $versionFactory;
 
-    /** @var FilesystemMigrationsRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     public function testCheckNonExistentMigration() : void

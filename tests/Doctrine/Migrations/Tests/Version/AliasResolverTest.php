@@ -14,6 +14,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
@@ -29,7 +30,7 @@ use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
 {
-    /** @var FilesystemMigrationsRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     /** @var DefaultAliasResolver */

@@ -7,8 +7,8 @@ namespace Doctrine\Migrations\Version;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
-use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationsRepository;
 use function substr;
 
 /**
@@ -24,7 +24,7 @@ final class DefaultAliasResolver implements AliasResolver
     private const ALIAS_NEXT    = 'next';
     private const ALIAS_LATEST  = 'latest';
 
-    /** @var FilesystemMigrationsRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */
@@ -34,7 +34,7 @@ final class DefaultAliasResolver implements AliasResolver
     private $migrationStatusCalculator;
 
     public function __construct(
-        FilesystemMigrationsRepository $migrationRepository,
+        MigrationsRepository $migrationRepository,
         MetadataStorage $metadataStorage,
         MigrationStatusCalculator $migrationStatusCalculator
     ) {

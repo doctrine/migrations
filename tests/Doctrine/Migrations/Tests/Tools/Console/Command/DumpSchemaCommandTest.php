@@ -11,6 +11,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
@@ -31,7 +32,7 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var FilesystemMigrationsRepository|MockObject */
+    /** @var MigrationsRepository|MockObject */
     private $migrationRepository;
 
     /** @var SchemaDumper|MockObject */

@@ -12,6 +12,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
@@ -25,7 +26,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /** @var MigrationPlanCalculator */
     private $migrationPlanCalculator;
 
-    /** @var MockObject|FilesystemMigrationsRepository */
+    /** @var MockObject|MigrationsRepository */
     private $migrationRepository;
 
     /** @var MockObject|MetadataStorage */

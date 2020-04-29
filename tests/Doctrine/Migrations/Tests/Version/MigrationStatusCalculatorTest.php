@@ -11,6 +11,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
@@ -22,7 +23,7 @@ final class MigrationStatusCalculatorTest extends TestCase
     /** @var MigrationStatusCalculator */
     private $migrationStatusCalculator;
 
-    /** @var MockObject|FilesystemMigrationsRepository */
+    /** @var MockObject|MigrationsRepository */
     private $migrationRepository;
 
     /** @var MockObject|MetadataStorage */

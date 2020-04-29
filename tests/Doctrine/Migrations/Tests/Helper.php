@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\FilesystemMigrationsRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\Version;
 use ReflectionMethod;
 use function array_map;
@@ -16,7 +17,7 @@ use function unlink;
 
 class Helper
 {
-    public static function registerMigrationInstance(FilesystemMigrationsRepository $repository, Version $version, AbstractMigration $migration) : void
+    public static function registerMigrationInstance(MigrationsRepository $repository, Version $version, AbstractMigration $migration) : void
     {
         $reflection = new ReflectionMethod(FilesystemMigrationsRepository::class, 'registerMigrationInstance');
         $reflection->setAccessible(true);

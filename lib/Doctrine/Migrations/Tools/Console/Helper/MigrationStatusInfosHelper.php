@@ -7,11 +7,11 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Helper\Table;
@@ -46,14 +46,14 @@ class MigrationStatusInfosHelper
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /** @var FilesystemMigrationsRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     public function __construct(
         Configuration $configuration,
         Connection $connection,
         AliasResolver $aliasResolver,
-        FilesystemMigrationsRepository $migrationRepository,
+        MigrationsRepository $migrationRepository,
         MetadataStorage $metadataStorage
     ) {
         $this->configuration       = $configuration;

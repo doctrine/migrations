@@ -17,12 +17,12 @@ use function class_exists;
 use function uasort;
 
 /**
- * The FilesystemMigrationsRepository class is responsible for retrieving migrations from the filesystem,
- * determining what the current migration version, etc.
+ * The MigrationRepository class is responsible for retrieving migrations, determining what the current migration
+ * version, etc.
  *
  * @internal
  */
-class FilesystemMigrationsRepository
+class FilesystemMigrationsRepository implements MigrationsRepository
 {
     /** @var bool */
     private $migrationsLoaded = false;
