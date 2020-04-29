@@ -28,7 +28,6 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function strpos;
@@ -142,15 +141,14 @@ class MigrateCommandTest extends MigrationTestCase
         $migrator->expects(self::never())
             ->method('migrate');
 
-        $this->questions->expects(self::at(0))
-            ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) : bool {
-                self::assertEquals(new ConfirmationQuestion('Are you sure you wish to continue? (y/n)'), $question);
-
-                return false;
-            });
+        $this->migrateCommandTester->setInputs(['no']);
 
         $this->migrateCommandTester->execute(['version' => 'prev']);
+
+        $output = $this->migrateCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('Are you sure you wish to continue?', $output);
+        self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
@@ -199,9 +197,7 @@ class MigrateCommandTest extends MigrationTestCase
         $migrator = $this->createMock(DbalMigrator::class);
         $this->dependencyFactory->setService(Migrator::class, $migrator);
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(true);
+        $this->migrateCommandTester->setInputs(['yes']);
 
         $migrator->expects(self::once())
             ->method('migrate')
@@ -215,7 +211,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute([]);
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
-        self::assertSame('[notice] Migrating up to A', trim($this->migrateCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[notice] Migrating up to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMigrateDown() : void
@@ -232,9 +228,7 @@ class MigrateCommandTest extends MigrationTestCase
         $migrator = $this->createMock(DbalMigrator::class);
         $this->dependencyFactory->setService(Migrator::class, $migrator);
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(true);
+        $this->migrateCommandTester->setInputs(['yes']);
 
         $migrator->expects(self::once())
             ->method('migrate')
@@ -248,7 +242,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute(['version' => 'prev']);
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
-        self::assertSame('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMigrateAllOrNothing() : void
@@ -285,23 +279,15 @@ class MigrateCommandTest extends MigrationTestCase
         $migrator->expects(self::never())
             ->method('migrate');
 
-        $this->questions->expects(self::at(0))
-            ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) : bool {
-                self::assertEquals(new ConfirmationQuestion('Are you sure you wish to continue? (y/n)'), $question);
-
-                return true;
-            });
-
-        $this->questions->expects(self::at(1))
-            ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) : bool {
-                self::assertEquals(new ConfirmationQuestion('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)'), $question);
-
-                return false;
-            });
+        $this->migrateCommandTester->setInputs(['yes', 'no']);
 
         $this->migrateCommandTester->execute(['version' => 'latest']);
+
+        $output = $this->migrateCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('[WARNING] You have 1 previously executed migrations in the database that are not registered migrations.', $output);
+        self::assertStringContainsString('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?', $output);
+        self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
@@ -314,15 +300,14 @@ class MigrateCommandTest extends MigrationTestCase
         $migrator->expects(self::never())
             ->method('migrate');
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturnCallback(static function ($input, $output, $question) : bool {
-                self::assertEquals(new ConfirmationQuestion('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)'), $question);
-
-                return false;
-            });
+        $this->migrateCommandTester->setInputs(['no']);
 
         $this->migrateCommandTester->execute(['version' => 'latest']);
+
+        $output = $this->migrateCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?', $output);
+        self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }

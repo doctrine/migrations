@@ -111,14 +111,14 @@ EOT
         $this->markMigrated = $input->getOption('add');
 
         if ($input->isInteractive()) {
-            $question = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue? (y/n)';
+            $question = 'WARNING! You are about to add, delete or synchronize migration versions from the version table that could result in data lost. Are you sure you wish to continue?';
 
-            $confirmation = $this->askConfirmation($question, $input, $output);
+            $confirmation = $this->io->confirm($question);
 
             if ($confirmation) {
                 $this->markVersions($input, $output);
             } else {
-                $output->writeln('<error>Migration cancelled!</error>');
+                $this->io->error('Migration cancelled!');
             }
         } else {
             $this->markVersions($input, $output);
@@ -204,15 +204,15 @@ EOT
 
             $question =
                 'WARNING! You are about to delete a migration version from the version table that has no corresponding migration file.' .
-                'Do you want to delete this migration from the migrations table? (y/n)';
+                'Do you want to delete this migration from the migrations table?';
 
-            $confirmation = $this->askConfirmation($question, $input, $output);
+            $confirmation = $this->io->confirm($question);
 
             if ($confirmation) {
                 $migrationResult = new ExecutionResult($version, Direction::DOWN);
                 $storage->complete($migrationResult);
-                $output->writeln(sprintf(
-                    '<info>%s</info> deleted from the version table.',
+                $this->io->text(sprintf(
+                    "<info>%s</info> deleted from the version table.\n",
                     (string) $version
                 ));
 
@@ -246,16 +246,16 @@ EOT
             $migrationResult = new ExecutionResult($version, Direction::UP);
             $storage->complete($migrationResult);
 
-            $output->writeln(sprintf(
-                '<info>%s</info> added to the version table.',
+            $this->io->text(sprintf(
+                "<info>%s</info> added to the version table.\n",
                 (string) $version
             ));
         } else {
             $migrationResult = new ExecutionResult($version, Direction::DOWN);
             $storage->complete($migrationResult);
 
-            $output->writeln(sprintf(
-                '<info>%s</info> deleted from the version table.',
+            $this->io->text(sprintf(
+                "<info>%s</info> deleted from the version table.\n",
                 (string) $version
             ));
         }

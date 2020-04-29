@@ -42,8 +42,8 @@ final class CurrentCommand extends DoctrineCommand
             }
         }
 
-        $output->writeln(sprintf(
-            '<info>%s</info>%s',
+        $this->io->text(sprintf(
+            "<info>%s</info>%s\n",
             (string) $version,
             $description !== '' ? ' - ' . $description : ''
         ));

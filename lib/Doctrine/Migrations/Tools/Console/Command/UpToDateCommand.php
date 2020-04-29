@@ -55,15 +55,15 @@ EOT
         $executedUnavailableMigrationsCount = count($executedUnavailableMigrations);
 
         if ($newMigrationsCount === 0 && $executedUnavailableMigrationsCount === 0) {
-            $output->writeln('<comment>Up-to-date! No migrations to execute.</comment>');
+            $this->io->success('Up-to-date! No migrations to execute.');
 
             return 0;
         }
 
         $exitCode = 0;
         if ($newMigrationsCount > 0) {
-            $output->writeln(sprintf(
-                '<error>Out-of-date! %u migration%s available to execute.</error>',
+            $this->io->error(sprintf(
+                'Out-of-date! %u migration%s available to execute.',
                 $newMigrationsCount,
                 $newMigrationsCount > 1 ? 's are' : ' is'
             ));
@@ -71,8 +71,8 @@ EOT
         }
 
         if ($executedUnavailableMigrationsCount > 0) {
-            $output->writeln(sprintf(
-                '<error>You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.</error>',
+            $this->io->error(sprintf(
+                'You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.',
                 $executedUnavailableMigrationsCount,
                 $executedUnavailableMigrationsCount > 1 ? 'are not' : 'is not a',
                 $executedUnavailableMigrationsCount > 1 ? 's' : ''
@@ -85,6 +85,8 @@ EOT
         if ($input->getOption('list-migrations')) {
             $versions = $this->getSortedVersions($newMigrations, $executedUnavailableMigrations);
             $this->getDependencyFactory()->getMigrationStatusInfosHelper()->listVersions($versions, $output);
+
+            $this->io->newLine();
         }
 
         return $exitCode;

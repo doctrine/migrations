@@ -123,7 +123,7 @@ EOT
         try {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
         } catch (UnknownMigrationVersion|NoMigrationsFoundWithCriteria $e) {
-            $this->getVersionNameFromAlias($versionAlias, $output);
+            $this->getVersionNameFromAlias($versionAlias);
 
             return 1;
         }
@@ -132,7 +132,7 @@ EOT
         $statusCalculator              = $this->getDependencyFactory()->getMigrationStatusCalculator();
         $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
 
-        if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input, $output) === false) {
+        if ($this->checkExecutedUnavailableMigrations($executedUnavailableMigrations, $input) === false) {
             return 3;
         }
 
@@ -142,13 +142,13 @@ EOT
         $plan = $planCalculator->getPlanUntilVersion($version);
 
         if (count($plan) === 0 && ! $allowNoMigration) {
-            $output->writeln('Could not find any migrations to execute.');
+            $this->io->warning('Could not find any migrations to execute.');
 
             return 1;
         }
 
         if (count($plan) === 0) {
-            $this->getVersionNameFromAlias($versionAlias, $output);
+            $this->getVersionNameFromAlias($versionAlias);
 
             return 0;
         }
@@ -161,7 +161,7 @@ EOT
             $path = is_string($path) ? $path : getcwd();
 
             if (! is_string($path) || ! is_writable($path)) {
-                $output->writeln('<error>Path not writeable!</error>');
+                $this->io->error('Path not writeable!');
 
                 return 1;
             }
@@ -172,10 +172,10 @@ EOT
             return 0;
         }
 
-        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue? (y/n)';
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?';
 
-        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
-            $output->writeln('<error>Migration cancelled!</error>');
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
+            $this->io->error('Migration cancelled!');
 
             return 3;
         }
@@ -192,23 +192,24 @@ EOT
 
         $migrator->migrate($plan, $migratorConfiguration);
 
+        $this->io->newLine();
+
         return 0;
     }
 
     private function checkExecutedUnavailableMigrations(
         ExecutedMigrationsSet $executedUnavailableMigrations,
-        InputInterface $input,
-        OutputInterface $output
+        InputInterface $input
     ) : bool {
         if (count($executedUnavailableMigrations) !== 0) {
-            $output->writeln(sprintf(
-                '<error>WARNING! You have %s previously executed migrations in the database that are not registered migrations.</error>',
+            $this->io->warning(sprintf(
+                'You have %s previously executed migrations in the database that are not registered migrations.',
                 count($executedUnavailableMigrations)
             ));
 
             foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
-                $output->writeln(sprintf(
-                    '    <comment>>></comment> %s (<comment>%s</comment>)',
+                $this->io->text(sprintf(
+                    '<comment>>></comment> %s (<comment>%s</comment>)',
                     $executedUnavailableMigration->getExecutedAt() !== null
                         ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
                         : null,
@@ -216,10 +217,10 @@ EOT
                 ));
             }
 
-            $question = 'Are you sure you wish to continue? (y/n)';
+            $question = 'Are you sure you wish to continue?';
 
-            if (! $this->canExecute($question, $input, $output)) {
-                $output->writeln('<error>Migration cancelled!</error>');
+            if (! $this->canExecute($question, $input)) {
+                $this->io->error('Migration cancelled!');
 
                 return false;
             }
@@ -228,30 +229,28 @@ EOT
         return true;
     }
 
-    private function getVersionNameFromAlias(
-        string $versionAlias,
-        OutputInterface $output
-    ) : void {
+    private function getVersionNameFromAlias(string $versionAlias) : void
+    {
         if ($versionAlias === 'first') {
-            $output->writeln('<error>Already at first version.</error>');
+            $this->io->error('Already at first version.');
 
             return;
         }
 
         if ($versionAlias === 'next' || $versionAlias === 'latest') {
-            $output->writeln('<error>Already at latest version.</error>');
+            $this->io->error('Already at latest version.');
 
             return;
         }
 
         if (substr($versionAlias, 0, 7) === 'current') {
-            $output->writeln('<error>The delta couldn\'t be reached.</error>');
+            $this->io->error('The delta couldn\'t be reached.');
 
             return;
         }
 
-        $output->writeln(sprintf(
-            '<error>Unknown version: %s</error>',
+        $this->io->error(sprintf(
+            'Unknown version: %s',
             OutputFormatter::escape($versionAlias)
         ));
     }

@@ -18,9 +18,8 @@ use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
+use function array_map;
 use function explode;
 use function sys_get_temp_dir;
 use function trim;
@@ -41,9 +40,6 @@ final class DiffCommandTest extends TestCase
 
     /** @var MockObject|DependencyFactory */
     private $dependencyFactory;
-
-    /** @var MockObject|QuestionHelper */
-    private $questions;
 
     /** @var CommandTester */
     private $diffCommandTester;
@@ -88,7 +84,7 @@ final class DiffCommandTest extends TestCase
             'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\\\\Version1234\'',
             '',
             'To revert the migration you can use migrations:execute --down \'FooNs\\\\Version1234\'',
-        ], explode("\n", trim($output)));
+        ], array_map('trim', explode("\n", trim($output))));
     }
 
     public function testAvailableMigrationsCancel() : void
@@ -103,19 +99,16 @@ final class DiffCommandTest extends TestCase
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(new ExecutedMigrationsSet([]));
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(false);
+        $this->diffCommandTester->setInputs(['no']);
 
         $this->migrationDiffGenerator->expects(self::never())->method('generate');
 
         $statusCode = $this->diffCommandTester->execute([]);
 
         $output = $this->diffCommandTester->getDisplay(true);
-        self::assertSame([
-            'WARNING! You have 1 available migrations to execute.',
-            'Migration cancelled!',
-        ], explode("\n", trim($output)));
+
+        self::assertStringContainsString('[WARNING] You have 1 available migrations to execute.', $output);
+        self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $statusCode);
     }
@@ -133,20 +126,17 @@ final class DiffCommandTest extends TestCase
             ->method('getExecutedUnavailableMigrations')
             ->willReturn(new ExecutedMigrationsSet([$e1]));
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(false);
+        $this->diffCommandTester->setInputs(['no']);
 
         $this->migrationDiffGenerator->expects(self::never())->method('generate');
 
         $statusCode = $this->diffCommandTester->execute([]);
 
         $output = $this->diffCommandTester->getDisplay(true);
-        self::assertSame([
-            'WARNING! You have 1 available migrations to execute.',
-            'WARNING! You have 1 previously executed migrations in the database that are not registered migrations.',
-            'Migration cancelled!',
-        ], explode("\n", trim($output)));
+
+        self::assertStringContainsString('[WARNING] You have 1 available migrations to execute.', $output);
+        self::assertStringContainsString('[WARNING] You have 1 previously executed migrations in the database that are not registered migrations.', $output);
+        self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $statusCode);
     }
@@ -179,8 +169,5 @@ final class DiffCommandTest extends TestCase
 
         $this->diffCommand       = new DiffCommand($this->dependencyFactory);
         $this->diffCommandTester = new CommandTester($this->diffCommand);
-
-        $this->questions = $this->createStub(QuestionHelper::class);
-        $this->diffCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
     }
 }

@@ -130,7 +130,7 @@ EOT
         $newMigrations                 = $statusCalculator->getNewMigrations();
 
         if (! $this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input, $output)) {
-            $output->writeln('<error>Migration cancelled!</error>');
+            $this->io->error('Migration cancelled!');
 
             return 3;
         }
@@ -149,7 +149,7 @@ EOT
             );
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {
-                $output->writeln($exception->getMessage());
+                $this->io->error($exception->getMessage());
 
                 return 0;
             }
@@ -157,7 +157,7 @@ EOT
             throw $exception;
         }
 
-        $output->writeln([
+        $this->io->text([
             sprintf('Generated new migration class to "<info>%s</info>"', $path),
             '',
             sprintf(
@@ -169,6 +169,7 @@ EOT
                 'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
                 addslashes($fqcn)
             ),
+            '',
         ]);
 
         return 0;
@@ -185,19 +186,19 @@ EOT
         }
 
         if (count($newMigrations) !== 0) {
-            $output->writeln(sprintf(
-                '<error>WARNING! You have %d available migrations to execute.</error>',
+            $this->io->warning(sprintf(
+                'You have %d available migrations to execute.',
                 count($newMigrations)
             ));
         }
 
         if (count($executedUnavailableMigrations) !== 0) {
-            $output->writeln(sprintf(
-                '<error>WARNING! You have %d previously executed migrations in the database that are not registered migrations.</error>',
+            $this->io->warning(sprintf(
+                'You have %d previously executed migrations in the database that are not registered migrations.',
                 count($executedUnavailableMigrations)
             ));
         }
 
-        return $this->canExecute('Are you sure you wish to continue? (y/n)', $input, $output);
+        return $this->canExecute('Are you sure you wish to continue?', $input);
     }
 }

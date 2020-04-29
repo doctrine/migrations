@@ -123,7 +123,7 @@ EOT
             $path = is_string($path) ? $path : getcwd();
 
             if (! is_string($path) || ! is_writable($path)) {
-                $output->writeln('<error>Path not writeable!</error>');
+                $this->io->error('Path not writeable!');
 
                 return 1;
             }
@@ -134,10 +134,10 @@ EOT
             return 0;
         }
 
-        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue? (y/n)';
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data lost. Are you sure you wish to continue?';
 
-        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input, $output)) {
-            $output->writeln('<error>Migration cancelled!</error>');
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
+            $this->io->error('Migration cancelled!');
 
             return 1;
         }

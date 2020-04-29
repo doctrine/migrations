@@ -111,7 +111,7 @@ EOT
             $lineLength
         );
 
-        $output->writeln([
+        $this->io->text([
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),
             '',
             sprintf(
@@ -125,6 +125,7 @@ EOT
             ),
             '',
             'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',
+            '',
         ]);
 
         return 0;

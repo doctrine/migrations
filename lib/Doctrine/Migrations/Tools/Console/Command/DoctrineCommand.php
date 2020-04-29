@@ -14,7 +14,8 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Question\ConfirmationQuestion;
+use Symfony\Component\Console\Style\StyleInterface;
+use Symfony\Component\Console\Style\SymfonyStyle;
 use function is_string;
 
 /**
@@ -24,6 +25,9 @@ abstract class DoctrineCommand extends Command
 {
     /** @var DependencyFactory|null */
     private $dependencyFactory;
+
+    /** @var StyleInterface */
+    protected $io;
 
     public function __construct(?DependencyFactory $dependencyFactory = null, ?string $name = null)
     {
@@ -55,6 +59,8 @@ abstract class DoctrineCommand extends Command
 
     protected function initialize(InputInterface $input, OutputInterface $output) : void
     {
+        $this->io = new SymfonyStyle($input, $output);
+
         $configurationParameter = $input->getOption('configuration');
         if ($this->dependencyFactory === null) {
             $configurationLoader     = new ConfigurationFileWithFallback(
@@ -87,23 +93,8 @@ abstract class DoctrineCommand extends Command
         return $this->dependencyFactory;
     }
 
-    protected function askConfirmation(
-        string $question,
-        InputInterface $input,
-        OutputInterface $output
-    ) : bool {
-        return $this->getHelper('question')->ask(
-            $input,
-            $output,
-            new ConfirmationQuestion($question)
-        );
-    }
-
-    protected function canExecute(
-        string $question,
-        InputInterface $input,
-        OutputInterface $output
-    ) : bool {
-        return ! $input->isInteractive() || $this->askConfirmation($question, $input, $output);
+    protected function canExecute(string $question, InputInterface $input) : bool
+    {
+        return ! $input->isInteractive() || $this->io->confirm($question);
     }
 }

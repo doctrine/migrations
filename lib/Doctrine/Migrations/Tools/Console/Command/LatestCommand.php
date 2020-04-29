@@ -39,8 +39,8 @@ final class LatestCommand extends DoctrineCommand
             $description = '';
         }
 
-        $output->writeln(sprintf(
-            '<info>%s</info>%s',
+        $this->io->text(sprintf(
+            "<info>%s</info>%s\n",
             $version,
             $description !== '' ? ' - ' . $description : ''
         ));

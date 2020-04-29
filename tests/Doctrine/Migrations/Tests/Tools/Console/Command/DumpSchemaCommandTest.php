@@ -18,6 +18,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
+use function array_map;
 use function explode;
 use function sys_get_temp_dir;
 use function trim;
@@ -84,7 +85,7 @@ final class DumpSchemaCommandTest extends TestCase
                 '',
                 'To use this as a rollup migration you can use the migrations:rollup command.',
             ],
-            explode("\n", trim($output))
+            array_map('trim', explode("\n", trim($output)))
         );
     }
 

@@ -9,8 +9,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Tools\Console\Command\SyncMetadataCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Tester\CommandTester;
 
 final class SyncMetadataCommandTest extends TestCase
 {
@@ -23,19 +22,19 @@ final class SyncMetadataCommandTest extends TestCase
     /** @var SyncMetadataCommand */
     private $storageCommand;
 
+    /** @var CommandTester */
+    private $storageCommandTester;
+
     public function testExecute() : void
     {
-        $input  = $this->createMock(InputInterface::class);
-        $output = $this->createMock(OutputInterface::class);
-
         $this->storage->expects(self::once())
             ->method('ensureInitialized');
 
-        $output->expects(self::once())
-            ->method('writeln')
-            ->with('Metadata storage synchronized');
+        $this->storageCommandTester->execute([]);
 
-        $this->storageCommand->execute($input, $output);
+        $output = $this->storageCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('[OK] Metadata storage synchronized', $output);
     }
 
     protected function setUp() : void
@@ -49,5 +48,7 @@ final class SyncMetadataCommandTest extends TestCase
             ->willReturn($this->storage);
 
         $this->storageCommand = new SyncMetadataCommand($this->dependencyFactory);
+
+        $this->storageCommandTester = new CommandTester($this->storageCommand);
     }
 }

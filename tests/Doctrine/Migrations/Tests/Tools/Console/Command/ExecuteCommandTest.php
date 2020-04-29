@@ -21,8 +21,6 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
-use Symfony\Component\Console\Helper\HelperSet;
-use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function sys_get_temp_dir;
@@ -47,9 +45,6 @@ class ExecuteCommandTest extends MigrationTestCase
 
     /** @var MigrationPlanCalculator|MockObject */
     private $planCalculator;
-
-    /** @var MockObject|QuestionHelper */
-    private $questions;
 
     /**
      * @param mixed $arg
@@ -93,9 +88,7 @@ class ExecuteCommandTest extends MigrationTestCase
 
     public function testExecute() : void
     {
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(true);
+        $this->executeCommandTester->setInputs(['yes']);
 
         $this->migrator
             ->expects(self::once())
@@ -112,7 +105,7 @@ class ExecuteCommandTest extends MigrationTestCase
         ]);
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
-        self::assertSame('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMultiple() : void
@@ -127,9 +120,7 @@ class ExecuteCommandTest extends MigrationTestCase
             ->with([new Version('1'), new Version('2')])
             ->willReturn($pl);
 
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(true);
+        $this->executeCommandTester->setInputs(['yes']);
 
         $this->migrator
             ->expects(self::once())
@@ -146,14 +137,12 @@ class ExecuteCommandTest extends MigrationTestCase
         ]);
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
-        self::assertSame('[notice] Executing 1, 2 up', trim($this->executeCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[notice] Executing 1, 2 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteCancel() : void
     {
-        $this->questions->expects(self::once())
-            ->method('ask')
-            ->willReturn(false);
+        $this->executeCommandTester->setInputs(['no']);
 
         $this->migrator
             ->expects(self::never())
@@ -200,9 +189,6 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
         $this->executeCommand = new ExecuteCommand($this->dependencyFactory);
-
-        $this->questions = $this->createMock(QuestionHelper::class);
-        $this->executeCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
 
         $this->executeCommandTester = new CommandTester($this->executeCommand);
     }
