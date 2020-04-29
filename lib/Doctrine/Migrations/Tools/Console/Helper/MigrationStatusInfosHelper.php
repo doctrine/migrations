@@ -7,12 +7,12 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableCell;
@@ -49,11 +49,15 @@ class MigrationStatusInfosHelper
     /** @var MigrationsRepository */
     private $migrationRepository;
 
+    /** @var MigrationStatusCalculator */
+    private $statusCalculator;
+
     public function __construct(
         Configuration $configuration,
         Connection $connection,
         AliasResolver $aliasResolver,
         MigrationsRepository $migrationRepository,
+        MigrationStatusCalculator $statusCalculator,
         MetadataStorage $metadataStorage
     ) {
         $this->configuration       = $configuration;
@@ -61,6 +65,7 @@ class MigrationStatusInfosHelper
         $this->aliasResolver       = $aliasResolver;
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;
+        $this->statusCalculator    = $statusCalculator;
     }
 
     /**
@@ -115,13 +120,14 @@ class MigrationStatusInfosHelper
         $table->render();
     }
 
-    public function showMigrationsInfo(
-        OutputInterface $output,
-        AvailableMigrationsList $availableMigrations,
-        ExecutedMigrationsList $executedMigrations,
-        AvailableMigrationsList $newMigrations,
-        ExecutedMigrationsList $executedUnavailableMigrations
-    ) : void {
+    public function showMigrationsInfo(OutputInterface $output) : void
+    {
+        $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
+        $availableMigrations = $this->migrationRepository->getMigrations();
+
+        $newMigrations                 = $this->statusCalculator->getNewMigrations();
+        $executedUnavailableMigrations = $this->statusCalculator->getExecutedUnavailableMigrations();
+
         $storage = $this->configuration->getMetadataStorageConfiguration();
 
         $table = new Table($output);
