@@ -286,10 +286,10 @@ class DependencyFactory
         });
     }
 
-    public function getMigrationRepository() : MigrationRepository
+    public function getMigrationRepository() : FilesystemMigrationsRepository
     {
-        return $this->getDependency(MigrationRepository::class, function () : MigrationRepository {
-            return new MigrationRepository(
+        return $this->getDependency(FilesystemMigrationsRepository::class, function () : FilesystemMigrationsRepository {
+            return new FilesystemMigrationsRepository(
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),

@@ -9,9 +9,9 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\CurrentCommand;
@@ -28,7 +28,7 @@ class CurrentCommandTest extends MigrationTestCase
     /** @var CurrentCommand */
     private $command;
 
-    /** @var MigrationRepository */
+    /** @var FilesystemMigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */

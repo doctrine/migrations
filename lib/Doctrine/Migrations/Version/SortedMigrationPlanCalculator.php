@@ -5,12 +5,12 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
 use function array_diff;
 use function array_filter;
 use function array_map;
@@ -27,13 +27,13 @@ use function reset;
  */
 final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
 {
-    /** @var MigrationRepository */
+    /** @var FilesystemMigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
+    public function __construct(FilesystemMigrationsRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;

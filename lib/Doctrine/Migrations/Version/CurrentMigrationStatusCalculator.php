@@ -4,12 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Version;
 
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
 use function array_filter;
 
 /**
@@ -18,13 +18,13 @@ use function array_filter;
  */
 final class CurrentMigrationStatusCalculator implements MigrationStatusCalculator
 {
-    /** @var MigrationRepository */
+    /** @var FilesystemMigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
+    public function __construct(FilesystemMigrationsRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;

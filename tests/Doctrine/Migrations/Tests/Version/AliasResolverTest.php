@@ -10,10 +10,10 @@ use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
@@ -29,7 +29,7 @@ use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
 {
-    /** @var MigrationRepository */
+    /** @var FilesystemMigrationsRepository */
     private $migrationRepository;
 
     /** @var DefaultAliasResolver */
@@ -140,7 +140,7 @@ final class AliasResolverTest extends TestCase
 
         $versionFactory = $this->createMock(MigrationFactory::class);
 
-        $this->migrationRepository = new MigrationRepository(
+        $this->migrationRepository = new FilesystemMigrationsRepository(
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
