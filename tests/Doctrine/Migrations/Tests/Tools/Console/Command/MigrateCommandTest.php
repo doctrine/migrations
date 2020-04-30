@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\TableDiff;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
@@ -15,6 +19,7 @@ use Doctrine\Migrations\Finder\Finder;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
+use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
@@ -60,6 +65,12 @@ class MigrateCommandTest extends MigrationTestCase
 
     /** @var MigrationsRepository */
     private $migrationRepository;
+
+    /** @var Connection */
+    private $connection;
+
+    /** @var TableMetadataStorageConfiguration */
+    private $metadataConfiguration;
 
     public function testExecuteEmptyMigrationPlanCausesException() : void
     {
@@ -215,6 +226,32 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Migrating up to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
+    public function testExecuteMigrateUpdatesMigrationsTableWhenNeeded() : void
+    {
+        $this->alterMetadataTable();
+
+        $this->migrateCommandTester->execute([], ['interactive' => false]);
+
+        $refreshedTable = $this->connection->getSchemaManager()
+            ->listTableDetails($this->metadataConfiguration->getTableName());
+
+        self::assertFalse($refreshedTable->hasColumn('extra'));
+    }
+
+    public function testExecuteMigrateDoesNotUpdateMigrationsTableWhenSyaingNo() : void
+    {
+        $this->alterMetadataTable();
+
+        $this->migrateCommandTester->setInputs(['no']);
+
+        $this->migrateCommandTester->execute([]);
+
+        $refreshedTable = $this->connection->getSchemaManager()
+            ->listTableDetails($this->metadataConfiguration->getTableName());
+
+        self::assertTrue($refreshedTable->hasColumn('extra'));
+    }
+
     public function testExecuteMigrateDown() : void
     {
         $migration = $this->createMock(AbstractMigration::class);
@@ -315,12 +352,16 @@ class MigrateCommandTest extends MigrationTestCase
 
     protected function setUp() : void
     {
+        $this->metadataConfiguration = new TableMetadataStorageConfiguration();
+
         $this->configuration = new Configuration();
+        $this->configuration->setMetadataStorageConfiguration($this->metadataConfiguration);
+
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
-        $connection = $this->getSqliteConnection();
+        $this->connection = $this->getSqliteConnection();
 
-        $this->dependencyFactory = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($connection));
+        $this->dependencyFactory = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
 
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
@@ -341,9 +382,26 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester = new CommandTester($this->migrateCommand);
 
-        $this->storage = new TableMetadataStorage($connection, $this->configuration->getMetadataStorageConfiguration(), $this->migrationRepository);
+        $this->storage = new TableMetadataStorage($this->connection, $this->metadataConfiguration, $this->migrationRepository);
         $this->storage->ensureInitialized();
 
         $this->dependencyFactory->setService(MetadataStorage::class, $this->storage);
+    }
+
+    private function alterMetadataTable() : void
+    {
+        $originalTable = $this->connection->getSchemaManager()
+            ->listTableDetails($this->metadataConfiguration->getTableName());
+
+        $modifiedTable = clone $originalTable;
+        $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
+
+        $comparator = new Comparator();
+        $diff       = $comparator->diffTable($originalTable, $modifiedTable);
+        if (! ($diff instanceof TableDiff)) {
+            return;
+        }
+
+        $this->connection->getSchemaManager()->alterTable($diff);
     }
 }

@@ -22,10 +22,11 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
     {
         $timeAllQueries = $input->hasOption('query-time') ? (bool) $input->getOption('query-time') : false;
         $dryRun         = $input->hasOption('dry-run') ? (bool) $input->getOption('dry-run') : false;
+        $writeSql       = $input->hasOption('write-sql') ? $input->getOption('write-sql') : false;
         $allOrNothing   = $input->hasOption('all-or-nothing') ? (bool) $input->getOption('all-or-nothing') : $this->configuration->isAllOrNothing();
 
         return (new MigratorConfiguration())
-            ->setDryRun($dryRun)
+            ->setDryRun($dryRun || $writeSql !== false)
             ->setTimeAllQueries($timeAllQueries)
             ->setAllOrNothing($allOrNothing);
     }

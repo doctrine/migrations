@@ -144,6 +144,10 @@ class ExecuteCommandTest extends MigrationTestCase
     {
         $this->executeCommandTester->setInputs(['no']);
 
+        $this->planCalculator
+            ->expects(self::never())
+            ->method('getPlanForVersions');
+
         $this->migrator
             ->expects(self::never())
             ->method('migrate')
@@ -174,7 +178,6 @@ class ExecuteCommandTest extends MigrationTestCase
 
         $this->planCalculator = $this->createMock(MigrationPlanCalculator::class);
         $this->planCalculator
-            ->expects(self::once())
             ->method('getPlanForVersions')
             ->willReturn($pl);
 
