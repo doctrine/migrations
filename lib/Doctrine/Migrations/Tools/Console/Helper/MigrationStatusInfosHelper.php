@@ -11,7 +11,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Helper\Table;
@@ -46,14 +46,14 @@ class MigrationStatusInfosHelper
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     public function __construct(
         Configuration $configuration,
         Connection $connection,
         AliasResolver $aliasResolver,
-        MigrationRepository $migrationRepository,
+        MigrationsRepository $migrationRepository,
         MetadataStorage $metadataStorage
     ) {
         $this->configuration       = $configuration;

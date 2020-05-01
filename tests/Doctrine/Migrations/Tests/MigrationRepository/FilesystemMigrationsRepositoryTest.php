@@ -8,8 +8,9 @@ use Closure;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\DuplicateMigrationVersion;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
@@ -22,12 +23,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function strcmp;
 
-class MigrationRepositoryTest extends TestCase
+class FilesystemMigrationsRepositoryTest extends TestCase
 {
     /** @var MigrationFactory|MockObject */
     private $versionFactory;
 
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     public function testCheckNonExistentMigration() : void
@@ -52,7 +53,7 @@ class MigrationRepositoryTest extends TestCase
 
     public function testLoadMigrationClassesProvidedViaConstructor() : void
     {
-        $migrationRepository = new MigrationRepository(
+        $migrationRepository = new FilesystemMigrationsRepository(
             [A::class],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
@@ -68,7 +69,7 @@ class MigrationRepositoryTest extends TestCase
 
     public function testNoMigrationsInFolder() : void
     {
-        $migrationRepository = new MigrationRepository(
+        $migrationRepository = new FilesystemMigrationsRepository(
             [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/NoMigrations',
@@ -91,7 +92,7 @@ class MigrationRepositoryTest extends TestCase
                 return strcmp((string) $b, (string) $a);
             }
         };
-        $migrationRepository = new MigrationRepository(
+        $migrationRepository = new FilesystemMigrationsRepository(
             [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',
@@ -154,7 +155,7 @@ class MigrationRepositoryTest extends TestCase
             ->method('createVersion')
             ->willReturnCallback(Closure::fromCallable([$this, 'createStub']));
 
-        $this->migrationRepository = new MigrationRepository(
+        $this->migrationRepository = new FilesystemMigrationsRepository(
             [],
             [
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',

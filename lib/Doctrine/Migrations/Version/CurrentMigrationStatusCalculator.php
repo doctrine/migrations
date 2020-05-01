@@ -9,7 +9,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use function array_filter;
 
 /**
@@ -18,13 +18,13 @@ use function array_filter;
  */
 final class CurrentMigrationStatusCalculator implements MigrationStatusCalculator
 {
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    public function __construct(MigrationRepository $migrationRepository, MetadataStorage $metadataStorage)
+    public function __construct(MigrationsRepository $migrationRepository, MetadataStorage $metadataStorage)
     {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;

@@ -17,7 +17,7 @@ use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -45,13 +45,13 @@ final class TableMetadataStorage implements MetadataStorage
     /** @var TableMetadataStorageConfiguration */
     private $configuration;
 
-    /** @var MigrationRepository|null */
+    /** @var MigrationsRepository|null */
     private $migrationRepository;
 
     public function __construct(
         Connection $connection,
         ?MetadataStorageConfiguration $configuration = null,
-        ?MigrationRepository $migrationRepository = null
+        ?MigrationsRepository $migrationRepository = null
     ) {
         $this->migrationRepository = $migrationRepository;
         $this->connection          = $connection;

@@ -5,12 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
@@ -22,7 +23,7 @@ final class MigrationStatusCalculatorTest extends TestCase
     /** @var MigrationStatusCalculator */
     private $migrationStatusCalculator;
 
-    /** @var MockObject|MigrationRepository */
+    /** @var MockObject|MigrationsRepository */
     private $migrationRepository;
 
     /** @var MockObject|MetadataStorage */
@@ -35,7 +36,7 @@ final class MigrationStatusCalculatorTest extends TestCase
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
 
-        $this->migrationRepository       = $this->createMock(MigrationRepository::class);
+        $this->migrationRepository       = $this->createMock(FilesystemMigrationsRepository::class);
         $this->metadataStorage           = $this->createMock(MetadataStorage::class);
         $this->migrationStatusCalculator = new CurrentMigrationStatusCalculator($this->migrationRepository, $this->metadataStorage);
     }

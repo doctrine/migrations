@@ -18,7 +18,7 @@ use function count;
  */
 class Rollup
 {
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     /** @var MetadataStorage */
@@ -26,7 +26,7 @@ class Rollup
 
     public function __construct(
         MetadataStorage $metadataStorage,
-        MigrationRepository $migrationRepository
+        MigrationsRepository $migrationRepository
     ) {
         $this->migrationRepository = $migrationRepository;
         $this->metadataStorage     = $metadataStorage;

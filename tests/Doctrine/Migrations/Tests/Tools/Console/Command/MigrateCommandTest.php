@@ -10,11 +10,12 @@ use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\Finder;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Migrator;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
@@ -57,7 +58,7 @@ class MigrateCommandTest extends MigrationTestCase
     /** @var MockObject|QuestionHelper */
     private $questions;
 
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     public function testExecuteEmptyMigrationPlanCausesException() : void
@@ -326,12 +327,12 @@ class MigrateCommandTest extends MigrationTestCase
 
         $finder                    = $this->createMock(Finder::class);
         $factory                   = $this->createMock(MigrationFactory::class);
-        $this->migrationRepository = new MigrationRepository([], [], $finder, $factory, new AlphabeticalComparator());
+        $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory, new AlphabeticalComparator());
 
         $migration = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('A'), $migration);
 
-        $this->dependencyFactory->setService(MigrationRepository::class, $this->migrationRepository);
+        $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
 
         $this->migrateCommand = new MigrateCommand($this->dependencyFactory);
 

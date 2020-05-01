@@ -7,10 +7,11 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
@@ -31,7 +32,7 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
 
-    /** @var MigrationRepository|MockObject */
+    /** @var MigrationsRepository|MockObject */
     private $migrationRepository;
 
     /** @var SchemaDumper|MockObject */
@@ -95,7 +96,7 @@ final class DumpSchemaCommandTest extends TestCase
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
-        $this->migrationRepository = $this->createMock(MigrationRepository::class);
+        $this->migrationRepository = $this->createMock(FilesystemMigrationsRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
 
         $classNameGenerator = $this->createMock(ClassNameGenerator::class);

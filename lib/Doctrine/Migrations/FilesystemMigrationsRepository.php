@@ -22,7 +22,7 @@ use function uasort;
  *
  * @internal
  */
-class MigrationRepository
+class FilesystemMigrationsRepository implements MigrationsRepository
 {
     /** @var bool */
     private $migrationsLoaded = false;

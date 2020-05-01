@@ -10,10 +10,11 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\AbstractMigration;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\MigrationFactory;
@@ -35,7 +36,7 @@ class ExistingTableMetadataStorageTest extends TestCase
     /** @var AbstractSchemaManager */
     private $schemaManager;
 
-    /** @var MigrationRepository */
+    /** @var MigrationsRepository */
     private $migrationRepository;
 
     private function getSqliteConnection() : Connection
@@ -52,7 +53,7 @@ class ExistingTableMetadataStorageTest extends TestCase
 
         $migration                 = $this->createMock(AbstractMigration::class);
         $versionFactory            = $this->createMock(MigrationFactory::class);
-        $this->migrationRepository = new MigrationRepository(
+        $this->migrationRepository = new FilesystemMigrationsRepository(
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),

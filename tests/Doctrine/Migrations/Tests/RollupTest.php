@@ -6,10 +6,11 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\RollupFailed;
+use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationRepository;
+use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Rollup;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -21,7 +22,7 @@ class RollupTest extends TestCase
     /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    /** @var MigrationRepository|MockObject */
+    /** @var MigrationsRepository|MockObject */
     private $repository;
 
     /** @var MetadataStorage|MockObject */
@@ -33,7 +34,7 @@ class RollupTest extends TestCase
     public function setUp() : void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
-        $this->repository        = $this->createMock(MigrationRepository::class);
+        $this->repository        = $this->createMock(FilesystemMigrationsRepository::class);
 
         $this->storage = $this->createMock(MetadataStorage::class);
         $this->rollup  = new Rollup($this->storage, $this->repository);
