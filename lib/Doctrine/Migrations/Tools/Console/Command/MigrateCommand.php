@@ -116,6 +116,18 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
+        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
+        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
+
+        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?';
+        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
+            $this->io->error('Migration cancelled!');
+
+            return 3;
+        }
+
+        $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
+
         $allowNoMigration = $input->getOption('allow-no-migration');
         $versionAlias     = $input->getArgument('version');
         $path             = $input->getOption('write-sql');
@@ -136,9 +148,6 @@ EOT
             return 3;
         }
 
-        $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
-        $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
-
         $plan = $planCalculator->getPlanUntilVersion($version);
 
         if (count($plan) === 0 && ! $allowNoMigration) {
@@ -154,8 +163,7 @@ EOT
         }
 
         $migrator = $this->getDependencyFactory()->getMigrator();
-        if ($path !== false) {
-            $migratorConfiguration->setDryRun(true);
+        if ($migratorConfiguration->isDryRun()) {
             $sql = $migrator->migrate($plan, $migratorConfiguration);
 
             $path = is_string($path) ? $path : getcwd();
@@ -171,16 +179,6 @@ EOT
 
             return 0;
         }
-
-        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?';
-
-        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
-            $this->io->error('Migration cancelled!');
-
-            return 3;
-        }
-
-        $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 
         $this->getDependencyFactory()->getLogger()->notice(
             'Migrating' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {direction} to {to}',
