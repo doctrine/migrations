@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -95,7 +95,7 @@ EOT
     /**
      * @return Version[]
      */
-    private function getSortedVersions(AvailableMigrationsList $newMigrations, ExecutedMigrationsSet $executedUnavailableMigrations) : array
+    private function getSortedVersions(AvailableMigrationsList $newMigrations, ExecutedMigrationsList $executedUnavailableMigrations) : array
     {
         $executedUnavailableVersion = array_map(static function (ExecutedMigration $executedMigration) : Version {
             return $executedMigration->getVersion();

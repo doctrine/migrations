@@ -8,7 +8,7 @@ use DateTimeImmutable;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
@@ -18,7 +18,7 @@ class ExecutedMigrationSetTest extends TestCase
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
-        $set = new ExecutedMigrationsSet([]);
+        $set = new ExecutedMigrationsList([]);
         $set->getFirst();
     }
 
@@ -26,7 +26,7 @@ class ExecutedMigrationSetTest extends TestCase
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
-        $set = new ExecutedMigrationsSet([]);
+        $set = new ExecutedMigrationsList([]);
         $set->getLast();
     }
 
@@ -36,7 +36,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertSame($m1, $set->getFirst());
         self::assertSame($m2, $set->getFirst(1));
     }
@@ -47,7 +47,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertSame($m3, $set->getLast());
         self::assertSame($m2, $set->getLast(-1));
     }
@@ -58,7 +58,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertSame([$m1, $m2, $m3], $set->getItems());
     }
 
@@ -68,7 +68,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertCount(3, $set);
     }
 
@@ -78,7 +78,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertSame($m2, $set->getMigration(new Version('B')));
     }
 
@@ -89,7 +89,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         $set->getMigration(new Version('D'));
     }
 
@@ -99,7 +99,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
-        $set = new ExecutedMigrationsSet([$m1, $m2, $m3]);
+        $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
         self::assertTrue($set->hasMigration(new Version('B')));
         self::assertFalse($set->hasMigration(new Version('D')));
     }

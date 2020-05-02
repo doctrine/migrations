@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -196,7 +196,7 @@ EOT
     }
 
     private function checkExecutedUnavailableMigrations(
-        ExecutedMigrationsSet $executedUnavailableMigrations,
+        ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input
     ) : bool {
         if (count($executedUnavailableMigrations) !== 0) {

@@ -12,7 +12,7 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
@@ -55,7 +55,7 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationStatusCalculator
             ->method('getExecutedUnavailableMigrations')
-            ->willReturn(new ExecutedMigrationsSet([]));
+            ->willReturn(new ExecutedMigrationsList([]));
 
         $this->classNameGenerator->expects(self::once())
             ->method('generateClassName')
@@ -97,7 +97,7 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationStatusCalculator
             ->method('getExecutedUnavailableMigrations')
-            ->willReturn(new ExecutedMigrationsSet([]));
+            ->willReturn(new ExecutedMigrationsList([]));
 
         $this->diffCommandTester->setInputs(['no']);
 
@@ -124,7 +124,7 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationStatusCalculator
             ->method('getExecutedUnavailableMigrations')
-            ->willReturn(new ExecutedMigrationsSet([$e1]));
+            ->willReturn(new ExecutedMigrationsList([$e1]));
 
         $this->diffCommandTester->setInputs(['no']);
 

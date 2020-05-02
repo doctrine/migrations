@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\SqlFormatter\SqlFormatter;
 use OutOfBoundsException;
@@ -178,7 +178,7 @@ EOT
 
     private function checkNewMigrationsOrExecutedUnavailable(
         AvailableMigrationsList $newMigrations,
-        ExecutedMigrationsSet $executedUnavailableMigrations,
+        ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input,
         OutputInterface $output
     ) : bool {

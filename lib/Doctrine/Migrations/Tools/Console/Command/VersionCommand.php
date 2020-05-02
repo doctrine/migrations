@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
 use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
@@ -188,7 +188,7 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsSet $executedMigrations) : void
+    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsList $executedMigrations) : void
     {
         try {
             $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);

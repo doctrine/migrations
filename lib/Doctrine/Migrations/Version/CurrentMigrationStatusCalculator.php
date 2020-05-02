@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Version;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use function array_filter;
@@ -30,23 +30,23 @@ final class CurrentMigrationStatusCalculator implements MigrationStatusCalculato
         $this->metadataStorage     = $metadataStorage;
     }
 
-    public function getExecutedUnavailableMigrations() : ExecutedMigrationsSet
+    public function getExecutedUnavailableMigrations() : ExecutedMigrationsList
     {
-        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrationsSet = $this->migrationRepository->getMigrations();
+        $executedMigrations = $this->metadataStorage->getExecutedMigrations();
+        $availableMigration = $this->migrationRepository->getMigrations();
 
-        return new ExecutedMigrationsSet(array_filter($executedMigrationsSet->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigrationsSet) : bool {
-            return ! $availableMigrationsSet->hasMigration($migrationInfo->getVersion());
+        return new ExecutedMigrationsList(array_filter($executedMigrations->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigration) : bool {
+            return ! $availableMigration->hasMigration($migrationInfo->getVersion());
         }));
     }
 
     public function getNewMigrations() : AvailableMigrationsList
     {
-        $executedMigrationsSet  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrationsSet = $this->migrationRepository->getMigrations();
+        $executedMigrations = $this->metadataStorage->getExecutedMigrations();
+        $availableMigration = $this->migrationRepository->getMigrations();
 
-        return new AvailableMigrationsList(array_filter($availableMigrationsSet->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrationsSet) : bool {
-            return ! $executedMigrationsSet->hasMigration($migrationInfo->getVersion());
+        return new AvailableMigrationsList(array_filter($availableMigration->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrations) : bool {
+            return ! $executedMigrations->hasMigration($migrationInfo->getVersion());
         }));
     }
 }

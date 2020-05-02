@@ -8,7 +8,7 @@ use DateTimeInterface;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\MigrationsRepository;
@@ -118,9 +118,9 @@ class MigrationStatusInfosHelper
     public function showMigrationsInfo(
         OutputInterface $output,
         AvailableMigrationsList $availableMigrations,
-        ExecutedMigrationsSet $executedMigrations,
+        ExecutedMigrationsList $executedMigrations,
         AvailableMigrationsList $newMigrations,
-        ExecutedMigrationsSet $executedUnavailableMigrations
+        ExecutedMigrationsList $executedUnavailableMigrations
     ) : void {
         $storage = $this->configuration->getMetadataStorageConfiguration();
 
@@ -191,7 +191,7 @@ class MigrationStatusInfosHelper
         $table->render();
     }
 
-    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsSet $executedMigrationsSet) : string
+    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsList $executedMigrations) : string
     {
         try {
             $version = $this->aliasResolver->resolveVersionAlias($alias);
@@ -210,7 +210,7 @@ class MigrationStatusInfosHelper
             }
         }
 
-        if ($alias === 'latest' && $version!== null && $executedMigrationsSet->hasMigration($version)) {
+        if ($alias === 'latest' && $version!== null && $executedMigrations->hasMigration($version)) {
             return 'Already at latest version';
         }
 

@@ -320,6 +320,7 @@ class DependencyFactory
         return $this->getDependency(MetadataStorage::class, function () : MetadataStorage {
             return new TableMetadataStorage(
                 $this->getConnection(),
+                $this->getVersionComparator(),
                 $this->getConfiguration()->getMetadataStorageConfiguration(),
                 $this->getMigrationRepository()
             );

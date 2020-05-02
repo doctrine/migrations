@@ -10,7 +10,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\Direction;
@@ -123,7 +123,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
-            ->willReturn(new ExecutedMigrationsSet([]));
+            ->willReturn(new ExecutedMigrationsList([]));
 
         $plan = $this->migrationPlanCalculator->getPlanUntilVersion(new Version($to));
 
@@ -161,7 +161,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
-            ->willReturn(new ExecutedMigrationsSet([$e1, $e2]));
+            ->willReturn(new ExecutedMigrationsList([$e1, $e2]));
 
         $plan = $this->migrationPlanCalculator->getPlanUntilVersion(new Version($to));
 

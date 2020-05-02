@@ -14,9 +14,9 @@ use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
 use Doctrine\Migrations\Exception\MetadataStorageError;
-use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -50,7 +50,7 @@ class TableMetadataStorageTest extends TestCase
         $this->schemaManager = $this->connection->getSchemaManager();
 
         $this->config  = new TableMetadataStorageConfiguration();
-        $this->storage = new TableMetadataStorage($this->connection, $this->config);
+        $this->storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $this->config);
     }
 
     public function testDifferentTableNotUpdatedOnRead() : void
@@ -88,7 +88,7 @@ class TableMetadataStorageTest extends TestCase
         $table->setPrimaryKey([$config->getVersionColumnName()]);
         $this->schemaManager->createTable($table);
 
-        $storage = new TableMetadataStorage($this->connection, $config);
+        $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
 
         $storage->ensureInitialized();
 
@@ -116,7 +116,7 @@ class TableMetadataStorageTest extends TestCase
         $table->setPrimaryKey([$config->getVersionColumnName()]);
         $this->schemaManager->createTable($table);
 
-        $storage = new TableMetadataStorage($this->connection, $config);
+        $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
         $storage->getExecutedMigrations();
     }
 
@@ -129,7 +129,7 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutedAtColumnName('c');
         $config->setExecutionTimeColumnName('d');
 
-        $storage = new TableMetadataStorage($this->connection, $config);
+        $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
 
         $storage->ensureInitialized();
 
@@ -218,13 +218,20 @@ class TableMetadataStorageTest extends TestCase
         self::assertNull($m2->getExecutionTime());
     }
 
-    public function testExecutedMigrationWithTiming() : void
+    public function testReadIsSorted() : void
     {
-        $date = new DateTimeImmutable();
-        $m1   = new ExecutedMigration(new Version('A'), $date, 123.0);
+        $this->storage->ensureInitialized();
 
-        self::assertSame($date, $m1->getExecutedAt());
-        self::assertSame(123.0, $m1->getExecutionTime());
+        $result = new ExecutionResult(new Version('9000'), Direction::UP);
+        $this->storage->complete($result);
+
+        $result = new ExecutionResult(new Version('1000'), Direction::UP);
+        $this->storage->complete($result);
+
+        $executedMigrations = $this->storage->getExecutedMigrations();
+
+        self::assertEquals(new Version('1000'), $executedMigrations->getItems()[0]->getVersion());
+        self::assertEquals(new Version('9000'), $executedMigrations->getItems()[1]->getVersion());
     }
 
     public function testCompleteDownRemovesTheRow() : void
