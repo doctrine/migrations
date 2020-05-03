@@ -148,7 +148,8 @@ final class AliasResolverTest extends TestCase
             $versionFactory,
             new AlphabeticalComparator()
         );
-        $this->metadataStorage     = new TableMetadataStorage($conn);
+
+        $this->metadataStorage = new TableMetadataStorage($conn, new AlphabeticalComparator());
         $this->metadataStorage->ensureInitialized();
 
         $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationRepository, $this->metadataStorage);

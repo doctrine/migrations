@@ -86,7 +86,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         }, $toExecute), $direction);
     }
 
-    private function findDirection(Version $to, Metadata\ExecutedMigrationsSet $executedMigrations) : string
+    private function findDirection(Version $to, Metadata\ExecutedMigrationsList $executedMigrations) : string
     {
         if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && ! $executedMigrations->getLast()->getVersion()->equals($to))) {
             return Direction::DOWN;
@@ -108,7 +108,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
      *
      * @return AvailableMigration[]
      */
-    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsSet $executedMigrations) : array
+    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, Metadata\ExecutedMigrationsList $executedMigrations) : array
     {
         $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {

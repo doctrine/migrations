@@ -16,8 +16,9 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\MigrationsRepository;
+use Doctrine\Migrations\Version\Comparator as MigrationsComparator;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -29,6 +30,7 @@ use function sprintf;
 use function strlen;
 use function strpos;
 use function strtolower;
+use function uasort;
 use const CASE_LOWER;
 
 final class TableMetadataStorage implements MetadataStorage
@@ -48,8 +50,12 @@ final class TableMetadataStorage implements MetadataStorage
     /** @var MigrationsRepository|null */
     private $migrationRepository;
 
+    /** @var MigrationsComparator */
+    private $comparator;
+
     public function __construct(
         Connection $connection,
+        MigrationsComparator $comparator,
         ?MetadataStorageConfiguration $configuration = null,
         ?MigrationsRepository $migrationRepository = null
     ) {
@@ -63,12 +69,13 @@ final class TableMetadataStorage implements MetadataStorage
         }
 
         $this->configuration = $configuration ?? new TableMetadataStorageConfiguration();
+        $this->comparator    = $comparator;
     }
 
-    public function getExecutedMigrations() : ExecutedMigrationsSet
+    public function getExecutedMigrations() : ExecutedMigrationsList
     {
         if (! $this->isInitialized()) {
-            return new ExecutedMigrationsSet([]);
+            return new ExecutedMigrationsList([]);
         }
 
         $this->checkInitialization();
@@ -98,7 +105,11 @@ final class TableMetadataStorage implements MetadataStorage
             $migrations[(string) $version] = $migration;
         }
 
-        return new ExecutedMigrationsSet($migrations);
+        uasort($migrations, function (ExecutedMigration $a, ExecutedMigration $b) : int {
+            return $this->comparator->compare($a->getVersion(), $b->getVersion());
+        });
+
+        return new ExecutedMigrationsList($migrations);
     }
 
     public function reset() : void

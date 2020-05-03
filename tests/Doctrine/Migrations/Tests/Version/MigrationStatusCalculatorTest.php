@@ -9,7 +9,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
@@ -57,7 +57,7 @@ final class MigrationStatusCalculatorTest extends TestCase
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
-            ->willReturn(new ExecutedMigrationsSet([$e1]));
+            ->willReturn(new ExecutedMigrationsList([$e1]));
 
         $newSet = $this->migrationStatusCalculator->getNewMigrations();
 
@@ -80,7 +80,7 @@ final class MigrationStatusCalculatorTest extends TestCase
         $this->metadataStorage
             ->expects(self::atLeastOnce())
             ->method('getExecutedMigrations')
-            ->willReturn(new ExecutedMigrationsSet([$e1, $e2, $e3]));
+            ->willReturn(new ExecutedMigrationsList([$e1, $e2, $e3]));
 
         $newSet = $this->migrationStatusCalculator->getExecutedUnavailableMigrations();
 

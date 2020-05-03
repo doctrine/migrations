@@ -64,7 +64,12 @@ class ExistingTableMetadataStorageTest extends TestCase
 
         $this->config = new TableMetadataStorageConfiguration();
 
-        $this->storage = new TableMetadataStorage($this->connection, $this->config, $this->migrationRepository);
+        $this->storage = new TableMetadataStorage(
+            $this->connection,
+            new AlphabeticalComparator(),
+            $this->config,
+            $this->migrationRepository
+        );
 
         // create partial table
         $table = new Table($this->config->getTableName());
@@ -91,7 +96,7 @@ class ExistingTableMetadataStorageTest extends TestCase
             ->method('getDatabasePlatform')
             ->willReturn($this->connection->getDatabasePlatform());
 
-        $storage = new TableMetadataStorage($connection, $this->config);
+        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $this->config);
         $storage->ensureInitialized();
     }
 

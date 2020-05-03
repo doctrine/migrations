@@ -382,7 +382,12 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester = new CommandTester($this->migrateCommand);
 
-        $this->storage = new TableMetadataStorage($this->connection, $this->metadataConfiguration, $this->migrationRepository);
+        $this->storage = new TableMetadataStorage(
+            $this->connection,
+            new AlphabeticalComparator(),
+            $this->metadataConfiguration,
+            $this->migrationRepository
+        );
         $this->storage->ensureInitialized();
 
         $this->dependencyFactory->setService(MetadataStorage::class, $this->storage);

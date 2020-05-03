@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Version;
 
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
-use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 
 /**
  * The MigrationStatusCalculator is responsible for calculating the current status of
@@ -13,7 +13,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsSet;
  */
 interface MigrationStatusCalculator
 {
-    public function getExecutedUnavailableMigrations() : ExecutedMigrationsSet;
+    public function getExecutedUnavailableMigrations() : ExecutedMigrationsList;
 
     public function getNewMigrations() : AvailableMigrationsList;
 }
