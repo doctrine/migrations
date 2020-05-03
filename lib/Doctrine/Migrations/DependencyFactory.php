@@ -48,6 +48,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\Stopwatch\Stopwatch;
 use function array_key_exists;
+use function call_user_func;
 use function preg_quote;
 use function sprintf;
 
@@ -80,6 +81,9 @@ class DependencyFactory
     /** @var EntityManagerLoader|null */
     private $emLoader;
 
+    /** @var callable[] */
+    private $factories = [];
+
     public static function fromConnection(
         ConfigurationLoader $configurationLoader,
         ConnectionLoader $connectionLoader,
@@ -110,7 +114,9 @@ class DependencyFactory
             return;
         }
 
-        $this->setService(LoggerInterface::class, $logger);
+        $this->setDefinition(LoggerInterface::class, static function () use ($logger) : LoggerInterface {
+            return $logger;
+        });
     }
 
     public function isFrozen() : bool
@@ -457,10 +463,20 @@ class DependencyFactory
      */
     private function getDependency(string $id, callable $callback)
     {
+        if (array_key_exists($id, $this->factories) && ! array_key_exists($id, $this->dependencies)) {
+            $this->dependencies[$id] = call_user_func($this->factories[$id], $this);
+        }
+
         if (! array_key_exists($id, $this->dependencies)) {
             $this->dependencies[$id] = $callback();
         }
 
         return $this->dependencies[$id];
+    }
+
+    public function setDefinition(string $id, callable $service) : void
+    {
+        $this->assertNotFrozen();
+        $this->factories[$id] = $service;
     }
 }

@@ -56,6 +56,19 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di->setService('foo', new stdClass());
     }
 
+    public function testFreezeForDefinition() : void
+    {
+        $this->configuration->addMigrationsDirectory('foo', 'bar');
+
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di->freeze();
+
+        $this->expectException(FrozenDependencies::class);
+        $this->expectExceptionMessage('The dependencies are frozen and cannot be edited anymore.');
+        $di->setDefinition('foo', static function () : void {
+        });
+    }
+
     public function testFinderForYearMonthStructure() : void
     {
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
@@ -127,6 +140,35 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di->setService(LoggerInterface::class, $anotherLogger);
         self::assertSame($anotherLogger, $di->getLogger());
         self::assertFalse($di->isFrozen());
+    }
+
+    public function testServiceDefinition() : void
+    {
+        $logger        = $this->createMock(LoggerInterface::class);
+        $anotherLogger = $this->createMock(LoggerInterface::class);
+        $di            = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
+
+        $di->setDefinition(LoggerInterface::class, static function (DependencyFactory $innerDi) use ($anotherLogger, $di) {
+            self::assertSame($di, $innerDi);
+
+            return $anotherLogger;
+        });
+        self::assertSame($anotherLogger, $di->getLogger());
+    }
+
+    public function testServiceHasPriorityOverDefinition() : void
+    {
+        $logger        = $this->createMock(LoggerInterface::class);
+        $anotherLogger = $this->createMock(LoggerInterface::class);
+        $di            = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+
+        $di->setDefinition(LoggerInterface::class, static function (DependencyFactory $innerDi) use ($anotherLogger, $di) {
+            self::assertSame($di, $innerDi);
+
+            return $anotherLogger;
+        });
+        $di->setService(LoggerInterface::class, $logger);
+        self::assertSame($logger, $di->getLogger());
     }
 
     public function testChangingConfigurationsDoesNotFreezeTheFactory() : void
