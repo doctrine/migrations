@@ -33,18 +33,8 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $storage       = $this->getDependencyFactory()->getMetadataStorage();
-        $migrationRepo = $this->getDependencyFactory()->getMigrationRepository();
-
-        $availableMigrations = $migrationRepo->getMigrations();
-        $executedMigrations  = $storage->getExecutedMigrations();
-
-        $statusCalculator              = $this->getDependencyFactory()->getMigrationStatusCalculator();
-        $newMigrations                 = $statusCalculator->getNewMigrations();
-        $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
-
         $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
-        $infosHelper->showMigrationsInfo($output, $availableMigrations, $executedMigrations, $newMigrations, $executedUnavailableMigrations);
+        $infosHelper->showMigrationsInfo($output);
 
         return 0;
     }

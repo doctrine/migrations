@@ -423,6 +423,7 @@ class DependencyFactory
                 $this->getConnection(),
                 $this->getVersionAliasResolver(),
                 $this->getMigrationRepository(),
+                $this->getMigrationStatusCalculator(),
                 $this->getMetadataStorage()
             );
         });
