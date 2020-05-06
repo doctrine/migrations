@@ -7,6 +7,10 @@ namespace Doctrine\Migrations\Metadata;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\Version;
 
+/**
+ * Available migrations may or may not be already executed
+ * The migration might be already executed or not.
+ */
 final class AvailableMigration
 {
     /** @var Version */

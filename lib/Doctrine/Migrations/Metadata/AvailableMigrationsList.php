@@ -11,6 +11,9 @@ use Doctrine\Migrations\Version\Version;
 use function array_values;
 use function count;
 
+/**
+ * Represents a sorted list of migrations that may or maybe not be already executed.
+ */
 final class AvailableMigrationsList implements Countable
 {
     /** @var AvailableMigration[] */
