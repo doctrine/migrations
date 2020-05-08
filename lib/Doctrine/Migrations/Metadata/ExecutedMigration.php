@@ -7,6 +7,10 @@ namespace Doctrine\Migrations\Metadata;
 use DateTimeImmutable;
 use Doctrine\Migrations\Version\Version;
 
+/**
+ * Represents an already executed migration.
+ * The migration might be not available anymore.
+ */
 final class ExecutedMigration
 {
     /** @var Version */

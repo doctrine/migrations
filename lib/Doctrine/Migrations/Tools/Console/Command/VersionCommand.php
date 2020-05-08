@@ -150,7 +150,7 @@ EOT
         }
 
         $executedMigrations = $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations();
-        $availableVersions  = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
+        $availableVersions  = $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations();
         if ($allOption === true) {
             if ($input->getOption('delete') === true) {
                 foreach ($executedMigrations->getItems() as $availableMigration) {

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\Version\Version;
 
 interface MigrationsRepository
@@ -14,5 +14,5 @@ interface MigrationsRepository
 
     public function getMigration(Version $version) : AvailableMigration;
 
-    public function getMigrations() : AvailableMigrationsList;
+    public function getMigrations() : AvailableMigrationsSet;
 }

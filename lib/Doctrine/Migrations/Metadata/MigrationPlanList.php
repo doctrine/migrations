@@ -10,6 +10,9 @@ use function count;
 use function end;
 use function reset;
 
+/**
+ * Represents a sorted list of MigrationPlan instances to execute.
+ */
 final class MigrationPlanList implements Countable
 {
     /** @var string */

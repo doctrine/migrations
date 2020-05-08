@@ -5,14 +5,13 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Migrations\AbstractMigration;
-use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
-use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
+use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -23,8 +22,8 @@ final class MigrationStatusCalculatorTest extends TestCase
     /** @var MigrationStatusCalculator */
     private $migrationStatusCalculator;
 
-    /** @var MockObject|MigrationsRepository */
-    private $migrationRepository;
+    /** @var MockObject|MigrationPlanCalculator */
+    private $migrationPlanCalculator;
 
     /** @var MockObject|MetadataStorage */
     private $metadataStorage;
@@ -34,11 +33,11 @@ final class MigrationStatusCalculatorTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->abstractMigration       = $this->createMock(AbstractMigration::class);
+        $this->metadataStorage         = $this->createMock(MetadataStorage::class);
+        $this->migrationPlanCalculator = $this->createMock(MigrationPlanCalculator::class);
 
-        $this->migrationRepository       = $this->createMock(FilesystemMigrationsRepository::class);
-        $this->metadataStorage           = $this->createMock(MetadataStorage::class);
-        $this->migrationStatusCalculator = new CurrentMigrationStatusCalculator($this->migrationRepository, $this->metadataStorage);
+        $this->migrationStatusCalculator = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
     }
 
     public function testGetNewMigrations() : void
@@ -49,7 +48,7 @@ final class MigrationStatusCalculatorTest extends TestCase
 
         $e1 = new ExecutedMigration(new Version('A'));
 
-        $this->migrationRepository
+        $this->migrationPlanCalculator
             ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$m1, $m2, $m3]));
@@ -72,7 +71,7 @@ final class MigrationStatusCalculatorTest extends TestCase
         $e2 = new ExecutedMigration(new Version('B'));
         $e3 = new ExecutedMigration(new Version('C'));
 
-        $this->migrationRepository
+        $this->migrationPlanCalculator
             ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$a1]));

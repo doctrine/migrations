@@ -10,8 +10,8 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
-use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\AliasResolver;
+use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Helper\Table;
@@ -46,8 +46,8 @@ class MigrationStatusInfosHelper
     /** @var MetadataStorage */
     private $metadataStorage;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    /** @var MigrationPlanCalculator */
+    private $migrationPlanCalculator;
 
     /** @var MigrationStatusCalculator */
     private $statusCalculator;
@@ -56,16 +56,16 @@ class MigrationStatusInfosHelper
         Configuration $configuration,
         Connection $connection,
         AliasResolver $aliasResolver,
-        MigrationsRepository $migrationRepository,
+        MigrationPlanCalculator $migrationPlanCalculator,
         MigrationStatusCalculator $statusCalculator,
         MetadataStorage $metadataStorage
     ) {
-        $this->configuration       = $configuration;
-        $this->connection          = $connection;
-        $this->aliasResolver       = $aliasResolver;
-        $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage     = $metadataStorage;
-        $this->statusCalculator    = $statusCalculator;
+        $this->configuration           = $configuration;
+        $this->connection              = $connection;
+        $this->aliasResolver           = $aliasResolver;
+        $this->migrationPlanCalculator = $migrationPlanCalculator;
+        $this->metadataStorage         = $metadataStorage;
+        $this->statusCalculator        = $statusCalculator;
     }
 
     /**
@@ -81,7 +81,7 @@ class MigrationStatusInfosHelper
             ]
         );
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrations = $this->migrationRepository->getMigrations();
+        $availableMigrations = $this->migrationPlanCalculator->getMigrations();
 
         foreach ($versions as $version) {
             $description   = null;
@@ -123,7 +123,7 @@ class MigrationStatusInfosHelper
     public function showMigrationsInfo(OutputInterface $output) : void
     {
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
-        $availableMigrations = $this->migrationRepository->getMigrations();
+        $availableMigrations = $this->migrationPlanCalculator->getMigrations();
 
         $newMigrations                 = $this->statusCalculator->getNewMigrations();
         $executedUnavailableMigrations = $this->statusCalculator->getExecutedUnavailableMigrations();

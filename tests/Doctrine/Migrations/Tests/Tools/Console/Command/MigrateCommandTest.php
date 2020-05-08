@@ -37,7 +37,6 @@ use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function strpos;
-use function sys_get_temp_dir;
 use function trim;
 
 class MigrateCommandTest extends MigrationTestCase
@@ -357,8 +356,6 @@ class MigrateCommandTest extends MigrationTestCase
         $this->configuration = new Configuration();
         $this->configuration->setMetadataStorageConfiguration($this->metadataConfiguration);
 
-        $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
-
         $this->connection = $this->getSqliteConnection();
 
         $this->dependencyFactory = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
@@ -368,7 +365,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $finder                    = $this->createMock(Finder::class);
         $factory                   = $this->createMock(MigrationFactory::class);
-        $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory, new AlphabeticalComparator());
+        $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
 
         $migration = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('A'), $migration);

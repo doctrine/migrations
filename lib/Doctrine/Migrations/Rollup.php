@@ -49,7 +49,7 @@ class Rollup
 
         $this->metadataStorage->reset();
 
-        $result = new ExecutionResult($versions->getFirst()->getVersion());
+        $result = new ExecutionResult($versions->getItems()[0]->getVersion());
         $this->metadataStorage->complete($result);
 
         return $result->getVersion();

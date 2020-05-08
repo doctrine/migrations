@@ -299,8 +299,7 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                $this->getMigrationFactory(),
-                $this->getVersionComparator()
+                $this->getMigrationFactory()
             );
         });
     }
@@ -362,7 +361,7 @@ class DependencyFactory
     {
         return $this->getDependency(AliasResolver::class, function () : AliasResolver {
             return new DefaultAliasResolver(
-                $this->getMigrationRepository(),
+                $this->getMigrationPlanCalculator(),
                 $this->getMetadataStorage(),
                 $this->getMigrationStatusCalculator()
             );
@@ -373,7 +372,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigrationStatusCalculator::class, function () : MigrationStatusCalculator {
             return new CurrentMigrationStatusCalculator(
-                $this->getMigrationRepository(),
+                $this->getMigrationPlanCalculator(),
                 $this->getMetadataStorage()
             );
         });
@@ -384,7 +383,8 @@ class DependencyFactory
         return $this->getDependency(MigrationPlanCalculator::class, function () : MigrationPlanCalculator {
             return new SortedMigrationPlanCalculator(
                 $this->getMigrationRepository(),
-                $this->getMetadataStorage()
+                $this->getMetadataStorage(),
+                $this->getVersionComparator()
             );
         });
     }
@@ -422,7 +422,7 @@ class DependencyFactory
                 $this->getConfiguration(),
                 $this->getConnection(),
                 $this->getVersionAliasResolver(),
-                $this->getMigrationRepository(),
+                $this->getMigrationPlanCalculator(),
                 $this->getMigrationStatusCalculator(),
                 $this->getMetadataStorage()
             );

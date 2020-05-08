@@ -6,13 +6,14 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
-use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\Metadata\AvailableMigration;
-use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\AvailableMigrationsSet;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
+use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
@@ -20,6 +21,7 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use function count;
+use function strcmp;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
@@ -37,19 +39,18 @@ final class MigrationPlanCalculatorTest extends TestCase
 
     protected function setUp() : void
     {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
-
-        $this->migrationRepository     = $this->createMock(FilesystemMigrationsRepository::class);
+        $this->abstractMigration       = $this->createMock(AbstractMigration::class);
+        $this->migrationRepository     = $this->createMock(MigrationsRepository::class);
         $this->metadataStorage         = $this->createMock(MetadataStorage::class);
-        $this->migrationPlanCalculator = new SortedMigrationPlanCalculator($this->migrationRepository, $this->metadataStorage);
+        $this->migrationPlanCalculator = new SortedMigrationPlanCalculator($this->migrationRepository, $this->metadataStorage, new AlphabeticalComparator());
 
         $m = [
-            'A' => new AvailableMigration(new Version('A'), $this->abstractMigration),
             'B' => new AvailableMigration(new Version('B'), $this->abstractMigration),
+            'A' => new AvailableMigration(new Version('A'), $this->abstractMigration),
             'C' => new AvailableMigration(new Version('C'), $this->abstractMigration),
         ];
 
-        $migrationList = new AvailableMigrationsList($m);
+        $migrationList = new AvailableMigrationsSet($m);
         $this->migrationRepository
             ->expects(self::any())
             ->method('hasMigration')
@@ -193,5 +194,29 @@ final class MigrationPlanCalculatorTest extends TestCase
             ['B', [], Direction::UP],
             ['C', ['C'], Direction::UP],
         ];
+    }
+
+    public function testCustomMigrationSorting() : void
+    {
+        $reverseSorter           = new class implements Comparator {
+            public function compare(Version $a, Version $b) : int
+            {
+                return strcmp((string) $b, (string) $a);
+            }
+        };
+        $migrationPlanCalculator = new SortedMigrationPlanCalculator(
+            $this->migrationRepository,
+            $this->metadataStorage,
+            $reverseSorter
+        );
+
+        $migrations = $migrationPlanCalculator->getMigrations();
+
+        self::assertCount(3, $migrations);
+
+        // reverse order
+        self::assertSame('A', (string) $migrations->getItems()[2]->getVersion());
+        self::assertSame('B', (string) $migrations->getItems()[1]->getVersion());
+        self::assertSame('C', (string) $migrations->getItems()[0]->getVersion());
     }
 }

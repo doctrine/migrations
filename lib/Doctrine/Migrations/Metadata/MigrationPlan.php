@@ -9,6 +9,9 @@ use Doctrine\Migrations\Exception\PlanAlreadyExecuted;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 
+/**
+ * Represents an available migration to be executed in a specific direction.
+ */
 final class MigrationPlan
 {
     /** @var string */
@@ -17,7 +20,6 @@ final class MigrationPlan
     private $version;
     /** @var AbstractMigration */
     private $migration;
-
     /** @var ExecutionResult */
     public $result;
 

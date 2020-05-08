@@ -42,7 +42,7 @@ EOT
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
         $versions = $this->getSortedVersions(
-            $this->getDependencyFactory()->getMigrationRepository()->getMigrations(), // available migrations
+            $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations(), // available migrations
             $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations() // executed migrations
         );
 
