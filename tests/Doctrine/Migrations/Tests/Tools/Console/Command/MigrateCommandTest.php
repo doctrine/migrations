@@ -36,6 +36,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
+use function sprintf;
 use function strpos;
 use function trim;
 
@@ -71,7 +72,7 @@ class MigrateCommandTest extends MigrationTestCase
     /** @var TableMetadataStorageConfiguration */
     private $metadataConfiguration;
 
-    public function testExecuteEmptyMigrationPlanCausesException() : void
+    public function testTargetUnknownVersion() : void
     {
         $result = new ExecutionResult(new Version('A'));
         $this->storage->complete($result);
@@ -81,53 +82,55 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Could not find any migrations to execute') !== false);
+        self::assertStringContainsString('[ERROR] Unknown version: A', $this->migrateCommandTester->getDisplay(true));
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
-    public function testExecuteAlreadyAtFirstVersion() : void
+    /**
+     * @return array<array<bool|string|null>>
+     */
+    public function getTargetAliases() : array
     {
+        return [
+            ['latest', true, 'A'],
+            ['latest', false, 'A'],
+            ['first', true, null],
+            ['first', false, null],
+            ['next', true, 'A'],
+            ['next', false, 'A'],
+            ['current+1', false, 'A'],
+            ['current+1', true, 'A'],
+        ];
+    }
+
+    /**
+     * @dataProvider getTargetAliases
+     */
+    public function testExecuteAtVersion(string $targetAlias, bool $allowNoMigration, ?string $executedMigration) : void
+    {
+        if ($executedMigration !== null) {
+            $result = new ExecutionResult(new Version($executedMigration));
+            $this->storage->complete($result);
+        }
+
         $this->migrateCommandTester->execute(
             [
-                'version' => 'first',
-                '--allow-no-migration' => true,
+                'version' => $targetAlias,
+                '--allow-no-migration' => $allowNoMigration,
             ],
             ['interactive' => false]
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Already at first version.') !== false);
-        self::assertSame(0, $this->migrateCommandTester->getStatusCode());
-    }
-
-    public function testExecuteAlreadyAtLatestVersion() : void
-    {
-        $result = new ExecutionResult(new Version('A'));
-        $this->storage->complete($result);
-
-        $this->migrateCommandTester->execute(
-            [
-                'version' => 'latest',
-                '--allow-no-migration' => true,
-            ],
-            ['interactive' => false]
+        self::assertStringContainsString(
+            trim($this->migrateCommandTester->getDisplay(true)),
+            sprintf(
+                '[%s] The version "%s" couldn\'t be reached, you are at version "%s"',
+                ($allowNoMigration ? 'WARNING' : 'ERROR'),
+                $targetAlias,
+                ($executedMigration ?? '0')
+            )
         );
-
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Already at latest version.') !== false);
-        self::assertSame(0, $this->migrateCommandTester->getStatusCode());
-    }
-
-    public function testExecuteTheDeltaCouldNotBeReached() : void
-    {
-        $result = new ExecutionResult(new Version('A'));
-        $this->storage->complete($result);
-
-        $this->migrateCommandTester->execute(
-            ['version' => 'current+1'],
-            ['interactive' => false]
-        );
-
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'The delta couldn\'t be reached.') !== false);
-        self::assertSame(1, $this->migrateCommandTester->getStatusCode());
+        self::assertSame($allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
     }
 
     public function testExecuteUnknownVersion() : void

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
+use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Symfony\Component\Console\Formatter\OutputFormatter;
@@ -14,10 +15,11 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use function count;
 use function getcwd;
+use function in_array;
 use function is_string;
 use function is_writable;
 use function sprintf;
-use function substr;
+use function strpos;
 
 /**
  * The MigrateCommand class is responsible for executing a migration from the current version to another
@@ -134,10 +136,8 @@ EOT
 
         try {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
-        } catch (UnknownMigrationVersion|NoMigrationsFoundWithCriteria $e) {
-            $this->getVersionNameFromAlias($versionAlias);
-
-            return 1;
+        } catch (UnknownMigrationVersion|NoMigrationsToExecute|NoMigrationsFoundWithCriteria $e) {
+            return $this->errorForAlias($versionAlias, $allowNoMigration);
         }
 
         $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
@@ -150,16 +150,8 @@ EOT
 
         $plan = $planCalculator->getPlanUntilVersion($version);
 
-        if (count($plan) === 0 && ! $allowNoMigration) {
-            $this->io->warning('Could not find any migrations to execute.');
-
-            return 1;
-        }
-
         if (count($plan) === 0) {
-            $this->getVersionNameFromAlias($versionAlias);
-
-            return 0;
+            return $this->errorForAlias($versionAlias, $allowNoMigration);
         }
 
         $migrator = $this->getDependencyFactory()->getMigrator();
@@ -227,29 +219,33 @@ EOT
         return true;
     }
 
-    private function getVersionNameFromAlias(string $versionAlias) : void
+    private function errorForAlias(string $versionAlias, bool $allowNoMigration) : int
     {
-        if ($versionAlias === 'first') {
-            $this->io->error('Already at first version.');
+        if (in_array($versionAlias, ['first', 'next', 'latest'], true) || strpos($versionAlias, 'current') === 0) {
+            $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias('current');
 
-            return;
-        }
+            $message = sprintf(
+                'The version "%s" couldn\'t be reached, you are at version "%s"',
+                $versionAlias,
+                (string) $version
+            );
 
-        if ($versionAlias === 'next' || $versionAlias === 'latest') {
-            $this->io->error('Already at latest version.');
+            if ($allowNoMigration) {
+                $this->io->warning($message);
 
-            return;
-        }
+                return 0;
+            }
 
-        if (substr($versionAlias, 0, 7) === 'current') {
-            $this->io->error('The delta couldn\'t be reached.');
+            $this->io->error($message);
 
-            return;
+            return 1;
         }
 
         $this->io->error(sprintf(
             'Unknown version: %s',
             OutputFormatter::escape($versionAlias)
         ));
+
+        return 1;
     }
 }
