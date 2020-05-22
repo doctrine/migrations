@@ -87,7 +87,7 @@ class StatusCommandTest extends MigrationTestCase
                 '| Versions             | Previous             | 1230                                                                   |',
                 '|                      | Current              | 1233                                                                   |',
                 '|                      | Next                 | Already at latest version                                              |',
-                '|                      | Latest               |                                                                        |',
+                '|                      | Latest               | 1233                                                                   |',
                 '|----------------------------------------------------------------------------------------------------------------------|',
                 '| Migrations           | Executed             | 2                                                                      |',
                 '|                      | Executed Unavailable | 2                                                                      |',

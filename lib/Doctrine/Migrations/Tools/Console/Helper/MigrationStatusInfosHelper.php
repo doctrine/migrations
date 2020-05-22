@@ -216,10 +216,6 @@ class MigrationStatusInfosHelper
             }
         }
 
-        if ($alias === 'latest' && $version!== null && $executedMigrations->hasMigration($version)) {
-            return 'Already at latest version';
-        }
-
         // Before first version "virtual" version number
         if ((string) $version === '0') {
             return '<comment>0</comment>';
