@@ -15,6 +15,7 @@ use function getcwd;
 use function implode;
 use function is_string;
 use function is_writable;
+use function sprintf;
 
 /**
  * The ExecuteCommand class is responsible for executing migration versions up or down manually.
@@ -114,33 +115,21 @@ EOT
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 
         $versions  = $input->getArgument('versions');
-        $path      = $input->getOption('write-sql');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
 
-        $migrator       = $this->getDependencyFactory()->getMigrator();
+        $path = $input->getOption('write-sql') ?? getcwd();
+        if (is_string($path) && ! is_writable($path)) {
+            $this->io->error(sprintf('The path "%s" not writeable!', $path));
+
+            return 1;
+        }
+
         $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
         $plan           = $planCalculator->getPlanForVersions(array_map(static function (string $version) : Version {
             return new Version($version);
         }, $versions), $direction);
-
-        if ($migratorConfiguration->isDryRun()) {
-            $sql = $migrator->migrate($plan, $migratorConfiguration);
-
-            $path = is_string($path) ? $path : getcwd();
-
-            if (! is_string($path) || ! is_writable($path)) {
-                $this->io->error('Path not writeable!');
-
-                return 1;
-            }
-
-            $writer = $this->getDependencyFactory()->getQueryWriter();
-            $writer->write($path, $direction, $sql);
-
-            return 0;
-        }
 
         $this->getDependencyFactory()->getLogger()->notice(
             'Executing' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {versions} {direction}',
@@ -149,7 +138,16 @@ EOT
                 'versions' => implode(', ', $versions),
             ]
         );
-        $migrator->migrate($plan, $migratorConfiguration);
+
+        $migrator = $this->getDependencyFactory()->getMigrator();
+        $sql      = $migrator->migrate($plan, $migratorConfiguration);
+
+        if (is_string($path)) {
+            $writer = $this->getDependencyFactory()->getQueryWriter();
+            $writer->write($path, $direction, $sql);
+        }
+
+        $this->io->newLine();
 
         return 0;
     }

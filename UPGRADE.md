@@ -10,7 +10,9 @@ please refer to the [Code BC breaks](#code-bc-breaks) section.
   Console output is not covered by the BC promise, so please try not to rely on specific a output.
   Different levels of verbosity are available now (`-v`, `-vv` and `-vvv` ).
 - The `--show-versions` option from `migrations:status` command has been removed, 
-  use `migrations:list` instead. 
+  use `migrations:list` instead.
+- The `--write-sql` option for `migrations:migrate` and `migrations:execute` does not imply dry-run anymore,  
+use the `--dry-run` parameter instead.  
 
 ## Migrations table
 

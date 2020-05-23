@@ -132,7 +132,13 @@ EOT
 
         $allowNoMigration = $input->getOption('allow-no-migration');
         $versionAlias     = $input->getArgument('version');
-        $path             = $input->getOption('write-sql');
+
+        $path = $input->getOption('write-sql') ?? getcwd();
+        if (is_string($path) && ! is_writable($path)) {
+            $this->io->error(sprintf('The path "%s" not writeable!', $path));
+
+            return 1;
+        }
 
         try {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
@@ -154,24 +160,6 @@ EOT
             return $this->errorForAlias($versionAlias, $allowNoMigration);
         }
 
-        $migrator = $this->getDependencyFactory()->getMigrator();
-        if ($migratorConfiguration->isDryRun()) {
-            $sql = $migrator->migrate($plan, $migratorConfiguration);
-
-            $path = is_string($path) ? $path : getcwd();
-
-            if (! is_string($path) || ! is_writable($path)) {
-                $this->io->error('Path not writeable!');
-
-                return 1;
-            }
-
-            $writer = $this->getDependencyFactory()->getQueryWriter();
-            $writer->write($path, $plan->getDirection(), $sql);
-
-            return 0;
-        }
-
         $this->getDependencyFactory()->getLogger()->notice(
             'Migrating' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {direction} to {to}',
             [
@@ -180,7 +168,13 @@ EOT
             ]
         );
 
-        $migrator->migrate($plan, $migratorConfiguration);
+        $migrator = $this->getDependencyFactory()->getMigrator();
+        $sql      = $migrator->migrate($plan, $migratorConfiguration);
+
+        if (is_string($path)) {
+            $writer = $this->getDependencyFactory()->getQueryWriter();
+            $writer->write($path, $plan->getDirection(), $sql);
+        }
 
         $this->io->newLine();
 
