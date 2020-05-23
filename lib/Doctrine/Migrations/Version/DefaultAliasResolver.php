@@ -54,6 +54,10 @@ final class DefaultAliasResolver implements AliasResolver
      * - latest: The latest available version.
      *
      * If an existing version number is specified, it is returned verbatimly.
+     *
+     * @throws NoMigrationsToExecute
+     * @throws UnknownMigrationVersion
+     * @throws NoMigrationsFoundWithCriteria
      */
     public function resolveVersionAlias(string $alias) : Version
     {
@@ -62,6 +66,7 @@ final class DefaultAliasResolver implements AliasResolver
 
         switch ($alias) {
             case self::ALIAS_FIRST:
+            case '0':
                 return new Version('0');
             case self::ALIAS_CURRENT:
                 try {
@@ -93,7 +98,7 @@ final class DefaultAliasResolver implements AliasResolver
                 try {
                     return $availableMigrations->getLast()->getVersion();
                 } catch (NoMigrationsFoundWithCriteria $e) {
-                    throw NoMigrationsToExecute::new($e);
+                    return $this->resolveVersionAlias(self::ALIAS_CURRENT);
                 }
 
                 // no break because of return
