@@ -132,6 +132,7 @@ final class AliasResolverTest extends TestCase
             ['current-1', 'A'],
             ['current+1', 'C'],
             ['B', 'B'],
+            ['0', '0'],
             ['X', null, UnknownMigrationVersion::class],
         ];
     }

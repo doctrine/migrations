@@ -66,6 +66,7 @@ final class DefaultAliasResolver implements AliasResolver
 
         switch ($alias) {
             case self::ALIAS_FIRST:
+            case '0':
                 return new Version('0');
             case self::ALIAS_CURRENT:
                 try {
