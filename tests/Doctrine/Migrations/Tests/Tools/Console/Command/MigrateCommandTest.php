@@ -168,11 +168,11 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
-     * @param mixed $arg
+     * @param bool|string|null $arg
      *
      * @dataProvider getWriteSqlValues
      */
-    public function testExecuteWriteSql($arg, string $path) : void
+    public function testExecuteWriteSql(bool $dryRun, $arg, ?string $path) : void
     {
         $migrator = $this->createMock(DbalMigrator::class);
 
@@ -180,16 +180,28 @@ class MigrateCommandTest extends MigrationTestCase
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) use ($dryRun) : array {
+                self::assertSame($dryRun, $configuration->isDryRun());
+
                 return ['A'];
             });
 
-        $this->queryWriter->expects(self::once())
-            ->method('write')
-            ->with($path, 'up', ['A']);
+        if ($arg === false) {
+            $this->queryWriter
+                ->expects(self::never())
+                ->method('write');
+        } else {
+            $this->queryWriter
+                ->expects(self::once())
+                ->method('write')
+                ->with($path, 'up', ['A']);
+        }
 
         $this->migrateCommandTester->execute(
-            ['--write-sql' => $arg],
+            [
+                '--write-sql' => $arg,
+                '--dry-run' => $dryRun,
+            ],
             ['interactive' => false]
         );
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
@@ -201,8 +213,14 @@ class MigrateCommandTest extends MigrationTestCase
     public function getWriteSqlValues() : array
     {
         return [
-            [true, getcwd()],
-            [ __DIR__ . '/_files', __DIR__ . '/_files'],
+            // dry-run, write-path, path
+            [true, false, null],
+            [true, null, getcwd()],
+            [true,  __DIR__ . '/_files', __DIR__ . '/_files'],
+
+            [false, false, null],
+            [false, null, getcwd()],
+            [false,  __DIR__ . '/_files', __DIR__ . '/_files'],
         ];
     }
 
