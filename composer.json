@@ -11,7 +11,7 @@
         {"name": "Michael Simonson", "email": "contact@mikesimonson.com" }
     ],
     "require": {
-        "php": "^7.1",
+        "php": "^7.1 || ^8.0",
         "composer/package-versions-deprecated": "^1.8",
         "doctrine/dbal": "^2.9",
         "ocramius/proxy-manager": "^2.0.2",
