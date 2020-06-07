@@ -55,9 +55,14 @@ final class DiffCommandTest extends TestCase
         $input->expects(self::at(4))
             ->method('getOption')
             ->with('check-database-platform')
-            ->willReturn(true);
+            ->willReturn(false);
 
         $input->expects(self::at(5))
+            ->method('getOption')
+            ->with('from-empty-schema')
+            ->willReturn(true);
+
+        $input->expects(self::at(6))
             ->method('getOption')
             ->with('editor-cmd')
             ->willReturn('mate');
@@ -68,7 +73,7 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
-            ->with('1234', 'filter expression', true, 80)
+            ->with('1234', 'filter expression', true, 80, false, true)
             ->willReturn('/path/to/migration.php');
 
         $this->diffCommand->expects(self::once())

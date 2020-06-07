@@ -119,7 +119,9 @@ class CliTest extends MigrationTestCase
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
+        self::assertContains('CREATE TABLE foo', $versionClassContents);
         self::assertContains('CREATE TABLE bar', $versionClassContents);
+        self::assertContains('DROP TABLE foo', $versionClassContents);
         self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
@@ -145,6 +147,42 @@ class CliTest extends MigrationTestCase
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
         self::assertContains("CREATE TABLE foo (\n", $versionClassContents);
+        self::assertContains("CREATE TABLE bar (\n", $versionClassContents);
+        self::assertContains('DROP TABLE foo', $versionClassContents);
+        self::assertContains('DROP TABLE bar', $versionClassContents);
+    }
+
+    public function testMigrationDiffFromEmptySchemaGeneratesFullMigration() : void
+    {
+        $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
+
+        $this->executeCommand('migrations:migrate', 'config.yml', ['--no-interaction']);
+        self::assertSuccessfulExit();
+
+        self::assertVersionCount(0, 'should start with no versions');
+        $this->executeCommand('migrations:diff');
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should add one version');
+
+        $versionClassContents = $this->getFileContentsForLatestVersion();
+
+        self::assertNotContains('CREATE TABLE foo', $versionClassContents);
+        self::assertContains('CREATE TABLE bar', $versionClassContents);
+        self::assertNotContains('DROP TABLE foo', $versionClassContents);
+        self::assertContains('DROP TABLE bar', $versionClassContents);
+
+        $this->deleteMigrationFiles();
+
+        self::assertVersionCount(0, 'should re-start with no versions');
+        $this->executeCommand('migrations:diff', 'config.yml', ['--from-empty-schema' => null]);
+        self::assertSuccessfulExit();
+        self::assertVersionCount(1, 'diff command should re-add one version');
+
+        $versionClassContents = $this->getFileContentsForLatestVersion();
+
+        self::assertContains('CREATE TABLE foo', $versionClassContents);
+        self::assertContains('CREATE TABLE bar', $versionClassContents);
+        self::assertContains('DROP TABLE foo', $versionClassContents);
         self::assertContains('DROP TABLE bar', $versionClassContents);
     }
 
@@ -240,9 +278,7 @@ class CliTest extends MigrationTestCase
         if (file_exists($migrationsDbFilePath)) {
             @unlink($migrationsDbFilePath);
         }
-        Helper::deleteDir(
-            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
-        );
+        $this->deleteMigrationFiles();
 
         $this->conn        = $this->getSqliteConnection();
         $this->application = new Application('Doctrine Migrations Test', Versions::getVersion('doctrine/migrations'));
@@ -330,6 +366,13 @@ class CliTest extends MigrationTestCase
         );
     }
 
+    private function deleteMigrationFiles() : bool
+    {
+        return Helper::deleteDir(
+            __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
+        );
+    }
+
     /**
      * @return string file content for latest version
      */
@@ -361,7 +404,7 @@ class FirstMigration extends AbstractMigration
 {
     public function up(Schema $schema) : void
     {
-        $this->addSql('CREATE TABLE foo (id INTEGER AUTO_INCREMENT, PRIMARY KEY (id))');
+        $this->addSql('CREATE TABLE foo (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)');
     }
 
     public function down(Schema $schema) : void

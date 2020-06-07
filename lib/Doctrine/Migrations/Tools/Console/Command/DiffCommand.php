@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
+use Doctrine\Migrations\Provider\EmptySchemaProvider;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaProviderInterface;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
@@ -28,6 +29,9 @@ class DiffCommand extends AbstractCommand
 
     /** @var SchemaProviderInterface|null */
     protected $schemaProvider;
+
+    /** @var EmptySchemaProvider|null */
+    private $emptySchemaProvider;
 
     public function __construct(?SchemaProviderInterface $schemaProvider = null)
     {
@@ -90,6 +94,12 @@ EOT
                 null,
                 InputOption::VALUE_NONE,
                 'Do not throw an exception when no changes are detected.'
+            )
+            ->addOption(
+                'from-empty-schema',
+                null,
+                InputOption::VALUE_NONE,
+                'Generate a full migration as if the current database was empty.'
             );
     }
 
@@ -105,6 +115,7 @@ EOT
         $lineLength       = (int) $input->getOption('line-length');
         $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
         $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
+        $fromEmptySchema  = (bool) $input->getOption('from-empty-schema');
 
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
@@ -122,7 +133,8 @@ EOT
                 $filterExpression,
                 $formatted,
                 $lineLength,
-                $checkDbPlatform
+                $checkDbPlatform,
+                $fromEmptySchema
             );
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {
@@ -164,7 +176,8 @@ EOT
             $this->getSchemaProvider(),
             $this->connection->getDatabasePlatform(),
             $this->dependencyFactory->getMigrationGenerator(),
-            $this->dependencyFactory->getMigrationSqlGenerator()
+            $this->dependencyFactory->getMigrationSqlGenerator(),
+            $this->getEmptySchemaProvider()
         );
     }
 
@@ -177,5 +190,16 @@ EOT
         }
 
         return $this->schemaProvider;
+    }
+
+    private function getEmptySchemaProvider() : EmptySchemaProvider
+    {
+        if ($this->emptySchemaProvider === null) {
+            $this->emptySchemaProvider = new EmptySchemaProvider(
+                $this->connection->getSchemaManager()
+            );
+        }
+
+        return $this->emptySchemaProvider;
     }
 }
