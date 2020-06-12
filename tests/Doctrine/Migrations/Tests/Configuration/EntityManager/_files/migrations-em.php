@@ -2,10 +2,10 @@
 
 declare(strict_types=1);
 
-use Doctrine\Common\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
+use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 
 $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 

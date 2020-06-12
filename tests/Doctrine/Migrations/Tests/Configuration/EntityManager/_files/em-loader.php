@@ -2,12 +2,12 @@
 
 declare(strict_types=1);
 
-use Doctrine\Common\Persistence\Mapping\Driver\PHPDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
 use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 
 return new class() implements EntityManagerLoader {
     public function getEntityManager() : EntityManagerInterface
