@@ -7,8 +7,10 @@ namespace Doctrine\Migrations\Provider;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Provider\Exception\NoMappingFound;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
 use function count;
+use function usort;
 
 /**
  * The OrmSchemaProvider class is responsible for creating a Doctrine\DBAL\Schema\Schema instance from the mapping
@@ -37,6 +39,10 @@ final class OrmSchemaProvider implements SchemaProvider
         if (count($metadata) === 0) {
             throw NoMappingFound::new();
         }
+
+        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b) : int {
+            return $a->getTableName() <=> $b->getTableName();
+        });
 
         $tool = new SchemaTool($this->entityManager);
 
