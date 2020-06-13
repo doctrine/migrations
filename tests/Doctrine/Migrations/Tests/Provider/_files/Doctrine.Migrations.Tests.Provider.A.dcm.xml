@@ -3,7 +3,7 @@
       xsi:schemaLocation="http://doctrine-project.org/schemas/orm/doctrine-mapping
                    https://raw.github.com/doctrine/doctrine2/master/doctrine-mapping.xsd">
 
-   <entity name="Doctrine\Migrations\Tests\Provider\SampleEntity" table="sample_entity">
+   <entity name="Doctrine\Migrations\Tests\Provider\A" table="a">
        <id name="id" type="integer" column="id">
            <generator strategy="AUTO" />
        </id>
