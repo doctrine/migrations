@@ -126,7 +126,7 @@ class MigrateCommandTest extends MigrationTestCase
         $aliases = ['next', 'latest'];
 
         if (in_array($targetAlias, $aliases, true)) {
-            $message = '[%s] Already at latest version';
+            $message = '[%s] Already at "%s" version ("%s")';
         } else {
             $message = '[%s] The version "%s" couldn\'t be reached, you are at version "%s"';
         }

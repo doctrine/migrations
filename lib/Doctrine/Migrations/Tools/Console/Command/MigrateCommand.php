@@ -220,7 +220,11 @@ EOT
 
             // Allow meaningful message when latest version already reached.
             if ($versionAlias === 'next' || $versionAlias === 'latest') {
-                $message = 'Already at latest version';
+                $message = sprintf(
+                    'Already at "%s" version ("%s")',
+                    $versionAlias,
+                    (string) $version
+                );
             } else {
                 $message = sprintf(
                     'The version "%s" couldn\'t be reached, you are at version "%s"',
