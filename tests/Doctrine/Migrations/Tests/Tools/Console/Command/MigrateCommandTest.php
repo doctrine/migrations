@@ -36,10 +36,10 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
+use function in_array;
 use function sprintf;
 use function strpos;
 use function trim;
-use function in_array;
 
 class MigrateCommandTest extends MigrationTestCase
 {
