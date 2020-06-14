@@ -124,7 +124,7 @@ class MigrateCommandTest extends MigrationTestCase
         $display = trim($this->migrateCommandTester->getDisplay(true));
         $aliases = ['next', 'latest'];
 
-        if (in_array($targetAlias, $aliases)) {
+        if (in_array($targetAlias, $aliases, false)) {
             $message = '[%s] Already at latest version';
         } else {
             $message = '[%s] The version "%s" couldn\'t be reached, you are at version "%s"';
