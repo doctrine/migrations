@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console;
 
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
+use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Application;
@@ -23,6 +24,66 @@ class ConsoleRunnerTest extends TestCase
 {
     /** @var Application */
     private $application;
+
+    public function testCreateDependencyFactoryFromLegacyDbalHelper() : void
+    {
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
+        chdir(__DIR__ . '/legacy-config-dbal');
+
+        try {
+            $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
+            self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
+            self::assertSame('sqlite', $dependencyFactory->getConnection()->getDatabasePlatform()->getName());
+        } finally {
+            chdir($dir);
+        }
+    }
+
+    public function testCreateDependencyFactoryFromLegacyOrmHelper() : void
+    {
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
+        chdir(__DIR__ . '/legacy-config-orm');
+
+        try {
+            $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
+            self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
+            self::assertSame('sqlite', $dependencyFactory->getConnection()->getDatabasePlatform()->getName());
+            self::assertInstanceOf(EntityManager::class, $dependencyFactory->getEntityManager());
+        } finally {
+            chdir($dir);
+        }
+    }
+
+    public function testCreateDependencyFactoryFromWrongLegacyHelper() : void
+    {
+        $this->expectException(RuntimeException::class);
+
+        $dir = getcwd();
+        if ($dir === false) {
+            $dir = '.';
+        }
+
+        chdir(__DIR__ . '/legacy-config-wrong');
+
+        $this->expectExceptionMessage(sprintf(
+            'Configuration HelperSet returned by "%s" does not have a valid "em" or the "db" helper.',
+            realpath(__DIR__ . '/legacy-config-wrong/cli-config.php')
+        ));
+
+        try {
+            $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
+        } finally {
+            chdir($dir);
+        }
+    }
 
     /**
      * @dataProvider getDependencyFactoryTestDirectories
