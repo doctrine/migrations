@@ -39,6 +39,7 @@ use function getcwd;
 use function sprintf;
 use function strpos;
 use function trim;
+use function in_array;
 
 class MigrateCommandTest extends MigrationTestCase
 {
