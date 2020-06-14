@@ -218,11 +218,16 @@ EOT
         if (in_array($versionAlias, ['first', 'next', 'latest'], true) || strpos($versionAlias, 'current') === 0) {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias('current');
 
-            $message = sprintf(
-                'The version "%s" couldn\'t be reached, you are at version "%s"',
-                $versionAlias,
-                (string) $version
-            );
+            // Allow meaningful message when latest version already reached.
+            if ($versionAlias === 'next' || $versionAlias === 'latest') {
+                $message = 'Already at latest version';
+            } else {
+                $message = sprintf(
+                    'The version "%s" couldn\'t be reached, you are at version "%s"',
+                    $versionAlias,
+                    (string) $version
+                );
+            }
 
             if ($allowNoMigration) {
                 $this->io->warning($message);

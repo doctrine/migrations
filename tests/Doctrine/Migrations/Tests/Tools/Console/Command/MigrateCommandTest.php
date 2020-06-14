@@ -121,15 +121,24 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
+        $display = trim($this->migrateCommandTester->getDisplay(true));
+
+        if (in_array($targetAlias, ['next', 'latest'])) {
+            $message = '[%s] Already at latest version';
+        } else {
+            $message = '[%s] The version "%s" couldn\'t be reached, you are at version "%s"';
+        }
+
         self::assertStringContainsString(
-            trim($this->migrateCommandTester->getDisplay(true)),
+            $display,
             sprintf(
-                '[%s] The version "%s" couldn\'t be reached, you are at version "%s"',
+                $message,
                 ($allowNoMigration ? 'WARNING' : 'ERROR'),
                 $targetAlias,
                 ($executedMigration ?? '0')
             )
         );
+
         self::assertSame($allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
     }
 
