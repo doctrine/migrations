@@ -42,7 +42,7 @@ final class ExecuteCommand extends DoctrineCommand
                 'write-sql',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'The path to output the migration SQL file instead of executing it. Defaults to current working directory.',
+                'The path to output the migration SQL file. Defaults to current working directory.',
                 false
             )
             ->addOption(
@@ -82,7 +82,7 @@ You can also execute the migration as a <comment>--dry-run</comment>:
 
     <info>%command.full_name% FQCN --dry-run</info>
 
-You can output the would be executed SQL statements to a file with <comment>--write-sql</comment>:
+You can output the prepared SQL statements to a file with <comment>--write-sql</comment>:
 
     <info>%command.full_name% FQCN --write-sql</info>
 
