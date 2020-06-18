@@ -36,6 +36,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
+use function in_array;
 use function sprintf;
 use function strpos;
 use function trim;
@@ -121,15 +122,25 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false]
         );
 
+        $display = trim($this->migrateCommandTester->getDisplay(true));
+        $aliases = ['next', 'latest'];
+
+        if (in_array($targetAlias, $aliases, true)) {
+            $message = '[%s] Already at "%s" version ("%s")';
+        } else {
+            $message = '[%s] The version "%s" couldn\'t be reached, you are at version "%s"';
+        }
+
         self::assertStringContainsString(
-            trim($this->migrateCommandTester->getDisplay(true)),
+            $display,
             sprintf(
-                '[%s] The version "%s" couldn\'t be reached, you are at version "%s"',
+                $message,
                 ($allowNoMigration ? 'WARNING' : 'ERROR'),
                 $targetAlias,
                 ($executedMigration ?? '0')
             )
         );
+
         self::assertSame($allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
     }
 
