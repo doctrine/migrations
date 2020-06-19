@@ -18,7 +18,7 @@ Once you have your custom integration setup, you can modify it to look like the 
     use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
     use Doctrine\Migrations\Configuration\Configuration\ExistingConfiguration;
     use Doctrine\Migrations\DependencyFactory;
-    une Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+    use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
     use Doctrine\Migrations\Tools\Console\Command;
     use Symfony\Component\Console\Application;
 
