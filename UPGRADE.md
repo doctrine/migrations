@@ -13,11 +13,15 @@ please refer to the [Code BC breaks](#code-bc-breaks) section.
   use `migrations:list` instead.
 - The `--write-sql` option for `migrations:migrate` and `migrations:execute` does not imply dry-run anymore,  
 use the `--dry-run` parameter instead.  
+- The `migrations:migrate` command will return a non-zero exit code if there are no migrations to execute, 
+use the `--allow-no-migration` parameter to have a zero exit code.
+
 
 ## Migrations table
 
 - The migrations table now has a new column named `execution_time`.
-
+- Running the `migrations:migrate` or `migrations:execute` command will automatically upgrade the migration
+table structure; a dedicated `migrations:sync-metadata-storage` command is available to sync manually the migrations table. 
 
 ## Configuration files
 

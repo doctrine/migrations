@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console;
 
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
+use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\Command\CurrentCommand;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
@@ -19,9 +23,11 @@ use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Doctrine\Migrations\Tools\Console\Command\SyncMetadataCommand;
 use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use PackageVersions\Versions;
 use RuntimeException;
 use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Helper\HelperSet;
 use function file_exists;
 use function getcwd;
 use function is_readable;
@@ -67,6 +73,7 @@ class ConsoleRunner
             }
 
             $dependencyFactory = require $configurationFile;
+            $dependencyFactory = self::checkLegacyConfiguration($dependencyFactory, $configurationFile);
         }
 
         if ($dependencyFactory !== null && ! ($dependencyFactory instanceof DependencyFactory)) {
@@ -120,5 +127,37 @@ class ConsoleRunner
         }
 
         $cli->add(new DiffCommand($dependencyFactory));
+    }
+
+    /**
+     * @param mixed|HelperSet $dependencyFactory
+     *
+     * @return mixed|DependencyFactory
+     */
+    private static function checkLegacyConfiguration($dependencyFactory, string $configurationFile)
+    {
+        if (! ($dependencyFactory instanceof HelperSet)) {
+            return $dependencyFactory;
+        }
+
+        $configurations = new ConfigurationFileWithFallback();
+        if ($dependencyFactory->has('em') && $dependencyFactory->get('em') instanceof EntityManagerHelper) {
+            return DependencyFactory::fromEntityManager(
+                $configurations,
+                new ExistingEntityManager($dependencyFactory->get('em')->getEntityManager())
+            );
+        }
+
+        if ($dependencyFactory->has('db') && $dependencyFactory->get('db') instanceof ConnectionHelper) {
+            return DependencyFactory::fromConnection(
+                $configurations,
+                new ExistingConnection($dependencyFactory->get('db')->getConnection())
+            );
+        }
+
+        throw new RuntimeException(sprintf(
+            'Configuration HelperSet returned by "%s" does not have a valid "em" or the "db" helper.',
+            $configurationFile
+        ));
     }
 }
