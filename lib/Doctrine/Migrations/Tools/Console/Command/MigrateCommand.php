@@ -140,10 +140,35 @@ EOT
             return 1;
         }
 
+        $migrationRepository = $this->getDependencyFactory()->getMigrationRepository();
+        if (count($migrationRepository->getMigrations()) === 0) {
+            $message = sprintf(
+                'The version "%s" couldn\'t be reached, there are no registered migrations.',
+                $versionAlias
+            );
+
+            if ($allowNoMigration) {
+                $this->io->warning($message);
+
+                return 0;
+            }
+
+            $this->io->error($message);
+
+            return 1;
+        }
+
         try {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
-        } catch (UnknownMigrationVersion|NoMigrationsToExecute|NoMigrationsFoundWithCriteria $e) {
-            return $this->errorForAlias($versionAlias, $allowNoMigration);
+        } catch (UnknownMigrationVersion $e) {
+            $this->io->error(sprintf(
+                'Unknown version: %s',
+                OutputFormatter::escape($versionAlias)
+            ));
+
+            return 1;
+        } catch (NoMigrationsToExecute|NoMigrationsFoundWithCriteria $e) {
+            return $this->exitForAlias($versionAlias);
         }
 
         $planCalculator                = $this->getDependencyFactory()->getMigrationPlanCalculator();
@@ -157,7 +182,7 @@ EOT
         $plan = $planCalculator->getPlanUntilVersion($version);
 
         if (count($plan) === 0) {
-            return $this->errorForAlias($versionAlias, $allowNoMigration);
+            return $this->exitForAlias($versionAlias);
         }
 
         $this->getDependencyFactory()->getLogger()->notice(
@@ -213,42 +238,36 @@ EOT
         return true;
     }
 
-    private function errorForAlias(string $versionAlias, bool $allowNoMigration) : int
+    private function exitForAlias(string $versionAlias) : int
     {
-        if (in_array($versionAlias, ['first', 'next', 'latest'], true) || strpos($versionAlias, 'current') === 0) {
-            $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias('current');
+        $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias('current');
 
-            // Allow meaningful message when latest version already reached.
-            if ($versionAlias === 'next' || $versionAlias === 'latest') {
-                $message = sprintf(
-                    'Already at "%s" version ("%s")',
-                    $versionAlias,
-                    (string) $version
-                );
-            } else {
-                $message = sprintf(
-                    'The version "%s" couldn\'t be reached, you are at version "%s"',
-                    $versionAlias,
-                    (string) $version
-                );
-            }
+        // Allow meaningful message when latest version already reached.
+        if (in_array($versionAlias, ['current', 'latest', 'first'], true)) {
+            $message = sprintf(
+                'Already at the %s version ("%s")',
+                $versionAlias,
+                (string) $version
+            );
 
-            if ($allowNoMigration) {
-                $this->io->warning($message);
-
-                return 0;
-            }
+            $this->io->success($message);
+        } elseif (in_array($versionAlias, ['next', 'prev'], true) || strpos($versionAlias, 'current') === 0) {
+            $message = sprintf(
+                'The version "%s" couldn\'t be reached, you are at version "%s"',
+                $versionAlias,
+                (string) $version
+            );
 
             $this->io->error($message);
+        } else {
+            $message = sprintf(
+                'You are already at version "%s"',
+                (string) $version
+            );
 
-            return 1;
+            $this->io->success($message);
         }
 
-        $this->io->error(sprintf(
-            'Unknown version: %s',
-            OutputFormatter::escape($versionAlias)
-        ));
-
-        return 1;
+        return 0;
     }
 }

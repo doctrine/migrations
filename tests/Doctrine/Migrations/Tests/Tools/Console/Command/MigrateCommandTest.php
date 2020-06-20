@@ -75,16 +75,61 @@ class MigrateCommandTest extends MigrationTestCase
 
     public function testTargetUnknownVersion() : void
     {
-        $result = new ExecutionResult(new Version('A'));
-        $this->storage->complete($result);
-
         $this->migrateCommandTester->execute(
-            ['version' => 'A'],
+            ['version' => 'B'],
             ['interactive' => false]
         );
 
-        self::assertStringContainsString('[ERROR] Unknown version: A', $this->migrateCommandTester->getDisplay(true));
+        self::assertStringContainsString('[ERROR] Unknown version: B', $this->migrateCommandTester->getDisplay(true));
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
+    }
+
+    /**
+     * @return bool[][]
+     */
+    public function getMigrateWithMigrationsOrWithout() : array
+    {
+        return [
+            // migrations available, allow-no-migrations
+            [false, false],
+            [true, false],
+            [false, true],
+            [true, true],
+        ];
+    }
+
+    /**
+     * @dataProvider getMigrateWithMigrationsOrWithout
+     */
+    public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration) : void
+    {
+        $finder                    = $this->createMock(Finder::class);
+        $factory                   = $this->createMock(MigrationFactory::class);
+        $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
+        $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
+
+        if ($hasMigrations) {
+            $migration = $this->createMock(AbstractMigration::class);
+            Helper::registerMigrationInstance($this->migrationRepository, new Version('A'), $migration);
+        }
+
+        $this->migrateCommandTester->execute(
+            ['--allow-no-migration' => $allowNoMigration],
+            ['interactive' => false]
+        );
+
+        if (! $hasMigrations) {
+            $display = trim($this->migrateCommandTester->getDisplay(true));
+            self::assertStringContainsString(
+                sprintf(
+                    '[%s] The version "latest" couldn\'t be reached, there are no registered migrations.',
+                    $allowNoMigration ? 'WARNING' : 'ERROR'
+                ),
+                $display
+            );
+        }
+
+        self::assertSame($hasMigrations || $allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
     }
 
     /**
@@ -93,21 +138,20 @@ class MigrateCommandTest extends MigrationTestCase
     public function getTargetAliases() : array
     {
         return [
-            ['latest', true, 'A'],
-            ['latest', false, 'A'],
-            ['first', true, null],
-            ['first', false, null],
-            ['next', true, 'A'],
-            ['next', false, 'A'],
-            ['current+1', false, 'A'],
-            ['current+1', true, 'A'],
+            ['A', 'OK', 'A'], // already at A
+            ['latest', 'OK', 'A'], // already at latest
+            ['first', 'OK', null], // already at first
+            ['next', 'ERROR', 'A'], // already at latest, no next available
+            ['prev', 'ERROR', null], // no prev, already at first
+            ['current', 'OK', 'A'], // already at latest, always
+            ['current+1', 'ERROR', 'A'], // no current+1
         ];
     }
 
     /**
      * @dataProvider getTargetAliases
      */
-    public function testExecuteAtVersion(string $targetAlias, bool $allowNoMigration, ?string $executedMigration) : void
+    public function testExecuteAtVersion(string $targetAlias, string $level, ?string $executedMigration) : void
     {
         if ($executedMigration !== null) {
             $result = new ExecutionResult(new Version($executedMigration));
@@ -115,33 +159,37 @@ class MigrateCommandTest extends MigrationTestCase
         }
 
         $this->migrateCommandTester->execute(
-            [
-                'version' => $targetAlias,
-                '--allow-no-migration' => $allowNoMigration,
-            ],
+            ['version' => $targetAlias],
             ['interactive' => false]
         );
 
         $display = trim($this->migrateCommandTester->getDisplay(true));
-        $aliases = ['next', 'latest'];
+        $aliases = ['current', 'latest', 'first'];
 
         if (in_array($targetAlias, $aliases, true)) {
-            $message = '[%s] Already at "%s" version ("%s")';
-        } else {
-            $message = '[%s] The version "%s" couldn\'t be reached, you are at version "%s"';
-        }
-
-        self::assertStringContainsString(
-            $display,
-            sprintf(
-                $message,
-                ($allowNoMigration ? 'WARNING' : 'ERROR'),
+            $message = sprintf(
+                '[%s] Already at the %s version ("%s")',
+                $level,
                 $targetAlias,
                 ($executedMigration ?? '0')
-            )
-        );
+            );
+        } elseif ($targetAlias === 'A') {
+            $message = sprintf(
+                '[%s] You are already at version "%s"',
+                $level,
+                $targetAlias
+            );
+        } else {
+            $message = sprintf(
+                '[%s] The version "%s" couldn\'t be reached, you are at version "%s"',
+                $level,
+                $targetAlias,
+                ($executedMigration ?? '0')
+            );
+        }
 
-        self::assertSame($allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
+        self::assertStringContainsString($message, $display);
+        self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
     public function testExecuteUnknownVersion() : void
