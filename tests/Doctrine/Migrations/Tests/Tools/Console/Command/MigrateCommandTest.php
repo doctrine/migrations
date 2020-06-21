@@ -85,23 +85,23 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
-     * @return bool[][]
+     * @return array<array<int, bool|int>>
      */
     public function getMigrateWithMigrationsOrWithout() : array
     {
         return [
-            // migrations available, allow-no-migrations
-            [false, false],
-            [true, false],
-            [false, true],
-            [true, true],
+            // migrations available, allow-no-migrations, expected exit code
+            [false, false, 1],
+            [true, false, 0],
+            [false, true, 0],
+            [true, true, 0],
         ];
     }
 
     /**
      * @dataProvider getMigrateWithMigrationsOrWithout
      */
-    public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration) : void
+    public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode) : void
     {
         $finder                    = $this->createMock(Finder::class);
         $factory                   = $this->createMock(MigrationFactory::class);
@@ -129,7 +129,7 @@ class MigrateCommandTest extends MigrationTestCase
             );
         }
 
-        self::assertSame($hasMigrations || $allowNoMigration ? 0 : 1, $this->migrateCommandTester->getStatusCode());
+        self::assertSame($expectedExitCode, $this->migrateCommandTester->getStatusCode());
     }
 
     /**
