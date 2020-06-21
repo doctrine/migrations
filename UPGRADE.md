@@ -52,7 +52,7 @@ return [
     'table_storage' => [
         'table_name' => 'doctrine_migration_versions',
         'version_column_name' => 'version',
-        'version_column_length' => 1024,
+        'version_column_length' => 191,
         'executed_at_column_name' => 'executed_at',
         'execution_time_column_name' => 'execution_time',
     ],
@@ -68,6 +68,10 @@ return [
 ```
 
 Files in XML, YAML or JSON also changed in a similar way. Please refer to the official documentation for more details.
+
+Note: the option in `table_storage` needs to be updated only if you have changed the metadata table settings
+by using v2 options such as `table_name`, `column_name`, `column_length` or `executed_at_column_name`. If you did not change
+those settings, it is recommended to not provide the options and let doctrine figure out the best settings.
 
 ## Code BC breaks
 
