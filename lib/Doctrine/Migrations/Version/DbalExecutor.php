@@ -19,6 +19,7 @@ use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 use function count;
@@ -176,7 +177,7 @@ final class DbalExecutor implements Executor
                 $this->executeResult($configuration);
             } else {
                 foreach ($this->sql as $query) {
-                    $this->outputSqlQuery($query);
+                    $this->outputSqlQuery($query, $configuration);
                 }
             }
         } else {
@@ -291,7 +292,7 @@ final class DbalExecutor implements Executor
     private function executeResult(MigratorConfiguration $configuration) : void
     {
         foreach ($this->sql as $key => $query) {
-            $this->outputSqlQuery($query);
+            $this->outputSqlQuery($query, $configuration);
 
             $stopwatchEvent = $this->stopwatch->start('query');
             $this->connection->executeUpdate($query->getStatement(), $query->getParameters(), $query->getTypes());
@@ -301,23 +302,27 @@ final class DbalExecutor implements Executor
                 continue;
             }
 
-            $this->logger->debug('{duration}ms', [
+            $this->logger->notice('Query took {duration}ms', [
                 'duration' => $stopwatchEvent->getDuration(),
             ]);
         }
     }
 
-    private function outputSqlQuery(Query $query) : void
+    private function outputSqlQuery(Query $query, MigratorConfiguration $configuration) : void
     {
         $params = $this->parameterFormatter->formatParameters(
             $query->getParameters(),
             $query->getTypes()
         );
 
-        $this->logger->debug('{query} {params}', [
-            'query' => $query->getStatement(),
-            'params' => $params,
-        ]);
+        $this->logger->log(
+            $configuration->getTimeAllQueries() ? LogLevel::NOTICE : LogLevel::DEBUG,
+            '{query} {params}',
+            [
+                'query'  => $query->getStatement(),
+                'params' => $params,
+            ]
+        );
     }
 
     private function getFromSchema(MigratorConfiguration $configuration) : Schema

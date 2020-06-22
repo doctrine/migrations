@@ -140,9 +140,9 @@ class ExecutorTest extends TestCase
         self::assertSame([
             0 => '++ migrating test',
             1 => 'SELECT 1 ',
-            2 => '100ms',
+            2 => 'Query took 100ms',
             3 => 'SELECT 2 ',
-            4 => '100ms',
+            4 => 'Query took 100ms',
             5 => 'Migration test migrated (took 100ms, used 100 memory)',
         ], $this->logger->logs);
     }
@@ -223,9 +223,9 @@ class ExecutorTest extends TestCase
         self::assertSame([
             0 => '++ reverting test',
             1 => 'SELECT 3 ',
-            2 => '100ms',
+            2 => 'Query took 100ms',
             3 => 'SELECT 4 ',
-            4 => '100ms',
+            4 => 'Query took 100ms',
             5 => 'Migration test reverted (took 100ms, used 100 memory)',
         ], $this->logger->logs);
     }
