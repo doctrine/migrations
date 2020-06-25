@@ -44,7 +44,6 @@ return [
 <?php
 
 return [
-    'name' => 'My Project Migrations',
 
     'table_storage' => [
         'table_name' => 'doctrine_migration_versions',
@@ -65,6 +64,8 @@ return [
 ```
 
 Files in XML, YAML or JSON also changed in a similar way. Please refer to the official documentation for more details.
+
+Note: the `name` property has been removed.
 
 Note: the option in `table_storage` needs to be updated only if you have changed the metadata table settings
 by using v2 options such as `table_name`, `column_name`, `column_length` or `executed_at_column_name`. If you did not change
