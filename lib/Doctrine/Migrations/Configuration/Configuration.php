@@ -39,6 +39,12 @@ final class Configuration
     /** @var bool */
     private $allOrNothing = false;
 
+    /** @var string|null */
+    private $connectionName;
+
+    /** @var string|null */
+    private $entityManagerName;
+
     /** @var bool */
     private $checkDbPlatform = true;
 
@@ -97,6 +103,28 @@ final class Configuration
     public function getMigrationDirectories() : array
     {
         return $this->migrationsDirectories;
+    }
+
+    public function getConnectionName() : ?string
+    {
+        return $this->connectionName;
+    }
+
+    public function setConnectionName(?string $connectionName) : void
+    {
+        $this->assertNotFrozen();
+        $this->connectionName = $connectionName;
+    }
+
+    public function getEntityManagerName() : ?string
+    {
+        return $this->entityManagerName;
+    }
+
+    public function setEntityManagerName(?string $entityManagerName) : void
+    {
+        $this->assertNotFrozen();
+        $this->entityManagerName = $entityManagerName;
     }
 
     public function setCustomTemplate(?string $customTemplate) : void

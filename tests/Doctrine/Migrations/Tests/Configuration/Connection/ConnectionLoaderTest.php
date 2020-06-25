@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Connection\ConfigurationFile;
 use Doctrine\Migrations\Configuration\Connection\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Connection\Exception\InvalidConfiguration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class ConnectionLoaderTest extends TestCase
@@ -20,6 +21,17 @@ final class ConnectionLoaderTest extends TestCase
         $loader = new ExistingConnection($conn);
 
         self::assertSame($conn, $loader->getConnection());
+    }
+
+    public function testNamedConnectionIsNotSupported() : void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
+
+        $conn   = $this->createMock(Connection::class);
+        $loader = new ExistingConnection($conn);
+
+        self::assertSame($conn, $loader->getConnection('foo'));
     }
 
     public function testArrayConnectionConfigurationLoader() : void

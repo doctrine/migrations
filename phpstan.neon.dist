@@ -24,7 +24,9 @@ parameters:
         -
             message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
-
+        -
+            message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
+            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php

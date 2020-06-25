@@ -127,7 +127,6 @@ class DependencyFactory
     public function freeze() : void
     {
         $this->frozen = true;
-        $this->getConfiguration()->freeze();
     }
 
     private function assertNotFrozen() : void
@@ -163,7 +162,7 @@ class DependencyFactory
         if ($this->connection === null) {
             $this->connection = $this->hasEntityManager()
                 ? $this->getEntityManager()->getConnection()
-                : $this->connectionLoader->getConnection();
+                : $this->connectionLoader->getConnection($this->getConfiguration()->getConnectionName());
             $this->freeze();
         }
 
@@ -177,7 +176,7 @@ class DependencyFactory
                 throw MissingDependency::noEntityManager();
             }
 
-            $this->em = $this->emLoader->getEntityManager();
+            $this->em = $this->emLoader->getEntityManager($this->getConfiguration()->getEntityManagerName());
             $this->freeze();
         }
 

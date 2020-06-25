@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Configuration\EntityManager;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\InvalidConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use function file_exists;
 
 /**
@@ -28,8 +29,12 @@ final class ConfigurationFile implements EntityManagerLoader
      *
      * @throws InvalidConfiguration
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(?string $name = null) : EntityManagerInterface
     {
+        if ($name !== null) {
+            throw new InvalidArgumentException('Only one connection is supported');
+        }
+
         if (! file_exists($this->filename)) {
             throw FileNotFound::new($this->filename);
         }

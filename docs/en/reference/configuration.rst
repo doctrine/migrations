@@ -41,6 +41,8 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             'all_or_nothing' => true,
             'check_database_platform' => true,
+            'connection' => null,
+            'em' => null,
         ];
 
     .. code-block:: yaml
@@ -61,6 +63,9 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
         all_or_nothing: true
         check_database_platform: true
 
+        connection: null
+        em: null
+
     .. code-block:: xml
 
         <?xml version="1.0" encoding="UTF-8"?>
@@ -69,6 +74,10 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
               xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration/3.0
                             http://doctrine-project.org/schemas/migrations/configuration-3.0.xsd">
 
+            <name>My Project Migrations</name>
+
+            <connection>default</connection>
+            <em>default</em>
             <name>My Project Migrations</name>
 
             <storage>
@@ -110,7 +119,10 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             },
 
             "all_or_nothing": true,
-            "check_database_platform": true
+            "check_database_platform": true,
+
+            "connection": null,
+            "em": null
         }
 
 Please note that if you want to use the YAML configuration option, you will need to install the ``symfony/yaml`` package with composer:
@@ -135,6 +147,10 @@ Here are details about what each configuration option does:
 | migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.  |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| connection                 | no         | null                         | The named connection to use (available only when ConnectionRegistryConnection is used). |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| em                         | no         | null                         | The named entity manager to use (available only when ManagerRegistryEntityManager is used). |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 
 
