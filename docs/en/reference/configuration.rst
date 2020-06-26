@@ -24,8 +24,6 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
         <?php
 
         return [
-            'name' => 'My Project Migrations',
-
             'table_storage' => [
                 'table_name' => 'doctrine_migration_versions',
                 'version_column_name' => 'version',
@@ -44,8 +42,6 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
         ];
 
     .. code-block:: yaml
-
-        name: "My Project Migrations"
 
         table_storage:
            table_name: doctrine_migration_versions
@@ -69,8 +65,6 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
               xsi:schemaLocation="http://doctrine-project.org/schemas/migrations/configuration/3.0
                             http://doctrine-project.org/schemas/migrations/configuration-3.0.xsd">
 
-            <name>My Project Migrations</name>
-
             <storage>
                 <table-storage
                         table-name="doctrine_migration_versions"
@@ -93,9 +87,6 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
     .. code-block:: json
 
         {
-            "name": "My Project Migrations",
-            "name": "My Project Migrations",
-
             "table_storage": {
                "table_name: "doctrine_migration_versions",
                "version_column_name": "version",
@@ -124,8 +115,6 @@ Here are details about what each configuration option does:
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | Name                       | Required   | Default                      | Description                                                                      |
 +============================+============+==============================+==================================================================================+
-| name                       | no         | Doctrine Database Migrations | The name that shows at the top of the migrations console application.            |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | migrations_paths<string, string>       | yes        | null             | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | table_storage              | no         |                              | Used by doctrine migrations to track the currently executed migrations           |
