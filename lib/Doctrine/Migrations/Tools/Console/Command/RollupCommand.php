@@ -37,7 +37,7 @@ EOT
 
     protected function execute(InputInterface $input, OutputInterface $output) : int
     {
-        $question = 'WARNING! You are about to execute a database migration that could result in schema changes and data loss. Are you sure you wish to continue?';
+        $question = sprintf('WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?', $this->getDependencyFactory()->getConnection()->getDatabase());
 
         if (! $this->canExecute($question, $input)) {
             $this->io->error('Migration cancelled!');
