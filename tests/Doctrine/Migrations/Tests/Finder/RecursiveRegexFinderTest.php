@@ -9,8 +9,7 @@ use InvalidArgumentException;
 use function count;
 use function in_array;
 use function sort;
-use function stripos;
-use const PHP_OS;
+use const PHP_OS_FAMILY;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {
@@ -42,7 +41,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\DifferentNamingSchema',
         ];
 
-        if (stripos(PHP_OS, 'Win') === false) {
+        if (PHP_OS_FAMILY !== 'Windows') {
             $tests[] = 'TestMigrations\\Version1SymlinkedFile';
         }
 
