@@ -12,4 +12,9 @@ final class MissingDependency extends RuntimeException implements DependencyExce
     {
         return new self('The entity manager is not available.');
     }
+
+    public static function noSchemaProvider(): self
+    {
+        return new self('The schema provider is not available.');
+    }
 }
