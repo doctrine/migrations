@@ -21,7 +21,7 @@ Now place the following code in the ``migrations`` file:
 
     use Doctrine\DBAL\DriverManager;
     use Doctrine\Migrations\DependencyFactory;
-    use Doctrine\Migrations\Configuration\Configuration\PhpFile;
+    use Doctrine\Migrations\Configuration\Migration\PhpFile;
     use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
     use Doctrine\Migrations\Tools\Console\Command;
     use Symfony\Component\Console\Application;
