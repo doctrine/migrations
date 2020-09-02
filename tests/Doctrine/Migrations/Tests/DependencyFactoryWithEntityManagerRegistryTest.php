@@ -48,12 +48,10 @@ final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTest
         $this->em2 = $this->createMock(EntityManager::class);
 
         $this->em1
-            ->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection1);
 
         $this->em2
-            ->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection2);
 
