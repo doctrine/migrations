@@ -41,6 +41,10 @@ final class ConfigurationArray implements ConfigurationLoader
                     $configuration->addMigrationClass($className);
                 }
             },
+
+            'connection' => 'setConnectionName',
+            'em' => 'setEntityManagerName',
+
             'table_storage' => [
                 'table_name' => 'setTableName',
                 'version_column_name' => 'setVersionColumnName',

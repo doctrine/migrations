@@ -14,5 +14,5 @@ use Doctrine\ORM\EntityManagerInterface;
  */
 interface EntityManagerLoader
 {
-    public function getEntityManager() : EntityManagerInterface;
+    public function getEntityManager(?string $name = null) : EntityManagerInterface;
 }

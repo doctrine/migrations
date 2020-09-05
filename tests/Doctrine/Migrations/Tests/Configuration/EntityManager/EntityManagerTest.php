@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\EntityManager\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\InvalidConfiguration;
 use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
 use Doctrine\ORM\EntityManager;
+use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
 final class EntityManagerTest extends TestCase
@@ -20,6 +21,17 @@ final class EntityManagerTest extends TestCase
         $loader = new ExistingEntityManager($em);
 
         self::assertSame($em, $loader->getEntityManager());
+    }
+
+    public function testNamedConnectionIsNotSupported() : void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one entity manager is supported by Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager');
+
+        $em     = $this->createMock(EntityManager::class);
+        $loader = new ExistingEntityManager($em);
+
+        self::assertSame($em, $loader->getEntityManager('foo'));
     }
 
     public function testArrayEntityManagerConfigurationLoader() : void

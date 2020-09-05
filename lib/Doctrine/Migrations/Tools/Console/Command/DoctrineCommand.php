@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
+use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
@@ -44,6 +45,20 @@ abstract class DoctrineCommand extends Command
             'The path to a migrations configuration file. <comment>[default: any of migrations.{php,xml,json,yml,yaml}]</comment>'
         );
 
+        $this->addOption(
+            'em',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The name of the entity manager to use.'
+        );
+
+        $this->addOption(
+            'conn',
+            null,
+            InputOption::VALUE_REQUIRED,
+            'The name of the connection to use.'
+        );
+
         if ($this->dependencyFactory !== null) {
             return;
         }
@@ -75,6 +90,8 @@ abstract class DoctrineCommand extends Command
             $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
 
+        $this->setNamedEmOrConnection($input);
+
         if ($this->dependencyFactory->isFrozen()) {
             return;
         }
@@ -96,5 +113,26 @@ abstract class DoctrineCommand extends Command
     protected function canExecute(string $question, InputInterface $input) : bool
     {
         return ! $input->isInteractive() || $this->io->confirm($question);
+    }
+
+    private function setNamedEmOrConnection(InputInterface $input) : void
+    {
+        $emName   = $input->getOption('em');
+        $connName = $input->getOption('conn');
+        if ($emName !== null && $connName !== null) {
+            throw new InvalidOptionUsage('You can specify only one of the --em and --conn options.');
+        }
+
+        if ($this->dependencyFactory->hasEntityManager() && $emName !== null) {
+            $this->dependencyFactory->getConfiguration()->setEntityManagerName((string) $emName);
+
+            return;
+        }
+
+        if ($connName !== null) {
+            $this->dependencyFactory->getConfiguration()->setConnectionName((string) $connName);
+
+            return;
+        }
     }
 }

@@ -68,3 +68,62 @@ Once you have your custom integration setup, you can modify it to look like the 
     $cli->run();
 
 :ref:`Next Chapter: Migrations Events <events>`
+
+
+It is possible to use multiple entity managers or connections, this is a way to configure your application:
+
+
+.. code-block:: php
+
+    #!/usr/bin/env php
+    <?php
+
+    require_once __DIR__.'/vendor/autoload.php';
+
+    use Doctrine\DBAL\DriverManager;
+    use Doctrine\Migrations\Configuration\Configuration;
+    use Doctrine\Migrations\Configuration\Configuration\ExistingConfiguration;
+    use Doctrine\Migrations\Configuration\Connection\ConnectionRegistryConnection;
+    use Doctrine\Migrations\DependencyFactory;
+    use Doctrine\Migrations\Tools\Console\Command;
+    use Symfony\Component\Console\Application;
+
+    $connection1 = DriverManager::getConnection([...]);
+    $connection2 = DriverManager::getConnection([...]);
+
+    $connectionRegistry = new class(
+        'some_registry',
+        ['foo' => $connection1, 'bar' => $connection2],
+        [], // entity managers
+        'foo', // default connection
+        null, // default entity manager
+        'Doctrine\Persistence\Proxy' // proxy class
+    ) extends AbstractManagerRegistry {
+        // implement abstract methods here
+    };
+
+    $configuration = new Configuration($connection);
+    $configuration->addMigrationsDirectory('MyProject\Migrations', 'some path');
+    $configurationLoader = new ExistingConfiguration($configuration);
+
+    $connectionLoader = ConnectionRegistryConnection::withSimpleDefault($connectionRegistry);
+
+    $dependencyFactory = DependencyFactory::fromConnection(
+        $configurationLoader,
+        $connectionLoader
+    );
+
+    $cli = new Application('Doctrine Migrations');
+    $cli->setCatchExceptions(true);
+
+    $cli->addCommands(array(
+        new Command\MigrateCommand($dependencyFactory),
+        // more commands here
+    ));
+
+    $cli->run();
+
+With this configuration you can use the ``--conn`` parameter to specify a connection that will be used for running
+migrations. If the parameter is not passed, it will fallback to the one passed in the configuration,
+and if that is also not provided it will fallback to the default connection name specified when creating
+the connection registry.
