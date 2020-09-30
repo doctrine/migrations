@@ -322,10 +322,10 @@ Now update your ``cli-config.php`` in the root of your project to look like the 
     $paths = [__DIR__.'/lib/MyProject/Entities'];
     $isDevMode = true;
 
-    $config = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
+    $ORMconfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
     $entityManager = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $config);
 
-    return DependencyFactory::fromEntityManager($config, new ExistingEntityManager($entityManager));
+    return DependencyFactory::fromEntityManager($ORMconfig, new ExistingEntityManager($entityManager));
 
 Make sure to create the directory where your ORM entities will be located:
 
