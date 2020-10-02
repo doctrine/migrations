@@ -186,6 +186,67 @@ class TableMetadataStorageTest extends TestCase
         ], $rows);
     }
 
+    public function testCompleteWillAlwaysCastTimeToInteger() : void
+    {
+        $schemaManager = $this->createMock(AbstractSchemaManager::class);
+        $connection    = $this->createMock(Connection::class);
+
+        $expectedTable = new Table($this->config->getTableName());
+        $expectedTable->addColumn(
+            $this->config->getVersionColumnName(),
+            'string',
+            [
+                'notnull' => true,
+                'length' => $this->config->getVersionColumnLength(),
+            ]
+        );
+        $expectedTable->addColumn(
+            $this->config->getExecutedAtColumnName(),
+            'datetime',
+            ['notnull' => false]
+        );
+        $expectedTable->addColumn(
+            $this->config->getExecutionTimeColumnName(),
+            'integer',
+            ['notnull' => false]
+        );
+        $expectedTable->setPrimaryKey([$this->config->getVersionColumnName()]);
+
+        $connection->expects(self::once())
+            ->method('getSchemaManager')
+            ->willReturn($schemaManager);
+
+        $connection->expects(self::once())
+            ->method('insert')
+            ->willReturnCallback(
+                function (string $tableName, array $params) : void {
+                    self::assertSame($this->config->getTableName(), $tableName);
+                    self::assertSame('1230', $params['version']);
+                    self::assertSame(31490, $params['execution_time']);
+                    self::assertEquals(new DateTimeImmutable('2010-01-05 10:30:21'), $params['executed_at']);
+                }
+            );
+
+        $schemaManager->expects(self::once())
+            ->method('tablesExist')
+            ->willReturn(true);
+
+        $schemaManager->expects(self::once())
+            ->method('listTableDetails')
+            ->willReturn($expectedTable);
+
+        $result = new ExecutionResult(
+            new Version('1230'),
+            Direction::UP,
+            new DateTimeImmutable('2010-01-05 10:30:21')
+        );
+        $result->setTime(31.49);
+
+        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $this->config);
+
+        $storage->complete($result);
+    }
+
     public function testRead() : void
     {
         $this->storage->ensureInitialized();
