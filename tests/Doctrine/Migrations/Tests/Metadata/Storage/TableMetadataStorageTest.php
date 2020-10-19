@@ -7,12 +7,14 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDOSqlite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -188,61 +190,41 @@ class TableMetadataStorageTest extends TestCase
 
     public function testCompleteWillAlwaysCastTimeToInteger() : void
     {
-        $schemaManager = $this->createMock(AbstractSchemaManager::class);
-        $connection    = $this->createMock(Connection::class);
+        $config     = new TableMetadataStorageConfiguration();
+        $executedAt = new DateTimeImmutable('2010-01-05 10:30:21');
 
-        $expectedTable = new Table($this->config->getTableName());
-        $expectedTable->addColumn(
-            $this->config->getVersionColumnName(),
-            'string',
-            [
-                'notnull' => true,
-                'length' => $this->config->getVersionColumnLength(),
-            ]
-        );
-        $expectedTable->addColumn(
-            $this->config->getExecutedAtColumnName(),
-            'datetime',
-            ['notnull' => false]
-        );
-        $expectedTable->addColumn(
-            $this->config->getExecutionTimeColumnName(),
-            'integer',
-            ['notnull' => false]
-        );
-        $expectedTable->setPrimaryKey([$this->config->getVersionColumnName()]);
+        $connection = $this->getMockBuilder(Connection::class)
+            ->setConstructorArgs([
+                ['pdo' => $this->getSqliteConnection()->getWrappedConnection()],
+                new SQLiteDriver(),
+            ])
+            ->onlyMethods(['insert'])
+            ->getMock();
 
-        $connection->expects(self::once())
-            ->method('getSchemaManager')
-            ->willReturn($schemaManager);
-
-        $connection->expects(self::once())
+        $connection
+            ->expects(self::once())
             ->method('insert')
-            ->willReturnCallback(
-                function (string $tableName, array $params) : void {
-                    self::assertSame($this->config->getTableName(), $tableName);
-                    self::assertSame('1230', $params['version']);
-                    self::assertSame(31490, $params['execution_time']);
-                    self::assertEquals(new DateTimeImmutable('2010-01-05 10:30:21'), $params['executed_at']);
-                }
-            );
+            ->willReturnCallback(static function ($table, $params, $types) use ($config, $executedAt) : int {
+                self::assertSame($config->getTableName(), $table);
+                self::assertSame([
+                    $config->getVersionColumnName() => '1230',
+                    $config->getExecutedAtColumnName() => $executedAt,
+                    $config->getExecutionTimeColumnName() => 31000,
+                ], $params);
+                self::assertSame([
+                    Types::STRING,
+                    Types::DATETIME_MUTABLE,
+                    Types::INTEGER,
+                ], $types);
 
-        $schemaManager->expects(self::once())
-            ->method('tablesExist')
-            ->willReturn(true);
+                return 1;
+            });
 
-        $schemaManager->expects(self::once())
-            ->method('listTableDetails')
-            ->willReturn($expectedTable);
+        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $config);
+        $storage->ensureInitialized();
 
-        $result = new ExecutionResult(
-            new Version('1230'),
-            Direction::UP,
-            new DateTimeImmutable('2010-01-05 10:30:21')
-        );
-        $result->setTime(31.49);
-
-        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $this->config);
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, $executedAt);
+        $result->setTime(31.0);
 
         $storage->complete($result);
     }
