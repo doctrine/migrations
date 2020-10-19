@@ -7,12 +7,14 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDOSqlite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -184,6 +186,47 @@ class TableMetadataStorageTest extends TestCase
                     'execution_time' => '31490',
                 ],
         ], $rows);
+    }
+
+    public function testCompleteWillAlwaysCastTimeToInteger() : void
+    {
+        $config     = new TableMetadataStorageConfiguration();
+        $executedAt = new DateTimeImmutable('2010-01-05 10:30:21');
+
+        $connection = $this->getMockBuilder(Connection::class)
+            ->setConstructorArgs([
+                ['pdo' => $this->getSqliteConnection()->getWrappedConnection()],
+                new SQLiteDriver(),
+            ])
+            ->onlyMethods(['insert'])
+            ->getMock();
+
+        $connection
+            ->expects(self::once())
+            ->method('insert')
+            ->willReturnCallback(static function ($table, $params, $types) use ($config, $executedAt) : int {
+                self::assertSame($config->getTableName(), $table);
+                self::assertSame([
+                    $config->getVersionColumnName() => '1230',
+                    $config->getExecutedAtColumnName() => $executedAt,
+                    $config->getExecutionTimeColumnName() => 31000,
+                ], $params);
+                self::assertSame([
+                    Types::STRING,
+                    Types::DATETIME_MUTABLE,
+                    Types::INTEGER,
+                ], $types);
+
+                return 1;
+            });
+
+        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $config);
+        $storage->ensureInitialized();
+
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, $executedAt);
+        $result->setTime(31.0);
+
+        $storage->complete($result);
     }
 
     public function testRead() : void
