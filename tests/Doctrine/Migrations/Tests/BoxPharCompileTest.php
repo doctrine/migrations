@@ -9,6 +9,7 @@ use Symfony\Component\Process\Process;
 use function assert;
 use function file_exists;
 use function realpath;
+use function sprintf;
 
 /**
  * @requires OS Linux|Darwin
@@ -32,9 +33,12 @@ class BoxPharCompileTest extends TestCase
 
         $doctrinePharPath = realpath(__DIR__ . '/../../../../build/doctrine-migrations.phar');
 
-        assert($doctrinePharPath !== false);
+        self::assertTrue(
+            $process->isSuccessful(),
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+        );
 
-        self::assertTrue($process->isSuccessful());
+        assert($doctrinePharPath !== false);
         self::assertTrue(file_exists($doctrinePharPath));
 
         $successful = true;
@@ -51,7 +55,10 @@ class BoxPharCompileTest extends TestCase
 
         $process->wait();
 
-        self::assertTrue($successful);
+        self::assertTrue(
+            $successful,
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+        );
         self::assertTrue($process->isSuccessful());
     }
 }
