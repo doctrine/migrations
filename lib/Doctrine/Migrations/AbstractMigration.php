@@ -60,11 +60,19 @@ abstract class AbstractMigration
         return true;
     }
 
+    /**
+     * Description of this migration.
+     *
+     * Describe what this migration does in simple terms. This information is displayed when you view the list of migrations.
+     */
     public function getDescription() : string
     {
         return '';
     }
 
+    /**
+     * Warn with a message if some condition is met.
+     */
     public function warnIf(bool $condition, string $message = 'Unknown Reason') : void
     {
         if (! $condition) {
@@ -155,6 +163,11 @@ abstract class AbstractMigration
         return $this->plannedSql;
     }
 
+    /**
+     * Write some debug information to the console.
+     *
+     * Debug information is written with debug().
+     */
     protected function write(string $message) : void
     {
         $this->logger->notice($message, ['migration' => $this]);
