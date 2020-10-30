@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use const PHP_VERSION_ID;
 use function assert;
 use function file_exists;
 use function realpath;
@@ -18,6 +19,10 @@ class BoxPharCompileTest extends TestCase
 {
     public function testCompile() : void
     {
+        if (PHP_VERSION_ID < 70200) {
+            self::markTestSkipped('https://github.com/box-project/box/issues/489');
+        }
+
         $boxPharPath = __DIR__ . '/../../../../box.phar';
 
         if (! file_exists($boxPharPath)) {
