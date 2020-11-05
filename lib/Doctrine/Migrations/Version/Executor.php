@@ -345,10 +345,11 @@ final class Executor implements ExecutorInterface
 
             $this->outputSqlQuery($key, $query);
 
+            // Do not use method that returns results here, to not block next queries
             if (! isset($this->params[$key])) {
-                $this->connection->executeUpdate($query);
+                $this->connection->executeQuery($query);
             } else {
-                $this->connection->executeUpdate($query, $this->params[$key], $this->types[$key]);
+                $this->connection->executeQuery($query, $this->params[$key], $this->types[$key]);
             }
 
             $stopwatchEvent->stop();

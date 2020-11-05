@@ -108,26 +108,6 @@ class ExecutorTest extends TestCase
         self::assertFalse($this->migration->postDownExecuted);
     }
 
-    public function testExecuteUsedExecuteUpdate() : void
-    {
-        $this->connection
-            ->expects(self::never())
-            ->method('executeQuery');
-        $this->connection
-            ->expects(self::exactly(2))
-            ->method('executeUpdate');
-
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setTimeAllQueries(true);
-
-        $this->versionExecutor->execute(
-            $this->version,
-            $this->migration,
-            Direction::UP,
-            $migratorConfiguration
-        );
-    }
-
     /**
      * @test
      */
