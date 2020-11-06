@@ -345,7 +345,7 @@ final class Executor implements ExecutorInterface
 
             $this->outputSqlQuery($key, $query);
 
-            // Do not use method that returns results here, to not block next queries
+            // executeQuery() must be used here because $query might return a result set, for instance REPAIR does
             if (! isset($this->params[$key])) {
                 $this->connection->executeQuery($query);
             } else {
