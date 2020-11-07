@@ -11,8 +11,10 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
 use function count;
 use function getcwd;
+use function is_string;
 use function sprintf;
 use function substr;
 
@@ -115,7 +117,8 @@ EOT
     {
         $this->outputHeader($output);
 
-        $version          = (string) $input->getArgument('version');
+        $version = $input->getArgument('version');
+        assert(is_string($version));
         $path             = $input->getOption('write-sql');
         $allowNoMigration = (bool) $input->getOption('allow-no-migration');
         $timeAllQueries   = (bool) $input->getOption('query-time');
@@ -142,6 +145,7 @@ EOT
         if ($path !== false) {
             $path = $path ?? getcwd();
 
+            assert(is_string($path));
             $migrator->writeSqlFile($path, $version);
 
             return 0;

@@ -54,7 +54,9 @@ class AbstractCommandTest extends MigrationTestCase
         }
 
         if (! $noConnection) {
-            $command->getHelperSet()->set(
+            $helperSet = $command->getHelperSet();
+            assert($helperSet !== null);
+            $helperSet->set(
                 new ConnectionHelper($this->getSqliteConnection()),
                 'connection'
             );

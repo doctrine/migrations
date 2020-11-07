@@ -355,7 +355,7 @@ class MigrationRepository
             return null;
         }
 
-        $relativeVersion = ((int) $offset) + $delta;
+        $relativeVersion = $offset + $delta;
 
         if (! isset($versions[$relativeVersion])) {
             // Unknown version or delta out of bounds.

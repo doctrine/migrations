@@ -63,8 +63,10 @@ abstract class MigrationTestCase extends TestCase
     {
         $stream = $streamOutput->getStream();
         rewind($stream);
+        $contents = stream_get_contents($stream);
+        assert($contents !== false);
 
-        return stream_get_contents($stream);
+        return $contents;
     }
 
     /** @return resource */

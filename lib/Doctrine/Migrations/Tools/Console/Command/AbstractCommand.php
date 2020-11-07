@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ConfirmationQuestion;
+use function assert;
 use function escapeshellarg;
 use function proc_open;
 use function str_repeat;
@@ -111,8 +112,10 @@ abstract class AbstractCommand extends Command
     ) : Configuration {
         if ($this->migrationConfiguration === null) {
             if ($this->hasConfigurationHelper()) {
+                $helperSet = $this->getHelperSet();
+                assert($helperSet !== null);
                 /** @var ConfigurationHelper $configHelper */
-                $configHelper = $this->getHelperSet()->get('configuration');
+                $configHelper = $helperSet->get('configuration');
             } else {
                 $configHelper = new ConfigurationHelper(
                     $this->getConnection($input),
@@ -187,8 +190,10 @@ abstract class AbstractCommand extends Command
     private function getConnection(InputInterface $input) : Connection
     {
         if ($this->connection === null) {
+            $helperSet = $this->getHelperSet();
+            assert($helperSet !== null);
             $this->connection = (new ConnectionLoader($this->configuration))
-                ->getConnection($input, $this->getHelperSet());
+                ->getConnection($input, $helperSet);
         }
 
         return $this->connection;
