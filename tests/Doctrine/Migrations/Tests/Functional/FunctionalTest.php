@@ -70,13 +70,13 @@ class FunctionalTest extends MigrationTestCase
 
         self::assertNotEmpty($output);
 
-        self::assertContains('migrations:execute', $output);
-        self::assertContains('migrations:generate', $output);
-        self::assertContains('migrations:latest', $output);
-        self::assertContains('migrations:migrate', $output);
-        self::assertContains('migrations:status', $output);
-        self::assertContains('migrations:up-to-date', $output);
-        self::assertContains('migrations:version', $output);
+        self::assertStringContainsString('migrations:execute', $output);
+        self::assertStringContainsString('migrations:generate', $output);
+        self::assertStringContainsString('migrations:latest', $output);
+        self::assertStringContainsString('migrations:migrate', $output);
+        self::assertStringContainsString('migrations:status', $output);
+        self::assertStringContainsString('migrations:up-to-date', $output);
+        self::assertStringContainsString('migrations:version', $output);
     }
 
     public function testMigrateUp() : void
@@ -395,8 +395,8 @@ class FunctionalTest extends MigrationTestCase
         self::assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
 
         foreach ($queries as $query) {
-            self::assertNotContains('bar', $query);
-            self::assertNotContains('bar2', $query);
+            self::assertStringNotContainsString('bar', $query);
+            self::assertStringNotContainsString('bar2', $query);
         }
 
         $queries = $version->execute('down')->getSql();
@@ -407,8 +407,8 @@ class FunctionalTest extends MigrationTestCase
         self::assertFalse($schema->hasTable('bar2'), 'The table bar2 is present');
 
         foreach ($queries as $query) {
-            self::assertNotContains('bar', $query);
-            self::assertNotContains('bar2', $query);
+            self::assertStringNotContainsString('bar', $query);
+            self::assertStringNotContainsString('bar2', $query);
         }
     }
 

@@ -81,7 +81,7 @@ final class FileQueryWriterTest extends MigrationTestCase
             }
 
             self::assertNotEmpty($contents);
-            self::assertContains($expectedSql, $contents);
+            self::assertStringContainsString($expectedSql, $contents);
         }
     }
 

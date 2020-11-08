@@ -5,6 +5,7 @@ reports/
 dist/
 tests/phpunit.xml
 phpunit.xml
+/.phpunit.result.cache
 /composer.lock
 vendor/
 /phpcs.xml

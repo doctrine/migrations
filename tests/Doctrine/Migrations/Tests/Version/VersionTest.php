@@ -38,7 +38,7 @@ use Doctrine\Migrations\Version\Version;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PDO;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -97,7 +97,7 @@ class VersionTest extends MigrationTestCase
 
         $version->execute(Direction::UP);
 
-        self::assertContains('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
+        self::assertStringContainsString('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
     }
 
     public function testShowSqlStatementsParametersWithTypes() : void
@@ -125,7 +125,7 @@ class VersionTest extends MigrationTestCase
         $version->execute(Direction::UP, (new MigratorConfiguration())
             ->setDryRun(true));
 
-        self::assertContains('([456, 3, 456])', $this->getOutputStreamContent($this->output));
+        self::assertStringContainsString('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
 
     public function testCreateVersionWithCustomName() : void
@@ -146,7 +146,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @dataProvider stateProvider */
-    public function testGetExecutionState(string $state) : void
+    public function testGetExecutionState(int $state) : void
     {
         $configuration = $this->getSqliteConfiguration();
 
@@ -208,7 +208,7 @@ class VersionTest extends MigrationTestCase
         $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $config */
+        /** @var Configuration|MockObject $config */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods(['getConnection', 'getOutputWriter', 'getQueryWriter'])
@@ -223,7 +223,7 @@ class VersionTest extends MigrationTestCase
         $config->method('getQueryWriter')
             ->willReturn($queryWriter);
 
-        /** @var Version|PHPUnit_Framework_MockObject_MockObject $version */
+        /** @var Version|MockObject $version */
         $version = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
@@ -268,7 +268,7 @@ class VersionTest extends MigrationTestCase
 
         $version->execute('up');
 
-        self::assertContains(
+        self::assertStringContainsString(
             'Migration 003 was executed but did not result in any SQL statements.',
             $this->getOutputStreamContent($this->output)
         );
@@ -290,7 +290,7 @@ class VersionTest extends MigrationTestCase
         try {
             $version->execute('up');
         } catch (Throwable $e) {
-            self::assertContains(
+            self::assertStringContainsString(
                 'Migration 004 failed during Execution. Error Super Exception',
                 $this->getOutputStreamContent($this->output)
             );
@@ -367,7 +367,7 @@ class VersionTest extends MigrationTestCase
                     $versionName
                 );
 
-                self::assertContains($sql, $contents);
+                self::assertStringContainsString($sql, $contents);
             } else {
                 $sql = sprintf(
                     "DELETE FROM %s WHERE %s = '%s'",
@@ -376,7 +376,7 @@ class VersionTest extends MigrationTestCase
                     $versionName
                 );
 
-                self::assertContains($sql, $contents);
+                self::assertStringContainsString($sql, $contents);
             }
 
             unlink($file);
@@ -401,7 +401,7 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Configuration|MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods([
@@ -424,7 +424,7 @@ class VersionTest extends MigrationTestCase
         $config->method('getQuotedMigrationsExecutedAtColumnName')
             ->willReturn('executed_at');
 
-        /** @var Version|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Version|MockObject $migration */
         $migration = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
@@ -468,7 +468,7 @@ class VersionTest extends MigrationTestCase
             ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('SELECT 1 WHERE 1', $messages[1]);
+        self::assertStringContainsString('SELECT 1 WHERE 1', $messages[1]);
     }
 
     public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement() : void
@@ -492,8 +492,8 @@ class VersionTest extends MigrationTestCase
             ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?, ?)', $messages[1]);
-        self::assertContains('with parameters ([one], [two])', $messages[1]);
+        self::assertStringContainsString('INSERT INTO test VALUES (?, ?)', $messages[1]);
+        self::assertStringContainsString('with parameters ([one], [two])', $messages[1]);
     }
 
     public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement() : void
@@ -517,8 +517,8 @@ class VersionTest extends MigrationTestCase
             ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (:one, :two)', $messages[1]);
-        self::assertContains('with parameters (:one => [one], :two => [two])', $messages[1]);
+        self::assertStringContainsString('INSERT INTO test VALUES (:one, :two)', $messages[1]);
+        self::assertStringContainsString('with parameters (:one => [one], :two => [two])', $messages[1]);
     }
 
     /** @return mixed[][] */
@@ -569,8 +569,8 @@ class VersionTest extends MigrationTestCase
             ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        self::assertContains(sprintf('with parameters (%s)', $output), $messages[1]);
+        self::assertStringContainsString('INSERT INTO test VALUES (?)', $messages[1]);
+        self::assertStringContainsString(sprintf('with parameters (%s)', $output), $messages[1]);
     }
 
     public function testRunWithInsertNullValue() : void
@@ -600,8 +600,8 @@ class VersionTest extends MigrationTestCase
             ->setDryRun(true));
 
         self::assertCount(3, $messages, 'should have written three messages (header, footer, 1 SQL statement)');
-        self::assertContains('INSERT INTO test VALUES (?)', $messages[1]);
-        self::assertContains('with parameters ([])', $messages[1]);
+        self::assertStringContainsString('INSERT INTO test VALUES (?)', $messages[1]);
+        self::assertStringContainsString('with parameters ([])', $messages[1]);
     }
 
     /**

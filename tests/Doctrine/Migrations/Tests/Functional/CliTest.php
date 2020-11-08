@@ -70,7 +70,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/new migrations:\s+1/im', $output);
 
         $output = $this->executeCommand('migrations:latest');
-        self::assertContains('20150426000000', $output);
+        self::assertStringContainsString('20150426000000', $output);
 
         $this->executeCommand('migrations:migrate', 'config.yml', ['--no-interaction']);
         self::assertSuccessfulExit();
@@ -119,10 +119,10 @@ class CliTest extends MigrationTestCase
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        self::assertContains('CREATE TABLE foo', $versionClassContents);
-        self::assertContains('CREATE TABLE bar', $versionClassContents);
-        self::assertContains('DROP TABLE foo', $versionClassContents);
-        self::assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE foo', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE bar', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE foo', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
     public function testMigrationDiffWritesNewMigrationWithFormattedSql() : void
@@ -146,10 +146,10 @@ class CliTest extends MigrationTestCase
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        self::assertContains("CREATE TABLE foo (\n", $versionClassContents);
-        self::assertContains("CREATE TABLE bar (\n", $versionClassContents);
-        self::assertContains('DROP TABLE foo', $versionClassContents);
-        self::assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertStringContainsString("CREATE TABLE foo (\n", $versionClassContents);
+        self::assertStringContainsString("CREATE TABLE bar (\n", $versionClassContents);
+        self::assertStringContainsString('DROP TABLE foo', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
     public function testMigrationDiffFromEmptySchemaGeneratesFullMigration() : void
@@ -166,10 +166,10 @@ class CliTest extends MigrationTestCase
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        self::assertNotContains('CREATE TABLE foo', $versionClassContents);
-        self::assertContains('CREATE TABLE bar', $versionClassContents);
-        self::assertNotContains('DROP TABLE foo', $versionClassContents);
-        self::assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertStringNotContainsString('CREATE TABLE foo', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE bar', $versionClassContents);
+        self::assertStringNotContainsString('DROP TABLE foo', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
 
         $this->deleteMigrationFiles();
 
@@ -180,10 +180,10 @@ class CliTest extends MigrationTestCase
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
 
-        self::assertContains('CREATE TABLE foo', $versionClassContents);
-        self::assertContains('CREATE TABLE bar', $versionClassContents);
-        self::assertContains('DROP TABLE foo', $versionClassContents);
-        self::assertContains('DROP TABLE bar', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE foo', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE bar', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE foo', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
     public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities() : void
@@ -206,8 +206,8 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/available migrations:\s+2/im', $output);
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        self::assertContains('CREATE TABLE sample_entity', $versionClassContents);
-        self::assertContains('DROP TABLE sample_entity', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE sample_entity', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE sample_entity', $versionClassContents);
     }
 
     public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter() : void
@@ -229,9 +229,9 @@ class CliTest extends MigrationTestCase
         self::assertVersionCount(1, 'diff command should add one version');
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        self::assertContains('CREATE TABLE bar', $versionClassContents);
-        self::assertContains('DROP TABLE bar', $versionClassContents);
-        self::assertNotContains(
+        self::assertStringContainsString('CREATE TABLE bar', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
+        self::assertStringNotContainsString(
             'CREATE TABLE foo',
             $versionClassContents,
             'should ignore the "foo" table due to schema asset filter'
@@ -267,8 +267,8 @@ class CliTest extends MigrationTestCase
         self::assertVersionCount(1, 'diff command should add one version');
 
         $versionClassContents = $this->getFileContentsForLatestVersion();
-        self::assertContains('CREATE TABLE FOO', $versionClassContents);
-        self::assertContains('DROP TABLE FOO', $versionClassContents);
+        self::assertStringContainsString('CREATE TABLE FOO', $versionClassContents);
+        self::assertStringContainsString('DROP TABLE FOO', $versionClassContents);
     }
 
     protected function setUp() : void

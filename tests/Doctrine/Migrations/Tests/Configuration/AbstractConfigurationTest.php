@@ -165,11 +165,11 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     {
         $configuration1 = $this->loadConfiguration('migrations_list');
 
-        self::assertContains('migrations_list', $configuration1->getFile());
+        self::assertStringContainsString('migrations_list', $configuration1->getFile());
 
         $configuration2 = $this->loadConfiguration('migrations_list2');
 
-        self::assertContains('migrations_list2', $configuration2->getFile());
+        self::assertStringContainsString('migrations_list2', $configuration2->getFile());
     }
 
     /**
@@ -179,7 +179,7 @@ abstract class AbstractConfigurationTest extends MigrationTestCase
     {
         $configuration = $this->loadConfiguration($file);
 
-        self::assertContains($file, $configuration->getFile());
+        self::assertStringContainsString($file, $configuration->getFile());
     }
 
     /** @return string[][] */

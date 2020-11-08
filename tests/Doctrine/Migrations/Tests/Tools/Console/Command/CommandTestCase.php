@@ -8,7 +8,7 @@ use Doctrine\DBAL\Driver\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
-use PHPUnit_Framework_MockObject_MockObject;
+use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use function array_replace;
@@ -23,7 +23,7 @@ abstract class CommandTestCase extends MigrationTestCase
     /** @var Application */
     protected $app;
 
-    /** @var Configuration|PHPUnit_Framework_MockObject_MockObject */
+    /** @var Configuration|MockObject */
     protected $config;
 
     /** @var Connection */

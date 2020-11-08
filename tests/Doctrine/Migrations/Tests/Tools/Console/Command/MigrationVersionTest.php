@@ -359,6 +359,6 @@ class MigrationVersionTest extends MigrationTestCase
             ['interactive' => false]
         );
 
-        self::assertContains('1233 deleted from the version table.', $commandTester->getDisplay());
+        self::assertStringContainsString('1233 deleted from the version table.', $commandTester->getDisplay());
     }
 }
