@@ -18,6 +18,7 @@ before_install:
 install:
   - rm composer.lock
   - travis_retry composer update --prefer-dist
+  - ./download-box.sh
 
 script:
   - ./vendor/bin/phpunit
