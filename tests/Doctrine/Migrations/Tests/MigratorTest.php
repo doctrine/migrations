@@ -126,7 +126,7 @@ class MigratorTest extends MigrationTestCase
         $migrator->migrate(null, $migratorConfiguration);
 
         self::assertCount(2, $messages, 'should output header and no migrations message');
-        self::assertContains('No migrations', $messages[1]);
+        self::assertStringContainsString('No migrations', $messages[1]);
     }
 
     /**
@@ -178,7 +178,7 @@ class MigratorTest extends MigrationTestCase
         $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|PHPUnit_Framework_MockObject_MockObject $migration */
+        /** @var Configuration|MockObject $migration */
         $config = $this->createMock(Configuration::class);
 
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
@@ -207,7 +207,7 @@ class MigratorTest extends MigrationTestCase
 
         if ($to === null) { // this will always just test the "up" direction
             $config->method('getLatestVersion')
-                ->willReturn((int) $from + 1);
+                ->willReturn((string) ((int) $from + 1));
         }
 
         /** @var Migrator|MockObject $migration */
@@ -261,7 +261,7 @@ class MigratorTest extends MigrationTestCase
         $migration->migrate();
 
         self::assertCount(1, $messages, 'should output the no migrations message');
-        self::assertContains('No migrations', $messages[0]);
+        self::assertStringContainsString('No migrations', $messages[0]);
     }
 
     public function testMigrateAllOrNothing() : void

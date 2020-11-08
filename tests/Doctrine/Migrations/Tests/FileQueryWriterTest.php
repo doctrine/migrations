@@ -58,6 +58,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
+            self::assertNotFalse($contents);
 
             unlink($file);
 
@@ -81,7 +82,7 @@ final class FileQueryWriterTest extends MigrationTestCase
             }
 
             self::assertNotEmpty($contents);
-            self::assertContains($expectedSql, $contents);
+            self::assertStringContainsString($expectedSql, $contents);
         }
     }
 

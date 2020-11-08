@@ -55,7 +55,7 @@ final class AliasResolverTest extends TestCase
             ['prev', '4', 'getPrevVersion', null],
             ['next', '6', 'getNextVersion', null],
             ['latest', '7', 'getLatestVersion', null],
-            ['current-5', '2', 'getDeltaVersion', -5],
+            ['current-5', '2', 'getDeltaVersion', '-5'],
             ['test-5', null, null, null],
         ];
     }
