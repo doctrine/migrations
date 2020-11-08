@@ -59,9 +59,8 @@ install:
 
     # install composer dependencies
     - cd C:\projects\migrations
-    - rm composer.lock
     - appveyor-retry composer self-update
-    - appveyor-retry composer install --no-progress --prefer-dist
+    - appveyor-retry composer update --no-progress --prefer-dist
 
 test_script:
   - vendor\bin\phpunit

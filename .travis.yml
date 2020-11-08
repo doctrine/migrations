@@ -16,7 +16,6 @@ before_install:
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
 
 install:
-  - rm composer.lock
   - travis_retry composer update --prefer-dist
   - ./download-box.sh
 
@@ -28,7 +27,6 @@ jobs:
     - stage: Test
       env: DEPENDENCIES=low
       install:
-        - rm composer.lock
         - travis_retry composer update --prefer-dist --prefer-lowest
         - ./download-box.sh
 
@@ -45,10 +43,10 @@ jobs:
 
     - stage: Code Quality
       env: CODING_STANDARDS
-      install: travis_retry composer install --prefer-dist
+      install: travis_retry composer update --prefer-dist
       script: ./vendor/bin/phpcs
 
     - stage: Code Quality
       env: STATIC_ANALYSIS
-      install: travis_retry composer install --prefer-dist
+      install: travis_retry composer update --prefer-dist
       script: vendor/bin/phpstan analyse
