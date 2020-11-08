@@ -6,9 +6,11 @@ namespace Doctrine\Migrations\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
+use const PHP_VERSION_ID;
 use function assert;
 use function file_exists;
 use function realpath;
+use function sprintf;
 
 /**
  * @requires OS Linux|Darwin
@@ -17,6 +19,10 @@ class BoxPharCompileTest extends TestCase
 {
     public function testCompile() : void
     {
+        if (PHP_VERSION_ID < 70200) {
+            self::markTestSkipped('https://github.com/box-project/box/issues/489');
+        }
+
         $boxPharPath = __DIR__ . '/../../../../box.phar';
 
         if (! file_exists($boxPharPath)) {
@@ -32,9 +38,12 @@ class BoxPharCompileTest extends TestCase
 
         $doctrinePharPath = realpath(__DIR__ . '/../../../../build/doctrine-migrations.phar');
 
-        assert($doctrinePharPath !== false);
+        self::assertTrue(
+            $process->isSuccessful(),
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+        );
 
-        self::assertTrue($process->isSuccessful());
+        assert($doctrinePharPath !== false);
         self::assertTrue(file_exists($doctrinePharPath));
 
         $successful = true;
@@ -51,7 +60,10 @@ class BoxPharCompileTest extends TestCase
 
         $process->wait();
 
-        self::assertTrue($successful);
+        self::assertTrue(
+            $successful,
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+        );
         self::assertTrue($process->isSuccessful());
     }
 }

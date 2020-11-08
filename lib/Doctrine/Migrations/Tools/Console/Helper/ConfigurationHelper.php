@@ -13,7 +13,9 @@ use Doctrine\Migrations\Configuration\YamlConfiguration;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
+use function assert;
 use function file_exists;
+use function is_string;
 use function pathinfo;
 
 /**
@@ -45,6 +47,8 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         $configuration = $input->getOption('configuration');
 
         if ($configuration !== null) {
+            assert(is_string($configuration));
+
             return $this->loadConfig($configuration);
         }
 

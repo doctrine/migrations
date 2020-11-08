@@ -12,6 +12,8 @@ use PHPUnit_Framework_MockObject_MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
 use function array_replace;
+use function assert;
+use function is_string;
 
 abstract class CommandTestCase extends MigrationTestCase
 {
@@ -47,7 +49,10 @@ abstract class CommandTestCase extends MigrationTestCase
 
     protected function createCommandTester() : CommandTester
     {
-        return new CommandTester($this->app->find($this->command->getName()));
+        $name = $this->command->getName();
+        assert(is_string($name));
+
+        return new CommandTester($this->app->find($name));
     }
 
     /**

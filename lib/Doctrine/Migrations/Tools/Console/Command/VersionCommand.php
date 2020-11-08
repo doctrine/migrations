@@ -12,6 +12,8 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use function assert;
+use function is_string;
 use function sprintf;
 
 /**
@@ -128,6 +130,8 @@ EOT
     private function markVersions(InputInterface $input, OutputInterface $output) : void
     {
         $affectedVersion = $input->getArgument('version');
+        assert(is_string($affectedVersion) || $affectedVersion === null);
+
         $allOption       = $input->getOption('all');
         $rangeFromOption = $input->getOption('range-from');
         $rangeToOption   = $input->getOption('range-to');
@@ -161,7 +165,7 @@ EOT
                 $this->mark($input, $output, $version, true);
             }
         } else {
-            $this->mark($input, $output, $affectedVersion);
+            $this->mark($input, $output, (string) $affectedVersion);
         }
     }
 

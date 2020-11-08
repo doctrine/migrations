@@ -14,6 +14,8 @@ use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
 use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
+use function assert;
+use function is_string;
 
 /**
  * The ConnectionLoader class is responsible for loading the Doctrine\DBAL\Connection instance to use for migrations.
@@ -46,8 +48,11 @@ class ConnectionLoader
         InputInterface $input,
         HelperSet $helperSet
     ) : ConnectionLoaderInterface {
+        $dbConfiguration = $input->getOption('db-configuration');
+        assert(is_string($dbConfiguration) || $dbConfiguration === null);
+
         return new ConnectionConfigurationChainLoader([
-            new ArrayConnectionConfigurationLoader($input->getOption('db-configuration')),
+            new ArrayConnectionConfigurationLoader($dbConfiguration),
             new ArrayConnectionConfigurationLoader('migrations-db.php'),
             new ConnectionHelperLoader($helperSet, 'connection'),
             new ConnectionConfigurationLoader($this->configuration),

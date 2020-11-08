@@ -321,7 +321,7 @@ class ConfigurationTest extends MigrationTestCase
 
     public function testDispatchEventProxiesToConnectionsEventManager() : void
     {
-        $config                            = $this->getSqliteConfiguration();
+        $config = $this->getSqliteConfiguration();
         $config->getConnection()
             ->getEventManager()
             ->addEventSubscriber($listener = new EventVerificationListener());

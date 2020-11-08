@@ -13,6 +13,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
+use const DIRECTORY_SEPARATOR;
+use function file_exists;
+use function mkdir;
 use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -33,7 +36,11 @@ class MigrationVersionTest extends MigrationTestCase
 
         $this->configuration = new Configuration($this->getSqliteConnection());
         $this->configuration->setMigrationsNamespace('DoctrineMigrations');
-        $this->configuration->setMigrationsDirectory(sys_get_temp_dir());
+        $migrationsDirectory = sys_get_temp_dir() . DIRECTORY_SEPARATOR . 'doctrine-migrations';
+        if (! file_exists($migrationsDirectory)) {
+            mkdir($migrationsDirectory);
+        }
+        $this->configuration->setMigrationsDirectory($migrationsDirectory);
 
         $this->command
             ->expects(self::once())

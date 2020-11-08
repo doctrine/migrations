@@ -4,8 +4,9 @@ logs/
 reports/
 dist/
 tests/phpunit.xml
-vendor/
 phpunit.xml
+/composer.lock
+vendor/
 /phpcs.xml
 /phpstan.neon
 /.phpcs-cache

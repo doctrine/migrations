@@ -14,8 +14,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use const FILTER_VALIDATE_BOOLEAN;
+use function assert;
 use function class_exists;
 use function filter_var;
+use function is_array;
+use function is_bool;
+use function is_string;
 use function sprintf;
 
 /**
@@ -111,11 +115,14 @@ EOT
         OutputInterface $output
     ) : ?int {
         $filterExpression = $input->getOption('filter-expression') ?? null;
-        $formatted        = (bool) $input->getOption('formatted');
-        $lineLength       = (int) $input->getOption('line-length');
-        $allowEmptyDiff   = (bool) $input->getOption('allow-empty-diff');
-        $checkDbPlatform  = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
-        $fromEmptySchema  = (bool) $input->getOption('from-empty-schema');
+        assert(is_string($filterExpression) || $filterExpression === null);
+        $formatted  = (bool) $input->getOption('formatted');
+        $lineLength = $input->getOption('line-length');
+        assert(! is_array($lineLength) && ! is_bool($lineLength));
+        $lineLength      = (int) $lineLength;
+        $allowEmptyDiff  = (bool) $input->getOption('allow-empty-diff');
+        $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
+        $fromEmptySchema = (bool) $input->getOption('from-empty-schema');
 
         if ($formatted) {
             if (! class_exists('SqlFormatter')) {
@@ -146,6 +153,7 @@ EOT
         }
 
         $editorCommand = $input->getOption('editor-cmd');
+        assert(is_string($editorCommand) || $editorCommand === null);
 
         if ($editorCommand !== null) {
             $this->procOpen($editorCommand, $path);
