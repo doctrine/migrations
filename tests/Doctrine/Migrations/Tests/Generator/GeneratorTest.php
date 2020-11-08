@@ -40,6 +40,7 @@ final class GeneratorTest extends TestCase
 
         $migrationCode = file_get_contents($path);
 
+        self::assertNotFalse($migrationCode);
         self::assertStringContainsString('// up', $migrationCode);
         self::assertStringContainsString('// down', $migrationCode);
 

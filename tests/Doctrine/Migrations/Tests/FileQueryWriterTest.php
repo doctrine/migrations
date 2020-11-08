@@ -58,6 +58,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
         foreach ($files as $file) {
             $contents = file_get_contents($file);
+            self::assertNotFalse($contents);
 
             unlink($file);
 

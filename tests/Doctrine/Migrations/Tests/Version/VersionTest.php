@@ -357,6 +357,7 @@ class VersionTest extends MigrationTestCase
             $contents = file_get_contents($file);
 
             self::assertNotEmpty($contents);
+            self::assertNotFalse($contents);
 
             if ($direction === Direction::UP) {
                 $sql = sprintf(
