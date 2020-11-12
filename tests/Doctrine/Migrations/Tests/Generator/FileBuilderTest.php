@@ -19,7 +19,7 @@ class FileBuilderTest extends TestCase
     /** @var FileBuilder */
     private $migrationFileBuilder;
 
-    public function testBuildMigrationFile() : void
+    public function testBuildMigrationFile(): void
     {
         $queriesByVersion = [
             '1' => [
@@ -69,7 +69,7 @@ FILE;
         self::assertSame($expected, $migrationFile);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
 

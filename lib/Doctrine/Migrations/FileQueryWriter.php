@@ -7,6 +7,7 @@ namespace Doctrine\Migrations;
 use DateTimeImmutable;
 use DateTimeInterface;
 use Doctrine\Migrations\Generator\FileBuilder;
+
 use function file_put_contents;
 use function is_dir;
 use function sprintf;
@@ -40,7 +41,7 @@ final class FileQueryWriter implements QueryWriter
         string $direction,
         array $queriesByVersion,
         ?DateTimeInterface $now = null
-    ) : bool {
+    ): bool {
         $now = $now ?? new DateTimeImmutable();
 
         $string = $this->migrationFileBuilder
@@ -57,7 +58,7 @@ final class FileQueryWriter implements QueryWriter
         return file_put_contents($path, $string) !== false;
     }
 
-    private function buildMigrationFilePath(string $path, DateTimeInterface $now) : string
+    private function buildMigrationFilePath(string $path, DateTimeInterface $now): string
     {
         if (is_dir($path)) {
             $path  = realpath($path);

@@ -23,7 +23,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
     /** @var Connection */
     private $connection;
 
-    public function testCreateMigrationTable() : void
+    public function testCreateMigrationTable(): void
     {
         $schemaManager = $this->connection->getSchemaManager();
 
@@ -46,7 +46,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
         self::assertTrue($table->getIndex('unique_version')->isUnique());
     }
 
-    public function testUpdateMigrationTable() : void
+    public function testUpdateMigrationTable(): void
     {
         $createTablesSql = [
             'CREATE TABLE doctrine_migration_versions (version varchar(200) NOT NULL, test varchar(255) DEFAULT NULL, PRIMARY KEY (version))',
@@ -78,7 +78,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
         self::assertTrue($schemaManager->tablesExist(['test']), 'Check table not related to Doctrine was not dropped');
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->getTestConnection();
 
@@ -93,7 +93,7 @@ class MigrationTableManipulatorTest extends MigrationTestCase
         $this->trackingTableStatus      = $dependencyFactory->getTrackingTableStatus();
     }
 
-    private function getTestConnection() : Connection
+    private function getTestConnection(): Connection
     {
         $params = [
             'driver' => 'pdo_sqlite',

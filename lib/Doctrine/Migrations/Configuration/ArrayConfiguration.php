@@ -11,8 +11,7 @@ namespace Doctrine\Migrations\Configuration;
  */
 class ArrayConfiguration extends AbstractFileConfiguration
 {
-    /** @inheritdoc */
-    protected function doLoad(string $file) : void
+    protected function doLoad(string $file): void
     {
         $config = require $file;
 

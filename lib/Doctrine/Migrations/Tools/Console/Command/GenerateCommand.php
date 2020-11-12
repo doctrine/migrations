@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function is_string;
 use function sprintf;
@@ -19,7 +20,7 @@ class GenerateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:generate';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['generate'])
@@ -44,7 +45,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $versionNumber = $this->configuration->generateVersionNumber();
 

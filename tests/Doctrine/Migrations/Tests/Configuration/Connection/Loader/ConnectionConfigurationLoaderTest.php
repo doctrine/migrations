@@ -18,14 +18,14 @@ final class ConnectionConfigurationLoaderTest extends TestCase
     /** @var ConnectionConfigurationLoader */
     private $connectionConfigurationLoader;
 
-    public function testChosenReturnsNull() : void
+    public function testChosenReturnsNull(): void
     {
         $connectionConfigurationLoader = new ConnectionConfigurationLoader();
 
         self::assertNull($connectionConfigurationLoader->chosen());
     }
 
-    public function testChosenReturnsConfigurationConnection() : void
+    public function testChosenReturnsConfigurationConnection(): void
     {
         $connection = $this->createMock(Connection::class);
 
@@ -36,7 +36,7 @@ final class ConnectionConfigurationLoaderTest extends TestCase
         self::assertSame($connection, $this->connectionConfigurationLoader->chosen());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = $this->createMock(Configuration::class);
 

@@ -29,22 +29,22 @@ class MigrationsEventArgs extends EventArgs
         $this->dryRun    = $dryRun;
     }
 
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         return $this->config;
     }
 
-    public function getConnection() : Connection
+    public function getConnection(): Connection
     {
         return $this->config->getConnection();
     }
 
-    public function getDirection() : string
+    public function getDirection(): string
     {
         return $this->direction;
     }
 
-    public function isDryRun() : bool
+    public function isDryRun(): bool
     {
         return $this->dryRun;
     }

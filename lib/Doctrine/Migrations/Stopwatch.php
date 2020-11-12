@@ -22,7 +22,7 @@ class Stopwatch
         $this->symfonyStopwatch = $symfonyStopwatch;
     }
 
-    public function start(string $section) : StopwatchEvent
+    public function start(string $section): StopwatchEvent
     {
         return $this->symfonyStopwatch->start($section);
     }

@@ -17,22 +17,22 @@ class VersionOutputSqlWithParamAndType extends AbstractMigration
     private $type = [Connection::PARAM_STR_ARRAY];
 
     /** @param mixed[] $param */
-    public function setParam(array $param) : void
+    public function setParam(array $param): void
     {
         $this->param = $param;
     }
 
     /** @param int[] $type */
-    public function setType(array $type) : void
+    public function setType(array $type): void
     {
         $this->type = $type;
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('Select id WHERE id IN ( :param1 )', $this->param, $this->type);
     }

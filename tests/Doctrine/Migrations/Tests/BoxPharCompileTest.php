@@ -6,18 +6,20 @@ namespace Doctrine\Migrations\Tests;
 
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Process\Process;
-use const PHP_VERSION_ID;
+
 use function assert;
 use function file_exists;
 use function realpath;
 use function sprintf;
+
+use const PHP_VERSION_ID;
 
 /**
  * @requires OS Linux|Darwin
  */
 class BoxPharCompileTest extends TestCase
 {
-    public function testCompile() : void
+    public function testCompile(): void
     {
         if (PHP_VERSION_ID < 70200) {
             self::markTestSkipped('https://github.com/box-project/box/issues/489');
@@ -50,7 +52,7 @@ class BoxPharCompileTest extends TestCase
 
         $process = new Process(['php', $doctrinePharPath]);
 
-        $process->start(static function ($type) use (&$successful) : void {
+        $process->start(static function ($type) use (&$successful): void {
             if ($type !== 'err') {
                 return;
             }

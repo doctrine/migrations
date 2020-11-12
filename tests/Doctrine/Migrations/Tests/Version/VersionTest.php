@@ -43,7 +43,8 @@ use ReflectionClass;
 use stdClass;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use Throwable;
-use const DIRECTORY_SEPARATOR;
+
+use function assert;
 use function current;
 use function date;
 use function file_get_contents;
@@ -54,15 +55,17 @@ use function sys_get_temp_dir;
 use function trim;
 use function unlink;
 
+use const DIRECTORY_SEPARATOR;
+
 class VersionTest extends MigrationTestCase
 {
-    public function testConstants() : void
+    public function testConstants(): void
     {
         self::assertSame('up', Direction::UP);
         self::assertSame('down', Direction::DOWN);
     }
 
-    public function testCreateVersion() : void
+    public function testCreateVersion(): void
     {
         $versionName = '003';
 
@@ -77,7 +80,7 @@ class VersionTest extends MigrationTestCase
         self::assertSame($versionName, $version->getVersion());
     }
 
-    public function testShowSqlStatementsParameters() : void
+    public function testShowSqlStatementsParameters(): void
     {
         $outputWriter = $this->getOutputWriter();
 
@@ -100,7 +103,7 @@ class VersionTest extends MigrationTestCase
         self::assertStringContainsString('([456], [tralala], [456])', $this->getOutputStreamContent($this->output));
     }
 
-    public function testShowSqlStatementsParametersWithTypes() : void
+    public function testShowSqlStatementsParametersWithTypes(): void
     {
         $outputWriter = $this->getOutputWriter();
 
@@ -128,7 +131,7 @@ class VersionTest extends MigrationTestCase
         self::assertStringContainsString('([456, 3, 456])', $this->getOutputStreamContent($this->output));
     }
 
-    public function testCreateVersionWithCustomName() : void
+    public function testCreateVersionWithCustomName(): void
     {
         $versionName        = '003';
         $versionDescription = 'My super migration';
@@ -146,7 +149,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @dataProvider stateProvider */
-    public function testGetExecutionState(int $state) : void
+    public function testGetExecutionState(int $state): void
     {
         $configuration = $this->getSqliteConfiguration();
 
@@ -166,7 +169,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public function stateProvider() : array
+    public function stateProvider(): array
     {
         return [
             [State::NONE],
@@ -177,7 +180,7 @@ class VersionTest extends MigrationTestCase
         ];
     }
 
-    public function testAddSql() : void
+    public function testAddSql(): void
     {
         $configuration = $this->getSqliteConfiguration();
 
@@ -197,7 +200,7 @@ class VersionTest extends MigrationTestCase
      *
      * @dataProvider writeSqlFileProvider
      */
-    public function testWriteSqlFile(string $path, string $direction, array $getSqlReturn) : void
+    public function testWriteSqlFile(string $path, string $direction, array $getSqlReturn): void
     {
         $version = '1';
 
@@ -208,11 +211,11 @@ class VersionTest extends MigrationTestCase
         $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|MockObject $config */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods(['getConnection', 'getOutputWriter', 'getQueryWriter'])
             ->getMock();
+        assert($config instanceof Configuration || $config instanceof MockObject);
 
         $config->method('getOutputWriter')
             ->willReturn($outputWriter);
@@ -223,11 +226,11 @@ class VersionTest extends MigrationTestCase
         $config->method('getQueryWriter')
             ->willReturn($queryWriter);
 
-        /** @var Version|MockObject $version */
         $version = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
             ->getMock();
+        assert($version instanceof Version || $version instanceof MockObject);
 
         $versionExecutionResult = new ExecutionResult($getSqlReturn);
 
@@ -244,7 +247,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public function writeSqlFileProvider() : array
+    public function writeSqlFileProvider(): array
     {
         return [
             [__DIR__, 'up', ['1' => ['SHOW DATABASES;']]], // up
@@ -253,7 +256,7 @@ class VersionTest extends MigrationTestCase
         ];
     }
 
-    public function testWarningWhenNoSqlStatementIsOutputed() : void
+    public function testWarningWhenNoSqlStatementIsOutputed(): void
     {
         $outputWriter = $this->getOutputWriter();
 
@@ -274,7 +277,7 @@ class VersionTest extends MigrationTestCase
         );
     }
 
-    public function testCatchExceptionDuringMigration() : void
+    public function testCatchExceptionDuringMigration(): void
     {
         $outputWriter = $this->getOutputWriter();
 
@@ -297,7 +300,7 @@ class VersionTest extends MigrationTestCase
         }
     }
 
-    public function testReturnTheSql() : void
+    public function testReturnTheSql(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -311,7 +314,7 @@ class VersionTest extends MigrationTestCase
         self::assertContains('Select 1', $version->execute('down')->getSql());
     }
 
-    public function testReturnTheSqlWithParams() : void
+    public function testReturnTheSqlWithParams(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -333,7 +336,7 @@ class VersionTest extends MigrationTestCase
         string $tableName,
         string $columnName,
         string $executedAtColumnName
-    ) : void {
+    ): void {
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsTableName($tableName);
         $configuration->setMigrationsColumnName($columnName);
@@ -385,7 +388,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @return string[][] */
-    public function sqlWriteProvider() : array
+    public function sqlWriteProvider(): array
     {
         return [
             [Direction::UP, 'fkqsdmfjl', 'balalala', 'executed_at'],
@@ -395,7 +398,7 @@ class VersionTest extends MigrationTestCase
         ];
     }
 
-    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql() : void
+    public function testWriteSqlFileShouldUseStandardCommentMarkerInSql(): void
     {
         $version   = '1';
         $direction = Direction::UP;
@@ -425,11 +428,11 @@ class VersionTest extends MigrationTestCase
         $config->method('getQuotedMigrationsExecutedAtColumnName')
             ->willReturn('executed_at');
 
-        /** @var Version|MockObject $migration */
         $migration = $this->getMockBuilder(Version::class)
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
             ->getMock();
+        assert($migration instanceof Version || $migration instanceof MockObject);
 
         $versionExecutionResult = new ExecutionResult(['SHOW DATABASES;']);
 
@@ -442,17 +445,17 @@ class VersionTest extends MigrationTestCase
 
         self::assertRegExp('/^\s*-- Version 1/m', $this->getOutputStreamContent($this->output));
 
-        /** @var vfsStreamFile $sqlMigrationFile */
         $sqlMigrationFile = current($sqlFilesDir->getChildren());
+        assert($sqlMigrationFile instanceof vfsStreamFile);
 
         self::assertNotRegExp('/^\s*#/m', $sqlMigrationFile->getContent());
     }
 
-    public function testDryRunCausesSqlToBeOutputViaTheOutputWriter() : void
+    public function testDryRunCausesSqlToBeOutputViaTheOutputWriter(): void
     {
         $messages = [];
 
-        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages): void {
             $messages[] = trim($msg);
         });
 
@@ -472,11 +475,11 @@ class VersionTest extends MigrationTestCase
         self::assertStringContainsString('SELECT 1 WHERE 1', $messages[1]);
     }
 
-    public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement() : void
+    public function testDryRunWithQuestionMarkedParamsOutputsParamsWithSqlStatement(): void
     {
         $messages = [];
 
-        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages): void {
             $messages[] = trim($msg);
         });
 
@@ -497,11 +500,11 @@ class VersionTest extends MigrationTestCase
         self::assertStringContainsString('with parameters ([one], [two])', $messages[1]);
     }
 
-    public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement() : void
+    public function testDryRunWithNamedParametersOutputsParamsAndNamesWithSqlStatement(): void
     {
         $messages = [];
 
-        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages): void {
             $messages[] = trim($msg);
         });
 
@@ -523,7 +526,7 @@ class VersionTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public static function dryRunTypes() : array
+    public static function dryRunTypes(): array
     {
         return [
             'datetime' => [[new DateTime('2016-07-05 01:00:00')], ['datetime'], '[2016-07-05 01:00:00]'],
@@ -545,10 +548,10 @@ class VersionTest extends MigrationTestCase
         array $value,
         array $type,
         string $output
-    ) : void {
+    ): void {
         $messages = [];
 
-        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages): void {
             $messages[] = trim($msg);
         });
 
@@ -574,11 +577,11 @@ class VersionTest extends MigrationTestCase
         self::assertStringContainsString(sprintf('with parameters (%s)', $output), $messages[1]);
     }
 
-    public function testRunWithInsertNullValue() : void
+    public function testRunWithInsertNullValue(): void
     {
         $messages = [];
 
-        $ow = new OutputWriter(static function ($msg) use (&$messages) : void {
+        $ow = new OutputWriter(static function ($msg) use (&$messages): void {
             $messages[] = trim($msg);
         });
 
@@ -608,7 +611,7 @@ class VersionTest extends MigrationTestCase
     /**
      * @dataProvider getExecutedAtTimeZones
      */
-    public function testExecutedAtTimeZone(string $timeZone) : void
+    public function testExecutedAtTimeZone(string $timeZone): void
     {
         $this->iniSet('date.timezone', $timeZone);
 
@@ -638,7 +641,7 @@ class VersionTest extends MigrationTestCase
     /**
      * @return string[][]
      */
-    public function getExecutedAtTimeZones() : array
+    public function getExecutedAtTimeZones(): array
     {
         return [
             ['America/New_York'],
@@ -654,7 +657,7 @@ class VersionTest extends MigrationTestCase
         Configuration $configuration,
         string $versionName,
         string $className
-    ) : array {
+    ): array {
         $schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
@@ -678,7 +681,7 @@ class VersionTest extends MigrationTestCase
         Configuration $configuration,
         string $versionName,
         string $className
-    ) : Version {
+    ): Version {
         $schemaDiffProvider = $this->createMock(SchemaDiffProviderInterface::class);
 
         $parameterFormatter = new ParameterFormatter($configuration->getConnection());
@@ -701,11 +704,11 @@ class VersionTest extends MigrationTestCase
 
 class TestMigration extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 }

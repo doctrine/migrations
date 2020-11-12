@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigrationRepository;
+
 use function count;
 use function sprintf;
 
@@ -35,7 +36,7 @@ class MigrationStatusInfosHelper
     }
 
     /** @return string[]|int[]|null[] */
-    public function getMigrationsInfos() : array
+    public function getMigrationsInfos(): array
     {
         $executedMigrations            = $this->migrationRepository->getMigratedVersions();
         $availableMigrations           = $this->migrationRepository->getAvailableVersions();
@@ -63,7 +64,7 @@ class MigrationStatusInfosHelper
         ];
     }
 
-    private function getFormattedVersionAlias(string $alias) : string
+    private function getFormattedVersionAlias(string $alias): string
     {
         $version = $this->configuration->resolveVersionAlias($alias);
 

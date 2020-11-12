@@ -18,5 +18,5 @@ interface ConnectionLoaderInterface
      * Read the input and return a Connection, returns null if the config
      * is not supported.
      */
-    public function chosen() : ?Connection;
+    public function chosen(): ?Connection;
 }

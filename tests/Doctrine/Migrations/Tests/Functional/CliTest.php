@@ -23,7 +23,7 @@ use ReflectionClass;
 use RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Input\ArrayInput;
-use const DIRECTORY_SEPARATOR;
+
 use function array_merge;
 use function assert;
 use function count;
@@ -32,6 +32,8 @@ use function file_get_contents;
 use function preg_match;
 use function reset;
 use function unlink;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * Tests the entire console application, end to end.
@@ -47,7 +49,7 @@ class CliTest extends MigrationTestCase
     /** @var int|null */
     private $lastExit;
 
-    public function testDumpSchema() : void
+    public function testDumpSchema(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Delete any previous migrations before dumping your schema.');
@@ -55,14 +57,14 @@ class CliTest extends MigrationTestCase
         $this->executeCommand('migrations:dump-schema');
     }
 
-    public function testRollup() : void
+    public function testRollup(): void
     {
         $output = $this->executeCommand('migrations:rollup');
 
         self::assertRegExp('/Rolled up migrations to version 20150426000000/', $output);
     }
 
-    public function testMigrationLifecycleFromCommandLine() : void
+    public function testMigrationLifecycleFromCommandLine(): void
     {
         $output = $this->executeCommand('migrations:status');
         self::assertSuccessfulExit();
@@ -81,7 +83,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/^.*new migrations:\s+0/im', $output);
     }
 
-    public function testGenerateCommandAddsNewVersion() : void
+    public function testGenerateCommandAddsNewVersion(): void
     {
         self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate');
@@ -93,7 +95,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/available migrations:\s+2/im', $output);
     }
 
-    public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth() : void
+    public function testGenerateCommandAddsNewMigrationOrganizedByYearAndMonth(): void
     {
         self::assertVersionCount(0, 'Should start with no versions');
         $this->executeCommand('migrations:generate', 'config_organize_by_year_and_month.xml');
@@ -105,7 +107,7 @@ class CliTest extends MigrationTestCase
         self::assertRegExp('/available migrations:\s+1/im', $output);
     }
 
-    public function testMigrationDiffWritesNewMigrationWithExpectedSql() : void
+    public function testMigrationDiffWritesNewMigrationWithExpectedSql(): void
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         self::assertVersionCount(0, 'should start with no versions');
@@ -125,7 +127,7 @@ class CliTest extends MigrationTestCase
         self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
-    public function testMigrationDiffWritesNewMigrationWithFormattedSql() : void
+    public function testMigrationDiffWritesNewMigrationWithFormattedSql(): void
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
         self::assertVersionCount(0, 'should start with no versions');
@@ -152,7 +154,7 @@ class CliTest extends MigrationTestCase
         self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
-    public function testMigrationDiffFromEmptySchemaGeneratesFullMigration() : void
+    public function testMigrationDiffFromEmptySchemaGeneratesFullMigration(): void
     {
         $this->withDiffCommand(new StubSchemaProvider($this->getSchema()));
 
@@ -186,7 +188,7 @@ class CliTest extends MigrationTestCase
         self::assertStringContainsString('DROP TABLE bar', $versionClassContents);
     }
 
-    public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities() : void
+    public function testMigrationDiffWithEntityManagerGeneratesMigrationFromEntities(): void
     {
         $config        = OrmSetup::createXMLMetadataConfiguration([__DIR__ . '/_files/entities'], true);
         $entityManager = EntityManager::create($this->conn, $config);
@@ -210,7 +212,7 @@ class CliTest extends MigrationTestCase
         self::assertStringContainsString('DROP TABLE sample_entity', $versionClassContents);
     }
 
-    public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter() : void
+    public function testDiffCommandWithSchemaFilterOnlyWorksWithTablesThatMatchFilter(): void
     {
         $this->conn->getConfiguration()->setSchemaAssetsFilter(
             static function ($assetName) {
@@ -243,7 +245,7 @@ class CliTest extends MigrationTestCase
      *
      * @group regression
      */
-    public function testDiffCommandSchemaFilterAreCaseSensitive() : void
+    public function testDiffCommandSchemaFilterAreCaseSensitive(): void
     {
         $this->conn->getConfiguration()->setSchemaAssetsFilter(
             static function ($assetName) {
@@ -271,13 +273,14 @@ class CliTest extends MigrationTestCase
         self::assertStringContainsString('DROP TABLE FOO', $versionClassContents);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $migrationsDbFilePath =
             __DIR__ . DIRECTORY_SEPARATOR . '_files ' . DIRECTORY_SEPARATOR . 'migrations.db';
         if (file_exists($migrationsDbFilePath)) {
             @unlink($migrationsDbFilePath);
         }
+
         $this->deleteMigrationFiles();
 
         $this->conn        = $this->getSqliteConnection();
@@ -300,7 +303,7 @@ class CliTest extends MigrationTestCase
         ]);
     }
 
-    protected function withDiffCommand(?SchemaProviderInterface $provider = null) : void
+    protected function withDiffCommand(?SchemaProviderInterface $provider = null): void
     {
         $this->application->add(new MigrationCommands\DiffCommand($provider));
     }
@@ -312,7 +315,7 @@ class CliTest extends MigrationTestCase
         string $commandName,
         string $configFile = 'config.yml',
         array $args = []
-    ) : string {
+    ): string {
         $input = new ArrayInput(array_merge(
             [
                 'command'         => $commandName,
@@ -329,17 +332,17 @@ class CliTest extends MigrationTestCase
         return $this->getOutputStreamContent($output);
     }
 
-    protected function assertSuccessfulExit(string $msg = '') : void
+    protected function assertSuccessfulExit(string $msg = ''): void
     {
         self::assertSame(0, $this->lastExit, $msg);
     }
 
-    protected function assertVersionCount(int $count, string $msg = '') : void
+    protected function assertVersionCount(int $count, string $msg = ''): void
     {
         self::assertCount($count, $this->findMigrations(), $msg);
     }
 
-    protected function getSchema() : Schema
+    protected function getSchema(): Schema
     {
         $schema = new Schema();
 
@@ -357,7 +360,7 @@ class CliTest extends MigrationTestCase
     /**
      * @return string[]
      */
-    private function findMigrations() : array
+    private function findMigrations(): array
     {
         $finder = new RecursiveRegexFinder();
 
@@ -366,7 +369,7 @@ class CliTest extends MigrationTestCase
         );
     }
 
-    private function deleteMigrationFiles() : bool
+    private function deleteMigrationFiles(): bool
     {
         return Helper::deleteDir(
             __DIR__ . DIRECTORY_SEPARATOR . '_files' . DIRECTORY_SEPARATOR . 'migrations'
@@ -376,7 +379,7 @@ class CliTest extends MigrationTestCase
     /**
      * @return string file content for latest version
      */
-    private function getFileContentsForLatestVersion() : string
+    private function getFileContentsForLatestVersion(): string
     {
         $versions = $this->findMigrations();
         self::assertCount(
@@ -402,12 +405,12 @@ class CliTest extends MigrationTestCase
 
 class FirstMigration extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('CREATE TABLE foo (id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL)');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->addSql('DROP TABLE foo');
     }
@@ -418,7 +421,7 @@ class SampleEntity
     /** @var int|null */
     private $id;
 
-    public function getId() : ?int
+    public function getId(): ?int
     {
         return $this->id;
     }

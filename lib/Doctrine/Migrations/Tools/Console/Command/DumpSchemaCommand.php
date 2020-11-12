@@ -9,6 +9,7 @@ use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function class_exists;
 use function count;
@@ -28,7 +29,7 @@ class DumpSchemaCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -70,7 +71,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : ?int {
+    ): ?int {
         $formatted  = (bool) $input->getOption('formatted');
         $lineLength = $input->getOption('line-length');
         assert(! is_array($lineLength) && ! is_bool($lineLength));

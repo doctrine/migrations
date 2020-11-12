@@ -13,7 +13,7 @@ class StopwatchTest extends TestCase
     /** @var Stopwatch */
     private $stopwatch;
 
-    public function testStart() : void
+    public function testStart(): void
     {
         $stopwatchEvent = $this->stopwatch->start('test');
 
@@ -22,7 +22,7 @@ class StopwatchTest extends TestCase
         $stopwatchEvent->stop();
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $symfonyStopwatch = new SymfonyStopwatch();
 

@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 class MigrationMigrateUp extends AbstractMigration
 {
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $schema->dropTable('foo');
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');

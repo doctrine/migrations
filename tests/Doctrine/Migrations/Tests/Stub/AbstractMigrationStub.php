@@ -10,20 +10,20 @@ use Doctrine\Migrations\Version\Version;
 
 class AbstractMigrationStub extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function exposedWrite(string $message) : void
+    public function exposedWrite(string $message): void
     {
         $this->write($message);
     }
 
-    public function exposedThrowIrreversibleMigrationException(?string $message = null) : void
+    public function exposedThrowIrreversibleMigrationException(?string $message = null): void
     {
         $this->throwIrreversibleMigrationException($message);
     }
@@ -32,12 +32,12 @@ class AbstractMigrationStub extends AbstractMigration
      * @param int[] $params
      * @param int[] $types
      */
-    public function exposedAddSql(string $sql, array $params = [], array $types = []) : void
+    public function exposedAddSql(string $sql, array $params = [], array $types = []): void
     {
         $this->addSql($sql, $params, $types);
     }
 
-    public function getVersion() : Version
+    public function getVersion(): Version
     {
         return $this->version;
     }

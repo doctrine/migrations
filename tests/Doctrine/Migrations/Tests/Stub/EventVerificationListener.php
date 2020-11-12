@@ -14,7 +14,7 @@ final class EventVerificationListener implements EventSubscriber
     public $events = [];
 
     /** @return string[] */
-    public function getSubscribedEvents() : array
+    public function getSubscribedEvents(): array
     {
         return [
             Events::onMigrationsMigrating,
@@ -25,27 +25,27 @@ final class EventVerificationListener implements EventSubscriber
         ];
     }
 
-    public function onMigrationsMigrating(EventArgs $args) : void
+    public function onMigrationsMigrating(EventArgs $args): void
     {
         $this->events[__FUNCTION__][] = $args;
     }
 
-    public function onMigrationsMigrated(EventArgs $args) : void
+    public function onMigrationsMigrated(EventArgs $args): void
     {
         $this->events[__FUNCTION__][] = $args;
     }
 
-    public function onMigrationsVersionExecuting(EventArgs $args) : void
+    public function onMigrationsVersionExecuting(EventArgs $args): void
     {
         $this->events[__FUNCTION__][] = $args;
     }
 
-    public function onMigrationsVersionExecuted(EventArgs $args) : void
+    public function onMigrationsVersionExecuted(EventArgs $args): void
     {
         $this->events[__FUNCTION__][] = $args;
     }
 
-    public function onMigrationsVersionSkipped(EventArgs $args) : void
+    public function onMigrationsVersionSkipped(EventArgs $args): void
     {
         $this->events[__FUNCTION__][] = $args;
     }

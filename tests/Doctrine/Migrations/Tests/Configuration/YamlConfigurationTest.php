@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\YamlNotValid;
 use Doctrine\Migrations\Configuration\YamlConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
+
 use const DIRECTORY_SEPARATOR;
 
 class YamlConfigurationTest extends AbstractConfigurationTest
@@ -17,7 +18,7 @@ class YamlConfigurationTest extends AbstractConfigurationTest
         string $configFileSuffix = '',
         ?OutputWriter $outputWriter = null,
         ?MigrationFinder $migrationFinder = null
-    ) : AbstractFileConfiguration {
+    ): AbstractFileConfiguration {
         $configFile = 'config.yml';
         if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.yml';
@@ -29,7 +30,7 @@ class YamlConfigurationTest extends AbstractConfigurationTest
         return $configFileSuffix;
     }
 
-    public function testInvalid() : void
+    public function testInvalid(): void
     {
         $this->expectException(YamlNotValid::class);
 

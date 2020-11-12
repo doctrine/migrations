@@ -13,6 +13,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function getcwd;
 
 class MigrateCommandTest extends TestCase
@@ -29,7 +30,7 @@ class MigrateCommandTest extends TestCase
     /** @var MigrateCommand|MockObject */
     private $migrateCommand;
 
-    public function testExecuteCouldNotResolveAlias() : void
+    public function testExecuteCouldNotResolveAlias(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -51,7 +52,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteAlreadyAtFirstVersion() : void
+    public function testExecuteAlreadyAtFirstVersion(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -77,7 +78,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteAlreadyAtLatestVersion() : void
+    public function testExecuteAlreadyAtLatestVersion(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -103,7 +104,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteTheDeltaCouldNotBeReached() : void
+    public function testExecuteTheDeltaCouldNotBeReached(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -129,7 +130,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteUnknownVersion() : void
+    public function testExecuteUnknownVersion(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -155,7 +156,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecutedUnavailableMigrationsCancel() : void
+    public function testExecutedUnavailableMigrationsCancel(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -185,7 +186,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteWriteSqlCustomPath() : void
+    public function testExecuteWriteSqlCustomPath(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -230,7 +231,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteWriteSqlCurrentWorkingDirectory() : void
+    public function testExecuteWriteSqlCurrentWorkingDirectory(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -275,7 +276,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteMigrate() : void
+    public function testExecuteMigrate(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -326,7 +327,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteMigrateAllOrNothing() : void
+    public function testExecuteMigrateAllOrNothing(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -397,7 +398,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(0, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteMigrateCancelExecutedUnavailableMigrations() : void
+    public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -442,7 +443,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    public function testExecuteMigrateCancel() : void
+    public function testExecuteMigrateCancel(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -492,7 +493,7 @@ class MigrateCommandTest extends TestCase
         self::assertSame(1, $this->migrateCommand->execute($input, $output));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration       = $this->createMock(Configuration::class);
         $this->migrationRepository = $this->createMock(MigrationRepository::class);

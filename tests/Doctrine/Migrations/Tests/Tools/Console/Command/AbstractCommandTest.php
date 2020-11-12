@@ -19,6 +19,7 @@ use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\Output;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function chdir;
 use function getcwd;
@@ -36,16 +37,16 @@ class AbstractCommandTest extends MigrationTestCase
         ?Configuration $configuration = null,
         bool $noConnection = false,
         ?HelperSet $helperSet = null
-    ) : Configuration {
+    ): Configuration {
         $class  = new ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('getMigrationConfiguration');
         $method->setAccessible(true);
 
-        /** @var AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
             AbstractCommand::class,
             ['command']
         );
+        assert($command instanceof AbstractCommand);
 
         if ($helperSet instanceof HelperSet) {
             $command->setHelperSet($helperSet);
@@ -73,7 +74,7 @@ class AbstractCommandTest extends MigrationTestCase
         return $method->invokeArgs($command, [$input, $output]);
     }
 
-    public function testSetConnection() : void
+    public function testSetConnection(): void
     {
         $command    = new TestAbstractCommand();
         $connection = $this->createMock(Connection::class);
@@ -83,7 +84,7 @@ class AbstractCommandTest extends MigrationTestCase
         self::assertSame($connection, $command->getConnection());
     }
 
-    public function testGetMigrationConfigurationDefaultsToConnection() : void
+    public function testGetMigrationConfigurationDefaultsToConnection(): void
     {
         $configuration = $this->createMock(Configuration::class);
         $input         = $this->createMock(InputInterface::class);
@@ -98,7 +99,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the returned migration configuration is the injected one
      */
-    public function testInjectedMigrationConfigurationIsBeingReturned() : void
+    public function testInjectedMigrationConfigurationIsBeingReturned(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -117,7 +118,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the migration configuration returns the connection from the helper set
      */
-    public function testMigrationConfigurationReturnsConnectionFromHelperSet() : void
+    public function testMigrationConfigurationReturnsConnectionFromHelperSet(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -136,7 +137,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the migration configuration returns the connection from the input option
      */
-    public function testMigrationConfigurationReturnsConnectionFromInputOption() : void
+    public function testMigrationConfigurationReturnsConnectionFromInputOption(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -156,7 +157,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the migration configuration returns values from the configuration file
      */
-    public function testMigrationConfigurationReturnsConfigurationFileOption() : void
+    public function testMigrationConfigurationReturnsConfigurationFileOption(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -179,7 +180,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the migration configuration use the connection in a configuration passed to it.
      */
-    public function testMigrationConfigurationReturnsConnectionFromConfigurationIfNothingElseIsProvided() : void
+    public function testMigrationConfigurationReturnsConnectionFromConfigurationIfNothingElseIsProvided(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -197,7 +198,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if throw an error if no connection is passed.
      */
-    public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided() : void
+    public function testMigrationConfigurationReturnsErrorWhenNoConnectionIsProvided(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -209,7 +210,7 @@ class AbstractCommandTest extends MigrationTestCase
         $this->invokeMigrationConfigurationGetter($input, null, true);
     }
 
-    public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration() : void
+    public function testMigrationsConfigurationFromCommandLineOverridesInjectedConfiguration(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -239,7 +240,7 @@ class AbstractCommandTest extends MigrationTestCase
      *
      * @group regression
      */
-    public function testInjectedConfigurationIsPreferedOverConfigFileIsCurrentWorkingDirectory() : void
+    public function testInjectedConfigurationIsPreferedOverConfigFileIsCurrentWorkingDirectory(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -262,7 +263,7 @@ class AbstractCommandTest extends MigrationTestCase
     /**
      * Test if the migration configuration can be set via ConfigurationHelper in HelperSet
      */
-    public function testMigrationsConfigurationFromConfighelperInHelperset() : void
+    public function testMigrationsConfigurationFromConfighelperInHelperset(): void
     {
         $input = $this->getMockBuilder(ArrayInput::class)
             ->setConstructorArgs([[]])
@@ -287,16 +288,16 @@ class AbstractCommandTest extends MigrationTestCase
         QuestionHelper $helper,
         string $response = 'y',
         string $question = 'There is no question?'
-    ) : bool {
+    ): bool {
         $class  = new ReflectionClass(AbstractCommand::class);
         $method = $class->getMethod('askConfirmation');
         $method->setAccessible(true);
 
-        /** @var AbstractCommand $command */
         $command = $this->getMockForAbstractClass(
             AbstractCommand::class,
             ['command']
         );
+        assert($command instanceof AbstractCommand);
 
         $input->setStream($this->getInputStream($response . "\n"));
 
@@ -311,7 +312,7 @@ class AbstractCommandTest extends MigrationTestCase
         return $method->invokeArgs($command, [$question, $input, $output]);
     }
 
-    public function testAskConfirmation() : void
+    public function testAskConfirmation(): void
     {
         $input  = new ArrayInput([]);
         $helper = new QuestionHelper();
@@ -320,7 +321,7 @@ class AbstractCommandTest extends MigrationTestCase
         self::assertFalse($this->invokeAbstractCommandConfirmation($input, $helper, 'n'));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $cwd = getcwd();
 
@@ -329,7 +330,7 @@ class AbstractCommandTest extends MigrationTestCase
         $this->originalCwd = $cwd;
     }
 
-    protected function tearDown() : void
+    protected function tearDown(): void
     {
         if (getcwd() === $this->originalCwd) {
             return;
@@ -341,12 +342,12 @@ class AbstractCommandTest extends MigrationTestCase
 
 class TestAbstractCommand extends AbstractCommand
 {
-    public function getConnection() : Connection
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
 
-    public function getConfiguration(InputInterface $input, OutputInterface $output) : Configuration
+    public function getConfiguration(InputInterface $input, OutputInterface $output): Configuration
     {
         return $this->getMigrationConfiguration($input, $output);
     }

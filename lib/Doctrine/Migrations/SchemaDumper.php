@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
+
 use function count;
 use function implode;
 
@@ -53,7 +54,7 @@ class SchemaDumper
         string $versionNumber,
         bool $formatted = false,
         int $lineLength = 120
-    ) : string {
+    ): string {
         $schema = $this->schemaManager->createSchema();
 
         $up   = [];

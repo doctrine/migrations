@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Generator;
 use DateTimeInterface;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Version\Direction;
+
 use function sprintf;
 
 /**
@@ -45,7 +46,7 @@ final class FileBuilder
         array $queriesByVersion,
         string $direction,
         DateTimeInterface $now
-    ) : string {
+    ): string {
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {
@@ -63,7 +64,7 @@ final class FileBuilder
         return $string;
     }
 
-    private function getVersionUpdateQuery(string $version, string $direction) : string
+    private function getVersionUpdateQuery(string $version, string $direction): string
     {
         if ($direction === Direction::DOWN) {
             return sprintf(

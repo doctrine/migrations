@@ -27,7 +27,7 @@ final class GenerateCommandTest extends TestCase
     /** @var GenerateCommand|MockObject */
     private $generateCommand;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -63,7 +63,7 @@ final class GenerateCommandTest extends TestCase
         $this->generateCommand->execute($input, $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration      = $this->createMock(Configuration::class);
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);

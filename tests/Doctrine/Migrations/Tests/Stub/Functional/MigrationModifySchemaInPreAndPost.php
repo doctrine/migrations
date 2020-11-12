@@ -9,38 +9,38 @@ use Doctrine\Migrations\AbstractMigration;
 
 class MigrationModifySchemaInPreAndPost extends AbstractMigration
 {
-    private function addTable(Schema $schema, string $tableName) : void
+    private function addTable(Schema $schema, string $tableName): void
     {
         $table = $schema->createTable($tableName);
         $table->addColumn('id', 'integer');
     }
 
-    public function preUp(Schema $schema) : void
+    public function preUp(Schema $schema): void
     {
         $this->addTable($schema, 'bar');
     }
 
-    public function preDown(Schema $schema) : void
+    public function preDown(Schema $schema): void
     {
         $this->addTable($schema, 'bar');
     }
 
-    public function postUp(Schema $schema) : void
+    public function postUp(Schema $schema): void
     {
         $this->addTable($schema, 'bar2');
     }
 
-    public function postDown(Schema $schema) : void
+    public function postDown(Schema $schema): void
     {
         $this->addTable($schema, 'bar2');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $schema->dropTable('foo');
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $table = $schema->createTable('foo');
         $table->addColumn('id', 'integer');

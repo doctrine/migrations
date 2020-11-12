@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
 use Doctrine\Migrations\Configuration\Connection\Loader\Exception\InvalidConfiguration;
+
 use function file_exists;
 use function is_array;
 
@@ -33,7 +34,7 @@ class ArrayConnectionConfigurationLoader implements ConnectionLoaderInterface
      *
      * @throws InvalidConfiguration
      */
-    public function chosen() : ?Connection
+    public function chosen(): ?Connection
     {
         if ($this->filename === null) {
             return null;

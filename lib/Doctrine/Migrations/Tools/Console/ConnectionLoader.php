@@ -14,6 +14,7 @@ use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionHelperLoader;
 use Doctrine\Migrations\Tools\Console\Exception\ConnectionNotSpecified;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Input\InputInterface;
+
 use function assert;
 use function is_string;
 
@@ -32,7 +33,7 @@ class ConnectionLoader
         $this->configuration = $configuration;
     }
 
-    public function getConnection(InputInterface $input, HelperSet $helperSet) : Connection
+    public function getConnection(InputInterface $input, HelperSet $helperSet): Connection
     {
         $connection = $this->createConnectionConfigurationChainLoader($input, $helperSet)
             ->chosen();
@@ -47,7 +48,7 @@ class ConnectionLoader
     protected function createConnectionConfigurationChainLoader(
         InputInterface $input,
         HelperSet $helperSet
-    ) : ConnectionLoaderInterface {
+    ): ConnectionLoaderInterface {
         $dbConfiguration = $input->getOption('db-configuration');
         assert(is_string($dbConfiguration) || $dbConfiguration === null);
 

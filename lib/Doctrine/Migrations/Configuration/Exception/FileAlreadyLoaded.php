@@ -8,7 +8,7 @@ use LogicException;
 
 final class FileAlreadyLoaded extends LogicException implements ConfigurationException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('Migrations configuration file already loaded', 8);
     }

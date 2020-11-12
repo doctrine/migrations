@@ -19,17 +19,17 @@ class VersionDryRunTypes extends AbstractMigration
      * @param mixed[] $value
      * @param int[]   $type
      */
-    public function setParam(array $value, array $type) : void
+    public function setParam(array $value, array $type): void
     {
         $this->value = $value;
         $this->type  = $type;
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('INSERT INTO test VALUES (?)', $this->value, $this->type);
     }

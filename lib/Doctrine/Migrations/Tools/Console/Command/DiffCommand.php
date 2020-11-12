@@ -13,7 +13,7 @@ use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-use const FILTER_VALIDATE_BOOLEAN;
+
 use function assert;
 use function class_exists;
 use function filter_var;
@@ -21,6 +21,8 @@ use function is_array;
 use function is_bool;
 use function is_string;
 use function sprintf;
+
+use const FILTER_VALIDATE_BOOLEAN;
 
 /**
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
@@ -44,7 +46,7 @@ class DiffCommand extends AbstractCommand
         parent::__construct();
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -113,7 +115,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : ?int {
+    ): ?int {
         $filterExpression = $input->getOption('filter-expression') ?? null;
         assert(is_string($filterExpression) || $filterExpression === null);
         $formatted  = (bool) $input->getOption('formatted');
@@ -149,6 +151,7 @@ EOT
 
                 return 0;
             }
+
             throw $exception;
         }
 
@@ -176,7 +179,7 @@ EOT
         return 0;
     }
 
-    protected function createMigrationDiffGenerator() : DiffGenerator
+    protected function createMigrationDiffGenerator(): DiffGenerator
     {
         return new DiffGenerator(
             $this->connection->getConfiguration(),
@@ -189,7 +192,7 @@ EOT
         );
     }
 
-    private function getSchemaProvider() : SchemaProviderInterface
+    private function getSchemaProvider(): SchemaProviderInterface
     {
         if ($this->schemaProvider === null) {
             $this->schemaProvider = new OrmSchemaProvider(
@@ -200,7 +203,7 @@ EOT
         return $this->schemaProvider;
     }
 
-    private function getEmptySchemaProvider() : EmptySchemaProvider
+    private function getEmptySchemaProvider(): EmptySchemaProvider
     {
         if ($this->emptySchemaProvider === null) {
             $this->emptySchemaProvider = new EmptySchemaProvider(

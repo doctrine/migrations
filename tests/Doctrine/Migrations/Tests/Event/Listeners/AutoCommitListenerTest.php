@@ -19,14 +19,14 @@ class AutoCommitListenerTest extends MigrationTestCase
     /** @var AutoCommitListener */
     private $listener;
 
-    public function testListenerDoesNothingDuringADryRun() : void
+    public function testListenerDoesNothingDuringADryRun(): void
     {
         $this->willNotCommit();
 
         $this->listener->onMigrationsMigrated($this->createArgs(true));
     }
 
-    public function testListenerDoesNothingWhenConnecitonAutoCommitIsOn() : void
+    public function testListenerDoesNothingWhenConnecitonAutoCommitIsOn(): void
     {
         $this->willNotCommit();
         $this->conn->expects(self::once())
@@ -36,7 +36,7 @@ class AutoCommitListenerTest extends MigrationTestCase
         $this->listener->onMigrationsMigrated($this->createArgs(false));
     }
 
-    public function testListenerDoesFinalCommitWhenAutoCommitIsOff() : void
+    public function testListenerDoesFinalCommitWhenAutoCommitIsOff(): void
     {
         $this->conn->expects(self::once())
             ->method('isAutoCommit')
@@ -47,7 +47,7 @@ class AutoCommitListenerTest extends MigrationTestCase
         $this->listener->onMigrationsMigrated($this->createArgs(false));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->conn = $this->getMockBuilder(Connection::class)
             ->disableOriginalConstructor()
@@ -56,13 +56,13 @@ class AutoCommitListenerTest extends MigrationTestCase
         $this->listener = new AutoCommitListener();
     }
 
-    private function willNotCommit() : void
+    private function willNotCommit(): void
     {
         $this->conn->expects(self::never())
             ->method('commit');
     }
 
-    private function createArgs(bool $isDryRun) : MigrationsEventArgs
+    private function createArgs(bool $isDryRun): MigrationsEventArgs
     {
         return new MigrationsEventArgs(new Configuration($this->conn), 'up', $isDryRun);
     }

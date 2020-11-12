@@ -18,12 +18,12 @@ interface ExecutorInterface
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    public function addSql(string $sql, array $params = [], array $types = []) : void;
+    public function addSql(string $sql, array $params = [], array $types = []): void;
 
     public function execute(
         Version $version,
         AbstractMigration $migration,
         string $direction,
         ?MigratorConfiguration $migratorConfiguration = null
-    ) : ExecutionResult;
+    ): ExecutionResult;
 }

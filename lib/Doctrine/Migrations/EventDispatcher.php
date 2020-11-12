@@ -30,7 +30,7 @@ final class EventDispatcher
         $this->eventManager  = $eventManager;
     }
 
-    public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun) : void
+    public function dispatchMigrationEvent(string $eventName, string $direction, bool $dryRun): void
     {
         $event = $this->createMigrationEventArgs($direction, $dryRun);
 
@@ -42,7 +42,7 @@ final class EventDispatcher
         string $eventName,
         string $direction,
         bool $dryRun
-    ) : void {
+    ): void {
         $event = $this->createMigrationsVersionEventArgs(
             $version,
             $direction,
@@ -52,12 +52,12 @@ final class EventDispatcher
         $this->dispatchEvent($eventName, $event);
     }
 
-    public function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
+    public function dispatchEvent(string $eventName, ?EventArgs $args = null): void
     {
         $this->eventManager->dispatchEvent($eventName, $args);
     }
 
-    private function createMigrationEventArgs(string $direction, bool $dryRun) : MigrationsEventArgs
+    private function createMigrationEventArgs(string $direction, bool $dryRun): MigrationsEventArgs
     {
         return new MigrationsEventArgs($this->configuration, $direction, $dryRun);
     }
@@ -66,7 +66,7 @@ final class EventDispatcher
         Version $version,
         string $direction,
         bool $dryRun
-    ) : MigrationsVersionEventArgs {
+    ): MigrationsVersionEventArgs {
         return new MigrationsVersionEventArgs(
             $version,
             $this->configuration,

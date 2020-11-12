@@ -6,13 +6,14 @@ namespace Doctrine\Migrations\Tests\Stub\Functional;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
+
 use function sprintf;
 
 class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
 {
     public const TABLE_NAME = 'test_add_sql_post_up_table';
 
-    public function preUp(Schema $schema) : void
+    public function preUp(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
@@ -20,7 +21,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
@@ -28,7 +29,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function postUp(Schema $schema) : void
+    public function postUp(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
@@ -36,7 +37,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function preDown(Schema $schema) : void
+    public function preDown(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
@@ -44,7 +45,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),
@@ -52,7 +53,7 @@ class MigrateAddSqlPostAndPreUpAndDownTest extends AbstractMigration
         );
     }
 
-    public function postDown(Schema $schema) : void
+    public function postDown(Schema $schema): void
     {
         $this->addSql(
             sprintf('INSERT INTO %s (test) values (?)', self::TABLE_NAME),

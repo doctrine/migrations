@@ -26,7 +26,7 @@ class MigrationsVersionEventArgs extends MigrationsEventArgs
         $this->version = $version;
     }
 
-    public function getVersion() : Version
+    public function getVersion(): Version
     {
         return $this->version;
     }

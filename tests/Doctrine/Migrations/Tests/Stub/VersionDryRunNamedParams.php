@@ -9,11 +9,11 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionDryRunNamedParams extends AbstractMigration
 {
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('INSERT INTO test VALUES (:one, :two)', [
             'one' => 'one',

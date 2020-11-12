@@ -33,12 +33,12 @@ class TableStatus
         $this->migrationTable = $migrationTable;
     }
 
-    public function setCreated(bool $created) : void
+    public function setCreated(bool $created): void
     {
         $this->created = $created;
     }
 
-    public function isCreated() : bool
+    public function isCreated(): bool
     {
         if ($this->created !== null) {
             return $this->created;
@@ -49,12 +49,12 @@ class TableStatus
         return $this->created;
     }
 
-    public function setUpToDate(bool $upToDate) : void
+    public function setUpToDate(bool $upToDate): void
     {
         $this->upToDate = $upToDate;
     }
 
-    public function isUpToDate() : bool
+    public function isUpToDate(): bool
     {
         if ($this->upToDate !== null) {
             return $this->upToDate;

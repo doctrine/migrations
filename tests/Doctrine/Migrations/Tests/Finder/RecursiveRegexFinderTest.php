@@ -6,35 +6,37 @@ namespace Doctrine\Migrations\Tests\Finder;
 
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use InvalidArgumentException;
-use const PHP_OS;
+
 use function asort;
 use function count;
 use function stripos;
 
+use const PHP_OS;
+
 class RecursiveRegexFinderTest extends FinderTestCase
 {
-    public function testVersionNameCausesErrorWhen0() : void
+    public function testVersionNameCausesErrorWhen0(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__DIR__ . '/_regression/NoVersionNamed0');
     }
 
-    public function testBadFilenameCausesErrorWhenFindingMigrations() : void
+    public function testBadFilenameCausesErrorWhenFindingMigrations(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__DIR__ . '/does/not/exist/at/all');
     }
 
-    public function testNonDirectoryCausesErrorWhenFindingMigrations() : void
+    public function testNonDirectoryCausesErrorWhenFindingMigrations(): void
     {
         $this->expectException(InvalidArgumentException::class);
 
         $this->finder->findMigrations(__FILE__);
     }
 
-    public function testFindMigrationsReturnsTheExpectedFilesFromDirectory() : void
+    public function testFindMigrationsReturnsTheExpectedFilesFromDirectory(): void
     {
         $migrations = $this->finder->findMigrations(__DIR__ . '/_files');
 
@@ -56,6 +58,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
             self::assertArrayHasKey($version, $migrations);
             self::assertSame($namespace, $migrations[$version]);
         }
+
         $migrationsForTestSort = $migrations;
 
         asort($migrationsForTestSort);
@@ -69,7 +72,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
         self::assertArrayNotHasKey('ARandomClass', $migrations);
     }
 
-    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories() : void
+    public function testFindMigrationsCanLocateClassesInNestedNamespacesAndDirectories(): void
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespaceNested');
 
@@ -79,7 +82,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
         ], $versions);
     }
 
-    public function testMigrationsInSubnamespaceAreLoadedIfNamespaceIsParentNamespace() : void
+    public function testMigrationsInSubnamespaceAreLoadedIfNamespaceIsParentNamespace(): void
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespaceNested',
@@ -92,7 +95,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
         ], $versions);
     }
 
-    public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided() : void
+    public function testOnlyMigrationsInTheProvidedNamespacesAreLoadedIfNamespaceIsProvided(): void
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespaceNested',
@@ -102,7 +105,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
         self::assertSame(['0002' => 'TestMigrations\MultiNested\Deep\Version0002'], $versions);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->finder = new RecursiveRegexFinder();
     }

@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\JsonConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
 use InvalidArgumentException;
+
 use const DIRECTORY_SEPARATOR;
 
 class JsonConfigurationTest extends AbstractConfigurationTest
@@ -18,7 +19,7 @@ class JsonConfigurationTest extends AbstractConfigurationTest
         string $configFileSuffix = '',
         ?OutputWriter $outputWriter = null,
         ?MigrationFinder $migrationFinder = null
-    ) : AbstractFileConfiguration {
+    ): AbstractFileConfiguration {
         $configFile = 'config.json';
 
         if ($configFileSuffix !== '') {
@@ -34,7 +35,7 @@ class JsonConfigurationTest extends AbstractConfigurationTest
     /**
      * Test that config file not exists exception
      */
-    public function testThrowExceptionIfFileNotExist() : void
+    public function testThrowExceptionIfFileNotExist(): void
     {
         $config = new JsonConfiguration($this->getSqliteConnection());
 
@@ -44,7 +45,7 @@ class JsonConfigurationTest extends AbstractConfigurationTest
         $config->load(__DIR__ . '/_files/none.json');
     }
 
-    public function testInvalid() : void
+    public function testInvalid(): void
     {
         $this->expectException(JsonNotValid::class);
 

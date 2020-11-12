@@ -12,11 +12,12 @@ use Doctrine\Migrations\Tests\Stub\EventVerificationListener;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tests\Stub\Version2Test;
 use Doctrine\Migrations\Tests\Stub\Version3Test;
+
 use function sys_get_temp_dir;
 
 class ConfigurationTest extends MigrationTestCase
 {
-    public function testGetConnection() : void
+    public function testGetConnection(): void
     {
         $conn   = $this->getSqliteConnection();
         $config = new Configuration($conn);
@@ -24,7 +25,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($conn, $config->getConnection());
     }
 
-    public function testValidateMigrationsNamespaceRequired() : void
+    public function testValidateMigrationsNamespaceRequired(): void
     {
         $config = new Configuration($this->getSqliteConnection());
 
@@ -33,7 +34,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->validate();
     }
 
-    public function testValidateMigrationsDirectoryRequired() : void
+    public function testValidateMigrationsDirectoryRequired(): void
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -44,7 +45,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->validate();
     }
 
-    public function testValidateMigrations() : void
+    public function testValidateMigrations(): void
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -55,7 +56,7 @@ class ConfigurationTest extends MigrationTestCase
         $this->addToAssertionCount(1);
     }
 
-    public function testSetGetName() : void
+    public function testSetGetName(): void
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setName('Test');
@@ -63,14 +64,14 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('Test', $config->getName());
     }
 
-    public function testMigrationsTable() : void
+    public function testMigrationsTable(): void
     {
         $config = new Configuration($this->getSqliteConnection());
 
         self::assertSame('doctrine_migration_versions', $config->getMigrationsTableName());
     }
 
-    public function testSetGetMigrationsColumnLength() : void
+    public function testSetGetMigrationsColumnLength(): void
     {
         $config = new Configuration($this->getSqliteConnection());
 
@@ -81,7 +82,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame(200, $config->getMigrationsColumnLength());
     }
 
-    public function testSetGetSetMigrationsExecutedAtColumnName() : void
+    public function testSetGetSetMigrationsExecutedAtColumnName(): void
     {
         $config = new Configuration($this->getSqliteConnection());
 
@@ -92,14 +93,14 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('executedAt', $config->getMigrationsExecutedAtColumnName());
     }
 
-    public function testGetQuotedMigrationsExecutedAtColumnName() : void
+    public function testGetQuotedMigrationsExecutedAtColumnName(): void
     {
         $config = new Configuration($this->getSqliteConnection());
 
         self::assertSame('executed_at', $config->getQuotedMigrationsExecutedAtColumnName());
     }
 
-    public function testEmptyProjectDefaults() : void
+    public function testEmptyProjectDefaults(): void
     {
         $config = $this->getSqliteConfiguration();
         self::assertNull($config->getPrevVersion(), 'no prev version');
@@ -111,7 +112,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame([], $config->getMigrations());
     }
 
-    public function testGetUnknownVersion() : void
+    public function testGetUnknownVersion(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -121,7 +122,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->getVersion('1234');
     }
 
-    public function testRegisterMigration() : void
+    public function testRegisterMigration(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigration('1234', Version1Test::class);
@@ -134,7 +135,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertFalse($version->isMigrated());
     }
 
-    public function testRegisterMigrations() : void
+    public function testRegisterMigrations(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
@@ -151,7 +152,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('1235', $version->getVersion());
     }
 
-    public function testRegisterDuplicateVersion() : void
+    public function testRegisterDuplicateVersion(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -164,7 +165,7 @@ class ConfigurationTest extends MigrationTestCase
         $config->registerMigration('1234', Version1Test::class);
     }
 
-    public function testRelativeVersion() : void
+    public function testRelativeVersion(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
@@ -227,7 +228,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertNull($config->getRelativeVersion('final', 1));
     }
 
-    public function testPreviousCurrentNextLatestVersion() : void
+    public function testPreviousCurrentNextLatestVersion(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
@@ -271,7 +272,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame('1236', $config->getLatestVersion(), 'latest version 1236');
     }
 
-    public function testDeltaVersion() : void
+    public function testDeltaVersion(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->registerMigrations([
@@ -311,7 +312,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertNull($config->getDeltaVersion('+1'), 'no current+1');
     }
 
-    public function testGetAvailableVersions() : void
+    public function testGetAvailableVersions(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -319,7 +320,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame(['1234'], $config->getAvailableVersions());
     }
 
-    public function testDispatchEventProxiesToConnectionsEventManager() : void
+    public function testDispatchEventProxiesToConnectionsEventManager(): void
     {
         $config = $this->getSqliteConfiguration();
         $config->getConnection()
@@ -338,7 +339,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @dataProvider autoloadVersionProvider
      */
-    public function testGetVersionAutoloadVersion(string $version) : void
+    public function testGetVersionAutoloadVersion(string $version): void
     {
         $config = $this->getSqliteConfiguration();
         $config->setMigrationsNamespace('Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions');
@@ -349,7 +350,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($version, $result->getVersion());
     }
 
-    public function testGetVersionNotFound() : void
+    public function testGetVersionNotFound(): void
     {
         $config = $this->getSqliteConfiguration();
 
@@ -361,14 +362,14 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @dataProvider versionProvider
      */
-    public function testGetDatetime(string $version, string $return) : void
+    public function testGetDatetime(string $version, string $return): void
     {
         $config = $this->getSqliteConfiguration();
 
         self::assertSame($return, $config->getDateTime($version));
     }
 
-    public function testDryRunMigratedAndCurrentVersions() : void
+    public function testDryRunMigratedAndCurrentVersions(): void
     {
         // migrations table created
         $config1 = $this->getSqliteConfiguration();
@@ -414,7 +415,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @return string[][]
      */
-    public function versionProvider() : array
+    public function versionProvider(): array
     {
         return [
             ['20150101123545Version', '2015-01-01 12:35:45'],
@@ -430,7 +431,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @return string[][]
      */
-    public function autoloadVersionProvider() : array
+    public function autoloadVersionProvider(): array
     {
         return [
             ['1Test'],
@@ -444,7 +445,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @dataProvider validCustomTemplates
      */
-    public function testSetCustomTemplateShould(?string $template) : void
+    public function testSetCustomTemplateShould(?string $template): void
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setCustomTemplate($template);
@@ -455,7 +456,7 @@ class ConfigurationTest extends MigrationTestCase
     /**
      * @return string[][]|null[][]
      */
-    public function validCustomTemplates() : array
+    public function validCustomTemplates(): array
     {
         return [
             'null template'  => [null],
