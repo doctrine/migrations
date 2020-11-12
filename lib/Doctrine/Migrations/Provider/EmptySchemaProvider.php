@@ -23,7 +23,7 @@ final class EmptySchemaProvider implements SchemaProviderInterface
         $this->schemaManager = $schemaManager;
     }
 
-    public function createSchema() : Schema
+    public function createSchema(): Schema
     {
         return new Schema([], [], $this->schemaManager->createSchemaConfig());
     }

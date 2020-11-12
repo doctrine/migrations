@@ -23,7 +23,7 @@ final class DiffCommandTest extends TestCase
     /** @var DiffCommand|MockObject */
     private $diffCommand;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -93,7 +93,7 @@ final class DiffCommandTest extends TestCase
         $this->diffCommand->execute($input, $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationDiffGenerator = $this->createMock(DiffGenerator::class);
         $this->configuration          = $this->createMock(Configuration::class);

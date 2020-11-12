@@ -18,27 +18,27 @@ class TableDefinitionTest extends TestCase
     /** @var TableDefinition */
     private $migrationTable;
 
-    public function testGetName() : void
+    public function testGetName(): void
     {
         self::assertSame('versions', $this->migrationTable->getName());
     }
 
-    public function testGetColumnName() : void
+    public function testGetColumnName(): void
     {
         self::assertSame('version_name', $this->migrationTable->getColumnName());
     }
 
-    public function testGetColumnLength() : void
+    public function testGetColumnLength(): void
     {
         self::assertSame(200, $this->migrationTable->getColumnLength());
     }
 
-    public function testGetExecutedAtColumnName() : void
+    public function testGetExecutedAtColumnName(): void
     {
         self::assertSame('executed_datetime', $this->migrationTable->getExecutedAtColumnName());
     }
 
-    public function testGetMigrationsColumn() : void
+    public function testGetMigrationsColumn(): void
     {
         $column = $this->migrationTable->getMigrationsColumn();
 
@@ -46,7 +46,7 @@ class TableDefinitionTest extends TestCase
         self::assertSame(200, $column->getLength());
     }
 
-    public function testGetExecutedAtColumn() : void
+    public function testGetExecutedAtColumn(): void
     {
         $column = $this->migrationTable->getExecutedAtColumn();
 
@@ -54,12 +54,12 @@ class TableDefinitionTest extends TestCase
         self::assertTrue($column->getNotnull());
     }
 
-    public function testGetColumnNames() : void
+    public function testGetColumnNames(): void
     {
         self::assertSame(['version_name', 'executed_datetime'], $this->migrationTable->getColumnNames());
     }
 
-    public function testGetDBALTable() : void
+    public function testGetDBALTable(): void
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
@@ -85,7 +85,7 @@ class TableDefinitionTest extends TestCase
         self::assertFalse($table->getColumn('executed_datetime')->getNotnull());
     }
 
-    public function testGetNewDBALTable() : void
+    public function testGetNewDBALTable(): void
     {
         $schemaConfig = $this->createMock(SchemaConfig::class);
 
@@ -111,7 +111,7 @@ class TableDefinitionTest extends TestCase
         self::assertTrue($table->getColumn('executed_datetime')->getNotnull());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->schemaManager = $this->createMock(AbstractSchemaManager::class);
 

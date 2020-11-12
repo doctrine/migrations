@@ -13,9 +13,11 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
-use const COUNT_RECURSIVE;
+
 use function count;
 use function sprintf;
+
+use const COUNT_RECURSIVE;
 
 /**
  * The Migrator class is responsible for generating and executing the SQL for a migration.
@@ -49,7 +51,7 @@ class Migrator
     }
 
     /** @return string[][] */
-    public function getSql(?string $to = null) : array
+    public function getSql(?string $to = null): array
     {
         $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun(true);
@@ -57,7 +59,7 @@ class Migrator
         return $this->migrate($to, $migratorConfiguration);
     }
 
-    public function writeSqlFile(string $path, ?string $to = null) : bool
+    public function writeSqlFile(string $path, ?string $to = null): bool
     {
         $sql = $this->getSql($to);
 
@@ -92,7 +94,7 @@ class Migrator
     public function migrate(
         ?string $to = null,
         ?MigratorConfiguration $migratorConfiguration = null
-    ) : array {
+    ): array {
         $migratorConfiguration = $migratorConfiguration ?? new MigratorConfiguration();
         $dryRun                = $migratorConfiguration->isDryRun();
 
@@ -159,7 +161,7 @@ class Migrator
         array $migrationsToExecute,
         string $direction,
         MigratorConfiguration $migratorConfiguration
-    ) : array {
+    ): array {
         $dryRun = $migratorConfiguration->isDryRun();
 
         $connection = $this->configuration->getConnection();
@@ -214,7 +216,7 @@ class Migrator
         StopwatchEvent $stopwatchEvent,
         array $migrationsToExecute,
         array $sql
-    ) : void {
+    ): void {
         $stopwatchEvent->stop();
 
         $this->outputWriter->write("\n  <comment>------------------------</comment>\n");
@@ -240,13 +242,13 @@ class Migrator
         ));
     }
 
-    private function calculateDirection(string $from, string $to) : string
+    private function calculateDirection(string $from, string $to): string
     {
         return (int) $from > (int) $to ? Direction::DOWN : Direction::UP;
     }
 
     /** @return string[][] */
-    private function noMigrations() : array
+    private function noMigrations(): array
     {
         $this->outputWriter->write('<comment>No migrations to execute.</comment>');
 

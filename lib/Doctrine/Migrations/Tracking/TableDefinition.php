@@ -49,27 +49,27 @@ class TableDefinition
         $this->executedAtColumnName = $executedAtColumnName;
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return $this->name;
     }
 
-    public function getColumnName() : string
+    public function getColumnName(): string
     {
         return $this->columnName;
     }
 
-    public function getColumnLength() : int
+    public function getColumnLength(): int
     {
         return $this->columnLength;
     }
 
-    public function getExecutedAtColumnName() : string
+    public function getExecutedAtColumnName(): string
     {
         return $this->executedAtColumnName;
     }
 
-    public function getMigrationsColumn() : Column
+    public function getMigrationsColumn(): Column
     {
         return new Column(
             $this->columnName,
@@ -78,7 +78,7 @@ class TableDefinition
         );
     }
 
-    public function getExecutedAtColumn() : Column
+    public function getExecutedAtColumn(): Column
     {
         return new Column(
             $this->executedAtColumnName,
@@ -89,7 +89,7 @@ class TableDefinition
     /**
      * @return string[]
      */
-    public function getColumnNames() : array
+    public function getColumnNames(): array
     {
         return [
             $this->columnName,
@@ -97,7 +97,7 @@ class TableDefinition
         ];
     }
 
-    public function getDBALTable() : Table
+    public function getDBALTable(): Table
     {
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(false);
@@ -110,7 +110,7 @@ class TableDefinition
         return $this->createDBALTable($columns);
     }
 
-    public function getNewDBALTable() : Table
+    public function getNewDBALTable(): Table
     {
         $executedAtColumn = $this->getExecutedAtColumn();
         $executedAtColumn->setNotnull(true);
@@ -126,7 +126,7 @@ class TableDefinition
     /**
      * @param Column[] $columns
      */
-    public function createDBALTable(array $columns) : Table
+    public function createDBALTable(array $columns): Table
     {
         $schemaConfig = $this->schemaManager->createSchemaConfig();
 

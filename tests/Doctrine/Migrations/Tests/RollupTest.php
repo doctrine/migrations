@@ -27,7 +27,7 @@ class RollupTest extends TestCase
     /** @var Rollup */
     private $rollup;
 
-    public function testRollupNoMigrtionsFoundException() : void
+    public function testRollupNoMigrtionsFoundException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('No migrations found.');
@@ -39,7 +39,7 @@ class RollupTest extends TestCase
         $this->rollup->rollup();
     }
 
-    public function testRollupTooManyMigrationsException() : void
+    public function testRollupTooManyMigrationsException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Too many migrations.');
@@ -59,7 +59,7 @@ class RollupTest extends TestCase
         $this->rollup->rollup();
     }
 
-    public function testRollup() : void
+    public function testRollup(): void
     {
         $version1 = $this->createMock(Version::class);
 
@@ -83,7 +83,7 @@ class RollupTest extends TestCase
         self::assertSame($version1, $this->rollup->rollup());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration       = $this->createMock(Configuration::class);
         $this->connection          = $this->createMock(Connection::class);

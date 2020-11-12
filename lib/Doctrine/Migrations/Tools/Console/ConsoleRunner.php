@@ -29,14 +29,14 @@ use Symfony\Component\Console\Helper\HelperSet;
 class ConsoleRunner
 {
     /** @param AbstractCommand[] $commands */
-    public static function run(HelperSet $helperSet, array $commands = []) : void
+    public static function run(HelperSet $helperSet, array $commands = []): void
     {
         $cli = static::createApplication($helperSet, $commands);
         $cli->run();
     }
 
     /** @param AbstractCommand[] $commands */
-    public static function createApplication(HelperSet $helperSet, array $commands = []) : Application
+    public static function createApplication(HelperSet $helperSet, array $commands = []): Application
     {
         $cli = new Application('Doctrine Migrations', Versions::getVersion('doctrine/migrations'));
         $cli->setCatchExceptions(true);
@@ -47,7 +47,7 @@ class ConsoleRunner
         return $cli;
     }
 
-    public static function addCommands(Application $cli) : void
+    public static function addCommands(Application $cli): void
     {
         $cli->addCommands([
             new DumpSchemaCommand(),

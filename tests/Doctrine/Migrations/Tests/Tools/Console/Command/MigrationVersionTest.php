@@ -13,10 +13,12 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
-use const DIRECTORY_SEPARATOR;
+
 use function file_exists;
 use function mkdir;
 use function sys_get_temp_dir;
+
+use const DIRECTORY_SEPARATOR;
 
 class MigrationVersionTest extends MigrationTestCase
 {
@@ -26,7 +28,7 @@ class MigrationVersionTest extends MigrationTestCase
     /** @var Configuration */
     private $configuration;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->command = $this
             ->getMockBuilder(VersionCommand::class)
@@ -40,6 +42,7 @@ class MigrationVersionTest extends MigrationTestCase
         if (! file_exists($migrationsDirectory)) {
             mkdir($migrationsDirectory);
         }
+
         $this->configuration->setMigrationsDirectory($migrationsDirectory);
 
         $this->command
@@ -51,7 +54,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-to --range-from" options on migrate only versions in interval.
      */
-    public function testAddRangeOption() : void
+    public function testAddRangeOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -79,7 +82,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-from" options without "--range-to".
      */
-    public function testAddRangeWithoutRangeToOption() : void
+    public function testAddRangeWithoutRangeToOption(): void
     {
         $commandTester = new CommandTester($this->command);
 
@@ -98,7 +101,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-to" options without "--range-from".
      */
-    public function testAddRangeWithoutRangeFromOption() : void
+    public function testAddRangeWithoutRangeFromOption(): void
     {
         $commandTester = new CommandTester($this->command);
 
@@ -117,7 +120,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all --range-to" options.
      */
-    public function testAddAllOptionsWithRangeTo() : void
+    public function testAddAllOptionsWithRangeTo(): void
     {
         $commandTester = new CommandTester($this->command);
 
@@ -137,7 +140,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all --range-from" options.
      */
-    public function testAddAllOptionsWithRangeFrom() : void
+    public function testAddAllOptionsWithRangeFrom(): void
     {
         $commandTester = new CommandTester($this->command);
 
@@ -157,7 +160,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete --range-to --range-from" options on migrate down only versions in interval.
      */
-    public function testDeleteRangeOption() : void
+    public function testDeleteRangeOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -190,7 +193,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all" options on migrate all versions.
      */
-    public function testAddAllOption() : void
+    public function testAddAllOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -217,7 +220,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete --all" options on migrate down all versions.
      */
-    public function testDeleteAllOption() : void
+    public function testDeleteAllOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -247,7 +250,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate one version.
      */
-    public function testAddOption() : void
+    public function testAddOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -272,7 +275,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" options on migrate down one version.
      */
-    public function testDeleteOption() : void
+    public function testDeleteOption(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->registerMigration('1234', Version1Test::class);
@@ -297,7 +300,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate already migrated version.
      */
-    public function testAddOptionIfVersionAlreadyMigrated() : void
+    public function testAddOptionIfVersionAlreadyMigrated(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->getVersion('1233')->markMigrated();
@@ -319,7 +322,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" option on not migrated version.
      */
-    public function testDeleteOptionIfVersionNotMigrated() : void
+    public function testDeleteOptionIfVersionNotMigrated(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
 
@@ -340,7 +343,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" option on migrated version without existing version file.
      */
-    public function testDeleteOptionIfVersionFileDoesNotExist() : void
+    public function testDeleteOptionIfVersionFileDoesNotExist(): void
     {
         $this->configuration->registerMigration('1233', Version1Test::class);
         $this->configuration->getVersion('1233')->markMigrated();

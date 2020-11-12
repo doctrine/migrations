@@ -9,6 +9,7 @@ use Doctrine\Migrations\FileQueryWriter;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Version\Direction;
+
 use function file_get_contents;
 use function sprintf;
 use function unlink;
@@ -31,7 +32,7 @@ final class FileQueryWriterTest extends MigrationTestCase
         string $direction,
         array $queries,
         OutputWriter $outputWriter
-    ) : void {
+    ): void {
         $platform = $this->createMock(AbstractPlatform::class);
 
         $migrationFileBuilder = new FileBuilder(
@@ -87,7 +88,7 @@ final class FileQueryWriterTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public function writeProvider() : array
+    public function writeProvider(): array
     {
         $outputWriter = $this->createMock(OutputWriter::class);
 

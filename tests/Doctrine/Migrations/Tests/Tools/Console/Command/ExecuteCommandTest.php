@@ -11,6 +11,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function getcwd;
 
 class ExecuteCommandTest extends TestCase
@@ -21,7 +22,7 @@ class ExecuteCommandTest extends TestCase
     /** @var ExecuteCommand|MockObject */
     private $executeCommand;
 
-    public function testWriteSqlCustomPath() : void
+    public function testWriteSqlCustomPath(): void
     {
         $versionName = '1';
 
@@ -56,7 +57,7 @@ class ExecuteCommandTest extends TestCase
         self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testWriteSqlCurrentWorkingDirectory() : void
+    public function testWriteSqlCurrentWorkingDirectory(): void
     {
         $versionName = '1';
 
@@ -91,7 +92,7 @@ class ExecuteCommandTest extends TestCase
         self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $versionName = '1';
 
@@ -136,7 +137,7 @@ class ExecuteCommandTest extends TestCase
         self::assertSame(0, $this->executeCommand->execute($input, $output));
     }
 
-    public function testExecuteCancel() : void
+    public function testExecuteCancel(): void
     {
         $versionName = '1';
 
@@ -184,7 +185,7 @@ class ExecuteCommandTest extends TestCase
         self::assertSame(1, $this->executeCommand->execute($input, $output));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
 

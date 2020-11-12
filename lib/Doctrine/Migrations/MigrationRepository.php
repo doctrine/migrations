@@ -13,7 +13,7 @@ use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\Version\Factory;
 use Doctrine\Migrations\Version\Version;
-use const SORT_STRING;
+
 use function array_diff;
 use function array_keys;
 use function array_map;
@@ -28,6 +28,8 @@ use function is_array;
 use function ksort;
 use function sprintf;
 use function substr;
+
+use const SORT_STRING;
 
 /**
  * The MigrationRepository class is responsible for retrieving migrations, determing what the current migration
@@ -67,7 +69,7 @@ class MigrationRepository
     /**
      * @return string[]
      */
-    public function findMigrations(string $path) : array
+    public function findMigrations(string $path): array
     {
         return $this->migrationFinder->findMigrations(
             $path,
@@ -76,12 +78,12 @@ class MigrationRepository
     }
 
     /** @return Version[] */
-    public function registerMigrationsFromDirectory(string $path) : array
+    public function registerMigrationsFromDirectory(string $path): array
     {
         return $this->registerMigrations($this->findMigrations($path));
     }
 
-    public function addVersion(Version $version) : void
+    public function addVersion(Version $version): void
     {
         $this->versions[$version->getVersion()] = $version;
 
@@ -91,14 +93,14 @@ class MigrationRepository
     /**
      * @param Version[] $versions
      */
-    public function addVersions(array $versions) : void
+    public function addVersions(array $versions): void
     {
         foreach ($versions as $version) {
             $this->addVersion($version);
         }
     }
 
-    public function removeMigrationVersionFromDatabase(string $version) : void
+    public function removeMigrationVersionFromDatabase(string $version): void
     {
         $this->connection->delete(
             $this->configuration->getMigrationsTableName(),
@@ -107,7 +109,7 @@ class MigrationRepository
     }
 
     /** @throws MigrationException */
-    public function registerMigration(string $version, string $migrationClassName) : Version
+    public function registerMigration(string $version, string $migrationClassName): Version
     {
         $this->ensureMigrationClassExists($migrationClassName);
 
@@ -130,7 +132,7 @@ class MigrationRepository
      *
      * @return Version[]
      */
-    public function registerMigrations(array $migrations) : array
+    public function registerMigrations(array $migrations): array
     {
         $versions = [];
 
@@ -141,7 +143,7 @@ class MigrationRepository
         return $versions;
     }
 
-    public function getCurrentVersion() : string
+    public function getCurrentVersion(): string
     {
         $this->configuration->createMigrationTable();
 
@@ -186,19 +188,19 @@ class MigrationRepository
     /**
      * @return Version[]
      */
-    public function getVersions() : array
+    public function getVersions(): array
     {
         $this->loadMigrationsFromDirectory();
 
         return $this->versions;
     }
 
-    public function clearVersions() : void
+    public function clearVersions(): void
     {
         $this->versions = [];
     }
 
-    public function getVersion(string $version) : Version
+    public function getVersion(string $version): Version
     {
         $this->loadMigrationsFromDirectory();
 
@@ -209,14 +211,14 @@ class MigrationRepository
         return $this->versions[$version];
     }
 
-    public function hasVersion(string $version) : bool
+    public function hasVersion(string $version): bool
     {
         $this->loadMigrationsFromDirectory();
 
         return isset($this->versions[$version]);
     }
 
-    public function hasVersionMigrated(Version $version) : bool
+    public function hasVersionMigrated(Version $version): bool
     {
         return $this->getVersionData($version) !== null;
     }
@@ -224,7 +226,7 @@ class MigrationRepository
     /**
      * @return mixed[]|null
      */
-    public function getVersionData(Version $version) : ?array
+    public function getVersionData(Version $version): ?array
     {
         $this->configuration->connect();
         $this->configuration->createMigrationTable();
@@ -245,7 +247,7 @@ class MigrationRepository
     /**
      * @return Version[]
      */
-    public function getMigrations() : array
+    public function getMigrations(): array
     {
         $this->loadMigrationsFromDirectory();
 
@@ -253,7 +255,7 @@ class MigrationRepository
     }
 
     /** @return string[] */
-    public function getAvailableVersions() : array
+    public function getAvailableVersions(): array
     {
         $availableVersions = [];
 
@@ -267,7 +269,7 @@ class MigrationRepository
     }
 
     /** @return string[] */
-    public function getNewVersions() : array
+    public function getNewVersions(): array
     {
         $availableMigrations = $this->getAvailableVersions();
         $executedMigrations  = $this->getMigratedVersions();
@@ -276,7 +278,7 @@ class MigrationRepository
     }
 
     /** @return string[] */
-    public function getMigratedVersions() : array
+    public function getMigratedVersions(): array
     {
         $this->configuration->createMigrationTable();
 
@@ -300,7 +302,7 @@ class MigrationRepository
     /**
      * @return string[]
      */
-    public function getExecutedUnavailableMigrations() : array
+    public function getExecutedUnavailableMigrations(): array
     {
         $executedMigrations  = $this->getMigratedVersions();
         $availableMigrations = $this->getAvailableVersions();
@@ -308,14 +310,14 @@ class MigrationRepository
         return array_diff($executedMigrations, $availableMigrations);
     }
 
-    public function getNumberOfAvailableMigrations() : int
+    public function getNumberOfAvailableMigrations(): int
     {
         $this->loadMigrationsFromDirectory();
 
         return count($this->versions);
     }
 
-    public function getLatestVersion() : string
+    public function getLatestVersion(): string
     {
         $this->loadMigrationsFromDirectory();
 
@@ -325,7 +327,7 @@ class MigrationRepository
         return $latest !== false ? (string) $latest : '0';
     }
 
-    public function getNumberOfExecutedMigrations() : int
+    public function getNumberOfExecutedMigrations(): int
     {
         $this->configuration->connect();
         $this->configuration->createMigrationTable();
@@ -341,7 +343,7 @@ class MigrationRepository
         return $result !== false ? (int) $result : 0;
     }
 
-    public function getRelativeVersion(string $version, int $delta) : ?string
+    public function getRelativeVersion(string $version, int $delta): ?string
     {
         $this->loadMigrationsFromDirectory();
 
@@ -365,7 +367,7 @@ class MigrationRepository
         return $versions[$relativeVersion];
     }
 
-    public function getDeltaVersion(string $delta) : ?string
+    public function getDeltaVersion(string $delta): ?string
     {
         $symbol = substr($delta, 0, 1);
         $number = (int) substr($delta, 1);
@@ -381,17 +383,17 @@ class MigrationRepository
         return null;
     }
 
-    public function getPrevVersion() : ?string
+    public function getPrevVersion(): ?string
     {
         return $this->getRelativeVersion($this->getCurrentVersion(), -1);
     }
 
-    public function getNextVersion() : ?string
+    public function getNextVersion(): ?string
     {
         return $this->getRelativeVersion($this->getCurrentVersion(), 1);
     }
 
-    private function loadMigrationsFromDirectory() : void
+    private function loadMigrationsFromDirectory(): void
     {
         $migrationsDirectory = $this->configuration->getMigrationsDirectory();
 
@@ -403,7 +405,7 @@ class MigrationRepository
     }
 
     /** @throws MigrationException */
-    private function ensureMigrationClassExists(string $class) : void
+    private function ensureMigrationClassExists(string $class): void
     {
         if (! class_exists($class)) {
             throw MigrationClassNotFound::new(

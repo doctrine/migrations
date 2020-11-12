@@ -34,7 +34,7 @@ class TableManipulatorTest extends TestCase
     /** @var TableManipulator */
     private $migrationTableManipulator;
 
-    public function testCreateMigrationTableAlreadyCreated() : void
+    public function testCreateMigrationTableAlreadyCreated(): void
     {
         $this->configuration->expects(self::once())
             ->method('validate');
@@ -54,7 +54,7 @@ class TableManipulatorTest extends TestCase
         self::assertFalse($this->migrationTableManipulator->createMigrationTable());
     }
 
-    public function testCreateMigrationTableNotUpToDate() : void
+    public function testCreateMigrationTableNotUpToDate(): void
     {
         $migrationTableManipulator = $this->getMockBuilder(TableManipulator::class)
             ->setConstructorArgs([
@@ -92,7 +92,7 @@ class TableManipulatorTest extends TestCase
         self::assertTrue($migrationTableManipulator->createMigrationTable());
     }
 
-    public function testCreateMigrationTable() : void
+    public function testCreateMigrationTable(): void
     {
         $this->configuration->expects(self::once())
             ->method('validate');
@@ -118,7 +118,7 @@ class TableManipulatorTest extends TestCase
         self::assertTrue($this->migrationTableManipulator->createMigrationTable());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration         = $this->createMock(Configuration::class);
         $this->schemaManager         = $this->createMock(AbstractSchemaManager::class);

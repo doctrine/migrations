@@ -14,6 +14,7 @@ use Doctrine\Migrations\Exception\MigrationNotConvertibleToSql;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\OutputWriter;
 use Doctrine\Migrations\Tracking\TableDefinition;
+
 use function assert;
 use function count;
 use function date_default_timezone_get;
@@ -67,17 +68,17 @@ class Version
         $this->versionExecutor = $versionExecutor;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return $this->version;
     }
 
-    public function getVersion() : string
+    public function getVersion(): string
     {
         return $this->version;
     }
 
-    public function getDateTime() : string
+    public function getDateTime(): string
     {
         $datetime = str_replace('Version', '', $this->version);
         $datetime = DateTimeImmutable::createFromFormat('YmdHis', $datetime);
@@ -89,22 +90,22 @@ class Version
         return $datetime->format('Y-m-d H:i:s');
     }
 
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         return $this->configuration;
     }
 
-    public function getMigration() : AbstractMigration
+    public function getMigration(): AbstractMigration
     {
         return $this->migration;
     }
 
-    public function isMigrated() : bool
+    public function isMigrated(): bool
     {
         return $this->configuration->hasVersionMigrated($this);
     }
 
-    public function getExecutedAt() : ?DateTimeImmutable
+    public function getExecutedAt(): ?DateTimeImmutable
     {
         $versionData          = $this->configuration->getVersionData($this);
         $executedAtColumnName = $this->configuration->getMigrationsExecutedAtColumnName();
@@ -117,22 +118,25 @@ class Version
             ->setTimezone(new DateTimeZone(date_default_timezone_get()));
     }
 
-    public function setState(int $state) : void
+    public function setState(int $state): void
     {
         assert(in_array($state, State::STATES, true));
 
         $this->state = $state;
     }
 
-    public function getExecutionState() : string
+    public function getExecutionState(): string
     {
         switch ($this->state) {
             case State::PRE:
                 return 'Pre-Checks';
+
             case State::POST:
                 return 'Post-Checks';
+
             case State::EXEC:
                 return 'Execution';
+
             default:
                 return 'No State';
         }
@@ -142,7 +146,7 @@ class Version
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    public function addSql(string $sql, array $params = [], array $types = []) : void
+    public function addSql(string $sql, array $params = [], array $types = []): void
     {
         $this->versionExecutor->addSql($sql, $params, $types);
     }
@@ -150,7 +154,7 @@ class Version
     public function writeSqlFile(
         string $path,
         string $direction = Direction::UP
-    ) : bool {
+    ): bool {
         $versionExecutionResult = $this->execute(
             $direction,
             $this->getWriteSqlFileMigratorConfig()
@@ -176,7 +180,7 @@ class Version
     public function execute(
         string $direction,
         ?MigratorConfiguration $migratorConfiguration = null
-    ) : ExecutionResult {
+    ): ExecutionResult {
         return $this->versionExecutor->execute(
             $this,
             $this->migration,
@@ -185,17 +189,17 @@ class Version
         );
     }
 
-    public function markMigrated() : void
+    public function markMigrated(): void
     {
         $this->markVersion(Direction::UP);
     }
 
-    public function markNotMigrated() : void
+    public function markNotMigrated(): void
     {
         $this->markVersion(Direction::DOWN);
     }
 
-    public function markVersion(string $direction) : void
+    public function markVersion(string $direction): void
     {
         $this->configuration->createMigrationTable();
 
@@ -225,12 +229,12 @@ class Version
         );
     }
 
-    private function getWriteSqlFileMigratorConfig() : MigratorConfiguration
+    private function getWriteSqlFileMigratorConfig(): MigratorConfiguration
     {
         return (new MigratorConfiguration())->setDryRun(true);
     }
 
-    private function getExecutedAtDatabaseValue() : string
+    private function getExecutedAtDatabaseValue(): string
     {
         return Type::getType(TableDefinition::MIGRATION_EXECUTED_AT_COLUMN_TYPE)->convertToDatabaseValue(
             (new DateTimeImmutable('now'))->setTimezone(new DateTimeZone('UTC')),

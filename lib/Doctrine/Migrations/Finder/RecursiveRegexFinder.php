@@ -8,8 +8,10 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
-use const DIRECTORY_SEPARATOR;
+
 use function sprintf;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * The RecursiveRegexFinder class recursively searches the given directory for migrations.
@@ -19,7 +21,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
     /**
      * @return string[]
      */
-    public function findMigrations(string $directory, ?string $namespace = null) : array
+    public function findMigrations(string $directory, ?string $namespace = null): array
     {
         $dir = $this->getRealPath($directory);
 
@@ -29,7 +31,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
         );
     }
 
-    private function createIterator(string $dir) : RegexIterator
+    private function createIterator(string $dir): RegexIterator
     {
         return new RegexIterator(
             new RecursiveIteratorIterator(
@@ -41,7 +43,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
         );
     }
 
-    private function getPattern() : string
+    private function getPattern(): string
     {
         return sprintf(
             '#^.+\\%sVersion[^\\%s]{1,255}\\.php$#i',
@@ -53,7 +55,7 @@ final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
     /**
      * @return string[]
      */
-    private function getMatches(RegexIterator $iteratorFilesMatch) : array
+    private function getMatches(RegexIterator $iteratorFilesMatch): array
     {
         $files = [];
         foreach ($iteratorFilesMatch as $file) {

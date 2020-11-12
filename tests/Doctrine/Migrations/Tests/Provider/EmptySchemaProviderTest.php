@@ -21,7 +21,7 @@ class EmptySchemaProviderTest extends MigrationTestCase
     /** @var EmptySchemaProvider */
     private $emptyProvider;
 
-    public function testCreateSchema() : void
+    public function testCreateSchema(): void
     {
         $schemaConfig = new SchemaConfig();
         $schemaConfig->setExplicitForeignKeyIndexes(true);
@@ -38,7 +38,7 @@ class EmptySchemaProviderTest extends MigrationTestCase
         self::assertSame([], $schema->getNamespaces());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->schemaManager = $this->createMock(AbstractSchemaManager::class);
         $this->emptyProvider = new EmptySchemaProvider($this->schemaManager);

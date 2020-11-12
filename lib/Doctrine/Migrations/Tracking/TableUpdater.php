@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Throwable;
+
 use function in_array;
 
 /**
@@ -43,7 +44,7 @@ class TableUpdater
         $this->platform       = $platform;
     }
 
-    public function updateMigrationTable() : void
+    public function updateMigrationTable(): void
     {
         $fromTable = $this->getFromTable();
         $toTable   = $this->migrationTable->getDBALTable();
@@ -71,12 +72,12 @@ class TableUpdater
     /**
      * @param Table[] $tables
      */
-    protected function createSchema(array $tables) : Schema
+    protected function createSchema(array $tables): Schema
     {
         return new Schema($tables);
     }
 
-    private function getFromTable() : Table
+    private function getFromTable(): Table
     {
         $tableName   = $this->migrationTable->getName();
         $columnNames = $this->migrationTable->getColumnNames();

@@ -33,7 +33,7 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var DumpSchemaCommand|MockObject */
     private $dumpSchemaCommand;
 
-    public function testExecuteThrowsRuntimeException() : void
+    public function testExecuteThrowsRuntimeException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Delete any previous migrations before dumping your schema.');
@@ -52,7 +52,7 @@ final class DumpSchemaCommandTest extends TestCase
         $this->dumpSchemaCommand->execute($input, $output);
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -101,7 +101,7 @@ final class DumpSchemaCommandTest extends TestCase
         $this->dumpSchemaCommand->execute($input, $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration       = $this->createMock(Configuration::class);
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);

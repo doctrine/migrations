@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Generator;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use SqlFormatter;
+
 use function array_unshift;
 use function count;
 use function implode;
@@ -41,7 +42,7 @@ class SqlGenerator
         bool $formatted = false,
         int $lineLength = 120,
         bool $checkDbPlatform = true
-    ) : string {
+    ): string {
         $code = [];
 
         foreach ($sql as $query) {

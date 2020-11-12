@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Generator;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
+
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
@@ -74,7 +75,7 @@ TEMPLATE;
         string $version,
         ?string $up = null,
         ?string $down = null
-    ) : string {
+    ): string {
         $placeHolders = [
             '<namespace>',
             '<version>',
@@ -101,7 +102,7 @@ TEMPLATE;
         return $path;
     }
 
-    private function getTemplate() : string
+    private function getTemplate(): string
     {
         if ($this->template === null) {
             $this->template = $this->loadCustomTemplate();
@@ -117,7 +118,7 @@ TEMPLATE;
     /**
      * @throws InvalidTemplateSpecified
      */
-    private function loadCustomTemplate() : ?string
+    private function loadCustomTemplate(): ?string
     {
         $customTemplate = $this->configuration->getCustomTemplate();
 

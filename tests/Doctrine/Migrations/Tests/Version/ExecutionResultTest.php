@@ -15,12 +15,12 @@ class ExecutionResultTest extends TestCase
     /** @var ExecutionResult */
     private $versionExecutionResult;
 
-    public function testHasSql() : void
+    public function testHasSql(): void
     {
         self::assertTrue($this->versionExecutionResult->hasSql());
     }
 
-    public function testGetSetSql() : void
+    public function testGetSetSql(): void
     {
         self::assertSame(['SELECT 1'], $this->versionExecutionResult->getSql());
 
@@ -29,7 +29,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame(['SELECT 2'], $this->versionExecutionResult->getSql());
     }
 
-    public function testGetSetParams() : void
+    public function testGetSetParams(): void
     {
         self::assertSame([1], $this->versionExecutionResult->getParams());
 
@@ -38,7 +38,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame([2], $this->versionExecutionResult->getParams());
     }
 
-    public function testGetTypes() : void
+    public function testGetTypes(): void
     {
         self::assertSame([2], $this->versionExecutionResult->getTypes());
 
@@ -47,7 +47,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame([3], $this->versionExecutionResult->getTypes());
     }
 
-    public function testGetSetTime() : void
+    public function testGetSetTime(): void
     {
         self::assertNull($this->versionExecutionResult->getTime());
 
@@ -56,7 +56,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame(5.5, $this->versionExecutionResult->getTime());
     }
 
-    public function testGetSetMemory() : void
+    public function testGetSetMemory(): void
     {
         self::assertNull($this->versionExecutionResult->getMemory());
 
@@ -65,7 +65,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame(555555.0, $this->versionExecutionResult->getMemory());
     }
 
-    public function testSkipped() : void
+    public function testSkipped(): void
     {
         self::assertFalse($this->versionExecutionResult->isSkipped());
 
@@ -74,7 +74,7 @@ class ExecutionResultTest extends TestCase
         self::assertTrue($this->versionExecutionResult->isSkipped());
     }
 
-    public function testError() : void
+    public function testError(): void
     {
         self::assertFalse($this->versionExecutionResult->hasError());
 
@@ -83,12 +83,12 @@ class ExecutionResultTest extends TestCase
         self::assertTrue($this->versionExecutionResult->hasError());
     }
 
-    public function testExceptionNull() : void
+    public function testExceptionNull(): void
     {
         self::assertNull($this->versionExecutionResult->getException());
     }
 
-    public function testException() : void
+    public function testException(): void
     {
         $exception = new InvalidArgumentException();
 
@@ -97,7 +97,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame($exception, $this->versionExecutionResult->getException());
     }
 
-    public function testToSchema() : void
+    public function testToSchema(): void
     {
         $toSchema = $this->createMock(Schema::class);
 
@@ -106,7 +106,7 @@ class ExecutionResultTest extends TestCase
         self::assertSame($toSchema, $this->versionExecutionResult->getToSchema());
     }
 
-    public function testToSchemaThrowsRuntimExceptionWhenToSchemaIsNull() : void
+    public function testToSchemaThrowsRuntimExceptionWhenToSchemaIsNull(): void
     {
         self::expectException(RuntimeException::class);
         self::expectExceptionMessage('Cannot call getToSchema() when toSchema is null.');
@@ -114,7 +114,7 @@ class ExecutionResultTest extends TestCase
         $this->versionExecutionResult->getToSchema();
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->versionExecutionResult = new ExecutionResult(
             ['SELECT 1'],

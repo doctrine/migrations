@@ -25,7 +25,7 @@ final class AliasResolverTest extends TestCase
         ?string $expectedVersion,
         ?string $expectedMethod,
         ?string $expectedArgument
-    ) : void {
+    ): void {
         $this->migrationRepository->expects(self::once())
             ->method('hasVersion')
             ->with($alias)
@@ -47,7 +47,7 @@ final class AliasResolverTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function getAliases() : array
+    public function getAliases(): array
     {
         return [
             ['first', '0', null, null],
@@ -60,7 +60,7 @@ final class AliasResolverTest extends TestCase
         ];
     }
 
-    public function testResolveVersionAliasHasVersion() : void
+    public function testResolveVersionAliasHasVersion(): void
     {
         $this->migrationRepository->expects(self::once())
             ->method('hasVersion')
@@ -70,7 +70,7 @@ final class AliasResolverTest extends TestCase
         self::assertSame('test', $this->versionAliasResolver->resolveVersionAlias('test'));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
 

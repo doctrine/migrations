@@ -7,19 +7,21 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
-use const DIRECTORY_SEPARATOR;
+
 use function date;
+
+use const DIRECTORY_SEPARATOR;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-    public function testMigrationDirectoryHelperReturnConfiguredDir() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDir(): void
     {
         $mirationDirectoryHelper = new MigrationDirectoryHelper($this->getSqliteConfiguration());
 
         self::assertSame($this->getSqliteConfiguration()->getMigrationsDirectory(), $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear(): void
     {
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsAreOrganizedByYear(true);
@@ -30,7 +32,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         self::assertSame($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth(): void
     {
         $configuration = $this->getSqliteConfiguration();
         $configuration->setMigrationsAreOrganizedByYearAndMonth(true);
@@ -41,7 +43,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         self::assertSame($dir, $mirationDirectoryHelper->getMigrationDirectory());
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists() : void
+    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
     {
         $dir           = DIRECTORY_SEPARATOR . 'IDoNotExists';
         $configuration = $this->getSqliteConfiguration();

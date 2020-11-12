@@ -31,13 +31,13 @@ class MigrationRepositoryTest extends TestCase
     /** @var MigrationRepository */
     private $migrationRepository;
 
-    public function testGetDeltaVersionReturnsNull() : void
+    public function testGetDeltaVersionReturnsNull(): void
     {
         self::assertNull($this->migrationRepository->getDeltaVersion('00'));
         self::assertNull($this->migrationRepository->getDeltaVersion('01'));
     }
 
-    public function testGetVersions() : void
+    public function testGetVersions(): void
     {
         $version1 = $this->createMock(Version::class);
         $version1->expects(self::once())
@@ -63,7 +63,7 @@ class MigrationRepositoryTest extends TestCase
         self::assertEmpty($this->migrationRepository->getVersions());
     }
 
-    public function testGetVersionData() : void
+    public function testGetVersionData(): void
     {
         $version = $this->createMock(Version::class);
 
@@ -98,14 +98,14 @@ class MigrationRepositoryTest extends TestCase
         self::assertSame($versionData, $this->migrationRepository->getVersionData($version));
     }
 
-    public function testRegisterMigrationWithNonExistentClassCausesError() : void
+    public function testRegisterMigrationWithNonExistentClassCausesError(): void
     {
         $this->expectException(MigrationClassNotFound::class);
 
         $this->migrationRepository->registerMigration('123', DoesNotExistAtAll::class);
     }
 
-    public function testRemoveMigrationVersionFromDatabase() : void
+    public function testRemoveMigrationVersionFromDatabase(): void
     {
         $migrationsTableName  = 'migration_versions';
         $migrationsColumnName = 'version';
@@ -127,7 +127,7 @@ class MigrationRepositoryTest extends TestCase
         $this->migrationRepository->removeMigrationVersionFromDatabase($version);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration   = $this->createMock(Configuration::class);
         $this->connection      = $this->createMock(Connection::class);

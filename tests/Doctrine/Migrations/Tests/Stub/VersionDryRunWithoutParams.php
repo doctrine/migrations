@@ -9,11 +9,11 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionDryRunWithoutParams extends AbstractMigration
 {
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('SELECT 1 WHERE 1');
     }

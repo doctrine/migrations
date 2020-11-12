@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Exception\FileAlreadyLoaded;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
+
 use function dirname;
 use function file_exists;
 use function getcwd;
@@ -61,7 +62,7 @@ abstract class AbstractFileConfiguration extends Configuration
     /**
      * @throws FileNotFound
      */
-    public function load(string $file) : void
+    public function load(string $file): void
     {
         if ($this->loaded) {
             throw FileAlreadyLoaded::new();
@@ -83,7 +84,7 @@ abstract class AbstractFileConfiguration extends Configuration
         $this->loaded = true;
     }
 
-    public function getFile() : string
+    public function getFile(): string
     {
         return $this->file;
     }
@@ -91,7 +92,7 @@ abstract class AbstractFileConfiguration extends Configuration
     /**
      * @param mixed[] $config
      */
-    protected function setConfiguration(array $config) : void
+    protected function setConfiguration(array $config): void
     {
         foreach ($config as $configurationKey => $configurationValue) {
             if (! in_array($configurationKey, self::ALLOWED_CONFIGURATION_KEYS, true)) {
@@ -108,7 +109,7 @@ abstract class AbstractFileConfiguration extends Configuration
         }
     }
 
-    protected function getDirectoryRelativeToFile(string $file, string $input) : string
+    protected function getDirectoryRelativeToFile(string $file, string $input): string
     {
         $path = realpath(dirname($file) . '/' . $input);
 
@@ -120,16 +121,16 @@ abstract class AbstractFileConfiguration extends Configuration
      * load the given configuration file whether it be xml, yaml, etc. or something
      * else.
      */
-    abstract protected function doLoad(string $file) : void;
+    abstract protected function doLoad(string $file): void;
 
-    private function loadMigrationsFromDirectory(string $migrationsDirectory) : void
+    private function loadMigrationsFromDirectory(string $migrationsDirectory): void
     {
         $this->setMigrationsDirectory($migrationsDirectory);
         $this->registerMigrationsFromDirectory($migrationsDirectory);
     }
 
     /** @param string[][] $migrations */
-    private function loadMigrations(array $migrations) : void
+    private function loadMigrations(array $migrations): void
     {
         foreach ($migrations as $migration) {
             $this->registerMigration(
@@ -139,7 +140,7 @@ abstract class AbstractFileConfiguration extends Configuration
         }
     }
 
-    private function setMigrationOrganization(string $migrationOrganization) : void
+    private function setMigrationOrganization(string $migrationOrganization): void
     {
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();

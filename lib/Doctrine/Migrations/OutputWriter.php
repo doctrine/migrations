@@ -18,7 +18,7 @@ class OutputWriter
     public function __construct(?callable $callback = null)
     {
         if ($callback === null) {
-            $callback = function (string $message) : void {
+            $callback = function (string $message): void {
                 $this->lastMessage = $message;
             };
         }
@@ -26,17 +26,17 @@ class OutputWriter
         $this->callback = $callback;
     }
 
-    public function setCallback(callable $callback) : void
+    public function setCallback(callable $callback): void
     {
         $this->callback = $callback;
     }
 
-    public function write(string $message) : void
+    public function write(string $message): void
     {
         ($this->callback)($message);
     }
 
-    public function getLastMessage() : string
+    public function getLastMessage(): string
     {
         return $this->lastMessage;
     }

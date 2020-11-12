@@ -42,7 +42,7 @@ class DiffGeneratorTest extends TestCase
     /** @var SchemaProviderInterface|MockObject */
     private $emptySchemaProvider;
 
-    public function testGenerate() : void
+    public function testGenerate(): void
     {
         $fromSchema = $this->createMock(Schema::class);
         $toSchema   = $this->createMock(Schema::class);
@@ -124,7 +124,7 @@ class DiffGeneratorTest extends TestCase
         self::assertSame('path', $this->migrationDiffGenerator->generate('1234', '/table_name1/', true, 80));
     }
 
-    public function testGenerateFromEmptySchema() : void
+    public function testGenerateFromEmptySchema(): void
     {
         $emptySchema = $this->createMock(Schema::class);
         $toSchema    = $this->createMock(Schema::class);
@@ -181,7 +181,7 @@ class DiffGeneratorTest extends TestCase
         self::assertSame('path2', $this->migrationDiffGenerator->generate('2345', null, false, 120, true, true));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->dbalConfiguration      = $this->createMock(DBALConfiguration::class);
         $this->schemaManager          = $this->createMock(AbstractSchemaManager::class);

@@ -8,13 +8,15 @@ use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use SimpleXMLElement;
-use const DIRECTORY_SEPARATOR;
-use const LIBXML_NOCDATA;
+
 use function assert;
 use function file_get_contents;
 use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_string;
+
+use const DIRECTORY_SEPARATOR;
+use const LIBXML_NOCDATA;
 
 /**
  * The XmlConfiguration class is responsible for loading migration configuration information from a XML file.
@@ -23,8 +25,7 @@ use function simplexml_load_string;
  */
 class XmlConfiguration extends AbstractFileConfiguration
 {
-    /** @inheritdoc */
-    protected function doLoad(string $file) : void
+    protected function doLoad(string $file): void
     {
         libxml_use_internal_errors(true);
 

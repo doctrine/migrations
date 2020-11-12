@@ -9,16 +9,16 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionDummyDescription extends AbstractMigration
 {
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return 'My super migration';
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 }

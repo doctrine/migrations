@@ -11,6 +11,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function count;
 use function getcwd;
@@ -27,7 +28,7 @@ class MigrateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:migrate';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['migrate'])
@@ -113,7 +114,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $this->outputHeader($output);
 
@@ -170,7 +171,7 @@ EOT
         return 0;
     }
 
-    protected function createMigrator() : Migrator
+    protected function createMigrator(): Migrator
     {
         return $this->dependencyFactory->getMigrator();
     }
@@ -178,7 +179,7 @@ EOT
     private function checkExecutedUnavailableMigrations(
         InputInterface $input,
         OutputInterface $output
-    ) : int {
+    ): int {
         $executedUnavailableMigrations = $this->migrationRepository->getExecutedUnavailableMigrations();
 
         if (count($executedUnavailableMigrations) !== 0) {
@@ -210,7 +211,7 @@ EOT
     private function getVersionNameFromAlias(
         string $versionAlias,
         OutputInterface $output
-    ) : string {
+    ): string {
         $version = $this->configuration->resolveVersionAlias($versionAlias);
 
         if ($version !== null) {
@@ -246,7 +247,7 @@ EOT
     /**
      * @param mixed $allOrNothing
      */
-    private function getAllOrNothing($allOrNothing) : bool
+    private function getAllOrNothing($allOrNothing): bool
     {
         if ($allOrNothing !== false) {
             return $allOrNothing !== null

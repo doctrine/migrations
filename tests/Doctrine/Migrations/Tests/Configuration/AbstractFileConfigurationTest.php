@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\AbstractFileConfiguration;
 use Doctrine\Migrations\Configuration\Exception\InvalidConfigurationKey;
 use PHPUnit\Framework\TestCase;
+
 use function assert;
 use function basename;
 use function chdir;
@@ -21,7 +22,7 @@ class AbstractFileConfigurationTest extends TestCase
     /** @var TestAbstractFileConfiguration */
     private $fileConfiguration;
 
-    public function testLoadChecksCurrentWorkingDirectory() : void
+    public function testLoadChecksCurrentWorkingDirectory(): void
     {
         $cwd = getcwd();
 
@@ -38,7 +39,7 @@ class AbstractFileConfigurationTest extends TestCase
         chdir($cwd);
     }
 
-    public function testSetConfiguration() : void
+    public function testSetConfiguration(): void
     {
         $fileConfiguration = $this->createPartialMock(TestAbstractFileConfiguration::class, [
             'setMigrationsNamespace',
@@ -128,7 +129,7 @@ class AbstractFileConfigurationTest extends TestCase
         ]);
     }
 
-    public function testSetConfigurationThrowsInvalidConfigurationKey() : void
+    public function testSetConfigurationThrowsInvalidConfigurationKey(): void
     {
         $this->expectException(InvalidConfigurationKey::class);
         $this->expectExceptionMessage('Migrations configuration key "unknown" does not exist.');
@@ -136,7 +137,7 @@ class AbstractFileConfigurationTest extends TestCase
         $this->fileConfiguration->setTestConfiguration(['unknown' => 'value']);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 
@@ -149,12 +150,12 @@ class TestAbstractFileConfiguration extends AbstractFileConfiguration
     /**
      * @param mixed[] $config
      */
-    public function setTestConfiguration(array $config) : void
+    public function setTestConfiguration(array $config): void
     {
         $this->setConfiguration($config);
     }
 
-    protected function doLoad(string $file) : void
+    protected function doLoad(string $file): void
     {
     }
 }

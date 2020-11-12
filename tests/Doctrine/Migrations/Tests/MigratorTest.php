@@ -21,6 +21,9 @@ use PHPUnit\Framework\Constraint\RegularExpression;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Throwable;
+
+use function assert;
+
 use const DIRECTORY_SEPARATOR;
 
 require_once __DIR__ . '/realpath.php';
@@ -36,7 +39,7 @@ class MigratorTest extends MigrationTestCase
     /** @var StreamOutput */
     protected $output;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->conn   = $this->getSqliteConnection();
         $this->config = new Configuration($this->conn);
@@ -44,7 +47,7 @@ class MigratorTest extends MigrationTestCase
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
     }
 
-    public function testWriteSqlDown() : void
+    public function testWriteSqlDown(): void
     {
         $configuration       = $this->createMock(Configuration::class);
         $migrationRepository = $this->createMock(MigrationRepository::class);
@@ -88,7 +91,7 @@ class MigratorTest extends MigrationTestCase
         $migration->writeSqlFile('/path', '1');
     }
 
-    public function testMigrateToUnknownVersionThrowsException() : void
+    public function testMigrateToUnknownVersionThrowsException(): void
     {
         $migration = $this->createTestMigrator($this->config);
 
@@ -98,7 +101,7 @@ class MigratorTest extends MigrationTestCase
         $migration->migrate('1234');
     }
 
-    public function testMigrateWithNoMigrationsThrowsException() : void
+    public function testMigrateWithNoMigrationsThrowsException(): void
     {
         $migration = $this->createTestMigrator($this->config);
 
@@ -108,11 +111,11 @@ class MigratorTest extends MigrationTestCase
         $migration->migrate();
     }
 
-    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption() : void
+    public function testMigrateWithNoMigrationsDontThrowsExceptionIfContiniousIntegrationOption(): void
     {
         $messages = [];
 
-        $callback = static function ($msg) use (&$messages) : void {
+        $callback = static function ($msg) use (&$messages): void {
             $messages[] = $msg;
         };
 
@@ -132,13 +135,13 @@ class MigratorTest extends MigrationTestCase
     /**
      * @dataProvider getSqlProvider
      */
-    public function testGetSql(?string $to) : void
+    public function testGetSql(?string $to): void
     {
-        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->disableOriginalConstructor()
             ->setMethods(['migrate'])
             ->getMock();
+        assert($migration instanceof Migrator || $migration instanceof MockObject);
 
         $expected = [['something']];
 
@@ -153,7 +156,7 @@ class MigratorTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public function getSqlProvider() : array
+    public function getSqlProvider(): array
     {
         return [
             [null],
@@ -166,7 +169,7 @@ class MigratorTest extends MigrationTestCase
      *
      * @dataProvider writeSqlFileProvider
      */
-    public function testWriteSqlFile(string $path, string $from, ?string $to, array $getSqlReturn) : void
+    public function testWriteSqlFile(string $path, string $from, ?string $to, array $getSqlReturn): void
     {
         $queryWriter  = $this->createMock(QueryWriter::class);
         $outputWriter = $this->createMock(OutputWriter::class);
@@ -210,11 +213,11 @@ class MigratorTest extends MigrationTestCase
                 ->willReturn((string) ((int) $from + 1));
         }
 
-        /** @var Migrator|MockObject $migration */
         $migration = $this->getMockBuilder(Migrator::class)
             ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
+        assert($migration instanceof Migrator || $migration instanceof MockObject);
 
         $migration->expects(self::once())
             ->method('getSql')
@@ -227,7 +230,7 @@ class MigratorTest extends MigrationTestCase
     /**
      * @return mixed[][]
      */
-    public function writeSqlFileProvider() : array
+    public function writeSqlFileProvider(): array
     {
         return [
             [__DIR__, '0', '1', ['1' => ['SHOW DATABASES;']]], // up
@@ -238,11 +241,11 @@ class MigratorTest extends MigrationTestCase
         ];
     }
 
-    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage() : void
+    public function testMigrateWithMigrationsAndAddTheCurrentVersionOutputsANoMigrationsMessage(): void
     {
         $messages = [];
 
-        $callback = static function ($msg) use (&$messages) : void {
+        $callback = static function ($msg) use (&$messages): void {
             $messages[] = $msg;
         };
 
@@ -264,7 +267,7 @@ class MigratorTest extends MigrationTestCase
         self::assertStringContainsString('No migrations', $messages[0]);
     }
 
-    public function testMigrateAllOrNothing() : void
+    public function testMigrateAllOrNothing(): void
     {
         $this->config->setMigrationsDirectory(__DIR__ . '/Stub/migrations-empty-folder');
         $this->config->setMigrationsNamespace('DoctrineMigrations\\');
@@ -278,7 +281,7 @@ class MigratorTest extends MigrationTestCase
         self::assertCount(1, $sql);
     }
 
-    public function testMigrateAllOrNothingRollback() : void
+    public function testMigrateAllOrNothingRollback(): void
     {
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Migration up throws exception.');

@@ -22,14 +22,14 @@ class TableStatusTest extends TestCase
     /** @var TableStatus */
     private $migrationTableStatus;
 
-    public function testSetCreated() : void
+    public function testSetCreated(): void
     {
         $this->migrationTableStatus->setCreated(true);
 
         self::assertTrue($this->migrationTableStatus->isCreated());
     }
 
-    public function testIsCreatedTrue() : void
+    public function testIsCreatedTrue(): void
     {
         $this->migrationTable->expects(self::once())
             ->method('getName')
@@ -43,7 +43,7 @@ class TableStatusTest extends TestCase
         self::assertTrue($this->migrationTableStatus->isCreated());
     }
 
-    public function testIsCreatedFalse() : void
+    public function testIsCreatedFalse(): void
     {
         $this->migrationTable->expects(self::once())
             ->method('getName')
@@ -57,14 +57,14 @@ class TableStatusTest extends TestCase
         self::assertFalse($this->migrationTableStatus->isCreated());
     }
 
-    public function testSetUpToDate() : void
+    public function testSetUpToDate(): void
     {
         $this->migrationTableStatus->setUpToDate(true);
 
         self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
 
-    public function testIsUpToDateTrue() : void
+    public function testIsUpToDateTrue(): void
     {
         $this->migrationTable->expects(self::once())
             ->method('getName')
@@ -97,7 +97,7 @@ class TableStatusTest extends TestCase
         self::assertTrue($this->migrationTableStatus->isUpToDate());
     }
 
-    public function testIsUpToDateFalse() : void
+    public function testIsUpToDateFalse(): void
     {
         $this->migrationTable->expects(self::once())
             ->method('getName')
@@ -130,7 +130,7 @@ class TableStatusTest extends TestCase
         self::assertFalse($this->migrationTableStatus->isUpToDate());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->schemaManager  = $this->createMock(AbstractSchemaManager::class);
         $this->migrationTable = $this->createMock(TableDefinition::class);

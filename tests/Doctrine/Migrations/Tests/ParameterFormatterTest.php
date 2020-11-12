@@ -21,7 +21,7 @@ class ParameterFormatterTest extends TestCase
     /** @var ParameterFormatter */
     private $parameterFormatter;
 
-    public function testFormatParameters() : void
+    public function testFormatParameters(): void
     {
         $params = [
             0       => 'string value',
@@ -58,7 +58,7 @@ class ParameterFormatterTest extends TestCase
         self::assertSame($expected, $result);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
 

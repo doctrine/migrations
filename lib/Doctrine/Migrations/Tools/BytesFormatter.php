@@ -17,7 +17,7 @@ use function round;
  */
 final class BytesFormatter
 {
-    public static function formatBytes(float $size, int $precision = 2) : string
+    public static function formatBytes(float $size, int $precision = 2): string
     {
         $base     = log($size, 1024);
         $suffixes = ['', 'K', 'M', 'G', 'T'];

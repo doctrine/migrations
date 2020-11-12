@@ -12,5 +12,5 @@ use Doctrine\DBAL\Schema\Schema;
  */
 interface SchemaProviderInterface
 {
-    public function createSchema() : Schema;
+    public function createSchema(): Schema;
 }

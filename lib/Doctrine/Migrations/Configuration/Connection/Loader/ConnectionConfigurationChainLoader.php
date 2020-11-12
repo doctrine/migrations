@@ -33,7 +33,7 @@ final class ConnectionConfigurationChainLoader implements ConnectionLoaderInterf
      *
      * @throws InvalidConfiguration
      */
-    public function chosen() : ?Connection
+    public function chosen(): ?Connection
     {
         foreach ($this->loaders as $loader) {
             $confObj = $loader->chosen();

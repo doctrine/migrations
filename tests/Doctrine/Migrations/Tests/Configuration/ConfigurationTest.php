@@ -22,14 +22,17 @@ use Doctrine\Migrations\Tests\Stub\Configuration\AutoloadVersions\Version1Test;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+
 use function array_keys;
+use function assert;
 use function call_user_func_array;
+use function is_callable;
 use function sprintf;
 use function str_replace;
 
 class ConfigurationTest extends MigrationTestCase
 {
-    public function testConstructorSetsOutputWriter() : void
+    public function testConstructorSetsOutputWriter(): void
     {
         $outputWriter = $this->getOutputWriterMock();
 
@@ -41,7 +44,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
-    public function testOutputWriterIsCreatedIfNotInjected() : void
+    public function testOutputWriterIsCreatedIfNotInjected(): void
     {
         $dependencyFactory = $this->createMock(DependencyFactory::class);
 
@@ -56,7 +59,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
-    public function testOutputWriterCanBeSet() : void
+    public function testOutputWriterCanBeSet(): void
     {
         $outputWriter = $this->getOutputWriterMock();
 
@@ -66,7 +69,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($outputWriter, $configuration->getOutputWriter());
     }
 
-    public function testGetSetMigrationsColumnName() : void
+    public function testGetSetMigrationsColumnName(): void
     {
         $configuration = new Configuration($this->getConnectionMock());
 
@@ -86,7 +89,7 @@ class ConfigurationTest extends MigrationTestCase
         string $method,
         array $args,
         $expectedResult
-    ) : void {
+    ): void {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
@@ -110,7 +113,7 @@ class ConfigurationTest extends MigrationTestCase
         string $method,
         array $args,
         $expectedResult
-    ) : void {
+    ): void {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
         $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
@@ -128,8 +131,8 @@ class ConfigurationTest extends MigrationTestCase
         );
         $migrator->migrate('3Test');
 
-        /** @var callable $callable */
         $callable = [$configuration, $method];
+        assert(is_callable($callable));
 
         $result = call_user_func_array($callable, $args);
 
@@ -140,7 +143,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($expectedResult, $result);
     }
 
-    public function testGenerateVersionNumberFormatsTheDatePassedIn() : void
+    public function testGenerateVersionNumberFormatsTheDatePassedIn(): void
     {
         $configuration = new Configuration($this->getSqliteConnection());
         $now           = new DateTime('2016-07-05 01:00:00');
@@ -156,7 +159,7 @@ class ConfigurationTest extends MigrationTestCase
      * that has the current date, hour, and minute. We're really just testing
      * the `?: new DateTime(...)` bit of generateVersionNumber
      */
-    public function testGenerateVersionNumberWithoutNowUsesTheCurrentTime() : void
+    public function testGenerateVersionNumberWithoutNowUsesTheCurrentTime(): void
     {
         $configuration = new Configuration($this->getSqliteConnection());
 
@@ -172,7 +175,7 @@ class ConfigurationTest extends MigrationTestCase
      *
      * @see https://github.com/doctrine/migrations/issues/336
      */
-    public function testMasterSlaveConnectionAlwaysConnectsToMaster() : void
+    public function testMasterSlaveConnectionAlwaysConnectsToMaster(): void
     {
         $connection = $this->createMock(MasterSlaveConnection::class);
 
@@ -189,7 +192,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /** @return mixed[] */
-    public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations() : array
+    public function methodsThatNeedsVersionsLoadedWithAlreadyMigratedMigrations(): array
     {
         return [
             ['hasVersion', ['4Test'], true],
@@ -229,7 +232,7 @@ class ConfigurationTest extends MigrationTestCase
     }
 
     /** @return mixed[] */
-    public function methodsThatNeedsVersionsLoaded() : array
+    public function methodsThatNeedsVersionsLoaded(): array
     {
         return [
             ['hasVersion', ['3Test'], true],
@@ -254,7 +257,7 @@ class ConfigurationTest extends MigrationTestCase
         ];
     }
 
-    public function testGetQueryWriterShouldReturnTheObjectGivenOnTheConstructor() : void
+    public function testGetQueryWriterShouldReturnTheObjectGivenOnTheConstructor(): void
     {
         $queryWriter   = $this->createMock(QueryWriter::class);
         $configuration = new Configuration($this->getConnectionMock(), null, null, $queryWriter);
@@ -262,14 +265,14 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($queryWriter, $configuration->getQueryWriter());
     }
 
-    public function testDBWhereVersionIsKeywordReturnsColumnNameWithQuotes() : void
+    public function testDBWhereVersionIsKeywordReturnsColumnNameWithQuotes(): void
     {
         $config = new Configuration(new Connection([], new DB2Driver()));
 
         self::assertSame('"version"', $config->getQuotedMigrationsColumnName());
     }
 
-    public function testGetVersionData() : void
+    public function testGetVersionData(): void
     {
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
         $migrationRepository = $this->createMock(MigrationRepository::class);
@@ -294,7 +297,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertSame($versionData, $configuration->getVersionData($version));
     }
 
-    public function testGetSetAllOrNothing() : void
+    public function testGetSetAllOrNothing(): void
     {
         $configuration = $this->createPartialMock(Configuration::class, []);
 
@@ -305,7 +308,7 @@ class ConfigurationTest extends MigrationTestCase
         self::assertTrue($configuration->isAllOrNothing());
     }
 
-    public function testGetSetCheckDatabasePlatform() : void
+    public function testGetSetCheckDatabasePlatform(): void
     {
         $configuration = $this->createPartialMock(Configuration::class, []);
 
@@ -336,12 +339,12 @@ class ConfigurationTest extends MigrationTestCase
 final class EmptyKeywordList extends KeywordList
 {
     /** @return string[] */
-    protected function getKeywords() : array
+    protected function getKeywords(): array
     {
         return [];
     }
 
-    public function getName() : string
+    public function getName(): string
     {
         return 'EMPTY';
     }

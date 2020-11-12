@@ -12,7 +12,7 @@ class MigratorConfigurationTest extends TestCase
     /** @var MigratorConfiguration */
     private $migratorConfiguration;
 
-    public function testDryRun() : void
+    public function testDryRun(): void
     {
         self::assertFalse($this->migratorConfiguration->isDryRun());
 
@@ -21,7 +21,7 @@ class MigratorConfigurationTest extends TestCase
         self::assertTrue($this->migratorConfiguration->isDryRun());
     }
 
-    public function testTimeAllQueries() : void
+    public function testTimeAllQueries(): void
     {
         self::assertFalse($this->migratorConfiguration->getTimeAllQueries());
 
@@ -30,7 +30,7 @@ class MigratorConfigurationTest extends TestCase
         self::assertTrue($this->migratorConfiguration->getTimeAllQueries());
     }
 
-    public function testNoMigrationException() : void
+    public function testNoMigrationException(): void
     {
         self::assertFalse($this->migratorConfiguration->getNoMigrationException());
 
@@ -39,7 +39,7 @@ class MigratorConfigurationTest extends TestCase
         self::assertTrue($this->migratorConfiguration->getNoMigrationException());
     }
 
-    public function testAllOrNothing() : void
+    public function testAllOrNothing(): void
     {
         self::assertFalse($this->migratorConfiguration->isAllOrNothing());
 
@@ -48,7 +48,7 @@ class MigratorConfigurationTest extends TestCase
         self::assertTrue($this->migratorConfiguration->isAllOrNothing());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migratorConfiguration = new MigratorConfiguration();
     }

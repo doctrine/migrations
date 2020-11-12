@@ -17,7 +17,7 @@ class Helper
      *
      * @see http://stackoverflow.com/a/8688278/1645517
      */
-    public static function deleteDir(string $path) : bool
+    public static function deleteDir(string $path): bool
     {
         if ($path === '') {
             return false;

@@ -17,6 +17,7 @@ use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
 use Throwable;
+
 use function count;
 use function rtrim;
 use function sprintf;
@@ -75,7 +76,7 @@ final class Executor implements ExecutorInterface
     /**
      * @return string[]
      */
-    public function getSql() : array
+    public function getSql(): array
     {
         return $this->sql;
     }
@@ -83,7 +84,7 @@ final class Executor implements ExecutorInterface
     /**
      * @return mixed[]
      */
-    public function getParams() : array
+    public function getParams(): array
     {
         return $this->params;
     }
@@ -91,7 +92,7 @@ final class Executor implements ExecutorInterface
     /**
      * @return mixed[]
      */
-    public function getTypes() : array
+    public function getTypes(): array
     {
         return $this->types;
     }
@@ -100,7 +101,7 @@ final class Executor implements ExecutorInterface
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    public function addSql(string $sql, array $params = [], array $types = []) : void
+    public function addSql(string $sql, array $params = [], array $types = []): void
     {
         $this->sql[] = $sql;
 
@@ -116,7 +117,7 @@ final class Executor implements ExecutorInterface
         AbstractMigration $migration,
         string $direction,
         ?MigratorConfiguration $migratorConfiguration = null
-    ) : ExecutionResult {
+    ): ExecutionResult {
         $migratorConfiguration = $migratorConfiguration ?? new MigratorConfiguration();
 
         $versionExecutionResult = new ExecutionResult();
@@ -162,7 +163,7 @@ final class Executor implements ExecutorInterface
         AbstractMigration $migration,
         string $direction,
         MigratorConfiguration $migratorConfiguration
-    ) : void {
+    ): void {
         $this->sql    = [];
         $this->params = [];
         $this->types  = [];
@@ -188,7 +189,7 @@ final class Executor implements ExecutorInterface
         ExecutionResult $versionExecutionResult,
         string $direction,
         MigratorConfiguration $migratorConfiguration
-    ) : ExecutionResult {
+    ): ExecutionResult {
         $stopwatchEvent = $this->stopwatch->start('execute');
 
         $version->setState(State::PRE);
@@ -236,7 +237,7 @@ final class Executor implements ExecutorInterface
 
         $stopwatchEvent->stop();
         $periods    = $stopwatchEvent->getPeriods();
-        $lastPeriod = $periods[count($periods) -1];
+        $lastPeriod = $periods[count($periods) - 1];
 
         $versionExecutionResult->setTime($lastPeriod->getDuration());
         $versionExecutionResult->setMemory($lastPeriod->getMemory());
@@ -272,7 +273,7 @@ final class Executor implements ExecutorInterface
         return $versionExecutionResult;
     }
 
-    private function getMigrationHeader(Version $version, AbstractMigration $migration, string $direction) : string
+    private function getMigrationHeader(Version $version, AbstractMigration $migration, string $direction): string
     {
         $versionInfo = $version->getVersion();
         $description = $migration->getDescription();
@@ -294,7 +295,7 @@ final class Executor implements ExecutorInterface
         AbstractMigration $migration,
         string $direction,
         MigratorConfiguration $migratorConfiguration
-    ) : void {
+    ): void {
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode
             $this->connection->rollBack();
@@ -319,7 +320,7 @@ final class Executor implements ExecutorInterface
     /**
      * @throws Throwable
      */
-    private function migrationError(Throwable $e, Version $version, AbstractMigration $migration) : void
+    private function migrationError(Throwable $e, Version $version, AbstractMigration $migration): void
     {
         $this->outputWriter->write(sprintf(
             '<error>Migration %s failed during %s. Error %s</error>',
@@ -339,7 +340,7 @@ final class Executor implements ExecutorInterface
     private function executeVersionExecutionResult(
         Version $version,
         MigratorConfiguration $migratorConfiguration
-    ) : void {
+    ): void {
         foreach ($this->sql as $key => $query) {
             $stopwatchEvent = $this->stopwatch->start('query');
 
@@ -366,14 +367,14 @@ final class Executor implements ExecutorInterface
      * @param mixed[]|int $params
      * @param mixed[]|int $types
      */
-    private function addQueryParams($params, $types) : void
+    private function addQueryParams($params, $types): void
     {
         $index                = count($this->sql) - 1;
         $this->params[$index] = $params;
         $this->types[$index]  = $types;
     }
 
-    private function outputSqlQuery(int $idx, string $query) : void
+    private function outputSqlQuery(int $idx, string $query): void
     {
         $params = $this->parameterFormatter->formatParameters(
             $this->params[$idx] ?? [],
@@ -387,7 +388,7 @@ final class Executor implements ExecutorInterface
         )));
     }
 
-    private function getFromSchema(MigratorConfiguration $migratorConfiguration) : Schema
+    private function getFromSchema(MigratorConfiguration $migratorConfiguration): Schema
     {
         // if we're in a dry run, use the from Schema instead of reading the schema from the database
         if ($migratorConfiguration->isDryRun() && $migratorConfiguration->getFromSchema() !== null) {

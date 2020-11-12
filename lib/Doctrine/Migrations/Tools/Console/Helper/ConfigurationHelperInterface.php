@@ -14,5 +14,5 @@ interface ConfigurationHelperInterface
 {
     public function getMigrationConfig(
         InputInterface $input
-    ) : Configuration;
+    ): Configuration;
 }
