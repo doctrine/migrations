@@ -405,7 +405,6 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        /** @var Configuration|MockObject $migration */
         $config = $this->getMockBuilder(Configuration::class)
             ->disableOriginalConstructor()
             ->setMethods([

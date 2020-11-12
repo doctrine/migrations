@@ -181,7 +181,6 @@ class MigratorTest extends MigrationTestCase
         $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
-        /** @var Configuration|MockObject $migration */
         $config = $this->createMock(Configuration::class);
 
         $dependencyFactory   = $this->createMock(DependencyFactory::class);
