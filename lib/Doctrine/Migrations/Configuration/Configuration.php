@@ -201,9 +201,19 @@ final class Configuration
         return $this->checkDbPlatform;
     }
 
-    public function setMigrationOrganization(string $migrationOrganization) : void
+    public function setMigrationOrganization($migrationOrganization) : void
     {
         $this->assertNotFrozen();
+        if ($migrationOrganization === false) {
+            $this->setMigrationsAreOrganizedByYearAndMonth(false);
+
+            return;
+        }
+
+        if (! is_string($migrationOrganization)) {
+            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
+        }
+
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();
         } elseif (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
