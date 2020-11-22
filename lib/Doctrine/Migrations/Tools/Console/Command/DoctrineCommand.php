@@ -68,7 +68,7 @@ abstract class DoctrineCommand extends Command
                     ? $configurationParameter
                     : null
             );
-            $connectionLoader        = new ConfigurationFile((string) $input->getOption('db-configuration'));
+            $connectionLoader        = new ConfigurationFile($input->getOption('db-configuration'));
             $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);
         } elseif (is_string($configurationParameter)) {
             $configurationLoader = new ConfigurationFileWithFallback($configurationParameter);
