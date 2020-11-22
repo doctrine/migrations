@@ -24,6 +24,7 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Provider\DBALSchemaDiffProvider;
+use Doctrine\Migrations\Provider\EmptySchemaProvider;
 use Doctrine\Migrations\Provider\LazySchemaDiffProvider;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
@@ -235,6 +236,15 @@ class DependencyFactory
         });
     }
 
+    private function getEmptySchemaProvider() : SchemaProvider
+    {
+        return $this->getDependency(EmptySchemaProvider::class, function () : SchemaProvider {
+            return new EmptySchemaProvider(
+                $this->getConnection()->getSchemaManager()
+            );
+        });
+    }
+
     private function getSchemaProvider() : SchemaProvider
     {
         return $this->getDependency(SchemaProvider::class, function () : SchemaProvider {
@@ -251,7 +261,8 @@ class DependencyFactory
                 $this->getSchemaProvider(),
                 $this->getConnection()->getDatabasePlatform(),
                 $this->getMigrationGenerator(),
-                $this->getMigrationSqlGenerator()
+                $this->getMigrationSqlGenerator(),
+                $this->getEmptySchemaProvider()
             );
         });
     }

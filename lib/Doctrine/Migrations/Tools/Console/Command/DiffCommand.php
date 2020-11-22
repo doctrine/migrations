@@ -83,6 +83,12 @@ EOT
                 null,
                 InputOption::VALUE_NONE,
                 'Do not throw an exception when no changes are detected.'
+            )
+            ->addOption(
+                'from-empty-schema',
+                null,
+                InputOption::VALUE_NONE,
+                'Generate a full migration as if the current database was empty.'
             );
     }
 
@@ -102,6 +108,7 @@ EOT
         $lineLength      = (int) $input->getOption('line-length');
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
+        $fromEmptySchema = $input->getOption('from-empty-schema');
         $namespace       = $input->getOption('namespace');
         if ($namespace === '') {
             $namespace = null;
@@ -146,7 +153,8 @@ EOT
                 $filterExpression,
                 $formatted,
                 $lineLength,
-                $checkDbPlatform
+                $checkDbPlatform,
+                $fromEmptySchema
             );
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {

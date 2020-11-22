@@ -41,13 +41,17 @@ class DiffGenerator
     /** @var SqlGenerator */
     private $migrationSqlGenerator;
 
+    /** @var SchemaProvider */
+    private $emptySchemaProvider;
+
     public function __construct(
         DBALConfiguration $dbalConfiguration,
         AbstractSchemaManager $schemaManager,
         SchemaProvider $schemaProvider,
         AbstractPlatform $platform,
         Generator $migrationGenerator,
-        SqlGenerator $migrationSqlGenerator
+        SqlGenerator $migrationSqlGenerator,
+        SchemaProvider $emptySchemaProvider
     ) {
         $this->dbalConfiguration     = $dbalConfiguration;
         $this->schemaManager         = $schemaManager;
@@ -55,6 +59,7 @@ class DiffGenerator
         $this->platform              = $platform;
         $this->migrationGenerator    = $migrationGenerator;
         $this->migrationSqlGenerator = $migrationSqlGenerator;
+        $this->emptySchemaProvider   = $emptySchemaProvider;
     }
 
     /**
@@ -65,7 +70,8 @@ class DiffGenerator
         ?string $filterExpression,
         bool $formatted = false,
         int $lineLength = 120,
-        bool $checkDbPlatform = true
+        bool $checkDbPlatform = true,
+        bool $fromEmptySchema = false
     ) : string {
         if ($filterExpression !== null) {
             $this->dbalConfiguration->setSchemaAssetsFilter(
@@ -79,7 +85,9 @@ class DiffGenerator
             );
         }
 
-        $fromSchema = $this->createFromSchema();
+        $fromSchema = $fromEmptySchema
+            ? $this->createEmptySchema()
+            : $this->createFromSchema();
 
         $toSchema = $this->createToSchema();
 
@@ -106,6 +114,11 @@ class DiffGenerator
             $up,
             $down
         );
+    }
+
+    private function createEmptySchema() : Schema
+    {
+        return $this->emptySchemaProvider->createSchema();
     }
 
     private function createFromSchema() : Schema
