@@ -15,6 +15,7 @@ before_install:
   - mv ~/.phpenv/versions/$(phpenv version-name)/etc/conf.d/xdebug.ini{,.disabled} || echo "xdebug not available"
   - stty cols 120
   - export COLUMNS=120
+  - composer self-update --1
 
 install:
   - rm composer.lock
