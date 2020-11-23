@@ -8,5 +8,5 @@ use Doctrine\Migrations\Configuration\Configuration;
 
 interface ConfigurationLoader
 {
-    public function getConfiguration() : Configuration;
+    public function getConfiguration(): Configuration;
 }

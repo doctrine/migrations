@@ -23,7 +23,7 @@ final class DbalFactoryTest extends TestCase
     /** @var DbalMigrationFactory */
     private $versionFactory;
 
-    public function testCreateVersion() : void
+    public function testCreateVersion(): void
     {
         $migration = $this->versionFactory->createVersion(
             VersionFactoryTestMigration::class
@@ -37,7 +37,7 @@ final class DbalFactoryTest extends TestCase
         self::assertSame($this->logger, $ref->getValue($migration));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->logger     = $this->createMock(LoggerInterface::class);
@@ -51,15 +51,15 @@ final class DbalFactoryTest extends TestCase
 
 class VersionFactoryTestMigration extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function getConnection() : Connection
+    public function getConnection(): Connection
     {
         return $this->connection;
     }

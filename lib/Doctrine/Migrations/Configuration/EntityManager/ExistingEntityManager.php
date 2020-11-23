@@ -16,7 +16,7 @@ final class ExistingEntityManager implements EntityManagerLoader
         $this->entityManager = $entityManager;
     }
 
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         return $this->entityManager;
     }

@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+
 use function class_exists;
 use function file_get_contents;
 use function file_put_contents;
@@ -23,7 +24,7 @@ final class GeneratorTest extends TestCase
     /** @var Generator */
     private $migrationGenerator;
 
-    public function testGenerateMigration() : void
+    public function testGenerateMigration(): void
     {
         $path = $this->migrationGenerator->generateMigration('Test\\Version1234', '// up', '// down');
 
@@ -40,7 +41,7 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
-    public function testCustomTemplate() : void
+    public function testCustomTemplate(): void
     {
         $customTemplate = sprintf('%s/template', sys_get_temp_dir());
 
@@ -57,7 +58,7 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
-    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing() : void
+    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Path not defined for the namespace "Bar"');
@@ -65,7 +66,7 @@ final class GeneratorTest extends TestCase
         $this->migrationGenerator->generateMigration('Bar\\Version1234');
     }
 
-    public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateMissing() : void
+    public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateMissing(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
@@ -75,7 +76,7 @@ final class GeneratorTest extends TestCase
         $this->migrationGenerator->generateMigration('Test\\Version1234');
     }
 
-    public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateEmpty() : void
+    public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateEmpty(): void
     {
         $customTemplate = sprintf('%s/template', sys_get_temp_dir());
 
@@ -94,7 +95,7 @@ final class GeneratorTest extends TestCase
         unlink($customTemplate);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
         $this->configuration->addMigrationsDirectory('Test', sys_get_temp_dir());

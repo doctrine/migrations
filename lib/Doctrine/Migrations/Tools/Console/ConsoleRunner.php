@@ -28,10 +28,12 @@ use PackageVersions\Versions;
 use RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Helper\HelperSet;
+
 use function file_exists;
 use function getcwd;
 use function is_readable;
 use function sprintf;
+
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -43,7 +45,7 @@ use const DIRECTORY_SEPARATOR;
  */
 class ConsoleRunner
 {
-    public static function findDependencyFactory() : ?DependencyFactory
+    public static function findDependencyFactory(): ?DependencyFactory
     {
         // Support for using the Doctrine ORM convention of providing a `cli-config.php` file.
         $configurationDirectories = [
@@ -88,14 +90,14 @@ class ConsoleRunner
     }
 
     /** @param DoctrineCommand[] $commands */
-    public static function run(array $commands = [], ?DependencyFactory $dependencyFactory = null) : void
+    public static function run(array $commands = [], ?DependencyFactory $dependencyFactory = null): void
     {
         $cli = static::createApplication($commands, $dependencyFactory);
         $cli->run();
     }
 
     /** @param DoctrineCommand[] $commands */
-    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null) : Application
+    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null): Application
     {
         $cli = new Application('Doctrine Migrations', Versions::getVersion('doctrine/migrations'));
         $cli->setCatchExceptions(true);
@@ -105,7 +107,7 @@ class ConsoleRunner
         return $cli;
     }
 
-    public static function addCommands(Application $cli, ?DependencyFactory $dependencyFactory = null) : void
+    public static function addCommands(Application $cli, ?DependencyFactory $dependencyFactory = null): void
     {
         $cli->addCommands([
             new CurrentCommand($dependencyFactory),

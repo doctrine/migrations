@@ -18,6 +18,7 @@ use Doctrine\Migrations\Tools\Console\Command\LatestCommand;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sys_get_temp_dir;
@@ -37,7 +38,7 @@ class LatestCommandTest extends MigrationTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $configuration = new Configuration();
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
@@ -58,7 +59,7 @@ class LatestCommandTest extends MigrationTestCase
         $this->commandTester = new CommandTester($this->command);
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);

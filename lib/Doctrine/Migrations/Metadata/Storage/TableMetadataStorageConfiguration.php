@@ -21,52 +21,52 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
     /** @var string */
     private $executionTimeColumnName = 'execution_time';
 
-    public function getTableName() : string
+    public function getTableName(): string
     {
         return $this->tableName;
     }
 
-    public function setTableName(string $tableName) : void
+    public function setTableName(string $tableName): void
     {
         $this->tableName = $tableName;
     }
 
-    public function getVersionColumnName() : string
+    public function getVersionColumnName(): string
     {
         return $this->versionColumnName;
     }
 
-    public function setVersionColumnName(string $versionColumnName) : void
+    public function setVersionColumnName(string $versionColumnName): void
     {
         $this->versionColumnName = $versionColumnName;
     }
 
-    public function getVersionColumnLength() : int
+    public function getVersionColumnLength(): int
     {
         return $this->versionColumnLength;
     }
 
-    public function setVersionColumnLength(int $versionColumnLength) : void
+    public function setVersionColumnLength(int $versionColumnLength): void
     {
         $this->versionColumnLength = $versionColumnLength;
     }
 
-    public function getExecutedAtColumnName() : string
+    public function getExecutedAtColumnName(): string
     {
         return $this->executedAtColumnName;
     }
 
-    public function setExecutedAtColumnName(string $executedAtColumnName) : void
+    public function setExecutedAtColumnName(string $executedAtColumnName): void
     {
         $this->executedAtColumnName = $executedAtColumnName;
     }
 
-    public function getExecutionTimeColumnName() : string
+    public function getExecutionTimeColumnName(): string
     {
         return $this->executionTimeColumnName;
     }
 
-    public function setExecutionTimeColumnName(string $executionTimeColumnName) : void
+    public function setExecutionTimeColumnName(string $executionTimeColumnName): void
     {
         $this->executionTimeColumnName = $executionTimeColumnName;
     }

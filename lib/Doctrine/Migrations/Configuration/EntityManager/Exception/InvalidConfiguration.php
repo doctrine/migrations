@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 final class InvalidConfiguration extends InvalidArgumentException implements LoaderException
 {
-    public static function invalidArrayConfiguration() : self
+    public static function invalidArrayConfiguration(): self
     {
         return new self('The EntityManager file has to return an array with database configuration parameters.');
     }

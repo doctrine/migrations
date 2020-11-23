@@ -13,7 +13,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
  */
 class StubSchemaProviderTest extends MigrationTestCase
 {
-    public function testCreateFromSchema() : void
+    public function testCreateFromSchema(): void
     {
         $schema   = $this->createMock(Schema::class);
         $provider = new StubSchemaProvider($schema);

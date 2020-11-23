@@ -16,7 +16,7 @@ final class StatusCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:status';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['status'])
@@ -31,7 +31,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
         $infosHelper->showMigrationsInfo($output);

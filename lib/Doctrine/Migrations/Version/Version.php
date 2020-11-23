@@ -14,7 +14,7 @@ final class Version
         $this->version = $version;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return $this->version;
     }
@@ -22,7 +22,7 @@ final class Version
     /**
      * @param mixed $object
      */
-    public function equals($object) : bool
+    public function equals($object): bool
     {
         return $object instanceof self && $object->version === $this->version;
     }

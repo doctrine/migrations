@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function sprintf;
 
 /**
@@ -17,7 +18,7 @@ final class RollupCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:rollup';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -35,7 +36,7 @@ EOT
             );
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $question = sprintf(
             'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',

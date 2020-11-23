@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class ArrayLoaderTest extends TestCase
 {
-    public function testInvalidKey() : void
+    public function testInvalidKey(): void
     {
         $this->expectException(InvalidConfigurationKey::class);
         $this->expectExceptionMessage('Migrations configuration key "foo" does not exist');

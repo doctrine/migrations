@@ -18,5 +18,5 @@ interface ParameterFormatter
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    public function formatParameters(array $params, array $types) : string;
+    public function formatParameters(array $params, array $types): string;
 }

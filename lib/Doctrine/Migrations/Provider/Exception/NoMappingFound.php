@@ -8,7 +8,7 @@ use UnexpectedValueException;
 
 final class NoMappingFound extends UnexpectedValueException implements ProviderException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('No mapping information to process');
     }

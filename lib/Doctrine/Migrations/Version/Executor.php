@@ -15,7 +15,7 @@ use Doctrine\Migrations\Query\Query;
  */
 interface Executor
 {
-    public function addSql(Query $sqlQuery) : void;
+    public function addSql(Query $sqlQuery): void;
 
-    public function execute(MigrationPlan $plan, MigratorConfiguration $migratorConfiguration) : ExecutionResult;
+    public function execute(MigrationPlan $plan, MigratorConfiguration $migratorConfiguration): ExecutionResult;
 }

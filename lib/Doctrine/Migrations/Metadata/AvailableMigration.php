@@ -25,12 +25,12 @@ final class AvailableMigration
         $this->migration = $migration;
     }
 
-    public function getVersion() : Version
+    public function getVersion(): Version
     {
         return $this->version;
     }
 
-    public function getMigration() : AbstractMigration
+    public function getMigration(): AbstractMigration
     {
         return $this->migration;
     }

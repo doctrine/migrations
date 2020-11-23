@@ -22,6 +22,7 @@ use InvalidArgumentException;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -38,7 +39,7 @@ class MigrationVersionTest extends MigrationTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
@@ -63,7 +64,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-to --range-from" options on migrate only versions in interval.
      */
-    public function testAddRangeOption() : void
+    public function testAddRangeOption(): void
     {
         $mock = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
@@ -92,7 +93,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-from" options without "--range-to".
      */
-    public function testAddRangeWithoutRangeToOption() : void
+    public function testAddRangeWithoutRangeToOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
@@ -109,7 +110,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --range-to" options without "--range-from".
      */
-    public function testAddRangeWithoutRangeFromOption() : void
+    public function testAddRangeWithoutRangeFromOption(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --range-to and --range-from should be used together.');
@@ -126,7 +127,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all --range-to" options.
      */
-    public function testAddAllOptionsWithRangeTo() : void
+    public function testAddAllOptionsWithRangeTo(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
@@ -144,7 +145,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all --range-from" options.
      */
-    public function testAddAllOptionsWithRangeFrom() : void
+    public function testAddAllOptionsWithRangeFrom(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Options --all and --range-to/--range-from both used. You should use only one of them.');
@@ -162,7 +163,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete --range-to --range-from" options on migrate down only versions in interval.
      */
-    public function testDeleteRangeOption() : void
+    public function testDeleteRangeOption(): void
     {
         $mock = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
@@ -196,7 +197,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add --all" options on migrate all versions.
      */
-    public function testAddAllOption() : void
+    public function testAddAllOption(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
 
@@ -225,7 +226,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete --all" options on migrate down all versions.
      */
-    public function testDeleteAllOption() : void
+    public function testDeleteAllOption(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
@@ -254,7 +255,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate one version.
      */
-    public function testAddOption() : void
+    public function testAddOption(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
 
@@ -278,7 +279,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" options on migrate down one version.
      */
-    public function testDeleteOption() : void
+    public function testDeleteOption(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
@@ -307,7 +308,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--add" option on migrate already migrated version.
      */
-    public function testAddOptionIfVersionAlreadyMigrated() : void
+    public function testAddOptionIfVersionAlreadyMigrated(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" already exists in the version table.');
@@ -332,7 +333,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" option on not migrated version.
      */
-    public function testDeleteOptionIfVersionNotMigrated() : void
+    public function testDeleteOptionIfVersionNotMigrated(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
@@ -352,7 +353,7 @@ class MigrationVersionTest extends MigrationTestCase
     /**
      * Test "--delete" option on migrated version without existing version file.
      */
-    public function testDeleteOptionIfVersionFileDoesNotExist() : void
+    public function testDeleteOptionIfVersionFileDoesNotExist(): void
     {
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);

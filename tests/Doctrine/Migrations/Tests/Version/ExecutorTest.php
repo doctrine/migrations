@@ -65,7 +65,7 @@ class ExecutorTest extends TestCase
     /** @var MockObject */
     private $metadataStorage;
 
-    public function testAddSql() : void
+    public function testAddSql(): void
     {
         $query = new Query('SELECT 1', [1], [2]);
         $this->versionExecutor->addSql($query);
@@ -74,7 +74,7 @@ class ExecutorTest extends TestCase
         self::assertSame($query, $this->versionExecutor->getSql()[0]);
     }
 
-    public function testExecuteWithNoQueries() : void
+    public function testExecuteWithNoQueries(): void
     {
         $migratorConfiguration = new MigratorConfiguration();
 
@@ -100,11 +100,11 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    public function testExecuteUp() : void
+    public function testExecuteUp(): void
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result) : void {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::UP, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
@@ -147,30 +147,10 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    public function testExecuteUsedExecuteUpdate() : void
-    {
-        $this->connection
-            ->expects(self::never())
-            ->method('executeQuery');
-        $this->connection
-            ->expects(self::exactly(2))
-            ->method('executeUpdate');
-
-        $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
-
-        $migratorConfiguration = (new MigratorConfiguration())
-            ->setTimeAllQueries(true);
-
-        $this->versionExecutor->execute(
-            $plan,
-            $migratorConfiguration
-        );
-    }
-
     /**
      * @test
      */
-    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty() : void
+    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->migration->setDescription('testing');
 
@@ -183,11 +163,11 @@ class ExecutorTest extends TestCase
         self::assertSame('++ migrating test (testing)', $this->logger->logs[0]);
     }
 
-    public function testExecuteDown() : void
+    public function testExecuteDown(): void
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result) : void {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::DOWN, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
@@ -230,7 +210,7 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    public function testExecuteDryRun() : void
+    public function testExecuteDryRun(): void
     {
         $this->metadataStorage
             ->expects(self::never())
@@ -283,7 +263,7 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function testSkipMigration() : void
+    public function testSkipMigration(): void
     {
         $this->metadataStorage
             ->expects(self::never())
@@ -292,7 +272,7 @@ class ExecutorTest extends TestCase
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
-        $listener = new class() {
+        $listener = new class () {
             /** @var bool */
             public $onMigrationsVersionExecuting = false;
             /** @var bool */
@@ -300,17 +280,17 @@ class ExecutorTest extends TestCase
             /** @var bool */
             public $onMigrationsVersionSkipped = false;
 
-            public function onMigrationsVersionExecuting() : void
+            public function onMigrationsVersionExecuting(): void
             {
                 $this->onMigrationsVersionExecuting = true;
             }
 
-            public function onMigrationsVersionExecuted() : void
+            public function onMigrationsVersionExecuted(): void
             {
                 $this->onMigrationsVersionExecuted = true;
             }
 
-            public function onMigrationsVersionSkipped() : void
+            public function onMigrationsVersionSkipped(): void
             {
                 $this->onMigrationsVersionSkipped = true;
             }
@@ -343,25 +323,25 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function testMigrationEvents() : void
+    public function testMigrationEvents(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
-        $listener = new class() {
+        $listener = new class () {
             /** @var bool */
             public $onMigrationsVersionExecuting = false;
             /** @var bool */
             public $onMigrationsVersionExecuted = false;
 
-            public function onMigrationsVersionExecuting() : void
+            public function onMigrationsVersionExecuting(): void
             {
                 $this->onMigrationsVersionExecuting = true;
             }
 
-            public function onMigrationsVersionExecuted() : void
+            public function onMigrationsVersionExecuted(): void
             {
                 $this->onMigrationsVersionExecuted = true;
             }
@@ -380,7 +360,7 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function testErrorMigration() : void
+    public function testErrorMigration(): void
     {
         $this->metadataStorage
             ->expects(self::never())
@@ -392,7 +372,7 @@ class ExecutorTest extends TestCase
         $plan                   = new MigrationPlan($this->version, $this->migration, Direction::UP);
         $this->migration->error = true;
 
-        $listener = new class() {
+        $listener = new class () {
             /** @var bool */
             public $onMigrationsVersionExecuting = false;
             /** @var bool */
@@ -400,17 +380,17 @@ class ExecutorTest extends TestCase
             /** @var bool */
             public $onMigrationsVersionSkipped = false;
 
-            public function onMigrationsVersionExecuting() : void
+            public function onMigrationsVersionExecuting(): void
             {
                 $this->onMigrationsVersionExecuting = true;
             }
 
-            public function onMigrationsVersionExecuted() : void
+            public function onMigrationsVersionExecuted(): void
             {
                 $this->onMigrationsVersionExecuted = true;
             }
 
-            public function onMigrationsVersionSkipped() : void
+            public function onMigrationsVersionSkipped(): void
             {
                 $this->onMigrationsVersionSkipped = true;
             }
@@ -445,7 +425,7 @@ class ExecutorTest extends TestCase
         self::assertFalse($migrationSucceed);
     }
 
-    public function testChangesNotCommittedIfMetadataFailure() : void
+    public function testChangesNotCommittedIfMetadataFailure(): void
     {
         $this->metadataStorage
             ->expects(self::once())
@@ -465,7 +445,7 @@ class ExecutorTest extends TestCase
 
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
-        $listener = new class() {
+        $listener = new class () {
             /** @var bool */
             public $onMigrationsVersionExecuting = false;
             /** @var bool */
@@ -473,17 +453,17 @@ class ExecutorTest extends TestCase
             /** @var bool */
             public $onMigrationsVersionSkipped = false;
 
-            public function onMigrationsVersionExecuting() : void
+            public function onMigrationsVersionExecuting(): void
             {
                 $this->onMigrationsVersionExecuting = true;
             }
 
-            public function onMigrationsVersionExecuted() : void
+            public function onMigrationsVersionExecuted(): void
             {
                 $this->onMigrationsVersionExecuted = true;
             }
 
-            public function onMigrationsVersionSkipped() : void
+            public function onMigrationsVersionSkipped(): void
             {
                 $this->onMigrationsVersionSkipped = true;
             }
@@ -521,7 +501,7 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty() : void
+    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -536,7 +516,7 @@ class ExecutorTest extends TestCase
         self::assertSame('++ reverting test', $this->logger->logs[0]);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->metadataStorage    = $this->createMock(MetadataStorage::class);
         $this->connection         = $this->createMock(Connection::class);

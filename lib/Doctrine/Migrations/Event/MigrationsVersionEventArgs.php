@@ -33,17 +33,17 @@ final class MigrationsVersionEventArgs extends EventArgs
         $this->migratorConfiguration = $migratorConfiguration;
     }
 
-    public function getConnection() : Connection
+    public function getConnection(): Connection
     {
         return $this->connection;
     }
 
-    public function getPlan() : MigrationPlan
+    public function getPlan(): MigrationPlan
     {
         return $this->plan;
     }
 
-    public function getMigratorConfiguration() : MigratorConfiguration
+    public function getMigratorConfiguration(): MigratorConfiguration
     {
         return $this->migratorConfiguration;
     }

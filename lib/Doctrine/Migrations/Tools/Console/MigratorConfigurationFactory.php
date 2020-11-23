@@ -9,5 +9,5 @@ use Symfony\Component\Console\Input\InputInterface;
 
 interface MigratorConfigurationFactory
 {
-    public function getMigratorConfiguration(InputInterface $input) : MigratorConfiguration;
+    public function getMigratorConfiguration(InputInterface $input): MigratorConfiguration;
 }

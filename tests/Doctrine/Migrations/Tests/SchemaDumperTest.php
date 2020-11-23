@@ -33,7 +33,7 @@ class SchemaDumperTest extends TestCase
     /** @var SchemaDumper */
     private $schemaDumper;
 
-    public function testDumpNoTablesException() : void
+    public function testDumpNoTablesException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
@@ -51,7 +51,7 @@ class SchemaDumperTest extends TestCase
         $this->schemaDumper->dump('Foo\\1234');
     }
 
-    public function testDump() : void
+    public function testDump(): void
     {
         $table = $this->createMock(Table::class);
         $table->expects(self::once())
@@ -94,7 +94,7 @@ class SchemaDumperTest extends TestCase
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
     }
 
-    public function testExcludedTableIsNotInTheDump() : void
+    public function testExcludedTableIsNotInTheDump(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
@@ -129,7 +129,7 @@ class SchemaDumperTest extends TestCase
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
     }
 
-    public function testRegexErrorsAreConvertedToExceptions() : void
+    public function testRegexErrorsAreConvertedToExceptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Internal PCRE error, please check your Regex. Reported errors: preg_match(): Delimiter must not be alphanumeric or backslash.');
@@ -152,7 +152,7 @@ class SchemaDumperTest extends TestCase
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['invalid regex']));
     }
 
-    public function testExcludedTableViaParamIsNotInTheDump() : void
+    public function testExcludedTableViaParamIsNotInTheDump(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
@@ -187,7 +187,7 @@ class SchemaDumperTest extends TestCase
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['/other_skipped_table_name/']));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->platform              = $this->createMock(AbstractPlatform::class);
         $this->schemaManager         = $this->createMock(AbstractSchemaManager::class);

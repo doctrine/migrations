@@ -9,6 +9,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Query\Query;
 use RuntimeException;
 use Throwable;
+
 use function count;
 
 /**
@@ -62,27 +63,27 @@ final class ExecutionResult
         $this->direction  = $direction;
     }
 
-    public function getDirection() : string
+    public function getDirection(): string
     {
         return $this->direction;
     }
 
-    public function getExecutedAt() : ?DateTimeImmutable
+    public function getExecutedAt(): ?DateTimeImmutable
     {
         return $this->executedAt;
     }
 
-    public function setExecutedAt(DateTimeImmutable $executedAt) : void
+    public function setExecutedAt(DateTimeImmutable $executedAt): void
     {
         $this->executedAt = $executedAt;
     }
 
-    public function getVersion() : Version
+    public function getVersion(): Version
     {
         return $this->version;
     }
 
-    public function hasSql() : bool
+    public function hasSql(): bool
     {
         return count($this->sql) !== 0;
     }
@@ -90,7 +91,7 @@ final class ExecutionResult
     /**
      * @return Query[]
      */
-    public function getSql() : array
+    public function getSql(): array
     {
         return $this->sql;
     }
@@ -98,63 +99,63 @@ final class ExecutionResult
     /**
      * @param Query[] $sql
      */
-    public function setSql(array $sql) : void
+    public function setSql(array $sql): void
     {
         $this->sql = $sql;
     }
 
-    public function getTime() : ?float
+    public function getTime(): ?float
     {
         return $this->time;
     }
 
-    public function setTime(float $time) : void
+    public function setTime(float $time): void
     {
         $this->time = $time;
     }
 
-    public function getMemory() : ?float
+    public function getMemory(): ?float
     {
         return $this->memory;
     }
 
-    public function setMemory(float $memory) : void
+    public function setMemory(float $memory): void
     {
         $this->memory = $memory;
     }
 
-    public function setSkipped(bool $skipped) : void
+    public function setSkipped(bool $skipped): void
     {
         $this->skipped = $skipped;
     }
 
-    public function isSkipped() : bool
+    public function isSkipped(): bool
     {
         return $this->skipped;
     }
 
-    public function setError(bool $error, ?Throwable $exception = null) : void
+    public function setError(bool $error, ?Throwable $exception = null): void
     {
         $this->error     = $error;
         $this->exception = $exception;
     }
 
-    public function hasError() : bool
+    public function hasError(): bool
     {
         return $this->error;
     }
 
-    public function getException() : ?Throwable
+    public function getException(): ?Throwable
     {
         return $this->exception;
     }
 
-    public function setToSchema(Schema $toSchema) : void
+    public function setToSchema(Schema $toSchema): void
     {
         $this->toSchema = $toSchema;
     }
 
-    public function getToSchema() : Schema
+    public function getToSchema(): Schema
     {
         if ($this->toSchema === null) {
             throw new RuntimeException('Cannot call getToSchema() when toSchema is null.');
@@ -163,12 +164,12 @@ final class ExecutionResult
         return $this->toSchema;
     }
 
-    public function getState() : int
+    public function getState(): int
     {
         return $this->state;
     }
 
-    public function setState(int $state) : void
+    public function setState(int $state): void
     {
         $this->state = $state;
     }

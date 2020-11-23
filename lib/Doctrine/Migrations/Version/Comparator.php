@@ -6,5 +6,5 @@ namespace Doctrine\Migrations\Version;
 
 interface Comparator
 {
-    public function compare(Version $a, Version $b) : int;
+    public function compare(Version $a, Version $b): int;
 }

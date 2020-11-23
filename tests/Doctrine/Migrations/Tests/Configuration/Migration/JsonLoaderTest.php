@@ -10,14 +10,14 @@ use Doctrine\Migrations\Configuration\Migration\JsonFile;
 
 class JsonLoaderTest extends LoaderTest
 {
-    public function load(string $prefix = '') : Configuration
+    public function load(string $prefix = ''): Configuration
     {
-        $loader = new JsonFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.json');
+        $loader = new JsonFile(__DIR__ . '/../_files/config' . ($prefix !== '' ? '_' . $prefix : '') . '.json');
 
         return $loader->getConfiguration();
     }
 
-    public function testMalformed() : void
+    public function testMalformed(): void
     {
         $this->expectException(JsonNotValid::class);
         $this->load('malformed');

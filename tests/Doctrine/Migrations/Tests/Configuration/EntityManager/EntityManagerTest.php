@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 final class EntityManagerTest extends TestCase
 {
-    public function testExistingEntityManagerLoader() : void
+    public function testExistingEntityManagerLoader(): void
     {
         $em     = $this->createMock(EntityManager::class);
         $loader = new ExistingEntityManager($em);
@@ -22,7 +22,7 @@ final class EntityManagerTest extends TestCase
         self::assertSame($em, $loader->getEntityManager());
     }
 
-    public function testArrayEntityManagerConfigurationLoader() : void
+    public function testArrayEntityManagerConfigurationLoader(): void
     {
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-loader.php');
         $em     = $loader->getEntityManager();
@@ -30,7 +30,7 @@ final class EntityManagerTest extends TestCase
         self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 
-    public function testArrayEntityManagerConfigurationLoaderWithEntityManagerInstance() : void
+    public function testArrayEntityManagerConfigurationLoaderWithEntityManagerInstance(): void
     {
         $loader = new ConfigurationFile(__DIR__ . '/_files/migrations-em.php');
         $em     = $loader->getEntityManager();
@@ -38,14 +38,14 @@ final class EntityManagerTest extends TestCase
         self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 
-    public function testArrayEntityManagerConfigurationLoaderInvalid() : void
+    public function testArrayEntityManagerConfigurationLoaderInvalid(): void
     {
         $this->expectException(InvalidConfiguration::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-invalid.php');
         $loader->getEntityManager();
     }
 
-    public function testArrayEntityManagerConfigurationLoaderNotFound() : void
+    public function testArrayEntityManagerConfigurationLoaderNotFound(): void
     {
         $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');

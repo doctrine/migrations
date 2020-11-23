@@ -10,6 +10,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function array_map;
 use function getcwd;
 use function implode;
@@ -25,7 +26,7 @@ final class ExecuteCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:execute';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['execute'])
@@ -34,7 +35,7 @@ final class ExecuteCommand extends DoctrineCommand
             )
             ->addArgument(
                 'versions',
-                InputArgument::REQUIRED|InputArgument::IS_ARRAY,
+                InputArgument::REQUIRED | InputArgument::IS_ARRAY,
                 'The versions to execute.',
                 null
             )
@@ -100,7 +101,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
@@ -130,7 +131,7 @@ EOT
         }
 
         $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
-        $plan           = $planCalculator->getPlanForVersions(array_map(static function (string $version) : Version {
+        $plan           = $planCalculator->getPlanForVersions(array_map(static function (string $version): Version {
             return new Version($version);
         }, $versions), $direction);
 

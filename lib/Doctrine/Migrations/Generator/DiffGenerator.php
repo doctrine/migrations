@@ -11,6 +11,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
+
 use function preg_match;
 use function strpos;
 use function substr;
@@ -72,7 +73,7 @@ class DiffGenerator
         int $lineLength = 120,
         bool $checkDbPlatform = true,
         bool $fromEmptySchema = false
-    ) : string {
+    ): string {
         if ($filterExpression !== null) {
             $this->dbalConfiguration->setSchemaAssetsFilter(
                 static function ($assetName) use ($filterExpression) {
@@ -116,17 +117,17 @@ class DiffGenerator
         );
     }
 
-    private function createEmptySchema() : Schema
+    private function createEmptySchema(): Schema
     {
         return $this->emptySchemaProvider->createSchema();
     }
 
-    private function createFromSchema() : Schema
+    private function createFromSchema(): Schema
     {
         return $this->schemaManager->createSchema();
     }
 
-    private function createToSchema() : Schema
+    private function createToSchema(): Schema
     {
         $toSchema = $this->schemaProvider->createSchema();
 
@@ -153,7 +154,7 @@ class DiffGenerator
      * a namespaced name with the form `{namespace}.{tableName}`. This extracts
      * the table name from that.
      */
-    private function resolveTableName(string $name) : string
+    private function resolveTableName(string $name): string
     {
         $pos = strpos($name, '.');
 

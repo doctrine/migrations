@@ -21,5 +21,5 @@ interface ConnectionLoader
      *
      * @throws ConnectionNotSpecified
      */
-    public function getConnection() : Connection;
+    public function getConnection(): Connection;
 }

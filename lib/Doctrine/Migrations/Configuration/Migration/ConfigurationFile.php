@@ -22,7 +22,7 @@ abstract class ConfigurationFile implements ConfigurationLoader
      *
      * @return array<string,string>
      */
-    final protected function getDirectoriesRelativeToFile(array $directories, string $file) : array
+    final protected function getDirectoriesRelativeToFile(array $directories, string $file): array
     {
         foreach ($directories as $ns => $dir) {
             $path = realpath(dirname($file) . '/' . $dir);

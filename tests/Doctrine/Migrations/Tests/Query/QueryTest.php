@@ -10,7 +10,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
 
 final class QueryTest extends MigrationTestCase
 {
-    public function testGetQuery() : void
+    public function testGetQuery(): void
     {
         $query = new Query('foo', ['bar', 'baz'], ['qux', 'quux']);
 
@@ -20,7 +20,7 @@ final class QueryTest extends MigrationTestCase
         self::assertSame(['qux', 'quux'], $query->getTypes());
     }
 
-    public function testInvalidTypeArguments() : void
+    public function testInvalidTypeArguments(): void
     {
         $this->expectException(InvalidArguments::class);
         $this->expectExceptionMessage('The number of types (2) is higher than the number of passed parameters (1) for the query "Select 1".');

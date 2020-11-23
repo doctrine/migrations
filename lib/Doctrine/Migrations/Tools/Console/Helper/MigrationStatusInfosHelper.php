@@ -19,6 +19,7 @@ use Symfony\Component\Console\Helper\TableCell;
 use Symfony\Component\Console\Helper\TableSeparator;
 use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
+
 use function array_unshift;
 use function count;
 use function get_class;
@@ -71,7 +72,7 @@ class MigrationStatusInfosHelper
     /**
      * @param Version[] $versions
      */
-    public function listVersions(array $versions, OutputInterface $output) : void
+    public function listVersions(array $versions, OutputInterface $output): void
     {
         $table = new Table($output);
         $table->setHeaders(
@@ -112,7 +113,7 @@ class MigrationStatusInfosHelper
                 (string) $version,
                 $status,
                 (string) $executedAt,
-                $executionTime !== null ? $executionTime . 's': '',
+                $executionTime !== null ? $executionTime . 's' : '',
                 $description,
             ]);
         }
@@ -120,7 +121,7 @@ class MigrationStatusInfosHelper
         $table->render();
     }
 
-    public function showMigrationsInfo(OutputInterface $output) : void
+    public function showMigrationsInfo(OutputInterface $output): void
     {
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrations = $this->migrationPlanCalculator->getMigrations();
@@ -139,7 +140,7 @@ class MigrationStatusInfosHelper
 
         $dataGroup = [
             'Storage' => [
-                'Type' => $storage!== null ? get_class($storage) : null,
+                'Type' => $storage !== null ? get_class($storage) : null,
             ],
             'Database' => [
                 'Driver' => get_class($this->connection->getDriver()),
@@ -197,7 +198,7 @@ class MigrationStatusInfosHelper
         $table->render();
     }
 
-    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsList $executedMigrations) : string
+    private function getFormattedVersionAlias(string $alias, ExecutedMigrationsList $executedMigrations): string
     {
         try {
             $version = $this->aliasResolver->resolveVersionAlias($alias);

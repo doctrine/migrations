@@ -10,14 +10,14 @@ use Doctrine\Migrations\Configuration\Migration\YamlFile;
 
 class YamlLoaderTest extends LoaderTest
 {
-    public function load(string $prefix = '') : Configuration
+    public function load(string $prefix = ''): Configuration
     {
-        $loader = new YamlFile(__DIR__ . '/../_files/config' . ($prefix!==''? '_' . $prefix : '') . '.yml');
+        $loader = new YamlFile(__DIR__ . '/../_files/config' . ($prefix !== '' ? '_' . $prefix : '') . '.yml');
 
         return $loader->getConfiguration();
     }
 
-    public function testMalformed() : void
+    public function testMalformed(): void
     {
         $this->expectException(YamlNotValid::class);
 

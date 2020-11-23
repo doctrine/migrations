@@ -12,7 +12,7 @@ use PHPUnit\Framework\TestCase;
 
 class ConfigurationTest extends TestCase
 {
-    public function testBase() : void
+    public function testBase(): void
     {
         $storage = $this->createMock(MetadataStorageConfiguration::class);
 
@@ -45,7 +45,7 @@ class ConfigurationTest extends TestCase
         self::assertFalse($config->areMigrationsOrganizedByYear());
     }
 
-    public function testFreezeConfiguration() : void
+    public function testFreezeConfiguration(): void
     {
         $config = new Configuration();
         $config->addMigrationsDirectory('foo', 'bar');
@@ -56,7 +56,7 @@ class ConfigurationTest extends TestCase
         $config->setAllOrNothing(false);
     }
 
-    public function testMigrationOrganizationByYear() : void
+    public function testMigrationOrganizationByYear(): void
     {
         $config = new Configuration();
         $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR);
@@ -65,7 +65,7 @@ class ConfigurationTest extends TestCase
         self::assertTrue($config->areMigrationsOrganizedByYear());
     }
 
-    public function testMigrationOrganizationByYearAndMonth() : void
+    public function testMigrationOrganizationByYearAndMonth(): void
     {
         $config = new Configuration();
         $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
@@ -74,7 +74,7 @@ class ConfigurationTest extends TestCase
         self::assertTrue($config->areMigrationsOrganizedByYear());
     }
 
-    public function testMigrationOrganizationWithWrongValue() : void
+    public function testMigrationOrganizationWithWrongValue(): void
     {
         $this->expectException(UnknownConfigurationValue::class);
         $config = new Configuration();

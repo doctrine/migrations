@@ -16,17 +16,21 @@ use function strtolower;
  */
 class BooleanStringFormatter
 {
-    public static function toBoolean(string $value, bool $default) : bool
+    public static function toBoolean(string $value, bool $default): bool
     {
         switch (strtolower($value)) {
             case 'true':
                 return true;
+
             case '1':
                 return true;
+
             case 'false':
                 return false;
+
             case '0':
                 return false;
+
             default:
                 return $default;
         }

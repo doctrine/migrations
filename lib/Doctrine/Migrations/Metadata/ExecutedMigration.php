@@ -33,17 +33,17 @@ final class ExecutedMigration
         $this->executionTime = $executionTime;
     }
 
-    public function getExecutionTime() : ?float
+    public function getExecutionTime(): ?float
     {
         return $this->executionTime;
     }
 
-    public function getExecutedAt() : ?DateTimeImmutable
+    public function getExecutedAt(): ?DateTimeImmutable
     {
         return $this->executedAt;
     }
 
-    public function getVersion() : Version
+    public function getVersion(): Version
     {
         return $this->version;
     }

@@ -13,11 +13,12 @@ use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function sys_get_temp_dir;
 
 class DoctrineCommandTest extends MigrationTestCase
 {
-    public function testCommandFreezes() : void
+    public function testCommandFreezes(): void
     {
         $dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->disableOriginalConstructor()
@@ -28,9 +29,9 @@ class DoctrineCommandTest extends MigrationTestCase
             ->expects(self::once())
             ->method('freeze');
 
-        $command       = new class($dependencyFactory) extends DoctrineCommand
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
             }
@@ -43,7 +44,7 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
-    public function testCustomConfiguration() : void
+    public function testCustomConfiguration(): void
     {
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
@@ -55,9 +56,9 @@ class DoctrineCommandTest extends MigrationTestCase
             new ExistingConnection($conn)
         );
 
-        $command       = new class($dependencyFactory) extends DoctrineCommand
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $migrationDirectories = $this->getDependencyFactory()->getConfiguration()->getMigrationDirectories();
                 DoctrineCommandTest::assertSame(['DoctrineMigrationsTest' => 'bar'], $migrationDirectories);

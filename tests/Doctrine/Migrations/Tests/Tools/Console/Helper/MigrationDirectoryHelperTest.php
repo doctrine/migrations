@@ -9,11 +9,13 @@ use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
+
 use function date;
 use function mkdir;
 use function sys_get_temp_dir;
 use function tempnam;
 use function unlink;
+
 use const DIRECTORY_SEPARATOR;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
@@ -27,7 +29,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
     /** @var string */
     private $tempDir;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->mirationDirectoryHelper = new MigrationDirectoryHelper();
         $this->configuration           = new Configuration();
@@ -38,12 +40,12 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         $this->configuration->addMigrationsDirectory('DoctrineMigrations', $this->tempDir);
     }
 
-    public function tearDown() : void
+    public function tearDown(): void
     {
         Helper::deleteDir($this->tempDir);
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDir() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDir(): void
     {
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
             $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
@@ -51,7 +53,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         }
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYear(): void
     {
         $this->configuration->setMigrationsAreOrganizedByYear(true);
 
@@ -63,7 +65,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         }
     }
 
-    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth() : void
+    public function testMigrationDirectoryHelperReturnConfiguredDirWithYearAndMonth(): void
     {
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
@@ -75,7 +77,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         }
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists() : void
+    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
     {
         $this->expectException(InvalidArgumentException::class);
 

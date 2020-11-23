@@ -14,10 +14,10 @@ use Doctrine\DBAL\Schema\Schema;
  */
 interface SchemaDiffProvider
 {
-    public function createFromSchema() : Schema;
+    public function createFromSchema(): Schema;
 
-    public function createToSchema(Schema $fromSchema) : Schema;
+    public function createToSchema(Schema $fromSchema): Schema;
 
     /** @return string[] */
-    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema) : array;
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array;
 }

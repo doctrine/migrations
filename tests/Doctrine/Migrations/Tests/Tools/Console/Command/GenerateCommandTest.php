@@ -12,6 +12,7 @@ use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sys_get_temp_dir;
@@ -34,7 +35,7 @@ final class GenerateCommandTest extends TestCase
     /** @var CommandTester */
     private $generateCommandTest;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -53,7 +54,7 @@ final class GenerateCommandTest extends TestCase
         ], array_map('trim', explode("\n", trim($output))));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());

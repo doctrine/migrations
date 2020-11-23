@@ -6,13 +6,15 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Phar;
+
 use function extension_loaded;
 use function file_exists;
 use function fwrite;
+
 use const PHP_EOL;
 use const STDERR;
 
-(static function () : void {
+(static function (): void {
     $autoloadFiles = [
         __DIR__ . '/../vendor/autoload.php',
         __DIR__ . '/../../../autoload.php',

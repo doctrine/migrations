@@ -13,7 +13,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
  */
 interface MigrationStatusCalculator
 {
-    public function getExecutedUnavailableMigrations() : ExecutedMigrationsList;
+    public function getExecutedUnavailableMigrations(): ExecutedMigrationsList;
 
-    public function getNewMigrations() : AvailableMigrationsList;
+    public function getNewMigrations(): AvailableMigrationsList;
 }

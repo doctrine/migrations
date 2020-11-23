@@ -28,19 +28,19 @@ class FilesystemMigrationsRepositoryTest extends TestCase
     /** @var MigrationsRepository */
     private $migrationRepository;
 
-    public function testCheckNonExistentMigration() : void
+    public function testCheckNonExistentMigration(): void
     {
         self::assertFalse($this->migrationRepository->hasMigration('non_existent'));
     }
 
-    public function testGetNonExistentMigration() : void
+    public function testGetNonExistentMigration(): void
     {
         $this->expectException(MigrationClassNotFound::class);
 
         $this->migrationRepository->getMigration(new Version('non_existent'));
     }
 
-    public function testGetOneMigration() : void
+    public function testGetOneMigration(): void
     {
         $migration = $this->migrationRepository->getMigration(new Version(A::class));
 
@@ -48,7 +48,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
         self::assertInstanceOf(A::class, $migration->getMigration());
     }
 
-    public function testLoadMigrationClassesProvidedViaConstructor() : void
+    public function testLoadMigrationClassesProvidedViaConstructor(): void
     {
         $migrationRepository = new FilesystemMigrationsRepository(
             [A::class],
@@ -63,7 +63,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
         self::assertInstanceOf(A::class, $migrations->getMigration(new Version(A::class))->getMigration());
     }
 
-    public function testNoMigrationsInFolder() : void
+    public function testNoMigrationsInFolder(): void
     {
         $migrationRepository = new FilesystemMigrationsRepository(
             [],
@@ -79,7 +79,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
         self::assertCount(0, $migrations);
     }
 
-    public function testLoadMigrationInstance() : void
+    public function testLoadMigrationInstance(): void
     {
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
 
@@ -92,14 +92,14 @@ class FilesystemMigrationsRepositoryTest extends TestCase
         self::assertSame('Z', (string) $migration->getVersion());
     }
 
-    public function testDuplicateLoadMigrationInstance() : void
+    public function testDuplicateLoadMigrationInstance(): void
     {
         $this->expectException(DuplicateMigrationVersion::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
     }
 
-    public function testFindMigrations() : void
+    public function testFindMigrations(): void
     {
         $this->versionFactory
             ->expects(self::exactly(3))
@@ -115,7 +115,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
         self::assertFalse($migrations->hasMigration(new Version('Z')));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->versionFactory = $this->createMock(MigrationFactory::class);
         $this->versionFactory

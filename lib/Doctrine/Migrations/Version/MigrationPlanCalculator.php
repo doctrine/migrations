@@ -16,12 +16,12 @@ interface MigrationPlanCalculator
     /**
      * @param Version[] $versions
      */
-    public function getPlanForVersions(array $versions, string $direction) : MigrationPlanList;
+    public function getPlanForVersions(array $versions, string $direction): MigrationPlanList;
 
-    public function getPlanUntilVersion(Version $to) : MigrationPlanList;
+    public function getPlanUntilVersion(Version $to): MigrationPlanList;
 
     /**
      * Returns a sorted list of migrations.
      */
-    public function getMigrations() : AvailableMigrationsList;
+    public function getMigrations(): AvailableMigrationsList;
 }

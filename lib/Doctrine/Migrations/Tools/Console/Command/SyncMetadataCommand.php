@@ -12,7 +12,7 @@ final class SyncMetadataCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:sync-metadata-storage';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -30,7 +30,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : int {
+    ): int {
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 
         $this->io->success('Metadata storage synchronized');

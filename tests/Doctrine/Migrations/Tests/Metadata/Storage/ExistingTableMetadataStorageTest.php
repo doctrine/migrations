@@ -20,6 +20,7 @@ use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
+
 use function sprintf;
 
 class ExistingTableMetadataStorageTest extends TestCase
@@ -39,14 +40,14 @@ class ExistingTableMetadataStorageTest extends TestCase
     /** @var MigrationsRepository */
     private $migrationRepository;
 
-    private function getSqliteConnection() : Connection
+    private function getSqliteConnection(): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
         return DriverManager::getConnection($params);
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->connection    = $this->getSqliteConnection();
         $this->schemaManager = $this->connection->getSchemaManager();
@@ -73,11 +74,11 @@ class ExistingTableMetadataStorageTest extends TestCase
         // create partial table
         $table = new Table($this->config->getTableName());
         $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
-        $table->setPrimaryKey([ $this->config->getVersionColumnName()]);
+        $table->setPrimaryKey([$this->config->getVersionColumnName()]);
         $this->schemaManager->createTable($table);
     }
 
-    public function testMasterSlaveConnectionGetsConnected() : void
+    public function testMasterSlaveConnectionGetsConnected(): void
     {
         $connection = $this->createMock(MasterSlaveConnection::class);
         $connection
@@ -99,7 +100,7 @@ class ExistingTableMetadataStorageTest extends TestCase
         $storage->ensureInitialized();
     }
 
-    public function testMigratedVersionUpdate() : void
+    public function testMigratedVersionUpdate(): void
     {
         $this->connection->insert($this->config->getTableName(), [$this->config->getVersionColumnName() => '1234']);
         $this->connection->insert($this->config->getTableName(), [$this->config->getVersionColumnName() => '5678']);

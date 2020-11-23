@@ -9,7 +9,7 @@ class C
     /** @var int|null */
     private $id;
 
-    public function getId() : ?int
+    public function getId(): ?int
     {
         return $this->id;
     }

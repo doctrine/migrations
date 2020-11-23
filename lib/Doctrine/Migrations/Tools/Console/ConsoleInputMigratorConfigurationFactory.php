@@ -18,7 +18,7 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
         $this->configuration = $configuration;
     }
 
-    public function getMigratorConfiguration(InputInterface $input) : MigratorConfiguration
+    public function getMigratorConfiguration(InputInterface $input): MigratorConfiguration
     {
         $timeAllQueries = $input->hasOption('query-time') ? (bool) $input->getOption('query-time') : false;
         $dryRun         = $input->hasOption('dry-run') ? (bool) $input->getOption('dry-run') : false;

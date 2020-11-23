@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Type;
+
 use function array_map;
 use function implode;
 use function is_array;
@@ -34,7 +35,7 @@ final class InlineParameterFormatter implements ParameterFormatter
      * @param mixed[] $params
      * @param mixed[] $types
      */
-    public function formatParameters(array $params, array $types) : string
+    public function formatParameters(array $params, array $types): string
     {
         if ($params === []) {
             return '';
@@ -76,10 +77,10 @@ final class InlineParameterFormatter implements ParameterFormatter
     /**
      * @param int[]|bool[]|string[]|array|int|string|bool $value
      */
-    private function parameterToString($value) : string
+    private function parameterToString($value): string
     {
         if (is_array($value)) {
-            return implode(', ', array_map(function ($value) : string {
+            return implode(', ', array_map(function ($value): string {
                 return $this->parameterToString($value);
             }, $value));
         }

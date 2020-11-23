@@ -14,5 +14,5 @@ interface ConfigurationHelper
 {
     public function getConfiguration(
         InputInterface $input
-    ) : Configuration;
+    ): Configuration;
 }

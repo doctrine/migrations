@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Configuration\EntityManager;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\InvalidConfiguration;
 use Doctrine\ORM\EntityManagerInterface;
+
 use function file_exists;
 
 /**
@@ -28,7 +29,7 @@ final class ConfigurationFile implements EntityManagerLoader
      *
      * @throws InvalidConfiguration
      */
-    public function getEntityManager() : EntityManagerInterface
+    public function getEntityManager(): EntityManagerInterface
     {
         if (! file_exists($this->filename)) {
             throw FileNotFound::new($this->filename);

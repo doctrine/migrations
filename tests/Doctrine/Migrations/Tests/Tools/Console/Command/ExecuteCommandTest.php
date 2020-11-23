@@ -22,6 +22,7 @@ use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function getcwd;
 use function sys_get_temp_dir;
 use function trim;
@@ -51,12 +52,12 @@ class ExecuteCommandTest extends MigrationTestCase
      *
      * @dataProvider getWriteSqlValues
      */
-    public function testWriteSql(bool $dryRun, $arg, ?string $path) : void
+    public function testWriteSql(bool $dryRun, $arg, ?string $path): void
     {
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) use ($dryRun) : array {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) use ($dryRun): array {
                 self::assertSame($dryRun, $configuration->isDryRun());
 
                 return ['A'];
@@ -86,7 +87,7 @@ class ExecuteCommandTest extends MigrationTestCase
     /**
      * @return mixed[]
      */
-    public function getWriteSqlValues() : array
+    public function getWriteSqlValues(): array
     {
         return [
             // dry-run, write-path, path
@@ -100,14 +101,14 @@ class ExecuteCommandTest extends MigrationTestCase
         ];
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->executeCommandTester->setInputs(['yes']);
 
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];
@@ -122,7 +123,7 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
-    public function testExecuteMultiple() : void
+    public function testExecuteMultiple(): void
     {
         $migration = $this->createMock(AbstractMigration::class);
         $p1        = new MigrationPlan(new Version('1'), $migration, Direction::UP);
@@ -139,7 +140,7 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->migrator
             ->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];
@@ -154,7 +155,7 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Executing 1, 2 up', trim($this->executeCommandTester->getDisplay(true)));
     }
 
-    public function testExecuteCancel() : void
+    public function testExecuteCancel(): void
     {
         $this->executeCommandTester->setInputs(['no']);
 
@@ -165,7 +166,7 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->migrator
             ->expects(self::never())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) : array {
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
                 self::assertFalse($configuration->isDryRun());
 
                 return ['A'];
@@ -179,7 +180,7 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertSame(1, $this->executeCommandTester->getStatusCode());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $connection = $this->getSqliteConnection();
 

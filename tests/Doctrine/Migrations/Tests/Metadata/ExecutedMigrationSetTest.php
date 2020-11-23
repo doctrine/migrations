@@ -14,7 +14,7 @@ use PHPUnit\Framework\TestCase;
 
 class ExecutedMigrationSetTest extends TestCase
 {
-    public function testFirstWhenEmpty() : void
+    public function testFirstWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
@@ -22,7 +22,7 @@ class ExecutedMigrationSetTest extends TestCase
         $set->getFirst();
     }
 
-    public function testLastWhenEmpty() : void
+    public function testLastWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
@@ -30,7 +30,7 @@ class ExecutedMigrationSetTest extends TestCase
         $set->getLast();
     }
 
-    public function testFirst() : void
+    public function testFirst(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -41,7 +41,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getFirst(1));
     }
 
-    public function testLast() : void
+    public function testLast(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -52,7 +52,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getLast(-1));
     }
 
-    public function testItems() : void
+    public function testItems(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -62,7 +62,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame([$m1, $m2, $m3], $set->getItems());
     }
 
-    public function testCount() : void
+    public function testCount(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -72,7 +72,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertCount(3, $set);
     }
 
-    public function testGetMigration() : void
+    public function testGetMigration(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -82,7 +82,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertSame($m2, $set->getMigration(new Version('B')));
     }
 
-    public function testGetMigrationThrowsExceptionIfNotExisting() : void
+    public function testGetMigrationThrowsExceptionIfNotExisting(): void
     {
         $this->expectException(MigrationNotExecuted::class);
         $m1 = new ExecutedMigration(new Version('A'));
@@ -93,7 +93,7 @@ class ExecutedMigrationSetTest extends TestCase
         $set->getMigration(new Version('D'));
     }
 
-    public function testHasMigration() : void
+    public function testHasMigration(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
@@ -104,7 +104,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertFalse($set->hasMigration(new Version('D')));
     }
 
-    public function testExecutedMigration() : void
+    public function testExecutedMigration(): void
     {
         $m1 = new ExecutedMigration(new Version('A'));
 
@@ -113,7 +113,7 @@ class ExecutedMigrationSetTest extends TestCase
         self::assertNull($m1->getExecutionTime());
     }
 
-    public function testExecutedMigrationWithTiming() : void
+    public function testExecutedMigrationWithTiming(): void
     {
         $date = new DateTimeImmutable();
         $m1   = new ExecutedMigration(new Version('A'), $date, 123.0);

@@ -19,6 +19,7 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sys_get_temp_dir;
@@ -47,7 +48,7 @@ final class DiffCommandTest extends TestCase
     /** @var ClassNameGenerator|MockObject */
     private $classNameGenerator;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->migrationStatusCalculator
             ->method('getNewMigrations')
@@ -87,7 +88,7 @@ final class DiffCommandTest extends TestCase
         ], array_map('trim', explode("\n", trim($output))));
     }
 
-    public function testAvailableMigrationsCancel() : void
+    public function testAvailableMigrationsCancel(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
 
@@ -113,7 +114,7 @@ final class DiffCommandTest extends TestCase
         self::assertSame(3, $statusCode);
     }
 
-    public function testExecutedUnavailableMigrationsCancel() : void
+    public function testExecutedUnavailableMigrationsCancel(): void
     {
         $e1 = new ExecutedMigration(new Version('B'));
         $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
@@ -141,7 +142,7 @@ final class DiffCommandTest extends TestCase
         self::assertSame(3, $statusCode);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationDiffGenerator    = $this->createStub(DiffGenerator::class);
         $this->migrationStatusCalculator = $this->createStub(MigrationStatusCalculator::class);

@@ -20,6 +20,7 @@ use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
 use function count;
 use function strcmp;
 
@@ -37,7 +38,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->abstractMigration       = $this->createMock(AbstractMigration::class);
         $this->migrationRepository     = $this->createMock(MigrationsRepository::class);
@@ -54,7 +55,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationRepository
             ->expects(self::any())
             ->method('hasMigration')
-            ->willReturnCallback(static function ($version) use ($m) : bool {
+            ->willReturnCallback(static function ($version) use ($m): bool {
                 return isset($m[$version]);
             });
 
@@ -64,7 +65,7 @@ final class MigrationPlanCalculatorTest extends TestCase
             ->willReturn($migrationList);
     }
 
-    public function testPlanForVersionsWhenNoMigrations() : void
+    public function testPlanForVersionsWhenNoMigrations(): void
     {
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C')], Direction::UP);
 
@@ -74,7 +75,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertEquals(new Version('C'), $plan->getFirst()->getVersion());
     }
 
-    public function testPlanForMultipleVersionsAreSortedUp() : void
+    public function testPlanForMultipleVersionsAreSortedUp(): void
     {
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C'), new Version('A')], Direction::UP);
 
@@ -86,7 +87,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertEquals(new Version('C'), $plan->getLast()->getVersion());
     }
 
-    public function testPlanForMultipleVersionsAreSortedDown() : void
+    public function testPlanForMultipleVersionsAreSortedDown(): void
     {
         $plan = $this->migrationPlanCalculator->getPlanForVersions([new Version('C'), new Version('A')], Direction::UP);
 
@@ -98,7 +99,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertEquals(new Version('C'), $plan->getLast()->getVersion());
     }
 
-    public function testPlanForNoMigration() : void
+    public function testPlanForNoMigration(): void
     {
         $this->expectException(MigrationClassNotFound::class);
         $this->expectExceptionMessage('Migration class "D" was not found?');
@@ -106,7 +107,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationPlanCalculator->getPlanForVersions([new Version('D')], Direction::UP);
     }
 
-    public function testPlanForNoVersions() : void
+    public function testPlanForNoVersions(): void
     {
         $plan = $this->migrationPlanCalculator->getPlanForVersions([], Direction::UP);
 
@@ -119,7 +120,7 @@ final class MigrationPlanCalculatorTest extends TestCase
      *
      * @dataProvider getPlanUpWhenNoMigrations
      */
-    public function testPlanWhenNoMigrations(string $to, array $expectedPlan, string $direction) : void
+    public function testPlanWhenNoMigrations(string $to, array $expectedPlan, string $direction): void
     {
         $this->metadataStorage
             ->expects(self::atLeastOnce())
@@ -140,7 +141,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function getPlanUpWhenNoMigrations() : array
+    public function getPlanUpWhenNoMigrations(): array
     {
         return [
             ['A', ['A'], Direction::UP],
@@ -154,7 +155,7 @@ final class MigrationPlanCalculatorTest extends TestCase
      *
      * @dataProvider getPlanUpWhenMigrations
      */
-    public function testPlanWhenMigrations(string $to, array $expectedPlan, string $direction) : void
+    public function testPlanWhenMigrations(string $to, array $expectedPlan, string $direction): void
     {
         $e1 = new ExecutedMigration(new Version('A'));
         $e2 = new ExecutedMigration(new Version('B'));
@@ -176,7 +177,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    public function testTargetMigrationNotFound() : void
+    public function testTargetMigrationNotFound(): void
     {
         $this->expectException(MigrationClassNotFound::class);
         $this->expectExceptionMessage('ss');
@@ -186,7 +187,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /**
      * @return mixed[]
      */
-    public function getPlanUpWhenMigrations() : array
+    public function getPlanUpWhenMigrations(): array
     {
         return [
             ['0', ['B', 'A'], Direction::DOWN],
@@ -196,10 +197,10 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
     }
 
-    public function testCustomMigrationSorting() : void
+    public function testCustomMigrationSorting(): void
     {
         $reverseSorter           = new class implements Comparator {
-            public function compare(Version $a, Version $b) : int
+            public function compare(Version $a, Version $b): int
             {
                 return strcmp((string) $b, (string) $a);
             }

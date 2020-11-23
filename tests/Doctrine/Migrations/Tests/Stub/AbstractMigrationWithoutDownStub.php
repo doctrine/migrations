@@ -9,7 +9,7 @@ use Doctrine\Migrations\AbstractMigration;
 
 class AbstractMigrationWithoutDownStub extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 }

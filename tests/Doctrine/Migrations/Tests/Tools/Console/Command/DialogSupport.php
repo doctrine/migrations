@@ -13,14 +13,14 @@ trait DialogSupport
     /** @var QuestionHelper|MockObject */
     protected $questions;
 
-    protected function configureDialogs(Application $app) : void
+    protected function configureDialogs(Application $app): void
     {
         $this->questions = $this->createMock(QuestionHelper::class);
 
         $app->getHelperSet()->set($this->questions, 'question');
     }
 
-    protected function willAskConfirmationAndReturn(bool $bool) : void
+    protected function willAskConfirmationAndReturn(bool $bool): void
     {
         $this->questions->expects(self::once())
             ->method('ask')
