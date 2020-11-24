@@ -9,8 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 
-use function is_string;
-use function strcasecmp;
+use function strtolower;
 
 /**
  * The Configuration class is responsible for defining migration configuration information.
