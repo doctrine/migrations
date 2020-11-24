@@ -7,6 +7,8 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use PHPUnit\Framework\TestCase;
 
+use function method_exists;
+
 class ClassNameGeneratorTest extends TestCase
 {
     public function testName(): void
