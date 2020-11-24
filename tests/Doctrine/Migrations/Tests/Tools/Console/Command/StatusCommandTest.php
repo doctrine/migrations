@@ -75,7 +75,8 @@ class StatusCommandTest extends MigrationTestCase
         $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
 
         if (DBALVersion::compare('2.11.0') > 0) {
-            $databaseDriver = 'Doctrine\DBAL\Driver\PDOSqlite\Driver '; // Trailing space bufferes outout assertion
+            // Trailing space is necessary to pad size to match `...\PDO\SQLite\Driver` namespace length
+            $databaseDriver = 'Doctrine\DBAL\Driver\PDOSqlite\Driver ';
         } else {
             $databaseDriver = 'Doctrine\DBAL\Driver\PDO\SQLite\Driver';
         }
