@@ -88,13 +88,9 @@ class DiffGeneratorTest extends TestCase
             ->method('createSchema')
             ->willReturn($toSchema);
 
-        $toSchema->expects(self::at(1))
+        $toSchema->expects($this->exactly(2))
             ->method('dropTable')
-            ->with('schema.table_name2');
-
-        $toSchema->expects(self::at(2))
-            ->method('dropTable')
-            ->with('schema.table_name3');
+            ->will($this->onConsecutiveCalls('schema.table_name2', 'schema.table_name3'));
 
         $fromSchema->expects(self::once())
             ->method('getMigrateToSql')
@@ -106,15 +102,13 @@ class DiffGeneratorTest extends TestCase
             ->with($toSchema, $this->platform)
             ->willReturn(['UPDATE table SET value = 1']);
 
-        $this->migrationSqlGenerator->expects(self::at(0))
+        $this->migrationSqlGenerator->expects($this->exactly(2))
             ->method('generate')
-            ->with(['UPDATE table SET value = 2'], true, 80)
-            ->willReturn('test1');
-
-        $this->migrationSqlGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(['UPDATE table SET value = 1'], true, 80)
-            ->willReturn('test2');
+            ->with($this->logicalOr(
+                 $this->equalTo(['UPDATE table SET value = 2']),
+                 $this->equalTo(['UPDATE table SET value = 1'])
+             ), true, 80)
+            ->will($this->onConsecutiveCalls('test1', 'test2'));
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -163,15 +157,13 @@ class DiffGeneratorTest extends TestCase
             ->with($toSchema, $this->platform)
             ->willReturn(['DROP TABLE table_name']);
 
-        $this->migrationSqlGenerator->expects(self::at(0))
+        $this->migrationSqlGenerator->expects($this->exactly(2))
             ->method('generate')
-            ->with(['CREATE TABLE table_name'], false, 120, true)
-            ->willReturn('test up');
-
-        $this->migrationSqlGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(['DROP TABLE table_name'], false, 120, true)
-            ->willReturn('test down');
+            ->with($this->logicalOr(
+                 $this->equalTo(['CREATE TABLE table_name']),
+                 $this->equalTo(['DROP TABLE table_name'])
+             ), false, 120, true)
+            ->will($this->onConsecutiveCalls('test up', 'test down'));
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')

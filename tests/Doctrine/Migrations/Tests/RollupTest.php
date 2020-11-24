@@ -50,9 +50,12 @@ class RollupTest extends TestCase
            ->willReturn(new AvailableMigrationsSet([$m1]));
 
         $this->storage
-           ->expects(self::at(0))->method('reset')->with();
+           ->expects(self::exactly(1))
+           ->method('reset')
+           ->with();
+
         $this->storage
-           ->expects(self::at(1))
+           ->expects(self::exactly(1))
            ->method('complete')
            ->willReturnCallback(static function (ExecutionResult $result): void {
               self::assertEquals(new Version('A'), $result->getVersion());
