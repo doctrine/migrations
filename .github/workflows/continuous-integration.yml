@@ -1,4 +1,3 @@
-
 name: "Continuous Integration"
 
 on:
@@ -21,11 +20,14 @@ jobs:
   composer_normalize:
     name: "Composer Normalize"
     runs-on: "ubuntu-latest"
-    needs:
-      - "composer"
     steps:
-      - name: "Composer Normalize"
-        run: "composer normalize --dry-run"
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: "docker://ergebnis/composer-normalize-action:latest"
+        with:
+          args: "--dry-run"
 
   phpunit:
     name: "PHPUnit"
