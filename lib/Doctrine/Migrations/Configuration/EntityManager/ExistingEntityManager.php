@@ -17,7 +17,7 @@ final class ExistingEntityManager implements EntityManagerLoader
         $this->entityManager = $entityManager;
     }
 
-    public function getEntityManager(?string $name = null) : EntityManagerInterface
+    public function getEntityManager(?string $name = null): EntityManagerInterface
     {
         if ($name !== null) {
             throw InvalidLoader::noMultipleEntityManagers($this);

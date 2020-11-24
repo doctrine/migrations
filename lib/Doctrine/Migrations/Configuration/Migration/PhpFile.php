@@ -6,13 +6,14 @@ namespace Doctrine\Migrations\Configuration\Migration;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\FileNotFound;
+
 use function assert;
 use function file_exists;
 use function is_array;
 
 final class PhpFile extends ConfigurationFile
 {
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         if (! file_exists($this->file)) {
             throw FileNotFound::new($this->file);

@@ -22,6 +22,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sys_get_temp_dir;
@@ -47,7 +48,7 @@ class UpToDateCommandTest extends MigrationTestCase
     /** @var TableMetadataStorageConfiguration */
     private $metadataConfig;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->metadataConfig = new TableMetadataStorageConfiguration();
 
@@ -78,7 +79,7 @@ class UpToDateCommandTest extends MigrationTestCase
      *
      * @dataProvider dataIsUpToDate
      */
-    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false) : void
+    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         foreach ($migrations as $version) {
@@ -95,7 +96,7 @@ class UpToDateCommandTest extends MigrationTestCase
         self::assertSame($exitCode, $this->commandTester->getStatusCode());
     }
 
-    public function testMigrationList() : void
+    public function testMigrationList(): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
         $migrationClass
@@ -141,7 +142,7 @@ class UpToDateCommandTest extends MigrationTestCase
     /**
      * @return mixed[][]
      */
-    public function dataIsUpToDate() : array
+    public function dataIsUpToDate(): array
     {
         return [
             'up-to-date' => [

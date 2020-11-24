@@ -23,6 +23,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
+
 use function array_change_key_case;
 use function floatval;
 use function round;
@@ -31,6 +32,7 @@ use function strlen;
 use function strpos;
 use function strtolower;
 use function uasort;
+
 use const CASE_LOWER;
 
 final class TableMetadataStorage implements MetadataStorage
@@ -72,7 +74,7 @@ final class TableMetadataStorage implements MetadataStorage
         $this->comparator    = $comparator;
     }
 
-    public function getExecutedMigrations() : ExecutedMigrationsList
+    public function getExecutedMigrations(): ExecutedMigrationsList
     {
         if (! $this->isInitialized()) {
             return new ExecutedMigrationsList([]);
@@ -93,7 +95,7 @@ final class TableMetadataStorage implements MetadataStorage
                 : null;
 
             $executionTime = isset($row[strtolower($this->configuration->getExecutionTimeColumnName())])
-                ? floatval($row[strtolower($this->configuration->getExecutionTimeColumnName())]/1000)
+                ? floatval($row[strtolower($this->configuration->getExecutionTimeColumnName())] / 1000)
                 : null;
 
             $migration = new ExecutedMigration(
@@ -105,14 +107,14 @@ final class TableMetadataStorage implements MetadataStorage
             $migrations[(string) $version] = $migration;
         }
 
-        uasort($migrations, function (ExecutedMigration $a, ExecutedMigration $b) : int {
+        uasort($migrations, function (ExecutedMigration $a, ExecutedMigration $b): int {
             return $this->comparator->compare($a->getVersion(), $b->getVersion());
         });
 
         return new ExecutedMigrationsList($migrations);
     }
 
-    public function reset() : void
+    public function reset(): void
     {
         $this->checkInitialization();
 
@@ -124,7 +126,7 @@ final class TableMetadataStorage implements MetadataStorage
         );
     }
 
-    public function complete(ExecutionResult $result) : void
+    public function complete(ExecutionResult $result): void
     {
         $this->checkInitialization();
 
@@ -136,7 +138,7 @@ final class TableMetadataStorage implements MetadataStorage
             $this->connection->insert($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
-                $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : round($result->getTime()*1000),
+                $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
             ], [
                 Types::STRING,
                 Types::DATETIME_MUTABLE,
@@ -145,7 +147,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
     }
 
-    public function ensureInitialized() : void
+    public function ensureInitialized(): void
     {
         if (! $this->isInitialized()) {
             $expectedSchemaChangelog = $this->getExpectedTable();
@@ -164,7 +166,7 @@ final class TableMetadataStorage implements MetadataStorage
         $this->updateMigratedVersionsFromV1orV2toV3();
     }
 
-    private function needsUpdate(Table $expectedTable) : ?TableDiff
+    private function needsUpdate(Table $expectedTable): ?TableDiff
     {
         $comparator   = new Comparator();
         $currentTable = $this->schemaManager->listTableDetails($this->configuration->getTableName());
@@ -173,7 +175,7 @@ final class TableMetadataStorage implements MetadataStorage
         return $diff instanceof TableDiff ? $diff : null;
     }
 
-    private function isInitialized() : bool
+    private function isInitialized(): bool
     {
         if ($this->connection instanceof MasterSlaveConnection) {
             $this->connection->connect('master');
@@ -182,7 +184,7 @@ final class TableMetadataStorage implements MetadataStorage
         return $this->schemaManager->tablesExist([$this->configuration->getTableName()]);
     }
 
-    private function checkInitialization() : void
+    private function checkInitialization(): void
     {
         if (! $this->isInitialized()) {
             throw MetadataStorageError::notInitialized();
@@ -195,7 +197,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
     }
 
-    private function getExpectedTable() : Table
+    private function getExpectedTable(): Table
     {
         $schemaChangelog = new Table($this->configuration->getTableName());
 
@@ -212,7 +214,7 @@ final class TableMetadataStorage implements MetadataStorage
         return $schemaChangelog;
     }
 
-    private function updateMigratedVersionsFromV1orV2toV3() : void
+    private function updateMigratedVersionsFromV1orV2toV3(): void
     {
         if ($this->migrationRepository === null) {
             return;
@@ -241,7 +243,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
     }
 
-    private function isAlreadyV3Format(AvailableMigration $availableMigration, ExecutedMigration $executedMigration) : bool
+    private function isAlreadyV3Format(AvailableMigration $availableMigration, ExecutedMigration $executedMigration): bool
     {
         return strpos(
             (string) $availableMigration->getVersion(),

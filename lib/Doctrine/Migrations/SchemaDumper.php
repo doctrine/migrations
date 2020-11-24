@@ -11,6 +11,7 @@ use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use InvalidArgumentException;
+
 use function array_merge;
 use function count;
 use function implode;
@@ -19,6 +20,7 @@ use function preg_match;
 use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
+
 use const PREG_BACKTRACK_LIMIT_ERROR;
 use const PREG_BAD_UTF8_ERROR;
 use const PREG_BAD_UTF8_OFFSET_ERROR;
@@ -77,7 +79,7 @@ class SchemaDumper
         array $excludedTablesRegexes = [],
         bool $formatted = false,
         int $lineLength = 120
-    ) : string {
+    ): string {
         $schema = $this->schemaManager->createSchema();
 
         $up   = [];
@@ -132,7 +134,7 @@ class SchemaDumper
     /**
      * @param string[] $excludedTablesRegexes
      */
-    private function shouldSkipTable(Table $table, array $excludedTablesRegexes) : bool
+    private function shouldSkipTable(Table $table, array $excludedTablesRegexes): bool
     {
         foreach (array_merge($excludedTablesRegexes, $this->excludedTablesRegexes) as $regex) {
             if (self::pregMatch($regex, $table->getName()) !== 0) {
@@ -152,11 +154,11 @@ class SchemaDumper
      *
      * @param mixed[] $matches
      */
-    private static function pregMatch(string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0) : int
+    private static function pregMatch(string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0): int
     {
         try {
             $errorMessages = [];
-            set_error_handler(static function (int $severity, string $message, string $file, int $line, array $params) use (&$errorMessages) : bool {
+            set_error_handler(static function (int $severity, string $message, string $file, int $line, array $params) use (&$errorMessages): bool {
                 $errorMessages[] = $message;
 
                 return true;

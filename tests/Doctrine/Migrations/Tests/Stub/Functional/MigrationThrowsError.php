@@ -10,12 +10,12 @@ use Exception;
 
 class MigrationThrowsError extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         throw new Exception('Migration up throws exception.');
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         throw new Exception('Migration down throws exception.');
     }

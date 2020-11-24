@@ -21,7 +21,7 @@ Now place the following code in the ``migrations`` file:
 
     use Doctrine\DBAL\DriverManager;
     use Doctrine\Migrations\DependencyFactory;
-    use Doctrine\Migrations\Configuration\Configuration\PhpFile;
+    use Doctrine\Migrations\Configuration\Migration\PhpFile;
     use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
     use Doctrine\Migrations\Tools\Console\Command;
     use Symfony\Component\Console\Application;
@@ -38,7 +38,7 @@ Now place the following code in the ``migrations`` file:
 
     $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
-    $dependencyFactory = DependencyFactory::fromConnection($config, new ExistingConnection($conn));
+    $dependencyFactory = DependencyFactory::fromConnection($config, new ExistingConnection($connection));
 
     $cli = new Application('Doctrine Migrations');
     $cli->setCatchExceptions(true);

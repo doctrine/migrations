@@ -32,7 +32,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     /** @var EntityManager|MockObject */
     private $entityManager;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->connection    = $this->createMock(Connection::class);
         $this->entityManager = $this->createMock(EntityManager::class);
@@ -44,7 +44,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         $this->configuration = new Configuration();
     }
 
-    public function testFreeze() : void
+    public function testFreeze(): void
     {
         $this->configuration->addMigrationsDirectory('foo', 'bar');
 
@@ -56,7 +56,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di->setService('foo', new stdClass());
     }
 
-    public function testFreezeForDefinition() : void
+    public function testFreezeForDefinition(): void
     {
         $this->configuration->addMigrationsDirectory('foo', 'bar');
 
@@ -65,11 +65,11 @@ final class DependencyFactoryTest extends MigrationTestCase
 
         $this->expectException(FrozenDependencies::class);
         $this->expectExceptionMessage('The dependencies are frozen and cannot be edited anymore.');
-        $di->setDefinition('foo', static function () : void {
+        $di->setDefinition('foo', static function (): void {
         });
     }
 
-    public function testFinderForYearMonthStructure() : void
+    public function testFinderForYearMonthStructure(): void
     {
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
@@ -79,7 +79,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
     }
 
-    public function testFinderForYearStructure() : void
+    public function testFinderForYearStructure(): void
     {
         $this->configuration->setMigrationsAreOrganizedByYear(true);
 
@@ -89,7 +89,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertInstanceOf(RecursiveRegexFinder::class, $finder);
     }
 
-    public function testFinder() : void
+    public function testFinder(): void
     {
         $this->configuration = new Configuration();
         $di                  = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
@@ -98,7 +98,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertInstanceOf(GlobFinder::class, $finder);
     }
 
-    public function testConnection() : void
+    public function testConnection(): void
     {
         $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
 
@@ -107,7 +107,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertTrue($di->isFrozen());
     }
 
-    public function testNoEntityManagerRaiseException() : void
+    public function testNoEntityManagerRaiseException(): void
     {
         $this->expectException(MissingDependency::class);
 
@@ -115,7 +115,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di->getEntityManager();
     }
 
-    public function testEntityManager() : void
+    public function testEntityManager(): void
     {
         $di = DependencyFactory::fromEntityManager(new ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
 
@@ -125,14 +125,14 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertTrue($di->isFrozen());
     }
 
-    public function testCustomLogger() : void
+    public function testCustomLogger(): void
     {
         $logger = $this->createMock(LoggerInterface::class);
         $di     = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection), $logger);
         self::assertSame($logger, $di->getLogger());
     }
 
-    public function testOverrideCustomLogger() : void
+    public function testOverrideCustomLogger(): void
     {
         $logger        = $this->createMock(LoggerInterface::class);
         $anotherLogger = $this->createMock(LoggerInterface::class);
@@ -142,7 +142,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertFalse($di->isFrozen());
     }
 
-    public function testServiceDefinition() : void
+    public function testServiceDefinition(): void
     {
         $logger        = $this->createMock(LoggerInterface::class);
         $anotherLogger = $this->createMock(LoggerInterface::class);
@@ -156,7 +156,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertSame($anotherLogger, $di->getLogger());
     }
 
-    public function testServiceHasPriorityOverDefinition() : void
+    public function testServiceHasPriorityOverDefinition(): void
     {
         $logger        = $this->createMock(LoggerInterface::class);
         $anotherLogger = $this->createMock(LoggerInterface::class);
@@ -171,7 +171,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertSame($logger, $di->getLogger());
     }
 
-    public function testChangingConfigurationsDoesNotFreezeTheFactory() : void
+    public function testChangingConfigurationsDoesNotFreezeTheFactory(): void
     {
         $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
 
@@ -183,7 +183,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertTrue($di->isFrozen());
     }
 
-    public function testMetadataConfigurationIsPassedToTableStorage() : void
+    public function testMetadataConfigurationIsPassedToTableStorage(): void
     {
         $connection     = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
         $metadataConfig = new TableMetadataStorageConfiguration();

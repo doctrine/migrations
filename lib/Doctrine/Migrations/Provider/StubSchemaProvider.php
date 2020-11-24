@@ -20,7 +20,7 @@ final class StubSchemaProvider implements SchemaProvider
         $this->toSchema = $schema;
     }
 
-    public function createSchema() : Schema
+    public function createSchema(): Schema
     {
         return $this->toSchema;
     }

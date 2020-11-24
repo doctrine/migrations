@@ -17,12 +17,12 @@ class AvailableMigrationListTest extends TestCase
     /** @var AbstractMigration */
     private $abstractMigration;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
     }
 
-    public function testFirstWhenEmpty() : void
+    public function testFirstWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
@@ -30,7 +30,7 @@ class AvailableMigrationListTest extends TestCase
         $set->getFirst();
     }
 
-    public function testLastWhenEmpty() : void
+    public function testLastWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
@@ -38,7 +38,7 @@ class AvailableMigrationListTest extends TestCase
         $set->getLast();
     }
 
-    public function testFirst() : void
+    public function testFirst(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -49,7 +49,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getFirst(1));
     }
 
-    public function testLast() : void
+    public function testLast(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -60,7 +60,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getLast(-1));
     }
 
-    public function testItems() : void
+    public function testItems(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -70,7 +70,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame([$m1, $m2, $m3], $set->getItems());
     }
 
-    public function testCount() : void
+    public function testCount(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -80,7 +80,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertCount(3, $set);
     }
 
-    public function testGetMigration() : void
+    public function testGetMigration(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -90,7 +90,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertSame($m2, $set->getMigration(new Version('B')));
     }
 
-    public function testGetMigrationThrowsExceptionIfNotExisting() : void
+    public function testGetMigrationThrowsExceptionIfNotExisting(): void
     {
         $this->expectException(MigrationNotAvailable::class);
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
@@ -101,7 +101,7 @@ class AvailableMigrationListTest extends TestCase
         $set->getMigration(new Version('D'));
     }
 
-    public function testHasMigration() : void
+    public function testHasMigration(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -112,7 +112,7 @@ class AvailableMigrationListTest extends TestCase
         self::assertFalse($set->hasMigration(new Version('D')));
     }
 
-    public function testAvailableMigration() : void
+    public function testAvailableMigration(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 

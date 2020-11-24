@@ -11,12 +11,12 @@ use DateTimeZone;
 {
     public const VERSION_FORMAT = 'YmdHis';
 
-    public function generateClassName(string $namespace) : string
+    public function generateClassName(string $namespace): string
     {
         return $namespace . '\\Version' . $this->generateVersionNumber();
     }
 
-    private function generateVersionNumber() : string
+    private function generateVersionNumber(): string
     {
         $now = new DateTimeImmutable('now', new DateTimeZone('UTC'));
 

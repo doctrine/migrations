@@ -17,7 +17,7 @@ final class ExistingConnection implements ConnectionLoader
         $this->connection = $connection;
     }
 
-    public function getConnection(?string $name = null) : Connection
+    public function getConnection(?string $name = null): Connection
     {
         if ($name !== null) {
             throw InvalidLoader::noMultipleConnections($this);

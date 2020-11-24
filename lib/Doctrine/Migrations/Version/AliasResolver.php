@@ -24,5 +24,5 @@ interface AliasResolver
      *
      * If an existing version number is specified, it is returned verbatim.
      */
-    public function resolveVersionAlias(string $alias) : Version;
+    public function resolveVersionAlias(string $alias): Version;
 }

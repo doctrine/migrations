@@ -25,7 +25,7 @@ final class SyncMetadataCommandTest extends TestCase
     /** @var CommandTester */
     private $storageCommandTester;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->storage->expects(self::once())
             ->method('ensureInitialized');
@@ -37,7 +37,7 @@ final class SyncMetadataCommandTest extends TestCase
         self::assertStringContainsString('[OK] Metadata storage synchronized', $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->storage           = $this->createMock(MetadataStorage::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);

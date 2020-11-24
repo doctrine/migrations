@@ -8,7 +8,7 @@ use LogicException;
 
 final class DependenciesNotSatisfied extends LogicException implements ConsoleException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('The dependency factory has not been initialized or provided.');
     }

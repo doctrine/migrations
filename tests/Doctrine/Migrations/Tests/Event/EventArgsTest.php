@@ -27,7 +27,7 @@ class EventArgsTest extends TestCase
     /** @var MigrationPlan */
     private $plan;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->connection = $this->createMock(Connection::class);
         $this->config     = $this->createMock(MigratorConfiguration::class);
@@ -35,7 +35,7 @@ class EventArgsTest extends TestCase
         $this->plan       = new MigrationPlan(new Version('1'), $migration, Direction::UP);
     }
 
-    public function testMigrationsVersionEventArgs() : void
+    public function testMigrationsVersionEventArgs(): void
     {
         $event = new MigrationsVersionEventArgs($this->connection, $this->plan, $this->config);
 
@@ -44,7 +44,7 @@ class EventArgsTest extends TestCase
         self::assertSame($this->plan, $event->getPlan());
     }
 
-    public function testMigrationsEventArgs() : void
+    public function testMigrationsEventArgs(): void
     {
         $plan  = new MigrationPlanList([], Direction::UP);
         $event = new MigrationsEventArgs($this->connection, $plan, $this->config);

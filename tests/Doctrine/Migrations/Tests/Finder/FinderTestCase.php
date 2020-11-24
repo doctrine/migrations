@@ -12,7 +12,7 @@ abstract class FinderTestCase extends MigrationTestCase
     /** @var MigrationFinder */
     protected $finder;
 
-    public function testClassesInMultipleNamespacesCanBeLoadedByTheFinder() : void
+    public function testClassesInMultipleNamespacesCanBeLoadedByTheFinder(): void
     {
         $versions = $this->finder->findMigrations(__DIR__ . '/_features/MultiNamespace', 'TestMigrations');
 
@@ -20,7 +20,7 @@ abstract class FinderTestCase extends MigrationTestCase
         self::assertContains('TestMigrations\\TestOther\\Version0002', $versions);
     }
 
-    public function testOnlyClassesInTheProvidedNamespaceAreLoadedWhenNamespaceIsProvided() : void
+    public function testOnlyClassesInTheProvidedNamespaceAreLoadedWhenNamespaceIsProvided(): void
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespace',

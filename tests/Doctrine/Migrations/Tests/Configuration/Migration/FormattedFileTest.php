@@ -10,7 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 class FormattedFileTest extends TestCase
 {
-    public function testUnknownLoader() : void
+    public function testUnknownLoader(): void
     {
         $this->expectException(InvalidConfigurationFormat::class);
 

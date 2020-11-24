@@ -10,6 +10,7 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function addslashes;
 use function assert;
 use function class_exists;
@@ -29,7 +30,7 @@ final class DumpSchemaCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:dump-schema';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -59,7 +60,7 @@ EOT
             ->addOption(
                 'filter-tables',
                 null,
-                InputOption::VALUE_REQUIRED|InputOption::VALUE_IS_ARRAY,
+                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
                 'Filter the tables to dump via Regex.'
             )
             ->addOption(
@@ -77,7 +78,7 @@ EOT
     public function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : int {
+    ): int {
         $formatted  = $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
 
@@ -132,7 +133,7 @@ EOT
         return 0;
     }
 
-    private function checkNoPreviousDumpExistsForNamespace(string $namespace) : void
+    private function checkNoPreviousDumpExistsForNamespace(string $namespace): void
     {
         $migrations = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
         foreach ($migrations->getItems() as $migration) {

@@ -37,7 +37,7 @@ final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTest
     /** @var DependencyFactory */
     private $di;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->configuration = new Configuration();
 
@@ -63,23 +63,23 @@ final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTest
         );
     }
 
-    public function testGetEntityManagerFromRegistry() : void
+    public function testGetEntityManagerFromRegistry(): void
     {
         self::assertSame($this->em1, $this->di->getEntityManager());
     }
 
-    public function testGetAlternativeEntityManagerFromRegistry() : void
+    public function testGetAlternativeEntityManagerFromRegistry(): void
     {
         $this->configuration->setEntityManagerName('bar');
         self::assertSame($this->em2, $this->di->getEntityManager());
     }
 
-    public function testGetConnectionFromRegistry() : void
+    public function testGetConnectionFromRegistry(): void
     {
         self::assertSame($this->connection1, $this->di->getConnection());
     }
 
-    public function testGetAlternativeConnectionFromRegistry() : void
+    public function testGetAlternativeConnectionFromRegistry(): void
     {
         $this->configuration->setEntityManagerName('bar');
         self::assertSame($this->connection2, $this->di->getConnection());

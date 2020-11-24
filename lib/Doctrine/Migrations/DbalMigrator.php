@@ -13,7 +13,9 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Throwable;
+
 use function count;
+
 use const COUNT_RECURSIVE;
 
 /**
@@ -58,7 +60,7 @@ class DbalMigrator implements Migrator
     private function executeMigrations(
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
-    ) : array {
+    ): array {
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
         if ($allOrNothing) {
@@ -89,7 +91,7 @@ class DbalMigrator implements Migrator
     /**
      * @return array<string, Query[]>
      */
-    private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
+    private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array
     {
         $sql  = [];
         $time = 0;
@@ -118,7 +120,7 @@ class DbalMigrator implements Migrator
         StopwatchEvent $stopwatchEvent,
         MigrationPlanList $migrationsPlan,
         array $sql
-    ) : void {
+    ): void {
         $stopwatchEvent->stop();
 
         $this->logger->notice(
@@ -135,7 +137,7 @@ class DbalMigrator implements Migrator
     /**
      * {@inheritDoc}
      */
-    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration) : array
+    public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array
     {
         if (count($migrationsPlan) === 0) {
             $this->logger->notice('No migrations to execute.');

@@ -20,5 +20,5 @@ interface QueryWriter
         string $path,
         string $direction,
         array $queriesByVersion
-    ) : bool;
+    ): bool;
 }

@@ -23,28 +23,28 @@ final class ConnectionRegistryLoaderTest extends TestCase
     /** @var AbstractManagerRegistry */
     private $registry;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->connection1 = $this->createMock(Connection::class);
         $this->connection2 = $this->createMock(Connection::class);
         $this->registry    = new DoctrineRegistry(['foo' => $this->connection1, 'bar' => $this->connection2], []);
     }
 
-    public function testLoadDefaultConnection() : void
+    public function testLoadDefaultConnection(): void
     {
         $loader = ConnectionRegistryConnection::withSimpleDefault($this->registry);
 
         self::assertSame($this->connection1, $loader->getConnection());
     }
 
-    public function testLoadAnotherConnection() : void
+    public function testLoadAnotherConnection(): void
     {
         $loader = ConnectionRegistryConnection::withSimpleDefault($this->registry);
 
         self::assertSame($this->connection2, $loader->getConnection('bar'));
     }
 
-    public function testUnknownConnection() : void
+    public function testUnknownConnection(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $loader = ConnectionRegistryConnection::withSimpleDefault($this->registry);

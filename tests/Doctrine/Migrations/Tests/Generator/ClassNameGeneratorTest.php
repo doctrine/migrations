@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class ClassNameGeneratorTest extends TestCase
 {
-    public function testName() : void
+    public function testName(): void
     {
         $generator = new ClassNameGenerator();
         $fqcn      = $generator->generateClassName('Foo');

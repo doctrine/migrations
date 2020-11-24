@@ -9,12 +9,12 @@ use Doctrine\Migrations\AbstractMigration;
 
 class Version20150502000003 extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         // ignored
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         // ignored
     }

@@ -10,9 +10,9 @@ use Doctrine\Migrations\Version\Version;
 
 interface MigrationsRepository
 {
-    public function hasMigration(string $version) : bool;
+    public function hasMigration(string $version): bool;
 
-    public function getMigration(Version $version) : AvailableMigration;
+    public function getMigration(Version $version): AvailableMigration;
 
-    public function getMigrations() : AvailableMigrationsSet;
+    public function getMigrations(): AvailableMigrationsSet;
 }

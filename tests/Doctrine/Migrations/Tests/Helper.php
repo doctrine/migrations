@@ -9,6 +9,7 @@ use Doctrine\Migrations\FilesystemMigrationsRepository;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Version\Version;
 use ReflectionMethod;
+
 use function array_map;
 use function glob;
 use function is_file;
@@ -17,7 +18,7 @@ use function unlink;
 
 class Helper
 {
-    public static function registerMigrationInstance(MigrationsRepository $repository, Version $version, AbstractMigration $migration) : void
+    public static function registerMigrationInstance(MigrationsRepository $repository, Version $version, AbstractMigration $migration): void
     {
         $reflection = new ReflectionMethod(FilesystemMigrationsRepository::class, 'registerMigrationInstance');
         $reflection->setAccessible(true);
@@ -29,7 +30,7 @@ class Helper
      *
      * @see http://stackoverflow.com/a/8688278/1645517
      */
-    public static function deleteDir(string $path) : bool
+    public static function deleteDir(string $path): bool
     {
         if ($path === '') {
             return false;

@@ -7,12 +7,13 @@ namespace Doctrine\Migrations\Tests\Configuration\Migration;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\Configuration\Migration\Exception\MissingConfigurationFile;
 use PHPUnit\Framework\TestCase;
+
 use function chdir;
 use function getcwd;
 
 class ConfigurationFileWithFallbackTest extends TestCase
 {
-    public function testFileLoader() : void
+    public function testFileLoader(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -31,7 +32,7 @@ class ConfigurationFileWithFallbackTest extends TestCase
         }
     }
 
-    public function testFileLoaderFallback() : void
+    public function testFileLoaderFallback(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -50,7 +51,7 @@ class ConfigurationFileWithFallbackTest extends TestCase
         }
     }
 
-    public function testMissingConfig() : void
+    public function testMissingConfig(): void
     {
         $this->expectException(MissingConfigurationFile::class);
         $loader        = new ConfigurationFileWithFallback();

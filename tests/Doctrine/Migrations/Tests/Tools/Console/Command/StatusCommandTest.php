@@ -17,6 +17,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sprintf;
@@ -35,7 +36,7 @@ class StatusCommandTest extends MigrationTestCase
     /** @var CommandTester */
     private $commandTester;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $configuration = new Configuration();
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
@@ -56,7 +57,7 @@ class StatusCommandTest extends MigrationTestCase
         $this->commandTester = new CommandTester($this->command);
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $result = new ExecutionResult(new Version('1230'), Direction::UP, new DateTimeImmutable('2010-01-01 02:03:04'));
         $result->setTime(10.0);

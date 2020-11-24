@@ -11,5 +11,5 @@ use Doctrine\Migrations\AbstractMigration;
  */
 interface MigrationFactory
 {
-    public function createVersion(string $migrationClassName) : AbstractMigration;
+    public function createVersion(string $migrationClassName): AbstractMigration;
 }

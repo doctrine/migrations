@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class TableMetadataStorageConfigurationTest extends TestCase
 {
-    public function testDefaults() : void
+    public function testDefaults(): void
     {
         $config = new TableMetadataStorageConfiguration();
 
@@ -20,7 +20,7 @@ class TableMetadataStorageConfigurationTest extends TestCase
         self::assertSame('execution_time', $config->getExecutionTimeColumnName());
     }
 
-    public function testConfigs() : void
+    public function testConfigs(): void
     {
         $config = new TableMetadataStorageConfiguration();
 

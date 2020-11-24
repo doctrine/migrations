@@ -30,7 +30,7 @@ final class DependencyFactoryWithConnectionRegistryTest extends MigrationTestCas
     /** @var DependencyFactory */
     private $di;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->configuration = new Configuration();
 
@@ -44,12 +44,12 @@ final class DependencyFactoryWithConnectionRegistryTest extends MigrationTestCas
         );
     }
 
-    public function testGetConnectionFromRegistry() : void
+    public function testGetConnectionFromRegistry(): void
     {
         self::assertSame($this->connection1, $this->di->getConnection());
     }
 
-    public function testGetAlternativeConnectionFromRegistry() : void
+    public function testGetAlternativeConnectionFromRegistry(): void
     {
         $this->configuration->setConnectionName('bar');
         self::assertSame($this->connection2, $this->di->getConnection());

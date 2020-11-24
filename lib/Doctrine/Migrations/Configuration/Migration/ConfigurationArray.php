@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
+
 use function assert;
 use function call_user_func;
 use function is_array;
@@ -28,15 +29,15 @@ final class ConfigurationArray implements ConfigurationLoader
         $this->configurations = $configurations;
     }
 
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         $configMap = [
-            'migrations_paths' => static function ($paths, Configuration $configuration) : void {
+            'migrations_paths' => static function ($paths, Configuration $configuration): void {
                 foreach ($paths as $namespace => $path) {
                     $configuration->addMigrationsDirectory($namespace, $path);
                 }
             },
-            'migrations' => static function ($migrations, Configuration $configuration) : void {
+            'migrations' => static function ($migrations, Configuration $configuration): void {
                 foreach ($migrations as $className) {
                     $configuration->addMigrationClass($className);
                 }
@@ -48,7 +49,7 @@ final class ConfigurationArray implements ConfigurationLoader
             'table_storage' => [
                 'table_name' => 'setTableName',
                 'version_column_name' => 'setVersionColumnName',
-                'version_column_length' => static function ($value, TableMetadataStorageConfiguration $configuration) : void {
+                'version_column_length' => static function ($value, TableMetadataStorageConfiguration $configuration): void {
                     $configuration->setVersionColumnLength((int) $value);
                 },
                 'executed_at_column_name' => 'setExecutedAtColumnName',
@@ -57,11 +58,11 @@ final class ConfigurationArray implements ConfigurationLoader
 
             'organize_migrations' => 'setMigrationOrganization',
             'custom_template' => 'setCustomTemplate',
-            'all_or_nothing' => static function ($value, Configuration $configuration) : void {
+            'all_or_nothing' => static function ($value, Configuration $configuration): void {
                 $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
             },
-            'check_database_platform' =>  static function ($value, Configuration $configuration) : void {
-                $configuration->setCheckDatabasePlatform(is_bool($value) ? $value :BooleanStringFormatter::toBoolean($value, false));
+            'check_database_platform' =>  static function ($value, Configuration $configuration): void {
+                $configuration->setCheckDatabasePlatform(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
             },
         ];
 
@@ -80,7 +81,7 @@ final class ConfigurationArray implements ConfigurationLoader
      * @param Configuration|TableMetadataStorageConfiguration $object
      * @param array<string|int,mixed>                         $data
      */
-    private static function applyConfigs(array $configMap, $object, array $data) : void
+    private static function applyConfigs(array $configMap, $object, array $data): void
     {
         foreach ($data as $configurationKey => $configurationValue) {
             if (! isset($configMap[$configurationKey])) {

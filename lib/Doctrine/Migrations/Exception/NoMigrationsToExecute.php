@@ -9,7 +9,7 @@ use Throwable;
 
 final class NoMigrationsToExecute extends RuntimeException implements MigrationException
 {
-    public static function new(?Throwable $previous = null) : self
+    public static function new(?Throwable $previous = null): self
     {
         return new self(
             'Could not find any migrations to execute.',

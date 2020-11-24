@@ -12,6 +12,7 @@ use RuntimeException;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
+
 use function chdir;
 use function getcwd;
 use function realpath;
@@ -25,7 +26,7 @@ class ConsoleRunnerTest extends TestCase
     /** @var Application */
     private $application;
 
-    public function testCreateDependencyFactoryFromLegacyDbalHelper() : void
+    public function testCreateDependencyFactoryFromLegacyDbalHelper(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -43,7 +44,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    public function testCreateDependencyFactoryFromLegacyOrmHelper() : void
+    public function testCreateDependencyFactoryFromLegacyOrmHelper(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -62,7 +63,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    public function testCreateDependencyFactoryFromWrongLegacyHelper() : void
+    public function testCreateDependencyFactoryFromWrongLegacyHelper(): void
     {
         $this->expectException(RuntimeException::class);
 
@@ -88,7 +89,7 @@ class ConsoleRunnerTest extends TestCase
     /**
      * @dataProvider getDependencyFactoryTestDirectories
      */
-    public function testDependencyFactory(string $directory) : void
+    public function testDependencyFactory(string $directory): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -106,7 +107,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    public function testInvalidCliConfigTriggersException() : void
+    public function testInvalidCliConfigTriggersException(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -129,7 +130,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    public function testNoDependencyFactoryWhenNoCliConfig() : void
+    public function testNoDependencyFactoryWhenNoCliConfig(): void
     {
         $dir = getcwd();
         if ($dir === false) {
@@ -149,7 +150,7 @@ class ConsoleRunnerTest extends TestCase
     /**
      * @return array<int,array<string>>
      */
-    public function getDependencyFactoryTestDirectories() : array
+    public function getDependencyFactoryTestDirectories(): array
     {
         return [
             [__DIR__],
@@ -157,7 +158,7 @@ class ConsoleRunnerTest extends TestCase
         ];
     }
 
-    public function testRun() : void
+    public function testRun(): void
     {
         $application = $this->createMock(Application::class);
 
@@ -169,56 +170,56 @@ class ConsoleRunnerTest extends TestCase
         ConsoleRunnerStub::run([]);
     }
 
-    public function testHasExecuteCommand() : void
+    public function testHasExecuteCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:execute'));
     }
 
-    public function testHasGenerateCommand() : void
+    public function testHasGenerateCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:generate'));
     }
 
-    public function testHasLatestCommand() : void
+    public function testHasLatestCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:latest'));
     }
 
-    public function testHasMigrateCommand() : void
+    public function testHasMigrateCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:migrate'));
     }
 
-    public function testHasStatusCommand() : void
+    public function testHasStatusCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:status'));
     }
 
-    public function testHasVersionCommand() : void
+    public function testHasVersionCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:version'));
     }
 
-    public function testHasUpToDateCommand() : void
+    public function testHasUpToDateCommand(): void
     {
         ConsoleRunner::addCommands($this->application);
 
         self::assertTrue($this->application->has('migrations:up-to-date'));
     }
 
-    public function testHasDiffCommand() : void
+    public function testHasDiffCommand(): void
     {
         $dependencyFactory = $this->createMock(DependencyFactory::class);
         $dependencyFactory
@@ -231,7 +232,7 @@ class ConsoleRunnerTest extends TestCase
         self::assertTrue($this->application->has('migrations:diff'));
     }
 
-    public function testNotHasDiffCommand() : void
+    public function testNotHasDiffCommand(): void
     {
         $this->application->setHelperSet(new HelperSet([]));
 
@@ -240,14 +241,14 @@ class ConsoleRunnerTest extends TestCase
         self::assertFalse($this->application->has('migrations:diff'));
     }
 
-    public function testCreateApplication() : void
+    public function testCreateApplication(): void
     {
         $application = ConsoleRunner::createApplication();
         $commands    = $application->all('migrations');
         self::assertCount(12, $commands);
     }
 
-    public function testCreateApplicationWithEntityManager() : void
+    public function testCreateApplicationWithEntityManager(): void
     {
         $dependencyFactory = $this->createMock(DependencyFactory::class);
         $dependencyFactory
@@ -260,7 +261,7 @@ class ConsoleRunnerTest extends TestCase
         self::assertCount(13, $commands);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         parent::setUp();
         $this->application = new Application();
@@ -275,7 +276,7 @@ class ConsoleRunnerStub extends ConsoleRunner
     /**
      * @param Command[] $commands
      */
-    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null) : Application
+    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null): Application
     {
         return static::$application;
     }

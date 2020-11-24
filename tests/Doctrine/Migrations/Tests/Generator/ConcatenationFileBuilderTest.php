@@ -21,7 +21,7 @@ class ConcatenationFileBuilderTest extends TestCase
     /** @var FileBuilder */
     private $migrationFileBuilder;
 
-    public function testBuildMigrationFile() : void
+    public function testBuildMigrationFile(): void
     {
         $queriesByVersion = [
             'foo' => [
@@ -68,7 +68,7 @@ FILE;
         self::assertSame($expected, $migrationFile);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->platform = $this->createMock(AbstractPlatform::class);
 

@@ -16,7 +16,7 @@ final class ExistingConfiguration implements ConfigurationLoader
         $this->configurations = $configurations;
     }
 
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         return $this->configurations;
     }

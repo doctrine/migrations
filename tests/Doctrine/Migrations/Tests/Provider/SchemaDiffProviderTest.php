@@ -17,14 +17,14 @@ class SchemaDiffProviderTest extends MigrationTestCase
     /** @var SchemaDiffProvider */
     private $provider;
 
-    public function testCreateFromSchema() : void
+    public function testCreateFromSchema(): void
     {
         $schema = $this->provider->createFromSchema();
 
         self::assertTrue($schema->hasTable('foo'));
     }
 
-    public function testGetSqlDiffToMigrate() : void
+    public function testGetSqlDiffToMigrate(): void
     {
         $oldSchema = $this->provider->createFromSchema();
 
@@ -37,7 +37,7 @@ class SchemaDiffProviderTest extends MigrationTestCase
         self::assertContains('DROP TABLE foo', $queries);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $conn           = $this->getSqliteConnection();
         $schemaManager  = $conn->getSchemaManager();

@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function sprintf;
 
 /**
@@ -30,7 +31,7 @@ final class VersionCommand extends DoctrineCommand
     /** @var bool */
     private $markMigrated;
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['version'])
@@ -102,7 +103,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw InvalidOptionUsage::new('You must specify whether you want to --add or --delete the specified version.');
@@ -130,7 +131,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    private function markVersions(InputInterface $input, OutputInterface $output) : void
+    private function markVersions(InputInterface $input, OutputInterface $output): void
     {
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
@@ -188,7 +189,7 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsList $executedMigrations) : void
+    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsList $executedMigrations): void
     {
         try {
             $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Query;
 
 use Doctrine\Migrations\Query\Exception\InvalidArguments;
+
 use function count;
 
 /**
@@ -36,24 +37,24 @@ final class Query
         $this->types      = $types;
     }
 
-    public function __toString() : string
+    public function __toString(): string
     {
         return $this->statement;
     }
 
-    public function getStatement() : string
+    public function getStatement(): string
     {
         return $this->statement;
     }
 
     /** @return mixed[] */
-    public function getParameters() : array
+    public function getParameters(): array
     {
         return $this->parameters;
     }
 
     /** @return mixed[] */
-    public function getTypes() : array
+    public function getTypes(): array
     {
         return $this->types;
     }

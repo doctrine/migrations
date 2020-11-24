@@ -15,7 +15,7 @@ use PHPUnit\Framework\TestCase;
 
 final class ConnectionLoaderTest extends TestCase
 {
-    public function testExistingConnectionLoader() : void
+    public function testExistingConnectionLoader(): void
     {
         $conn   = $this->createMock(Connection::class);
         $loader = new ExistingConnection($conn);
@@ -23,7 +23,7 @@ final class ConnectionLoaderTest extends TestCase
         self::assertSame($conn, $loader->getConnection());
     }
 
-    public function testNamedConnectionIsNotSupported() : void
+    public function testNamedConnectionIsNotSupported(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
@@ -34,7 +34,7 @@ final class ConnectionLoaderTest extends TestCase
         self::assertSame($conn, $loader->getConnection('foo'));
     }
 
-    public function testArrayConnectionConfigurationLoader() : void
+    public function testArrayConnectionConfigurationLoader(): void
     {
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection.php');
         $conn   = $loader->getConnection();
@@ -42,7 +42,7 @@ final class ConnectionLoaderTest extends TestCase
         self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
     }
 
-    public function testArrayConnectionConfigurationLoaderWithConnectionInstance() : void
+    public function testArrayConnectionConfigurationLoaderWithConnectionInstance(): void
     {
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection-instance.php');
         $conn   = $loader->getConnection();
@@ -50,14 +50,14 @@ final class ConnectionLoaderTest extends TestCase
         self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
     }
 
-    public function testArrayConnectionConfigurationLoaderInvalid() : void
+    public function testArrayConnectionConfigurationLoaderInvalid(): void
     {
         $this->expectException(InvalidConfiguration::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection-invalid.php');
         $loader->getConnection();
     }
 
-    public function testArrayConnectionConfigurationLoaderNotFound() : void
+    public function testArrayConnectionConfigurationLoaderNotFound(): void
     {
         $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');

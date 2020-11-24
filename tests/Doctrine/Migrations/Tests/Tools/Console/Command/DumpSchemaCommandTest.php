@@ -19,6 +19,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_map;
 use function explode;
 use function sys_get_temp_dir;
@@ -44,7 +45,7 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var CommandTester */
     private $dumpSchemaCommandTester;
 
-    public function testExecuteThrowsRuntimeException() : void
+    public function testExecuteThrowsRuntimeException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
@@ -58,7 +59,7 @@ final class DumpSchemaCommandTest extends TestCase
         $this->dumpSchemaCommandTester->execute([]);
     }
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
@@ -90,7 +91,7 @@ final class DumpSchemaCommandTest extends TestCase
         );
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());

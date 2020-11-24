@@ -21,6 +21,10 @@ use the `--dry-run` parameter instead.
 - Running the `migrations:migrate` or `migrations:execute` command will automatically upgrade the migration
 table structure; a dedicated `migrations:sync-metadata-storage` command is available to sync manually the migrations table. 
 
+## Migration template
+
+- The `<version>` placeholder has been replaced by the `<className>` placeholder.
+
 ## Configuration files
 
 *migrations.php Before*

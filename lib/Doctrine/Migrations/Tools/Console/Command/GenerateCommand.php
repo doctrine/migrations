@@ -8,6 +8,7 @@ use Exception;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function is_string;
 use function key;
@@ -21,7 +22,7 @@ final class GenerateCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:generate';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['generate'])
@@ -43,7 +44,7 @@ EOT
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output) : int
+    protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $configuration = $this->getDependencyFactory()->getConfiguration();
 

@@ -28,7 +28,7 @@ class MigrationPlanListTest extends TestCase
     /** @var MigrationPlan */
     private $m3;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
         $this->m1                = new MigrationPlan(new Version('A'), $this->abstractMigration, Direction::UP);
@@ -38,7 +38,7 @@ class MigrationPlanListTest extends TestCase
         $this->set = new MigrationPlanList([$this->m1, $this->m2, $this->m3], Direction::UP);
     }
 
-    public function testFirstWhenEmpty() : void
+    public function testFirstWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
@@ -46,7 +46,7 @@ class MigrationPlanListTest extends TestCase
         $set->getFirst();
     }
 
-    public function testLastWhenEmpty() : void
+    public function testLastWhenEmpty(): void
     {
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
@@ -54,33 +54,33 @@ class MigrationPlanListTest extends TestCase
         $set->getLast();
     }
 
-    public function testFirst() : void
+    public function testFirst(): void
     {
         self::assertSame($this->m1, $this->set->getFirst());
     }
 
-    public function testLast() : void
+    public function testLast(): void
     {
         self::assertSame($this->m3, $this->set->getLast());
     }
 
-    public function testItems() : void
+    public function testItems(): void
     {
         self::assertSame([$this->m1, $this->m2, $this->m3], $this->set->getItems());
     }
 
-    public function testCount() : void
+    public function testCount(): void
     {
         self::assertCount(3, $this->set);
     }
 
-    public function testDirection() : void
+    public function testDirection(): void
     {
         self::assertSame(Direction::UP, $this->set->getDirection());
         self::assertSame(Direction::UP, $this->set->getFirst()->getDirection());
     }
 
-    public function testPlan() : void
+    public function testPlan(): void
     {
         self::assertSame(Direction::UP, $this->m1->getDirection());
         self::assertSame($this->abstractMigration, $this->m1->getMigration());
@@ -88,7 +88,7 @@ class MigrationPlanListTest extends TestCase
         self::assertNull($this->m1->getResult());
     }
 
-    public function testPlanResultCanBeSetOnlyOnce() : void
+    public function testPlanResultCanBeSetOnlyOnce(): void
     {
         $this->expectException(PlanAlreadyExecuted::class);
         $this->expectExceptionMessage('This plan was already marked as executed.');
@@ -98,7 +98,7 @@ class MigrationPlanListTest extends TestCase
         $this->m1->markAsExecuted($result);
     }
 
-    public function testPlanResult() : void
+    public function testPlanResult(): void
     {
         $result = new ExecutionResult(new Version('A'), Direction::UP);
         $this->m1->markAsExecuted($result);

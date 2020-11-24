@@ -31,7 +31,7 @@ final class MigrationStatusCalculatorTest extends TestCase
     /** @var MockObject|AbstractMigration */
     private $abstractMigration;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->abstractMigration       = $this->createMock(AbstractMigration::class);
         $this->metadataStorage         = $this->createMock(MetadataStorage::class);
@@ -40,7 +40,7 @@ final class MigrationStatusCalculatorTest extends TestCase
         $this->migrationStatusCalculator = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
     }
 
-    public function testGetNewMigrations() : void
+    public function testGetNewMigrations(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -63,7 +63,7 @@ final class MigrationStatusCalculatorTest extends TestCase
         self::assertSame([$m2, $m3], $newSet->getItems());
     }
 
-    public function testGetExecutedUnavailableMigrations() : void
+    public function testGetExecutedUnavailableMigrations(): void
     {
         $a1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 

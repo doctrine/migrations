@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
+
 use function strcasecmp;
 
 /**
@@ -54,19 +55,19 @@ final class Configuration
     /** @var bool */
     private $frozen = false;
 
-    public function freeze() : void
+    public function freeze(): void
     {
         $this->frozen = true;
     }
 
-    private function assertNotFrozen() : void
+    private function assertNotFrozen(): void
     {
         if ($this->frozen) {
             throw FrozenConfiguration::new();
         }
     }
 
-    public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfiguration) : void
+    public function setMetadataStorageConfiguration(MetadataStorageConfiguration $metadataStorageConfiguration): void
     {
         $this->assertNotFrozen();
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
@@ -75,23 +76,23 @@ final class Configuration
     /**
      * @return string[]
      */
-    public function getMigrationClasses() : array
+    public function getMigrationClasses(): array
     {
         return $this->migrationClasses;
     }
 
-    public function addMigrationClass(string $className) : void
+    public function addMigrationClass(string $className): void
     {
         $this->assertNotFrozen();
         $this->migrationClasses[] = $className;
     }
 
-    public function getMetadataStorageConfiguration() : ?MetadataStorageConfiguration
+    public function getMetadataStorageConfiguration(): ?MetadataStorageConfiguration
     {
         return $this->metadataStorageConfiguration;
     }
 
-    public function addMigrationsDirectory(string $namespace, string $path) : void
+    public function addMigrationsDirectory(string $namespace, string $path): void
     {
         $this->assertNotFrozen();
         $this->migrationsDirectories[$namespace] = $path;
@@ -100,45 +101,45 @@ final class Configuration
     /**
      * @return array<string,string>
      */
-    public function getMigrationDirectories() : array
+    public function getMigrationDirectories(): array
     {
         return $this->migrationsDirectories;
     }
 
-    public function getConnectionName() : ?string
+    public function getConnectionName(): ?string
     {
         return $this->connectionName;
     }
 
-    public function setConnectionName(?string $connectionName) : void
+    public function setConnectionName(?string $connectionName): void
     {
         $this->assertNotFrozen();
         $this->connectionName = $connectionName;
     }
 
-    public function getEntityManagerName() : ?string
+    public function getEntityManagerName(): ?string
     {
         return $this->entityManagerName;
     }
 
-    public function setEntityManagerName(?string $entityManagerName) : void
+    public function setEntityManagerName(?string $entityManagerName): void
     {
         $this->assertNotFrozen();
         $this->entityManagerName = $entityManagerName;
     }
 
-    public function setCustomTemplate(?string $customTemplate) : void
+    public function setCustomTemplate(?string $customTemplate): void
     {
         $this->assertNotFrozen();
         $this->customTemplate = $customTemplate;
     }
 
-    public function getCustomTemplate() : ?string
+    public function getCustomTemplate(): ?string
     {
         return $this->customTemplate;
     }
 
-    public function areMigrationsOrganizedByYear() : bool
+    public function areMigrationsOrganizedByYear(): bool
     {
         return $this->migrationsAreOrganizedByYear;
     }
@@ -148,7 +149,7 @@ final class Configuration
      */
     public function setMigrationsAreOrganizedByYear(
         bool $migrationsAreOrganizedByYear = true
-    ) : void {
+    ): void {
         $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
     }
@@ -158,50 +159,50 @@ final class Configuration
      */
     public function setMigrationsAreOrganizedByYearAndMonth(
         bool $migrationsAreOrganizedByYearAndMonth = true
-    ) : void {
+    ): void {
         $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear         = $migrationsAreOrganizedByYearAndMonth;
         $this->migrationsAreOrganizedByYearAndMonth = $migrationsAreOrganizedByYearAndMonth;
     }
 
-    public function areMigrationsOrganizedByYearAndMonth() : bool
+    public function areMigrationsOrganizedByYearAndMonth(): bool
     {
         return $this->migrationsAreOrganizedByYearAndMonth;
     }
 
-    public function setIsDryRun(bool $isDryRun) : void
+    public function setIsDryRun(bool $isDryRun): void
     {
         $this->assertNotFrozen();
         $this->isDryRun = $isDryRun;
     }
 
-    public function isDryRun() : bool
+    public function isDryRun(): bool
     {
         return $this->isDryRun;
     }
 
-    public function setAllOrNothing(bool $allOrNothing) : void
+    public function setAllOrNothing(bool $allOrNothing): void
     {
         $this->assertNotFrozen();
         $this->allOrNothing = $allOrNothing;
     }
 
-    public function isAllOrNothing() : bool
+    public function isAllOrNothing(): bool
     {
         return $this->allOrNothing;
     }
 
-    public function setCheckDatabasePlatform(bool $checkDbPlatform) : void
+    public function setCheckDatabasePlatform(bool $checkDbPlatform): void
     {
         $this->checkDbPlatform = $checkDbPlatform;
     }
 
-    public function isDatabasePlatformChecked() : bool
+    public function isDatabasePlatformChecked(): bool
     {
         return $this->checkDbPlatform;
     }
 
-    public function setMigrationOrganization(string $migrationOrganization) : void
+    public function setMigrationOrganization(string $migrationOrganization): void
     {
         $this->assertNotFrozen();
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {

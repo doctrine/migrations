@@ -11,6 +11,7 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function trim;
 
 final class RollupCommandTest extends TestCase
@@ -27,7 +28,7 @@ final class RollupCommandTest extends TestCase
     /** @var CommandTester */
     private $rollupCommandTest;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $this->dependencyFactory
             ->expects(self::once())
@@ -44,7 +45,7 @@ final class RollupCommandTest extends TestCase
         self::assertSame('[OK] Rolled up migrations to version 1234', trim($output));
     }
 
-    public function testExecutionContinuesWhenAnsweringYes() : void
+    public function testExecutionContinuesWhenAnsweringYes(): void
     {
         $this->rollupCommandTest->setInputs(['yes']);
 
@@ -63,7 +64,7 @@ final class RollupCommandTest extends TestCase
         self::assertStringContainsString('[OK] Rolled up migrations to version 1234', trim($output));
     }
 
-    public function testExecutionStoppedWhenAnsweringNo() : void
+    public function testExecutionStoppedWhenAnsweringNo(): void
     {
         $this->rollupCommandTest->setInputs(['no']);
 
@@ -82,7 +83,7 @@ final class RollupCommandTest extends TestCase
         self::assertStringContainsString('[ERROR] Migration cancelled!', trim($output));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);

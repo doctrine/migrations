@@ -17,6 +17,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
+
 use function is_string;
 
 /**
@@ -36,7 +37,7 @@ abstract class DoctrineCommand extends Command
         $this->dependencyFactory = $dependencyFactory;
     }
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this->addOption(
             'configuration',
@@ -72,7 +73,7 @@ abstract class DoctrineCommand extends Command
         );
     }
 
-    protected function initialize(InputInterface $input, OutputInterface $output) : void
+    protected function initialize(InputInterface $input, OutputInterface $output): void
     {
         $this->io = new SymfonyStyle($input, $output);
 
@@ -83,7 +84,7 @@ abstract class DoctrineCommand extends Command
                     ? $configurationParameter
                     : null
             );
-            $connectionLoader        = new ConfigurationFile((string) $input->getOption('db-configuration'));
+            $connectionLoader        = new ConfigurationFile($input->getOption('db-configuration'));
             $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);
         } elseif (is_string($configurationParameter)) {
             $configurationLoader = new ConfigurationFileWithFallback($configurationParameter);
@@ -101,7 +102,7 @@ abstract class DoctrineCommand extends Command
         $this->dependencyFactory->freeze();
     }
 
-    protected function getDependencyFactory() : DependencyFactory
+    protected function getDependencyFactory(): DependencyFactory
     {
         if ($this->dependencyFactory === null) {
             throw DependenciesNotSatisfied::new();
@@ -110,12 +111,12 @@ abstract class DoctrineCommand extends Command
         return $this->dependencyFactory;
     }
 
-    protected function canExecute(string $question, InputInterface $input) : bool
+    protected function canExecute(string $question, InputInterface $input): bool
     {
         return ! $input->isInteractive() || $this->io->confirm($question);
     }
 
-    private function setNamedEmOrConnection(InputInterface $input) : void
+    private function setNamedEmOrConnection(InputInterface $input): void
     {
         $emName   = $input->getOption('em');
         $connName = $input->getOption('conn');
@@ -124,13 +125,13 @@ abstract class DoctrineCommand extends Command
         }
 
         if ($this->dependencyFactory->hasEntityManager() && $emName !== null) {
-            $this->dependencyFactory->getConfiguration()->setEntityManagerName((string) $emName);
+            $this->dependencyFactory->getConfiguration()->setEntityManagerName($emName);
 
             return;
         }
 
         if ($connName !== null) {
-            $this->dependencyFactory->getConfiguration()->setConnectionName((string) $connName);
+            $this->dependencyFactory->getConfiguration()->setConnectionName($connName);
 
             return;
         }

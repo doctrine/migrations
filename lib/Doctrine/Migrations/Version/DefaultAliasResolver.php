@@ -8,6 +8,7 @@ use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+
 use function substr;
 
 /**
@@ -59,7 +60,7 @@ final class DefaultAliasResolver implements AliasResolver
      * @throws UnknownMigrationVersion
      * @throws NoMigrationsFoundWithCriteria
      */
-    public function resolveVersionAlias(string $alias) : Version
+    public function resolveVersionAlias(string $alias): Version
     {
         $availableMigrations = $this->migrationPlanCalculator->getMigrations();
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
@@ -68,6 +69,7 @@ final class DefaultAliasResolver implements AliasResolver
             case self::ALIAS_FIRST:
             case '0':
                 return new Version('0');
+
             case self::ALIAS_CURRENT:
                 try {
                     return $executedMigrations->getLast()->getVersion();

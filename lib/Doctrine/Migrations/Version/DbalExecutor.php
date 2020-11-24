@@ -22,6 +22,7 @@ use Psr\Log\LoggerInterface;
 use Psr\Log\LogLevel;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
+
 use function count;
 use function ucfirst;
 
@@ -77,12 +78,12 @@ final class DbalExecutor implements Executor
     /**
      * @return Query[]
      */
-    public function getSql() : array
+    public function getSql(): array
     {
         return $this->sql;
     }
 
-    public function addSql(Query $sqlQuery) : void
+    public function addSql(Query $sqlQuery): void
     {
         $this->sql[] = $sqlQuery;
     }
@@ -90,7 +91,7 @@ final class DbalExecutor implements Executor
     public function execute(
         MigrationPlan $plan,
         MigratorConfiguration $configuration
-    ) : ExecutionResult {
+    ): ExecutionResult {
         $result = new ExecutionResult($plan->getVersion(), $plan->getDirection(), new DateTimeImmutable());
 
         $this->startMigration($plan, $configuration);
@@ -121,7 +122,7 @@ final class DbalExecutor implements Executor
     private function startMigration(
         MigrationPlan $plan,
         MigratorConfiguration $configuration
-    ) : void {
+    ): void {
         $this->sql = [];
 
         $this->dispatcher->dispatchVersionEvent(
@@ -142,7 +143,7 @@ final class DbalExecutor implements Executor
         MigrationPlan $plan,
         ExecutionResult $result,
         MigratorConfiguration $configuration
-    ) : ExecutionResult {
+    ): ExecutionResult {
         $stopwatchEvent = $this->stopwatch->start('execute');
 
         $migration = $plan->getMigration();
@@ -192,9 +193,9 @@ final class DbalExecutor implements Executor
 
         $stopwatchEvent->stop();
         $periods    = $stopwatchEvent->getPeriods();
-        $lastPeriod = $periods[count($periods) -1];
+        $lastPeriod = $periods[count($periods) - 1];
 
-        $result->setTime((float) $lastPeriod->getDuration()/1000);
+        $result->setTime((float) $lastPeriod->getDuration() / 1000);
         $result->setMemory($lastPeriod->getMemory());
 
         $params = [
@@ -230,7 +231,7 @@ final class DbalExecutor implements Executor
     /**
      * @return mixed[]
      */
-    private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction) : array
+    private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction): array
     {
         $versionInfo = (string) $planItem->getVersion();
         $description = $migration->getDescription();
@@ -248,7 +249,7 @@ final class DbalExecutor implements Executor
         return ['++ reverting {version_name}', $params];
     }
 
-    private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration) : void
+    private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration): void
     {
         $migration = $plan->getMigration();
         if ($migration->isTransactional()) {
@@ -266,7 +267,7 @@ final class DbalExecutor implements Executor
         );
     }
 
-    private function logResult(Throwable $e, ExecutionResult $result, MigrationPlan $plan) : void
+    private function logResult(Throwable $e, ExecutionResult $result, MigrationPlan $plan): void
     {
         if ($result->isSkipped()) {
             $this->logger->error(
@@ -289,13 +290,14 @@ final class DbalExecutor implements Executor
         }
     }
 
-    private function executeResult(MigratorConfiguration $configuration) : void
+    private function executeResult(MigratorConfiguration $configuration): void
     {
         foreach ($this->sql as $key => $query) {
             $this->outputSqlQuery($query, $configuration);
 
             $stopwatchEvent = $this->stopwatch->start('query');
-            $this->connection->executeUpdate($query->getStatement(), $query->getParameters(), $query->getTypes());
+            // executeQuery() must be used here because $query might return a result set, for instance REPAIR does
+            $this->connection->executeQuery($query->getStatement(), $query->getParameters(), $query->getTypes());
             $stopwatchEvent->stop();
 
             if (! $configuration->getTimeAllQueries()) {
@@ -308,7 +310,7 @@ final class DbalExecutor implements Executor
         }
     }
 
-    private function outputSqlQuery(Query $query, MigratorConfiguration $configuration) : void
+    private function outputSqlQuery(Query $query, MigratorConfiguration $configuration): void
     {
         $params = $this->parameterFormatter->formatParameters(
             $query->getParameters(),
@@ -325,7 +327,7 @@ final class DbalExecutor implements Executor
         );
     }
 
-    private function getFromSchema(MigratorConfiguration $configuration) : Schema
+    private function getFromSchema(MigratorConfiguration $configuration): Schema
     {
         // if we're in a dry run, use the from Schema instead of reading the schema from the database
         if ($configuration->isDryRun() && $configuration->getFromSchema() !== null) {
@@ -335,15 +337,18 @@ final class DbalExecutor implements Executor
         return $this->schemaProvider->createFromSchema();
     }
 
-    private function getExecutionStateAsString(int $state) : string
+    private function getExecutionStateAsString(int $state): string
     {
         switch ($state) {
             case State::PRE:
                 return 'Pre-Checks';
+
             case State::POST:
                 return 'Post-Checks';
+
             case State::EXEC:
                 return 'Execution';
+
             default:
                 return 'No State';
         }

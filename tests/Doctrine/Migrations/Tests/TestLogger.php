@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use DateTime;
 use DateTimeInterface;
 use Psr\Log\AbstractLogger;
+
 use function get_class;
 use function gettype;
 use function is_object;
@@ -23,7 +24,7 @@ class TestLogger extends AbstractLogger
     /**
      * {@inheritDoc}
      */
-    public function log($level, $message, array $context = []) : void
+    public function log($level, $message, array $context = []): void
     {
         $this->logs[] = $this->interpolate($message, $context);
     }
@@ -33,7 +34,7 @@ class TestLogger extends AbstractLogger
      *
      * @param mixed[] $context
      */
-    private function interpolate(string $message, array $context) : string
+    private function interpolate(string $message, array $context): string
     {
         if (strpos($message, '{') === false) {
             return $message;

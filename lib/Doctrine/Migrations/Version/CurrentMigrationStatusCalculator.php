@@ -9,6 +9,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
+
 use function array_filter;
 
 /**
@@ -31,22 +32,22 @@ final class CurrentMigrationStatusCalculator implements MigrationStatusCalculato
         $this->metadataStorage         = $metadataStorage;
     }
 
-    public function getExecutedUnavailableMigrations() : ExecutedMigrationsList
+    public function getExecutedUnavailableMigrations(): ExecutedMigrationsList
     {
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
         $availableMigration = $this->migrationPlanCalculator->getMigrations();
 
-        return new ExecutedMigrationsList(array_filter($executedMigrations->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigration) : bool {
+        return new ExecutedMigrationsList(array_filter($executedMigrations->getItems(), static function (ExecutedMigration $migrationInfo) use ($availableMigration): bool {
             return ! $availableMigration->hasMigration($migrationInfo->getVersion());
         }));
     }
 
-    public function getNewMigrations() : AvailableMigrationsList
+    public function getNewMigrations(): AvailableMigrationsList
     {
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
         $availableMigration = $this->migrationPlanCalculator->getMigrations();
 
-        return new AvailableMigrationsList(array_filter($availableMigration->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrations) : bool {
+        return new AvailableMigrationsList(array_filter($availableMigration->getItems(), static function (AvailableMigration $migrationInfo) use ($executedMigrations): bool {
             return ! $executedMigrations->hasMigration($migrationInfo->getVersion());
         }));
     }

@@ -25,7 +25,9 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
+
 use function array_map;
+
 use const DIRECTORY_SEPARATOR;
 
 class MigratorTest extends MigrationTestCase
@@ -48,7 +50,7 @@ class MigratorTest extends MigrationTestCase
     /** @var TestLogger */
     private $logger;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->conn   = $this->createMock(Connection::class);
         $this->config = new Configuration();
@@ -60,7 +62,7 @@ class MigratorTest extends MigrationTestCase
         );
     }
 
-    public function testGetSql() : void
+    public function testGetSql(): void
     {
         $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
 
@@ -80,7 +82,7 @@ class MigratorTest extends MigrationTestCase
         );
     }
 
-    public function testEmptyPlanShowsMessage() : void
+    public function testEmptyPlanShowsMessage(): void
     {
         $migrator = $this->createTestMigrator();
 
@@ -91,7 +93,7 @@ class MigratorTest extends MigrationTestCase
         self::assertStringContainsString('No migrations', $this->logger->logs[0]);
     }
 
-    protected function createTestMigrator() : DbalMigrator
+    protected function createTestMigrator(): DbalMigrator
     {
         $eventManager    = new EventManager();
         $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
@@ -108,7 +110,7 @@ class MigratorTest extends MigrationTestCase
         return new DbalMigrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
     }
 
-    public function testMigrateAllOrNothing() : void
+    public function testMigrateAllOrNothing(): void
     {
         $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
 
@@ -141,7 +143,7 @@ class MigratorTest extends MigrationTestCase
         );
     }
 
-    public function testMigrateAllOrNothingRollback() : void
+    public function testMigrateAllOrNothingRollback(): void
     {
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Migration up throws exception.');

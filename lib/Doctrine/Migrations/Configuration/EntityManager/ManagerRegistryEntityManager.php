@@ -16,7 +16,7 @@ final class ManagerRegistryEntityManager implements EntityManagerLoader
     /** @var string|null */
     private $defaultManagerName;
 
-    public static function withSimpleDefault(ManagerRegistry $registry, ?string $managerName = null) : self
+    public static function withSimpleDefault(ManagerRegistry $registry, ?string $managerName = null): self
     {
         $that                     = new self();
         $that->registry           = $registry;
@@ -29,7 +29,7 @@ final class ManagerRegistryEntityManager implements EntityManagerLoader
     {
     }
 
-    public function getEntityManager(?string $name = null) : EntityManagerInterface
+    public function getEntityManager(?string $name = null): EntityManagerInterface
     {
         $managerName = $name ?? $this->defaultManagerName;
 

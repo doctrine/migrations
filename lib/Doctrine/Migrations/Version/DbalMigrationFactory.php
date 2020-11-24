@@ -27,7 +27,7 @@ final class DbalMigrationFactory implements MigrationFactory
         $this->logger     = $logger;
     }
 
-    public function createVersion(string $migrationClassName) : AbstractMigration
+    public function createVersion(string $migrationClassName): AbstractMigration
     {
         return new $migrationClassName(
             $this->connection,

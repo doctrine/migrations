@@ -13,6 +13,7 @@ use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
+
 use function array_diff;
 use function array_filter;
 use function array_map;
@@ -52,20 +53,20 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
     /**
      * @param Version[] $versions
      */
-    public function getPlanForVersions(array $versions, string $direction) : MigrationPlanList
+    public function getPlanForVersions(array $versions, string $direction): MigrationPlanList
     {
         $migrationsToCheck   = $this->arrangeMigrationsForDirection($direction, $this->getMigrations());
-        $availableMigrations = array_filter($migrationsToCheck, static function (AvailableMigration $availableMigration) use ($versions) : bool {
+        $availableMigrations = array_filter($migrationsToCheck, static function (AvailableMigration $availableMigration) use ($versions): bool {
             // in_array third parameter is intentionally false to force object to string casting
             return in_array($availableMigration->getVersion(), $versions, false);
         });
 
-        $planItems = array_map(static function (AvailableMigration $availableMigration) use ($direction) : MigrationPlan {
+        $planItems = array_map(static function (AvailableMigration $availableMigration) use ($direction): MigrationPlan {
             return new MigrationPlan($availableMigration->getVersion(), $availableMigration->getMigration(), $direction);
         }, $availableMigrations);
 
         if (count($planItems) !== count($versions)) {
-            $plannedVersions = array_map(static function (MigrationPlan $migrationPlan) : Version {
+            $plannedVersions = array_map(static function (MigrationPlan $migrationPlan): Version {
                 return $migrationPlan->getVersion();
             }, $planItems);
             $diff            = array_diff($versions, $plannedVersions);
@@ -76,7 +77,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         return new MigrationPlanList($planItems, $direction);
     }
 
-    public function getPlanUntilVersion(Version $to) : MigrationPlanList
+    public function getPlanUntilVersion(Version $to): MigrationPlanList
     {
         if ((string) $to !== '0' && ! $this->migrationRepository->hasMigration((string) $to)) {
             throw MigrationClassNotFound::new((string) $to);
@@ -91,22 +92,22 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
 
         $toExecute = $this->findMigrationsToExecute($to, $migrationsToCheck, $direction, $executedMigrations);
 
-        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction) : MigrationPlan {
+        return new MigrationPlanList(array_map(static function (AvailableMigration $migration) use ($direction): MigrationPlan {
             return new MigrationPlan($migration->getVersion(), $migration->getMigration(), $direction);
         }, $toExecute), $direction);
     }
 
-    public function getMigrations() : AvailableMigrationsList
+    public function getMigrations(): AvailableMigrationsList
     {
         $availableMigrations = $this->migrationRepository->getMigrations()->getItems();
-        uasort($availableMigrations, function (AvailableMigration $a, AvailableMigration $b) : int {
+        uasort($availableMigrations, function (AvailableMigration $a, AvailableMigration $b): int {
             return $this->sorter->compare($a->getVersion(), $b->getVersion());
         });
 
         return new AvailableMigrationsList($availableMigrations);
     }
 
-    private function findDirection(Version $to, ExecutedMigrationsList $executedMigrations) : string
+    private function findDirection(Version $to, ExecutedMigrationsList $executedMigrations): string
     {
         if ((string) $to === '0' || ($executedMigrations->hasMigration($to) && ! $executedMigrations->getLast()->getVersion()->equals($to))) {
             return Direction::DOWN;
@@ -118,7 +119,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
     /**
      * @return  AvailableMigration[]
      */
-    private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations) : array
+    private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations): array
     {
         return $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());
     }
@@ -128,7 +129,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
      *
      * @return AvailableMigration[]
      */
-    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, ExecutedMigrationsList $executedMigrations) : array
+    private function findMigrationsToExecute(Version $to, array $migrationsToCheck, string $direction, ExecutedMigrationsList $executedMigrations): array
     {
         $toExecute = [];
         foreach ($migrationsToCheck as $availableMigration) {

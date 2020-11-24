@@ -28,6 +28,7 @@ use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 use Throwable;
+
 use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
@@ -52,7 +53,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliases
      */
-    public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
+    public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);
@@ -81,7 +82,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliasesWithNoExecuted
      */
-    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null) : void
+    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);
@@ -103,7 +104,7 @@ final class AliasResolverTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function getAliasesWithNoExecuted() : array
+    public function getAliasesWithNoExecuted(): array
     {
         return [
             ['first', '0'],
@@ -121,7 +122,7 @@ final class AliasResolverTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function getAliases() : array
+    public function getAliases(): array
     {
         return [
             ['first', '0'],
@@ -137,7 +138,7 @@ final class AliasResolverTest extends TestCase
         ];
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $configuration = new Configuration();
         $configuration->setMetadataStorageConfiguration(new TableMetadataStorageConfiguration());
@@ -171,7 +172,7 @@ final class AliasResolverTest extends TestCase
         );
     }
 
-    private function getSqliteConnection() : Connection
+    private function getSqliteConnection(): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 

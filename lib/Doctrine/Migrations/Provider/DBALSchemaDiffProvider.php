@@ -32,18 +32,18 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
         $this->platform      = $platform;
     }
 
-    public function createFromSchema() : Schema
+    public function createFromSchema(): Schema
     {
         return $this->schemaManager->createSchema();
     }
 
-    public function createToSchema(Schema $fromSchema) : Schema
+    public function createToSchema(Schema $fromSchema): Schema
     {
         return clone $fromSchema;
     }
 
     /** @return string[] */
-    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema) : array
+    public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array
     {
         return $fromSchema->getMigrateToSql($toSchema, $this->platform);
     }

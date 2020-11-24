@@ -19,11 +19,12 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function sys_get_temp_dir;
 
 class DoctrineCommandTest extends MigrationTestCase
 {
-    public function testCommandFreezes() : void
+    public function testCommandFreezes(): void
     {
         $dependencyFactory = $this->getMockBuilder(DependencyFactory::class)
             ->disableOriginalConstructor()
@@ -34,9 +35,9 @@ class DoctrineCommandTest extends MigrationTestCase
             ->expects(self::once())
             ->method('freeze');
 
-        $command       = new class($dependencyFactory) extends DoctrineCommand
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
             }
@@ -49,7 +50,7 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
-    public function testCustomConfiguration() : void
+    public function testCustomConfiguration(): void
     {
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
@@ -61,9 +62,9 @@ class DoctrineCommandTest extends MigrationTestCase
             new ExistingConnection($conn)
         );
 
-        $command       = new class($dependencyFactory) extends DoctrineCommand
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $migrationDirectories = $this->getDependencyFactory()->getConfiguration()->getMigrationDirectories();
                 DoctrineCommandTest::assertSame(['DoctrineMigrationsTest' => 'bar'], $migrationDirectories);
@@ -79,7 +80,7 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
-    public function testCustomEntityManager() : void
+    public function testCustomEntityManager(): void
     {
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
@@ -93,7 +94,7 @@ class DoctrineCommandTest extends MigrationTestCase
             ManagerRegistryEntityManager::withSimpleDefault($registry)
         );
 
-        $command       = new class($em2, $dependencyFactory) extends DoctrineCommand
+        $command       = new class ($em2, $dependencyFactory) extends DoctrineCommand
         {
             /** @var EntityManager */
             private $expectedEm;
@@ -104,7 +105,7 @@ class DoctrineCommandTest extends MigrationTestCase
                 $this->expectedEm = $entityManager;
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $em = $this->getDependencyFactory()->getEntityManager();
                 DoctrineCommandTest::assertSame($this->expectedEm, $em);
@@ -120,7 +121,7 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
-    public function testCustomConnection() : void
+    public function testCustomConnection(): void
     {
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
@@ -134,7 +135,7 @@ class DoctrineCommandTest extends MigrationTestCase
             ConnectionRegistryConnection::withSimpleDefault($registry)
         );
 
-        $command       = new class($conn2, $dependencyFactory) extends DoctrineCommand
+        $command       = new class ($conn2, $dependencyFactory) extends DoctrineCommand
         {
             /** @var Connection */
             private $expectedConnection;
@@ -145,7 +146,7 @@ class DoctrineCommandTest extends MigrationTestCase
                 $this->expectedConnection = $connection;
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $connection = $this->getDependencyFactory()->getConnection();
                 DoctrineCommandTest::assertSame($this->expectedConnection, $connection);
@@ -161,7 +162,7 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
-    public function testCanNotSpecifyBothEmAndConnection() : void
+    public function testCanNotSpecifyBothEmAndConnection(): void
     {
         $this->expectException(InvalidOptionUsage::class);
         $this->expectExceptionMessage('You can specify only one of the --em and --conn options.');
@@ -176,9 +177,9 @@ class DoctrineCommandTest extends MigrationTestCase
             $connLoader
         );
 
-        $command       = new class($dependencyFactory) extends DoctrineCommand
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output) : int
+            protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
             }

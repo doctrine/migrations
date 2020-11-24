@@ -13,6 +13,7 @@ use OutOfBoundsException;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function addslashes;
 use function assert;
 use function class_exists;
@@ -21,6 +22,7 @@ use function filter_var;
 use function is_string;
 use function key;
 use function sprintf;
+
 use const FILTER_VALIDATE_BOOLEAN;
 
 /**
@@ -32,7 +34,7 @@ final class DiffCommand extends DoctrineCommand
     /** @var string */
     protected static $defaultName = 'migrations:diff';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         parent::configure();
 
@@ -83,6 +85,12 @@ EOT
                 null,
                 InputOption::VALUE_NONE,
                 'Do not throw an exception when no changes are detected.'
+            )
+            ->addOption(
+                'from-empty-schema',
+                null,
+                InputOption::VALUE_NONE,
+                'Generate a full migration as if the current database was empty.'
             );
     }
 
@@ -92,7 +100,7 @@ EOT
     protected function execute(
         InputInterface $input,
         OutputInterface $output
-    ) : int {
+    ): int {
         $filterExpression = (string) $input->getOption('filter-expression');
         if ($filterExpression === '') {
             $filterExpression = null;
@@ -102,6 +110,7 @@ EOT
         $lineLength      = (int) $input->getOption('line-length');
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
+        $fromEmptySchema = $input->getOption('from-empty-schema');
         $namespace       = $input->getOption('namespace');
         if ($namespace === '') {
             $namespace = null;
@@ -146,7 +155,8 @@ EOT
                 $filterExpression,
                 $formatted,
                 $lineLength,
-                $checkDbPlatform
+                $checkDbPlatform,
+                $fromEmptySchema
             );
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {
@@ -181,7 +191,7 @@ EOT
         ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input,
         OutputInterface $output
-    ) : bool {
+    ): bool {
         if (count($newMigrations) === 0 && count($executedUnavailableMigrations) === 0) {
             return true;
         }

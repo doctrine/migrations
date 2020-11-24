@@ -10,6 +10,7 @@ use Doctrine\Migrations\Configuration\Migration\Exception\XmlNotValid;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
 use DOMDocument;
 use SimpleXMLElement;
+
 use function assert;
 use function file_exists;
 use function file_get_contents;
@@ -17,12 +18,13 @@ use function libxml_clear_errors;
 use function libxml_use_internal_errors;
 use function simplexml_load_string;
 use function strtr;
+
 use const DIRECTORY_SEPARATOR;
 use const LIBXML_NOCDATA;
 
 final class XmlFile extends ConfigurationFile
 {
-    public function getConfiguration() : Configuration
+    public function getConfiguration(): Configuration
     {
         if (! file_exists($this->file)) {
             throw FileNotFound::new($this->file);
@@ -58,7 +60,7 @@ final class XmlFile extends ConfigurationFile
     /**
      * @return mixed[]
      */
-    private function extractParameters(SimpleXMLElement $root, bool $loopOverNodes) : array
+    private function extractParameters(SimpleXMLElement $root, bool $loopOverNodes): array
     {
         $config = [];
 
@@ -90,7 +92,7 @@ final class XmlFile extends ConfigurationFile
         return $config;
     }
 
-    private function validateXml(string $file) : void
+    private function validateXml(string $file): void
     {
         try {
             libxml_use_internal_errors(true);

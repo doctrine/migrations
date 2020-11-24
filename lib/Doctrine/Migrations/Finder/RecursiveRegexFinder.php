@@ -8,7 +8,9 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
+
 use function sprintf;
+
 use const DIRECTORY_SEPARATOR;
 
 /**
@@ -31,7 +33,7 @@ final class RecursiveRegexFinder extends Finder
     /**
      * @return string[]
      */
-    public function findMigrations(string $directory, ?string $namespace = null) : array
+    public function findMigrations(string $directory, ?string $namespace = null): array
     {
         $dir = $this->getRealPath($directory);
 
@@ -41,7 +43,7 @@ final class RecursiveRegexFinder extends Finder
         );
     }
 
-    private function createIterator(string $dir) : RegexIterator
+    private function createIterator(string $dir): RegexIterator
     {
         return new RegexIterator(
             new RecursiveIteratorIterator(
@@ -53,7 +55,7 @@ final class RecursiveRegexFinder extends Finder
         );
     }
 
-    private function getPattern() : string
+    private function getPattern(): string
     {
         return $this->pattern;
     }
@@ -61,7 +63,7 @@ final class RecursiveRegexFinder extends Finder
     /**
      * @return string[]
      */
-    private function getMatches(RegexIterator $iteratorFilesMatch) : array
+    private function getMatches(RegexIterator $iteratorFilesMatch): array
     {
         $files = [];
         foreach ($iteratorFilesMatch as $file) {

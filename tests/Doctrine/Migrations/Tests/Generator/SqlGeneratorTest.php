@@ -12,6 +12,7 @@ use Doctrine\SqlFormatter\NullHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
 use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
@@ -31,7 +32,7 @@ final class SqlGeneratorTest extends TestCase
     /** @var TableMetadataStorageConfiguration */
     private $metadataConfig;
 
-    public function testGenerate() : void
+    public function testGenerate(): void
     {
         $this->configuration->setCheckDatabasePlatform(true);
 
@@ -54,7 +55,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    public function testGenerationWithoutCheckingDatabasePlatform() : void
+    public function testGenerationWithoutCheckingDatabasePlatform(): void
     {
         $this->configuration->setCheckDatabasePlatform(true);
 
@@ -71,7 +72,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration() : void
+    public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration(): void
     {
         $this->configuration->setCheckDatabasePlatform(false);
 
@@ -88,7 +89,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = new Configuration();
         $this->platform      = $this->createMock(AbstractPlatform::class);
@@ -101,7 +102,7 @@ CODE
         );
     }
 
-    private function prepareGeneratedCode(string $expectedCode) : string
+    private function prepareGeneratedCode(string $expectedCode): string
     {
         $this->sql = [
             'SELECT 1',

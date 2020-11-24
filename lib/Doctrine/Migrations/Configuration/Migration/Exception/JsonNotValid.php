@@ -9,7 +9,7 @@ use LogicException;
 
 final class JsonNotValid extends LogicException implements ConfigurationException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('Configuration is not valid JSON.', 10);
     }

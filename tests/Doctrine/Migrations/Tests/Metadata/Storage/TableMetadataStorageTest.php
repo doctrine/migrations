@@ -7,12 +7,14 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\PDOSqlite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorage;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -21,6 +23,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
+
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -37,14 +40,14 @@ class TableMetadataStorageTest extends TestCase
     /** @var AbstractSchemaManager */
     private $schemaManager;
 
-    private function getSqliteConnection() : Connection
+    private function getSqliteConnection(): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
         return DriverManager::getConnection($params);
     }
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->connection    = $this->getSqliteConnection();
         $this->schemaManager = $this->connection->getSchemaManager();
@@ -53,7 +56,7 @@ class TableMetadataStorageTest extends TestCase
         $this->storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $this->config);
     }
 
-    public function testDifferentTableNotUpdatedOnRead() : void
+    public function testDifferentTableNotUpdatedOnRead(): void
     {
         $this->expectException(MetadataStorageError::class);
         $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
@@ -66,7 +69,7 @@ class TableMetadataStorageTest extends TestCase
         $this->storage->getExecutedMigrations();
     }
 
-    public function testTableNotCreatedOnReadButReadingWorks() : void
+    public function testTableNotCreatedOnReadButReadingWorks(): void
     {
         $executedMigrations = $this->storage->getExecutedMigrations();
 
@@ -74,7 +77,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertFalse($this->schemaManager->tablesExist([$this->config->getTableName()]));
     }
 
-    public function testTableStructureUpdate() : void
+    public function testTableStructureUpdate(): void
     {
         $config = new TableMetadataStorageConfiguration();
         $config->setTableName('a');
@@ -99,7 +102,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
     }
 
-    public function testTableNotUpToDateTriggersExcepton() : void
+    public function testTableNotUpToDateTriggersExcepton(): void
     {
         $this->expectException(MetadataStorageError::class);
         $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
@@ -120,7 +123,7 @@ class TableMetadataStorageTest extends TestCase
         $storage->getExecutedMigrations();
     }
 
-    public function testTableStructure() : void
+    public function testTableStructure(): void
     {
         $config = new TableMetadataStorageConfiguration();
         $config->setTableName('a');
@@ -140,7 +143,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
     }
 
-    public function testComplete() : void
+    public function testComplete(): void
     {
         $this->storage->ensureInitialized();
 
@@ -163,7 +166,7 @@ class TableMetadataStorageTest extends TestCase
         ], $rows);
     }
 
-    public function testCompleteWithFloatTime() : void
+    public function testCompleteWithFloatTime(): void
     {
         $this->storage->ensureInitialized();
 
@@ -186,7 +189,48 @@ class TableMetadataStorageTest extends TestCase
         ], $rows);
     }
 
-    public function testRead() : void
+    public function testCompleteWillAlwaysCastTimeToInteger(): void
+    {
+        $config     = new TableMetadataStorageConfiguration();
+        $executedAt = new DateTimeImmutable('2010-01-05 10:30:21');
+
+        $connection = $this->getMockBuilder(Connection::class)
+            ->setConstructorArgs([
+                ['pdo' => $this->getSqliteConnection()->getWrappedConnection()],
+                new SQLiteDriver(),
+            ])
+            ->onlyMethods(['insert'])
+            ->getMock();
+
+        $connection
+            ->expects(self::once())
+            ->method('insert')
+            ->willReturnCallback(static function ($table, $params, $types) use ($config, $executedAt): int {
+                self::assertSame($config->getTableName(), $table);
+                self::assertSame([
+                    $config->getVersionColumnName() => '1230',
+                    $config->getExecutedAtColumnName() => $executedAt,
+                    $config->getExecutionTimeColumnName() => 31000,
+                ], $params);
+                self::assertSame([
+                    Types::STRING,
+                    Types::DATETIME_MUTABLE,
+                    Types::INTEGER,
+                ], $types);
+
+                return 1;
+            });
+
+        $storage = new TableMetadataStorage($connection, new AlphabeticalComparator(), $config);
+        $storage->ensureInitialized();
+
+        $result = new ExecutionResult(new Version('1230'), Direction::UP, $executedAt);
+        $result->setTime(31.0);
+
+        $storage->complete($result);
+    }
+
+    public function testRead(): void
     {
         $this->storage->ensureInitialized();
 
@@ -218,7 +262,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertNull($m2->getExecutionTime());
     }
 
-    public function testReadIsSorted() : void
+    public function testReadIsSorted(): void
     {
         $this->storage->ensureInitialized();
 
@@ -234,7 +278,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertEquals(new Version('9000'), $executedMigrations->getItems()[1]->getVersion());
     }
 
-    public function testCompleteDownRemovesTheRow() : void
+    public function testCompleteDownRemovesTheRow(): void
     {
         $this->storage->ensureInitialized();
 
@@ -255,7 +299,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertCount(0, $this->connection->fetchAll($sql));
     }
 
-    public function testReset() : void
+    public function testReset(): void
     {
         $this->storage->ensureInitialized();
 
@@ -274,7 +318,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertCount(0, $this->connection->fetchAll($sql));
     }
 
-    public function testResetWithEmptySchema() : void
+    public function testResetWithEmptySchema(): void
     {
         $this->storage->ensureInitialized();
 

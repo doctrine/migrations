@@ -31,7 +31,7 @@ class RollupTest extends TestCase
     /** @var Rollup */
     private $rollup;
 
-    public function setUp() : void
+    public function setUp(): void
     {
         $this->abstractMigration = $this->createMock(AbstractMigration::class);
         $this->repository        = $this->createMock(FilesystemMigrationsRepository::class);
@@ -40,7 +40,7 @@ class RollupTest extends TestCase
         $this->rollup  = new Rollup($this->storage, $this->repository);
     }
 
-    public function testRollup() : void
+    public function testRollup(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
 
@@ -54,14 +54,14 @@ class RollupTest extends TestCase
         $this->storage
            ->expects(self::at(1))
            ->method('complete')
-           ->willReturnCallback(static function (ExecutionResult $result) : void {
+           ->willReturnCallback(static function (ExecutionResult $result): void {
               self::assertEquals(new Version('A'), $result->getVersion());
            })->with();
 
         $this->rollup->rollup();
     }
 
-    public function testRollupTooManyMigrations() : void
+    public function testRollupTooManyMigrations(): void
     {
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
@@ -79,7 +79,7 @@ class RollupTest extends TestCase
         $this->rollup->rollup();
     }
 
-    public function testRollupNoMigrations() : void
+    public function testRollupNoMigrations(): void
     {
         $this->repository
             ->expects(self::any())

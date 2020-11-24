@@ -35,7 +35,7 @@ final class EventDispatcher
         string $eventName,
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
-    ) : void {
+    ): void {
         $event = $this->createMigrationEventArgs($migrationsPlan, $migratorConfiguration);
 
         $this->dispatchEvent($eventName, $event);
@@ -45,7 +45,7 @@ final class EventDispatcher
         string $eventName,
         MigrationPlan $plan,
         MigratorConfiguration $migratorConfiguration
-    ) : void {
+    ): void {
         $event = $this->createMigrationsVersionEventArgs(
             $plan,
             $migratorConfiguration
@@ -54,7 +54,7 @@ final class EventDispatcher
         $this->dispatchEvent($eventName, $event);
     }
 
-    private function dispatchEvent(string $eventName, ?EventArgs $args = null) : void
+    private function dispatchEvent(string $eventName, ?EventArgs $args = null): void
     {
         $this->eventManager->dispatchEvent($eventName, $args);
     }
@@ -62,14 +62,14 @@ final class EventDispatcher
     private function createMigrationEventArgs(
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
-    ) : MigrationsEventArgs {
+    ): MigrationsEventArgs {
         return new MigrationsEventArgs($this->connection, $migrationsPlan, $migratorConfiguration);
     }
 
     private function createMigrationsVersionEventArgs(
         MigrationPlan $plan,
         MigratorConfiguration $migratorConfiguration
-    ) : MigrationsVersionEventArgs {
+    ): MigrationsVersionEventArgs {
         return new MigrationsVersionEventArgs(
             $this->connection,
             $plan,
