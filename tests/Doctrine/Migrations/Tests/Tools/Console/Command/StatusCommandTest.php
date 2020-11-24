@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use DateTimeImmutable;
+use Doctrine\DBAL\Version as DBALVersion;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
@@ -73,6 +74,12 @@ class StatusCommandTest extends MigrationTestCase
 
         $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
 
+        if (DBALVersion::compare('2.11.0') > 0) {
+            $databaseDriver = 'Doctrine\DBAL\Driver\PDOSqlite\Driver '; // Trailing space bufferes outout assertion
+        } else {
+            $databaseDriver = 'Doctrine\DBAL\Driver\PDO\SQLite\Driver';
+        }
+
         self::assertSame(
             [
                 '+----------------------+----------------------+------------------------------------------------------------------------+',
@@ -82,7 +89,7 @@ class StatusCommandTest extends MigrationTestCase
                 '|                      | Table Name           | doctrine_migration_versions                                            |',
                 '|                      | Column Name          | version                                                                |',
                 '|----------------------------------------------------------------------------------------------------------------------|',
-                '| Database             | Driver               | Doctrine\DBAL\Driver\PDOSqlite\Driver                                  |',
+                '| Database             | Driver               | ' . $databaseDriver . '                                 |',
                 '|                      | Name                 |                                                                        |',
                 '|----------------------------------------------------------------------------------------------------------------------|',
                 '| Versions             | Previous             | 1230                                                                   |',
