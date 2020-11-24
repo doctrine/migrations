@@ -55,11 +55,6 @@
             "php": "7.2.2"
         }
     },
-    "extra": {
-        "branch-alias": {
-            "dev-master": "3.1.x-dev"
-        }
-    },
     "bin": [
         "bin/doctrine-migrations"
     ]
