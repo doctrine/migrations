@@ -18,6 +18,15 @@ jobs:
         with:
           args: --from=${{ github.event.pull_request.base.sha }}
 
+  composer_normalize:
+    name: "Composer Normalize"
+    runs-on: "ubuntu-latest"
+    needs:
+      - "composer"
+    steps:
+      - name: "Composer Normalize"
+        run: "composer normalize --dry-run"
+
   phpunit:
     name: "PHPUnit"
     runs-on: "ubuntu-20.04"
