@@ -13,6 +13,11 @@ class ClassNameGeneratorTest extends TestCase
     {
         $generator = new ClassNameGenerator();
         $fqcn      = $generator->generateClassName('Foo');
-        $this->assertMatchesRegularExpression('/^Foo\\\\Version[0-9]{14}$/', $fqcn);
+
+        if (method_exists($this, 'assertMatchesRegularExpression')) {
+            $this->assertMatchesRegularExpression('/^Foo\\\\Version[0-9]{14}$/', $fqcn);
+        } else {
+            self::assertRegExp('/^Foo\\\\Version[0-9]{14}$/', $fqcn);
+        }
     }
 }

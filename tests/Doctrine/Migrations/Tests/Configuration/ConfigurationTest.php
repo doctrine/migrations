@@ -98,12 +98,4 @@ class ConfigurationTest extends TestCase
         $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
         $config->setMigrationOrganization(true);
     }
-
-    public function testMigrationOrganizationMustBeSetToFalseOrStringTestNumber(): void
-    {
-        $this->expectException(UnknownConfigurationValue::class);
-        $config = new Configuration();
-        $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
-        $config->setMigrationOrganization(123);
-    }
 }
