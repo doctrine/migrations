@@ -17,6 +17,7 @@ use function strcasecmp;
  */
 final class Configuration
 {
+    public const VERSIONS_ORGANIZATION_NONE              = 'none';
     public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
 
@@ -175,29 +176,22 @@ final class Configuration
         return $this->checkDbPlatform;
     }
 
-    /**
-     * @param string | bool $migrationOrganization
-     */
-    public function setMigrationOrganization($migrationOrganization): void
+    public function setMigrationOrganization(string $migrationOrganization): void
     {
         $this->assertNotFrozen();
 
-        if ($migrationOrganization === false) {
-            $this->setMigrationsAreOrganizedByYearAndMonth(false);
-
-            return;
-        }
-
-        if (! is_string($migrationOrganization)) {
-            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
-        }
-
-        if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
-            $this->setMigrationsAreOrganizedByYear();
-        } elseif (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
-            $this->setMigrationsAreOrganizedByYearAndMonth();
-        } else {
-            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
+        switch (strtolower($migrationOrganization)) {
+            case self::VERSIONS_ORGANIZATION_NONE:
+                $this->setMigrationsAreOrganizedByYearAndMonth(false);
+                break;
+            case self::VERSIONS_ORGANIZATION_BY_YEAR:
+                $this->setMigrationsAreOrganizedByYear();
+                break;
+            case self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH:
+                $this->setMigrationsAreOrganizedByYearAndMonth();
+                break;
+            default:
+                throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
         }
     }
 }
