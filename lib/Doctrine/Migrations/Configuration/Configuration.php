@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 
+use function is_string;
 use function strcasecmp;
 
 /**
@@ -174,9 +175,23 @@ final class Configuration
         return $this->checkDbPlatform;
     }
 
-    public function setMigrationOrganization(string $migrationOrganization): void
+    /**
+     * @param string | bool $migrationOrganization
+     */
+    public function setMigrationOrganization($migrationOrganization): void
     {
         $this->assertNotFrozen();
+
+        if ($migrationOrganization === false) {
+            $this->setMigrationsAreOrganizedByYearAndMonth(false);
+
+            return;
+        }
+
+        if (! is_string($migrationOrganization)) {
+            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
+        }
+
         if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
             $this->setMigrationsAreOrganizedByYear();
         } elseif (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {

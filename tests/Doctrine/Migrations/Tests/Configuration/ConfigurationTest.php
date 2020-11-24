@@ -80,4 +80,30 @@ class ConfigurationTest extends TestCase
         $config = new Configuration();
         $config->setMigrationOrganization('foo');
     }
+
+    public function testMigrationOrganizationCanBeResetToFalse(): void
+    {
+        $config = new Configuration();
+        $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
+        $config->setMigrationOrganization(false);
+
+        self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
+        self::assertFalse($config->areMigrationsOrganizedByYear());
+    }
+
+    public function testMigrationOrganizationMustBeSetToFalseOrStringTestTrue(): void
+    {
+        $this->expectException(UnknownConfigurationValue::class);
+        $config = new Configuration();
+        $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
+        $config->setMigrationOrganization(true);
+    }
+
+    public function testMigrationOrganizationMustBeSetToFalseOrStringTestNumber(): void
+    {
+        $this->expectException(UnknownConfigurationValue::class);
+        $config = new Configuration();
+        $config->setMigrationOrganization(Configuration::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH);
+        $config->setMigrationOrganization(123);
+    }
 }

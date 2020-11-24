@@ -105,9 +105,9 @@ class DiffGeneratorTest extends TestCase
         $this->migrationSqlGenerator->expects($this->exactly(2))
             ->method('generate')
             ->with($this->logicalOr(
-                 $this->equalTo(['UPDATE table SET value = 2']),
-                 $this->equalTo(['UPDATE table SET value = 1'])
-             ), true, 80)
+                $this->equalTo(['UPDATE table SET value = 2']),
+                $this->equalTo(['UPDATE table SET value = 1'])
+            ), true, 80)
             ->will($this->onConsecutiveCalls('test1', 'test2'));
 
         $this->migrationGenerator->expects(self::once())
@@ -160,9 +160,9 @@ class DiffGeneratorTest extends TestCase
         $this->migrationSqlGenerator->expects($this->exactly(2))
             ->method('generate')
             ->with($this->logicalOr(
-                 $this->equalTo(['CREATE TABLE table_name']),
-                 $this->equalTo(['DROP TABLE table_name'])
-             ), false, 120, true)
+                $this->equalTo(['CREATE TABLE table_name']),
+                $this->equalTo(['DROP TABLE table_name'])
+            ), false, 120, true)
             ->will($this->onConsecutiveCalls('test up', 'test down'));
 
         $this->migrationGenerator->expects(self::once())
