@@ -69,8 +69,12 @@ jobs:
         uses: "actions/cache@v2"
         with:
           path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-locked-${{ hashFiles('composer.lock') }}"
+          key: "php-${{ matrix.php-version }}-composer-${{ matrix.deps }}-locked-${{ hashFiles('composer.lock') }}"
           restore-keys: "php-${{ matrix.php-version }}-composer-locked-"
+
+      - name: "Downgrade Composer"
+        run: "composer self-update --1"
+        if: "${{ matrix.deps == 'low' }}"
 
       - name: "Install dependencies with composer"
         run: "composer update --no-interaction --prefer-dist --no-progress"
