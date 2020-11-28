@@ -9,13 +9,14 @@ use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
 
-use function strcasecmp;
+use function strtolower;
 
 /**
  * The Configuration class is responsible for defining migration configuration information.
  */
 final class Configuration
 {
+    public const VERSIONS_ORGANIZATION_NONE              = 'none';
     public const VERSIONS_ORGANIZATION_BY_YEAR           = 'year';
     public const VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH = 'year_and_month';
 
@@ -177,12 +178,19 @@ final class Configuration
     public function setMigrationOrganization(string $migrationOrganization): void
     {
         $this->assertNotFrozen();
-        if (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR) === 0) {
-            $this->setMigrationsAreOrganizedByYear();
-        } elseif (strcasecmp($migrationOrganization, self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH) === 0) {
-            $this->setMigrationsAreOrganizedByYearAndMonth();
-        } else {
-            throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
+
+        switch (strtolower($migrationOrganization)) {
+            case self::VERSIONS_ORGANIZATION_NONE:
+                $this->setMigrationsAreOrganizedByYearAndMonth(false);
+                break;
+            case self::VERSIONS_ORGANIZATION_BY_YEAR:
+                $this->setMigrationsAreOrganizedByYear();
+                break;
+            case self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH:
+                $this->setMigrationsAreOrganizedByYearAndMonth();
+                break;
+            default:
+                throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
         }
     }
 }
