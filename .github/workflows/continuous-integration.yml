@@ -7,19 +7,6 @@ on:
       - "*.x"
 
 jobs:
-  roave_bc_check:
-    name: "Roave BC Check"
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - name: Roave BC Check
-        uses: docker://nyholm/roave-bc-check-ga
-        with:
-          args: --from=${{ github.event.pull_request.base.sha }}
-
   composer_normalize:
     name: "Composer Normalize"
     runs-on: "ubuntu-20.04"
