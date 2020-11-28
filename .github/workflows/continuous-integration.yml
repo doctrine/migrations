@@ -41,8 +41,6 @@ jobs:
     steps:
       - name: "Checkout"
         uses: "actions/checkout@v2"
-        with:
-          fetch-depth: 2
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
@@ -86,6 +84,11 @@ jobs:
       - "phpunit"
 
     steps:
+      - name: "Checkout"
+        uses: "actions/checkout@v2"
+        with:
+          fetch-depth: 2
+
       - name: "Download coverage files"
         uses: "actions/download-artifact@v2"
         with:
