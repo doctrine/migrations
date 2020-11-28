@@ -1,8 +1,10 @@
-
 name: "Continuous Integration"
 
 on:
   pull_request:
+  push:
+    branches:
+      - "*.x"
 
 jobs:
   roave_bc_check:
@@ -17,6 +19,18 @@ jobs:
         uses: docker://nyholm/roave-bc-check-ga
         with:
           args: --from=${{ github.event.pull_request.base.sha }}
+
+  composer_normalize:
+    name: "Composer Normalize"
+    runs-on: "ubuntu-20.04"
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - uses: "docker://ergebnis/composer-normalize-action:latest"
+        with:
+          args: "--dry-run"
 
   phpunit:
     name: "PHPUnit"
