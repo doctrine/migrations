@@ -39,6 +39,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             'all_or_nothing' => true,
             'check_database_platform' => true,
+            'organize_migrations' => 'none',
         ];
 
     .. code-block:: yaml
@@ -56,6 +57,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
         all_or_nothing: true
         check_database_platform: true
+        organize_migrations: none
 
     .. code-block:: xml
 
@@ -82,6 +84,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             <all-or-nothing>true</all-or-nothing>
 
             <check-database-platform>true</check-database-platform>
+            <organize_migrations>none</organize_migrations>
         </doctrine-migrations>
 
     .. code-block:: json
@@ -101,7 +104,8 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
             },
 
             "all_or_nothing": true,
-            "check_database_platform": true
+            "check_database_platform": true,
+            "organize_migrations": "none"
         }
 
 Please note that if you want to use the YAML configuration option, you will need to install the ``symfony/yaml`` package with composer:
@@ -124,6 +128,8 @@ Here are details about what each configuration option does:
 | migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.  |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
++----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
+| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories. |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 
 
