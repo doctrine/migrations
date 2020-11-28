@@ -2,42 +2,68 @@
     "name": "doctrine/migrations",
     "type": "library",
     "description": "PHP Doctrine Migrations project offer additional functionality on top of the database abstraction layer (DBAL) for versioning your database schema and easily deploying changes to it. It is a very easy to use and a powerful tool.",
-    "keywords": ["php", "database", "migrations", "dbal"],
+    "keywords": [
+        "database",
+        "migrations",
+        "dbal"
+    ],
     "homepage": "https://www.doctrine-project.org/projects/migrations.html",
     "license": "MIT",
     "authors": [
-        {"name": "Benjamin Eberlei", "email": "kontakt@beberlei.de"},
-        {"name": "Jonathan Wage", "email": "jonwage@gmail.com"},
-        {"name": "Michael Simonson", "email": "contact@mikesimonson.com" }
+        {
+            "name": "Benjamin Eberlei",
+            "email": "kontakt@beberlei.de"
+        },
+        {
+            "name": "Jonathan Wage",
+            "email": "jonwage@gmail.com"
+        },
+        {
+            "name": "Michael Simonson",
+            "email": "contact@mikesimonson.com"
+        }
     ],
     "require": {
         "php": "^7.2",
+        "composer/package-versions-deprecated": "^1.8",
         "doctrine/dbal": "^2.10",
         "doctrine/event-manager": "^1.0",
-        "composer/package-versions-deprecated": "^1.8",
         "ocramius/proxy-manager": "^2.0.2",
         "psr/log": "^1.1.3",
-        "symfony/console": "^3.4||^4.4.16||^5.0",
-        "symfony/stopwatch": "^3.4||^4.0||^5.0"
+        "symfony/console": "^3.4 || ^4.4.16 || ^5.0",
+        "symfony/stopwatch": "^3.4 || ^4.0 || ^5.0"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^8.0",
         "doctrine/orm": "^2.6",
-        "doctrine/persistence": "^1.3||^2.0",
+        "doctrine/persistence": "^1.3 || ^2.0",
         "doctrine/sql-formatter": "^1.0",
+        "ergebnis/composer-normalize": "^2.11",
         "phpstan/phpstan": "^0.12",
         "phpstan/phpstan-deprecation-rules": "^0.12",
         "phpstan/phpstan-phpunit": "^0.12",
         "phpstan/phpstan-strict-rules": "^0.12",
         "phpstan/phpstan-symfony": "^0.12",
         "phpunit/phpunit": "^8.5 || ^9.4",
-        "symfony/process": "^3.4||^4.0||^5.0",
-        "symfony/yaml": "^3.4||^4.0||^5.0"
+        "symfony/process": "^3.4 || ^4.0 || ^5.0",
+        "symfony/yaml": "^3.4 || ^4.0 || ^5.0"
     },
     "suggest": {
         "doctrine/sql-formatter": "Allows to generate formatted SQL with the diff command.",
         "symfony/yaml": "Allows the use of yaml for migration configuration files."
+    },
+    "config": {
+        "sort-packages": true
+    },
+    "extra": {
+        "branch-alias": {
+            "dev-master": "3.0.x-dev"
+        },
+        "composer-normalize": {
+            "indent-size": 4,
+            "indent-style": "space"
+        }
     },
     "autoload": {
         "psr-4": {
@@ -47,12 +73,6 @@
     "autoload-dev": {
         "psr-4": {
             "Doctrine\\Migrations\\Tests\\": "tests/Doctrine/Migrations/Tests"
-        }
-    },
-    "config": {
-        "sort-packages": true,
-        "platform": {
-            "php": "7.2.2"
         }
     },
     "bin": [

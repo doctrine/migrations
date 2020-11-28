@@ -76,15 +76,13 @@ class SchemaDumperTest extends TestCase
             ->method('getDropTableSQL')
             ->willReturn('DROP TABLE test');
 
-        $this->migrationSqlGenerator->expects(self::at(0))
+        $this->migrationSqlGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(['CREATE TABLE test'])
-            ->willReturn('up');
-
-        $this->migrationSqlGenerator->expects(self::at(1))
-            ->method('generate')
-            ->with(['DROP TABLE test'])
-            ->willReturn('down');
+            ->with(self::logicalOr(
+                self::equalTo(['CREATE TABLE test']),
+                self::equalTo(['DROP TABLE test'])
+            ))
+            ->will(self::onConsecutiveCalls('up', 'down'));
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')

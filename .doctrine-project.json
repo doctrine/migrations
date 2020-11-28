@@ -6,7 +6,7 @@
     "versions": [
         {
             "name": "3.1",
-            "branchName": "master",
+            "branchName": "3.1.x",
             "slug": "3.1",
             "upcoming": true
         },
