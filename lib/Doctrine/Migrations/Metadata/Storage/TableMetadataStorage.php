@@ -158,11 +158,10 @@ final class TableMetadataStorage implements MetadataStorage
 
         $expectedSchemaChangelog = $this->getExpectedTable();
         $diff                    = $this->needsUpdate($expectedSchemaChangelog);
-        if ($diff === null) {
-            return;
+        if ($diff !== null) {
+            $this->schemaManager->alterTable($diff);
         }
 
-        $this->schemaManager->alterTable($diff);
         $this->updateMigratedVersionsFromV1orV2toV3();
     }
 
