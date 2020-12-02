@@ -33,8 +33,8 @@ abstract class DoctrineCommand extends Command
 
     public function __construct(?DependencyFactory $dependencyFactory = null, ?string $name = null)
     {
-        parent::__construct($name);
         $this->dependencyFactory = $dependencyFactory;
+        parent::__construct($name);
     }
 
     protected function configure(): void

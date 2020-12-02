@@ -80,6 +80,20 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
+    public function testDependencyFactoryIsSetFirst(): void
+    {
+        $dependencyFactory = $this->createMock(DependencyFactory::class);
+        $command           = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function configure(): void
+            {
+                $this->getDependencyFactory();
+            }
+        };
+
+        self::assertFalse($command->getDefinition()->hasOption('db-configuration'));
+    }
+
     public function testCustomEntityManager(): void
     {
         $configuration = new Configuration();
