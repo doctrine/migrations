@@ -10,6 +10,7 @@ use DateTimeZone;
 use Doctrine\Common\EventArgs;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\Migrations\Configuration\Exception\MigrationsNamespaceRequired;
 use Doctrine\Migrations\Configuration\Exception\ParameterIncompatibleWithFinder;
 use Doctrine\Migrations\DependencyFactory;
@@ -351,13 +352,18 @@ class Configuration
 
     /**
      * Explicitely opens the database connection. This is done to play nice
-     * with DBAL's MasterSlaveConnection. Which, in some cases, connects to a
-     * follower when fetching the executed migrations. If a follower is lagging
-     * significantly behind that means the migrations system may see unexecuted
-     * migrations that were actually executed earlier.
+     * with DBAL's PrimaryReadReplicaConnection. Which, in some cases, connects
+     * to a follower when fetching the executed migrations. If a follower is
+     * lagging significantly behind that means the migrations system may see
+     * unexecuted migrations that were actually executed earlier.
      */
     public function connect() : bool
     {
+        if ($this->connection instanceof PrimaryReadReplicaConnection) {
+            return $this->connection->ensureConnectedToPrimary();
+        }
+
+        // Drop this if block when bumping to doctrine/dbal 2.11.0
         if ($this->connection instanceof MasterSlaveConnection) {
             return $this->connection->connect('master');
         }
