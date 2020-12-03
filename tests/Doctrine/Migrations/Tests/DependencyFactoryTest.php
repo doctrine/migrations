@@ -16,6 +16,8 @@ use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\Provider\OrmSchemaProvider;
+use Doctrine\Migrations\Provider\SchemaProvider;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -123,6 +125,46 @@ final class DependencyFactoryTest extends MigrationTestCase
         self::assertSame($this->entityManager, $di->getEntityManager());
         self::assertSame($this->connection, $di->getConnection());
         self::assertTrue($di->isFrozen());
+    }
+
+    public function testNoSchemaProviderRaiseException(): void
+    {
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        self::assertFalse($di->hasSchemaProvider());
+
+        $this->expectException(MissingDependency::class);
+        $di->getSchemaProvider();
+    }
+
+    public function testSchemaProviderFromEntityManager(): void
+    {
+        $di = DependencyFactory::fromEntityManager(new ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
+
+        self::assertTrue($di->hasSchemaProvider());
+        self::assertEquals(new OrmSchemaProvider($this->entityManager), $di->getSchemaProvider());
+        self::assertTrue($di->isFrozen());
+    }
+
+    public function testSchemaProviderFromManualService(): void
+    {
+        $schemaProvider = $this->createMock(SchemaProvider::class);
+        $di             = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+        $di->setService(SchemaProvider::class, $schemaProvider);
+
+        self::assertTrue($di->hasSchemaProvider());
+        self::assertSame($schemaProvider, $di->getSchemaProvider());
+        self::assertFalse($di->isFrozen());
+    }
+
+    public function testProvidedSchemaProviderHasPrecedenceOverProviderFromEntityManagerConfig(): void
+    {
+        $schemaProvider = $this->createMock(SchemaProvider::class);
+        $di             = DependencyFactory::fromEntityManager(new ExistingConfiguration($this->configuration), new ExistingEntityManager($this->entityManager));
+        $di->setService(SchemaProvider::class, $schemaProvider);
+
+        self::assertTrue($di->hasSchemaProvider());
+        self::assertSame($schemaProvider, $di->getSchemaProvider());
+        self::assertFalse($di->isFrozen());
     }
 
     public function testCustomLogger(): void

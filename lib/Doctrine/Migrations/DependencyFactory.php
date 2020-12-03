@@ -245,10 +245,25 @@ class DependencyFactory
         });
     }
 
-    private function getSchemaProvider(): SchemaProvider
+    public function hasSchemaProvider(): bool
+    {
+        try {
+            $this->getSchemaProvider();
+        } catch (MissingDependency $exception) {
+            return false;
+        }
+
+        return true;
+    }
+
+    public function getSchemaProvider(): SchemaProvider
     {
         return $this->getDependency(SchemaProvider::class, function (): SchemaProvider {
-            return new OrmSchemaProvider($this->getEntityManager());
+            if ($this->hasEntityManager()) {
+                return new OrmSchemaProvider($this->getEntityManager());
+            }
+
+            throw MissingDependency::noSchemaProvider();
         });
     }
 

@@ -224,7 +224,7 @@ class ConsoleRunnerTest extends TestCase
         $dependencyFactory = $this->createMock(DependencyFactory::class);
         $dependencyFactory
             ->expects(self::atLeastOnce())
-            ->method('hasEntityManager')
+            ->method('hasSchemaProvider')
             ->willReturn(true);
 
         ConsoleRunner::addCommands($this->application, $dependencyFactory);
@@ -248,12 +248,12 @@ class ConsoleRunnerTest extends TestCase
         self::assertCount(12, $commands);
     }
 
-    public function testCreateApplicationWithEntityManager(): void
+    public function testCreateApplicationWithSchemaProvider(): void
     {
         $dependencyFactory = $this->createMock(DependencyFactory::class);
         $dependencyFactory
             ->expects(self::atLeastOnce())
-            ->method('hasEntityManager')
+            ->method('hasSchemaProvider')
             ->willReturn(true);
 
         $application = ConsoleRunner::createApplication([], $dependencyFactory);

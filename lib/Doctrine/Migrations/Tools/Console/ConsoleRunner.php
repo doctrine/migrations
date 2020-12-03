@@ -124,7 +124,7 @@ class ConsoleRunner
             new ListCommand($dependencyFactory),
         ]);
 
-        if ($dependencyFactory === null || ! $dependencyFactory->hasEntityManager()) {
+        if ($dependencyFactory === null || ! $dependencyFactory->hasSchemaProvider()) {
             return;
         }
 
