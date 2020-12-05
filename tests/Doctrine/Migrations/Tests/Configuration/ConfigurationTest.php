@@ -8,6 +8,7 @@ use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Driver\IBMDB2\DB2Driver;
 use Doctrine\DBAL\Platforms\Keywords\KeywordList;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -24,6 +25,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
 use function array_keys;
 use function call_user_func_array;
+use function class_exists;
 use function sprintf;
 use function str_replace;
 
@@ -176,9 +178,40 @@ class ConfigurationTest extends MigrationTestCase
     {
         $connection = $this->createMock(MasterSlaveConnection::class);
 
+        if (class_exists(PrimaryReadReplicaConnection::class)) {
+            $connection->expects(self::once())
+                ->method('ensureConnectedToPrimary')
+                ->willReturn(true);
+        } else {
+            $connection->expects(self::once())
+                ->method('connect')
+                ->with('master')
+                ->willReturn(true);
+        }
+
+        $configuration = new Configuration($connection);
+        $configuration->setMigrationsNamespace(str_replace('\Version1Test', '', Version1Test::class));
+        $configuration->setMigrationsDirectory(__DIR__ . '/../Stub/Configuration/AutoloadVersions');
+
+        self::assertTrue($configuration->connect());
+    }
+
+    /**
+     * Connection is tested via the `getMigratedVersions` method which is the
+     * simplest to set up for.
+     *
+     * @see https://github.com/doctrine/migrations/issues/336
+     */
+    public function testPrimaryReadReplicaConnectionAlwaysConnectsToMaster() : void
+    {
+        if (! class_exists(PrimaryReadReplicaConnection::class)) {
+            self::markTestSkipped('This test requires doctrine/dbal 2.11+');
+        }
+
+        $connection = $this->createMock(PrimaryReadReplicaConnection::class);
+
         $connection->expects(self::once())
-            ->method('connect')
-            ->with('master')
+            ->method('ensureConnectedToPrimary')
             ->willReturn(true);
 
         $configuration = new Configuration($connection);

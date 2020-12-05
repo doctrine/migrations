@@ -17,6 +17,8 @@ parameters:
         - '~^Parameter #1 \$files of method Doctrine\\Migrations\\Finder\\Finder::loadMigrationClasses\(\) expects array<string>, array<int, string\|false> given\.\z~'
         - '~^Class Doctrine\\Migrations\\Tests\\DoesNotExistAtAll not found\.\z~'
         - '~^Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\.$~'
+        # Drop when bumping to doctrine/dbal 2.11+
+        - '~^.*PrimaryReadReplicaConnection.*$~'
 
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
