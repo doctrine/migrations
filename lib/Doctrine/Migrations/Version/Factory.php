@@ -26,7 +26,7 @@ class Factory
         $this->versionExecutor = $versionExecutor;
     }
 
-    public function createVersion(string $version, string $migrationClassName) : Version
+    public function createVersion(string $version, string $migrationClassName): Version
     {
         return new Version(
             $this->configuration,

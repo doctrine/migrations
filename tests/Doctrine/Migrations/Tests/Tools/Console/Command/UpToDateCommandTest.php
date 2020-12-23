@@ -20,7 +20,7 @@ class UpToDateCommandTest extends TestCase
     /** @var UpToDateCommand */
     private $upToDateCommand;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
 
@@ -34,7 +34,7 @@ class UpToDateCommandTest extends TestCase
      *
      * @dataProvider dataIsUpToDate
      */
-    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false) : void
+    public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false): void
     {
         $this->migrationRepository
             ->method('getMigrations')
@@ -62,7 +62,7 @@ class UpToDateCommandTest extends TestCase
     /**
      * @return mixed[][]
      */
-    public function dataIsUpToDate() : array
+    public function dataIsUpToDate(): array
     {
         return [
             'up-to-date' => [
@@ -108,7 +108,7 @@ class UpToDateCommandTest extends TestCase
         ];
     }
 
-    private function createVersion(string $migration) : Version
+    private function createVersion(string $migration): Version
     {
         $version = $this->createMock(Version::class);
 

@@ -28,7 +28,7 @@ class ConnectionConfigurationLoader implements ConnectionLoaderInterface
      * Read the input and return a Configuration, returns null if the config
      * is not supported.
      */
-    public function chosen() : ?Connection
+    public function chosen(): ?Connection
     {
         if ($this->configuration !== null) {
             return $this->configuration->getConnection();

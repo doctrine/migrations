@@ -8,7 +8,7 @@ use InvalidArgumentException;
 
 final class FileNotFound extends InvalidArgumentException implements ConfigurationException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('Given config file does not exist');
     }

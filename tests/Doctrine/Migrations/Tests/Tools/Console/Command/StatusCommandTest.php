@@ -34,7 +34,7 @@ class StatusCommandTest extends TestCase
     /** @var StatusCommand */
     private $statusCommand;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -140,7 +140,7 @@ class StatusCommandTest extends TestCase
         $this->statusCommand->execute($input, $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration              = $this->createMock(Configuration::class);
         $this->dependencyFactory          = $this->createMock(DependencyFactory::class);

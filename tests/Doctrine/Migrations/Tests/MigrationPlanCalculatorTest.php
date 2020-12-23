@@ -19,7 +19,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     /** @var MigrationPlanCalculator */
     private $migrationPlanCalculator;
 
-    public function testGetMigrationsToExecuteUp() : void
+    public function testGetMigrationsToExecuteUp(): void
     {
         $version1 = $this->createMock(Version::class);
         $version1->expects(self::any())
@@ -70,7 +70,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertSame($expected, $migrationsToExecute);
     }
 
-    public function testGetMigrationsToExecuteDown() : void
+    public function testGetMigrationsToExecuteDown(): void
     {
         $version1 = $this->createMock(Version::class);
         $version1->expects(self::any())
@@ -121,7 +121,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertSame($expected, $migrationsToExecute);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
 

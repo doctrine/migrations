@@ -9,6 +9,7 @@ use Doctrine\Migrations\Provider\Exception\NoMappingFound;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Tools\SchemaTool;
+
 use function count;
 use function usort;
 
@@ -32,7 +33,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
     /**
      * @throws NoMappingFound
      */
-    public function createSchema() : Schema
+    public function createSchema(): Schema
     {
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 

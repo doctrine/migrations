@@ -8,7 +8,7 @@ use RuntimeException;
 
 final class NoMigrationsToExecute extends RuntimeException implements MigrationException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self(
             'Could not find any migrations to execute.',

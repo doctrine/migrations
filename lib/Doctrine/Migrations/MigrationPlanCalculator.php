@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+
 use function array_filter;
 use function array_reverse;
 use function count;
@@ -28,7 +29,7 @@ final class MigrationPlanCalculator
     }
 
     /** @return Version[] */
-    public function getMigrationsToExecute(string $direction, string $to) : array
+    public function getMigrationsToExecute(string $direction, string $to): array
     {
         $allVersions = $this->migrationRepository->getMigrations();
 
@@ -53,7 +54,7 @@ final class MigrationPlanCalculator
         Version $version,
         string $to,
         array $migrated
-    ) : bool {
+    ): bool {
         $to = (int) $to;
 
         if ($direction === Direction::DOWN) {

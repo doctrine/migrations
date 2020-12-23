@@ -37,7 +37,7 @@ class ConnectionHelperLoader implements ConnectionLoaderInterface
      * Read the input and return a Configuration, returns null if the config
      * is not supported.
      */
-    public function chosen() : ?Connection
+    public function chosen(): ?Connection
     {
         if ($this->helperSet->has($this->helperName)) {
             $connectionHelper = $this->helperSet->get($this->helperName);

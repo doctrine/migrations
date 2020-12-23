@@ -8,6 +8,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Exception\RollupFailed;
 use Doctrine\Migrations\Version\Version;
+
 use function count;
 use function current;
 use function sprintf;
@@ -44,7 +45,7 @@ class Rollup
     /**
      * @throws RollupFailed
      */
-    public function rollup() : Version
+    public function rollup(): Version
     {
         $versions = $this->migrationRepository->getVersions();
 

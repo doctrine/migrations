@@ -9,13 +9,13 @@ use Doctrine\Migrations\AbstractMigration;
 
 class DryRun2 extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $table = $schema->getTable('foo');
         $table->addColumn('bar', 'string', ['notnull' => false]);
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $table = $schema->getTable('foo');
         $table->dropColumn('bar');

@@ -52,7 +52,7 @@ class ExecutorTest extends TestCase
     /** @var VersionExecutorTestMigration */
     private $migration;
 
-    public function testAddSql() : void
+    public function testAddSql(): void
     {
         $this->versionExecutor->addSql('SELECT 1', [1], [2]);
 
@@ -61,7 +61,7 @@ class ExecutorTest extends TestCase
         self::assertSame([[2]], $this->versionExecutor->getTypes());
     }
 
-    public function testExecuteUp() : void
+    public function testExecuteUp(): void
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
@@ -111,7 +111,7 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty() : void
+    public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
@@ -128,7 +128,7 @@ class ExecutorTest extends TestCase
         );
     }
 
-    public function testExecuteDown() : void
+    public function testExecuteDown(): void
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
@@ -178,7 +178,7 @@ class ExecutorTest extends TestCase
     /**
      * @test
      */
-    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty() : void
+    public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->outputWriter->expects(self::at(0))
             ->method('write')
@@ -195,7 +195,7 @@ class ExecutorTest extends TestCase
         );
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration      = $this->createMock(Configuration::class);
         $this->connection         = $this->createMock(Connection::class);
@@ -276,39 +276,39 @@ class VersionExecutorTestMigration extends AbstractMigration
         $this->description = $description;
     }
 
-    public function getDescription() : string
+    public function getDescription(): string
     {
         return $this->description;
     }
 
-    public function preUp(Schema $fromSchema) : void
+    public function preUp(Schema $fromSchema): void
     {
         $this->preUpExecuted = true;
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('SELECT 1', [1], [3]);
         $this->addSql('SELECT 2', [2], [4]);
     }
 
-    public function postUp(Schema $toSchema) : void
+    public function postUp(Schema $toSchema): void
     {
         $this->postUpExecuted = true;
     }
 
-    public function preDown(Schema $fromSchema) : void
+    public function preDown(Schema $fromSchema): void
     {
         $this->preDownExecuted = true;
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $this->addSql('SELECT 3', [5], [7]);
         $this->addSql('SELECT 4', [6], [8]);
     }
 
-    public function postDown(Schema $toSchema) : void
+    public function postDown(Schema $toSchema): void
     {
         $this->postDownExecuted = true;
     }

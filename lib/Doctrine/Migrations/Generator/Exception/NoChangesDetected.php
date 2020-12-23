@@ -8,7 +8,7 @@ use RuntimeException;
 
 final class NoChangesDetected extends RuntimeException implements GeneratorException
 {
-    public static function new() : self
+    public static function new(): self
     {
         return new self('No changes detected in your mapping information.');
     }

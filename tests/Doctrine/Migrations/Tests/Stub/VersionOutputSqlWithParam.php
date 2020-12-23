@@ -17,16 +17,16 @@ class VersionOutputSqlWithParam extends AbstractMigration
     ];
 
     /** @param mixed[] $param */
-    public function setParam(array $param) : void
+    public function setParam(array $param): void
     {
         $this->param = $param;
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->addSql('Select 1 WHERE 1');
         $this->addSql('Select :param1 WHERE :param2 = :param3', $this->param);

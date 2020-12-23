@@ -9,11 +9,11 @@ use Doctrine\Migrations\AbstractMigration;
 
 class Version5Test extends AbstractMigration
 {
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 }

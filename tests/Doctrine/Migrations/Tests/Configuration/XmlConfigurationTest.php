@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\XmlConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
+
 use const DIRECTORY_SEPARATOR;
 
 class XmlConfigurationTest extends AbstractConfigurationTest
@@ -17,7 +18,7 @@ class XmlConfigurationTest extends AbstractConfigurationTest
         string $configFileSuffix = '',
         ?OutputWriter $outputWriter = null,
         ?MigrationFinder $migrationFinder = null
-    ) : AbstractFileConfiguration {
+    ): AbstractFileConfiguration {
         $configFile = 'config.xml';
         if ($configFileSuffix !== '') {
             $configFile = 'config_' . $configFileSuffix . '.xml';
@@ -29,7 +30,7 @@ class XmlConfigurationTest extends AbstractConfigurationTest
         return $configFileSuffix;
     }
 
-    public function testInvalid() : void
+    public function testInvalid(): void
     {
         $this->expectException(XmlNotValid::class);
 

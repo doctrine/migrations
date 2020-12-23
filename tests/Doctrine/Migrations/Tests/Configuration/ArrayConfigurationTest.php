@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\ArrayConfiguration;
 use Doctrine\Migrations\Finder\MigrationFinder;
 use Doctrine\Migrations\OutputWriter;
 use InvalidArgumentException;
+
 use const DIRECTORY_SEPARATOR;
 
 class ArrayConfigurationTest extends AbstractConfigurationTest
@@ -17,7 +18,7 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
         string $configFileSuffix = '',
         ?OutputWriter $outputWriter = null,
         ?MigrationFinder $migrationFinder = null
-    ) : AbstractFileConfiguration {
+    ): AbstractFileConfiguration {
         $configFile = 'config.php';
 
         if ($configFileSuffix !== '') {
@@ -33,7 +34,7 @@ class ArrayConfigurationTest extends AbstractConfigurationTest
     /**
      * Test that config file not exists exception
      */
-    public function testThrowExceptionIfFileNotExist() : void
+    public function testThrowExceptionIfFileNotExist(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Given config file does not exist');

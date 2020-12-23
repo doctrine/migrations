@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BooleanStringFormatterTest extends TestCase
 {
-    public function testToBoolean() : void
+    public function testToBoolean(): void
     {
         self::assertTrue(BooleanStringFormatter::toBoolean('true', false));
         self::assertTrue(BooleanStringFormatter::toBoolean('1', false));

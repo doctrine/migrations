@@ -1,5 +1,6 @@
 parameters:
     level: 7
+    reportUnmatchedIgnoredErrors: false
     paths:
         - %currentWorkingDirectory%/lib
         - %currentWorkingDirectory%/tests
@@ -12,16 +13,15 @@ parameters:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/realpath.php
     ignoreErrors:
-        # Ignore proxy manager magic
-        - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
-        - '~^Parameter #1 \$files of method Doctrine\\Migrations\\Finder\\Finder::loadMigrationClasses\(\) expects array<string>, array<int, string\|false> given\.\z~'
-        - '~^Class Doctrine\\Migrations\\Tests\\DoesNotExistAtAll not found\.\z~'
-        - '~^Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\.$~'
+        - '~Unable to resolve the template type T in call to method static method Doctrine\\DBAL\\DriverManager\:\:getConnection\(\)~'
+        - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
         # Drop when bumping to doctrine/dbal 2.11+
         - '~^.*PrimaryReadReplicaConnection.*$~'
+
 
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
+    - .github/phpstan-baseline.neon

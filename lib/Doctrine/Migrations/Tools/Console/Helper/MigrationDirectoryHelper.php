@@ -6,13 +6,15 @@ namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExist;
-use const DIRECTORY_SEPARATOR;
+
 use function assert;
 use function date;
 use function file_exists;
 use function getcwd;
 use function mkdir;
 use function rtrim;
+
+use const DIRECTORY_SEPARATOR;
 
 /**
  * The MigrationDirectoryHelper class is responsible for returning the directory that migrations are stored in.
@@ -32,7 +34,7 @@ class MigrationDirectoryHelper
     /**
      * @throws DirectoryDoesNotExist
      */
-    public function getMigrationDirectory() : string
+    public function getMigrationDirectory(): string
     {
         $dir = $this->configuration->getMigrationsDirectory();
         $dir = $dir ?? getcwd();
@@ -58,12 +60,12 @@ class MigrationDirectoryHelper
         return $dir;
     }
 
-    private function appendDir(string $dir) : string
+    private function appendDir(string $dir): string
     {
         return DIRECTORY_SEPARATOR . $dir;
     }
 
-    private function createDirIfNotExists(string $dir) : void
+    private function createDirIfNotExists(string $dir): void
     {
         if (file_exists($dir)) {
             return;

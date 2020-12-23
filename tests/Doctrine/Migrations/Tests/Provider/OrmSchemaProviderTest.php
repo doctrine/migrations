@@ -31,7 +31,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
     /** @var  OrmSchemaProvider */
     private $ormProvider;
 
-    public function testCreateSchemaFetchesMetadataFromEntityManager() : void
+    public function testCreateSchemaFetchesMetadataFromEntityManager(): void
     {
         $schema = $this->ormProvider->createSchema();
 
@@ -50,7 +50,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
         }
     }
 
-    public function testEntityManagerWithoutMetadataCausesError() : void
+    public function testEntityManagerWithoutMetadataCausesError(): void
     {
         $this->expectException(UnexpectedValueException::class);
 
@@ -59,7 +59,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->ormProvider->createSchema();
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->config = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);

@@ -32,7 +32,7 @@ class SchemaDumperTest extends TestCase
     /** @var SchemaDumper */
     private $schemaDumper;
 
-    public function testDumpNoTablesException() : void
+    public function testDumpNoTablesException(): void
     {
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
@@ -50,7 +50,7 @@ class SchemaDumperTest extends TestCase
         $this->schemaDumper->dump('1234');
     }
 
-    public function testDump() : void
+    public function testDump(): void
     {
         $table = $this->createMock(Table::class);
 
@@ -90,7 +90,7 @@ class SchemaDumperTest extends TestCase
         self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('1234'));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->platform              = $this->createMock(AbstractPlatform::class);
         $this->schemaManager         = $this->createMock(AbstractSchemaManager::class);

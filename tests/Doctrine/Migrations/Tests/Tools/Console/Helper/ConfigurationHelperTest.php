@@ -14,6 +14,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\StreamOutput;
+
 use function copy;
 use function trim;
 use function unlink;
@@ -29,7 +30,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     /** @var InputInterface|MockObject */
     private $input;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->getSqliteConnection();
 
@@ -47,7 +48,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     protected function getConfigurationHelperLoadsASpecificFormat(
         string $baseFile,
         string $configFile
-    ) : string {
+    ): string {
         try {
             $file = 'tests/Doctrine/Migrations/Tests/Tools/Console/Helper/files/' . $baseFile;
             copy($file, $configFile);
@@ -65,7 +66,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         }
     }
 
-    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine() : void
+    public function testConfigurationHelperLoadsPhpArrayFormatFromCommandLine(): void
     {
         $this->input->method('getOption')
             ->with('configuration')
@@ -78,7 +79,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         self::assertSame('DoctrineMigrationsTest', $migrationConfig->getMigrationsNamespace());
     }
 
-    public function testConfigurationHelperLoadsJsonFormatFromCommandLine() : void
+    public function testConfigurationHelperLoadsJsonFormatFromCommandLine(): void
     {
         $this->input->method('getOption')
             ->with('configuration')
@@ -94,7 +95,7 @@ class ConfigurationHelperTest extends MigrationTestCase
     /**
      * Test that unsupported file type throws exception
      */
-    public function testConfigurationHelperFailsToLoadOtherFormat() : void
+    public function testConfigurationHelperFailsToLoadOtherFormat(): void
     {
         $this->input->method('getOption')
             ->with('configuration')
@@ -108,7 +109,7 @@ class ConfigurationHelperTest extends MigrationTestCase
         $configurationHelper->getMigrationConfig($this->input);
     }
 
-    public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath() : void
+    public function testConfigurationHelperWithoutConfigurationFromSetterAndWithoutOverrideFromCommandLineAndWithoutConfigInPath(): void
     {
         $this->input->method('getOption')
             ->with('configuration')

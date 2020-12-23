@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function assert;
 use function is_string;
 use function sprintf;
@@ -27,7 +28,7 @@ class VersionCommand extends AbstractCommand
     /** @var bool */
     private $markMigrated;
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['version'])
@@ -99,7 +100,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
             throw InvalidOptionUsage::new('You must specify whether you want to --add or --delete the specified version.');
@@ -127,7 +128,7 @@ EOT
     /**
      * @throws InvalidOptionUsage
      */
-    private function markVersions(InputInterface $input, OutputInterface $output) : void
+    private function markVersions(InputInterface $input, OutputInterface $output): void
     {
         $affectedVersion = $input->getArgument('version');
         assert(is_string($affectedVersion) || $affectedVersion === null);
@@ -174,7 +175,7 @@ EOT
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, string $version, bool $all = false) : void
+    private function mark(InputInterface $input, OutputInterface $output, string $version, bool $all = false): void
     {
         if (! $this->migrationRepository->hasVersion($version)) {
             if ((bool) $input->getOption('delete') === false) {

@@ -29,7 +29,7 @@ class MigrationStatusInfosHelperTest extends TestCase
     /** @var MigrationStatusInfosHelper */
     private $migrationStatusInfosHelper;
 
-    public function testGetMigrationsInfos() : void
+    public function testGetMigrationsInfos(): void
     {
         $this->driver->expects(self::once())
             ->method('getName')
@@ -92,7 +92,7 @@ class MigrationStatusInfosHelperTest extends TestCase
         self::assertSame($expected, $infos);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration       = $this->createMock(Configuration::class);
         $this->migrationRepository = $this->createMock(MigrationRepository::class);

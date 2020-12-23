@@ -22,7 +22,7 @@ final class FactoryTest extends TestCase
     /** @var Factory */
     private $versionFactory;
 
-    public function testCreateVersion() : void
+    public function testCreateVersion(): void
     {
         $version = $this->versionFactory->createVersion(
             '001',
@@ -33,7 +33,7 @@ final class FactoryTest extends TestCase
         self::assertInstanceOf(VersionFactoryTestMigration::class, $version->getMigration());
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration   = $this->createMock(Configuration::class);
         $this->versionExecutor = $this->createMock(ExecutorInterface::class);
@@ -47,11 +47,11 @@ final class FactoryTest extends TestCase
 
 class VersionFactoryTestMigration extends AbstractMigration
 {
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
     }
 
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
     }
 }

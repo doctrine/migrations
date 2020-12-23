@@ -13,6 +13,7 @@ use Doctrine\Migrations\Configuration\YamlConfiguration;
 use Doctrine\Migrations\Tools\Console\Exception\FileTypeNotSupported;
 use Symfony\Component\Console\Helper\Helper;
 use Symfony\Component\Console\Input\InputInterface;
+
 use function assert;
 use function file_exists;
 use function is_string;
@@ -38,7 +39,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         $this->configuration = $configuration;
     }
 
-    public function getMigrationConfig(InputInterface $input) : Configuration
+    public function getMigrationConfig(InputInterface $input): Configuration
     {
         /**
          * If a configuration option is passed to the command line, use that configuration
@@ -79,7 +80,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         return new Configuration($this->connection);
     }
 
-    private function configExists(string $config) : bool
+    private function configExists(string $config): bool
     {
         return file_exists($config);
     }
@@ -87,7 +88,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
     /**
      * @throws FileTypeNotSupported
      */
-    private function loadConfig(string $config) : Configuration
+    private function loadConfig(string $config): Configuration
     {
         $map = [
             'xml'   => XmlConfiguration::class,
@@ -111,10 +112,7 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
         return $configuration;
     }
 
-    /**
-     * {@inheritdoc}
-     */
-    public function getName() : string
+    public function getName(): string
     {
         return 'configuration';
     }

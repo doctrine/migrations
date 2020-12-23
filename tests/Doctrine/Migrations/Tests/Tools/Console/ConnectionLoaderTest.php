@@ -25,7 +25,7 @@ class ConnectionLoaderTest extends TestCase
     /** @var ConnectionLoader */
     private $connectionLoader;
 
-    public function testGetConnection() : void
+    public function testGetConnection(): void
     {
         $input      = $this->createMock(InputInterface::class);
         $helperSet  = $this->createMock(HelperSet::class);
@@ -38,7 +38,7 @@ class ConnectionLoaderTest extends TestCase
         self::assertSame($connection, $this->connectionLoader->getConnection($input, $helperSet));
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = $this->createMock(Configuration::class);
 

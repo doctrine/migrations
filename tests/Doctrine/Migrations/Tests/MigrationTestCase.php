@@ -14,6 +14,7 @@ use Exception;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
+
 use function assert;
 use function fopen;
 use function fwrite;
@@ -34,14 +35,14 @@ abstract class MigrationTestCase extends TestCase
     /** @var  StreamOutput */
     protected $output;
 
-    public function getSqliteConnection() : Connection
+    public function getSqliteConnection(): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
         return DriverManager::getConnection($params);
     }
 
-    public function getSqliteConfiguration() : Configuration
+    public function getSqliteConfiguration(): Configuration
     {
         $config = new Configuration($this->getSqliteConnection());
         $config->setMigrationsDirectory(__DIR__ . '/Stub/migration-empty-folder');
@@ -50,7 +51,7 @@ abstract class MigrationTestCase extends TestCase
         return $config;
     }
 
-    public function getOutputStream() : StreamOutput
+    public function getOutputStream(): StreamOutput
     {
         $stream = fopen('php://memory', 'r+', false);
 
@@ -59,7 +60,7 @@ abstract class MigrationTestCase extends TestCase
         return new StreamOutput($stream);
     }
 
-    public function getOutputStreamContent(StreamOutput $streamOutput) : string
+    public function getOutputStreamContent(StreamOutput $streamOutput): string
     {
         $stream = $streamOutput->getStream();
         rewind($stream);
@@ -82,7 +83,7 @@ abstract class MigrationTestCase extends TestCase
         return $stream;
     }
 
-    protected function getOutputWriter() : OutputWriter
+    protected function getOutputWriter(): OutputWriter
     {
         if ($this->outputWriter === null) {
             $this->output       = $this->getOutputStream();
@@ -96,7 +97,7 @@ abstract class MigrationTestCase extends TestCase
     }
 
     /** @throws Exception */
-    protected function createTempDirForMigrations(string $path) : void
+    protected function createTempDirForMigrations(string $path): void
     {
         if (! mkdir($path)) {
             throw new Exception('fail to create a temporary folder for the tests at ' . $path);
@@ -104,7 +105,7 @@ abstract class MigrationTestCase extends TestCase
     }
 
     /** @return string[] */
-    protected function getSqlFilesList(string $path) : array
+    protected function getSqlFilesList(string $path): array
     {
         if (is_dir($path)) {
             return glob(realpath($path) . '/*.sql');
@@ -117,7 +118,7 @@ abstract class MigrationTestCase extends TestCase
         return [];
     }
 
-    protected function createTestMigrator(Configuration $config) : Migrator
+    protected function createTestMigrator(Configuration $config): Migrator
     {
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -131,7 +132,7 @@ abstract class MigrationTestCase extends TestCase
     /**
      * @return mixed[]
      */
-    protected function getMigratorConstructorArgs(Configuration $config) : array
+    protected function getMigratorConstructorArgs(Configuration $config): array
     {
         $dependencyFactory   = $config->getDependencyFactory();
         $migrationRepository = $dependencyFactory->getMigrationRepository();

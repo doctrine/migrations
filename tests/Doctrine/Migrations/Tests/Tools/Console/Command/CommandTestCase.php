@@ -11,6 +11,7 @@ use Doctrine\Migrations\Tools\Console\Command\AbstractCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Application;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function array_replace;
 use function assert;
 use function is_string;
@@ -29,7 +30,7 @@ abstract class CommandTestCase extends MigrationTestCase
     /** @var Connection */
     protected $connection;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection = $this->createConnection();
         $this->config     = $this->createMock(Configuration::class);
@@ -40,14 +41,14 @@ abstract class CommandTestCase extends MigrationTestCase
         $this->app->add($this->command);
     }
 
-    abstract protected function createCommand() : AbstractCommand;
+    abstract protected function createCommand(): AbstractCommand;
 
-    protected function createConnection() : Connection
+    protected function createConnection(): Connection
     {
         return $this->getSqliteConnection();
     }
 
-    protected function createCommandTester() : CommandTester
+    protected function createCommandTester(): CommandTester
     {
         $name = $this->command->getName();
         assert(is_string($name));
@@ -61,7 +62,7 @@ abstract class CommandTestCase extends MigrationTestCase
      *
      * @return mixed[] [CommandTester, int]
      */
-    protected function executeCommand(array $args, array $options = []) : array
+    protected function executeCommand(array $args, array $options = []): array
     {
         $tester = $this->createCommandTester();
 

@@ -35,7 +35,7 @@ class TableUpdaterTest extends TestCase
     /** @var TableUpdater|MockObject */
     private $migrationTableUpdater;
 
-    public function testUpdateMigrationTable() : void
+    public function testUpdateMigrationTable(): void
     {
         $this->migrationTable->expects(self::once())
             ->method('getName')
@@ -109,7 +109,7 @@ class TableUpdaterTest extends TestCase
         $this->migrationTableUpdater->updateMigrationTable();
     }
 
-    public function testUpdateMigrationTableRollback() : void
+    public function testUpdateMigrationTableRollback(): void
     {
         $this->expectException(Throwable::class);
         $this->expectExceptionMessage('Rolling back.');
@@ -187,7 +187,7 @@ class TableUpdaterTest extends TestCase
         $this->migrationTableUpdater->updateMigrationTable();
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->connection     = $this->createMock(Connection::class);
         $this->schemaManager  = $this->createMock(AbstractSchemaManager::class);

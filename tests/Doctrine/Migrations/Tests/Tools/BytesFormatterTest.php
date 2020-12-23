@@ -9,7 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class BytesFormatterTest extends TestCase
 {
-    public function testFormatBytes() : void
+    public function testFormatBytes(): void
     {
         self::assertSame('1000', BytesFormatter::formatBytes(1000));
         self::assertSame('97.66K', BytesFormatter::formatBytes(100000));

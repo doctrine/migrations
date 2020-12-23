@@ -9,6 +9,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tests\Stub\Version1Test;
 use Doctrine\Migrations\Tools\Console\Command\StatusCommand;
 use Symfony\Component\Console\Tester\CommandTester;
+
 use function preg_quote;
 
 class MigrationStatusTest extends MigrationTestCase
@@ -16,7 +17,7 @@ class MigrationStatusTest extends MigrationTestCase
     /** @var string */
     private $migrationDirectory;
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->migrationDirectory = __DIR__ . '/../../../Stub/migration-empty-folder';
     }
@@ -24,7 +25,7 @@ class MigrationStatusTest extends MigrationTestCase
     /**
      * Tests the display of the previous/current/next/latest versions.
      */
-    public function testVersions() : void
+    public function testVersions(): void
     {
         self::assertVersion('prev', '123', 'Previous Version', 'FORMATTED (123)');
         self::assertVersion('current', '234', 'Current Version', 'FORMATTED (234)');
@@ -47,7 +48,7 @@ class MigrationStatusTest extends MigrationTestCase
      * @param  string      $label   The expected row label.
      * @param  string      $output  The expected row value.
      */
-    protected function assertVersion(string $alias, ?string $version, string $label, string $output) : void
+    protected function assertVersion(string $alias, ?string $version, string $label, string $output): void
     {
         $command = $this
             ->getMockBuilder(StatusCommand::class)
@@ -95,7 +96,7 @@ class MigrationStatusTest extends MigrationTestCase
         self::assertRegExp('/\s+>> ' . $label . ':\s+' . preg_quote($output) . '/m', $textOutput);
     }
 
-    public function testShowVersions() : void
+    public function testShowVersions(): void
     {
         $configuration = new Configuration($this->getSqliteConnection());
         $configuration->setMigrationsNamespace('DoctrineMigrations');

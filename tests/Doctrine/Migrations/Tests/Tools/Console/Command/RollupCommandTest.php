@@ -24,7 +24,7 @@ final class RollupCommandTest extends TestCase
     /** @var RollupCommand|MockObject */
     private $rollupCommand;
 
-    public function testExecute() : void
+    public function testExecute(): void
     {
         $input  = $this->createMock(InputInterface::class);
         $output = $this->createMock(OutputInterface::class);
@@ -45,7 +45,7 @@ final class RollupCommandTest extends TestCase
         $this->rollupCommand->execute($input, $output);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->rollup            = $this->createMock(Rollup::class);
         $this->dependencyFactory = $this->createMock(DependencyFactory::class);

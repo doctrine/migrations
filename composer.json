@@ -11,23 +11,23 @@
         {"name": "Michael Simonson", "email": "contact@mikesimonson.com" }
     ],
     "require": {
-        "php": "^7.1",
+        "php": "^7.1 || ^8.0",
         "composer/package-versions-deprecated": "^1.8",
         "doctrine/dbal": "^2.9",
-        "ocramius/proxy-manager": "^2.0.2",
+        "friendsofphp/proxy-manager-lts": "^1.0",
         "symfony/console": "^3.4||^4.4.16||^5.0",
         "symfony/stopwatch": "^3.4||^4.0||^5.0"
     },
     "require-dev": {
         "ext-pdo_sqlite": "*",
-        "doctrine/coding-standard": "^6.0",
+        "doctrine/coding-standard": "^8.2",
         "doctrine/orm": "^2.6",
         "jdorn/sql-formatter": "^1.1",
         "mikey179/vfsstream": "^1.6",
-        "phpstan/phpstan": "^0.10",
-        "phpstan/phpstan-deprecation-rules": "^0.10",
-        "phpstan/phpstan-phpunit": "^0.10",
-        "phpstan/phpstan-strict-rules": "^0.10",
+        "phpstan/phpstan": "^0.12",
+        "phpstan/phpstan-deprecation-rules": "^0.12",
+        "phpstan/phpstan-phpunit": "^0.12",
+        "phpstan/phpstan-strict-rules": "^0.12",
         "phpunit/phpunit": "^7.5 || ^8.5 || ^9.4",
         "symfony/process": "^3.4||^4.0||^5.0",
         "symfony/yaml": "^3.4||^4.0||^5.0"

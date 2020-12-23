@@ -10,6 +10,7 @@ use Doctrine\Migrations\Generator\SqlGenerator;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use SqlFormatter;
+
 use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
@@ -26,7 +27,7 @@ final class SqlGeneratorTest extends TestCase
     /** @var string[] */
     private $sql;
 
-    public function testGenerate() : void
+    public function testGenerate(): void
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
 
@@ -49,7 +50,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    public function testGenerationWithoutCheckingDatabasePlatform() : void
+    public function testGenerationWithoutCheckingDatabasePlatform(): void
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(true);
 
@@ -66,7 +67,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration() : void
+    public function testGenerationWithoutCheckingDatabasePlatformWithConfiguration(): void
     {
         $this->configuration->method('isDatabasePlatformChecked')->willReturn(false);
 
@@ -83,7 +84,7 @@ CODE
         self::assertSame($expectedCode, $code);
     }
 
-    protected function setUp() : void
+    protected function setUp(): void
     {
         $this->configuration = $this->createMock(Configuration::class);
         $this->platform      = $this->createMock(AbstractPlatform::class);
@@ -94,7 +95,7 @@ CODE
         );
     }
 
-    private function prepareGeneratedCode(string $expectedCode) : string
+    private function prepareGeneratedCode(string $expectedCode): string
     {
         $this->sql = [
             'SELECT 1',

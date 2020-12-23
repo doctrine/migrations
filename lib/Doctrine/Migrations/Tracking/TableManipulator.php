@@ -44,7 +44,7 @@ class TableManipulator
         $this->migrationTableUpdater = $migrationTableUpdater;
     }
 
-    public function createMigrationTable() : bool
+    public function createMigrationTable(): bool
     {
         $this->configuration->validate();
 

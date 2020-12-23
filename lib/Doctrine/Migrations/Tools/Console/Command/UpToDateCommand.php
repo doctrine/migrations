@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+
 use function count;
 use function sprintf;
 
@@ -19,7 +20,7 @@ class UpToDateCommand extends AbstractCommand
     /** @var string */
     protected static $defaultName = 'migrations:up-to-date';
 
-    protected function configure() : void
+    protected function configure(): void
     {
         $this
             ->setAliases(['up-to-date'])
@@ -35,7 +36,7 @@ EOT
         parent::configure();
     }
 
-    public function execute(InputInterface $input, OutputInterface $output) : ?int
+    public function execute(InputInterface $input, OutputInterface $output): ?int
     {
         $migrations          = count($this->migrationRepository->getMigrations());
         $migratedVersions    = count($this->migrationRepository->getMigratedVersions());
