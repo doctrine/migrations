@@ -9,8 +9,6 @@ parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     ignoreErrors:
-        # Ignore proxy manager magic
-        - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
             message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'

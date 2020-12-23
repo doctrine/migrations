@@ -158,7 +158,7 @@ class SchemaDumper
     {
         try {
             $errorMessages = [];
-            set_error_handler(static function (int $severity, string $message, string $file, int $line, array $params) use (&$errorMessages): bool {
+            set_error_handler(static function (int $severity, string $message, string $file, int $line) use (&$errorMessages): bool {
                 $errorMessages[] = $message;
 
                 return true;
