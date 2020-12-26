@@ -9,8 +9,6 @@ parameters:
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     ignoreErrors:
-        # Ignore proxy manager magic
-        - '~ProxyManager\\Proxy\\VirtualProxyInterface~'
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
             message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
@@ -29,7 +27,6 @@ parameters:
             path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
         - '~Unable to resolve the template type T in call to method static method Doctrine\\DBAL\\DriverManager\:\:getConnection\(\)~'
         - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
-
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
