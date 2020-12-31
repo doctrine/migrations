@@ -499,9 +499,10 @@ class MigrateCommandTest extends TestCase
         $this->migrationRepository = $this->createMock(MigrationRepository::class);
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
 
-        $this->migrateCommand = $this->getMockBuilder(MigrateCommand::class)
-            ->setMethods(['canExecute'])
-            ->getMock();
+        $this->migrateCommand = $this->createPartialMock(
+            MigrateCommand::class,
+            ['canExecute']
+        );
 
         $this->migrateCommand->setMigrationConfiguration($this->configuration);
         $this->migrateCommand->setMigrationRepository($this->migrationRepository);

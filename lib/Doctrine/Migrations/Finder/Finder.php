@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Finder;
 
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Finder\Exception\InvalidDirectory;
 use Doctrine\Migrations\Finder\Exception\NameIsReserved;
 use ReflectionClass;
@@ -11,6 +12,7 @@ use ReflectionClass;
 use function assert;
 use function get_declared_classes;
 use function in_array;
+use function is_a;
 use function is_dir;
 use function ksort;
 use function realpath;
@@ -47,9 +49,9 @@ abstract class Finder implements MigrationFinder
     /**
      * @param string[] $files
      *
-     * @return string[]
-     *
      * @throws NameIsReserved
+     *
+     * @psalm-return array<string, class-string<AbstractMigration>>
      */
     protected function loadMigrations(array $files, ?string $namespace): array
     {
@@ -87,7 +89,7 @@ abstract class Finder implements MigrationFinder
      * @param string[]    $files     The set of files that were `required`
      * @param string|null $namespace If not null only classes in this namespace will be returned
      *
-     * @return ReflectionClass[] the classes in `$files`
+     * @psalm-return list<ReflectionClass<AbstractMigration>> the classes in `$files`
      */
     protected function loadMigrationClasses(array $files, ?string $namespace): array
     {
@@ -99,16 +101,22 @@ abstract class Finder implements MigrationFinder
                 continue;
             }
 
+            /** @psalm-var ReflectionClass<AbstractMigration> $reflectionClass */
+
             if ($namespace !== null && ! $this->isReflectionClassInNamespace($reflectionClass, $namespace)) {
                 continue;
             }
 
+            assert(is_a($class, AbstractMigration::class, true));
             $classes[] = $reflectionClass;
         }
 
         return $classes;
     }
 
+    /**
+     * @psalm-param ReflectionClass<AbstractMigration> $reflectionClass
+     */
     private function isReflectionClassInNamespace(ReflectionClass $reflectionClass, string $namespace): bool
     {
         return strncmp($reflectionClass->getName(), $namespace . '\\', strlen($namespace) + 1) === 0;

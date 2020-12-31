@@ -75,7 +75,7 @@ final class ParameterFormatter implements ParameterFormatterInterface
     }
 
     /**
-     * @param int[]|bool[]|string[]|array|int|string|bool $value
+     * @param int[]|bool[]|string[]|array|int|string|bool|mixed $value
      */
     private function parameterToString($value): string
     {

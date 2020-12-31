@@ -43,7 +43,7 @@ final class MigrationPlanCalculator
             $migrated,
             $direction,
             $to
-        ) {
+        ): bool {
             return $this->shouldExecuteMigration($direction, $version, $to, $migrated);
         });
     }

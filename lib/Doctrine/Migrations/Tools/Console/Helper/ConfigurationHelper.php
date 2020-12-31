@@ -100,6 +100,8 @@ class ConfigurationHelper extends Helper implements ConfigurationHelperInterface
 
         $info = pathinfo($config);
 
+        assert(isset($info['extension']));
+
         // check we can support this file type
         if (! isset($map[$info['extension']])) {
             throw FileTypeNotSupported::new();

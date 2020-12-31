@@ -7,7 +7,6 @@ namespace Doctrine\Migrations\Tests\Tools\Console;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoaderInterface;
-use Doctrine\Migrations\Configuration\Connection\Loader\ConnectionConfigurationChainLoader;
 use Doctrine\Migrations\Tools\Console\ConnectionLoader;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -16,10 +15,10 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class ConnectionLoaderTest extends TestCase
 {
-    /** @var Configuration|MockObject */
+    /** @var Configuration&MockObject */
     private $configuration;
 
-    /** @var ConnectionConfigurationChainLoader|MockObject */
+    /** @var MockObject */
     private $connectionConfigurationChainLoader;
 
     /** @var ConnectionLoader */
@@ -33,7 +32,7 @@ class ConnectionLoaderTest extends TestCase
 
         $this->connectionConfigurationChainLoader->expects(self::once())
             ->method('chosen')
-            ->wilLReturn($connection);
+            ->willReturn($connection);
 
         self::assertSame($connection, $this->connectionLoader->getConnection($input, $helperSet));
     }

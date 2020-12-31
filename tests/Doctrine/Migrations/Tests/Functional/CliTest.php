@@ -358,7 +358,7 @@ class CliTest extends MigrationTestCase
     }
 
     /**
-     * @return string[]
+     * @psalm-return array<string, class-string<AbstractMigration>>
      */
     private function findMigrations(): array
     {
@@ -388,7 +388,8 @@ class CliTest extends MigrationTestCase
             'This method is designed to work for one existing version, you have ' . count($versions) . ' versions'
         );
 
-        $versionClassName      = reset($versions);
+        $versionClassName = reset($versions);
+        assert($versionClassName !== false);
         $versionClassReflected = new ReflectionClass($versionClassName);
 
         $fileName = $versionClassReflected->getFileName();

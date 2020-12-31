@@ -1,19 +1,40 @@
 parameters:
     level: 7
-    reportUnmatchedIgnoredErrors: false
     paths:
         - lib
         - tests
     ignoreErrors:
-        - '~Unable to resolve the template type T in call to method static method Doctrine\\DBAL\\DriverManager\:\:getConnection\(\)~'
-        - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
-        # Drop when bumping to doctrine/dbal 2.11+
-        - '~^.*PrimaryReadReplicaConnection.*$~'
-
+        - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
+        - '~Variable method call on Doctrine\\Migrations\\Configuration\\Configuration\.~'
+        - '~Variable method call on \$this\(Doctrine\\Migrations\\Configuration\\AbstractFileConfiguration\)\.~'
+        - '~Variable property access on SimpleXMLElement\.~'
+        - '~^Class Doctrine\\Migrations\\Tests\\DoesNotExistAtAll not found\.\z~'
+        # https://github.com/phpstan/phpstan/issues/3853
+        -
+            message: '~Unable to resolve the template type T in call to method static method Doctrine\\DBAL\\DriverManager::getConnection\(\)~'
+            paths:
+                - lib/Doctrine/Migrations/Configuration/Connection/Loader/ArrayConnectionConfigurationLoader.php
+                - tests/Doctrine/Migrations/Tests/Functional/FunctionalTest.php
+                - tests/Doctrine/Migrations/Tests/Functional/MigrationTableManipulatorTest.php
+                - tests/Doctrine/Migrations/Tests/MigrationTestCase.php
+        # Changing the public API of commands would be a BC-break
+        -
+            message: '~Return type.*Command::execute.*should be covariant with.*~'
+            paths:
+                - lib/Doctrine/Migrations/Tools/Console/Command/DiffCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/DumpSchemaCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/ExecuteCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/GenerateCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/LatestCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/MigrateCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/RollupCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/StatusCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/UpToDateCommand.php
+                - lib/Doctrine/Migrations/Tools/Console/Command/VersionCommand.php
+        - '~Instanceof between Doctrine\\DBAL\\Connection and Doctrine\\DBAL\\Connections\\MasterSlaveConnection will always evaluate to false\.~'
 
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
     - vendor/phpstan/phpstan-phpunit/rules.neon
     - vendor/phpstan/phpstan-strict-rules/rules.neon
-    - .github/phpstan-baseline.neon

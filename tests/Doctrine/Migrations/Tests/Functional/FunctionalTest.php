@@ -526,8 +526,6 @@ class FunctionalTest extends MigrationTestCase
     {
         $listener        = new AutoCommitListener();
         [$conn, $config] = self::fileConnectionAndConfig();
-        assert($conn instanceof Connection);
-        assert($config instanceof Configuration);
         $config->registerMigration('1', MigrateWithDataModification::class);
         $migrator = $this->createTestMigrator($config);
         $conn->getEventManager()->addEventSubscriber($listener);

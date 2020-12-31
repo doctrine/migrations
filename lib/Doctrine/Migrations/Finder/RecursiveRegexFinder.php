@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Finder;
 
+use Doctrine\Migrations\AbstractMigration;
 use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
@@ -19,7 +20,7 @@ use const DIRECTORY_SEPARATOR;
 final class RecursiveRegexFinder extends Finder implements MigrationDeepFinder
 {
     /**
-     * @return string[]
+     * @psalm-return array<string, class-string<AbstractMigration>>
      */
     public function findMigrations(string $directory, ?string $namespace = null): array
     {

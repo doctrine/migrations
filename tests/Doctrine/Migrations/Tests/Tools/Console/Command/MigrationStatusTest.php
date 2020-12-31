@@ -66,7 +66,7 @@ class MigrationStatusTest extends MigrationTestCase
         $configuration
             ->expects(self::exactly(4))
             ->method('resolveVersionAlias')
-            ->will(self::returnCallback(static function ($argAlias) use ($alias, $version) {
+            ->will(self::returnCallback(static function (?string $argAlias) use ($alias, $version): ?string {
                 return $argAlias === $alias ? $version : '999';
             }));
 

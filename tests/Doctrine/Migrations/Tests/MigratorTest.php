@@ -18,11 +18,8 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Version\Direction;
 use PHPUnit\Framework\Constraint\RegularExpression;
-use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
 use Throwable;
-
-use function assert;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -141,7 +138,6 @@ class MigratorTest extends MigrationTestCase
             ->disableOriginalConstructor()
             ->setMethods(['migrate'])
             ->getMock();
-        assert($migration instanceof Migrator || $migration instanceof MockObject);
 
         $expected = [['something']];
 
@@ -216,7 +212,6 @@ class MigratorTest extends MigrationTestCase
             ->setConstructorArgs($this->getMigratorConstructorArgs($config))
             ->setMethods(['getSql'])
             ->getMock();
-        assert($migration instanceof Migrator || $migration instanceof MockObject);
 
         $migration->expects(self::once())
             ->method('getSql')

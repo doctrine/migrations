@@ -46,7 +46,6 @@ class AbstractCommandTest extends MigrationTestCase
             AbstractCommand::class,
             ['command']
         );
-        assert($command instanceof AbstractCommand);
 
         if ($helperSet instanceof HelperSet) {
             $command->setHelperSet($helperSet);
@@ -297,7 +296,6 @@ class AbstractCommandTest extends MigrationTestCase
             AbstractCommand::class,
             ['command']
         );
-        assert($command instanceof AbstractCommand);
 
         $input->setStream($this->getInputStream($response . "\n"));
 

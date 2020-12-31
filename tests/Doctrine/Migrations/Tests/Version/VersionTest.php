@@ -38,7 +38,6 @@ use Doctrine\Migrations\Version\Version;
 use org\bovigo\vfs\vfsStream;
 use org\bovigo\vfs\vfsStreamFile;
 use PDO;
-use PHPUnit\Framework\MockObject\MockObject;
 use ReflectionClass;
 use stdClass;
 use Symfony\Component\Stopwatch\Stopwatch as SymfonyStopwatch;
@@ -211,11 +210,10 @@ class VersionTest extends MigrationTestCase
         $outputWriter->expects(self::atLeastOnce())
             ->method('write');
 
-        $config = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->setMethods(['getConnection', 'getOutputWriter', 'getQueryWriter'])
-            ->getMock();
-        assert($config instanceof Configuration || $config instanceof MockObject);
+        $config = $this->createPartialMock(
+            Configuration::class,
+            ['getConnection', 'getOutputWriter', 'getQueryWriter']
+        );
 
         $config->method('getOutputWriter')
             ->willReturn($outputWriter);
@@ -230,7 +228,6 @@ class VersionTest extends MigrationTestCase
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
             ->getMock();
-        assert($version instanceof Version || $version instanceof MockObject);
 
         $versionExecutionResult = new ExecutionResult($getSqlReturn);
 
@@ -405,15 +402,12 @@ class VersionTest extends MigrationTestCase
 
         $connection = $this->getSqliteConnection();
 
-        $config = $this->getMockBuilder(Configuration::class)
-            ->disableOriginalConstructor()
-            ->setMethods([
-                'getOutputWriter',
-                'getConnection',
-                'getQuotedMigrationsColumnName',
-                'getQuotedMigrationsExecutedAtColumnName',
-            ])
-            ->getMock();
+        $config = $this->createPartialMock(Configuration::class, [
+            'getOutputWriter',
+            'getConnection',
+            'getQuotedMigrationsColumnName',
+            'getQuotedMigrationsExecutedAtColumnName',
+        ]);
 
         $config->method('getOutputWriter')
             ->willReturn($this->getOutputWriter());
@@ -431,7 +425,6 @@ class VersionTest extends MigrationTestCase
             ->setConstructorArgs($this->getMockVersionConstructorArgs($config, $version, TestMigration::class))
             ->setMethods(['execute'])
             ->getMock();
-        assert($migration instanceof Version || $migration instanceof MockObject);
 
         $versionExecutionResult = new ExecutionResult(['SHOW DATABASES;']);
 

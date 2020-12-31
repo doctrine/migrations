@@ -348,7 +348,7 @@ class Configuration
 
     public function generateVersionNumber(?DateTimeInterface $now = null): string
     {
-        $now = $now ?: $this->createDateTime();
+        $now = $now ?? $this->createDateTime();
 
         return $now->format(self::VERSION_FORMAT);
     }

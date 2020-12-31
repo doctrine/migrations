@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use function array_map;
+use function assert;
 use function glob;
 use function is_file;
 use function rmdir;
@@ -32,6 +33,7 @@ class Helper
         }
 
         $files = glob($path . '/*');
+        assert($files !== false);
 
         if ($files !== []) {
             array_map($classFunction, $files);

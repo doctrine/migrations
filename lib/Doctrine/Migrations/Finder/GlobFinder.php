@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Finder;
 
+use function assert;
 use function glob;
 use function rtrim;
 
@@ -20,6 +21,8 @@ final class GlobFinder extends Finder
         $dir = $this->getRealPath($directory);
 
         $files = glob(rtrim($dir, '/') . '/Version*.php');
+
+        assert($files !== false);
 
         return $this->loadMigrations($files, $namespace);
     }

@@ -108,7 +108,10 @@ abstract class MigrationTestCase extends TestCase
     protected function getSqlFilesList(string $path): array
     {
         if (is_dir($path)) {
-            return glob(realpath($path) . '/*.sql');
+            $matchedFiles = glob(realpath($path) . '/*.sql');
+            assert($matchedFiles !== false);
+
+            return $matchedFiles;
         }
 
         if (is_file($path)) {

@@ -41,7 +41,7 @@ final class OrmSchemaProvider implements SchemaProviderInterface
             throw NoMappingFound::new();
         }
 
-        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b) {
+        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b): int {
             return $a->getTableName() <=> $b->getTableName();
         });
 

@@ -68,13 +68,11 @@ abstract class AbstractMigration
         return '';
     }
 
-    public function warnIf(bool $condition, string $message = ''): void
+    public function warnIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if (! $condition) {
             return;
         }
-
-        $message = $message ?: 'Unknown Reason';
 
         $this->outputWriter->write(sprintf(
             '    <comment>Warning during %s: %s</comment>',
@@ -86,20 +84,20 @@ abstract class AbstractMigration
     /**
      * @throws AbortMigration
      */
-    public function abortIf(bool $condition, string $message = ''): void
+    public function abortIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
-            throw new AbortMigration($message ?: 'Unknown Reason');
+            throw new AbortMigration($message);
         }
     }
 
     /**
      * @throws SkipMigration
      */
-    public function skipIf(bool $condition, string $message = ''): void
+    public function skipIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
-            throw new SkipMigration($message ?: 'Unknown Reason');
+            throw new SkipMigration($message);
         }
     }
 
