@@ -295,7 +295,7 @@ final class DbalExecutor implements Executor
             $this->outputSqlQuery($query);
 
             $stopwatchEvent = $this->stopwatch->start('query');
-            $this->connection->executeStatement($query->getStatement(), $query->getParameters(), $query->getTypes());
+            $this->connection->executeUpdate($query->getStatement(), $query->getParameters(), $query->getTypes());
             $stopwatchEvent->stop();
 
             if (! $configuration->getTimeAllQueries()) {
