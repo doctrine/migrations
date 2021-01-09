@@ -179,8 +179,7 @@ class MigrationRepository
             $this->configuration->getQuotedMigrationsColumnName()
         );
 
-        $sql    = $this->connection->getDatabasePlatform()->modifyLimitQuery($sql, 1);
-        $result = $this->connection->fetchColumn($sql);
+        $result = $this->connection->fetchOne($sql);
 
         return $result !== false ? (string) $result : '0';
     }
@@ -239,7 +238,7 @@ class MigrationRepository
             $this->configuration->getQuotedMigrationsColumnName()
         );
 
-        $data = $this->connection->fetchAssoc($sql, [$version->getVersion()]);
+        $data = $this->connection->fetchAssociative($sql, [$version->getVersion()]);
 
         return is_array($data) ? $data : null;
     }
@@ -338,7 +337,7 @@ class MigrationRepository
             $this->configuration->getMigrationsTableName()
         );
 
-        $result = $this->connection->fetchColumn($sql);
+        $result = $this->connection->fetchOne($sql);
 
         return $result !== false ? (int) $result : 0;
     }
