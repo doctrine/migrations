@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Helper;
 
 use Doctrine\Migrations\Configuration\Configuration;
-use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExist;
+use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExistAndCouldNotBeCreated;
+use Throwable;
 
 use function date;
 use function file_exists;
@@ -21,15 +22,21 @@ use const DIRECTORY_SEPARATOR;
  */
 class MigrationDirectoryHelper
 {
+    private const MIGRATION_DIRECTORY_PERMISSIONS = 755;
+
     /**
-     * @throws DirectoryDoesNotExist
+     * @throws DirectoryDoesNotExistAndCouldNotBeCreated
      */
     public function getMigrationDirectory(Configuration $configuration, string $dir): string
     {
-        $dir = rtrim($dir, '/');
+        $dir = rtrim($dir, DIRECTORY_SEPARATOR);
 
-        if (! file_exists($dir)) {
-            throw DirectoryDoesNotExist::new($dir);
+        try {
+            if (! file_exists($dir)) {
+                $this->createDirIfNotExists($dir);
+            }
+        } catch (Throwable $ex) {
+            throw DirectoryDoesNotExistAndCouldNotBeCreated::new($dir, $ex->getMessage());
         }
 
         if ($configuration->areMigrationsOrganizedByYear()) {
@@ -39,8 +46,6 @@ class MigrationDirectoryHelper
         if ($configuration->areMigrationsOrganizedByYearAndMonth()) {
             $dir .= $this->appendDir(date('m'));
         }
-
-        $this->createDirIfNotExists($dir);
 
         return $dir;
     }
@@ -56,6 +61,6 @@ class MigrationDirectoryHelper
             return;
         }
 
-        mkdir($dir, 0755, true);
+        mkdir($dir, self::MIGRATION_DIRECTORY_PERMISSIONS, true);
     }
 }

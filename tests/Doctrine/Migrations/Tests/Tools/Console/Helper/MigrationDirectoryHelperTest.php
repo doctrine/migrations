@@ -7,8 +7,8 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Helper;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
+use Doctrine\Migrations\Tools\Console\Exception\DirectoryDoesNotExistAndCouldNotBeCreated;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
-use InvalidArgumentException;
 
 use function date;
 use function mkdir;
@@ -21,7 +21,7 @@ use const DIRECTORY_SEPARATOR;
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
     /** @var MigrationDirectoryHelper */
-    private $mirationDirectoryHelper;
+    private $migrationDirectoryHelper;
 
     /** @var Configuration */
     private $configuration;
@@ -31,10 +31,10 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
 
     public function setUp(): void
     {
-        $this->mirationDirectoryHelper = new MigrationDirectoryHelper();
-        $this->configuration           = new Configuration();
-        $tempDir                       = tempnam(sys_get_temp_dir(), 'DoctrineMigrations-tests');
-        $this->tempDir                 = $tempDir === false ? '/tmp' : $tempDir;
+        $this->migrationDirectoryHelper = new MigrationDirectoryHelper();
+        $this->configuration            = new Configuration();
+        $tempDir                        = tempnam(sys_get_temp_dir(), 'DoctrineMigrations-tests');
+        $this->tempDir                  = $tempDir === false ? '/tmp' : $tempDir;
         @unlink($this->tempDir);
         mkdir($this->tempDir);
         $this->configuration->addMigrationsDirectory('DoctrineMigrations', $this->tempDir);
@@ -48,7 +48,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
     public function testMigrationDirectoryHelperReturnConfiguredDir(): void
     {
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
-            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            $migrationDir = $this->migrationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
             self::assertSame($dir, $migrationDir);
         }
     }
@@ -58,7 +58,7 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         $this->configuration->setMigrationsAreOrganizedByYear(true);
 
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
-            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            $migrationDir = $this->migrationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
             $expectedDir  = $dir . DIRECTORY_SEPARATOR . date('Y');
 
             self::assertSame($expectedDir, $migrationDir);
@@ -70,21 +70,26 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
         $this->configuration->setMigrationsAreOrganizedByYearAndMonth(true);
 
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
-            $migrationDir = $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+            $migrationDir = $this->migrationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
             $expectedDir  = $dir . DIRECTORY_SEPARATOR . date('Y') . DIRECTORY_SEPARATOR . date('m');
 
             self::assertSame($expectedDir, $migrationDir);
         }
     }
 
-    public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
+    public function testMigrationsDirectoryHelperThrowsExpectedExceptionTryingToCreateDirectory(): void
     {
-        $this->expectException(InvalidArgumentException::class);
+        $this->expectException(DirectoryDoesNotExistAndCouldNotBeCreated::class);
 
-        $this->configuration->addMigrationsDirectory('DoctrineMigrations', '/non_exiting_folder');
+        /**
+         * The random "<test>" in the path below is for when AppVeyer Suite is running phpunit on the Windows
+         * environment it causes the mkdir method that gets called in MigrationDirectoryHelper::createDirIfNotExists
+         * to fail and throw the expected DirectoryDoesNotExistAndCouldNotBeCreated exception.
+         */
+        $this->configuration->addMigrationsDirectory('DoctrineMigrations', '/migrations\<test\>');
 
-        foreach ($this->configuration->getMigrationDirectories() as $dir) {
-            $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);
+        foreach ($this->configuration->getMigrationDirectories() as $directory) {
+            $this->migrationDirectoryHelper->getMigrationDirectory($this->configuration, $directory);
         }
     }
 }
