@@ -161,7 +161,7 @@ Here the possible options for ``table_storage``:
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| execution_time_column_name | no         | executed_at                  | The name of the column which stores how long a migration took (milliseconds).    |
+| execution_time_column_name | no         | execution_time               | The name of the column which stores how long a migration took (milliseconds).    |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 
 Manually Providing Migrations

@@ -22,17 +22,25 @@ class DoctrineRegistry extends AbstractManagerRegistry
     private $connections;
 
     /**
-     * @param Connection[]    $connections
-     * @param EntityManager[] $realEntityManagers
+     * @param array<string,Connection>    $connections
+     * @param array<string,EntityManager> $realEntityManagers
      */
     public function __construct(array $connections = [], array $realEntityManagers = [])
     {
+        /**
+         * @var string[] $connectionNames
+         */
+        $connectionNames = array_keys($connections);
+        /**
+         * @var string[] $realEntityManagerNames
+         */
+        $realEntityManagerNames = array_keys($realEntityManagers);
         parent::__construct(
             'some_registry',
-            (array) array_combine(array_keys($connections), array_keys($connections)),
-            (array) array_combine(array_keys($realEntityManagers), array_keys($realEntityManagers)),
-            key($connections) !== null ? (string) key($connections) : null,
-            key($realEntityManagers) !== null ? (string) key($realEntityManagers) : null,
+            array_combine($connectionNames, $connectionNames),
+            array_combine($realEntityManagerNames, $realEntityManagerNames),
+            key($connections) ?? null,
+            key($realEntityManagers) ?? null,
             'Doctrine\Persistence\Proxy'
         );
         $this->realEntityManagers = $realEntityManagers;
