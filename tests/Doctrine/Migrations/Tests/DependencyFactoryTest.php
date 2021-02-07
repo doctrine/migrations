@@ -16,6 +16,9 @@ use Doctrine\Migrations\Exception\MissingDependency;
 use Doctrine\Migrations\Finder\GlobFinder;
 use Doctrine\Migrations\Finder\RecursiveRegexFinder;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
+use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
+use Doctrine\Migrations\Tests\Stub\CustomClassNameMigrationFactory;
+use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManager;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\LoggerInterface;
@@ -154,6 +157,23 @@ final class DependencyFactoryTest extends MigrationTestCase
             return $anotherLogger;
         });
         self::assertSame($anotherLogger, $di->getLogger());
+    }
+
+    public function testServiceDecoratesDefaultImplementation(): void
+    {
+        $configuration = new Configuration();
+        $configuration->addMigrationClass(A::class);
+
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($configuration), new ExistingConnection($this->connection));
+
+        $di->setDefinition(MigrationFactory::class, static function (DependencyFactory $innerDi): CustomClassNameMigrationFactory {
+            $serviceToDecorate = $innerDi->getMigrationFactory();
+
+            return new CustomClassNameMigrationFactory($serviceToDecorate, A::class);
+        });
+
+        $factory = $di->getMigrationFactory();
+        self::assertInstanceOf(A::class, $factory->createVersion('SomeVersion'));
     }
 
     public function testServiceHasPriorityOverDefinition(): void
