@@ -14,6 +14,7 @@ use Doctrine\Migrations\Version\Comparator;
 use function class_exists;
 use function class_implements;
 use function in_array;
+use function is_array;
 use function strtolower;
 
 /**
@@ -251,7 +252,13 @@ final class Configuration
             throw UnknownConfigurationValue::new('version_comparator', $this->versionComparator);
         }
 
-        if (! in_array(Comparator::class, class_implements($this->versionComparator))) {
+        $classImplements = class_implements($this->versionComparator);
+
+        if (! is_array($classImplements)) {
+            throw UnknownConfigurationValue::new('version_comparator', $this->versionComparator);
+        }
+
+        if (! in_array(Comparator::class, $classImplements)) {
             throw UnknownConfigurationValue::new('version_comparator', $this->versionComparator);
         }
 
