@@ -8,7 +8,12 @@ use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
+use Doctrine\Migrations\Version\Comparator;
 
+use function class_exists;
+use function class_implements;
+use function in_array;
 use function strtolower;
 
 /**
@@ -47,6 +52,9 @@ final class Configuration
     /** @var string|null */
     private $entityManagerName;
 
+    /** @var string */
+    private $versionComparator;
+
     /** @var bool */
     private $checkDbPlatform = true;
 
@@ -55,6 +63,11 @@ final class Configuration
 
     /** @var bool */
     private $frozen = false;
+
+    public function __construct()
+    {
+        $this->versionComparator = AlphabeticalComparator::class;
+    }
 
     public function freeze(): void
     {
@@ -133,6 +146,12 @@ final class Configuration
     {
         $this->assertNotFrozen();
         $this->customTemplate = $customTemplate;
+    }
+
+    public function setVersionComparator(string $versionComparator): void
+    {
+        $this->assertNotFrozen();
+        $this->versionComparator = $versionComparator;
     }
 
     public function getCustomTemplate(): ?string
@@ -220,5 +239,24 @@ final class Configuration
             default:
                 throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
         }
+    }
+
+    public function getVersionComparator(): Comparator
+    {
+        if ($this->versionComparator === null) {
+            throw UnknownConfigurationValue::new('version_comparator', null);
+        }
+
+        if (! class_exists($this->versionComparator)) {
+            throw UnknownConfigurationValue::new('version_comparator', $this->versionComparator);
+        }
+
+        if (! in_array(Comparator::class, class_implements($this->versionComparator))) {
+            throw UnknownConfigurationValue::new('version_comparator', $this->versionComparator);
+        }
+
+        $comparator = $this->versionComparator;
+
+        return new $comparator();
     }
 }

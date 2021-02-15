@@ -33,7 +33,6 @@ use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationStatusInfosHelper;
 use Doctrine\Migrations\Tools\Console\MigratorConfigurationFactory;
 use Doctrine\Migrations\Version\AliasResolver;
-use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\Comparator;
 use Doctrine\Migrations\Version\CurrentMigrationStatusCalculator;
 use Doctrine\Migrations\Version\DbalExecutor;
@@ -190,8 +189,8 @@ class DependencyFactory
 
     public function getVersionComparator(): Comparator
     {
-        return $this->getDependency(Comparator::class, static function (): AlphabeticalComparator {
-            return new AlphabeticalComparator();
+        return $this->getDependency(Comparator::class, function (): Comparator {
+            return $this->getConfiguration()->getVersionComparator();
         });
     }
 
