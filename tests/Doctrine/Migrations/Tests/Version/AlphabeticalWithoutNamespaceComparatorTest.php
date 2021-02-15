@@ -10,9 +10,7 @@ use PHPUnit\Framework\TestCase;
 
 final class AlphabeticalWithoutNamespaceComparatorTest extends TestCase
 {
-    /**
-     * @return iterable[]
-     */
+    /** @return array<Version, Version, int> */
     public function provideVersion(): iterable
     {
         yield [new Version('a'), new Version('b'), -1];
