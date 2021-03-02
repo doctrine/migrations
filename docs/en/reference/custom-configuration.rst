@@ -16,7 +16,7 @@ Once you have your custom integration setup, you can modify it to look like the 
     use Doctrine\DBAL\DriverManager;
     use Doctrine\Migrations\Configuration\Configuration;
     use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
-    use Doctrine\Migrations\Configuration\Configuration\ExistingConfiguration;
+    use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
     use Doctrine\Migrations\DependencyFactory;
     use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
     use Doctrine\Migrations\Tools\Console\Command;
@@ -34,7 +34,6 @@ Once you have your custom integration setup, you can modify it to look like the 
 
     $configuration = new Configuration($connection);
 
-    $configuration->setName('My Project Migrations');
     $configuration->addMigrationsDirectory('MyProject\Migrations', '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations');
     $configuration->setAllOrNothing(true);
     $configuration->setCheckDatabasePlatform(false);
