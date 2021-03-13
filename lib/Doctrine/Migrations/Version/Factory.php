@@ -10,7 +10,7 @@ use Doctrine\Migrations\Configuration\Configuration;
  * The Factory class is responsible for creating instances of the Version class for a version number
  * and a migration class name.
  *
- * @var internal
+ * @internal
  */
 class Factory
 {
