@@ -9,6 +9,7 @@ use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Doctrine\Migrations\Tools\TransactionHelper;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Stopwatch\StopwatchEvent;
@@ -202,7 +203,7 @@ class Migrator
         }
 
         if ($allOrNothing) {
-            $connection->commit();
+            TransactionHelper::commitIfInTransaction($connection);
         }
 
         return $sql;

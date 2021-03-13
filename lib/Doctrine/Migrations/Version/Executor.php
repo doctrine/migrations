@@ -16,6 +16,7 @@ use Doctrine\Migrations\ParameterFormatterInterface;
 use Doctrine\Migrations\Provider\SchemaDiffProviderInterface;
 use Doctrine\Migrations\Stopwatch;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Doctrine\Migrations\Tools\TransactionHelper;
 use Throwable;
 
 use function count;
@@ -257,8 +258,7 @@ final class Executor implements ExecutorInterface
         }
 
         if ($migration->isTransactional()) {
-            //commit only if running in transactional mode
-            $this->connection->commit();
+            TransactionHelper::commitIfInTransaction($this->connection);
         }
 
         $version->setState(State::NONE);

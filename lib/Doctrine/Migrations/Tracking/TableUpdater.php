@@ -9,6 +9,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\Migrations\Tools\TransactionHelper;
 use Throwable;
 
 use function in_array;
@@ -66,7 +67,7 @@ class TableUpdater
             throw $e;
         }
 
-        $this->connection->commit();
+        TransactionHelper::commitIfInTransaction($this->connection);
     }
 
     /**
