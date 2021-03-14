@@ -221,7 +221,7 @@ All or Nothing Transaction
 
 .. note::
 
-    This is only works if your database supports transactions for DDL statements.
+    This only works if your database supports transactions for DDL statements.
 
 When using the ``all_or_nothing`` option, multiple migrations ran at the same time will be wrapped in a single
 transaction. If one migration fails, all migrations will be rolled back
