@@ -18,6 +18,7 @@ use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tools\BytesFormatter;
+use Doctrine\Migrations\Tools\TransactionHelper;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
@@ -211,8 +212,7 @@ final class DbalExecutor implements Executor
         }
 
         if ($migration->isTransactional()) {
-            //commit only if running in transactional mode
-            $this->connection->commit();
+            TransactionHelper::commitIfInTransaction($this->connection);
         }
 
         $plan->markAsExecuted($result);
