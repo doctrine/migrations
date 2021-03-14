@@ -67,6 +67,16 @@ Override this method if you want to disable transactions in a migration. It defa
         return false;
     }
 
+.. note::
+
+    Some database platforms like MySQL or Oracle do not support DDL
+    statements in transactions and may or may not implicitly commit the
+    transaction opened by this library as soon as they encounter such a
+    statement, and before running it. Make sure to read the manual of
+    your database platform to know what is actually happening.
+    ``isTransactional()`` does not guarantee that statements are wrapped
+    in a single transaction.
+
 getDescription
 ~~~~~~~~~~~~~~
 

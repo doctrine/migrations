@@ -16,7 +16,7 @@ Once you have your custom integration setup, you can modify it to look like the 
     use Doctrine\DBAL\DriverManager;
     use Doctrine\Migrations\Configuration\Configuration;
     use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
-    use Doctrine\Migrations\Configuration\Configuration\ExistingConfiguration;
+    use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
     use Doctrine\Migrations\DependencyFactory;
     use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
     use Doctrine\Migrations\Tools\Console\Command;
@@ -34,7 +34,6 @@ Once you have your custom integration setup, you can modify it to look like the 
 
     $configuration = new Configuration($connection);
 
-    $configuration->setName('My Project Migrations');
     $configuration->addMigrationsDirectory('MyProject\Migrations', '/data/doctrine/migrations-docs-example/lib/MyProject/Migrations');
     $configuration->setAllOrNothing(true);
     $configuration->setCheckDatabasePlatform(false);
@@ -127,3 +126,47 @@ With this configuration you can use the ``--conn`` parameter to specify a connec
 migrations. If the parameter is not passed, it will fallback to the one passed in the configuration,
 and if that is also not provided it will fallback to the default connection name specified when creating
 the connection registry.
+
+Custom migration template
+-------------------------
+
+When the default generated migrations do not suit your needs, you may provide a custom migration template that will
+be used to generate future migrations.
+
+For example, if you don't need a ``down`` migration your template could look like this:
+
+.. code-block:: php
+
+    <?php
+
+    declare(strict_types=1);
+
+    namespace <namespace>;
+
+    use Doctrine\DBAL\Schema\Schema;
+    use Doctrine\Migrations\AbstractMigration;
+
+    final class <className> extends AbstractMigration
+    {
+        public function up(Schema $schema): void
+        {
+            <up>
+        }
+    }
+
+Placeholders (words inside ``< >``) are replaced with correct code upon generation. All possible wildcards are:
+
+===============  ===============================================
+Placeholder      Description
+---------------  -----------------------------------------------
+``<namespace>``  Namespace of the class, e.g. ``App\Migrations``
+``<className>``  Classname, e.g. ``Version20210212092730``
+``<up>``         SQL for migrating up
+``<down>``       SQL for migrating down
+===============  ===============================================
+
+The custom template needs to be configured.
+
+.. code-block:: php
+
+    $configuration->setCustomTemplate(__DIR__ . '/custom_template.tpl');
