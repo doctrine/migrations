@@ -20,10 +20,10 @@ jobs:
           - "7.3"
           - "7.4"
           - "8.0"
-        deps:
-          - "normal"
+        dependencies:
+          - "highest"
         include:
-          - deps: "low"
+          - deps: "lowest"
             php-version: "7.1"
 
     steps:
@@ -51,20 +51,10 @@ jobs:
       - name: "Download box"
         run: "./download-box.sh"
 
-      - name: "Cache dependencies installed with composer"
-        uses: "actions/cache@v2"
+      - name: "Install dependencies with Composer"
+        uses: "ramsey/composer-install@v1"
         with:
-          path: "~/.composer/cache"
-          key: "php-${{ matrix.php-version }}-composer-locked-${{ hashFiles('composer.lock') }}"
-          restore-keys: "php-${{ matrix.php-version }}-composer-locked-"
-
-      - name: "Install dependencies with composer"
-        run: "composer update --no-interaction --prefer-dist --no-progress"
-        if: "${{ matrix.deps == 'normal' }}"
-
-      - name: "Install lowest possible dependencies with composer"
-        run: "composer update --no-interaction --prefer-dist --prefer-lowest --no-progress"
-        if: "${{ matrix.deps == 'low' }}"
+          dependency-versions: "${{ matrix.dependencies }}"
 
       - name: "Run PHPUnit"
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
