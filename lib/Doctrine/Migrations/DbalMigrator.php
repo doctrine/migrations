@@ -76,7 +76,7 @@ class DbalMigrator implements Migrator
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $migratorConfiguration);
         } catch (Throwable $e) {
             if ($allOrNothing) {
-                $this->connection->rollBack();
+                TransactionHelper::rollbackIfInTransaction($this->connection);
             }
 
             throw $e;

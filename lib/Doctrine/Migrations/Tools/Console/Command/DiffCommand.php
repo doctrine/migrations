@@ -71,7 +71,7 @@ EOT
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Max line length of unformatted lines.',
-                120
+                '120'
             )
             ->addOption(
                 'check-database-platform',
