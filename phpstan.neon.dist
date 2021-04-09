@@ -4,14 +4,6 @@ parameters:
     paths:
         - %currentWorkingDirectory%/lib
         - %currentWorkingDirectory%/tests
-    autoload_directories:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_features
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_files
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_regression
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Functional/_files
-    autoload_files:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/realpath.php
     ignoreErrors:
         - '~Unable to resolve the template type T in call to method static method Doctrine\\DBAL\\DriverManager\:\:getConnection\(\)~'
         - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
