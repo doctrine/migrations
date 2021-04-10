@@ -6,7 +6,7 @@ namespace Doctrine\Migrations\Metadata\Storage;
 
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
@@ -81,7 +81,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
 
         $this->checkInitialization();
-        $rows = $this->connection->fetchAll(sprintf('SELECT * FROM %s', $this->configuration->getTableName()));
+        $rows = $this->connection->fetchAllAssociative(sprintf('SELECT * FROM %s', $this->configuration->getTableName()));
 
         $migrations = [];
         foreach ($rows as $row) {
@@ -118,7 +118,7 @@ final class TableMetadataStorage implements MetadataStorage
     {
         $this->checkInitialization();
 
-        $this->connection->executeUpdate(
+        $this->connection->executeStatement(
             sprintf(
                 'DELETE FROM %s WHERE 1 = 1',
                 $this->platform->quoteIdentifier($this->configuration->getTableName())
@@ -177,7 +177,7 @@ final class TableMetadataStorage implements MetadataStorage
 
     private function isInitialized(): bool
     {
-        if ($this->connection instanceof MasterSlaveConnection) {
+        if ($this->connection instanceof PrimaryReadReplicaConnection) {
             $this->connection->connect('master');
         }
 
