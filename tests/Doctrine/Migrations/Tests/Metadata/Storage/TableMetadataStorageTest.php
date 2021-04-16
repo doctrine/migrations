@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 use DateTime;
 use DateTimeImmutable;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDOSqlite\Driver as SQLiteDriver;
+use Doctrine\DBAL\Driver\PDO\SQLite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -155,7 +155,7 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         self::assertSame([
             0 =>
                 [
@@ -178,7 +178,7 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         self::assertSame([
             0 =>
                 [
@@ -290,13 +290,13 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(1, $this->connection->fetchAll($sql));
+        self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
         $result = new ExecutionResult(new Version('1230'), Direction::DOWN, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.0);
         $this->storage->complete($result);
 
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
     public function testReset(): void
@@ -311,11 +311,11 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(1, $this->connection->fetchAll($sql));
+        self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
         $this->storage->reset();
 
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
     public function testResetWithEmptySchema(): void
@@ -328,6 +328,6 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 }

@@ -35,6 +35,7 @@ final class OrmSchemaProvider implements SchemaProvider
      */
     public function createSchema(): Schema
     {
+        /** @var array<int, ClassMetadata> $metadata */
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
         if (count($metadata) === 0) {

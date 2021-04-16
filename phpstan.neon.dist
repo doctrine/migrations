@@ -26,6 +26,16 @@ parameters:
             message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
             path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
         - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
+        -
+            message: '~^Instantiation of deprecated class~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
+        # Requires PHPUnit 9
+        -
+            message: '~assert.*Reg~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Generator/ClassNameGeneratorTest.php
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php

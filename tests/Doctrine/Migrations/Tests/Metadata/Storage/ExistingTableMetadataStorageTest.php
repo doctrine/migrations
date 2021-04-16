@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Connections\MasterSlaveConnection;
+use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -78,9 +78,9 @@ class ExistingTableMetadataStorageTest extends TestCase
         $this->schemaManager->createTable($table);
     }
 
-    public function testMasterSlaveConnectionGetsConnected(): void
+    public function testPrimaryReadReplicaConnectionGetsConnected(): void
     {
-        $connection = $this->createMock(MasterSlaveConnection::class);
+        $connection = $this->createMock(PrimaryReadReplicaConnection::class);
         $connection
             ->expects(self::atLeastOnce())
             ->method('connect')
@@ -107,7 +107,7 @@ class ExistingTableMetadataStorageTest extends TestCase
 
         $this->storage->ensureInitialized();
 
-        $rows = $this->connection->fetchAll(sprintf(
+        $rows = $this->connection->fetchAllAssociative(sprintf(
             'SELECT * FROM %s ORDER BY %s ASC',
             $this->config->getTableName(),
             $this->config->getVersionColumnName()
