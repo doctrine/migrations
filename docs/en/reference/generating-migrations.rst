@@ -43,17 +43,17 @@ the ORM. To test this functionality, create a new ``User`` entity located at ``l
             $this->id = $id;
         }
 
-        public function getId() : ?int
+        public function getId(): ?int
         {
             return $this->id;
         }
 
-        public function setUsername(string $username) : void
+        public function setUsername(string $username): void
         {
             $this->username = $username;
         }
 
-        public function getUsername() : ?string
+        public function getUsername(): ?string
         {
             return $this->username;
         }
@@ -95,12 +95,12 @@ Take a look at the generated migration:
      */
     final class Version20180601215504 extends AbstractMigration
     {
-        public function getDescription() : string
+        public function getDescription(): string
         {
             return '';
         }
 
-        public function up(Schema $schema) : void
+        public function up(Schema $schema): void
         {
             // this up() migration is auto-generated, please modify it to your needs
             $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
@@ -109,7 +109,7 @@ Take a look at the generated migration:
             $this->addSql('DROP TABLE example_table');
         }
 
-        public function down(Schema $schema) : void
+        public function down(Schema $schema): void
         {
             // this down() migration is auto-generated, please modify it to your needs
             $this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');

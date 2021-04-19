@@ -24,7 +24,7 @@ listens for all possible migrations events.
 
     class MigrationsListener implements EventSubscriber
     {
-        public function getSubscribedEvents() : array
+        public function getSubscribedEvents(): array
         {
             return [
                 Events::onMigrationsMigrating,
@@ -35,27 +35,27 @@ listens for all possible migrations events.
             ];
         }
 
-        public function onMigrationsMigrating(MigrationsEventArgs $args) : void
+        public function onMigrationsMigrating(MigrationsEventArgs $args): void
         {
             // ...
         }
 
-        public function onMigrationsMigrated(MigrationsEventArgs $args) : void
+        public function onMigrationsMigrated(MigrationsEventArgs $args): void
         {
             // ...
         }
 
-        public function onMigrationsVersionExecuting(MigrationsVersionEventArgs $args) : void
+        public function onMigrationsVersionExecuting(MigrationsVersionEventArgs $args): void
         {
             // ...
         }
 
-        public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args) : void
+        public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args): void
         {
             // ...
         }
 
-        public function onMigrationsVersionSkipped(MigrationsVersionEventArgs $args) : void
+        public function onMigrationsVersionSkipped(MigrationsVersionEventArgs $args): void
         {
             // ...
         }
