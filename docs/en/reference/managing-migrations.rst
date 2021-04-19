@@ -57,17 +57,17 @@ is, it does not have anything in it so nothing would be executed! Let's add some
      */
     final class Version20180601193057 extends AbstractMigration
     {
-        public function getDescription() : string
+        public function getDescription(): string
         {
             return 'This is my example migration.';
         }
 
-        public function up(Schema $schema) : void
+        public function up(Schema $schema): void
         {
             $this->addSql('CREATE TABLE example_table (id INT AUTO_INCREMENT NOT NULL, title VARCHAR(255) DEFAULT NULL, PRIMARY KEY(id))');
         }
 
-        public function down(Schema $schema) : void
+        public function down(Schema $schema): void
         {
             $this->addSql('DROP TABLE example_table');
         }
