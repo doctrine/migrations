@@ -13,21 +13,23 @@ use PHPUnit\Framework\TestCase;
 final class TransactionHelperTest extends TestCase
 {
     /**
+     * @param class-string $driverConnectionFqcn
+     *
      * @dataProvider getDriverConnectionClassesImplementingInTransactionMethod
      */
     public function testCommitIfInTransactionWithConnectionImplementingInTransactionMethod(string $driverConnectionFqcn, bool $commitExpected): void
     {
         $wrappedConnection = $this->createMock($driverConnectionFqcn);
-        $wrappedConnection->expects($this->once())
+        $wrappedConnection->expects(self::once())
             ->method('inTransaction')
             ->willReturn($commitExpected);
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('getWrappedConnection')
             ->willReturn($wrappedConnection);
 
-        $connection->expects($commitExpected ? $this->once() : $this->never())
+        $connection->expects($commitExpected ? self::once() : self::never())
             ->method('commit');
 
         TransactionHelper::commitIfInTransaction($connection);
@@ -36,32 +38,34 @@ final class TransactionHelperTest extends TestCase
     public function testCommitIfInTransactionWithConnectionNotImplementingInTransactionMethod(): void
     {
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('getWrappedConnection')
             ->willReturn($this->createMock(DriverConnection::class));
 
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('commit');
 
         TransactionHelper::commitIfInTransaction($connection);
     }
 
     /**
+     * @param class-string $driverConnectionFqcn
+     *
      * @dataProvider getDriverConnectionClassesImplementingInTransactionMethod
      */
     public function testRollbackIfInTransactionWithConnectionImplementingInTransactionMethod(string $driverConnectionFqcn, bool $commitExpected): void
     {
         $wrappedConnection = $this->createMock($driverConnectionFqcn);
-        $wrappedConnection->expects($this->once())
+        $wrappedConnection->expects(self::once())
             ->method('inTransaction')
             ->willReturn($commitExpected);
 
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('getWrappedConnection')
             ->willReturn($wrappedConnection);
 
-        $connection->expects($commitExpected ? $this->once() : $this->never())
+        $connection->expects($commitExpected ? self::once() : self::never())
             ->method('rollback');
 
         TransactionHelper::rollbackIfInTransaction($connection);
@@ -70,11 +74,11 @@ final class TransactionHelperTest extends TestCase
     public function testRollbackIfInTransactionWithConnectionNotImplementingInTransactionMethod(): void
     {
         $connection = $this->createMock(Connection::class);
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('getWrappedConnection')
             ->willReturn($this->createMock(DriverConnection::class));
 
-        $connection->expects($this->once())
+        $connection->expects(self::once())
             ->method('rollback');
 
         TransactionHelper::rollbackIfInTransaction($connection);
