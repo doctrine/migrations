@@ -5,7 +5,8 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools;
 
 use Doctrine\DBAL\Connection;
-use PDO;
+
+use function method_exists;
 
 /**
  * @internal
@@ -36,6 +37,10 @@ final class TransactionHelper
 
         /* Attempt to commit or rollback while no transaction is running
            results in an exception since PHP 8 + pdo_mysql combination */
-        return ! $wrappedConnection instanceof PDO || $wrappedConnection->inTransaction();
+        if (method_exists($wrappedConnection, 'inTransaction')) {
+            return $wrappedConnection->inTransaction();
+        }
+
+        return true;
     }
 }
