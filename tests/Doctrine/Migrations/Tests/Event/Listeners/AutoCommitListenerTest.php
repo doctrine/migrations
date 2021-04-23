@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Event\Listeners;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
@@ -39,8 +40,13 @@ class AutoCommitListenerTest extends MigrationTestCase
     public function testListenerDoesFinalCommitWhenAutoCommitIsOff(): void
     {
         $this->conn->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
+        $this->conn->expects(self::once())
             ->method('isAutoCommit')
             ->willReturn(false);
+
         $this->conn->expects(self::once())
             ->method('commit');
 

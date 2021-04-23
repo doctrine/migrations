@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
@@ -63,6 +64,10 @@ class ExecutorTest extends TestCase
 
     public function testExecuteUp(): void
     {
+        $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>++</info> migrating <comment>001</comment>\n");
@@ -113,6 +118,10 @@ class ExecutorTest extends TestCase
      */
     public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
+        $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>++</info> migrating <comment>001 (testing)</comment>\n");
@@ -130,6 +139,10 @@ class ExecutorTest extends TestCase
 
     public function testExecuteDown(): void
     {
+        $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>--</info> reverting <comment>001</comment>\n");
@@ -180,6 +193,10 @@ class ExecutorTest extends TestCase
      */
     public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
+        $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
         $this->outputWriter->expects(self::at(0))
             ->method('write')
             ->with("\n  <info>--</info> reverting <comment>001 (testing)</comment>\n");

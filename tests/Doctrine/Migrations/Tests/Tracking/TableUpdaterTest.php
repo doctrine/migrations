@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tracking;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Column;
@@ -97,6 +98,10 @@ class TableUpdaterTest extends TestCase
             ->willReturn(['ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL']);
 
         $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
+
+        $this->connection->expects(self::once())
             ->method('beginTransaction');
 
         $this->connection->expects(self::once())
@@ -172,6 +177,10 @@ class TableUpdaterTest extends TestCase
             ->method('getMigrateToSql')
             ->with($toSchema, $this->platform)
             ->willReturn(['ALTER TABLE table_name ADD COLUMN executed_at DATETIME DEFAULT NULL']);
+
+        $this->connection->expects(self::once())
+            ->method('getWrappedConnection')
+            ->willReturn($this->createMock(DriverConnection::class));
 
         $this->connection->expects(self::once())
             ->method('beginTransaction');

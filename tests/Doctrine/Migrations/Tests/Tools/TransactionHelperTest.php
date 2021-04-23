@@ -85,7 +85,7 @@ final class TransactionHelperTest extends TestCase
     }
 
     /**
-     * @return mixed[]
+     * @return list<array{class-string<DriverConnection>, bool}>
      */
     public function getDriverConnectionClassesImplementingInTransactionMethod(): array
     {
