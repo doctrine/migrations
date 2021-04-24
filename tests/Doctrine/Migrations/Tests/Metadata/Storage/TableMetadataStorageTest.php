@@ -6,9 +6,11 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use DateTime;
 use DateTimeImmutable;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\PDOSqlite\Driver as SQLiteDriver;
+use Doctrine\DBAL\Driver\PDO\SQLite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Logging\DebugStack;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
@@ -31,6 +33,9 @@ class TableMetadataStorageTest extends TestCase
     /** @var Connection */
     private $connection;
 
+    /** @var Configuration */
+    private $connectionConfig;
+
     /** @var TableMetadataStorage */
     private $storage;
 
@@ -40,20 +45,36 @@ class TableMetadataStorageTest extends TestCase
     /** @var AbstractSchemaManager */
     private $schemaManager;
 
-    private function getSqliteConnection(): Connection
+    private function getSqliteConnection(?Configuration $configuration = null): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 
-        return DriverManager::getConnection($params);
+        return DriverManager::getConnection($params, $configuration);
     }
 
     public function setUp(): void
     {
-        $this->connection    = $this->getSqliteConnection();
-        $this->schemaManager = $this->connection->getSchemaManager();
+        $this->connectionConfig = new Configuration();
+        $this->connection       = $this->getSqliteConnection($this->connectionConfig);
+        $this->schemaManager    = $this->connection->getSchemaManager();
 
         $this->config  = new TableMetadataStorageConfiguration();
         $this->storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $this->config);
+    }
+
+    public function testSchemaIntrospectionExecutedOnlyOnce(): void
+    {
+        $stack = new DebugStack();
+        $this->connectionConfig->setSQLLogger($stack);
+        $this->storage->ensureInitialized();
+
+        $oldQueryCount = $stack->currentQuery;
+        $this->storage->ensureInitialized();
+        self::assertSame(0, $stack->currentQuery - $oldQueryCount);
+
+        $oldQueryCount = $stack->currentQuery;
+        $this->storage->getExecutedMigrations();
+        self::assertSame(1, $stack->currentQuery - $oldQueryCount);
     }
 
     public function testDifferentTableNotUpdatedOnRead(): void
@@ -155,7 +176,7 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         self::assertSame([
             0 =>
                 [
@@ -178,7 +199,7 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        $rows = $this->connection->fetchAll($sql);
+        $rows = $this->connection->fetchAllAssociative($sql);
         self::assertSame([
             0 =>
                 [
@@ -290,13 +311,13 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(1, $this->connection->fetchAll($sql));
+        self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
         $result = new ExecutionResult(new Version('1230'), Direction::DOWN, new DateTimeImmutable('2010-01-05 10:30:21'));
         $result->setTime(31.0);
         $this->storage->complete($result);
 
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
     public function testReset(): void
@@ -311,11 +332,11 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(1, $this->connection->fetchAll($sql));
+        self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
         $this->storage->reset();
 
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
     public function testResetWithEmptySchema(): void
@@ -328,6 +349,6 @@ class TableMetadataStorageTest extends TestCase
             'SELECT * FROM %s',
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
-        self::assertCount(0, $this->connection->fetchAll($sql));
+        self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 }
