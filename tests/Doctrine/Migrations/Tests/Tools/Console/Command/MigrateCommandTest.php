@@ -309,6 +309,14 @@ class MigrateCommandTest extends MigrationTestCase
     public function testExecuteMigrateUpdatesMigrationsTableWhenNeeded(): void
     {
         $this->alterMetadataTable();
+        // replace the old storage instance since it has cached the metadata state and we have altered it with alterMetadataTable() above
+        $this->storage = new TableMetadataStorage(
+            $this->connection,
+            new AlphabeticalComparator(),
+            $this->metadataConfiguration,
+            $this->migrationRepository
+        );
+        $this->dependencyFactory->setService(MetadataStorage::class, $this->storage);
 
         $this->migrateCommandTester->execute([], ['interactive' => false]);
 
