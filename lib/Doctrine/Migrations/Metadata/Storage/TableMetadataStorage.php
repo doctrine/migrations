@@ -37,6 +37,12 @@ use const CASE_LOWER;
 
 final class TableMetadataStorage implements MetadataStorage
 {
+    /** @var bool */
+    private $isInitialized;
+
+    /** @var bool */
+    private $schemaUpToDate = false;
+
     /** @var Connection */
     private $connection;
 
@@ -152,22 +158,32 @@ final class TableMetadataStorage implements MetadataStorage
         if (! $this->isInitialized()) {
             $expectedSchemaChangelog = $this->getExpectedTable();
             $this->schemaManager->createTable($expectedSchemaChangelog);
+            $this->schemaUpToDate = true;
+            $this->isInitialized  = true;
 
             return;
         }
 
+        $this->isInitialized     = true;
         $expectedSchemaChangelog = $this->getExpectedTable();
         $diff                    = $this->needsUpdate($expectedSchemaChangelog);
         if ($diff === null) {
+            $this->schemaUpToDate = true;
+
             return;
         }
 
+        $this->schemaUpToDate = true;
         $this->schemaManager->alterTable($diff);
         $this->updateMigratedVersionsFromV1orV2toV3();
     }
 
     private function needsUpdate(Table $expectedTable): ?TableDiff
     {
+        if ($this->schemaUpToDate) {
+            return null;
+        }
+
         $comparator   = new Comparator();
         $currentTable = $this->schemaManager->listTableDetails($this->configuration->getTableName());
         $diff         = $comparator->diffTable($currentTable, $expectedTable);
@@ -177,6 +193,10 @@ final class TableMetadataStorage implements MetadataStorage
 
     private function isInitialized(): bool
     {
+        if ($this->isInitialized) {
+            return $this->isInitialized;
+        }
+
         if ($this->connection instanceof PrimaryReadReplicaConnection) {
             $this->connection->connect('master');
         }
