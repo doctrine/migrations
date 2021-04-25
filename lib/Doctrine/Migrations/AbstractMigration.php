@@ -7,6 +7,8 @@ namespace Doctrine\Migrations;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySqlPlatform;
+use Doctrine\DBAL\Platforms\OraclePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
@@ -52,7 +54,7 @@ abstract class AbstractMigration
     /**
      * Indicates the transactional mode of this migration.
      *
-     * If this function returns true (default) the migration will be executed
+     * If this function returns true (default when the underlying database supports transactional DDL) the migration will be executed
      * in one transaction, otherwise non-transactional state will be used to
      * execute each of the migration SQLs.
      *
@@ -60,7 +62,7 @@ abstract class AbstractMigration
      */
     public function isTransactional(): bool
     {
-        return true;
+        return ! ($this->platform instanceof MySqlPlatform || $this->platform instanceof OraclePlatform);
     }
 
     public function getDescription(): string
