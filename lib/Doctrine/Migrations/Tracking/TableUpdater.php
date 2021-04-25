@@ -62,7 +62,7 @@ class TableUpdater
                 $this->connection->executeQuery($query);
             }
         } catch (Throwable $e) {
-            TransactionHelper::rollbackIfInTransaction($this->connection);
+            $this->connection->rollBack();
 
             throw $e;
         }

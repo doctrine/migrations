@@ -298,7 +298,7 @@ final class Executor implements ExecutorInterface
     ): void {
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode
-            TransactionHelper::rollbackIfInTransaction($this->connection);
+            $this->connection->rollBack();
         }
 
         if (! $migratorConfiguration->isDryRun()) {
@@ -331,7 +331,7 @@ final class Executor implements ExecutorInterface
 
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode
-            TransactionHelper::rollbackIfInTransaction($this->connection);
+            $this->connection->rollBack();
         }
 
         $version->setState(State::NONE);

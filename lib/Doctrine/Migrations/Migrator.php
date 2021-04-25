@@ -196,7 +196,7 @@ class Migrator
             $this->configuration->dispatchMigrationEvent(Events::onMigrationsMigrated, $direction, $dryRun);
         } catch (Throwable $e) {
             if ($allOrNothing) {
-                TransactionHelper::rollbackIfInTransaction($connection);
+                $connection->rollBack();
             }
 
             throw $e;
