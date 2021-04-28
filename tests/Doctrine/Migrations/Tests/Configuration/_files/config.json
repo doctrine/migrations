@@ -10,5 +10,6 @@
         "executed_at_column_name" : "doctrine_migration_executed_at_column_test",
         "execution_time_column_name" : "doctrine_migration_execution_time_column_test"
     },
-    "all_or_nothing"            : true
+    "all_or_nothing"            : true,
+    "transactional"             : true
 }
