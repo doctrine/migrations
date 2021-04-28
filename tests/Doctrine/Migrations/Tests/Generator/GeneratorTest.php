@@ -58,7 +58,7 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
-    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing(): void
+    public function testThrowsInvalidArgumentExceptionWhenNamespaceDirMissing(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Path not defined for the namespace "Bar"');
