@@ -198,7 +198,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
 
         if ($this->connection instanceof PrimaryReadReplicaConnection) {
-            $this->connection->connect('master');
+            $this->connection->connect();
         }
 
         return $this->schemaManager->tablesExist([$this->configuration->getTableName()]);
