@@ -83,7 +83,7 @@ class ExistingTableMetadataStorageTest extends TestCase
         $connection = $this->createMock(PrimaryReadReplicaConnection::class);
         $connection
             ->expects(self::atLeastOnce())
-            ->method('connect');
+            ->method('ensureConnectedToPrimary');
 
         $connection
             ->expects(self::atLeastOnce())
