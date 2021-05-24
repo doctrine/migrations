@@ -31,6 +31,7 @@ use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
+use Generator;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -371,26 +372,44 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
-    public function testExecuteMigrateAllOrNothing(): void
+    /**
+     * @dataProvider allOrNothing
+     * @psalm-param array<string, bool> $input
+     */
+    public function testExecuteMigrateAllOrNothing(bool $default, array $input, bool $expected): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
         $this->dependencyFactory->setService(Migrator::class, $migrator);
+        $this->configuration->setAllOrNothing($default);
 
         $migrator->expects(self::once())
             ->method('migrate')
-            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
-                self::assertTrue($configuration->isAllOrNothing());
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration) use ($expected): array {
+                self::assertSame($expected, $configuration->isAllOrNothing());
                 self::assertCount(1, $planList);
 
                 return ['A'];
             });
 
         $this->migrateCommandTester->execute(
-            ['--all-or-nothing' => true],
+            $input,
             ['interactive' => false]
         );
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
+    }
+
+    /**
+     * @psalm-return Generator<array{bool, array<string, bool>, bool}>
+     */
+    public function allOrNothing(): Generator
+    {
+        yield [false, ['--all-or-nothing' => false], false];
+        yield [false, ['--all-or-nothing' => true], true];
+        yield [true, ['--all-or-nothing' => false], false];
+
+        yield [true, [], true];
+        yield [false, [], false];
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
