@@ -50,6 +50,8 @@ jobs:
           coverage: "pcov"
           extensions: "pdo_sqlite"
           ini-values: "zend.assertions=1"
+          # Remove this line when a fix for is available https://github.com/box-project/box/issues/555
+          tools: "composer:v2.0.14"
 
       - name: "Download box"
         run: "./download-box.sh"
