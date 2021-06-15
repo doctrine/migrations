@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\Migrations\Exception\MigrationConfigurationConflict;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tools\BytesFormatter;
@@ -65,6 +66,7 @@ class DbalMigrator implements Migrator
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
         if ($allOrNothing) {
+            $this->assertAllMigrationsAreTransactional($migrationsPlan);
             $this->connection->beginTransaction();
         }
 
@@ -87,6 +89,15 @@ class DbalMigrator implements Migrator
         }
 
         return $sql;
+    }
+
+    private function assertAllMigrationsAreTransactional(MigrationPlanList $migrationsPlan): void
+    {
+        foreach ($migrationsPlan->getItems() as $plan) {
+            if (! $plan->getMigration()->isTransactional()) {
+                throw MigrationConfigurationConflict::migrationIsNotTransactional($plan->getMigration());
+            }
+        }
     }
 
     /**
