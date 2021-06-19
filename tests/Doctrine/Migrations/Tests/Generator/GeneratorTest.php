@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Generator;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\Generator;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\LoggerInterface;
+use Test\VersionNonTransactional1234;
+use Test\VersionNonTransactional1235;
 
 use function class_exists;
 use function file_get_contents;
@@ -58,7 +62,7 @@ final class GeneratorTest extends TestCase
         unlink($path);
     }
 
-    public function tesThrowsInvalidArgumentExceptionWhenNamespaceDirMissing(): void
+    public function testThrowsInvalidArgumentExceptionWhenNamespaceDirMissing(): void
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Path not defined for the namespace "Bar"');
@@ -93,6 +97,49 @@ final class GeneratorTest extends TestCase
         $this->migrationGenerator->generateMigration('Test\\Version1234');
 
         unlink($customTemplate);
+    }
+
+    public function testItCanGenerateNonTransactionalMigrations(): void
+    {
+        $this->configuration->setTransactional(false);
+        $path = $this->migrationGenerator->generateMigration(
+            'Test\\VersionNonTransactional1234',
+            '// up',
+            '// down'
+        );
+
+        self::assertFileExists($path);
+
+        include $path;
+
+        self::assertTrue(class_exists('Test\VersionNonTransactional1234'));
+        self::assertFalse((new VersionNonTransactional1234(
+            $this->createStub(Connection::class),
+            $this->createStub(LoggerInterface::class)
+        ))->isTransactional());
+
+        unlink($path);
+    }
+
+    public function testItCanGenerateTransactionalMigrationsByDefault(): void
+    {
+        $path = $this->migrationGenerator->generateMigration(
+            'Test\\VersionNonTransactional1235',
+            '// up',
+            '// down'
+        );
+
+        self::assertFileExists($path);
+
+        include $path;
+
+        self::assertTrue(class_exists('Test\VersionNonTransactional1235'));
+        self::assertTrue((new VersionNonTransactional1235(
+            $this->createStub(Connection::class),
+            $this->createStub(LoggerInterface::class)
+        ))->isTransactional());
+
+        unlink($path);
     }
 
     protected function setUp(): void

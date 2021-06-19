@@ -10,5 +10,6 @@ migrations_paths:
   DoctrineMigrationsTest: .
 migrations : ["Foo", "Bar"]
 all_or_nothing: true
+transactional: true
 check_database_platform: true
 

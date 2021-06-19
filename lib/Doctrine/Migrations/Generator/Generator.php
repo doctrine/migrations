@@ -58,7 +58,7 @@ final class <className> extends AbstractMigration
     {
         // this down() migration is auto-generated, please modify it to your needs
 <down>
-    }
+    }<override>
 }
 
 TEMPLATE;
@@ -98,6 +98,15 @@ TEMPLATE;
             '<className>' => $className,
             '<up>' => $up !== null ? '        ' . implode("\n        ", explode("\n", $up)) : null,
             '<down>' => $down !== null ? '        ' . implode("\n        ", explode("\n", $down)) : null,
+            '<override>' => $this->configuration->isTransactional() ? '' : <<<'METHOD'
+
+
+    public function isTransactional(): bool
+    {
+        return false;
+    }
+METHOD
+        ,
         ];
 
         $code = strtr($this->getTemplate(), $replacements);
