@@ -27,6 +27,7 @@
         "php": "^7.2 || ^8.0",
         "composer/package-versions-deprecated": "^1.8",
         "doctrine/dbal": "^2.11",
+        "doctrine/deprecations": "^0.5.3",
         "doctrine/event-manager": "^1.0",
         "friendsofphp/proxy-manager-lts": "^1.0",
         "psr/log": "^1.1.3",
