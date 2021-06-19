@@ -9,6 +9,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\EventDispatcher;
+use Doctrine\Migrations\Exception\MigrationConfigurationConflict;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -17,6 +18,7 @@ use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
+use Doctrine\Migrations\Tests\Stub\NonTransactional\MigrationNonTransactional;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Executor;
@@ -167,6 +169,24 @@ class MigratorTest extends MigrationTestCase
         $migration = new MigrationThrowsError($this->conn, $this->logger);
         $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
         $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        $migrator->migrate($planList, $this->migratorConfiguration);
+    }
+
+    public function testMigrateAllOrNothingNonTransactionalMigration(): void
+    {
+        $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/NonTransactional');
+
+        $migrator = $this->createTestMigrator();
+
+        $this->migratorConfiguration->setAllOrNothing(true);
+
+        $migration = new MigrationNonTransactional($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrationNonTransactional::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        self::expectException(MigrationConfigurationConflict::class);
+        self::expectExceptionMessage(MigrationNonTransactional::class);
 
         $migrator->migrate($planList, $this->migratorConfiguration);
     }
