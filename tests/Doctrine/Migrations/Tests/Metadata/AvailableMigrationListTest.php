@@ -9,6 +9,8 @@ use Doctrine\Migrations\Exception\MigrationNotAvailable;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
+use Doctrine\Migrations\Metadata\ExecutedMigration;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
@@ -118,5 +120,22 @@ class AvailableMigrationListTest extends TestCase
 
         self::assertEquals(new Version('A'), $m1->getVersion());
         self::assertSame($this->abstractMigration, $m1->getMigration());
+    }
+
+    public function testNewSubset(): void
+    {
+        $m1           = new AvailableMigration(new Version('A'), $this->abstractMigration);
+        $m2           = new AvailableMigration(new Version('B'), $this->abstractMigration);
+        $m3           = new AvailableMigration(new Version('C'), $this->abstractMigration);
+        $availableSet = new AvailableMigrationsList([$m1, $m2, $m3]);
+
+        $executedSet = new ExecutedMigrationsList([
+            new ExecutedMigration(new Version('A')),
+            new ExecutedMigration(new Version('B')),
+        ]);
+
+        $newSubset = $availableSet->newSubset($executedSet);
+        self::assertCount(1, $newSubset);
+        self::assertTrue($newSubset->hasMigration(new Version('C')));
     }
 }
