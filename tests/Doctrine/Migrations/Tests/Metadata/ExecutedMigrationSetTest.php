@@ -5,8 +5,11 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata;
 
 use DateTimeImmutable;
+use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MigrationNotExecuted;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
@@ -120,5 +123,23 @@ class ExecutedMigrationSetTest extends TestCase
 
         self::assertSame($date, $m1->getExecutedAt());
         self::assertSame(123.0, $m1->getExecutionTime());
+    }
+
+    public function testUnavailableSubset(): void
+    {
+        $m1          = new ExecutedMigration(new Version('A'));
+        $m2          = new ExecutedMigration(new Version('B'));
+        $m3          = new ExecutedMigration(new Version('C'));
+        $executedSet = new ExecutedMigrationsList([$m1, $m2, $m3]);
+
+        $abstractMigration = $this->createMock(AbstractMigration::class);
+        $availableSet      = new AvailableMigrationsList([
+            new AvailableMigration(new Version('A'), $abstractMigration),
+            new AvailableMigration(new Version('C'), $abstractMigration),
+        ]);
+
+        $unavailableSubset = $executedSet->unavailableSubset($availableSet);
+        self::assertCount(1, $unavailableSubset);
+        self::assertTrue($unavailableSubset->hasMigration(new Version('B')));
     }
 }
