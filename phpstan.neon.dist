@@ -3,9 +3,6 @@ parameters:
     paths:
         - %currentWorkingDirectory%/lib
         - %currentWorkingDirectory%/tests
-    autoload_directories:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_features
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Finder/_files
     excludes_analyse:
         - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     ignoreErrors:
