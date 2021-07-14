@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\Exception\InvalidConfigurationKey;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\Migrations\Tools\BooleanStringFormatter;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 
 use function assert;
 use function call_user_func;
@@ -58,6 +59,7 @@ final class ConfigurationArray implements ConfigurationLoader
 
             'organize_migrations' => 'setMigrationOrganization',
             'custom_template' => 'setCustomTemplate',
+            'version_comparator' => AlphabeticalComparator::class,
             'all_or_nothing' => static function ($value, Configuration $configuration): void {
                 $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
             },

@@ -8,6 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Exception\FrozenConfiguration;
 use Doctrine\Migrations\Configuration\Exception\UnknownConfigurationValue;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorageConfiguration;
+use Doctrine\Migrations\Version\AlphabeticalComparator;
 use PHPUnit\Framework\TestCase;
 
 class ConfigurationTest extends TestCase
@@ -43,6 +44,7 @@ class ConfigurationTest extends TestCase
 
         self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
         self::assertFalse($config->areMigrationsOrganizedByYear());
+        self::assertInstanceOf(AlphabeticalComparator::class, $config->getVersionComparator());
     }
 
     public function testFreezeConfiguration(): void
