@@ -197,6 +197,43 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
     }
 
+    /**
+     * @param string[] $expectedPlan
+     *
+     * @dataProvider getPlanUpWhenMigrationsOutOfOrder
+     */
+    public function testPlanWhenMigrationsOutOfOrder(string $to, array $expectedPlan, string $direction): void
+    {
+        $e1 = new ExecutedMigration(new Version('B'));
+        $e2 = new ExecutedMigration(new Version('C'));
+
+        $this->metadataStorage
+            ->expects(self::atLeastOnce())
+            ->method('getExecutedMigrations')
+            ->willReturn(new ExecutedMigrationsList([$e1, $e2]));
+
+        $plan = $this->migrationPlanCalculator->getPlanUntilVersion(new Version($to));
+
+        self::assertCount(count($expectedPlan), $plan);
+
+        self::assertSame($direction, $plan->getDirection());
+
+        foreach ($expectedPlan as $itemN => $version) {
+            self::assertSame($direction, $plan->getItems()[$itemN]->getDirection());
+            self::assertEquals(new Version($version), $plan->getItems()[$itemN]->getVersion());
+        }
+    }
+
+    /**
+     * @return mixed[]
+     */
+    public function getPlanUpWhenMigrationsOutOfOrder(): array
+    {
+        return [
+            ['C',['A'],Direction::UP],
+        ];
+    }
+
     public function testCustomMigrationSorting(): void
     {
         $reverseSorter           = new class implements Comparator {
