@@ -94,10 +94,12 @@ class ExecuteCommandTest extends MigrationTestCase
             [true, false, null],
             [true, null, getcwd()],
             [true,  __DIR__ . '/_files', __DIR__ . '/_files'],
+            [true,  __DIR__ . '/_files/run.sql', __DIR__ . '/_files/run.sql'],
 
             [false, false, null],
             [false, null, getcwd()],
             [false,  __DIR__ . '/_files', __DIR__ . '/_files'],
+            [true,  __DIR__ . '/_files/run.sql', __DIR__ . '/_files/run.sql'],
         ];
     }
 

@@ -12,8 +12,10 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function array_map;
+use function dirname;
 use function getcwd;
 use function implode;
+use function is_dir;
 use function is_string;
 use function is_writable;
 use function sprintf;
@@ -130,7 +132,8 @@ EOT
             : Direction::UP;
 
         $path = $input->getOption('write-sql') ?? getcwd();
-        if (is_string($path) && ! is_writable($path)) {
+
+        if (is_string($path) && ! $this->isPathWritable($path)) {
             $this->io->error(sprintf('The path "%s" not writeable!', $path));
 
             return 1;
@@ -160,5 +163,10 @@ EOT
         $this->io->newLine();
 
         return 0;
+    }
+
+    private function isPathWritable(string $path): bool
+    {
+        return is_writable($path) || is_dir($path) || is_writable(dirname($path));
     }
 }
