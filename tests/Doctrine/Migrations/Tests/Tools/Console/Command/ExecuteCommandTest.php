@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -17,6 +18,7 @@ use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
+use Doctrine\Migrations\Version\AliasResolver;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
@@ -47,6 +49,9 @@ class ExecuteCommandTest extends MigrationTestCase
     /** @var MigrationPlanCalculator|MockObject */
     private $planCalculator;
 
+    /** @var AliasResolver|MockObject */
+    private $versionAliasResolver;
+
     /**
      * @param bool|string|null $arg
      *
@@ -62,6 +67,12 @@ class ExecuteCommandTest extends MigrationTestCase
 
                 return ['A'];
             });
+
+        $this->versionAliasResolver
+            ->expects(self::once())
+            ->method('resolveVersionAlias')
+            ->with('1')
+            ->willReturn(new Version('1'));
 
         if ($arg === false) {
             $this->queryWriter
@@ -116,6 +127,12 @@ class ExecuteCommandTest extends MigrationTestCase
                 return ['A'];
             });
 
+        $this->versionAliasResolver
+            ->expects(self::once())
+            ->method('resolveVersionAlias')
+            ->with('1')
+            ->willReturn(new Version('1'));
+
         $this->executeCommandTester->execute([
             'versions' => ['1'],
             '--down' => true,
@@ -123,6 +140,63 @@ class ExecuteCommandTest extends MigrationTestCase
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
         self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
+    }
+
+    public function testExecuteVersionAlias(): void
+    {
+        $this->executeCommandTester->setInputs(['yes']);
+
+        $this->migrator
+            ->expects(self::once())
+            ->method('migrate')
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
+                self::assertFalse($configuration->isDryRun());
+
+                return ['A'];
+            });
+
+        $this->versionAliasResolver
+            ->expects(self::once())
+            ->method('resolveVersionAlias')
+            ->with('current')
+            ->willReturn(new Version('1'));
+
+        $this->executeCommandTester->execute([
+            'versions' => ['current'],
+            '--down' => true,
+        ]);
+
+        self::assertSame(0, $this->executeCommandTester->getStatusCode());
+        self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
+    }
+
+    public function testExecuteVersionAliasException(): void
+    {
+        $this->executeCommandTester->setInputs(['yes']);
+
+        $this->migrator
+            ->expects(self::never())
+            ->method('migrate')
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
+                self::assertFalse($configuration->isDryRun());
+
+                return ['A'];
+            });
+
+        $exception = new UnknownMigrationVersion('not_a_valid_version_alias');
+
+        $this->versionAliasResolver
+            ->expects(self::once())
+            ->method('resolveVersionAlias')
+            ->with('not_a_valid_version_alias')
+            ->willThrowException($exception);
+
+        self::expectExceptionObject($exception);
+
+        $this->executeCommandTester->execute([
+            'versions' => ['not_a_valid_version_alias'],
+            '--down' => true,
+        ]);
     }
 
     public function testExecuteMultiple(): void
@@ -147,6 +221,12 @@ class ExecuteCommandTest extends MigrationTestCase
 
                 return ['A'];
             });
+
+        $this->versionAliasResolver
+            ->expects(self::exactly(2))
+            ->method('resolveVersionAlias')
+            ->withConsecutive(['1'], ['2'])
+            ->willReturnOnConsecutiveCalls(new Version('1'), new Version('2'));
 
         $this->executeCommandTester->execute([
             'versions' => ['1', '2'],
@@ -174,6 +254,12 @@ class ExecuteCommandTest extends MigrationTestCase
                 return ['A'];
             });
 
+        $this->versionAliasResolver
+            ->expects(self::once())
+            ->method('resolveVersionAlias')
+            ->with('1')
+            ->willReturn(new Version('1'));
+
         $this->executeCommandTester->execute([
             'versions' => ['1'],
             '--down' => true,
@@ -186,9 +272,10 @@ class ExecuteCommandTest extends MigrationTestCase
     {
         $connection = $this->getSqliteConnection();
 
-        $this->migrator    = $this->createMock(Migrator::class);
-        $this->queryWriter = $this->createMock(QueryWriter::class);
-        $migration         = $this->createMock(AbstractMigration::class);
+        $this->migrator             = $this->createMock(Migrator::class);
+        $this->queryWriter          = $this->createMock(QueryWriter::class);
+        $this->versionAliasResolver = $this->createMock(AliasResolver::class);
+        $migration                  = $this->createMock(AbstractMigration::class);
 
         $p1 = new MigrationPlan(new Version('1'), $migration, Direction::UP);
         $pl = new MigrationPlanList([$p1], Direction::UP);
@@ -207,6 +294,7 @@ class ExecuteCommandTest extends MigrationTestCase
         $this->dependencyFactory->setService(Migrator::class, $this->migrator);
         $this->dependencyFactory->setService(MigrationPlanCalculator::class, $this->planCalculator);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
+        $this->dependencyFactory->setService(AliasResolver::class, $this->versionAliasResolver);
 
         $this->executeCommand = new ExecuteCommand($this->dependencyFactory);
 

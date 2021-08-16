@@ -38,7 +38,10 @@ final class ExecuteCommand extends DoctrineCommand
             ->addArgument(
                 'versions',
                 InputArgument::REQUIRED | InputArgument::IS_ARRAY,
-                'The versions to execute.',
+                sprintf(
+                    'The versions to execute. Use the FQCN of the migration, or the following reserved aliases: %s',
+                    implode(', ', ['first', 'current', 'prev', 'next', 'latest'])
+                ),
                 null
             )
             ->addOption(
@@ -76,6 +79,10 @@ final class ExecuteCommand extends DoctrineCommand
 The <info>%command.name%</info> command executes migration versions up or down manually:
 
     <info>%command.full_name% FQCN</info>
+    
+You can use version aliases instead of the FQCN:
+
+    <info>%command.full_name% current</info>
 
 You can show more information about the process by increasing the verbosity level. To see the
 executed queries, set the level to debug with <comment>-vv</comment>:
@@ -113,20 +120,31 @@ EOT
     {
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
+        $aliasResolver                = $this->getDependencyFactory()->getVersionAliasResolver();
 
-        $question = sprintf(
-            'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
-            $this->getDependencyFactory()->getConnection()->getDatabase() ?? '<unnamed>'
-        );
-        if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
-            $this->io->error('Migration cancelled!');
+        $versions = $input->getArgument('versions');
 
-            return 1;
+        foreach ($versions as &$version) {
+            $version = (string) $aliasResolver->resolveVersionAlias($version);
+        }
+
+        if (! $migratorConfiguration->isDryRun()) {
+            $this->io->listing($versions);
+
+            $question = sprintf(
+                'WARNING! You are about to execute the migrations listed above in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
+                $this->getDependencyFactory()->getConnection()->getDatabase() ?? '<unnamed>'
+            );
+
+            if (! $this->canExecute($question, $input)) {
+                $this->io->error('Migration cancelled!');
+
+                return 1;
+            }
         }
 
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 
-        $versions  = $input->getArgument('versions');
         $direction = $input->getOption('down') !== false
             ? Direction::DOWN
             : Direction::UP;
