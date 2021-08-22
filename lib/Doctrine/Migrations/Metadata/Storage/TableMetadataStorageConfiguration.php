@@ -21,6 +21,9 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
     /** @var string */
     private $executionTimeColumnName = 'execution_time';
 
+    /** @var string */
+    private $executionReasonColumnName = 'reason';
+
     public function getTableName(): string
     {
         return $this->tableName;
@@ -64,6 +67,16 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
     public function getExecutionTimeColumnName(): string
     {
         return $this->executionTimeColumnName;
+    }
+
+    public function getExecutionReasonColumnName(): string
+    {
+        return $this->executionReasonColumnName;
+    }
+
+    public function setExecutionReasonColumnName(string $executionReasonColumnName): void
+    {
+        $this->executionReasonColumnName = $executionReasonColumnName;
     }
 
     public function setExecutionTimeColumnName(string $executionTimeColumnName): void

@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
+use Doctrine\Migrations\Exception\MetadataStorageError;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -105,6 +106,10 @@ final class DbalExecutor implements Executor
             );
 
             $result->setSql($this->sql);
+        } catch (MetadataStorageError $e) {
+            $result->setError(true, $e);
+
+            $this->migrationEnd($e, $plan, $result, $configuration);
         } catch (SkipMigration $e) {
             $result->setSkipped(true);
 
@@ -209,7 +214,11 @@ final class DbalExecutor implements Executor
         $this->logger->info('Migration {version} {direction} (took {time}ms, used {memory} memory)', $params);
 
         if (! $configuration->isDryRun()) {
-            $this->metadataStorage->complete($result);
+            try {
+                $this->metadataStorage->complete($result);
+            } catch (Throwable $e) {
+                throw MetadataStorageError::errorSavingMetadata();
+            }
         }
 
         if ($migration->isTransactional()) {
@@ -251,7 +260,12 @@ final class DbalExecutor implements Executor
 
     private function migrationEnd(Throwable $e, MigrationPlan $plan, ExecutionResult $result, MigratorConfiguration $configuration): void
     {
+        if (! $configuration->isDryRun() && ! ($e instanceof MetadataStorageError)) {
+            $this->metadataStorage->complete($result);
+        }
+
         $migration = $plan->getMigration();
+
         if ($migration->isTransactional()) {
             //only rollback transaction if in transactional mode
             TransactionHelper::rollbackIfInTransaction($this->connection);

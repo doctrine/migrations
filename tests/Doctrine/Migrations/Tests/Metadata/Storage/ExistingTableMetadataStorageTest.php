@@ -118,11 +118,13 @@ class ExistingTableMetadataStorageTest extends TestCase
             'version' => '1234',
             'executed_at' => null,
             'execution_time' => null,
+            'reason' => 'execute',
         ], $rows[0]);
         self::assertSame([
             'version' => 'Foo\\5678',
             'executed_at' => null,
             'execution_time' => null,
+            'reason' => 'execute',
         ], $rows[1]);
     }
 }
