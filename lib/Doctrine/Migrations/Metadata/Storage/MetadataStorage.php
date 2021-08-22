@@ -11,7 +11,16 @@ interface MetadataStorage
 {
     public function ensureInitialized(): void;
 
+    /**
+     * Returns only the migrations that have been successfully executed (reason=executed)
+     */
     public function getExecutedMigrations(): ExecutedMigrationsList;
+
+    /**
+     * Returns all the for which there was an execution attempt
+     * Includes skipped, errored executed migrations.
+     */
+    public function getAllExecutedMigrations(): ExecutedMigrationsList;
 
     public function complete(ExecutionResult $migration): void;
 
