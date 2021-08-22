@@ -101,11 +101,40 @@ final class TableMetadataStorage implements MetadataStorage
             ['reason' => Types::STRING]
         );
 
+        return $this->hydrateExecutedMigrationsList($rows);
+    }
+
+    public function getAllExecutedMigrations(): ExecutedMigrationsList
+    {
+        if (! $this->isInitialized()) {
+            return new ExecutedMigrationsList([]);
+        }
+
+        $this->checkInitialization();
+        $rows = $this->connection->fetchAllAssociative(
+            sprintf(
+                'SELECT * FROM %s',
+                $this->configuration->getTableName(),
+            ),
+            ['reason' => self::RUN_EXECUTED],
+            ['reason' => Types::STRING]
+        );
+
+        return $this->hydrateExecutedMigrationsList($rows);
+    }
+
+    /**
+     * @param array<int,array<string,mixed>> $rows
+     */
+    private function hydrateExecutedMigrationsList(array $rows): ExecutedMigrationsList
+    {
         $migrations = [];
         foreach ($rows as $row) {
             $row = array_change_key_case($row, CASE_LOWER);
 
             $version = new Version($row[strtolower($this->configuration->getVersionColumnName())]);
+
+            $reason = $row[strtolower($this->configuration->getExecutionReasonColumnName())];
 
             $executedAt = $row[strtolower($this->configuration->getExecutedAtColumnName())] ?? '';
             $executedAt = $executedAt !== ''
@@ -119,7 +148,8 @@ final class TableMetadataStorage implements MetadataStorage
             $migration = new ExecutedMigration(
                 $version,
                 $executedAt instanceof DateTimeImmutable ? $executedAt : null,
-                $executionTime
+                $executionTime,
+                $reason
             );
 
             $migrations[(string) $version] = $migration;
