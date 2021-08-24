@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\Migrations\Configuration\Configuration;
+use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationLoader;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tests\MigrationTestCase;
@@ -13,7 +15,6 @@ use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
-
 use function sys_get_temp_dir;
 
 class DoctrineCommandTest extends MigrationTestCase
@@ -29,8 +30,7 @@ class DoctrineCommandTest extends MigrationTestCase
             ->expects(self::once())
             ->method('freeze');
 
-        $command       = new class ($dependencyFactory) extends DoctrineCommand
-        {
+        $command = new class ($dependencyFactory) extends DoctrineCommand {
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
@@ -42,6 +42,39 @@ class DoctrineCommandTest extends MigrationTestCase
             [],
             ['interactive' => false]
         );
+    }
+
+    public function testCommandNotThrowingFrozenException()
+    {
+        $configurationLoader = $this->createMock(ConfigurationLoader::class);
+        $configurationLoader->method('getConfiguration')->willReturn(new Configuration());
+
+        $dependencyFactory = DependencyFactory::fromConnection(
+            $configurationLoader,
+            $this->createMock(ConnectionLoader::class)
+        );
+
+        $command = new class ($dependencyFactory) extends DoctrineCommand {
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                return 0;
+            }
+        };
+        $commandTester = new CommandTester($command);
+
+        // execute once, this will freeze the dependencies.
+        $commandTester->execute(
+            ['--configuration' => __DIR__ . '/_files/config.yml'],
+            ['interactive' => false,]
+        );
+
+        // execute one more time, this will throw exception.
+        $commandTester->execute(
+            ['--configuration' => __DIR__ . '/_files/config.yml'],
+            ['interactive' => false,]
+        );
+
+        $this->expectNotToPerformAssertions();
     }
 
     public function testCustomConfiguration(): void
@@ -56,8 +89,7 @@ class DoctrineCommandTest extends MigrationTestCase
             new ExistingConnection($conn)
         );
 
-        $command       = new class ($dependencyFactory) extends DoctrineCommand
-        {
+        $command = new class ($dependencyFactory) extends DoctrineCommand {
             protected function execute(InputInterface $input, OutputInterface $output): int
             {
                 $migrationDirectories = $this->getDependencyFactory()->getConfiguration()->getMigrationDirectories();
@@ -77,8 +109,7 @@ class DoctrineCommandTest extends MigrationTestCase
     public function testDependencyFactoryIsSetFirst(): void
     {
         $dependencyFactory = $this->createMock(DependencyFactory::class);
-        $command           = new class ($dependencyFactory) extends DoctrineCommand
-        {
+        $command = new class ($dependencyFactory) extends DoctrineCommand {
             protected function configure(): void
             {
                 $this->getDependencyFactory();
