@@ -16,6 +16,7 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Query\Query;
 use Psr\Log\LoggerInterface;
 
+use function method_exists;
 use function sprintf;
 
 /**
@@ -42,7 +43,9 @@ abstract class AbstractMigration
     public function __construct(Connection $connection, LoggerInterface $logger)
     {
         $this->connection = $connection;
-        $this->sm         = $this->connection->getSchemaManager();
+        $this->sm         = method_exists($this->connection, 'createSchemaManager')
+                             ? $this->connection->createSchemaManager()
+                             : $this->connection->getSchemaManager();
         $this->platform   = $this->connection->getDatabasePlatform();
         $this->logger     = $logger;
     }
