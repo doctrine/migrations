@@ -129,10 +129,10 @@ EOT
         $migratorConfigurationFactory = $this->getDependencyFactory()->getConsoleInputMigratorConfigurationFactory();
         $migratorConfiguration        = $migratorConfigurationFactory->getMigratorConfiguration($input);
 
-        $databaseName = $this->getDependencyFactory()->getConnection()->getDatabase();
+        $databaseName = (string) $this->getDependencyFactory()->getConnection()->getDatabase();
         $question     = sprintf(
             'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
-            $databaseName === '' || $databaseName === null ? '<unnamed>' : $databaseName
+            $databaseName === '' ? '<unnamed>' : $databaseName
         );
         if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
             $this->io->error('Migration cancelled!');
