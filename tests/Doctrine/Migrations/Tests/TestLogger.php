@@ -22,7 +22,9 @@ class TestLogger extends AbstractLogger
     public $logs = [];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
+     * @param mixed[] $context
      */
     public function log($level, $message, array $context = []): void
     {

@@ -72,6 +72,8 @@ final class ConsoleLogger extends AbstractLogger
 
     /**
      * {@inheritdoc}
+     *
+     * @param mixed[] $context
      */
     public function log($level, $message, array $context = []): void
     {
