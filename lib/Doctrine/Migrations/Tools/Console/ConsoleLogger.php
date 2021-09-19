@@ -9,6 +9,7 @@ use DateTimeInterface;
 use Psr\Log\AbstractLogger;
 use Psr\Log\InvalidArgumentException;
 use Psr\Log\LogLevel;
+use Stringable;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -102,10 +103,12 @@ final class ConsoleLogger extends AbstractLogger
     /**
      * Interpolates context values into the message placeholders.
      *
-     * @param mixed[] $context
+     * @param string|Stringable $message
+     * @param mixed[]           $context
      */
-    private function interpolate(string $message, array $context): string
+    private function interpolate($message, array $context): string
     {
+        $message = (string) $message;
         if (strpos($message, '{') === false) {
             return $message;
         }
