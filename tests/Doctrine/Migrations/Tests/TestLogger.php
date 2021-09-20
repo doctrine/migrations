@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests;
 use DateTime;
 use DateTimeInterface;
 use Psr\Log\AbstractLogger;
+use Stringable;
 
 use function get_class;
 use function gettype;
@@ -22,7 +23,9 @@ class TestLogger extends AbstractLogger
     public $logs = [];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
+     *
+     * @param mixed[] $context
      */
     public function log($level, $message, array $context = []): void
     {
@@ -32,10 +35,12 @@ class TestLogger extends AbstractLogger
     /**
      * Interpolates context values into the message placeholders.
      *
-     * @param mixed[] $context
+     * @param string|Stringable $message
+     * @param mixed[]           $context
      */
-    private function interpolate(string $message, array $context): string
+    private function interpolate($message, array $context): string
     {
+        $message = (string) $message;
         if (strpos($message, '{') === false) {
             return $message;
         }
