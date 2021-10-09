@@ -35,15 +35,6 @@ class OrmSchemaProviderTest extends MigrationTestCase
     {
         $schema = $this->ormProvider->createSchema();
 
-        self::assertSame(
-            [
-                'public.a',
-                'public.b',
-                'public.c',
-            ],
-            $schema->getTableNames()
-        );
-
         foreach (['a', 'b', 'c'] as $expectedTable) {
             $table = $schema->getTable($expectedTable);
             self::assertTrue($table->hasColumn('id'));
