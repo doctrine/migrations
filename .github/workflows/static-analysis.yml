@@ -16,6 +16,9 @@ jobs:
 
     strategy:
       matrix:
+        dbal-version:
+          - "^2.11"
+          - "^3.0"
         php-version:
           - "7.2"
           - "7.4"
@@ -31,6 +34,9 @@ jobs:
           coverage: "none"
           php-version: "${{ matrix.php-version }}"
           extensions: "pdo_sqlite"
+
+      - name: "Require the right DBAL version"
+        run: "composer require doctrine/dbal:${{ matrix.dbal-version }} --no-update"
 
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v1"

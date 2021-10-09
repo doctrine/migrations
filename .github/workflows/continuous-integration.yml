@@ -28,6 +28,9 @@ jobs:
 
     strategy:
       matrix:
+        dbal-version:
+          - "^2.11"
+          - "^3.0"
         php-version:
           - "7.2"
           - "7.3"
@@ -59,6 +62,9 @@ jobs:
       - name: "Downgrade Composer"
         run: "composer self-update --1"
         if: "${{ matrix.deps == 'lowest' }}"
+
+      - name: "Require the right DBAL version"
+        run: "composer require doctrine/dbal:${{ matrix.dbal-version }} --no-update"
 
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v1"
