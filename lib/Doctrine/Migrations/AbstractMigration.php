@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\DBALException;
+use Doctrine\DBAL\Exception as DBALException;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
