@@ -43,5 +43,9 @@ jobs:
         with:
           dependency-versions: "${{ matrix.dependencies }}"
 
-      - name: "Run a static analysis with phpstan/phpstan"
-        run: "vendor/bin/phpstan analyse"
+      - name: "Run a static analysis with phpstan/phpstan (dbal v2)"
+        run: "vendor/bin/phpstan analyse -c phpstan-dbal-2.neon.dist"
+        if: "contains(matrix.dbal-version, '^2.')"
+      - name: "Run a static analysis with phpstan/phpstan (dbal v3)"
+        run: "vendor/bin/phpstan analyse -c phpstan-dbal-3.neon.dist"
+        if: "contains(matrix.dbal-version, '^3.')"
