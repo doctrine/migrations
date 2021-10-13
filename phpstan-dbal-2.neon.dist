@@ -1,48 +1,19 @@
+includes:
+    - phpstan-common.neon.dist
+
 parameters:
-    level: 7
-    paths:
-        - %currentWorkingDirectory%/lib
-        - %currentWorkingDirectory%/tests
-    excludes_analyse:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     ignoreErrors:
-        - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
+
         -
-            message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
-        -
-            message: '~^Variable property access on SimpleXMLElement\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Migration/XmlFile.php
+            message: '~^Fetching class constant class of deprecated class Doctrine\\DBAL\\Tools\\Console\\Helper\\ConnectionHelper~'
+            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Tools/Console/ConsoleRunnerTest.php
+
         -
             message: "~^Casting to string something that's already string~"
             path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/Command/*Command.php
 
         -
-            message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/InlineParameterFormatter.php
-        -
-            message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
-        -
-            message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
-            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
-        - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
-        -
             message: '~^Instantiation of deprecated class~'
             paths:
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
-        # Requires PHPUnit 9
-        -
-            message: '~assert.*Reg~'
-            paths:
-                - tests/Doctrine/Migrations/Tests/Generator/ClassNameGeneratorTest.php
-
-    symfony:
-            console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
-includes:
-    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
-    - vendor/phpstan/phpstan-phpunit/extension.neon
-    - vendor/phpstan/phpstan-phpunit/rules.neon
-    - vendor/phpstan/phpstan-strict-rules/rules.neon
-    - vendor/phpstan/phpstan-symfony/extension.neon

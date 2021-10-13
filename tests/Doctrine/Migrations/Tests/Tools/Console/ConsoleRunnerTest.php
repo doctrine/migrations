@@ -30,7 +30,6 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateDependencyFactoryFromLegacyDbalHelper(): void
     {
-        // @phpstan-ignore-next-line
         if (! class_exists(ConnectionHelper::class)) {
             self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
         }
@@ -72,7 +71,6 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateDependencyFactoryFromWrongLegacyHelper(): void
     {
-        // @phpstan-ignore-next-line
         if (! class_exists(ConnectionHelper::class)) {
             self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
         }
