@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
@@ -51,6 +52,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 use function array_key_exists;
 use function call_user_func;
+use function method_exists;
 use function preg_quote;
 use function sprintf;
 
@@ -231,7 +233,7 @@ class DependencyFactory
 
             return new SchemaDumper(
                 $this->getConnection()->getDatabasePlatform(),
-                $this->getConnection()->getSchemaManager(),
+                $this->getSchemaManager($this->getConnection()),
                 $this->getMigrationGenerator(),
                 $this->getMigrationSqlGenerator(),
                 $excludedTables
@@ -239,11 +241,18 @@ class DependencyFactory
         });
     }
 
+    private function getSchemaManager(Connection $connection): AbstractSchemaManager
+    {
+        return method_exists($connection, 'createSchemaManager')
+            ? $connection->createSchemaManager()
+            : $connection->getSchemaManager();
+    }
+
     private function getEmptySchemaProvider(): SchemaProvider
     {
         return $this->getDependency(EmptySchemaProvider::class, function (): SchemaProvider {
             return new EmptySchemaProvider(
-                $this->getConnection()->getSchemaManager()
+                $this->getSchemaManager($this->getConnection())
             );
         });
     }
@@ -275,7 +284,7 @@ class DependencyFactory
         return $this->getDependency(DiffGenerator::class, function (): DiffGenerator {
             return new DiffGenerator(
                 $this->getConnection()->getConfiguration(),
-                $this->getConnection()->getSchemaManager(),
+                $this->getSchemaManager($this->getConnection()),
                 $this->getSchemaProvider(),
                 $this->getConnection()->getDatabasePlatform(),
                 $this->getMigrationGenerator(),
@@ -290,7 +299,7 @@ class DependencyFactory
         return $this->getDependency(SchemaDiffProvider::class, function (): LazySchemaDiffProvider {
             return LazySchemaDiffProvider::fromDefaultProxyFactoryConfiguration(
                 new DBALSchemaDiffProvider(
-                    $this->getConnection()->getSchemaManager(),
+                    $this->getSchemaManager($this->getConnection()),
                     $this->getConnection()->getDatabasePlatform()
                 )
             );

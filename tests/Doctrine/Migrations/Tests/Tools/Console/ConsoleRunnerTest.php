@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
+use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\EntityManager;
@@ -14,6 +15,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 
 use function chdir;
+use function class_exists;
 use function getcwd;
 use function realpath;
 use function sprintf;
@@ -28,6 +30,10 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateDependencyFactoryFromLegacyDbalHelper(): void
     {
+        if (! class_exists(ConnectionHelper::class)) {
+            self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
+        }
+
         $dir = getcwd();
         if ($dir === false) {
             $dir = '.';
@@ -65,6 +71,10 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateDependencyFactoryFromWrongLegacyHelper(): void
     {
+        if (! class_exists(ConnectionHelper::class)) {
+            self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
+        }
+
         $this->expectException(RuntimeException::class);
 
         $dir = getcwd();

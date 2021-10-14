@@ -1,0 +1,25 @@
+includes:
+    - phpstan-common.neon.dist
+
+parameters:
+
+    ignoreErrors:
+        - "~Call to function method_exists\\(\\) with Doctrine\\\\DBAL\\\\Connection and 'createSchemaManager' will always evaluate to true~"
+        - '~^Call to deprecated method getSchemaManager\(\) of class Doctrine\\DBAL\\Connection~'
+        -
+            message: '~^Parameter.* class Symfony\\Component\\Console\\Helper\\HelperSet constructor expects ~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
+        -
+            message: '~^Class Doctrine\\DBAL\\Tools\\Console\\Helper\\ConnectionHelper not found~'
+            path: lib/Doctrine/Migrations/Tools/Console/ConsoleRunner.php
+        -
+            message: '~^Call to method getConnection\(\) on an unknown class Doctrine\\DBAL\\Tools\\Console\\Helper\\ConnectionHelper~'
+            path: lib/Doctrine/Migrations/Tools/Console/ConsoleRunner.php
+        -
+            message: '~Instantiated class Doctrine\\DBAL\\Tools\\Console\\Helper\\ConnectionHelper not found~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
+

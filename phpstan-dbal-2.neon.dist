@@ -1,0 +1,19 @@
+includes:
+    - phpstan-common.neon.dist
+
+parameters:
+    ignoreErrors:
+
+        -
+            message: '~^Fetching class constant class of deprecated class Doctrine\\DBAL\\Tools\\Console\\Helper\\ConnectionHelper~'
+            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Tools/Console/ConsoleRunnerTest.php
+
+        -
+            message: "~^Casting to string something that's already string~"
+            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/Command/*Command.php
+
+        -
+            message: '~^Instantiation of deprecated class~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
