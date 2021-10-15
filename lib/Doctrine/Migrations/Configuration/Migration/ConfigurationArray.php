@@ -62,7 +62,7 @@ final class ConfigurationArray implements ConfigurationLoader
                 $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
             },
             'transactional' => static function ($value, Configuration $configuration): void {
-                $configuration->setAllOrNothing(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, true));
+                $configuration->setTransactional(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, true));
             },
             'check_database_platform' =>  static function ($value, Configuration $configuration): void {
                 $configuration->setCheckDatabasePlatform(is_bool($value) ? $value : BooleanStringFormatter::toBoolean($value, false));
