@@ -96,7 +96,7 @@ abstract class AbstractFileConfiguration extends Configuration
     {
         foreach ($config as $configurationKey => $configurationValue) {
             if (! in_array($configurationKey, self::ALLOWED_CONFIGURATION_KEYS, true)) {
-                throw InvalidConfigurationKey::new($configurationKey);
+                throw InvalidConfigurationKey::new((string) $configurationKey);
             }
         }
 

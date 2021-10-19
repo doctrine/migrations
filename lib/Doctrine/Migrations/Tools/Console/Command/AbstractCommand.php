@@ -116,7 +116,7 @@ abstract class AbstractCommand extends Command
                 $helperSet = $this->getHelperSet();
                 assert($helperSet !== null);
                 $configHelper = $helperSet->get('configuration');
-                assert($configHelper instanceof ConfigurationHelper);
+                assert($configHelper instanceof ConfigurationHelperInterface);
             } else {
                 $configHelper = new ConfigurationHelper(
                     $this->getConnection($input),
