@@ -12,7 +12,7 @@ use function array_reverse;
 class ClassMetadataFactory extends BaseMetadataFactoryAlias
 {
     /**
-     * @return ClassMetadata[]
+     * @return list<ClassMetadata<object>>
      */
     public function getAllMetadata(): array
     {
