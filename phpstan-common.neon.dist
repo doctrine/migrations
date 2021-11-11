@@ -1,28 +1,28 @@
 parameters:
     level: 7
     paths:
-        - %currentWorkingDirectory%/lib
-        - %currentWorkingDirectory%/tests
+        - lib
+        - tests
     excludePaths:
-        - %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
+        - tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
     ignoreErrors:
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
             message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
+            path: lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
         -
             message: '~^Variable property access on SimpleXMLElement\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Configuration/Migration/XmlFile.php
+            path: lib/Doctrine/Migrations/Configuration/Migration/XmlFile.php
 
         -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/InlineParameterFormatter.php
+            path: lib/Doctrine/Migrations/InlineParameterFormatter.php
         -
             message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
-            path: %currentWorkingDirectory%/lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
+            path: lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
         -
             message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
-            path: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
+            path: tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
         - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
 
         # Requires PHPUnit 9
