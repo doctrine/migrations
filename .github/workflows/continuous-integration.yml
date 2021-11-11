@@ -23,9 +23,6 @@ jobs:
     name: "PHPUnit"
     runs-on: "ubuntu-20.04"
 
-    env:
-      COLUMNS: 120
-
     strategy:
       matrix:
         dbal-version:
@@ -83,6 +80,12 @@ jobs:
         with:
           name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
+
+  phpunit-with-symfony-6:
+    name: "PHPUnit with Symfony 6.0.x-dev"
+    uses: "doctrine/.github/.github/workflows/continuous-integration-symfony-unstable.yml@1.4.0"
+    with:
+      symfony-version-constraint: "6.0.*"
 
   upload_coverage:
     name: "Upload coverage to Codecov"

@@ -6,6 +6,10 @@
          verbose="true"
          beStrictAboutOutputDuringTests="true"
 >
+    <php>
+        <env name="COLUMNS" value="120" />
+    </php>
+
     <testsuites>
         <testsuite name="Doctrine2 Database Migrations Test Suite">
             <directory>./tests/Doctrine/</directory>
