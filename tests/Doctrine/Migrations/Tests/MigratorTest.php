@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\EventDispatcher;
@@ -54,7 +55,10 @@ class MigratorTest extends MigrationTestCase
 
     protected function setUp(): void
     {
-        $this->conn   = $this->createMock(Connection::class);
+        $this->conn       = $this->createMock(Connection::class);
+        $driverConnection = $this->createStub(DriverConnection::class);
+        $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
+
         $this->config = new Configuration();
 
         $this->migratorConfiguration = new MigratorConfiguration();

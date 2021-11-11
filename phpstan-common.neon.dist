@@ -25,6 +25,11 @@ parameters:
             path: tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
         - '~Call to method getVersion\(\) of deprecated class PackageVersions\\Versions\:.*~'
 
+	# https://github.com/phpstan/phpstan/issues/5982
+        -
+            message: '~^Cannot call method getWrappedConnection\(\) on class-string\|object\.~'
+            path: lib/Doctrine/Migrations/Tools/TransactionHelper.php
+
         # Requires PHPUnit 9
         -
             message: '~assert.*Reg~'
