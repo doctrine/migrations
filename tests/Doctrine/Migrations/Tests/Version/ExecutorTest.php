@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -518,8 +519,10 @@ class ExecutorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->metadataStorage    = $this->createMock(MetadataStorage::class);
-        $this->connection         = $this->createMock(Connection::class);
+        $this->metadataStorage = $this->createMock(MetadataStorage::class);
+        $this->connection      = $this->createMock(Connection::class);
+        $driverConnection      = $this->createStub(DriverConnection::class);
+        $this->connection->method('getWrappedConnection')->willReturn($driverConnection);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
 
