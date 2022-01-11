@@ -25,7 +25,7 @@
     ],
     "require": {
         "php": "^7.2 || ^8.0",
-        "composer/package-versions-deprecated": "^1.8",
+        "composer-runtime-api": "^2",
         "doctrine/dbal": "^2.11 || ^3.0",
         "doctrine/deprecations": "^0.5.3",
         "doctrine/event-manager": "^1.0",

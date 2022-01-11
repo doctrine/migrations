@@ -59,10 +59,6 @@ jobs:
       - name: "Download box"
         run: "./download-box.sh"
 
-      - name: "Downgrade Composer"
-        run: "composer self-update --1"
-        if: "${{ matrix.deps == 'lowest' }}"
-
       - name: "Require the right DBAL version"
         run: "composer require doctrine/dbal:${{ matrix.dbal-version }} --no-update"
         if: "${{ matrix.dbal-version }}"
