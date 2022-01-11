@@ -56,6 +56,11 @@
         "symfony/yaml": "Allows the use of yaml for migration configuration files."
     },
     "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
+            "ergebnis/composer-normalize": true
+        },
         "sort-packages": true
     },
     "extra": {
