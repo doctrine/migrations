@@ -28,7 +28,7 @@ abstract class AbstractMigration
     /** @var Connection */
     protected $connection;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     protected $sm;
 
     /** @var AbstractPlatform */

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
@@ -241,6 +242,9 @@ class DependencyFactory
         });
     }
 
+    /**
+     * @return AbstractSchemaManager<AbstractPlatform>
+     */
     private function getSchemaManager(Connection $connection): AbstractSchemaManager
     {
         return method_exists($connection, 'createSchemaManager')

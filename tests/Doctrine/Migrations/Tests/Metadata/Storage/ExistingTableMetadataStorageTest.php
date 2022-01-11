@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tests\Metadata\Storage;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\DriverManager;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\AbstractMigration;
@@ -34,7 +35,7 @@ class ExistingTableMetadataStorageTest extends TestCase
     /** @var TableMetadataStorageConfiguration */
     private $config;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
     /** @var MigrationsRepository */

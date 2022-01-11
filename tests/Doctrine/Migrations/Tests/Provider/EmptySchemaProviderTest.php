@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Provider;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\SchemaConfig;
 use Doctrine\Migrations\Provider\EmptySchemaProvider;
@@ -15,7 +16,7 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class EmptySchemaProviderTest extends MigrationTestCase
 {
-    /** @var AbstractSchemaManager|MockObject */
+    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
     private $schemaManager;
 
     /** @var EmptySchemaProvider */
@@ -24,7 +25,6 @@ class EmptySchemaProviderTest extends MigrationTestCase
     public function testCreateSchema(): void
     {
         $schemaConfig = new SchemaConfig();
-        $schemaConfig->setExplicitForeignKeyIndexes(true);
 
         $this->schemaManager->expects(self::once())
             ->method('createSchemaConfig')
@@ -34,7 +34,6 @@ class EmptySchemaProviderTest extends MigrationTestCase
 
         self::assertSame([], $schema->getTables());
         self::assertSame([], $schema->getSequences());
-        self::assertTrue($schema->hasExplicitForeignKeyIndexes());
         self::assertSame([], $schema->getNamespaces());
     }
 

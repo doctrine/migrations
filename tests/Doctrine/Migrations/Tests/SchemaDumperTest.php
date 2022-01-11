@@ -21,7 +21,7 @@ class SchemaDumperTest extends TestCase
     /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var AbstractSchemaManager|MockObject */
+    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
     private $schemaManager;
 
     /** @var Generator|MockObject */

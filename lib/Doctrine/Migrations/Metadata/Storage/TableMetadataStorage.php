@@ -46,7 +46,7 @@ final class TableMetadataStorage implements MetadataStorage
     /** @var Connection */
     private $connection;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
     /** @var AbstractPlatform */

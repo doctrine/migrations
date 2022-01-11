@@ -17,3 +17,19 @@ parameters:
             paths:
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
+
+        -
+            message: '~.*AbstractSchemaManager.*is not generic\.$~'
+            paths:
+                - lib/Doctrine/Migrations/SchemaDumper.php
+                - lib/Doctrine/Migrations/AbstractMigration.php
+                - lib/Doctrine/Migrations/DependencyFactory.php
+                - lib/Doctrine/Migrations/Generator/DiffGenerator.php
+                - lib/Doctrine/Migrations/Metadata/Storage/TableMetadataStorage.php
+                - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+                - lib/Doctrine/Migrations/Provider/EmptySchemaProvider.php
+                - tests/Doctrine/Migrations/Tests/Generator/DiffGeneratorTest.php
+                - tests/Doctrine/Migrations/Tests/Metadata/Storage/ExistingTableMetadataStorageTest.php
+                - tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+                - tests/Doctrine/Migrations/Tests/Provider/EmptySchemaProviderTest.php
+                - tests/Doctrine/Migrations/Tests/SchemaDumperTest.php

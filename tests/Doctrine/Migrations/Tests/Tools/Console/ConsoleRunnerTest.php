@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
@@ -44,7 +45,7 @@ class ConsoleRunnerTest extends TestCase
         try {
             $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
             self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
-            self::assertSame('sqlite', $dependencyFactory->getConnection()->getDatabasePlatform()->getName());
+            self::assertInstanceOf(SqlitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
         } finally {
             chdir($dir);
         }
@@ -62,7 +63,7 @@ class ConsoleRunnerTest extends TestCase
         try {
             $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
             self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
-            self::assertSame('sqlite', $dependencyFactory->getConnection()->getDatabasePlatform()->getName());
+            self::assertInstanceOf(SqlitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
             self::assertInstanceOf(EntityManager::class, $dependencyFactory->getEntityManager());
         } finally {
             chdir($dir);
