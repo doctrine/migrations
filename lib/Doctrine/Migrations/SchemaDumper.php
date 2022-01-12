@@ -40,7 +40,7 @@ class SchemaDumper
     /** @var AbstractPlatform */
     private $platform;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
     /** @var Generator */
@@ -53,7 +53,8 @@ class SchemaDumper
     private $excludedTablesRegexes;
 
     /**
-     * @param string[] $excludedTablesRegexes
+     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
+     * @param string[]                                $excludedTablesRegexes
      */
     public function __construct(
         AbstractPlatform $platform,

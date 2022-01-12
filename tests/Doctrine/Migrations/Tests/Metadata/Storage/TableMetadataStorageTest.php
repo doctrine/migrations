@@ -11,6 +11,7 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\SQLite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
@@ -42,7 +43,7 @@ class TableMetadataStorageTest extends TestCase
     /** @var TableMetadataStorageConfiguration */
     private $config;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
     private function getSqliteConnection(?Configuration $configuration = null): Connection

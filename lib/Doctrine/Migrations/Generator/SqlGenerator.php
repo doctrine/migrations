@@ -12,6 +12,7 @@ use Doctrine\SqlFormatter\SqlFormatter;
 
 use function array_unshift;
 use function count;
+use function get_class;
 use function implode;
 use function sprintf;
 use function stripos;
@@ -68,14 +69,20 @@ class SqlGenerator
         }
 
         if (count($code) !== 0 && $checkDbPlatform && $this->configuration->isDatabasePlatformChecked()) {
-            $currentPlatform = $this->platform->getName();
+            $currentPlatform = '\\' . get_class($this->platform);
 
             array_unshift(
                 $code,
                 sprintf(
-                    '$this->abortIf($this->connection->getDatabasePlatform()->getName() !== %s, %s);',
-                    var_export($currentPlatform, true),
-                    var_export(sprintf("Migration can only be executed safely on '%s'.", $currentPlatform), true)
+                    <<<'PHP'
+$this->abortIf(
+    !$this->connection->getDatabasePlatform() instanceof %s,
+    "Migration can only be executed safely on '%s'."
+);
+PHP
+                    ,
+                    $currentPlatform,
+                    $currentPlatform
                 ),
                 ''
             );
