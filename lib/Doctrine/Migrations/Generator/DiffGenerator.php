@@ -12,6 +12,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
 
+use function method_exists;
 use function preg_match;
 use function strpos;
 use function substr;
@@ -95,15 +96,27 @@ class DiffGenerator
 
         $toSchema = $this->createToSchema();
 
+        if (method_exists($this->schemaManager, 'createComparator')) {
+            $comparator = $this->schemaManager->createComparator();
+        }
+
+        $upSql = isset($comparator) ?
+            $comparator->compareSchemas($fromSchema, $toSchema)->toSql($this->platform) :
+            $fromSchema->getMigrateToSql($toSchema, $this->platform);
+
         $up = $this->migrationSqlGenerator->generate(
-            $fromSchema->getMigrateToSql($toSchema, $this->platform),
+            $upSql,
             $formatted,
             $lineLength,
             $checkDbPlatform
         );
 
+        $downSql = isset($comparator) ?
+            $comparator->compareSchemas($toSchema, $fromSchema)->toSql($this->platform) :
+            $fromSchema->getMigrateFromSql($toSchema, $this->platform);
+
         $down = $this->migrationSqlGenerator->generate(
-            $fromSchema->getMigrateFromSql($toSchema, $this->platform),
+            $downSql,
             $formatted,
             $lineLength,
             $checkDbPlatform

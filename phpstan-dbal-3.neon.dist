@@ -23,9 +23,23 @@ parameters:
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
 
-        # We need to implement platform-aware comparison
+        # Compatibility with DBAL 2
         -
             message: '~Call to deprecated method getMigrate(From|ToSql)~'
+            paths:
+                - lib/Doctrine/Migrations/Generator/DiffGenerator.php
+                - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+
+        -
+            message: "~Call to function method_exists.*'createComparator' will always evaluate to true.~"
+            paths:
+                - lib/Doctrine/Migrations/Generator/DiffGenerator.php
+                - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+                - tests/Doctrine/Migrations/Tests/Generator/DiffGeneratorTest.php
+
+        # That method will no longer be static in the future
+        -
+            message: '~Dynamic call to static method Doctrine\\DBAL\\Schema\\Comparator\:\:compareSchemas\(\)\.~'
             paths:
                 - lib/Doctrine/Migrations/Generator/DiffGenerator.php
                 - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
