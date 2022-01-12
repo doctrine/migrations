@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Mapping\ClassMetadataFactory as BaseMetadataFactoryAlias;
-use Doctrine\Persistence\Mapping\ClassMetadata;
 
 use function array_reverse;
 
