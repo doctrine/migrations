@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Generator;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SqlitePlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -34,11 +35,20 @@ final class SqlGeneratorTest extends TestCase
 
     public function testGenerate(): void
     {
-        $this->configuration->setCheckDatabasePlatform(true);
+        $configuration = new Configuration();
+        $platform      = new SqlitePlatform();
+
+        $metadataConfig = new TableMetadataStorageConfiguration();
+        $configuration->setMetadataStorageConfiguration($this->metadataConfig);
+        $migrationSqlGenerator = new SqlGenerator($configuration, $platform);
+        $configuration->setCheckDatabasePlatform(true);
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-$this->abortIf($this->connection->getDatabasePlatform()->getName() !== 'mysql', 'Migration can only be executed safely on \'mysql\'.');
+$this->abortIf(
+    !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform,
+    "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\SqlitePlatform'."
+);
 
 $this->addSql('SELECT 1');
 $this->addSql('SELECT 2');
@@ -46,11 +56,7 @@ $this->addSql('%s');
 CODE
         );
 
-        $this->platform->expects(self::once())
-            ->method('getName')
-            ->willReturn('mysql');
-
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
+        $code = $migrationSqlGenerator->generate($this->sql, true, 80);
 
         self::assertSame($expectedCode, $code);
     }

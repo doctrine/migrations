@@ -21,7 +21,7 @@ class DiffGeneratorTest extends TestCase
     /** @var DBALConfiguration|MockObject */
     private $dbalConfiguration;
 
-    /** @var AbstractSchemaManager|MockObject */
+    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
     private $schemaManager;
 
     /** @var SchemaProvider|MockObject */

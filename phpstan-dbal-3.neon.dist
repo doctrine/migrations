@@ -23,3 +23,14 @@ parameters:
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-dbal/cli-config.php
                 - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-wrong/cli-config.php
 
+        # We need to implement platform-aware comparison
+        -
+            message: '~Call to deprecated method getMigrate(From|ToSql)~'
+            paths:
+                - lib/Doctrine/Migrations/Generator/DiffGenerator.php
+                - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+
+        # Switch to Logging\Connection after dropping compatibility with DBAL 2
+        -
+            message: '~deprecated.*DebugStack~'
+            path: tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php

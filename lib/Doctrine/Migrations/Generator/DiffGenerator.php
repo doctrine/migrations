@@ -27,7 +27,7 @@ class DiffGenerator
     /** @var DBALConfiguration */
     private $dbalConfiguration;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
     /** @var SchemaProvider */
@@ -45,6 +45,9 @@ class DiffGenerator
     /** @var SchemaProvider */
     private $emptySchemaProvider;
 
+    /**
+     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
+     */
     public function __construct(
         DBALConfiguration $dbalConfiguration,
         AbstractSchemaManager $schemaManager,

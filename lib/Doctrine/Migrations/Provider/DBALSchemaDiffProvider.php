@@ -23,9 +23,12 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     /** @var AbstractPlatform */
     private $platform;
 
-    /** @var AbstractSchemaManager */
+    /** @var AbstractSchemaManager<AbstractPlatform> */
     private $schemaManager;
 
+    /**
+     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager-
+     */
     public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
     {
         $this->schemaManager = $schemaManager;
