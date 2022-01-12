@@ -38,7 +38,8 @@
         {
             "name": "2.3",
             "branchName": "2.3.x",
-            "slug": "2.3"
+            "slug": "2.3",
+            "maintained": false
         },
         {
             "name": "2.2",
