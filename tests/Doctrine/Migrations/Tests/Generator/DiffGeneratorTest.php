@@ -7,7 +7,9 @@ namespace Doctrine\Migrations\Tests\Generator;
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
@@ -15,6 +17,8 @@ use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
+use function method_exists;
 
 class DiffGeneratorTest extends TestCase
 {
@@ -92,15 +96,42 @@ class DiffGeneratorTest extends TestCase
             ->method('dropTable')
             ->will(self::onConsecutiveCalls('schema.table_name2', 'schema.table_name3'));
 
-        $fromSchema->expects(self::once())
-            ->method('getMigrateToSql')
-            ->with($toSchema, $this->platform)
-            ->willReturn(['UPDATE table SET value = 2']);
+        if (method_exists($this->schemaManager, 'createComparator')) {
+            $schemaDiff = $this->createStub(SchemaDiff::class);
+            $schemaDiff->method('toSql')->willReturn(self::onConsecutiveCalls(
+                ['UPDATE table SET value = 2'],
+                ['UPDATE table SET value = 1']
+            ));
 
-        $fromSchema->expects(self::once())
-            ->method('getMigrateFromSql')
-            ->with($toSchema, $this->platform)
-            ->willReturn(['UPDATE table SET value = 1']);
+            // regular mocks cannot be used here, because the method is static
+            $comparator = new class extends Comparator {
+                /** @var SchemaDiff */
+                public static $schemaDiff;
+
+                public static function compareSchemas(
+                    Schema $fromSchema,
+                    Schema $toSchema
+                ): SchemaDiff {
+                    return self::$schemaDiff;
+                }
+            };
+
+            $comparator::$schemaDiff = $schemaDiff;
+
+            $this->schemaManager->expects(self::once())
+                ->method('createComparator')
+                ->willReturn($comparator);
+        } else {
+            $fromSchema->expects(self::once())
+                ->method('getMigrateToSql')
+                ->with($toSchema, $this->platform)
+                ->willReturn(['UPDATE table SET value = 2']);
+
+            $fromSchema->expects(self::once())
+                ->method('getMigrateFromSql')
+                ->with($toSchema, $this->platform)
+                ->willReturn(['UPDATE table SET value = 1']);
+        }
 
         $this->migrationSqlGenerator->expects(self::exactly(2))
             ->method('generate')
@@ -115,7 +146,12 @@ class DiffGeneratorTest extends TestCase
             ->with('1234', 'test1', 'test2')
             ->willReturn('path');
 
-        self::assertSame('path', $this->migrationDiffGenerator->generate('1234', '/table_name1/', true, 80));
+        self::assertSame('path', $this->migrationDiffGenerator->generate(
+            '1234',
+            '/table_name1/',
+            true,
+            80
+        ));
     }
 
     public function testGenerateFromEmptySchema(): void
@@ -147,15 +183,42 @@ class DiffGeneratorTest extends TestCase
         $toSchema->expects(self::never())
             ->method('dropTable');
 
-        $emptySchema->expects(self::once())
-            ->method('getMigrateToSql')
-            ->with($toSchema, $this->platform)
-            ->willReturn(['CREATE TABLE table_name']);
+        if (method_exists($this->schemaManager, 'createComparator')) {
+            $schemaDiff = $this->createStub(SchemaDiff::class);
+            $schemaDiff->method('toSql')->willReturn(self::onConsecutiveCalls(
+                ['CREATE TABLE table_name'],
+                ['DROP TABLE table_name']
+            ));
 
-        $emptySchema->expects(self::once())
-            ->method('getMigrateFromSql')
-            ->with($toSchema, $this->platform)
-            ->willReturn(['DROP TABLE table_name']);
+            // regular mocks cannot be used here, because the method is static
+            $comparator = new class extends Comparator {
+                /** @var SchemaDiff */
+                public static $schemaDiff;
+
+                public static function compareSchemas(
+                    Schema $fromSchema,
+                    Schema $toSchema
+                ): SchemaDiff {
+                    return self::$schemaDiff;
+                }
+            };
+
+            $comparator::$schemaDiff = $schemaDiff;
+
+            $this->schemaManager->expects(self::once())
+                ->method('createComparator')
+                ->willReturn($comparator);
+        } else {
+            $emptySchema->expects(self::once())
+                ->method('getMigrateToSql')
+                ->with($toSchema, $this->platform)
+                ->willReturn(['CREATE TABLE table_name']);
+
+            $emptySchema->expects(self::once())
+                ->method('getMigrateFromSql')
+                ->with($toSchema, $this->platform)
+                ->willReturn(['DROP TABLE table_name']);
+        }
 
         $this->migrationSqlGenerator->expects(self::exactly(2))
             ->method('generate')
