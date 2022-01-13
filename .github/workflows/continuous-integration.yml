@@ -83,7 +83,7 @@ jobs:
 
   phpunit-with-symfony-6:
     name: "PHPUnit with Symfony 6.0.x-dev"
-    uses: "doctrine/.github/.github/workflows/continuous-integration-symfony-unstable.yml@1.4.0"
+    uses: "doctrine/.github/.github/workflows/continuous-integration-symfony-unstable.yml@1.4.1"
     with:
       symfony-version-constraint: "6.0.*"
 
