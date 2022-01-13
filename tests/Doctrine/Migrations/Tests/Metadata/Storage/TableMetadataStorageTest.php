@@ -184,6 +184,7 @@ class TableMetadataStorageTest extends TestCase
                     'version' => '1230',
                     'executed_at' => '2010-01-05 10:30:21',
                     'execution_time' => '31000',
+                    'reason' => 'execute',
                 ],
         ], $rows);
     }
@@ -207,6 +208,7 @@ class TableMetadataStorageTest extends TestCase
                     'version' => '1230',
                     'executed_at' => '2010-01-05 10:30:21',
                     'execution_time' => '31490',
+                    'reason' => 'execute',
                 ],
         ], $rows);
     }
@@ -233,11 +235,13 @@ class TableMetadataStorageTest extends TestCase
                     $config->getVersionColumnName() => '1230',
                     $config->getExecutedAtColumnName() => $executedAt,
                     $config->getExecutionTimeColumnName() => 31000,
+                    $config->getExecutionReasonColumnName() => 'execute',
                 ], $params);
                 self::assertSame([
                     Types::STRING,
                     Types::DATETIME_MUTABLE,
                     Types::INTEGER,
+                    Types::STRING,
                 ], $types);
 
                 return 1;

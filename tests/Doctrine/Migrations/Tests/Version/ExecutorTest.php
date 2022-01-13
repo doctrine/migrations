@@ -107,6 +107,8 @@ class ExecutorTest extends TestCase
             ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::UP, $result->getDirection());
+                self::assertFalse($result->isSkipped());
+                self::assertFalse($result->hasError());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
             });
@@ -170,6 +172,8 @@ class ExecutorTest extends TestCase
             ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::DOWN, $result->getDirection());
+                self::assertFalse($result->isSkipped());
+                self::assertFalse($result->hasError());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
             });
@@ -267,8 +271,14 @@ class ExecutorTest extends TestCase
     public function testSkipMigration(): void
     {
         $this->metadataStorage
-            ->expects(self::never())
-            ->method('complete');
+            ->expects(self::once())
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
+                self::assertSame(Direction::UP, $result->getDirection());
+                self::assertTrue($result->isSkipped());
+                self::assertFalse($result->hasError());
+                self::assertNull($result->getTime());
+                self::assertNotNull($result->getExecutedAt());
+            });
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -364,8 +374,14 @@ class ExecutorTest extends TestCase
     public function testErrorMigration(): void
     {
         $this->metadataStorage
-            ->expects(self::never())
-            ->method('complete');
+            ->expects(self::once())
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
+                self::assertSame(Direction::UP, $result->getDirection());
+                self::assertFalse($result->isSkipped());
+                self::assertTrue($result->hasError());
+                self::assertNull($result->getTime());
+                self::assertNotNull($result->getExecutedAt());
+            });
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setTimeAllQueries(true);
@@ -473,30 +489,23 @@ class ExecutorTest extends TestCase
         $this->eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
         $this->eventManager->addEventListener(Events::onMigrationsVersionSkipped, $listener);
 
-        $migrationSucceed = false;
-        try {
-            $this->versionExecutor->execute(
-                $plan,
-                $migratorConfiguration
-            );
-            $migrationSucceed = true;
-        } catch (Throwable $e) {
-            self::assertFalse($listener->onMigrationsVersionExecuted);
-            self::assertTrue($listener->onMigrationsVersionSkipped);
-            self::assertTrue($listener->onMigrationsVersionExecuting);
+        $this->versionExecutor->execute(
+            $plan,
+            $migratorConfiguration
+        );
+        self::assertFalse($listener->onMigrationsVersionExecuted);
+        self::assertTrue($listener->onMigrationsVersionSkipped);
+        self::assertTrue($listener->onMigrationsVersionExecuting);
 
-            $result = $plan->getResult();
-            self::assertNotNull($result);
-            self::assertSame([], $result->getSql());
-            self::assertSame([], $result->getSql());
-            self::assertSame(State::POST, $result->getState());
-            self::assertTrue($this->migration->preUpExecuted);
-            self::assertTrue($this->migration->postUpExecuted);
-            self::assertFalse($this->migration->preDownExecuted);
-            self::assertFalse($this->migration->postDownExecuted);
-        }
-
-        self::assertFalse($migrationSucceed);
+        $result = $plan->getResult();
+        self::assertNotNull($result);
+        self::assertSame([], $result->getSql());
+        self::assertSame([], $result->getSql());
+        self::assertSame(State::POST, $result->getState());
+        self::assertTrue($this->migration->preUpExecuted);
+        self::assertTrue($this->migration->postUpExecuted);
+        self::assertFalse($this->migration->preDownExecuted);
+        self::assertFalse($this->migration->postDownExecuted);
     }
 
     /**

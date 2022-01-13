@@ -37,6 +37,10 @@ use const CASE_LOWER;
 
 final class TableMetadataStorage implements MetadataStorage
 {
+    private const RUN_EXECUTED = 'execute';
+    private const RUN_SKIPPED  = 'skip';
+    private const RUN_ERRORED  = 'error';
+
     /** @var bool */
     private $isInitialized;
 
@@ -87,7 +91,15 @@ final class TableMetadataStorage implements MetadataStorage
         }
 
         $this->checkInitialization();
-        $rows = $this->connection->fetchAllAssociative(sprintf('SELECT * FROM %s', $this->configuration->getTableName()));
+        $rows = $this->connection->fetchAllAssociative(
+            sprintf(
+                'SELECT * FROM %s WHERE %s = :reason',
+                $this->configuration->getTableName(),
+                $this->configuration->getExecutionReasonColumnName()
+            ),
+            ['reason' => self::RUN_EXECUTED],
+            ['reason' => Types::STRING]
+        );
 
         $migrations = [];
         foreach ($rows as $row) {
@@ -136,6 +148,10 @@ final class TableMetadataStorage implements MetadataStorage
     {
         $this->checkInitialization();
 
+        $reason =  ($result->isSkipped()
+            ? 'skipp'
+            : ($result->hasError() ? 'error' : 'execute'));
+
         if ($result->getDirection() === Direction::DOWN) {
             $this->connection->delete($this->configuration->getTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
@@ -145,10 +161,12 @@ final class TableMetadataStorage implements MetadataStorage
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
+                $this->configuration->getExecutionReasonColumnName() => $reason,
             ], [
                 Types::STRING,
                 Types::DATETIME_MUTABLE,
                 Types::INTEGER,
+                Types::STRING,
             ]);
         }
     }
@@ -228,6 +246,11 @@ final class TableMetadataStorage implements MetadataStorage
         );
         $schemaChangelog->addColumn($this->configuration->getExecutedAtColumnName(), 'datetime', ['notnull' => false]);
         $schemaChangelog->addColumn($this->configuration->getExecutionTimeColumnName(), 'integer', ['notnull' => false]);
+        $schemaChangelog->addColumn(
+            $this->configuration->getExecutionReasonColumnName(),
+            'string',
+            ['notnull' => true, 'default' => self::RUN_EXECUTED]
+        );
 
         $schemaChangelog->setPrimaryKey([$this->configuration->getVersionColumnName()]);
 
