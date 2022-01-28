@@ -26,6 +26,7 @@ use InvalidArgumentException;
 
 use function array_change_key_case;
 use function floatval;
+use function method_exists;
 use function round;
 use function sprintf;
 use function strlen;
@@ -184,7 +185,9 @@ final class TableMetadataStorage implements MetadataStorage
             return null;
         }
 
-        $comparator   = new Comparator();
+        $comparator   = method_exists($this->schemaManager, 'createComparator') ?
+            $this->schemaManager->createComparator() :
+            new Comparator();
         $currentTable = $this->schemaManager->listTableDetails($this->configuration->getTableName());
         $diff         = $comparator->diffTable($currentTable, $expectedTable);
 

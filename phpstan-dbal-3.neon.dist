@@ -44,7 +44,9 @@ parameters:
             paths:
                 - lib/Doctrine/Migrations/Generator/DiffGenerator.php
                 - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+                - lib/Doctrine/Migrations/Metadata/Storage/TableMetadataStorage.php
                 - tests/Doctrine/Migrations/Tests/Generator/DiffGeneratorTest.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/Command/MigrateCommandTest.php
 
         # That method will no longer be static in the future
         -
