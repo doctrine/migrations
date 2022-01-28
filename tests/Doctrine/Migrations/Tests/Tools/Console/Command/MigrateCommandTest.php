@@ -39,6 +39,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use function getcwd;
 use function in_array;
+use function method_exists;
 use function sprintf;
 use function strpos;
 use function trim;
@@ -500,14 +501,18 @@ class MigrateCommandTest extends MigrationTestCase
 
     private function alterMetadataTable(): void
     {
-        $originalTable = $this->connection->getSchemaManager()
+        $schemaManager = $this->connection->getSchemaManager();
+        $originalTable = $schemaManager
             ->listTableDetails($this->metadataConfiguration->getTableName());
 
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
 
-        $comparator = new Comparator();
-        $diff       = $comparator->diffTable($originalTable, $modifiedTable);
+        $comparator = method_exists($schemaManager, 'createComparator') ?
+            $schemaManager->createComparator() :
+            new Comparator();
+
+        $diff = $comparator->diffTable($originalTable, $modifiedTable);
         if (! ($diff instanceof TableDiff)) {
             return;
         }

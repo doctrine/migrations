@@ -31,11 +31,22 @@ parameters:
                 - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
 
         -
+            message: '~Call to deprecated method getWrappedConnection~'
+            paths:
+                - tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+
+        -
+            message: "~Call to function method_exists.*'getNativeConnection' will always evaluate to true.~"
+            path: tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+
+        -
             message: "~Call to function method_exists.*'createComparator' will always evaluate to true.~"
             paths:
                 - lib/Doctrine/Migrations/Generator/DiffGenerator.php
                 - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
+                - lib/Doctrine/Migrations/Metadata/Storage/TableMetadataStorage.php
                 - tests/Doctrine/Migrations/Tests/Generator/DiffGeneratorTest.php
+                - tests/Doctrine/Migrations/Tests/Tools/Console/Command/MigrateCommandTest.php
 
         # That method will no longer be static in the future
         -

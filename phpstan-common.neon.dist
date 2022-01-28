@@ -24,7 +24,7 @@ parameters:
             message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
             path: tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
 
-	# https://github.com/phpstan/phpstan/issues/5982
+        # https://github.com/phpstan/phpstan/issues/5982
         -
             message: '~^Cannot call method getWrappedConnection\(\) on class-string\|object\.~'
             path: lib/Doctrine/Migrations/Tools/TransactionHelper.php
@@ -34,6 +34,7 @@ parameters:
             message: '~assert.*Reg~'
             paths:
                 - tests/Doctrine/Migrations/Tests/Generator/ClassNameGeneratorTest.php
+
 
     symfony:
             console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php

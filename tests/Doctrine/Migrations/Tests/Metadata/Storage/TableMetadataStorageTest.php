@@ -27,6 +27,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
+use function method_exists;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -216,9 +217,14 @@ class TableMetadataStorageTest extends TestCase
         $config     = new TableMetadataStorageConfiguration();
         $executedAt = new DateTimeImmutable('2010-01-05 10:30:21');
 
+        $connection = $this->getSqliteConnection();
+        $pdo        = method_exists($connection, 'getNativeConnection')
+            ? $connection->getNativeConnection()
+            : $connection->getWrappedConnection();
+
         $connection = $this->getMockBuilder(Connection::class)
             ->setConstructorArgs([
-                ['pdo' => $this->getSqliteConnection()->getWrappedConnection()],
+                ['pdo' => $pdo],
                 new SQLiteDriver(),
             ])
             ->onlyMethods(['insert'])
