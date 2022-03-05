@@ -216,9 +216,10 @@ It simply takes a schema object to its constructor and returns it from ``createS
     $provider->createSchema() === $schema; // true
 
 By default the Doctrine Migrations command line tool will only add the diff command if the ORM is present.
-Without the ORM, you'll have to add the diff command to your console application manually, passing in your schema
-provider implementation to the diff command's constructor. Take a look at the :ref:`Custom Integration <custom-integration>`
-chapter for information on how to setup a custom console application.
+Without the ORM, you'll have to add the diff command to your console application manually and set your
+custom schema provider to the dependency factory, which will be passed to the the diff command's constructor.
+Take a look at the :ref:`Custom Integration <custom-integration>` chapter for information on how to setup a
+custom console application.
 
 .. code-block:: php
 
@@ -227,9 +228,10 @@ chapter for information on how to setup a custom console application.
     use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 
     $schemaProvider = new CustomSchemaProvider();
+    $dependencyFactory->setDefinition(SchemaProvider::class, static fn () => $schemaProvider);
 
     /** @var Symfony\Component\Console\Application */
-    $cli->add(new DiffCommand($schemaProvider));
+    $cli->add(new DiffCommand($dependencyFactory);
 
     // ...
 
