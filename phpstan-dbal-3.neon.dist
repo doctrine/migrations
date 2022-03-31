@@ -37,7 +37,10 @@ parameters:
 
         -
             message: "~Call to function method_exists.*'getNativeConnection' will always evaluate to true.~"
-            path: tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+            paths:
+                - lib/Doctrine/Migrations/Tools/TransactionHelper.php
+                - tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+                - tests/Doctrine/Migrations/Tests/Tools/TransactionHelperTest.php
 
         -
             message: "~Call to function method_exists.*'createComparator' will always evaluate to true.~"
@@ -52,5 +55,3 @@ parameters:
         -
             message: '~deprecated.*DebugStack~'
             path: tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
-
-        - "~Call to function method_exists\\(\\) with.*\\Connection.*and 'getNativeConnection' will always evaluate to true~"
