@@ -33,3 +33,5 @@ parameters:
                 - tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
                 - tests/Doctrine/Migrations/Tests/Provider/EmptySchemaProviderTest.php
                 - tests/Doctrine/Migrations/Tests/SchemaDumperTest.php
+
+        - '~Trying to mock an undefined method getNativeConnection\(\) on class Doctrine\\DBAL\\Connection~'
