@@ -10,6 +10,8 @@ use Doctrine\Migrations\Tools\TransactionHelper;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
+use function method_exists;
+
 final class TransactionHelperTest extends TestCase
 {
     use VerifyDeprecations;
@@ -18,7 +20,13 @@ final class TransactionHelperTest extends TestCase
     {
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
-        $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
+
+        if (method_exists(Connection::class, 'getNativeConnection')) {
+            $connection->method('getNativeConnection')->willReturn($wrappedConnection);
+        } else {
+            $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
+        }
+
         $wrappedConnection->method('inTransaction')->willReturn(false);
 
         $this->expectDeprecationWithIdentifier(
@@ -36,7 +44,13 @@ final class TransactionHelperTest extends TestCase
     {
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
-        $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
+
+        if (method_exists(Connection::class, 'getNativeConnection')) {
+            $connection->method('getNativeConnection')->willReturn($wrappedConnection);
+        } else {
+            $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
+        }
+
         $wrappedConnection->method('inTransaction')->willReturn(true);
 
         $this->expectNoDeprecationWithIdentifier(

@@ -37,7 +37,10 @@ parameters:
 
         -
             message: "~Call to function method_exists.*'getNativeConnection' will always evaluate to true.~"
-            path: tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+            paths:
+                - lib/Doctrine/Migrations/Tools/TransactionHelper.php
+                - tests/Doctrine/Migrations/Tests/Metadata/Storage/TableMetadataStorageTest.php
+                - tests/Doctrine/Migrations/Tests/Tools/TransactionHelperTest.php
 
         -
             message: "~Call to function method_exists.*'createComparator' will always evaluate to true.~"
@@ -47,13 +50,6 @@ parameters:
                 - lib/Doctrine/Migrations/Metadata/Storage/TableMetadataStorage.php
                 - tests/Doctrine/Migrations/Tests/Generator/DiffGeneratorTest.php
                 - tests/Doctrine/Migrations/Tests/Tools/Console/Command/MigrateCommandTest.php
-
-        # That method will no longer be static in the future
-        -
-            message: '~Dynamic call to static method Doctrine\\DBAL\\Schema\\Comparator\:\:compareSchemas\(\)\.~'
-            paths:
-                - lib/Doctrine/Migrations/Generator/DiffGenerator.php
-                - lib/Doctrine/Migrations/Provider/DBALSchemaDiffProvider.php
 
         # Switch to Logging\Connection after dropping compatibility with DBAL 2
         -
