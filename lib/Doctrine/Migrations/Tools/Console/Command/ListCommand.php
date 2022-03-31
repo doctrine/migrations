@@ -22,7 +22,7 @@ use function uasort;
  */
 final class ListCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:list';
 
     protected function configure(): void

@@ -35,3 +35,8 @@ parameters:
                 - tests/Doctrine/Migrations/Tests/SchemaDumperTest.php
 
         - '~Trying to mock an undefined method getNativeConnection\(\) on class Doctrine\\DBAL\\Connection~'
+
+        -
+            message: '~^Expression on left side of \?\? is not nullable\.$~'
+            paths:
+                - lib/Doctrine/Migrations/Tools/Console/Command/RollupCommand.php

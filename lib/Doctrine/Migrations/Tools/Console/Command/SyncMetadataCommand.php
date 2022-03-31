@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 final class SyncMetadataCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:sync-metadata-storage';
 
     protected function configure(): void

@@ -26,7 +26,7 @@ use function uasort;
  */
 final class UpToDateCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:up-to-date';
 
     protected function configure(): void

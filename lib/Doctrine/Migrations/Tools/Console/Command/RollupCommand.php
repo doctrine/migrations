@@ -15,7 +15,7 @@ use function sprintf;
  */
 final class RollupCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:rollup';
 
     protected function configure(): void

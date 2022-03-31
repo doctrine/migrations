@@ -25,7 +25,7 @@ use function sprintf;
  */
 final class ExecuteCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:execute';
 
     protected function configure(): void

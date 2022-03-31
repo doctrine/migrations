@@ -19,7 +19,7 @@ use function sprintf;
  */
 final class GenerateCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:generate';
 
     protected function configure(): void
