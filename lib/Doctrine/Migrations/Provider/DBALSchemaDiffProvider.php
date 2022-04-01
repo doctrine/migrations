@@ -8,8 +8,6 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 
-use function method_exists;
-
 /**
  * The SchemaDiffProvider class is responsible for providing a Doctrine\DBAL\Schema\Schema instance that
  * represents the current state of your database. A clone of this Schema instance is passed to each of your migrations
@@ -50,10 +48,6 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     /** @return string[] */
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array
     {
-        if (! method_exists($this->schemaManager, 'createComparator')) {
-            return $fromSchema->getMigrateToSql($toSchema, $this->platform);
-        }
-
         return $this->schemaManager->createComparator()->compareSchemas(
             $fromSchema,
             $toSchema

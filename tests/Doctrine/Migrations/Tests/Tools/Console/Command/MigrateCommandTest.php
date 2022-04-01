@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
@@ -39,42 +38,32 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use function getcwd;
 use function in_array;
-use function method_exists;
 use function sprintf;
 use function strpos;
 use function trim;
 
 class MigrateCommandTest extends MigrationTestCase
 {
-    /** @var DependencyFactory */
-    private $dependencyFactory;
+    private DependencyFactory $dependencyFactory;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var MigrateCommand */
-    private $migrateCommand;
+    private MigrateCommand $migrateCommand;
 
-    /** @var CommandTester */
-    private $migrateCommandTester;
+    private CommandTester $migrateCommandTester;
 
-    /** @var MetadataStorage */
-    private $storage;
+    private MetadataStorage $storage;
 
-    /** @var MockObject */
-    private $queryWriter;
+    private MockObject $queryWriter;
 
     /** @var MockObject|QuestionHelper */
     private $questions;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $metadataConfiguration;
+    private TableMetadataStorageConfiguration $metadataConfiguration;
 
     public function testTargetUnknownVersion(): void
     {
@@ -322,7 +311,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([], ['interactive' => false]);
 
-        $refreshedTable = $this->connection->getSchemaManager()
+        $refreshedTable = $this->connection->createSchemaManager()
             ->listTableDetails($this->metadataConfiguration->getTableName());
 
         self::assertFalse($refreshedTable->hasColumn('extra'));
@@ -336,7 +325,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([]);
 
-        $refreshedTable = $this->connection->getSchemaManager()
+        $refreshedTable = $this->connection->createSchemaManager()
             ->listTableDetails($this->metadataConfiguration->getTableName());
 
         self::assertTrue($refreshedTable->hasColumn('extra'));
@@ -502,22 +491,18 @@ class MigrateCommandTest extends MigrationTestCase
 
     private function alterMetadataTable(): void
     {
-        $schemaManager = $this->connection->getSchemaManager();
+        $schemaManager = $this->connection->createSchemaManager();
         $originalTable = $schemaManager
             ->listTableDetails($this->metadataConfiguration->getTableName());
 
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
 
-        $comparator = method_exists($schemaManager, 'createComparator') ?
-            $schemaManager->createComparator() :
-            new Comparator();
-
-        $diff = $comparator->diffTable($originalTable, $modifiedTable);
+        $diff = $schemaManager->createComparator()->diffTable($originalTable, $modifiedTable);
         if (! ($diff instanceof TableDiff)) {
             return;
         }
 
-        $this->connection->getSchemaManager()->alterTable($diff);
+        $this->connection->createSchemaManager()->alterTable($diff);
     }
 }

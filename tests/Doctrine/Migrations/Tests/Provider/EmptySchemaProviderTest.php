@@ -19,8 +19,7 @@ class EmptySchemaProviderTest extends MigrationTestCase
     /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
     private $schemaManager;
 
-    /** @var EmptySchemaProvider */
-    private $emptyProvider;
+    private EmptySchemaProvider $emptyProvider;
 
     public function testCreateSchema(): void
     {

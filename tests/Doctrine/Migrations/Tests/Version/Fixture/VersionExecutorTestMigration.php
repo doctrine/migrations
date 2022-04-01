@@ -9,25 +9,18 @@ use Doctrine\Migrations\AbstractMigration;
 
 class VersionExecutorTestMigration extends AbstractMigration
 {
-    /** @var bool */
-    public $preUpExecuted = false;
+    public bool $preUpExecuted = false;
 
-    /** @var bool */
-    public $preDownExecuted = false;
+    public bool $preDownExecuted = false;
 
-    /** @var bool */
-    public $postUpExecuted = false;
+    public bool $postUpExecuted = false;
 
-    /** @var bool */
-    public $postDownExecuted = false;
+    public bool $postDownExecuted = false;
 
-    /** @var string */
-    private $description = '';
+    private string $description = '';
 
-    /** @var bool */
-    public $skip = false;
-    /** @var bool */
-    public $error = false;
+    public bool $skip  = false;
+    public bool $error = false;
 
     public function getDescription(): string
     {

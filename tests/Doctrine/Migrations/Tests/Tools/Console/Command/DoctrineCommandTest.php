@@ -110,8 +110,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $command       = new class ($em2, $dependencyFactory) extends DoctrineCommand
         {
-            /** @var EntityManager */
-            private $expectedEm;
+            private EntityManager $expectedEm;
 
             public function __construct(EntityManager $entityManager, DependencyFactory $dependencyFactory)
             {
@@ -151,8 +150,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $command       = new class ($conn2, $dependencyFactory) extends DoctrineCommand
         {
-            /** @var Connection */
-            private $expectedConnection;
+            private Connection $expectedConnection;
 
             public function __construct(Connection $connection, DependencyFactory $dependencyFactory)
             {

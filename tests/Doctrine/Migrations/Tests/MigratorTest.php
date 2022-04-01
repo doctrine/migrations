@@ -38,20 +38,15 @@ class MigratorTest extends MigrationTestCase
     /** @var Connection|MockObject */
     private $conn;
 
-    /** @var Configuration */
-    private $config;
+    private Configuration $config;
 
-    /** @var StreamOutput */
-    protected $output;
+    protected StreamOutput $output;
 
-    /** @var MigratorConfiguration */
-    private $migratorConfiguration;
+    private MigratorConfiguration $migratorConfiguration;
 
-    /** @var Executor */
-    private $executor;
+    private Executor $executor;
 
-    /** @var TestLogger */
-    private $logger;
+    private TestLogger $logger;
 
     protected function setUp(): void
     {

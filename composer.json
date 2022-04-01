@@ -24,9 +24,9 @@
         }
     ],
     "require": {
-        "php": "^7.2 || ^8.0",
+        "php": "^7.4 || ^8.0",
         "composer-runtime-api": "^2",
-        "doctrine/dbal": "^2.11 || ^3.0",
+        "doctrine/dbal": "^3.3",
         "doctrine/deprecations": "^0.5.3",
         "doctrine/event-manager": "^1.0",
         "friendsofphp/proxy-manager-lts": "^1.0",
@@ -46,7 +46,7 @@
         "phpstan/phpstan-phpunit": "^1.1",
         "phpstan/phpstan-strict-rules": "^1.1",
         "phpstan/phpstan-symfony": "^1.1",
-        "phpunit/phpunit": "^8.5 || ^9.4",
+        "phpunit/phpunit": "^9.4",
         "symfony/cache": "^3.4.26 || ^4.2.12 || ^5.0 || ^6.0",
         "symfony/process": "^3.4 || ^4.0 || ^5.0 || ^6.0",
         "symfony/yaml": "^3.4 || ^4.0 || ^5.0 || ^6.0"

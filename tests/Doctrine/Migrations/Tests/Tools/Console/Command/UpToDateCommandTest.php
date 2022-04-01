@@ -30,23 +30,17 @@ use function trim;
 
 class UpToDateCommandTest extends MigrationTestCase
 {
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
-    /** @var UpToDateCommand */
-    private $command;
+    private UpToDateCommand $command;
 
-    /** @var Connection */
-    private $conn;
+    private Connection $conn;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $metadataConfig;
+    private TableMetadataStorageConfiguration $metadataConfig;
 
     protected function setUp(): void
     {

@@ -19,17 +19,13 @@ use UnexpectedValueException;
  */
 class OrmSchemaProviderTest extends MigrationTestCase
 {
-    /** @var  Connection */
-    private $conn;
+    private Connection $conn;
 
-    /** @var  Configuration */
-    private $config;
+    private Configuration $config;
 
-    /** @var  EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /** @var  OrmSchemaProvider */
-    private $ormProvider;
+    private OrmSchemaProvider $ormProvider;
 
     public function testCreateSchemaFetchesMetadataFromEntityManager(): void
     {

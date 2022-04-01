@@ -24,8 +24,7 @@ class EventArgsTest extends TestCase
     /** @var MockObject|MigratorConfiguration */
     private $config;
 
-    /** @var MigrationPlan */
-    private $plan;
+    private MigrationPlan $plan;
 
     public function setUp(): void
     {

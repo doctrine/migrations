@@ -28,14 +28,11 @@ final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTest
     /** @var MockObject|EntityManager */
     private $em2;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var AbstractManagerRegistry */
-    private $registry;
+    private AbstractManagerRegistry $registry;
 
-    /** @var DependencyFactory */
-    private $di;
+    private DependencyFactory $di;
 
     public function setUp(): void
     {

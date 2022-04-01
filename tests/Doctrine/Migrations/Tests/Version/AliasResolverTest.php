@@ -33,20 +33,15 @@ use function sys_get_temp_dir;
 
 final class AliasResolverTest extends TestCase
 {
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    private MigrationPlanCalculator $migrationPlanCalculator;
 
-    /** @var DefaultAliasResolver */
-    private $versionAliasResolver;
+    private DefaultAliasResolver $versionAliasResolver;
 
-    /** @var TableMetadataStorage */
-    private $metadataStorage;
+    private TableMetadataStorage $metadataStorage;
 
-    /** @var MigrationStatusCalculator */
-    private $statusCalculator;
+    private MigrationStatusCalculator $statusCalculator;
 
     /**
      * @param class-string<Throwable>|null $expectedException

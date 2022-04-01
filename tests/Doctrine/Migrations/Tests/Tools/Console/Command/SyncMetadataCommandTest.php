@@ -19,11 +19,9 @@ final class SyncMetadataCommandTest extends TestCase
     /** @var MetadataStorage|MockObject */
     private $storage;
 
-    /** @var SyncMetadataCommand */
-    private $storageCommand;
+    private SyncMetadataCommand $storageCommand;
 
-    /** @var CommandTester */
-    private $storageCommandTester;
+    private CommandTester $storageCommandTester;
 
     public function testExecute(): void
     {

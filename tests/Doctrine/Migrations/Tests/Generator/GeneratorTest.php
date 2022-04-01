@@ -22,11 +22,9 @@ use function unlink;
 
 final class GeneratorTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var Generator */
-    private $migrationGenerator;
+    private Generator $migrationGenerator;
 
     public function testGenerateMigration(): void
     {

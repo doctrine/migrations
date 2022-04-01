@@ -28,8 +28,7 @@ class RollupTest extends TestCase
     /** @var MetadataStorage|MockObject */
     private $storage;
 
-    /** @var Rollup */
-    private $rollup;
+    private Rollup $rollup;
 
     public function setUp(): void
     {

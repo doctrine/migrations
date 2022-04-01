@@ -33,17 +33,14 @@ final class DiffCommandTest extends TestCase
     /** @var MigrationStatusCalculator|MockObject */
     private $migrationStatusCalculator;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var DiffCommand */
-    private $diffCommand;
+    private DiffCommand $diffCommand;
 
     /** @var MockObject|DependencyFactory */
     private $dependencyFactory;
 
-    /** @var CommandTester */
-    private $diffCommandTester;
+    private CommandTester $diffCommandTester;
 
     /** @var ClassNameGenerator|MockObject */
     private $classNameGenerator;

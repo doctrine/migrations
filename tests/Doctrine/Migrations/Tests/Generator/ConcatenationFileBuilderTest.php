@@ -18,8 +18,7 @@ class ConcatenationFileBuilderTest extends TestCase
     /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var FileBuilder */
-    private $migrationFileBuilder;
+    private FileBuilder $migrationFileBuilder;
 
     public function testBuildMigrationFile(): void
     {

@@ -27,17 +27,13 @@ use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
 {
-    /** @var VersionCommand */
-    private $command;
+    private VersionCommand $command;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

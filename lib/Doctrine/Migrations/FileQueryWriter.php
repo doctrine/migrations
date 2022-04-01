@@ -44,7 +44,7 @@ final class FileQueryWriter implements QueryWriter
         array $queriesByVersion,
         ?DateTimeInterface $now = null
     ): bool {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $string = $this->migrationFileBuilder
             ->buildMigrationFile($queriesByVersion, $direction, $now);

@@ -27,8 +27,7 @@ use function trim;
 
 final class DumpSchemaCommandTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
@@ -39,11 +38,9 @@ final class DumpSchemaCommandTest extends TestCase
     /** @var SchemaDumper|MockObject */
     private $schemaDumper;
 
-    /** @var DumpSchemaCommand */
-    private $dumpSchemaCommand;
+    private DumpSchemaCommand $dumpSchemaCommand;
 
-    /** @var CommandTester */
-    private $dumpSchemaCommandTester;
+    private CommandTester $dumpSchemaCommandTester;
 
     public function testExecuteThrowsRuntimeException(): void
     {

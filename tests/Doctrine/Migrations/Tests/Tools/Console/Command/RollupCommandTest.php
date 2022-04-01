@@ -22,11 +22,9 @@ final class RollupCommandTest extends TestCase
     /** @var Rollup|MockObject */
     private $rollup;
 
-    /** @var RollupCommand */
-    private $rollupCommand;
+    private RollupCommand $rollupCommand;
 
-    /** @var CommandTester */
-    private $rollupCommandTest;
+    private CommandTester $rollupCommandTest;
 
     public function testExecute(): void
     {

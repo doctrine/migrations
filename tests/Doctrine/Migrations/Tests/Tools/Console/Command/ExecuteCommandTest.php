@@ -29,20 +29,15 @@ use function trim;
 
 class ExecuteCommandTest extends MigrationTestCase
 {
-    /** @var ExecuteCommand */
-    private $executeCommand;
+    private ExecuteCommand $executeCommand;
 
-    /** @var DependencyFactory */
-    private $dependencyFactory;
+    private DependencyFactory $dependencyFactory;
 
-    /** @var CommandTester */
-    private $executeCommandTester;
+    private CommandTester $executeCommandTester;
 
-    /** @var MockObject */
-    private $migrator;
+    private MockObject $migrator;
 
-    /** @var MockObject */
-    private $queryWriter;
+    private MockObject $queryWriter;
 
     /** @var MigrationPlanCalculator|MockObject */
     private $planCalculator;

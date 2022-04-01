@@ -20,14 +20,11 @@ use const DIRECTORY_SEPARATOR;
 
 class MigrationDirectoryHelperTest extends MigrationTestCase
 {
-    /** @var MigrationDirectoryHelper */
-    private $mirationDirectoryHelper;
+    private MigrationDirectoryHelper $mirationDirectoryHelper;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var string */
-    private $tempDir;
+    private string $tempDir;
 
     public function setUp(): void
     {

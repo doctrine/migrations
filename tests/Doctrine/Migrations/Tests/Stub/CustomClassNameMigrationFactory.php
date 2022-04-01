@@ -9,8 +9,7 @@ use Doctrine\Migrations\Version\MigrationFactory;
 
 class CustomClassNameMigrationFactory implements MigrationFactory
 {
-    /** @var MigrationFactory */
-    private $parentMigrationFactory;
+    private MigrationFactory $parentMigrationFactory;
 
     /** @psalm-var class-string<AbstractMigration> */
     private $migrationClassName;

@@ -16,8 +16,7 @@ use PHPUnit\Framework\TestCase;
 
 class AvailableMigrationListTest extends TestCase
 {
-    /** @var AbstractMigration */
-    private $abstractMigration;
+    private AbstractMigration $abstractMigration;
 
     public function setUp(): void
     {

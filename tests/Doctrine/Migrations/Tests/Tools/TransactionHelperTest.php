@@ -10,8 +10,6 @@ use Doctrine\Migrations\Tools\TransactionHelper;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
-use function method_exists;
-
 final class TransactionHelperTest extends TestCase
 {
     use VerifyDeprecations;
@@ -21,11 +19,7 @@ final class TransactionHelperTest extends TestCase
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
 
-        if (method_exists(Connection::class, 'getNativeConnection')) {
-            $connection->method('getNativeConnection')->willReturn($wrappedConnection);
-        } else {
-            $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
-        }
+        $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 
         $wrappedConnection->method('inTransaction')->willReturn(false);
 
@@ -45,11 +39,7 @@ final class TransactionHelperTest extends TestCase
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
 
-        if (method_exists(Connection::class, 'getNativeConnection')) {
-            $connection->method('getNativeConnection')->willReturn($wrappedConnection);
-        } else {
-            $connection->method('getWrappedConnection')->willReturn($wrappedConnection);
-        }
+        $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 
         $wrappedConnection->method('inTransaction')->willReturn(true);
 

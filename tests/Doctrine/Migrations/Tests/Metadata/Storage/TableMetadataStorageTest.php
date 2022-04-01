@@ -10,7 +10,7 @@ use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDO\SQLite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
-use Doctrine\DBAL\Logging\DebugStack;
+use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Table;
@@ -27,25 +27,22 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
-use function method_exists;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var Configuration */
-    private $connectionConfig;
+    private Configuration $connectionConfig;
 
-    /** @var TableMetadataStorage */
-    private $storage;
+    private TableMetadataStorage $storage;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $config;
+    private TableMetadataStorageConfiguration $config;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
+
+    private DebugLogger $debugLogger;
 
     private function getSqliteConnection(?Configuration $configuration = null): Connection
     {
@@ -57,8 +54,10 @@ class TableMetadataStorageTest extends TestCase
     public function setUp(): void
     {
         $this->connectionConfig = new Configuration();
-        $this->connection       = $this->getSqliteConnection($this->connectionConfig);
-        $this->schemaManager    = $this->connection->getSchemaManager();
+        $this->debugLogger      = new DebugLogger();
+        $this->connectionConfig->setMiddlewares([new Middleware($this->debugLogger)]);
+        $this->connection    = $this->getSqliteConnection($this->connectionConfig);
+        $this->schemaManager = $this->connection->createSchemaManager();
 
         $this->config  = new TableMetadataStorageConfiguration();
         $this->storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $this->config);
@@ -66,17 +65,15 @@ class TableMetadataStorageTest extends TestCase
 
     public function testSchemaIntrospectionExecutedOnlyOnce(): void
     {
-        $stack = new DebugStack();
-        $this->connectionConfig->setSQLLogger($stack);
         $this->storage->ensureInitialized();
 
-        $oldQueryCount = $stack->currentQuery;
+        $oldQueryCount = $this->debugLogger->count;
         $this->storage->ensureInitialized();
-        self::assertSame(0, $stack->currentQuery - $oldQueryCount);
+        self::assertSame(0, $this->debugLogger->count - $oldQueryCount);
 
-        $oldQueryCount = $stack->currentQuery;
+        $oldQueryCount = $this->debugLogger->count;
         $this->storage->getExecutedMigrations();
-        self::assertSame(1, $stack->currentQuery - $oldQueryCount);
+        self::assertSame(1, $this->debugLogger->count - $oldQueryCount);
     }
 
     public function testDifferentTableNotUpdatedOnRead(): void
@@ -218,9 +215,7 @@ class TableMetadataStorageTest extends TestCase
         $executedAt = new DateTimeImmutable('2010-01-05 10:30:21');
 
         $connection = $this->getSqliteConnection();
-        $pdo        = method_exists($connection, 'getNativeConnection')
-            ? $connection->getNativeConnection()
-            : $connection->getWrappedConnection();
+        $pdo        = $connection->getNativeConnection();
 
         $connection = $this->getMockBuilder(Connection::class)
             ->setConstructorArgs([

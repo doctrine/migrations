@@ -14,11 +14,9 @@ use Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
-    /** @var AbstractMigrationStub */
-    private $migration;
+    private AbstractMigrationStub $migration;
 
-    /** @var TestLogger */
-    private $logger;
+    private TestLogger $logger;
 
     protected function setUp(): void
     {

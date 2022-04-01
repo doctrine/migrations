@@ -9,7 +9,6 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
-use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\Types;
@@ -26,7 +25,6 @@ use InvalidArgumentException;
 
 use function array_change_key_case;
 use function floatval;
-use function method_exists;
 use function round;
 use function sprintf;
 use function strlen;
@@ -70,7 +68,7 @@ final class TableMetadataStorage implements MetadataStorage
     ) {
         $this->migrationRepository = $migrationRepository;
         $this->connection          = $connection;
-        $this->schemaManager       = $connection->getSchemaManager();
+        $this->schemaManager       = $connection->createSchemaManager();
         $this->platform            = $connection->getDatabasePlatform();
 
         if ($configuration !== null && ! ($configuration instanceof TableMetadataStorageConfiguration)) {
@@ -185,11 +183,8 @@ final class TableMetadataStorage implements MetadataStorage
             return null;
         }
 
-        $comparator   = method_exists($this->schemaManager, 'createComparator') ?
-            $this->schemaManager->createComparator() :
-            new Comparator();
         $currentTable = $this->schemaManager->listTableDetails($this->configuration->getTableName());
-        $diff         = $comparator->diffTable($currentTable, $expectedTable);
+        $diff         = $this->schemaManager->createComparator()->diffTable($currentTable, $expectedTable);
 
         return $diff instanceof TableDiff ? $diff : null;
     }

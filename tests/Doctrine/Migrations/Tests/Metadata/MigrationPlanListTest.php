@@ -16,17 +16,12 @@ use PHPUnit\Framework\TestCase;
 
 class MigrationPlanListTest extends TestCase
 {
-    /** @var AbstractMigration */
-    private $abstractMigration;
+    private AbstractMigration $abstractMigration;
 
-    /** @var MigrationPlanList */
-    private $set;
-    /** @var MigrationPlan */
-    private $m1;
-    /** @var MigrationPlan */
-    private $m2;
-    /** @var MigrationPlan */
-    private $m3;
+    private MigrationPlanList $set;
+    private MigrationPlan $m1;
+    private MigrationPlan $m2;
+    private MigrationPlan $m3;
 
     public function setUp(): void
     {
