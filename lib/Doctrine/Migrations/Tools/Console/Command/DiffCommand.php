@@ -31,7 +31,7 @@ use const FILTER_VALIDATE_BOOLEAN;
  */
 final class DiffCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:diff';
 
     protected function configure(): void

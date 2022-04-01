@@ -15,7 +15,7 @@ use function sprintf;
  */
 final class LatestCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:latest';
 
     protected function configure(): void

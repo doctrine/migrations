@@ -52,7 +52,7 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     protected function setUp(): void
     {
-        $this->conn       = $this->createStub(Connection::class);
+        $this->conn       = $this->createMock(Connection::class);
         $driverConnection = $this->createStub(DriverConnection::class);
         $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
 

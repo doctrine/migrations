@@ -25,7 +25,7 @@ use function sprintf;
  */
 final class VersionCommand extends DoctrineCommand
 {
-    /** @var string */
+    /** @var string|null */
     protected static $defaultName = 'migrations:version';
 
     /** @var bool */

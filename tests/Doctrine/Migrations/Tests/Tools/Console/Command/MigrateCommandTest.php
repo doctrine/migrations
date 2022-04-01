@@ -374,8 +374,9 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
-     * @dataProvider allOrNothing
      * @psalm-param array<string, bool> $input
+     *
+     * @dataProvider allOrNothing
      */
     public function testExecuteMigrateAllOrNothing(bool $default, array $input, bool $expected): void
     {

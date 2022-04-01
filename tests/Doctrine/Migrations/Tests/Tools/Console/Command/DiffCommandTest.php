@@ -144,8 +144,8 @@ final class DiffCommandTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->migrationDiffGenerator    = $this->createStub(DiffGenerator::class);
-        $this->migrationStatusCalculator = $this->createStub(MigrationStatusCalculator::class);
+        $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);
+        $this->migrationStatusCalculator = $this->createMock(MigrationStatusCalculator::class);
         $this->configuration             = new Configuration();
         $this->configuration->addMigrationsDirectory('FooNs', sys_get_temp_dir());
 
