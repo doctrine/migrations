@@ -16,9 +16,9 @@
         </testsuite>
     </testsuites>
 
-    <filter>
-        <whitelist>
+    <coverage>
+        <include>
             <directory>./lib/</directory>
-        </whitelist>
-    </filter>
+        </include>
+    </coverage>
 </phpunit>

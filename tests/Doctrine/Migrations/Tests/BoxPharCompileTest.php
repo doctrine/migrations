@@ -12,8 +12,6 @@ use function file_exists;
 use function realpath;
 use function sprintf;
 
-use const PHP_VERSION_ID;
-
 /**
  * @requires OS Linux|Darwin
  */
@@ -21,10 +19,6 @@ class BoxPharCompileTest extends TestCase
 {
     public function testCompile(): void
     {
-        if (PHP_VERSION_ID < 70200) {
-            self::markTestSkipped('https://github.com/box-project/box/issues/489');
-        }
-
         $boxPharPath = __DIR__ . '/../../../../box.phar';
 
         if (! file_exists($boxPharPath)) {
