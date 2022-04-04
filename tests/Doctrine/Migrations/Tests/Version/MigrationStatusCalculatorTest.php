@@ -19,8 +19,7 @@ use PHPUnit\Framework\TestCase;
 
 final class MigrationStatusCalculatorTest extends TestCase
 {
-    /** @var MigrationStatusCalculator */
-    private $migrationStatusCalculator;
+    private MigrationStatusCalculator $migrationStatusCalculator;
 
     /** @var MockObject|MigrationPlanCalculator */
     private $migrationPlanCalculator;

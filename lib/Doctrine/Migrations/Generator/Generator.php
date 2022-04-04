@@ -63,11 +63,9 @@ final class <className> extends AbstractMigration
 
 TEMPLATE;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var string|null */
-    private $template;
+    private ?string $template = null;
 
     public function __construct(Configuration $configuration)
     {

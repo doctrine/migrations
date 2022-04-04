@@ -18,11 +18,9 @@ use ProxyManager\Proxy\LazyLoadingInterface;
  */
 class LazySchemaDiffProvider implements SchemaDiffProvider
 {
-    /** @var LazyLoadingValueHolderFactory */
-    private $proxyFactory;
+    private LazyLoadingValueHolderFactory $proxyFactory;
 
-    /** @var SchemaDiffProvider */
-    private $originalSchemaManipulator;
+    private SchemaDiffProvider $originalSchemaManipulator;
 
     public function __construct(
         LazyLoadingValueHolderFactory $proxyFactory,

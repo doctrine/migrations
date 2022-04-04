@@ -23,7 +23,7 @@ final class ConcatenationFileBuilder implements FileBuilder
         string $direction,
         ?DateTimeInterface $now = null
     ): string {
-        $now    = $now ?? new DateTimeImmutable();
+        $now  ??= new DateTimeImmutable();
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));
 
         foreach ($queriesByVersion as $version => $queries) {

@@ -25,22 +25,14 @@ jobs:
 
     strategy:
       matrix:
-        dbal-version:
-          - "^2.11"
-          - "^3.0"
         php-version:
-          - "7.2"
-          - "7.3"
           - "7.4"
           - "8.0"
         dependencies:
           - "highest"
         include:
           - deps: "lowest"
-            php-version: "7.2"
-        exclude:
-          - dbal-version: "^3.0"
-            php-version: "7.2"
+            php-version: "7.4"
 
     steps:
       - name: "Checkout"
@@ -58,10 +50,6 @@ jobs:
 
       - name: "Download box"
         run: "./download-box.sh"
-
-      - name: "Require the right DBAL version"
-        run: "composer require doctrine/dbal:${{ matrix.dbal-version }} --no-update"
-        if: "${{ matrix.dbal-version }}"
 
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v1"

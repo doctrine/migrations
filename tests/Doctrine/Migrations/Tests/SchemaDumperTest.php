@@ -30,8 +30,7 @@ class SchemaDumperTest extends TestCase
     /** @var SqlGenerator|MockObject */
     private $migrationSqlGenerator;
 
-    /** @var SchemaDumper */
-    private $schemaDumper;
+    private SchemaDumper $schemaDumper;
 
     public function testDumpNoTablesException(): void
     {

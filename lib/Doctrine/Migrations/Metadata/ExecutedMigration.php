@@ -13,18 +13,14 @@ use Doctrine\Migrations\Version\Version;
  */
 final class ExecutedMigration
 {
-    /** @var Version */
-    private $version;
+    private Version $version;
 
-    /** @var DateTimeImmutable|null */
-    private $executedAt;
+    private ?DateTimeImmutable $executedAt = null;
 
     /**
      * Seconds
-     *
-     * @var float|null
      */
-    public $executionTime;
+    public ?float $executionTime = null;
 
     public function __construct(Version $version, ?DateTimeImmutable $executedAt = null, ?float $executionTime = null)
     {

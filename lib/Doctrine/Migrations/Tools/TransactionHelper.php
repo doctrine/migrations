@@ -72,11 +72,9 @@ DEPRECATION
      */
     private static function getInnerConnection(Connection $connection)
     {
-        if (method_exists($connection, 'getNativeConnection')) {
-            try {
-                return $connection->getNativeConnection();
-            } catch (LogicException $e) {
-            }
+        try {
+            return $connection->getNativeConnection();
+        } catch (LogicException $e) {
         }
 
         $innermostConnection = $connection;

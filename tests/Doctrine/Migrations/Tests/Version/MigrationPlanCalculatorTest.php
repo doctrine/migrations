@@ -26,8 +26,7 @@ use function strcmp;
 
 final class MigrationPlanCalculatorTest extends TestCase
 {
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    private MigrationPlanCalculator $migrationPlanCalculator;
 
     /** @var MockObject|MigrationsRepository */
     private $migrationRepository;

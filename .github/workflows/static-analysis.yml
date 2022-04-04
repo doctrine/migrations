@@ -16,16 +16,9 @@ jobs:
 
     strategy:
       matrix:
-        dbal-version:
-          - "^2.11"
-          - "^3.0"
         php-version:
-          - "7.2"
           - "7.4"
           - "8.0"
-        exclude:
-          - dbal-version: "^3.0"
-            php-version: "7.2"
 
     steps:
       - name: "Checkout code"
@@ -38,17 +31,10 @@ jobs:
           php-version: "${{ matrix.php-version }}"
           extensions: "pdo_sqlite"
 
-      - name: "Require the right DBAL version"
-        run: "composer require doctrine/dbal:${{ matrix.dbal-version }} --no-update"
-
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v1"
         with:
           dependency-versions: "${{ matrix.dependencies }}"
 
-      - name: "Run a static analysis with phpstan/phpstan (dbal v2)"
-        run: "vendor/bin/phpstan analyse -c phpstan-dbal-2.neon.dist"
-        if: "contains(matrix.dbal-version, '^2.')"
-      - name: "Run a static analysis with phpstan/phpstan (dbal v3)"
-        run: "vendor/bin/phpstan analyse -c phpstan-dbal-3.neon.dist"
-        if: "contains(matrix.dbal-version, '^3.')"
+      - name: "Run a static analysis with phpstan/phpstan"
+        run: "vendor/bin/phpstan analyse -c phpstan.neon.dist"

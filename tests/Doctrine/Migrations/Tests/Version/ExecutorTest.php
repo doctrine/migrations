@@ -45,26 +45,19 @@ class ExecutorTest extends TestCase
     /** @var Stopwatch|MockObject */
     private $stopwatch;
 
-    /** @var DbalExecutor */
-    private $versionExecutor;
+    private DbalExecutor $versionExecutor;
 
-    /** @var Version */
-    private $version;
+    private Version $version;
 
-    /** @var VersionExecutorTestMigration */
-    private $migration;
+    private VersionExecutorTestMigration $migration;
 
-    /** @var TestLogger */
-    private $logger;
+    private TestLogger $logger;
 
-    /** @var EventDispatcher */
-    private $eventDispatcher;
+    private EventDispatcher $eventDispatcher;
 
-    /** @var EventManager */
-    private $eventManager;
+    private EventManager $eventManager;
 
-    /** @var MockObject */
-    private $metadataStorage;
+    private MockObject $metadataStorage;
 
     public function testAddSql(): void
     {
@@ -274,12 +267,9 @@ class ExecutorTest extends TestCase
             ->setTimeAllQueries(true);
 
         $listener = new class () {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
+            public bool $onMigrationsVersionExecuting = false;
+            public bool $onMigrationsVersionExecuted  = false;
+            public bool $onMigrationsVersionSkipped   = false;
 
             public function onMigrationsVersionExecuting(): void
             {
@@ -332,10 +322,8 @@ class ExecutorTest extends TestCase
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
         $listener = new class () {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
+            public bool $onMigrationsVersionExecuting = false;
+            public bool $onMigrationsVersionExecuted  = false;
 
             public function onMigrationsVersionExecuting(): void
             {
@@ -374,12 +362,9 @@ class ExecutorTest extends TestCase
         $this->migration->error = true;
 
         $listener = new class () {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
+            public bool $onMigrationsVersionExecuting = false;
+            public bool $onMigrationsVersionExecuted  = false;
+            public bool $onMigrationsVersionSkipped   = false;
 
             public function onMigrationsVersionExecuting(): void
             {
@@ -447,12 +432,9 @@ class ExecutorTest extends TestCase
         $plan = new MigrationPlan($this->version, $this->migration, Direction::UP);
 
         $listener = new class () {
-            /** @var bool */
-            public $onMigrationsVersionExecuting = false;
-            /** @var bool */
-            public $onMigrationsVersionExecuted = false;
-            /** @var bool */
-            public $onMigrationsVersionSkipped = false;
+            public bool $onMigrationsVersionExecuting = false;
+            public bool $onMigrationsVersionExecuted  = false;
+            public bool $onMigrationsVersionSkipped   = false;
 
             public function onMigrationsVersionExecuting(): void
             {

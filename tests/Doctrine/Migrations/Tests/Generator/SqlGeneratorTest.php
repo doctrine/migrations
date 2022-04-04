@@ -18,20 +18,17 @@ use function sprintf;
 
 final class SqlGeneratorTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
     /** @var AbstractPlatform|MockObject */
     private $platform;
 
-    /** @var SqlGenerator */
-    private $migrationSqlGenerator;
+    private SqlGenerator $migrationSqlGenerator;
 
     /** @var string[] */
-    private $sql;
+    private array $sql;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $metadataConfig;
+    private TableMetadataStorageConfiguration $metadataConfig;
 
     public function testGenerate(): void
     {

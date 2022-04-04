@@ -16,8 +16,7 @@ use RuntimeException;
 
 class ExecutionResultTest extends TestCase
 {
-    /** @var ExecutionResult */
-    private $versionExecutionResult;
+    private ExecutionResult $versionExecutionResult;
 
     public function testHasSql(): void
     {

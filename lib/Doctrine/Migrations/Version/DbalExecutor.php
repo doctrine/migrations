@@ -34,29 +34,22 @@ use function ucfirst;
  */
 final class DbalExecutor implements Executor
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var SchemaDiffProvider */
-    private $schemaProvider;
+    private SchemaDiffProvider $schemaProvider;
 
-    /** @var ParameterFormatter */
-    private $parameterFormatter;
+    private ParameterFormatter $parameterFormatter;
 
-    /** @var Stopwatch */
-    private $stopwatch;
+    private Stopwatch $stopwatch;
 
     /** @var Query[] */
-    private $sql = [];
+    private array $sql = [];
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
-    /** @var EventDispatcher */
-    private $dispatcher;
+    private EventDispatcher $dispatcher;
 
     public function __construct(
         MetadataStorage $metadataStorage,

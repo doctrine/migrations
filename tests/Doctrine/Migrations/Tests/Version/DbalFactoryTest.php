@@ -20,8 +20,7 @@ final class DbalFactoryTest extends TestCase
     /** @var MockObject|LoggerInterface */
     private $logger;
 
-    /** @var DbalMigrationFactory */
-    private $versionFactory;
+    private DbalMigrationFactory $versionFactory;
 
     public function testCreateVersion(): void
     {

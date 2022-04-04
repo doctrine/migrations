@@ -28,8 +28,7 @@ final class VersionCommand extends DoctrineCommand
     /** @var string|null */
     protected static $defaultName = 'migrations:version';
 
-    /** @var bool */
-    private $markMigrated;
+    private bool $markMigrated;
 
     protected function configure(): void
     {

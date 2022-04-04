@@ -25,8 +25,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
     /** @var MigrationFactory|MockObject */
     private $versionFactory;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
     public function testCheckNonExistentMigration(): void
     {

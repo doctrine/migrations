@@ -24,18 +24,10 @@ parameters:
             message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
             path: tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
 
-        - '~^Property Doctrine\\Migrations\\Tests\\Provider\\\w+::\$id is never written, only read\.$~'
-
         # https://github.com/phpstan/phpstan/issues/5982
         -
             message: '~^Cannot call method getWrappedConnection\(\) on class-string\|object\.~'
             path: lib/Doctrine/Migrations/Tools/TransactionHelper.php
-
-        # Requires PHPUnit 9
-        -
-            message: '~assert.*Reg~'
-            paths:
-                - tests/Doctrine/Migrations/Tests/Generator/ClassNameGeneratorTest.php
 
         # TODO: Be more precise about class-strings
         -
@@ -44,7 +36,7 @@ parameters:
                 - lib/Doctrine/Migrations/Version/DbalMigrationFactory.php
 
     symfony:
-            console_application_loader: %currentWorkingDirectory%/tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
+            console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon

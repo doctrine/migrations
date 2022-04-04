@@ -31,8 +31,7 @@ final class DependencyFactoryTest extends MigrationTestCase
     /** @var MockObject|Connection */
     private $connection;
 
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
     /** @var EntityManager|MockObject */
     private $entityManager;
@@ -256,7 +255,7 @@ final class DependencyFactoryTest extends MigrationTestCase
         $di = DependencyFactory::fromConnection(new ExistingConfiguration($configuration), new ExistingConnection($connection));
         $di->getMetadataStorage()->ensureInitialized();
 
-        self::assertTrue($connection->getSchemaManager()->tablesExist(['foo']));
+        self::assertTrue($connection->createSchemaManager()->tablesExist(['foo']));
         self::assertTrue($di->isFrozen());
     }
 }

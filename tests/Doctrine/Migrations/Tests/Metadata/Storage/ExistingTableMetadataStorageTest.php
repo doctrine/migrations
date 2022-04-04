@@ -26,20 +26,16 @@ use function sprintf;
 
 class ExistingTableMetadataStorageTest extends TestCase
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var TableMetadataStorage */
-    private $storage;
+    private TableMetadataStorage $storage;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $config;
+    private TableMetadataStorageConfiguration $config;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
     private function getSqliteConnection(): Connection
     {
@@ -51,7 +47,7 @@ class ExistingTableMetadataStorageTest extends TestCase
     public function setUp(): void
     {
         $this->connection    = $this->getSqliteConnection();
-        $this->schemaManager = $this->connection->getSchemaManager();
+        $this->schemaManager = $this->connection->createSchemaManager();
 
         $migration                 = $this->createMock(AbstractMigration::class);
         $versionFactory            = $this->createMock(MigrationFactory::class);
@@ -88,8 +84,8 @@ class ExistingTableMetadataStorageTest extends TestCase
 
         $connection
             ->expects(self::atLeastOnce())
-            ->method('getSchemaManager')
-            ->willReturn($this->connection->getSchemaManager());
+            ->method('createSchemaManager')
+            ->willReturn($this->connection->createSchemaManager());
 
         $connection
             ->expects(self::atLeastOnce())

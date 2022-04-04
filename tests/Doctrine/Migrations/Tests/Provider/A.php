@@ -6,8 +6,7 @@ namespace Doctrine\Migrations\Tests\Provider;
 
 class A
 {
-    /** @var int|null */
-    private $id;
+    private ?int $id = null;
 
     public function getId(): ?int
     {

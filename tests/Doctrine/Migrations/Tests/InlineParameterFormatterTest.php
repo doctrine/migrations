@@ -12,14 +12,11 @@ use PHPUnit\Framework\TestCase;
 
 class InlineParameterFormatterTest extends TestCase
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var AbstractPlatform */
-    private $platform;
+    private AbstractPlatform $platform;
 
-    /** @var InlineParameterFormatter */
-    private $parameterFormatter;
+    private InlineParameterFormatter $parameterFormatter;
 
     public function testFormatParameters(): void
     {

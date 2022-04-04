@@ -28,17 +28,13 @@ use function trim;
 
 class ListCommandTest extends MigrationTestCase
 {
-    /** @var ListCommand */
-    private $command;
+    private ListCommand $command;
 
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

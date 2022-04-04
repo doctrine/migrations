@@ -20,7 +20,7 @@ use function count;
 final class ExecutedMigrationsList implements Countable
 {
     /** @var ExecutedMigration[] */
-    private $items = [];
+    private array $items = [];
 
     /**
      * @param ExecutedMigration[] $items

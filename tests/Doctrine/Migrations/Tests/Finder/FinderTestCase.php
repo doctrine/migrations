@@ -9,8 +9,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
 
 abstract class FinderTestCase extends MigrationTestCase
 {
-    /** @var MigrationFinder */
-    protected $finder;
+    protected MigrationFinder $finder;
 
     public function testClassesInMultipleNamespacesCanBeLoadedByTheFinder(): void
     {

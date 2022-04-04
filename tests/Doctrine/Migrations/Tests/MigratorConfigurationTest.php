@@ -9,8 +9,7 @@ use PHPUnit\Framework\TestCase;
 
 class MigratorConfigurationTest extends TestCase
 {
-    /** @var MigratorConfiguration */
-    private $migratorConfiguration;
+    private MigratorConfiguration $migratorConfiguration;
 
     public function testDryRun(): void
     {

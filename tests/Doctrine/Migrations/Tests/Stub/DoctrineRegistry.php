@@ -16,10 +16,10 @@ use function key;
 class DoctrineRegistry extends AbstractManagerRegistry
 {
     /** @var EntityManager[] */
-    private $realEntityManagers;
+    private array $realEntityManagers;
 
     /** @var Connection[] */
-    private $connections;
+    private array $connections;
 
     /**
      * @param array<string,Connection>    $connections

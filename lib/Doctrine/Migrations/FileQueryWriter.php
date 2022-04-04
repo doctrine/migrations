@@ -21,11 +21,9 @@ use function realpath;
  */
 final class FileQueryWriter implements QueryWriter
 {
-    /** @var FileBuilder */
-    private $migrationFileBuilder;
+    private FileBuilder $migrationFileBuilder;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileBuilder $migrationFileBuilder,
@@ -44,7 +42,7 @@ final class FileQueryWriter implements QueryWriter
         array $queriesByVersion,
         ?DateTimeInterface $now = null
     ): bool {
-        $now = $now ?? new DateTimeImmutable();
+        $now ??= new DateTimeImmutable();
 
         $string = $this->migrationFileBuilder
             ->buildMigrationFile($queriesByVersion, $direction, $now);

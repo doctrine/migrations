@@ -16,20 +16,15 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class MigratorConfiguration
 {
-    /** @var bool */
-    private $dryRun = false;
+    private bool $dryRun = false;
 
-    /** @var bool */
-    private $timeAllQueries = false;
+    private bool $timeAllQueries = false;
 
-    /** @var bool */
-    private $noMigrationException = false;
+    private bool $noMigrationException = false;
 
-    /** @var bool */
-    private $allOrNothing = false;
+    private bool $allOrNothing = false;
 
-    /** @var Schema|null */
-    private $fromSchema;
+    private ?Schema $fromSchema = null;
 
     public function isDryRun(): bool
     {

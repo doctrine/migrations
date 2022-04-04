@@ -37,20 +37,17 @@ use const PREG_RECURSION_LIMIT_ERROR;
  */
 class SchemaDumper
 {
-    /** @var AbstractPlatform */
-    private $platform;
+    private AbstractPlatform $platform;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var Generator */
-    private $migrationGenerator;
+    private Generator $migrationGenerator;
 
-    /** @var SqlGenerator */
-    private $migrationSqlGenerator;
+    private SqlGenerator $migrationSqlGenerator;
 
     /** @var string[] */
-    private $excludedTablesRegexes;
+    private array $excludedTablesRegexes;
 
     /**
      * @param AbstractSchemaManager<AbstractPlatform> $schemaManager

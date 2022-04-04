@@ -14,8 +14,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
  */
 class SchemaDiffProviderTest extends MigrationTestCase
 {
-    /** @var SchemaDiffProvider */
-    private $provider;
+    private SchemaDiffProvider $provider;
 
     public function testCreateFromSchema(): void
     {
@@ -40,7 +39,7 @@ class SchemaDiffProviderTest extends MigrationTestCase
     protected function setUp(): void
     {
         $conn           = $this->getSqliteConnection();
-        $schemaManager  = $conn->getSchemaManager();
+        $schemaManager  = $conn->createSchemaManager();
         $this->provider = new DBALSchemaDiffProvider($schemaManager, $conn->getDatabasePlatform());
 
         $schemaChangelog = new Table('foo');

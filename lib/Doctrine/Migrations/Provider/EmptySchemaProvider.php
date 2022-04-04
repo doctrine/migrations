@@ -17,7 +17,7 @@ use Doctrine\DBAL\Schema\Schema;
 final class EmptySchemaProvider implements SchemaProvider
 {
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
     /**
      * @param AbstractSchemaManager<AbstractPlatform> $schemaManager

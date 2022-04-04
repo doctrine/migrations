@@ -35,23 +35,17 @@ use function sprintf;
  */
 class MigrationStatusInfosHelper
 {
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var AliasResolver */
-    private $aliasResolver;
+    private AliasResolver $aliasResolver;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    private MigrationPlanCalculator $migrationPlanCalculator;
 
-    /** @var MigrationStatusCalculator */
-    private $statusCalculator;
+    private MigrationStatusCalculator $statusCalculator;
 
     public function __construct(
         Configuration $configuration,

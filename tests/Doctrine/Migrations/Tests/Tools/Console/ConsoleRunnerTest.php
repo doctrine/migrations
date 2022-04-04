@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
 use Doctrine\DBAL\Platforms\SqlitePlatform;
-use Doctrine\DBAL\Tools\Console\Helper\ConnectionHelper;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\EntityManager;
@@ -16,7 +15,6 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 
 use function chdir;
-use function class_exists;
 use function getcwd;
 use function realpath;
 use function sprintf;
@@ -26,30 +24,7 @@ use function sprintf;
  */
 class ConsoleRunnerTest extends TestCase
 {
-    /** @var Application */
-    private $application;
-
-    public function testCreateDependencyFactoryFromLegacyDbalHelper(): void
-    {
-        if (! class_exists(ConnectionHelper::class)) {
-            self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
-        }
-
-        $dir = getcwd();
-        if ($dir === false) {
-            $dir = '.';
-        }
-
-        chdir(__DIR__ . '/legacy-config-dbal');
-
-        try {
-            $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
-            self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
-            self::assertInstanceOf(SqlitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
-        } finally {
-            chdir($dir);
-        }
-    }
+    private Application $application;
 
     public function testCreateDependencyFactoryFromLegacyOrmHelper(): void
     {
@@ -65,33 +40,6 @@ class ConsoleRunnerTest extends TestCase
             self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
             self::assertInstanceOf(SqlitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
             self::assertInstanceOf(EntityManager::class, $dependencyFactory->getEntityManager());
-        } finally {
-            chdir($dir);
-        }
-    }
-
-    public function testCreateDependencyFactoryFromWrongLegacyHelper(): void
-    {
-        if (! class_exists(ConnectionHelper::class)) {
-            self::markTestSkipped('DBAL 3.0 does not provide anymore the ConnectionHelper');
-        }
-
-        $this->expectException(RuntimeException::class);
-
-        $dir = getcwd();
-        if ($dir === false) {
-            $dir = '.';
-        }
-
-        chdir(__DIR__ . '/legacy-config-wrong');
-
-        $this->expectExceptionMessage(sprintf(
-            'Configuration HelperSet returned by "%s" does not have a valid "em" or the "db" helper.',
-            realpath(__DIR__ . '/legacy-config-wrong/cli-config.php')
-        ));
-
-        try {
-            $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
         } finally {
             chdir($dir);
         }
@@ -281,8 +229,7 @@ class ConsoleRunnerTest extends TestCase
 
 class ConsoleRunnerStub extends ConsoleRunner
 {
-    /** @var Application */
-    public static $application;
+    public static Application $application;
 
     /**
      * @param Command[] $commands

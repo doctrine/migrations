@@ -13,8 +13,7 @@ cache:
 
 environment:
   matrix:
-    - php: 7.2.25
-    - php: 7.3.12
+    - php: 7.4.28
 
 init:
   - SET PATH=C:\Program Files\OpenSSL;c:\tools\php;C:\tools\composer;%PATH%

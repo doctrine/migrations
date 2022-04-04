@@ -19,8 +19,7 @@ class AutoCommitListenerTest extends MigrationTestCase
     /** @var Connection|MockObject */
     private $conn;
 
-    /** @var AutoCommitListener */
-    private $listener;
+    private AutoCommitListener $listener;
 
     public function testListenerDoesNothingDuringADryRun(): void
     {

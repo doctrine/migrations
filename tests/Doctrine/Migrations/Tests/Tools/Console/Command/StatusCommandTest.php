@@ -27,14 +27,11 @@ use function trim;
 
 class StatusCommandTest extends MigrationTestCase
 {
-    /** @var StatusCommand */
-    private $command;
+    private StatusCommand $command;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
-    /** @var CommandTester */
-    private $commandTester;
+    private CommandTester $commandTester;
 
     protected function setUp(): void
     {

@@ -18,8 +18,7 @@ use const PHP_EOL;
 
 class ConsoleLoggerTest extends TestCase
 {
-    /** @var BufferedOutput */
-    private $output;
+    private BufferedOutput $output;
 
     protected function setUp(): void
     {

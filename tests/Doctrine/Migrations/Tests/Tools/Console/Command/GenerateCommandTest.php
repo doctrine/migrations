@@ -20,8 +20,7 @@ use function trim;
 
 final class GenerateCommandTest extends TestCase
 {
-    /** @var Configuration */
-    private $configuration;
+    private Configuration $configuration;
 
     /** @var DependencyFactory|MockObject */
     private $dependencyFactory;
@@ -29,11 +28,9 @@ final class GenerateCommandTest extends TestCase
     /** @var Generator|MockObject */
     private $migrationGenerator;
 
-    /** @var GenerateCommand */
-    private $generateCommand;
+    private GenerateCommand $generateCommand;
 
-    /** @var CommandTester */
-    private $generateCommandTest;
+    private CommandTester $generateCommandTest;
 
     public function testExecute(): void
     {

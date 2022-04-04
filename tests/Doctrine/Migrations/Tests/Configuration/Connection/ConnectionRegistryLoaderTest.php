@@ -20,8 +20,7 @@ final class ConnectionRegistryLoaderTest extends TestCase
     /** @var Connection|MockObject */
     private $connection2;
 
-    /** @var AbstractManagerRegistry */
-    private $registry;
+    private AbstractManagerRegistry $registry;
 
     public function setUp(): void
     {

@@ -20,8 +20,7 @@ final class EntityManagerRegistryLoaderTest extends TestCase
     /** @var EntityManager|MockObject */
     private $em2;
 
-    /** @var AbstractManagerRegistry */
-    private $registry;
+    private AbstractManagerRegistry $registry;
 
     public function setUp(): void
     {

@@ -20,7 +20,7 @@ use function strtr;
 class TestLogger extends AbstractLogger
 {
     /** @var string[] */
-    public $logs = [];
+    public array $logs = [];
 
     /**
      * {@inheritdoc}
