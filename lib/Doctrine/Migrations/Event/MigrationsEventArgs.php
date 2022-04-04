@@ -14,14 +14,11 @@ use Doctrine\Migrations\MigratorConfiguration;
  */
 final class MigrationsEventArgs extends EventArgs
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
-    /** @var MigrationPlanList */
-    private $plan;
+    private MigrationPlanList $plan;
 
-    /** @var MigratorConfiguration */
-    private $migratorConfiguration;
+    private MigratorConfiguration $migratorConfiguration;
 
     public function __construct(
         Connection $connection,

@@ -33,11 +33,10 @@ abstract class AbstractMigration
     /** @var AbstractPlatform */
     protected $platform;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     /** @var Query[] */
-    private $plannedSql = [];
+    private array $plannedSql = [];
 
     public function __construct(Connection $connection, LoggerInterface $logger)
     {

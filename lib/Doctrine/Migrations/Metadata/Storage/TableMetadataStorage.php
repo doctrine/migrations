@@ -36,29 +36,22 @@ use const CASE_LOWER;
 
 final class TableMetadataStorage implements MetadataStorage
 {
-    /** @var bool */
-    private $isInitialized;
+    private bool $isInitialized = false;
 
-    /** @var bool */
-    private $schemaUpToDate = false;
+    private bool $schemaUpToDate = false;
 
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var AbstractPlatform */
-    private $platform;
+    private AbstractPlatform $platform;
 
-    /** @var TableMetadataStorageConfiguration */
-    private $configuration;
+    private TableMetadataStorageConfiguration $configuration;
 
-    /** @var MigrationsRepository|null */
-    private $migrationRepository;
+    private ?MigrationsRepository $migrationRepository = null;
 
-    /** @var MigrationsComparator */
-    private $comparator;
+    private MigrationsComparator $comparator;
 
     public function __construct(
         Connection $connection,

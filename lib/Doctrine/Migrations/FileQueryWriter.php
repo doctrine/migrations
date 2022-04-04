@@ -21,11 +21,9 @@ use function realpath;
  */
 final class FileQueryWriter implements QueryWriter
 {
-    /** @var FileBuilder */
-    private $migrationFileBuilder;
+    private FileBuilder $migrationFileBuilder;
 
-    /** @var LoggerInterface */
-    private $logger;
+    private LoggerInterface $logger;
 
     public function __construct(
         FileBuilder $migrationFileBuilder,

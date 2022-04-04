@@ -13,11 +13,9 @@ use Doctrine\Migrations\Version\Version;
  */
 final class AvailableMigration
 {
-    /** @var Version */
-    private $version;
+    private Version $version;
 
-    /** @var AbstractMigration */
-    private $migration;
+    private AbstractMigration $migration;
 
     public function __construct(Version $version, AbstractMigration $migration)
     {

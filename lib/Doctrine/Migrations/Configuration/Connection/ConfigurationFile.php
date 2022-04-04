@@ -18,8 +18,7 @@ use function is_array;
  */
 final class ConfigurationFile implements ConnectionLoader
 {
-    /** @var string */
-    private $filename;
+    private string $filename;
 
     public function __construct(string $filename)
     {

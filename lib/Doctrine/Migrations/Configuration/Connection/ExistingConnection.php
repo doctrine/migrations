@@ -9,8 +9,7 @@ use Doctrine\Migrations\Configuration\Exception\InvalidLoader;
 
 final class ExistingConnection implements ConnectionLoader
 {
-    /** @var Connection */
-    private $connection;
+    private Connection $connection;
 
     public function __construct(Connection $connection)
     {

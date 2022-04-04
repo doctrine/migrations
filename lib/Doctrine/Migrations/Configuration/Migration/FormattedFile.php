@@ -18,7 +18,7 @@ use const PATHINFO_EXTENSION;
 final class FormattedFile extends ConfigurationFile
 {
     /** @var callable[] */
-    private $loaders = [];
+    private array $loaders = [];
 
     private function setDefaultLoaders(): void
     {

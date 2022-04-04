@@ -14,11 +14,9 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
  */
 final class CurrentMigrationStatusCalculator implements MigrationStatusCalculator
 {
-    /** @var MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    private MigrationPlanCalculator $migrationPlanCalculator;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
     public function __construct(
         MigrationPlanCalculator $migrationPlanCalculator,

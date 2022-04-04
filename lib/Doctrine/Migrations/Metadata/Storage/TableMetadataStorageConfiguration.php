@@ -6,20 +6,15 @@ namespace Doctrine\Migrations\Metadata\Storage;
 
 final class TableMetadataStorageConfiguration implements MetadataStorageConfiguration
 {
-    /** @var string */
-    private $tableName = 'doctrine_migration_versions';
+    private string $tableName = 'doctrine_migration_versions';
 
-    /** @var string */
-    private $versionColumnName = 'version';
+    private string $versionColumnName = 'version';
 
-    /** @var int */
-    private $versionColumnLength = 191;
+    private int $versionColumnLength = 191;
 
-    /** @var string */
-    private $executedAtColumnName = 'executed_at';
+    private string $executedAtColumnName = 'executed_at';
 
-    /** @var string */
-    private $executionTimeColumnName = 'execution_time';
+    private string $executionTimeColumnName = 'execution_time';
 
     public function getTableName(): string
     {

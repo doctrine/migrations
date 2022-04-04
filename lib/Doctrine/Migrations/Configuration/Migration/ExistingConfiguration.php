@@ -8,8 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 
 final class ExistingConfiguration implements ConfigurationLoader
 {
-    /** @var Configuration */
-    private $configurations;
+    private Configuration $configurations;
 
     public function __construct(Configuration $configurations)
     {

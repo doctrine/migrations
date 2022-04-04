@@ -17,7 +17,7 @@ use function count;
 final class AvailableMigrationsSet implements Countable
 {
     /** @var AvailableMigration[] */
-    private $items = [];
+    private array $items = [];
 
     /**
      * @param AvailableMigration[] $items

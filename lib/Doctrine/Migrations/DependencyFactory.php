@@ -62,32 +62,25 @@ class DependencyFactory
     /** @psalm-var array<string, bool> */
     private $inResolution = [];
 
-    /** @var Configuration */
-    private $configuration;
+    private ?Configuration $configuration = null;
 
     /** @var object[]|callable[] */
-    private $dependencies = [];
+    private array $dependencies = [];
 
-    /** @var Connection */
-    private $connection;
+    private ?Connection $connection = null;
 
-    /** @var EntityManagerInterface|null */
-    private $em;
+    private ?EntityManagerInterface $em = null;
 
-    /** @var bool */
-    private $frozen = false;
+    private bool $frozen = false;
 
-    /** @var ConfigurationLoader */
-    private $configurationLoader;
+    private ConfigurationLoader $configurationLoader;
 
-    /** @var ConnectionLoader */
-    private $connectionLoader;
+    private ConnectionLoader $connectionLoader;
 
-    /** @var EntityManagerLoader|null */
-    private $emLoader;
+    private ?EntityManagerLoader $emLoader = null;
 
     /** @var callable[] */
-    private $factories = [];
+    private array $factories = [];
 
     public static function fromConnection(
         ConfigurationLoader $configurationLoader,

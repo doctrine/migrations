@@ -14,14 +14,10 @@ use Doctrine\Migrations\Version\Version;
  */
 final class MigrationPlan
 {
-    /** @var string */
-    private $direction;
-    /** @var Version */
-    private $version;
-    /** @var AbstractMigration */
-    private $migration;
-    /** @var ExecutionResult */
-    public $result;
+    private string $direction;
+    private Version $version;
+    private AbstractMigration $migration;
+    public ?ExecutionResult $result = null;
 
     public function __construct(Version $version, AbstractMigration $migration, string $direction)
     {

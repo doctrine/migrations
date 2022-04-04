@@ -18,8 +18,7 @@ use const DIRECTORY_SEPARATOR;
  */
 final class RecursiveRegexFinder extends Finder
 {
-    /** @var string */
-    private $pattern;
+    private string $pattern;
 
     public function __construct(?string $pattern = null)
     {

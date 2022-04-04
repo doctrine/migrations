@@ -34,11 +34,10 @@ final class ConsoleLogger extends AbstractLogger
     public const INFO  = 'info';
     public const ERROR = 'error';
 
-    /** @var OutputInterface */
-    private $output;
+    private OutputInterface $output;
 
     /** @var array<string, int> */
-    private $verbosityLevelMap = [
+    private array $verbosityLevelMap = [
         LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
         LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
@@ -49,7 +48,7 @@ final class ConsoleLogger extends AbstractLogger
         LogLevel::DEBUG => OutputInterface::VERBOSITY_VERY_VERBOSE,
     ];
     /** @var array<string, string> */
-    private $formatLevelMap = [
+    private array $formatLevelMap = [
         LogLevel::EMERGENCY => self::ERROR,
         LogLevel::ALERT => self::ERROR,
         LogLevel::CRITICAL => self::ERROR,

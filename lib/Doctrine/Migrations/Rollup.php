@@ -19,11 +19,9 @@ use function count;
  */
 class Rollup
 {
-    /** @var MigrationsRepository */
-    private $migrationRepository;
+    private MigrationsRepository $migrationRepository;
 
-    /** @var MetadataStorage */
-    private $metadataStorage;
+    private MetadataStorage $metadataStorage;
 
     public function __construct(
         MetadataStorage $metadataStorage,

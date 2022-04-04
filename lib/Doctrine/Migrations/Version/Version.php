@@ -6,8 +6,7 @@ namespace Doctrine\Migrations\Version;
 
 final class Version
 {
-    /** @var string */
-    private $version;
+    private string $version;
 
     public function __construct(string $version)
     {

@@ -24,26 +24,20 @@ use function substr;
  */
 class DiffGenerator
 {
-    /** @var DBALConfiguration */
-    private $dbalConfiguration;
+    private DBALConfiguration $dbalConfiguration;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var SchemaProvider */
-    private $schemaProvider;
+    private SchemaProvider $schemaProvider;
 
-    /** @var AbstractPlatform */
-    private $platform;
+    private AbstractPlatform $platform;
 
-    /** @var Generator */
-    private $migrationGenerator;
+    private Generator $migrationGenerator;
 
-    /** @var SqlGenerator */
-    private $migrationSqlGenerator;
+    private SqlGenerator $migrationSqlGenerator;
 
-    /** @var SchemaProvider */
-    private $emptySchemaProvider;
+    private SchemaProvider $emptySchemaProvider;
 
     /**
      * @param AbstractSchemaManager<AbstractPlatform> $schemaManager

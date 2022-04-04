@@ -20,11 +20,10 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class DBALSchemaDiffProvider implements SchemaDiffProvider
 {
-    /** @var AbstractPlatform */
-    private $platform;
+    private AbstractPlatform $platform;
 
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private $schemaManager;
+    private AbstractSchemaManager $schemaManager;
 
     /**
      * @param AbstractSchemaManager<AbstractPlatform> $schemaManager-
