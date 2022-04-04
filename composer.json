@@ -46,7 +46,7 @@
         "phpstan/phpstan-phpunit": "^1.1",
         "phpstan/phpstan-strict-rules": "^1.1",
         "phpstan/phpstan-symfony": "^1.1",
-        "phpunit/phpunit": "^9.4",
+        "phpunit/phpunit": "^9.5",
         "symfony/cache": "^4.4 || ^5.4 || ^6.0",
         "symfony/process": "^4.4 || ^5.4 || ^6.0",
         "symfony/yaml": "^4.4 || ^5.4 || ^6.0"
