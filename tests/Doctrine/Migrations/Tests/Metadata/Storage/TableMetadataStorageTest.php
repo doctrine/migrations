@@ -176,9 +176,10 @@ class TableMetadataStorageTest extends TestCase
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
         $rows = $this->connection->fetchAllAssociative($sql);
-        self::assertSame([
+        self::assertEquals([
             0 =>
                 [
+                    // Depending on the database driver, execution_time might be returned either as string or int.
                     'version' => '1230',
                     'executed_at' => '2010-01-05 10:30:21',
                     'execution_time' => '31000',
@@ -199,9 +200,10 @@ class TableMetadataStorageTest extends TestCase
             $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
         );
         $rows = $this->connection->fetchAllAssociative($sql);
-        self::assertSame([
+        self::assertEquals([
             0 =>
                 [
+                    // Depending on the database driver, execution_time might be returned either as string or int.
                     'version' => '1230',
                     'executed_at' => '2010-01-05 10:30:21',
                     'execution_time' => '31490',

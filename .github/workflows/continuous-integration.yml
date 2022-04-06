@@ -28,6 +28,7 @@ jobs:
         php-version:
           - "7.4"
           - "8.0"
+          - "8.1"
         dependencies:
           - "highest"
         include:
@@ -64,12 +65,6 @@ jobs:
         with:
           name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
-
-  phpunit-with-symfony-6:
-    name: "PHPUnit with Symfony 6.0.x-dev"
-    uses: "doctrine/.github/.github/workflows/continuous-integration-symfony-unstable.yml@1.4.1"
-    with:
-      symfony-version-constraint: "6.0.*"
 
   upload_coverage:
     name: "Upload coverage to Codecov"
