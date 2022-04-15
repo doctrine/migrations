@@ -7,11 +7,11 @@ namespace Doctrine\Migrations\Tests\Stub;
 use Doctrine\DBAL\Connection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\AbstractManagerRegistry;
+use Doctrine\Persistence\Proxy;
 use Exception;
 
 use function array_combine;
 use function array_keys;
-use function key;
 
 class DoctrineRegistry extends AbstractManagerRegistry
 {
@@ -27,21 +27,16 @@ class DoctrineRegistry extends AbstractManagerRegistry
      */
     public function __construct(array $connections = [], array $realEntityManagers = [])
     {
-        /**
-         * @var string[] $connectionNames
-         */
-        $connectionNames = array_keys($connections);
-        /**
-         * @var string[] $realEntityManagerNames
-         */
+        $connectionNames        = array_keys($connections);
         $realEntityManagerNames = array_keys($realEntityManagers);
+
         parent::__construct(
             'some_registry',
             array_combine($connectionNames, $connectionNames),
             array_combine($realEntityManagerNames, $realEntityManagerNames),
-            key($connections) ?? null,
-            key($realEntityManagers) ?? null,
-            'Doctrine\Persistence\Proxy'
+            $connectionNames[0] ?? 'default',
+            $realEntityManagerNames[0] ?? 'default',
+            Proxy::class
         );
         $this->realEntityManagers = $realEntityManagers;
         $this->connections        = $connections;
