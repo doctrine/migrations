@@ -58,7 +58,9 @@ class DoctrineRegistry extends AbstractManagerRegistry
     }
 
     /**
-     * {@inheritDoc}
+     * To be removed when support for Persistence 2 is dropped.
+     *
+     * @param string $alias
      */
     public function getAliasNamespace($alias): string
     {

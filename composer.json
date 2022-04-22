@@ -34,10 +34,13 @@
         "symfony/console": "^4.4.16 || ^5.4 || ^6.0",
         "symfony/stopwatch": "^4.4 || ^5.4 || ^6.0"
     },
+    "conflict": {
+        "doctrine/orm": "<2.12"
+    },
     "require-dev": {
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^9",
-        "doctrine/orm": "^2.6",
+        "doctrine/orm": "^2.12",
         "doctrine/persistence": "^2 || ^3",
         "doctrine/sql-formatter": "^1.0",
         "ergebnis/composer-normalize": "^2.9",

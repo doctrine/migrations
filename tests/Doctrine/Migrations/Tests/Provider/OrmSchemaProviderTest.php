@@ -11,7 +11,7 @@ use Doctrine\ORM\Configuration;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
-use Doctrine\ORM\Tools\Setup;
+use Doctrine\ORM\ORMSetup;
 use UnexpectedValueException;
 
 /**
@@ -48,7 +48,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
 
     protected function setUp(): void
     {
-        $this->config = Setup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
+        $this->config = ORMSetup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);
 
         $this->conn          = $this->getSqliteConnection();
