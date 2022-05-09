@@ -35,6 +35,15 @@ parameters:
             paths:
                 - lib/Doctrine/Migrations/Version/DbalMigrationFactory.php
 
+        # We're testing legacy functionality here.
+        -
+            message: """
+				#^Instantiation of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
+				This class will be removed in ORM 3\\.0 without replacement\\.$#
+			"""
+            count: 1
+            path: tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
+
     symfony:
             console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:

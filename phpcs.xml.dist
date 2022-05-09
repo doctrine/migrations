@@ -48,4 +48,8 @@
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 
+    <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
+        <exclude-pattern>tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php</exclude-pattern>
+    </rule>
+
 </ruleset>
