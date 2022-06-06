@@ -4,6 +4,9 @@ name: "Backward Compatibility Check"
 on:
   pull_request:
 
+permissions:
+  contents: read
+
 jobs:
   roave_bc_check:
     name: "Roave BC Check"
