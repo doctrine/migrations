@@ -32,7 +32,7 @@ jobs:
         dependencies:
           - "highest"
         include:
-          - deps: "lowest"
+          - dependencies: "lowest"
             php-version: "7.4"
 
     steps:
