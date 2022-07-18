@@ -98,10 +98,11 @@ class ExecutorTest extends TestCase
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): array {
                 self::assertSame(Direction::UP, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
+                return [];
             });
 
         $migratorConfiguration = (new MigratorConfiguration())
@@ -161,10 +162,11 @@ class ExecutorTest extends TestCase
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): array {
                 self::assertSame(Direction::DOWN, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
+                return [];
             });
 
         $migratorConfiguration = (new MigratorConfiguration())
@@ -207,8 +209,15 @@ class ExecutorTest extends TestCase
     public function testExecuteDryRun(): void
     {
         $this->metadataStorage
-            ->expects(self::never())
-            ->method('complete');
+            ->expects(self::exactly(1))
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result, bool $dry_run): array {
+                self::assertTrue($dry_run);
+                self::assertSame(Direction::UP, $result->getDirection());
+                return [
+                    new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)')
+                ];
+            })
+        ;
 
         $this->connection
             ->expects(self::never())
@@ -230,7 +239,8 @@ class ExecutorTest extends TestCase
         );
 
         $queries = $result->getSql();
-        self::assertCount(2, $queries);
+
+        self::assertCount(3, $queries);
         self::assertSame('SELECT 1', $queries[0]->getStatement());
         self::assertSame([1], $queries[0]->getParameters());
         self::assertSame([3], $queries[0]->getTypes());
@@ -238,6 +248,10 @@ class ExecutorTest extends TestCase
         self::assertSame('SELECT 2', $queries[1]->getStatement());
         self::assertSame([], $queries[1]->getParameters());
         self::assertSame([], $queries[1]->getTypes());
+
+        self::assertSame('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)', $queries[2]->getStatement());
+        self::assertSame([], $queries[2]->getParameters());
+        self::assertSame([], $queries[2]->getTypes());
 
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());

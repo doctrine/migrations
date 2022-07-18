@@ -56,8 +56,9 @@ class RollupTest extends TestCase
         $this->storage
            ->expects(self::exactly(1))
            ->method('complete')
-           ->willReturnCallback(static function (ExecutionResult $result): void {
+           ->willReturnCallback(static function (ExecutionResult $result): array {
               self::assertEquals(new Version('A'), $result->getVersion());
+              return [];
            })->with();
 
         $this->rollup->rollup();

@@ -13,7 +13,7 @@ interface MetadataStorage
 
     public function getExecutedMigrations(): ExecutedMigrationsList;
 
-    public function complete(ExecutionResult $migration): void;
+    public function complete(ExecutionResult $result, bool $dry_run = false) : array;
 
     public function reset(): void;
 }

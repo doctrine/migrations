@@ -201,8 +201,8 @@ final class DbalExecutor implements Executor
 
         $this->logger->info('Migration {version} {direction} (took {time}ms, used {memory} memory)', $params);
 
-        if (! $configuration->isDryRun()) {
-            $this->metadataStorage->complete($result);
+        foreach ($this->metadataStorage->complete($result, $configuration->isDryRun()) as $sqlQuery) {
+            $this->addSql($sqlQuery);
         }
 
         if ($migration->isTransactional()) {
