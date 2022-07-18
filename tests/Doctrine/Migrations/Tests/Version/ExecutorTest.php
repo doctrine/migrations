@@ -102,6 +102,7 @@ class ExecutorTest extends TestCase
                 self::assertSame(Direction::UP, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
+
                 return [];
             });
 
@@ -166,6 +167,7 @@ class ExecutorTest extends TestCase
                 self::assertSame(Direction::DOWN, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
+
                 return [];
             });
 
@@ -210,14 +212,12 @@ class ExecutorTest extends TestCase
     {
         $this->metadataStorage
             ->expects(self::exactly(1))
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result, bool $dry_run): array {
-                self::assertTrue($dry_run);
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result, bool $dryRun): array {
+                self::assertTrue($dryRun);
                 self::assertSame(Direction::UP, $result->getDirection());
-                return [
-                    new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)')
-                ];
-            })
-        ;
+
+                return [new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)')];
+            });
 
         $this->connection
             ->expects(self::never())

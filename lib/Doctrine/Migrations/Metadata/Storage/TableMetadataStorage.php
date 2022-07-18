@@ -125,35 +125,36 @@ final class TableMetadataStorage implements MetadataStorage
         );
     }
 
-    public function complete(ExecutionResult $result, bool $dry_run = false): array
+    /**
+     * {@inheritDoc}
+     */
+    public function complete(ExecutionResult $result, bool $dryRun = false): array
     {
-        $sql_queries = [];
-        if ($dry_run) {
-            $sql_queries[] = new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata');
+        $sql = [];
+        if ($dryRun) {
+            $sql[] = new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata');
             if ($result->getDirection() === Direction::DOWN) {
-                $delete_query = 'DELETE FROM ' . $this->configuration->getTableName() . ' WHERE ';
-                $delete_query .= $this->configuration->getVersionColumnName() . ' = ' . $this->connection->quote((string) $result->getVersion());
-
-                $sql_queries[] = new Query($delete_query);
+                $query  = 'DELETE FROM ' . $this->configuration->getTableName() . ' WHERE ';
+                $query .= $this->configuration->getVersionColumnName() . ' = ' . $this->connection->quote((string) $result->getVersion());
             } else {
-                $insert_query = 'INSERT INTO ' . $this->configuration->getTableName();
-                $insert_query .= ' (' . $this->configuration->getVersionColumnName() . ', ' . $this->configuration->getExecutedAtColumnName() . ', ' . $this->configuration->getExecutionTimeColumnName() . ')';
-                $insert_query .= ' VALUES (' . $this->connection->quote((string) $result->getVersion()) . ', NOW(), 0)';
-
-                $sql_queries[] = new Query($insert_query);
+                $query  = 'INSERT INTO ' . $this->configuration->getTableName();
+                $query .= ' (' . $this->configuration->getVersionColumnName() . ', ' . $this->configuration->getExecutedAtColumnName() . ', ' . $this->configuration->getExecutionTimeColumnName() . ')';
+                $query .= ' VALUES (' . $this->connection->quote((string) $result->getVersion()) . ', NOW(), 0)';
             }
+
+            $sql[] = new Query($query);
         } else {
             $this->checkInitialization();
 
             if ($result->getDirection() === Direction::DOWN) {
                 $this->connection->delete($this->configuration->getTableName(), [
-                    $this->configuration->getVersionColumnName() => (string)$result->getVersion(),
+                    $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 ]);
             } else {
                 $this->connection->insert($this->configuration->getTableName(), [
-                    $this->configuration->getVersionColumnName() => (string)$result->getVersion(),
+                    $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                     $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
-                    $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int)round($result->getTime() * 1000),
+                    $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
                 ], [
                     Types::STRING,
                     Types::DATETIME_MUTABLE,
@@ -162,7 +163,7 @@ final class TableMetadataStorage implements MetadataStorage
             }
         }
 
-        return $sql_queries;
+        return $sql;
     }
 
     public function ensureInitialized(): void
