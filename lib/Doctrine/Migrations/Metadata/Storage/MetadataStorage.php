@@ -14,10 +14,12 @@ interface MetadataStorage
 
     public function getExecutedMigrations(): ExecutedMigrationsList;
 
+    public function complete(ExecutionResult $result): void;
+
+    public function reset(): void;
+
     /**
      * @return Query[]
      */
-    public function complete(ExecutionResult $result, bool $dryRun = false): array;
-
-    public function reset(): void;
+    public function getSql(ExecutionResult $result): array;
 }

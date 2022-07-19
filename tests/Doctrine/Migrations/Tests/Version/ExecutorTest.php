@@ -98,12 +98,10 @@ class ExecutorTest extends TestCase
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): array {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::UP, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
-
-                return [];
             });
 
         $migratorConfiguration = (new MigratorConfiguration())
@@ -163,12 +161,10 @@ class ExecutorTest extends TestCase
     {
         $this->metadataStorage
             ->expects(self::once())
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): array {
+            ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
                 self::assertSame(Direction::DOWN, $result->getDirection());
                 self::assertNotNull($result->getTime());
                 self::assertNotNull($result->getExecutedAt());
-
-                return [];
             });
 
         $migratorConfiguration = (new MigratorConfiguration())
@@ -211,9 +207,12 @@ class ExecutorTest extends TestCase
     public function testExecuteDryRun(): void
     {
         $this->metadataStorage
-            ->expects(self::exactly(1))
-            ->method('complete')->willReturnCallback(static function (ExecutionResult $result, bool $dryRun): array {
-                self::assertTrue($dryRun);
+            ->expects(self::never())
+            ->method('complete');
+
+        $this->metadataStorage
+            ->expects(self::once())
+            ->method('getSql')->willReturnCallback(static function (ExecutionResult $result): array {
                 self::assertSame(Direction::UP, $result->getDirection());
 
                 return [new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)')];

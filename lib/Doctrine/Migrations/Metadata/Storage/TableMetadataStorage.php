@@ -125,43 +125,53 @@ final class TableMetadataStorage implements MetadataStorage
         );
     }
 
+    public function complete(ExecutionResult $result): void
+    {
+        $this->checkInitialization();
+
+        if ($result->getDirection() === Direction::DOWN) {
+            $this->connection->delete($this->configuration->getTableName(), [
+                $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
+            ]);
+        } else {
+            $this->connection->insert($this->configuration->getTableName(), [
+                $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
+                $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
+                $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
+            ], [
+                Types::STRING,
+                Types::DATETIME_MUTABLE,
+                Types::INTEGER,
+            ]);
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
-    public function complete(ExecutionResult $result, bool $dryRun = false): array
+    public function getSql(ExecutionResult $result): array
     {
-        $sql = [];
-        if ($dryRun) {
-            $sql[] = new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata');
-            if ($result->getDirection() === Direction::DOWN) {
-                $query  = 'DELETE FROM ' . $this->configuration->getTableName() . ' WHERE ';
-                $query .= $this->configuration->getVersionColumnName() . ' = ' . $this->connection->quote((string) $result->getVersion());
-            } else {
-                $query  = 'INSERT INTO ' . $this->configuration->getTableName();
-                $query .= ' (' . $this->configuration->getVersionColumnName() . ', ' . $this->configuration->getExecutedAtColumnName() . ', ' . $this->configuration->getExecutionTimeColumnName() . ')';
-                $query .= ' VALUES (' . $this->connection->quote((string) $result->getVersion()) . ', NOW(), 0)';
-            }
-
-            $sql[] = new Query($query);
+        $sql = [new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata')];
+        if ($result->getDirection() === Direction::DOWN) {
+            $query = sprintf(
+                'DELETE FROM %s WHERE %s = %s',
+                $this->configuration->getTableName(),
+                $this->configuration->getVersionColumnName(),
+                $this->connection->quote((string) $result->getVersion())
+            );
         } else {
-            $this->checkInitialization();
-
-            if ($result->getDirection() === Direction::DOWN) {
-                $this->connection->delete($this->configuration->getTableName(), [
-                    $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
-                ]);
-            } else {
-                $this->connection->insert($this->configuration->getTableName(), [
-                    $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
-                    $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
-                    $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
-                ], [
-                    Types::STRING,
-                    Types::DATETIME_MUTABLE,
-                    Types::INTEGER,
-                ]);
-            }
+            $query = sprintf(
+                'INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, 0)',
+                $this->configuration->getTableName(),
+                $this->configuration->getVersionColumnName(),
+                $this->configuration->getExecutedAtColumnName(),
+                $this->configuration->getExecutionTimeColumnName(),
+                $this->connection->quote((string) $result->getVersion()),
+                $this->connection->quote(($result->getExecutedAt() ?? new DateTimeImmutable())->format('Y-m-d H:i:s'))
+            );
         }
+
+        $sql[] = new Query($query);
 
         return $sql;
     }
