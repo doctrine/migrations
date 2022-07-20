@@ -147,7 +147,7 @@ final class TableMetadataStorage implements MetadataStorage
     }
 
     /**
-     * {@inheritDoc}
+     * @return iterable<Query>
      */
     public function getSql(ExecutionResult $result): iterable
     {
