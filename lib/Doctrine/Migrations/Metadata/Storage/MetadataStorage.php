@@ -21,5 +21,5 @@ interface MetadataStorage
     /**
      * @return Query[]
      */
-    public function getSql(ExecutionResult $result): array;
+    public function getSql(ExecutionResult $result): iterable;
 }

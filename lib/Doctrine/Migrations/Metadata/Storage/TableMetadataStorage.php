@@ -149,31 +149,30 @@ final class TableMetadataStorage implements MetadataStorage
     /**
      * {@inheritDoc}
      */
-    public function getSql(ExecutionResult $result): array
+    public function getSql(ExecutionResult $result): iterable
     {
-        $sql = [new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata')];
+        yield new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata');
+
         if ($result->getDirection() === Direction::DOWN) {
-            $query = sprintf(
+            yield new Query(sprintf(
                 'DELETE FROM %s WHERE %s = %s',
                 $this->configuration->getTableName(),
                 $this->configuration->getVersionColumnName(),
                 $this->connection->quote((string) $result->getVersion())
-            );
-        } else {
-            $query = sprintf(
-                'INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, 0)',
-                $this->configuration->getTableName(),
-                $this->configuration->getVersionColumnName(),
-                $this->configuration->getExecutedAtColumnName(),
-                $this->configuration->getExecutionTimeColumnName(),
-                $this->connection->quote((string) $result->getVersion()),
-                $this->connection->quote(($result->getExecutedAt() ?? new DateTimeImmutable())->format('Y-m-d H:i:s'))
-            );
+            ));
+
+            return;
         }
 
-        $sql[] = new Query($query);
-
-        return $sql;
+        yield new Query(sprintf(
+            'INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, 0)',
+            $this->configuration->getTableName(),
+            $this->configuration->getVersionColumnName(),
+            $this->configuration->getExecutedAtColumnName(),
+            $this->configuration->getExecutionTimeColumnName(),
+            $this->connection->quote((string) $result->getVersion()),
+            $this->connection->quote(($result->getExecutedAt() ?? new DateTimeImmutable())->format('Y-m-d H:i:s'))
+        ));
     }
 
     public function ensureInitialized(): void

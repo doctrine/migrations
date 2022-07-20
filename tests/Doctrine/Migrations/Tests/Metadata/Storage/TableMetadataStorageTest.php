@@ -27,6 +27,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
+use function iterator_to_array;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -362,11 +363,15 @@ class TableMetadataStorageTest extends TestCase
 
         $result = new ExecutionResult(new Version('2230'), Direction::UP, new DateTimeImmutable('2010-01-05 10:30:21'));
 
-        $queries = $this->storage->getSql($result);
+        $queries = iterator_to_array($this->storage->getSql($result));
 
         self::assertCount(2, $queries);
         self::assertSame('-- Version 2230 update table metadata', $queries[0]->getStatement());
-        self::assertSame('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUES (\'2230\', \'2010-01-05 10:30:21\', 0)', $queries[1]->getStatement());
+        self::assertSame(sprintf(
+            "INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUES ('%s', '%s', 0)",
+            '2230',
+            '2010-01-05 10:30:21'
+        ), $queries[1]->getStatement());
 
         foreach ($queries as $query) {
             $this->connection->executeStatement($query);
@@ -381,11 +386,14 @@ class TableMetadataStorageTest extends TestCase
 
         $result = new ExecutionResult(new Version('2230'), Direction::DOWN, new DateTimeImmutable('2010-01-05 10:30:21'));
 
-        $queries = $this->storage->getSql($result);
+        $queries = iterator_to_array($this->storage->getSql($result));
 
         self::assertCount(2, $queries);
         self::assertSame('-- Version 2230 update table metadata', $queries[0]->getStatement());
-        self::assertSame('DELETE FROM doctrine_migration_versions WHERE version = \'2230\'', $queries[1]->getStatement());
+        self::assertSame(sprintf(
+            "DELETE FROM doctrine_migration_versions WHERE version = '%s'",
+            '2230'
+        ), $queries[1]->getStatement());
 
         foreach ($queries as $query) {
             $this->connection->executeStatement($query);
