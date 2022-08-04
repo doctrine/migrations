@@ -17,6 +17,7 @@ use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\MigrationsRepository;
+use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Comparator as MigrationsComparator;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
@@ -143,6 +144,35 @@ final class TableMetadataStorage implements MetadataStorage
                 Types::INTEGER,
             ]);
         }
+    }
+
+    /**
+     * @return iterable<Query>
+     */
+    public function getSql(ExecutionResult $result): iterable
+    {
+        yield new Query('-- Version ' . (string) $result->getVersion() . ' update table metadata');
+
+        if ($result->getDirection() === Direction::DOWN) {
+            yield new Query(sprintf(
+                'DELETE FROM %s WHERE %s = %s',
+                $this->configuration->getTableName(),
+                $this->configuration->getVersionColumnName(),
+                $this->connection->quote((string) $result->getVersion())
+            ));
+
+            return;
+        }
+
+        yield new Query(sprintf(
+            'INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, 0)',
+            $this->configuration->getTableName(),
+            $this->configuration->getVersionColumnName(),
+            $this->configuration->getExecutedAtColumnName(),
+            $this->configuration->getExecutionTimeColumnName(),
+            $this->connection->quote((string) $result->getVersion()),
+            $this->connection->quote(($result->getExecutedAt() ?? new DateTimeImmutable())->format('Y-m-d H:i:s'))
+        ));
     }
 
     public function ensureInitialized(): void
