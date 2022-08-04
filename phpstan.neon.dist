@@ -44,6 +44,10 @@ parameters:
             count: 1
             path: tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
 
+        -
+            message: '~^Call to function method_exists\(\) with Doctrine\\Migrations\\Metadata\\Storage\\MetadataStorage and ''getSql'' will always evaluate to true\.$~'
+            path: lib/Doctrine/Migrations/Version/DbalExecutor.php
+
     symfony:
             console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:

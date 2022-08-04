@@ -210,6 +210,14 @@ class ExecutorTest extends TestCase
             ->expects(self::never())
             ->method('complete');
 
+        $this->metadataStorage
+            ->expects(self::once())
+            ->method('getSql')->willReturnCallback(static function (ExecutionResult $result): iterable {
+                self::assertSame(Direction::UP, $result->getDirection());
+
+                yield new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)');
+            });
+
         $this->connection
             ->expects(self::never())
             ->method('executeQuery');
@@ -230,7 +238,8 @@ class ExecutorTest extends TestCase
         );
 
         $queries = $result->getSql();
-        self::assertCount(2, $queries);
+
+        self::assertCount(3, $queries);
         self::assertSame('SELECT 1', $queries[0]->getStatement());
         self::assertSame([1], $queries[0]->getParameters());
         self::assertSame([3], $queries[0]->getTypes());
@@ -238,6 +247,10 @@ class ExecutorTest extends TestCase
         self::assertSame('SELECT 2', $queries[1]->getStatement());
         self::assertSame([], $queries[1]->getParameters());
         self::assertSame([], $queries[1]->getTypes());
+
+        self::assertSame('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)', $queries[2]->getStatement());
+        self::assertSame([], $queries[2]->getParameters());
+        self::assertSame([], $queries[2]->getTypes());
 
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());
@@ -501,9 +514,18 @@ class ExecutorTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->metadataStorage = $this->createMock(MetadataStorage::class);
-        $this->connection      = $this->createMock(Connection::class);
-        $driverConnection      = $this->createStub(DriverConnection::class);
+        // add getSql to mock until method will be added to MetadataStorage interface
+        $this->metadataStorage = $this->getMockBuilder(MetadataStorage::class)
+            ->disableOriginalConstructor()
+            ->disableOriginalClone()
+            ->disableArgumentCloning()
+            ->disallowMockingUnknownTypes()
+            ->onlyMethods(['ensureInitialized', 'getExecutedMigrations', 'complete', 'reset'])
+            ->addMethods(['getSql'])
+            ->getMock();
+
+        $this->connection = $this->createMock(Connection::class);
+        $driverConnection = $this->createStub(DriverConnection::class);
         $this->connection->method('getWrappedConnection')->willReturn($driverConnection);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
