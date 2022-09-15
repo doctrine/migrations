@@ -26,7 +26,7 @@
     "require": {
         "php": "^7.4 || ^8.0",
         "composer-runtime-api": "^2",
-        "doctrine/dbal": "^3.3",
+        "doctrine/dbal": "^3.4.3",
         "doctrine/deprecations": "^0.5.3 || ^1",
         "doctrine/event-manager": "^1.0",
         "friendsofphp/proxy-manager-lts": "^1.0",
