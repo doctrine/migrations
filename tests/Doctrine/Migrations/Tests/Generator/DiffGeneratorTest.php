@@ -20,28 +20,28 @@ use PHPUnit\Framework\TestCase;
 
 class DiffGeneratorTest extends TestCase
 {
-    /** @var DBALConfiguration|MockObject */
-    private $dbalConfiguration;
+    /** @var DBALConfiguration&MockObject */
+    private DBALConfiguration $dbalConfiguration;
 
-    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
-    private $schemaManager;
+    /** @var AbstractSchemaManager<AbstractPlatform>&MockObject */
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var SchemaProvider|MockObject */
-    private $schemaProvider;
+    /** @var SchemaProvider&MockObject */
+    private SchemaProvider $schemaProvider;
 
-    /** @var AbstractPlatform|MockObject */
-    private $platform;
+    /** @var AbstractPlatform&MockObject */
+    private AbstractPlatform $platform;
 
-    /** @var Generator|MockObject */
-    private $migrationGenerator;
+    /** @var Generator&MockObject */
+    private Generator $migrationGenerator;
 
-    /** @var SqlGenerator|MockObject */
-    private $migrationSqlGenerator;
+    /** @var SqlGenerator&MockObject */
+    private SqlGenerator $migrationSqlGenerator;
 
     private DiffGenerator $migrationDiffGenerator;
 
-    /** @var SchemaProvider|MockObject */
-    private $emptySchemaProvider;
+    /** @var SchemaProvider&MockObject */
+    private SchemaProvider $emptySchemaProvider;
 
     public function testGenerate(): void
     {

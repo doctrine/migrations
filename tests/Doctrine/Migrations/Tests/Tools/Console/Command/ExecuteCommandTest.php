@@ -39,8 +39,8 @@ class ExecuteCommandTest extends MigrationTestCase
 
     private MockObject $queryWriter;
 
-    /** @var MigrationPlanCalculator|MockObject */
-    private $planCalculator;
+    /** @var MigrationPlanCalculator&MockObject */
+    private MigrationPlanCalculator $planCalculator;
 
     /**
      * @param bool|string|null $arg

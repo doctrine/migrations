@@ -27,23 +27,23 @@ use function trim;
 
 final class DiffCommandTest extends TestCase
 {
-    /** @var DiffGenerator|MockObject */
-    private $migrationDiffGenerator;
+    /** @var DiffGenerator&MockObject */
+    private DiffGenerator $migrationDiffGenerator;
 
-    /** @var MigrationStatusCalculator|MockObject */
-    private $migrationStatusCalculator;
+    /** @var MigrationStatusCalculator&MockObject */
+    private MigrationStatusCalculator $migrationStatusCalculator;
 
     private Configuration $configuration;
 
     private DiffCommand $diffCommand;
 
-    /** @var MockObject|DependencyFactory */
-    private $dependencyFactory;
+    /** @var DependencyFactory&MockObject */
+    private DependencyFactory $dependencyFactory;
 
     private CommandTester $diffCommandTester;
 
-    /** @var ClassNameGenerator|MockObject */
-    private $classNameGenerator;
+    /** @var ClassNameGenerator&MockObject */
+    private ClassNameGenerator $classNameGenerator;
 
     public function testExecute(): void
     {

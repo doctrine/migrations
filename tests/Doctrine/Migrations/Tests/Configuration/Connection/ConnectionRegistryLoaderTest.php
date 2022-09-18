@@ -14,11 +14,11 @@ use PHPUnit\Framework\TestCase;
 
 final class ConnectionRegistryLoaderTest extends TestCase
 {
-    /** @var Connection|MockObject */
-    private $connection1;
+    /** @var Connection&MockObject */
+    private Connection $connection1;
 
-    /** @var Connection|MockObject */
-    private $connection2;
+    /** @var Connection&MockObject */
+    private Connection $connection2;
 
     private AbstractManagerRegistry $registry;
 

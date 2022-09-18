@@ -19,14 +19,14 @@ use PHPUnit\Framework\TestCase;
 
 class RollupTest extends TestCase
 {
-    /** @var MockObject|AbstractMigration */
-    private $abstractMigration;
+    /** @var AbstractMigration&MockObject */
+    private AbstractMigration $abstractMigration;
 
-    /** @var MigrationsRepository|MockObject */
-    private $repository;
+    /** @var MigrationsRepository&MockObject */
+    private MigrationsRepository $repository;
 
-    /** @var MetadataStorage|MockObject */
-    private $storage;
+    /** @var MetadataStorage&MockObject */
+    private MetadataStorage $storage;
 
     private Rollup $rollup;
 

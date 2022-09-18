@@ -18,11 +18,11 @@ use PHPUnit\Framework\TestCase;
 
 class EventArgsTest extends TestCase
 {
-    /** @var MockObject|Connection */
-    private $connection;
+    /** @var Connection&MockObject */
+    private Connection $connection;
 
-    /** @var MockObject|MigratorConfiguration */
-    private $config;
+    /** @var MigratorConfiguration&MockObject */
+    private MigratorConfiguration $config;
 
     private MigrationPlan $plan;
 

@@ -28,13 +28,13 @@ use stdClass;
 
 final class DependencyFactoryTest extends MigrationTestCase
 {
-    /** @var MockObject|Connection */
-    private $connection;
+    /** @var Connection&MockObject */
+    private Connection $connection;
 
     private Configuration $configuration;
 
-    /** @var EntityManager|MockObject */
-    private $entityManager;
+    /** @var EntityManager&MockObject */
+    private EntityManager $entityManager;
 
     public function setUp(): void
     {

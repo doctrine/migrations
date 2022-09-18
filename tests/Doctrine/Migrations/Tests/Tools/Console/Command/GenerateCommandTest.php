@@ -22,11 +22,11 @@ final class GenerateCommandTest extends TestCase
 {
     private Configuration $configuration;
 
-    /** @var DependencyFactory|MockObject */
-    private $dependencyFactory;
+    /** @var DependencyFactory&MockObject */
+    private DependencyFactory $dependencyFactory;
 
-    /** @var Generator|MockObject */
-    private $migrationGenerator;
+    /** @var Generator&MockObject */
+    private Generator $migrationGenerator;
 
     private GenerateCommand $generateCommand;
 

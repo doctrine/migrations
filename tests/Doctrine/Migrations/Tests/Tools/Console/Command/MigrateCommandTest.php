@@ -56,8 +56,8 @@ class MigrateCommandTest extends MigrationTestCase
 
     private MockObject $queryWriter;
 
-    /** @var MockObject|QuestionHelper */
-    private $questions;
+    /** @var QuestionHelper&MockObject */
+    private QuestionHelper $questions;
 
     private MigrationsRepository $migrationRepository;
 

@@ -15,8 +15,8 @@ use PHPUnit\Framework\TestCase;
 
 class ConcatenationFileBuilderTest extends TestCase
 {
-    /** @var AbstractPlatform|MockObject */
-    private $platform;
+    /** @var AbstractPlatform&MockObject */
+    private AbstractPlatform $platform;
 
     private FileBuilder $migrationFileBuilder;
 

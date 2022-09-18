@@ -13,11 +13,11 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 final class SyncMetadataCommandTest extends TestCase
 {
-    /** @var DependencyFactory|MockObject */
-    private $dependencyFactory;
+    /** @var DependencyFactory&MockObject */
+    private DependencyFactory $dependencyFactory;
 
-    /** @var MetadataStorage|MockObject */
-    private $storage;
+    /** @var MetadataStorage&MockObject */
+    private MetadataStorage $storage;
 
     private SyncMetadataCommand $storageCommand;
 

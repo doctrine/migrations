@@ -14,11 +14,11 @@ use PHPUnit\Framework\TestCase;
 
 final class EntityManagerRegistryLoaderTest extends TestCase
 {
-    /** @var EntityManager|MockObject */
-    private $em1;
+    /** @var EntityManager&MockObject */
+    private EntityManager $em1;
 
-    /** @var EntityManager|MockObject */
-    private $em2;
+    /** @var EntityManager&MockObject */
+    private EntityManager $em2;
 
     private AbstractManagerRegistry $registry;
 

@@ -16,17 +16,17 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTestCase
 {
-    /** @var MockObject|Connection */
-    private $connection1;
+    /** @var Connection&MockObject */
+    private Connection $connection1;
 
-    /** @var MockObject|Connection */
-    private $connection2;
+    /** @var Connection&MockObject */
+    private Connection $connection2;
 
-    /** @var MockObject|EntityManager */
-    private $em1;
+    /** @var EntityManager&MockObject */
+    private EntityManager $em1;
 
-    /** @var MockObject|EntityManager */
-    private $em2;
+    /** @var EntityManager&MockObject */
+    private EntityManager $em2;
 
     private Configuration $configuration;
 
