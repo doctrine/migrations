@@ -80,7 +80,7 @@ class StatusCommandTest extends MigrationTestCase
                 '|                      | Column Name          | version                                                                |',
                 '|----------------------------------------------------------------------------------------------------------------------|',
                 '| Database             | Driver               | Doctrine\DBAL\Driver\PDO\SQLite\Driver                                 |',
-                '|                      | Name                 |                                                                        |',
+                '|                      | Name                 | main                                                                   |',
                 '|----------------------------------------------------------------------------------------------------------------------|',
                 '| Versions             | Previous             | 1230                                                                   |',
                 '|                      | Current              | 1233                                                                   |',
