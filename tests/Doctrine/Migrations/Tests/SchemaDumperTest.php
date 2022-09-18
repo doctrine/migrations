@@ -16,6 +16,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 
+use const PHP_VERSION_ID;
+
 class SchemaDumperTest extends TestCase
 {
     /** @var AbstractPlatform|MockObject */
@@ -129,7 +131,11 @@ class SchemaDumperTest extends TestCase
     public function testRegexErrorsAreConvertedToExceptions(): void
     {
         $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Internal PCRE error, please check your Regex. Reported errors: preg_match(): Delimiter must not be alphanumeric or backslash.');
+        if (PHP_VERSION_ID < 80200) {
+            $this->expectExceptionMessage('Internal PCRE error, please check your Regex. Reported errors: preg_match(): Delimiter must not be alphanumeric or backslash.');
+        } else {
+            $this->expectExceptionMessage('Internal PCRE error, please check your Regex. Reported errors: preg_match(): Delimiter must not be alphanumeric, backslash, or NUL.');
+        }
 
         $table = $this->createMock(Table::class);
         $table->expects(self::atLeastOnce())
