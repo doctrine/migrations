@@ -11,8 +11,8 @@ class CustomClassNameMigrationFactory implements MigrationFactory
 {
     private MigrationFactory $parentMigrationFactory;
 
-    /** @psalm-var class-string<AbstractMigration> */
-    private $migrationClassName;
+    /** @var class-string<AbstractMigration> */
+    private string $migrationClassName;
 
     /**
      * @param class-string<AbstractMigration> $migrationClassName

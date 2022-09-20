@@ -16,8 +16,8 @@ use PHPUnit\Framework\MockObject\MockObject;
  */
 class EmptySchemaProviderTest extends MigrationTestCase
 {
-    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
-    private $schemaManager;
+    /** @var AbstractSchemaManager<AbstractPlatform>&MockObject */
+    private AbstractSchemaManager $schemaManager;
 
     private EmptySchemaProvider $emptyProvider;
 

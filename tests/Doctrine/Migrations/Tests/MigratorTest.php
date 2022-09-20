@@ -35,8 +35,8 @@ use const DIRECTORY_SEPARATOR;
 
 class MigratorTest extends MigrationTestCase
 {
-    /** @var Connection|MockObject */
-    private $conn;
+    /** @var Connection&MockObject */
+    private Connection $conn;
 
     private Configuration $config;
 

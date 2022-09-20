@@ -22,8 +22,8 @@ use PHPUnit\Framework\TestCase;
 
 class FilesystemMigrationsRepositoryTest extends TestCase
 {
-    /** @var MigrationFactory|MockObject */
-    private $versionFactory;
+    /** @var MigrationFactory&MockObject */
+    private MigrationFactory $versionFactory;
 
     private MigrationsRepository $migrationRepository;
 

@@ -33,17 +33,17 @@ use Throwable;
 
 class ExecutorTest extends TestCase
 {
-    /** @var Connection|MockObject */
-    private $connection;
+    /** @var Connection&MockObject */
+    private Connection $connection;
 
-    /** @var SchemaDiffProvider|MockObject */
-    private $schemaDiffProvider;
+    /** @var SchemaDiffProvider&MockObject */
+    private SchemaDiffProvider $schemaDiffProvider;
 
-    /** @var ParameterFormatter|MockObject */
-    private $parameterFormatter;
+    /** @var ParameterFormatter&MockObject */
+    private ParameterFormatter $parameterFormatter;
 
-    /** @var Stopwatch|MockObject */
-    private $stopwatch;
+    /** @var Stopwatch&MockObject */
+    private Stopwatch $stopwatch;
 
     private DbalExecutor $versionExecutor;
 

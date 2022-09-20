@@ -29,14 +29,14 @@ final class DumpSchemaCommandTest extends TestCase
 {
     private Configuration $configuration;
 
-    /** @var DependencyFactory|MockObject */
-    private $dependencyFactory;
+    /** @var DependencyFactory&MockObject */
+    private DependencyFactory $dependencyFactory;
 
-    /** @var MigrationsRepository|MockObject */
-    private $migrationRepository;
+    /** @var MigrationsRepository&MockObject */
+    private MigrationsRepository $migrationRepository;
 
-    /** @var SchemaDumper|MockObject */
-    private $schemaDumper;
+    /** @var SchemaDumper&MockObject */
+    private SchemaDumper $schemaDumper;
 
     private DumpSchemaCommand $dumpSchemaCommand;
 

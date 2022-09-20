@@ -16,11 +16,11 @@ use function trim;
 
 final class RollupCommandTest extends TestCase
 {
-    /** @var DependencyFactory|MockObject */
-    private $dependencyFactory;
+    /** @var DependencyFactory&MockObject */
+    private DependencyFactory $dependencyFactory;
 
-    /** @var Rollup|MockObject */
-    private $rollup;
+    /** @var Rollup&MockObject */
+    private Rollup $rollup;
 
     private RollupCommand $rollupCommand;
 
