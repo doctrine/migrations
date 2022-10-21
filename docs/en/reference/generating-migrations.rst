@@ -260,7 +260,13 @@ with a schema filter.
 
 .. code-block:: php
 
-    $connection->getConfiguration()->setFilterSchemaAssetsExpression("~^(?!t_)~");
+    $connection->getConfiguration()->setSchemaAssetsFilter(static function ($assetName) {
+        if ($assetName instanceof AbstractAsset) {
+            $assetName = $assetName->getName();
+        }
+
+        return preg_match("~^(?!t_)~", $assetName);
+    });
 
 With this expression all tables prefixed with t_ will ignored by the schema tool.
 
