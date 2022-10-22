@@ -260,7 +260,7 @@ with a schema filter.
 
 .. code-block:: php
 
-    $connection->getConfiguration()->setSchemaAssetsFilter(static function ($assetName) {
+    $connection->getConfiguration()->setSchemaAssetsFilter(static function (string|AbstractAsset $assetName): bool {
         if ($assetName instanceof AbstractAsset) {
             $assetName = $assetName->getName();
         }
