@@ -265,7 +265,7 @@ with a schema filter.
             $assetName = $assetName->getName();
         }
 
-        return preg_match("~^(?!t_)~", $assetName);
+        return (bool) preg_match("~^(?!t_)~", $assetName);
     });
 
 With this expression all tables prefixed with t_ will ignored by the schema tool.
