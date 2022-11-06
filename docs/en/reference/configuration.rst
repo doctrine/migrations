@@ -147,7 +147,7 @@ Here are details about what each configuration option does:
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories. |
+| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``by_year``) or year and month (``by_year_and_month``) subdirectories. |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | connection                 | no         | null                         | The named connection to use (available only when ConnectionRegistryConnection is used). |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
