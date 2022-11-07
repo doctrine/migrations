@@ -115,7 +115,7 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->listTableDetails($config->getTableName());
+        $table = $this->schemaManager->introspectTable($config->getTableName());
 
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
@@ -156,7 +156,7 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->listTableDetails($config->getTableName());
+        $table = $this->schemaManager->introspectTable($config->getTableName());
 
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
