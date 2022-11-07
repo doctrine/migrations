@@ -82,7 +82,7 @@ class DiffGeneratorTest extends TestCase
             ->method('createSchema');
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($fromSchema);
 
         $this->schemaProvider->expects(self::once())
@@ -94,10 +94,15 @@ class DiffGeneratorTest extends TestCase
             ->will(self::onConsecutiveCalls('schema.table_name2', 'schema.table_name3'));
 
         $schemaDiff = $this->createStub(SchemaDiff::class);
-        $schemaDiff->method('toSql')->willReturn(self::onConsecutiveCalls(
-            ['UPDATE table SET value = 2'],
-            ['UPDATE table SET value = 1']
-        ));
+
+        $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
+            static $i = 0;
+            if ($i++ === 0) {
+                return ['UPDATE table SET value = 2'];
+            }
+
+            return ['UPDATE table SET value = 1'];
+        });
 
         // regular mocks cannot be used here, because the method is static
         $comparator = new class extends Comparator {
@@ -158,7 +163,7 @@ class DiffGeneratorTest extends TestCase
             ->willReturn($emptySchema);
 
         $this->schemaManager->expects(self::never())
-            ->method('createSchema');
+            ->method('introspectSchema');
 
         $this->schemaProvider->expects(self::once())
             ->method('createSchema')
@@ -168,10 +173,14 @@ class DiffGeneratorTest extends TestCase
             ->method('dropTable');
 
         $schemaDiff = $this->createStub(SchemaDiff::class);
-        $schemaDiff->method('toSql')->willReturn(self::onConsecutiveCalls(
-            ['CREATE TABLE table_name'],
-            ['DROP TABLE table_name']
-        ));
+        $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
+            static $i = 0;
+            if ($i++ === 0) {
+                return ['CREATE TABLE table_name'];
+            }
+
+            return ['DROP TABLE table_name'];
+        });
 
         // regular mocks cannot be used here, because the method is static
         $comparator = new class extends Comparator {

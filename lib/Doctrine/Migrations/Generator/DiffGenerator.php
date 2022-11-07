@@ -91,7 +91,7 @@ class DiffGenerator
 
         $comparator = $this->schemaManager->createComparator();
 
-        $upSql = $comparator->compareSchemas($fromSchema, $toSchema)->toSql($this->platform);
+        $upSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($fromSchema, $toSchema));
 
         $up = $this->migrationSqlGenerator->generate(
             $upSql,
@@ -100,7 +100,7 @@ class DiffGenerator
             $checkDbPlatform
         );
 
-        $downSql = $comparator->compareSchemas($toSchema, $fromSchema)->toSql($this->platform);
+        $downSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($toSchema, $fromSchema));
 
         $down = $this->migrationSqlGenerator->generate(
             $downSql,
@@ -127,7 +127,7 @@ class DiffGenerator
 
     private function createFromSchema(): Schema
     {
-        return $this->schemaManager->createSchema();
+        return $this->schemaManager->introspectSchema();
     }
 
     private function createToSchema(): Schema
