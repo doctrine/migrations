@@ -52,6 +52,8 @@ Once you have your custom integration setup, you can modify it to look like the 
     $cli->setCatchExceptions(true);
 
     $cli->addCommands(array(
+        new Command\CurrentCommand($dependencyFactory),
+        new Command\DiffCommand($dependencyFactory),
         new Command\DumpSchemaCommand($dependencyFactory),
         new Command\ExecuteCommand($dependencyFactory),
         new Command\GenerateCommand($dependencyFactory),
@@ -61,6 +63,7 @@ Once you have your custom integration setup, you can modify it to look like the 
         new Command\RollupCommand($dependencyFactory),
         new Command\StatusCommand($dependencyFactory),
         new Command\SyncMetadataCommand($dependencyFactory),
+        new Command\UpToDateCommand($dependencyFactory),
         new Command\VersionCommand($dependencyFactory),
     ));
 
