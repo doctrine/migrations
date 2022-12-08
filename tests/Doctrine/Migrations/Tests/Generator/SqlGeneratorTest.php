@@ -20,8 +20,8 @@ final class SqlGeneratorTest extends TestCase
 {
     private Configuration $configuration;
 
-    /** @var AbstractPlatform|MockObject */
-    private $platform;
+    /** @var AbstractPlatform&MockObject */
+    private AbstractPlatform $platform;
 
     private SqlGenerator $migrationSqlGenerator;
 

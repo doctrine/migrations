@@ -21,14 +21,14 @@ final class MigrationStatusCalculatorTest extends TestCase
 {
     private MigrationStatusCalculator $migrationStatusCalculator;
 
-    /** @var MockObject|MigrationPlanCalculator */
-    private $migrationPlanCalculator;
+    /** @var MigrationPlanCalculator&MockObject */
+    private MigrationPlanCalculator $migrationPlanCalculator;
 
-    /** @var MockObject|MetadataStorage */
-    private $metadataStorage;
+    /** @var MetadataStorage&MockObject */
+    private MetadataStorage $metadataStorage;
 
-    /** @var MockObject|AbstractMigration */
-    private $abstractMigration;
+    /** @var AbstractMigration&MockObject */
+    private AbstractMigration $abstractMigration;
 
     protected function setUp(): void
     {

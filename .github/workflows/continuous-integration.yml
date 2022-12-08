@@ -2,23 +2,25 @@ name: "Continuous Integration"
 
 on:
   pull_request:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - composer.*
+      - lib/**
+      - phpunit.xml.dist
+      - tests/**
   push:
     branches:
       - "*.x"
+    paths:
+      - .github/workflows/continuous-integration.yml
+      - composer.*
+      - lib/**
+      - phpunit.xml.dist
+      - tests/**
 
 jobs:
-  composer_normalize:
-    name: "Composer Normalize"
-    runs-on: "ubuntu-22.04"
-    steps:
-      - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-
-      - uses: "docker://ergebnis/composer-normalize-action:latest"
-        with:
-          args: "--dry-run"
-
   phpunit:
     name: "PHPUnit"
     runs-on: "ubuntu-22.04"
@@ -38,7 +40,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
@@ -52,7 +54,7 @@ jobs:
         run: "./download-box.sh"
 
       - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v1"
+        uses: "ramsey/composer-install@v2"
         with:
           dependency-versions: "${{ matrix.dependencies }}"
           composer-options: "--ignore-platform-req=php+"
@@ -61,7 +63,7 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
       - name: "Upload coverage file"
-        uses: "actions/upload-artifact@v2"
+        uses: "actions/upload-artifact@v3"
         with:
           name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
@@ -74,16 +76,16 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v2"
+        uses: "actions/checkout@v3"
         with:
           fetch-depth: 2
 
       - name: "Download coverage files"
-        uses: "actions/download-artifact@v2"
+        uses: "actions/download-artifact@v3"
         with:
           path: "reports"
 
       - name: "Upload to Codecov"
-        uses: "codecov/codecov-action@v1"
+        uses: "codecov/codecov-action@v3"
         with:
           directory: reports

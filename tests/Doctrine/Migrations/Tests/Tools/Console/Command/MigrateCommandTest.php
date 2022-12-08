@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -56,8 +55,8 @@ class MigrateCommandTest extends MigrationTestCase
 
     private MockObject $queryWriter;
 
-    /** @var MockObject|QuestionHelper */
-    private $questions;
+    /** @var QuestionHelper&MockObject */
+    private QuestionHelper $questions;
 
     private MigrationsRepository $migrationRepository;
 
@@ -312,7 +311,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute([], ['interactive' => false]);
 
         $refreshedTable = $this->connection->createSchemaManager()
-            ->listTableDetails($this->metadataConfiguration->getTableName());
+            ->introspectTable($this->metadataConfiguration->getTableName());
 
         self::assertFalse($refreshedTable->hasColumn('extra'));
     }
@@ -326,7 +325,7 @@ class MigrateCommandTest extends MigrationTestCase
         $this->migrateCommandTester->execute([]);
 
         $refreshedTable = $this->connection->createSchemaManager()
-            ->listTableDetails($this->metadataConfiguration->getTableName());
+            ->introspectTable($this->metadataConfiguration->getTableName());
 
         self::assertTrue($refreshedTable->hasColumn('extra'));
     }
@@ -493,13 +492,13 @@ class MigrateCommandTest extends MigrationTestCase
     {
         $schemaManager = $this->connection->createSchemaManager();
         $originalTable = $schemaManager
-            ->listTableDetails($this->metadataConfiguration->getTableName());
+            ->introspectTable($this->metadataConfiguration->getTableName());
 
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
 
-        $diff = $schemaManager->createComparator()->diffTable($originalTable, $modifiedTable);
-        if (! ($diff instanceof TableDiff)) {
+        $diff = $schemaManager->createComparator()->compareTables($originalTable, $modifiedTable);
+        if ($diff->isEmpty()) {
             return;
         }
 

@@ -16,8 +16,8 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    /** @var Connection|MockObject */
-    private $conn;
+    /** @var Connection&MockObject */
+    private Connection $conn;
 
     private AutoCommitListener $listener;
 

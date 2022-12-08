@@ -15,11 +15,11 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 final class DependencyFactoryWithConnectionRegistryTest extends MigrationTestCase
 {
-    /** @var MockObject|Connection */
-    private $connection1;
+    /** @var Connection&MockObject */
+    private Connection $connection1;
 
-    /** @var MockObject|Connection */
-    private $connection2;
+    /** @var Connection&MockObject */
+    private Connection $connection2;
 
     private Configuration $configuration;
 

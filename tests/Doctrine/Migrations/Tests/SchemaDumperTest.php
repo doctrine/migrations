@@ -20,17 +20,17 @@ use const PHP_VERSION_ID;
 
 class SchemaDumperTest extends TestCase
 {
-    /** @var AbstractPlatform|MockObject */
-    private $platform;
+    /** @var AbstractPlatform&MockObject */
+    private AbstractPlatform $platform;
 
-    /** @var AbstractSchemaManager<AbstractPlatform>|MockObject */
-    private $schemaManager;
+    /** @var AbstractSchemaManager<AbstractPlatform>&MockObject */
+    private AbstractSchemaManager $schemaManager;
 
-    /** @var Generator|MockObject */
-    private $migrationGenerator;
+    /** @var Generator&MockObject */
+    private Generator $migrationGenerator;
 
-    /** @var SqlGenerator|MockObject */
-    private $migrationSqlGenerator;
+    /** @var SqlGenerator&MockObject */
+    private SqlGenerator $migrationSqlGenerator;
 
     private SchemaDumper $schemaDumper;
 
@@ -42,7 +42,7 @@ class SchemaDumperTest extends TestCase
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($schema);
 
         $schema->expects(self::once())
@@ -62,7 +62,7 @@ class SchemaDumperTest extends TestCase
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($schema);
 
         $schema->expects(self::once())
@@ -106,7 +106,7 @@ class SchemaDumperTest extends TestCase
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($schema);
 
         $schema->expects(self::once())
@@ -145,7 +145,7 @@ class SchemaDumperTest extends TestCase
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($schema);
 
         $schema->expects(self::once())
@@ -168,7 +168,7 @@ class SchemaDumperTest extends TestCase
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
-            ->method('createSchema')
+            ->method('introspectSchema')
             ->willReturn($schema);
 
         $schema->expects(self::once())

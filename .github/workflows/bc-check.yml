@@ -3,13 +3,24 @@ name: "Backward Compatibility Check"
 
 on:
   pull_request:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/bc-check.yml
+      - lib/**
+  push:
+    branches:
+      - "*.x"
+    paths:
+      - .github/workflows/bc-check.yml
+      - lib/**
 
 jobs:
   roave_bc_check:
     name: "Roave BC Check"
     runs-on: "ubuntu-22.04"
     steps:
-      - uses: "actions/checkout@v2"
+      - uses: "actions/checkout@v3"
         with:
           fetch-depth: 0
 

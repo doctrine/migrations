@@ -1,14 +1,13 @@
 {
     "name": "doctrine/migrations",
-    "type": "library",
     "description": "PHP Doctrine Migrations project offer additional functionality on top of the database abstraction layer (DBAL) for versioning your database schema and easily deploying changes to it. It is a very easy to use and a powerful tool.",
+    "license": "MIT",
+    "type": "library",
     "keywords": [
         "database",
         "migrations",
         "dbal"
     ],
-    "homepage": "https://www.doctrine-project.org/projects/migrations.html",
-    "license": "MIT",
     "authors": [
         {
             "name": "Benjamin Eberlei",
@@ -23,10 +22,11 @@
             "email": "contact@mikesimonson.com"
         }
     ],
+    "homepage": "https://www.doctrine-project.org/projects/migrations.html",
     "require": {
         "php": "^7.4 || ^8.0",
         "composer-runtime-api": "^2",
-        "doctrine/dbal": "^3.4.3",
+        "doctrine/dbal": "^3.5.1",
         "doctrine/deprecations": "^0.5.3 || ^1",
         "doctrine/event-manager": "^1.0",
         "friendsofphp/proxy-manager-lts": "^1.0",
@@ -34,16 +34,12 @@
         "symfony/console": "^4.4.16 || ^5.4 || ^6.0",
         "symfony/stopwatch": "^4.4 || ^5.4 || ^6.0"
     },
-    "conflict": {
-        "doctrine/orm": "<2.12"
-    },
     "require-dev": {
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^9",
         "doctrine/orm": "^2.12",
         "doctrine/persistence": "^2 || ^3",
         "doctrine/sql-formatter": "^1.0",
-        "ergebnis/composer-normalize": "^2.9",
         "phpstan/phpstan": "^1.5",
         "phpstan/phpstan-deprecation-rules": "^1",
         "phpstan/phpstan-phpunit": "^1.1",
@@ -54,23 +50,12 @@
         "symfony/process": "^4.4 || ^5.4 || ^6.0",
         "symfony/yaml": "^4.4 || ^5.4 || ^6.0"
     },
+    "conflict": {
+        "doctrine/orm": "<2.12"
+    },
     "suggest": {
         "doctrine/sql-formatter": "Allows to generate formatted SQL with the diff command.",
         "symfony/yaml": "Allows the use of yaml for migration configuration files."
-    },
-    "config": {
-        "allow-plugins": {
-            "composer/package-versions-deprecated": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "ergebnis/composer-normalize": true
-        },
-        "sort-packages": true
-    },
-    "extra": {
-        "composer-normalize": {
-            "indent-size": 4,
-            "indent-style": "space"
-        }
     },
     "autoload": {
         "psr-4": {
@@ -84,5 +69,12 @@
     },
     "bin": [
         "bin/doctrine-migrations"
-    ]
+    ],
+    "config": {
+        "allow-plugins": {
+            "composer/package-versions-deprecated": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true
+        },
+        "sort-packages": true
+    }
 }

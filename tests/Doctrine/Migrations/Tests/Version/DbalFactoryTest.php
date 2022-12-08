@@ -15,10 +15,10 @@ use ReflectionProperty;
 
 final class DbalFactoryTest extends TestCase
 {
-    /** @var MockObject|Connection */
-    private $connection;
-    /** @var MockObject|LoggerInterface */
-    private $logger;
+    /** @var Connection&MockObject */
+    private Connection $connection;
+    /** @var LoggerInterface&MockObject */
+    private LoggerInterface $logger;
 
     private DbalMigrationFactory $versionFactory;
 
