@@ -21,12 +21,26 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
     {
         $timeAllQueries = $input->hasOption('query-time') ? (bool) $input->getOption('query-time') : false;
         $dryRun         = $input->hasOption('dry-run') ? (bool) $input->getOption('dry-run') : false;
-        $allOrNothing   = $input->hasOption('all-or-nothing') ? $input->getOption('all-or-nothing') : null;
-        $allOrNothing   = (bool) ($allOrNothing ?? $this->configuration->isAllOrNothing());
+        $allOrNothing   = $this->determineAllOrNothingValueFrom($input) ?? $this->configuration->isAllOrNothing();
 
         return (new MigratorConfiguration())
             ->setDryRun($dryRun)
             ->setTimeAllQueries($timeAllQueries)
             ->setAllOrNothing($allOrNothing);
+    }
+
+    private function determineAllOrNothingValueFrom(InputInterface $input): ?bool
+    {
+        $allOrNothingOption = null;
+
+        if ($input->hasOption('all-or-nothing')) {
+            $allOrNothingOption = $input->getOption('all-or-nothing');
+        }
+
+        if ($allOrNothingOption === 'notprovided') {
+            return null;
+        }
+
+        return (bool) ($allOrNothingOption ?? true);
     }
 }
