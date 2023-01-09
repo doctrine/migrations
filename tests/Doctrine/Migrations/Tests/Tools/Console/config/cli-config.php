@@ -17,7 +17,7 @@ $conf->setMetadataDriverImpl(new PHPDriver(''));
 
 $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
-$em = EntityManager::create($conn, $conf);
+$em = new EntityManager($conn, $conf);
 
 $config = new ConfigurationArray([
     'custom_template' => 'foo',
