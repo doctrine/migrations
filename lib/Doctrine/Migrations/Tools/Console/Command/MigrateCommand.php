@@ -13,7 +13,6 @@ use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
-
 use function count;
 use function dirname;
 use function getcwd;
@@ -202,7 +201,7 @@ EOT
             'Migrating' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {direction} to {to}',
             [
                 'direction' => $plan->getDirection(),
-                'to' => (string) $version,
+                'to'        => (string) $version,
             ]
         );
 
@@ -214,6 +213,10 @@ EOT
             $writer->write($path, $plan->getDirection(), $sql);
         }
 
+        $this->io->success(sprintf(
+            'Successfully migrated to version : %s',
+            $version
+        ));
         $this->io->newLine();
 
         return 0;
