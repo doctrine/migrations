@@ -19,6 +19,6 @@ return new class () implements EntityManagerLoader {
         $conf->setProxyNamespace('Foo');
         $conf->setMetadataDriverImpl(new PHPDriver(''));
 
-        return EntityManager::create($conn, $conf);
+        return new EntityManager($conn, $conf);
     }
 };

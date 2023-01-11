@@ -14,4 +14,4 @@ $conf->setProxyDir(__DIR__);
 $conf->setProxyNamespace('Foo');
 $conf->setMetadataDriverImpl(new PHPDriver(''));
 
-return EntityManager::create($conn, $conf);
+return new EntityManager($conn, $conf);

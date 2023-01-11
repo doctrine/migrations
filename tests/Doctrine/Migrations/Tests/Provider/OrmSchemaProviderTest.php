@@ -55,7 +55,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);
 
         $this->conn          = $this->getSqliteConnection();
-        $this->entityManager = EntityManager::create($this->conn, $this->config);
+        $this->entityManager = new EntityManager($this->conn, $this->config);
         $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
     }
 }
