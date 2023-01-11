@@ -362,7 +362,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
-     * @psalm-param array<string, bool> $input
+     * @psalm-param array<string, bool|int|string|null> $input
      *
      * @dataProvider allOrNothing
      */
@@ -390,13 +390,22 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /**
-     * @psalm-return Generator<array{bool, array<string, bool>, bool}>
+     * @psalm-return Generator<array{bool, array<string, bool|int|string|null>, bool}>
      */
     public function allOrNothing(): Generator
     {
         yield [false, ['--all-or-nothing' => false], false];
+        yield [false, ['--all-or-nothing' => 0], false];
+        yield [false, ['--all-or-nothing' => '0'], false];
+
         yield [false, ['--all-or-nothing' => true], true];
+        yield [false, ['--all-or-nothing' => 1], true];
+        yield [false, ['--all-or-nothing' => '1'], true];
+        yield [false, ['--all-or-nothing' => null], true];
+
         yield [true, ['--all-or-nothing' => false], false];
+        yield [true, ['--all-or-nothing' => 0], false];
+        yield [true, ['--all-or-nothing' => '0'], false];
 
         yield [true, [], true];
         yield [false, [], false];
