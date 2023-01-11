@@ -12,7 +12,6 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
-use UnexpectedValueException;
 
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
@@ -37,10 +36,14 @@ class OrmSchemaProviderTest extends MigrationTestCase
         }
     }
 
-    public function testEntityManagerWithoutMetadataCausesError(): void
+    /**
+     * It should be OK to use migrations to manage tables not managed by
+     * the ORM.
+     *
+     * @doesNotPerformAssertions
+     */
+    public function testEntityManagerWithoutMetadata(): void
     {
-        $this->expectException(UnexpectedValueException::class);
-
         $this->config->setMetadataDriverImpl(new XmlDriver([]));
 
         $this->ormProvider->createSchema();
@@ -52,7 +55,7 @@ class OrmSchemaProviderTest extends MigrationTestCase
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);
 
         $this->conn          = $this->getSqliteConnection();
-        $this->entityManager = EntityManager::create($this->conn, $this->config);
+        $this->entityManager = new EntityManager($this->conn, $this->config);
         $this->ormProvider   = new OrmSchemaProvider($this->entityManager);
     }
 }

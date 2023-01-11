@@ -37,7 +37,7 @@
     "require-dev": {
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^9",
-        "doctrine/orm": "^2.12",
+        "doctrine/orm": "^2.13",
         "doctrine/persistence": "^2 || ^3",
         "doctrine/sql-formatter": "^1.0",
         "phpstan/phpstan": "^1.5",
