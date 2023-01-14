@@ -5,16 +5,14 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\Tools\TransactionHelper;
+use LogicException;
 use PDO;
 use PHPUnit\Framework\TestCase;
 
 final class TransactionHelperTest extends TestCase
 {
-    use VerifyDeprecations;
-
-    public function testItTriggersADeprecationWhenUseful(): void
+    public function testItThrowsAnExceptionWhenAttemptingToCommitWhileNotInsideATransaction(): void
     {
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
@@ -23,18 +21,27 @@ final class TransactionHelperTest extends TestCase
 
         $wrappedConnection->method('inTransaction')->willReturn(false);
 
-        $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
-        );
-        TransactionHelper::commitIfInTransaction($connection);
-
-        $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
-        );
-        TransactionHelper::rollbackIfInTransaction($connection);
+        $this->expectException(LogicException::class);
+        TransactionHelper::commit($connection);
     }
 
-    public function testItDoesNotTriggerADeprecationWhenUseless(): void
+    public function testItThrowsAnExceptionWhenAttemptingToRollbackWhileNotInsideATransaction(): void
+    {
+        $connection        = $this->createStub(Connection::class);
+        $wrappedConnection = $this->createStub(PDO::class);
+
+        $connection->method('getNativeConnection')->willReturn($wrappedConnection);
+
+        $wrappedConnection->method('inTransaction')->willReturn(false);
+
+        $this->expectException(LogicException::class);
+        TransactionHelper::rollback($connection);
+    }
+
+    /**
+     * @doesNotPerformAssertions
+     */
+    public function testItDoesNotThrowAnExceptionWhenUseless(): void
     {
         $connection        = $this->createStub(Connection::class);
         $wrappedConnection = $this->createStub(PDO::class);
@@ -43,14 +50,7 @@ final class TransactionHelperTest extends TestCase
 
         $wrappedConnection->method('inTransaction')->willReturn(true);
 
-        $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
-        );
-        TransactionHelper::commitIfInTransaction($connection);
-
-        $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
-        );
-        TransactionHelper::rollbackIfInTransaction($connection);
+        TransactionHelper::commit($connection);
+        TransactionHelper::rollback($connection);
     }
 }

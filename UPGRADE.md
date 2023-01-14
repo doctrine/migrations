@@ -1,3 +1,8 @@
+# Upgrade to 4.0
+
+It is no longer possible to relying on silencing to enable transactional
+migrations when the platform does not allow DDL inside transactions.
+
 # Upgrade to 3.1
 
 - The "version" is the FQCN of the migration class (existing entries in the migrations table will be automatically updated).

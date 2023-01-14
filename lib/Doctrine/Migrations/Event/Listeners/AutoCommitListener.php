@@ -26,7 +26,7 @@ final class AutoCommitListener implements EventSubscriber
             return;
         }
 
-        TransactionHelper::commitIfInTransaction($conn);
+        TransactionHelper::commit($conn);
     }
 
     /** {@inheritdoc} */
