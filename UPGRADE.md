@@ -1,3 +1,12 @@
+# Upgrade to 3.6
+
+## Console
+- The `--all-or-nothing` option for `migrations:migrate` does not accept a value anymore, and passing it a 
+  value will generate a deprecation. Specifying `--all-or-nothing` will wrap all the migrations to be 
+  executed into a single transaction, regardless of the specified configuration.
+
+
+
 # Upgrade to 3.1
 
 - The "version" is the FQCN of the migration class (existing entries in the migrations table will be automatically updated).
