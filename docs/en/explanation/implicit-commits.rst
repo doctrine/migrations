@@ -33,7 +33,7 @@ Consider the following migration.
 When you run that migration, what actually happens with some platforms
 is you get the updates inside an implicitly commited transaction, then
 the ``CREATE TABLE`` happens outside that transaction, and then there is
-an attempt to commit an non-existent transaction.
+an attempt to commit a non-existent transaction.
 
 In that sort of situation, if you still wish to get the DML statements
 inside a transaction, we recommend you split the migration in 2

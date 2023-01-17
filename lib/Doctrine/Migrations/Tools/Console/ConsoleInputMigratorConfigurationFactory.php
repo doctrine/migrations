@@ -31,11 +31,11 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
 
     private function determineAllOrNothingValueFrom(InputInterface $input): ?bool
     {
-        $allOrNothingOption = null;
-
-        if ($input->hasOption('all-or-nothing')) {
-            $allOrNothingOption = $input->getOption('all-or-nothing');
+        if (! $input->hasOption('all-or-nothing')) {
+            return null;
         }
+
+        $allOrNothingOption = $input->getOption('all-or-nothing');
 
         if ($allOrNothingOption === 'notprovided') {
             return null;
