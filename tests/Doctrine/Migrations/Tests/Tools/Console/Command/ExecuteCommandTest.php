@@ -177,6 +177,28 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertSame(1, $this->executeCommandTester->getStatusCode());
     }
 
+    public function testExecuteAllOrNothingDefaultsToFalse(): void
+    {
+        $this->executeCommandTester->setInputs(['yes']);
+
+        $this->migrator
+            ->expects(self::once())
+            ->method('migrate')
+            ->willReturnCallback(static function (MigrationPlanList $planList, MigratorConfiguration $configuration): array {
+                self::assertFalse($configuration->isAllOrNothing());
+
+                return ['A'];
+            });
+
+        $this->executeCommandTester->execute([
+            'versions' => ['1'],
+            '--down' => true,
+        ]);
+
+        self::assertSame(0, $this->executeCommandTester->getStatusCode());
+        self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
+    }
+
     protected function setUp(): void
     {
         $connection = $this->getSqliteConnection();
