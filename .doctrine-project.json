@@ -5,17 +5,23 @@
     "docsSlug": "doctrine-migrations",
     "versions": [
         {
+            "name": "3.7",
+            "branchName": "3.7.x",
+            "slug": "3.7",
+            "upcoming": true
+        },
+        {
             "name": "3.6",
             "branchName": "3.6.x",
             "slug": "3.6",
-            "upcoming": true
+            "aliases": ["stable"],
+            "current": true
         },
         {
             "name": "3.5",
             "branchName": "3.5.x",
             "slug": "3.5",
-            "aliases": ["stable"],
-            "current": true
+            "maintained": false
         },
         {
             "name": "3.4",
