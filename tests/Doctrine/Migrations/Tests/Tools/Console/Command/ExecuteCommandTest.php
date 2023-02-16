@@ -118,7 +118,7 @@ class ExecuteCommandTest extends MigrationTestCase
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
         self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
-        self::assertStringContainsString('[OK] Successfully migrated version(s) : 1 : [UP]', trim($this->executeCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[OK] Successfully migrated version(s): 1: [UP]', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMultiple(): void
