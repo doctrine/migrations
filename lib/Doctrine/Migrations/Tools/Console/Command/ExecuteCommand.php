@@ -163,7 +163,7 @@ EOT
         }
 
         $this->io->success(sprintf(
-            'Successfully migrated version(s) : %s : [%s]',
+            'Successfully migrated version(s): %s: [%s]',
             implode(', ', $versions),
             strtoupper($plan->getDirection())
         ));

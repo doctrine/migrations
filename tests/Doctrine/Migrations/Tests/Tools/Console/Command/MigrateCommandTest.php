@@ -294,7 +294,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
         self::assertStringContainsString('[notice] Migrating up to A', trim($this->migrateCommandTester->getDisplay(true)));
-        self::assertStringContainsString('[OK] Successfully migrated to version : A', trim($this->migrateCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[OK] Successfully migrated to version: A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMigrateUpdatesMigrationsTableWhenNeeded(): void

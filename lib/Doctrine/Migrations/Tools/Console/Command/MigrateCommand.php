@@ -95,7 +95,7 @@ You can optionally manually specify the version you wish to migrate to:
 You can specify the version you wish to migrate to using an alias:
 
     <info>%command.full_name% prev</info>
-    <info>These alias are defined : first, latest, prev, current and next</info>
+    <info>These alias are defined: first, latest, prev, current and next</info>
 
 You can specify the version you wish to migrate to using an number against the current version:
 
@@ -216,7 +216,7 @@ EOT
         }
 
         $this->io->success(sprintf(
-            'Successfully migrated to version : %s',
+            'Successfully migrated to version: %s',
             $version
         ));
         $this->io->newLine();
