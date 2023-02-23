@@ -17,6 +17,7 @@ use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tests\Version\Fixture\EmptyTestMigration;
+use Doctrine\Migrations\Tests\Version\Fixture\TestMigrationWithStatement;
 use Doctrine\Migrations\Tests\Version\Fixture\VersionExecutorTestMigration;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
@@ -92,6 +93,22 @@ class ExecutorTest extends TestCase
             'Migration xx was executed but did not result in any SQL statements.',
             'Migration xx migrated (took 100ms, used 100 memory)',
         ], $this->logger->logs);
+    }
+
+    public function testExecuteWithStatement(): void
+    {
+        $migratorConfiguration = new MigratorConfiguration();
+
+        $migration = new TestMigrationWithStatement($this->connection, $this->logger);
+        $version   = new Version('xx');
+        $plan      = new MigrationPlan($version, $migration, Direction::UP);
+
+        $this->connection
+            ->expects(self::once())
+            ->method('executeStatement')
+            ->with('CREATE TRIGGER', [], []);
+
+        $this->versionExecutor->execute($plan, $migratorConfiguration);
     }
 
     public function testExecuteUp(): void
@@ -214,6 +231,7 @@ class ExecutorTest extends TestCase
                 self::assertSame(Direction::UP, $result->getDirection());
 
                 yield new Query('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)');
+                yield new Query('CREATE TRIGGER something...', executeAsStatement: true);
             });
 
         $this->connection
@@ -223,6 +241,10 @@ class ExecutorTest extends TestCase
         $this->connection
             ->expects(self::never())
             ->method('executeUpdate');
+
+        $this->connection
+            ->expects(self::never())
+            ->method('executeStatement');
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun(true)
@@ -237,7 +259,7 @@ class ExecutorTest extends TestCase
 
         $queries = $result->getSql();
 
-        self::assertCount(3, $queries);
+        self::assertCount(4, $queries);
         self::assertSame('SELECT 1', $queries[0]->getStatement());
         self::assertSame([1], $queries[0]->getParameters());
         self::assertSame([3], $queries[0]->getTypes());
@@ -249,6 +271,11 @@ class ExecutorTest extends TestCase
         self::assertSame('INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUE (' . $result->getVersion() . ', NOW(), 0)', $queries[2]->getStatement());
         self::assertSame([], $queries[2]->getParameters());
         self::assertSame([], $queries[2]->getTypes());
+
+        self::assertSame('CREATE TRIGGER something...', $queries[3]->getStatement());
+        self::assertSame([], $queries[3]->getParameters());
+        self::assertSame([], $queries[3]->getTypes());
+        self::assertTrue($queries[3]->getExecuteAsStatement());
 
         self::assertNotNull($result->getTime());
         self::assertSame(State::NONE, $result->getState());

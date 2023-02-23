@@ -126,9 +126,10 @@ abstract class AbstractMigration
     protected function addSql(
         string $sql,
         array $params = [],
-        array $types = []
+        array $types = [],
+        bool $executeAsStatement = false
     ): void {
-        $this->plannedSql[] = new Query($sql, $params, $types);
+        $this->plannedSql[] = new Query($sql, $params, $types, $executeAsStatement);
     }
 
     /** @return Query[] */
