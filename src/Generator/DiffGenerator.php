@@ -120,6 +120,16 @@ class DiffGenerator
 
                 $toSchema->dropTable($tableName);
             }
+
+            foreach ($toSchema->getSequences() as $sequence) {
+                $sequenceName = $sequence->getName();
+
+                if ($schemaAssetsFilter($sequenceName)) {
+                    continue;
+                }
+
+                $toSchema->dropSequence($sequenceName);
+            }
         }
 
         return $toSchema;
