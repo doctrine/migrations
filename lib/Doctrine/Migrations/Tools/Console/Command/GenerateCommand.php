@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Exception;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -17,6 +18,7 @@ use function sprintf;
 /**
  * The GenerateCommand class is responsible for generating a blank migration class for you to modify to your needs.
  */
+#[AsCommand(name: 'migrations:generate', description: 'Generate a blank migration class.')]
 final class GenerateCommand extends DoctrineCommand
 {
     /** @var string|null */

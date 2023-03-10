@@ -9,6 +9,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -20,6 +21,7 @@ use function uasort;
 /**
  * The ListCommand class is responsible for outputting a list of all available migrations and their status.
  */
+#[AsCommand(name: 'migrations:list', description: 'Display a list of all available migrations and their status.')]
 final class ListCommand extends DoctrineCommand
 {
     /** @var string|null */

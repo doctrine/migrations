@@ -10,6 +10,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\SqlFormatter\SqlFormatter;
 use OutOfBoundsException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,6 +30,7 @@ use const FILTER_VALIDATE_BOOLEAN;
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
  * your mapping information.
  */
+#[AsCommand(name: 'migrations:diff', description: 'Generate a migration by comparing your current database to your mapping information.')]
 final class DiffCommand extends DoctrineCommand
 {
     /** @var string|null */

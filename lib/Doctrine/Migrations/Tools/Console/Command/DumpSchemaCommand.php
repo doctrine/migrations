@@ -7,6 +7,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\SchemaDumpRequiresNoMigrations;
 use Doctrine\SqlFormatter\SqlFormatter;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -25,6 +26,7 @@ use function strpos;
  *
  * @see Doctrine\Migrations\Tools\Console\Command\RollupCommand
  */
+#[AsCommand(name: 'migrations:dump-schema', description: 'Dump the schema for your database to a migration.')]
 final class DumpSchemaCommand extends DoctrineCommand
 {
     /** @var string|null */

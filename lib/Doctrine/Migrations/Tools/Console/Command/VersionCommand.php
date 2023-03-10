@@ -13,6 +13,7 @@ use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -23,6 +24,7 @@ use function sprintf;
 /**
  * The VersionCommand class is responsible for manually adding and deleting migration versions from the tracking table.
  */
+#[AsCommand(name: 'migrations:version', description: 'Manually add and delete migration versions from the version table.')]
 final class VersionCommand extends DoctrineCommand
 {
     /** @var string|null */

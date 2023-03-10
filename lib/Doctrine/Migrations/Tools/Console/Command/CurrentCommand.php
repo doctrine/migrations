@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -13,6 +14,7 @@ use function sprintf;
 /**
  * The CurrentCommand class is responsible for outputting what your current version is.
  */
+#[AsCommand(name: 'migrations:current', description: 'Outputs the current version')]
 final class CurrentCommand extends DoctrineCommand
 {
     /** @var string|null */
