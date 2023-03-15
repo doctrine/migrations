@@ -1,8 +1,8 @@
 {
     "alias": "doctrine-migrations.phar",
     "compactors": [
-        "Herrera\\Box\\Compactor\\Php",
-        "Herrera\\Box\\Compactor\\Json"
+        "KevinGH\\Box\\Compactor\\Php",
+        "KevinGH\\Box\\Compactor\\Json"
     ],
     "compression": "GZ",
     "main": "bin/doctrine-migrations.php",
