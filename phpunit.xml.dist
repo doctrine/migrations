@@ -3,7 +3,6 @@
 <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
-         verbose="true"
          beStrictAboutOutputDuringTests="true"
 >
     <php>
@@ -16,9 +15,9 @@
         </testsuite>
     </testsuites>
 
-    <coverage>
+    <source>
         <include>
             <directory>./lib/</directory>
         </include>
-    </coverage>
+    </source>
 </phpunit>
