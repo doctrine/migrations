@@ -15,7 +15,7 @@ use function dirname;
 
 use const DIRECTORY_SEPARATOR;
 
-abstract class LoaderTest extends TestCase
+abstract class LoaderTestCase extends TestCase
 {
     abstract public function load(string $prefix = ''): Configuration;
 

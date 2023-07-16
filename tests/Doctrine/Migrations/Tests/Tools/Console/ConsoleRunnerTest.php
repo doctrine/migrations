@@ -103,7 +103,7 @@ class ConsoleRunnerTest extends TestCase
     }
 
     /** @return array<int,array<string>> */
-    public function getDependencyFactoryTestDirectories(): array
+    public static function getDependencyFactoryTestDirectories(): array
     {
         return [
             [__DIR__],

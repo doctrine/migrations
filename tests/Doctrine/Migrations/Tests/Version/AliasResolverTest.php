@@ -97,7 +97,7 @@ final class AliasResolverTest extends TestCase
     }
 
     /** @return mixed[][] */
-    public function getAliasesWithNoExecuted(): array
+    public static function getAliasesWithNoExecuted(): array
     {
         return [
             ['first', '0'],
@@ -113,7 +113,7 @@ final class AliasResolverTest extends TestCase
     }
 
     /** @return mixed[][] */
-    public function getAliases(): array
+    public static function getAliases(): array
     {
         return [
             ['first', '0'],

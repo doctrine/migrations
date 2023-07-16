@@ -504,15 +504,8 @@ class ExecutorTest extends TestCase
 
     protected function setUp(): void
     {
-        // add getSql to mock until method will be added to MetadataStorage interface
-        $this->metadataStorage = $this->getMockBuilder(MetadataStorage::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
-            ->onlyMethods(['ensureInitialized', 'getExecutedMigrations', 'complete', 'reset'])
-            ->addMethods(['getSql'])
-            ->getMock();
+        // use FutureMetadataStorage until getSql is added to MetadataStorage interface
+        $this->metadataStorage = $this->createMock(FutureMetadataStorage::class);
 
         $this->connection = $this->createMock(Connection::class);
         $driverConnection = $this->createStub(DriverConnection::class);
@@ -562,4 +555,10 @@ class ExecutorTest extends TestCase
         $stopwatchEvent->method('getPeriods')
             ->willReturn([$stopWatchPeriod]);
     }
+}
+
+interface FutureMetadataStorage extends MetadataStorage
+{
+    /** @return iterable<Query> */
+    public function getSql(ExecutionResult $result): iterable;
 }

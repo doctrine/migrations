@@ -8,7 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\Exception\YamlNotValid;
 use Doctrine\Migrations\Configuration\Migration\YamlFile;
 
-class YamlLoaderTest extends LoaderTest
+class YamlLoaderTest extends LoaderTestCase
 {
     public function load(string $prefix = ''): Configuration
     {

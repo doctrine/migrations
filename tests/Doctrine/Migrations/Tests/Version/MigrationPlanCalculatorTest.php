@@ -138,7 +138,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     }
 
     /** @return mixed[] */
-    public function getPlanUpWhenNoMigrations(): array
+    public static function getPlanUpWhenNoMigrations(): array
     {
         return [
             ['A', ['A'], Direction::UP],
@@ -182,7 +182,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     }
 
     /** @return mixed[] */
-    public function getPlanUpWhenMigrations(): array
+    public static function getPlanUpWhenMigrations(): array
     {
         return [
             ['0', ['B', 'A'], Direction::DOWN],
@@ -220,7 +220,7 @@ final class MigrationPlanCalculatorTest extends TestCase
     }
 
     /** @return mixed[] */
-    public function getPlanUpWhenMigrationsOutOfOrder(): array
+    public static function getPlanUpWhenMigrationsOutOfOrder(): array
     {
         return [
             ['C',['A'],Direction::UP],
