@@ -46,7 +46,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $commandTester->execute(
             [],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -59,7 +59,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($conn)
+            new ExistingConnection($conn),
         );
 
         $command       = new class ($dependencyFactory) extends DoctrineCommand
@@ -76,7 +76,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $commandTester->execute(
             ['--configuration' => __DIR__ . '/_files/config.yml'],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -105,7 +105,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromEntityManager(
             new ExistingConfiguration($configuration),
-            ManagerRegistryEntityManager::withSimpleDefault($registry)
+            ManagerRegistryEntityManager::withSimpleDefault($registry),
         );
 
         $command       = new class ($em2, $dependencyFactory) extends DoctrineCommand
@@ -115,6 +115,7 @@ class DoctrineCommandTest extends MigrationTestCase
             public function __construct(EntityManager $entityManager, DependencyFactory $dependencyFactory)
             {
                 parent::__construct($dependencyFactory);
+
                 $this->expectedEm = $entityManager;
             }
 
@@ -130,7 +131,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $commandTester->execute(
             ['--em' => 'bar'],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -145,7 +146,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            ConnectionRegistryConnection::withSimpleDefault($registry)
+            ConnectionRegistryConnection::withSimpleDefault($registry),
         );
 
         $command       = new class ($conn2, $dependencyFactory) extends DoctrineCommand
@@ -155,6 +156,7 @@ class DoctrineCommandTest extends MigrationTestCase
             public function __construct(Connection $connection, DependencyFactory $dependencyFactory)
             {
                 parent::__construct($dependencyFactory);
+
                 $this->expectedConnection = $connection;
             }
 
@@ -170,7 +172,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $commandTester->execute(
             ['--conn' => 'bar'],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -186,7 +188,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            $connLoader
+            $connLoader,
         );
 
         $command       = new class ($dependencyFactory) extends DoctrineCommand
@@ -202,7 +204,7 @@ class DoctrineCommandTest extends MigrationTestCase
                 '--conn' => 'bar',
                 '--em' => 'foo',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 }

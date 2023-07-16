@@ -63,9 +63,7 @@ class MigrationStatusInfosHelper
         $this->statusCalculator        = $statusCalculator;
     }
 
-    /**
-     * @param Version[] $versions
-     */
+    /** @param Version[] $versions */
     public function listVersions(array $versions, OutputInterface $output): void
     {
         $table = new Table($output);
@@ -73,7 +71,7 @@ class MigrationStatusInfosHelper
             [
                 [new TableCell('Migration Versions', ['colspan' => 4])],
                 ['Migration', 'Status', 'Migrated At', 'Execution Time', 'Description'],
-            ]
+            ],
         );
         $executedMigrations  = $this->metadataStorage->getExecutedMigrations();
         $availableMigrations = $this->migrationPlanCalculator->getMigrations();
@@ -129,7 +127,7 @@ class MigrationStatusInfosHelper
         $table->setHeaders(
             [
                 [new TableCell('Configuration', ['colspan' => 3])],
-            ]
+            ],
         );
 
         $dataGroup = [
@@ -184,7 +182,7 @@ class MigrationStatusInfosHelper
             $first = false;
             array_unshift(
                 $nsRows[0],
-                new TableCell('<info>' . $group . '</info>', ['rowspan' => count($dataValues)])
+                new TableCell('<info>' . $group . '</info>', ['rowspan' => count($dataValues)]),
             );
             $table->addRows($nsRows);
         }
@@ -219,7 +217,7 @@ class MigrationStatusInfosHelper
         // Show normal version number
         return sprintf(
             '<comment>%s </comment>',
-            (string) $version
+            (string) $version,
         );
     }
 }

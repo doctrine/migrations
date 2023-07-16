@@ -79,9 +79,7 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getWriteSqlValues(): array
     {
         return [

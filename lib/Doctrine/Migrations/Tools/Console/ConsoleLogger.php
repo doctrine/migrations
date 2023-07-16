@@ -71,7 +71,7 @@ final class ConsoleLogger extends AbstractLogger
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param mixed[] $context
      */

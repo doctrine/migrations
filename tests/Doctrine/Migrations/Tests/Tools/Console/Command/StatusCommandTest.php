@@ -43,7 +43,7 @@ class StatusCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($conn)
+            new ExistingConnection($conn),
         );
 
         $this->metadataStorage = $dependencyFactory->getMetadataStorage();
@@ -65,7 +65,7 @@ class StatusCommandTest extends MigrationTestCase
 
         $this->commandTester->execute(
             [],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
@@ -95,7 +95,7 @@ class StatusCommandTest extends MigrationTestCase
                 sprintf('| Migration Namespaces | DoctrineMigrations   | %s |', str_pad(sys_get_temp_dir(), 70)),
                 '+----------------------+----------------------+------------------------------------------------------------------------+',
             ],
-            $lines
+            $lines,
         );
     }
 }

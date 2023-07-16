@@ -21,9 +21,7 @@ final class MigrationPlanList implements Countable
     /** @var MigrationPlan[] */
     private array $items = [];
 
-    /**
-     * @param MigrationPlan[] $items
-     */
+    /** @param MigrationPlan[] $items */
     public function __construct(array $items, string $direction)
     {
         $this->items     = $items;
@@ -35,9 +33,7 @@ final class MigrationPlanList implements Countable
         return count($this->items);
     }
 
-    /**
-     * @return MigrationPlan[]
-     */
+    /** @return MigrationPlan[] */
     public function getItems(): array
     {
         return $this->items;

@@ -11,18 +11,16 @@ use function var_export;
 
 final class UnknownConfigurationValue extends LogicException implements ConfigurationException
 {
-    /**
-     * @param mixed $value
-     */
+    /** @param mixed $value */
     public static function new(string $key, $value): self
     {
         return new self(
             sprintf(
                 'Unknown %s for configuration "%s".',
                 var_export($value, true),
-                $key
+                $key,
             ),
-            10
+            10,
         );
     }
 }

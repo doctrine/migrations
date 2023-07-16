@@ -18,9 +18,7 @@ final class Version
         return $this->version;
     }
 
-    /**
-     * @param mixed $object
-     */
+    /** @param mixed $object */
     public function equals($object): bool
     {
         return $object instanceof self && $object->version === $this->version;

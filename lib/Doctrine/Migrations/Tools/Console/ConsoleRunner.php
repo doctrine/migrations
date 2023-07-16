@@ -69,7 +69,7 @@ class ConsoleRunner
             if (! is_readable($configurationFile)) {
                 throw new RuntimeException(sprintf(
                     'Configuration file "%s" cannot be read.',
-                    $configurationFile
+                    $configurationFile,
                 ));
             }
 
@@ -81,7 +81,7 @@ class ConsoleRunner
             throw new RuntimeException(sprintf(
                 'Configuration file "%s" must return an instance of "%s"',
                 $configurationFile,
-                DependencyFactory::class
+                DependencyFactory::class,
             ));
         }
 
@@ -147,13 +147,13 @@ class ConsoleRunner
         if ($dependencyFactory->has('em') && $dependencyFactory->get('em') instanceof EntityManagerHelper) {
             return DependencyFactory::fromEntityManager(
                 $configurations,
-                new ExistingEntityManager($dependencyFactory->get('em')->getEntityManager())
+                new ExistingEntityManager($dependencyFactory->get('em')->getEntityManager()),
             );
         }
 
         throw new RuntimeException(sprintf(
             'Configuration HelperSet returned by "%s" does not have a valid "em" or the "db" helper.',
-            $configurationFile
+            $configurationFile,
         ));
     }
 }

@@ -59,7 +59,7 @@ class MigratorTest extends MigrationTestCase
         $this->migratorConfiguration = new MigratorConfiguration();
         $this->config->addMigrationsDirectory(
             'DoctrineMigrations\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder'
+            __DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder',
         );
     }
 
@@ -79,7 +79,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 
@@ -140,7 +140,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 

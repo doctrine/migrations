@@ -19,9 +19,7 @@ final class EmptySchemaProvider implements SchemaProvider
     /** @var AbstractSchemaManager<AbstractPlatform> */
     private AbstractSchemaManager $schemaManager;
 
-    /**
-     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
-     */
+    /** @param AbstractSchemaManager<AbstractPlatform> $schemaManager */
     public function __construct(AbstractSchemaManager $schemaManager)
     {
         $this->schemaManager = $schemaManager;

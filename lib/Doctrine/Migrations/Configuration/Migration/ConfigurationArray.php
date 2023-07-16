@@ -21,9 +21,7 @@ final class ConfigurationArray implements ConfigurationLoader
     /** @var array<string,mixed> */
     private array $configurations;
 
-    /**
-     * @param array<string,mixed> $configurations
-     */
+    /** @param array<string,mixed> $configurations */
     public function __construct(array $configurations)
     {
         $this->configurations = $configurations;
@@ -109,7 +107,7 @@ final class ConfigurationArray implements ConfigurationLoader
                     $callable,
                     $configurationValue,
                     $object,
-                    $data
+                    $data,
                 );
             }
         }

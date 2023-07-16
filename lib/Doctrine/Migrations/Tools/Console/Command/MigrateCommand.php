@@ -38,47 +38,47 @@ final class MigrateCommand extends DoctrineCommand
         $this
             ->setAliases(['migrate'])
             ->setDescription(
-                'Execute a migration to a specified version or the latest available version.'
+                'Execute a migration to a specified version or the latest available version.',
             )
             ->addArgument(
                 'version',
                 InputArgument::OPTIONAL,
                 'The version FQCN or alias (first, prev, next, latest) to migrate to.',
-                'latest'
+                'latest',
             )
             ->addOption(
                 'write-sql',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'The path to output the migration SQL file. Defaults to current working directory.',
-                false
+                false,
             )
             ->addOption(
                 'dry-run',
                 null,
                 InputOption::VALUE_NONE,
-                'Execute the migration as a dry run.'
+                'Execute the migration as a dry run.',
             )
             ->addOption(
                 'query-time',
                 null,
                 InputOption::VALUE_NONE,
-                'Time all the queries individually.'
+                'Time all the queries individually.',
             )
             ->addOption(
                 'allow-no-migration',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not throw an exception if no migration is available.'
+                'Do not throw an exception if no migration is available.',
             )
             ->addOption(
                 'all-or-nothing',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Wrap the entire migration in a transaction.',
-                'notprovided'
+                'notprovided',
             )
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 
     <info>%command.full_name%</info>
@@ -119,8 +119,7 @@ You can also time all the different queries if you wanna know which one is takin
 
 Use the --all-or-nothing option to wrap the entire migration in a transaction.
 
-EOT
-            );
+EOT);
 
         parent::configure();
     }
@@ -133,7 +132,7 @@ EOT
         $databaseName = (string) $this->getDependencyFactory()->getConnection()->getDatabase();
         $question     = sprintf(
             'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
-            $databaseName === '' ? '<unnamed>' : $databaseName
+            $databaseName === '' ? '<unnamed>' : $databaseName,
         );
         if (! $migratorConfiguration->isDryRun() && ! $this->canExecute($question, $input)) {
             $this->io->error('Migration cancelled!');
@@ -158,7 +157,7 @@ EOT
         if (count($migrationRepository->getMigrations()) === 0) {
             $message = sprintf(
                 'The version "%s" couldn\'t be reached, there are no registered migrations.',
-                $versionAlias
+                $versionAlias,
             );
 
             if ($allowNoMigration) {
@@ -177,7 +176,7 @@ EOT
         } catch (UnknownMigrationVersion $e) {
             $this->io->error(sprintf(
                 'Unknown version: %s',
-                OutputFormatter::escape($versionAlias)
+                OutputFormatter::escape($versionAlias),
             ));
 
             return 1;
@@ -204,7 +203,7 @@ EOT
             [
                 'direction' => $plan->getDirection(),
                 'to' => (string) $version,
-            ]
+            ],
         );
 
         $migrator = $this->getDependencyFactory()->getMigrator();
@@ -217,7 +216,7 @@ EOT
 
         $this->io->success(sprintf(
             'Successfully migrated to version: %s',
-            $version
+            $version,
         ));
         $this->io->newLine();
 
@@ -231,7 +230,7 @@ EOT
         if (count($executedUnavailableMigrations) !== 0) {
             $this->io->warning(sprintf(
                 'You have %s previously executed migrations in the database that are not registered migrations.',
-                count($executedUnavailableMigrations)
+                count($executedUnavailableMigrations),
             ));
 
             foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
@@ -240,7 +239,7 @@ EOT
                     $executedUnavailableMigration->getExecutedAt() !== null
                         ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
                         : null,
-                    $executedUnavailableMigration->getVersion()
+                    $executedUnavailableMigration->getVersion(),
                 ));
             }
 
@@ -265,7 +264,7 @@ EOT
             $message = sprintf(
                 'Already at the %s version ("%s")',
                 $versionAlias,
-                (string) $version
+                (string) $version,
             );
 
             $this->io->success($message);
@@ -273,14 +272,14 @@ EOT
             $message = sprintf(
                 'The version "%s" couldn\'t be reached, you are at version "%s"',
                 $versionAlias,
-                (string) $version
+                (string) $version,
             );
 
             $this->io->error($message);
         } else {
             $message = sprintf(
                 'You are already at version "%s"',
-                (string) $version
+                (string) $version,
             );
 
             $this->io->success($message);

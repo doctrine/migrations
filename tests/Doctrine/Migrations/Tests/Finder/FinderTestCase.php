@@ -23,7 +23,7 @@ abstract class FinderTestCase extends MigrationTestCase
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespace',
-            'TestMigrations\\Test'
+            'TestMigrations\\Test',
         );
 
         self::assertSame(['TestMigrations\\Test\\Version0001'], $versions);

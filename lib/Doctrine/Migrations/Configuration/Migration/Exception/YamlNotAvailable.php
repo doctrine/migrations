@@ -13,7 +13,7 @@ final class YamlNotAvailable extends LogicException implements ConfigurationExce
     {
         return new self(
             'Unable to load yaml configuration files, please run '
-            . '`composer require symfony/yaml` to load yaml configuration files.'
+            . '`composer require symfony/yaml` to load yaml configuration files.',
         );
     }
 }

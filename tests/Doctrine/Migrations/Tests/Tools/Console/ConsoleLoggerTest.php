@@ -53,7 +53,7 @@ class ConsoleLoggerTest extends TestCase
 
         self::assertSame(
             '[info] foo' . PHP_EOL . '[debug] bar' . PHP_EOL,
-            $this->output->fetch()
+            $this->output->fetch(),
         );
     }
 
@@ -68,7 +68,7 @@ class ConsoleLoggerTest extends TestCase
         ]);
         self::assertSame(
             '[error] foo 1 2010-01-01T00:08:09+00:00 [object stdClass] [resource] {missing}  bar' . PHP_EOL,
-            $this->output->fetch()
+            $this->output->fetch(),
         );
     }
 }

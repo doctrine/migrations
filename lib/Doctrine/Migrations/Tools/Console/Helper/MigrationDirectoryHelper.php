@@ -21,9 +21,7 @@ use const DIRECTORY_SEPARATOR;
  */
 class MigrationDirectoryHelper
 {
-    /**
-     * @throws DirectoryDoesNotExist
-     */
+    /** @throws DirectoryDoesNotExist */
     public function getMigrationDirectory(Configuration $configuration, string $dir): string
     {
         $dir = rtrim($dir, '/');

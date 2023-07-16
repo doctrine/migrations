@@ -137,9 +137,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getPlanUpWhenNoMigrations(): array
     {
         return [
@@ -183,9 +181,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationPlanCalculator->getPlanUntilVersion(new Version('D'));
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getPlanUpWhenMigrations(): array
     {
         return [
@@ -223,9 +219,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getPlanUpWhenMigrationsOutOfOrder(): array
     {
         return [
@@ -244,7 +238,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $migrationPlanCalculator = new SortedMigrationPlanCalculator(
             $this->migrationRepository,
             $this->metadataStorage,
-            $reverseSorter
+            $reverseSorter,
         );
 
         $migrations = $migrationPlanCalculator->getMigrations();

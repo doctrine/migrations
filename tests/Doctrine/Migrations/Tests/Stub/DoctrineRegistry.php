@@ -36,8 +36,9 @@ class DoctrineRegistry extends AbstractManagerRegistry
             array_combine($realEntityManagerNames, $realEntityManagerNames),
             $connectionNames[0] ?? 'default',
             $realEntityManagerNames[0] ?? 'default',
-            Proxy::class
+            Proxy::class,
         );
+
         $this->realEntityManagers = $realEntityManagers;
         $this->connections        = $connections;
     }

@@ -24,12 +24,12 @@ final class TransactionHelperTest extends TestCase
         $wrappedConnection->method('inTransaction')->willReturn(false);
 
         $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::commitIfInTransaction($connection);
 
         $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::rollbackIfInTransaction($connection);
     }
@@ -44,12 +44,12 @@ final class TransactionHelperTest extends TestCase
         $wrappedConnection->method('inTransaction')->willReturn(true);
 
         $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::commitIfInTransaction($connection);
 
         $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::rollbackIfInTransaction($connection);
     }

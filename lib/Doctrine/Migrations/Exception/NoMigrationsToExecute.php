@@ -14,7 +14,7 @@ final class NoMigrationsToExecute extends RuntimeException implements MigrationE
         return new self(
             'Could not find any migrations to execute.',
             4,
-            $previous
+            $previous,
         );
     }
 }

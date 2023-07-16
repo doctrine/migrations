@@ -53,7 +53,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
             [A::class],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
         );
 
         $migrations = $migrationRepository->getMigrations();
@@ -70,7 +70,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/NoMigrations',
             ],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
         );
 
         $migrations = $migrationRepository->getMigrations();
@@ -127,7 +127,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
                 'Doctrine\Migrations\Tests\MigrationRepository\Migrations' => __DIR__ . '/Migrations',
             ],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $this->versionFactory
+            $this->versionFactory,
         );
     }
 }

@@ -200,7 +200,7 @@ class DependencyFactory
         return $this->getDependency(EventDispatcher::class, function (): EventDispatcher {
             return new EventDispatcher(
                 $this->getConnection(),
-                $this->getConnection()->getEventManager()
+                $this->getConnection()->getEventManager(),
             );
         });
     }
@@ -227,7 +227,7 @@ class DependencyFactory
                 $this->getConnection()->createSchemaManager(),
                 $this->getMigrationGenerator(),
                 $this->getMigrationSqlGenerator(),
-                $excludedTables
+                $excludedTables,
             );
         });
     }
@@ -271,7 +271,7 @@ class DependencyFactory
                 $this->getConnection()->getDatabasePlatform(),
                 $this->getMigrationGenerator(),
                 $this->getMigrationSqlGenerator(),
-                $this->getEmptySchemaProvider()
+                $this->getEmptySchemaProvider(),
             );
         });
     }
@@ -282,8 +282,8 @@ class DependencyFactory
             return new LazySchemaDiffProvider(
                 new DBALSchemaDiffProvider(
                     $this->getConnection()->createSchemaManager(),
-                    $this->getConnection()->getDatabasePlatform()
-                )
+                    $this->getConnection()->getDatabasePlatform(),
+                ),
             );
         });
     }
@@ -319,7 +319,7 @@ class DependencyFactory
                 $this->getConfiguration()->getMigrationClasses(),
                 $this->getConfiguration()->getMigrationDirectories(),
                 $this->getMigrationsFinder(),
-                $this->getMigrationFactory()
+                $this->getMigrationFactory(),
             );
         });
     }
@@ -331,9 +331,7 @@ class DependencyFactory
         });
     }
 
-    /**
-     * @param object|callable $service
-     */
+    /** @param object|callable $service */
     public function setService(string $id, $service): void
     {
         $this->assertNotFrozen();
@@ -347,7 +345,7 @@ class DependencyFactory
                 $this->getConnection(),
                 $this->getVersionComparator(),
                 $this->getConfiguration()->getMetadataStorageConfiguration(),
-                $this->getMigrationRepository()
+                $this->getMigrationRepository(),
             );
         });
     }
@@ -362,7 +360,7 @@ class DependencyFactory
                 $this->getSchemaDiffProvider(),
                 $this->getLogger(),
                 $this->getParameterFormatter(),
-                $this->getStopwatch()
+                $this->getStopwatch(),
             );
         });
     }
@@ -372,7 +370,7 @@ class DependencyFactory
         return $this->getDependency(QueryWriter::class, function (): QueryWriter {
             return new FileQueryWriter(
                 $this->getFileBuilder(),
-                $this->getLogger()
+                $this->getLogger(),
             );
         });
     }
@@ -383,7 +381,7 @@ class DependencyFactory
             return new DefaultAliasResolver(
                 $this->getMigrationPlanCalculator(),
                 $this->getMetadataStorage(),
-                $this->getMigrationStatusCalculator()
+                $this->getMigrationStatusCalculator(),
             );
         });
     }
@@ -393,7 +391,7 @@ class DependencyFactory
         return $this->getDependency(MigrationStatusCalculator::class, function (): MigrationStatusCalculator {
             return new CurrentMigrationStatusCalculator(
                 $this->getMigrationPlanCalculator(),
-                $this->getMetadataStorage()
+                $this->getMetadataStorage(),
             );
         });
     }
@@ -404,7 +402,7 @@ class DependencyFactory
             return new SortedMigrationPlanCalculator(
                 $this->getMigrationRepository(),
                 $this->getMetadataStorage(),
-                $this->getVersionComparator()
+                $this->getVersionComparator(),
             );
         });
     }
@@ -421,7 +419,7 @@ class DependencyFactory
         return $this->getDependency(SqlGenerator::class, function (): SqlGenerator {
             return new SqlGenerator(
                 $this->getConfiguration(),
-                $this->getConnection()->getDatabasePlatform()
+                $this->getConnection()->getDatabasePlatform(),
             );
         });
     }
@@ -430,7 +428,7 @@ class DependencyFactory
     {
         return $this->getDependency(MigratorConfigurationFactory::class, function (): MigratorConfigurationFactory {
             return new ConsoleInputMigratorConfigurationFactory(
-                $this->getConfiguration()
+                $this->getConfiguration(),
             );
         });
     }
@@ -444,7 +442,7 @@ class DependencyFactory
                 $this->getVersionAliasResolver(),
                 $this->getMigrationPlanCalculator(),
                 $this->getMigrationStatusCalculator(),
-                $this->getMetadataStorage()
+                $this->getMetadataStorage(),
             );
         });
     }
@@ -457,7 +455,7 @@ class DependencyFactory
                 $this->getEventDispatcher(),
                 $this->getVersionExecutor(),
                 $this->getLogger(),
-                $this->getStopwatch()
+                $this->getStopwatch(),
             );
         });
     }
@@ -474,14 +472,12 @@ class DependencyFactory
         return $this->getDependency(Rollup::class, function (): Rollup {
             return new Rollup(
                 $this->getMetadataStorage(),
-                $this->getMigrationRepository()
+                $this->getMigrationRepository(),
             );
         });
     }
 
-    /**
-     * @return mixed
-     */
+    /** @return mixed */
     private function getDependency(string $id, callable $callback)
     {
         if (! isset($this->inResolution[$id]) && array_key_exists($id, $this->factories) && ! array_key_exists($id, $this->dependencies)) {

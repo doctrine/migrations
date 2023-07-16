@@ -66,9 +66,7 @@ final class Configuration
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getMigrationClasses(): array
     {
         return $this->migrationClasses;
@@ -91,9 +89,7 @@ final class Configuration
         $this->migrationsDirectories[$namespace] = $path;
     }
 
-    /**
-     * @return array<string,string>
-     */
+    /** @return array<string,string> */
     public function getMigrationDirectories(): array
     {
         return $this->migrationsDirectories;
@@ -137,9 +133,7 @@ final class Configuration
         return $this->migrationsAreOrganizedByYear;
     }
 
-    /**
-     * @throws MigrationException
-     */
+    /** @throws MigrationException */
     public function setMigrationsAreOrganizedByYear(
         bool $migrationsAreOrganizedByYear = true
     ): void {
@@ -147,9 +141,7 @@ final class Configuration
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
     }
 
-    /**
-     * @throws MigrationException
-     */
+    /** @throws MigrationException */
     public function setMigrationsAreOrganizedByYearAndMonth(
         bool $migrationsAreOrganizedByYearAndMonth = true
     ): void {

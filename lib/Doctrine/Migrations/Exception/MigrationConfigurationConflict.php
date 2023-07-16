@@ -21,7 +21,7 @@ Problem: migration %s is marked as non-transactional
 Solution: disable all-or-nothing in configuration or by command-line option, or enable transactions for all migrations
 EXCEPTION
                 ,
-            get_class($migration)
+            get_class($migration),
         ));
     }
 }

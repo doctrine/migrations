@@ -8,9 +8,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\ExecutionResult;
 
-/**
- * @method iterable<Query> getSql(ExecutionResult $result);
- */
+/** @method iterable<Query> getSql(ExecutionResult $result); */
 interface MetadataStorage
 {
     public function ensureInitialized(): void;

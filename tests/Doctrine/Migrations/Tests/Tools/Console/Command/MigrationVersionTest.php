@@ -46,7 +46,7 @@ class MigrationVersionTest extends MigrationTestCase
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
             new ExistingConnection($conn),
-            $logger
+            $logger,
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -75,7 +75,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executed = $this->metadataStorage->getExecutedMigrations();
@@ -99,7 +99,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'        => true,
                 '--range-from' => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -116,7 +116,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'      => true,
                 '--range-to' => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -134,7 +134,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-to' => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -152,7 +152,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--all'      => true,
                 '--range-from' => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -179,7 +179,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--range-from' => '1234',
                 '--range-to'   => '1239',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executed = $this->metadataStorage->getExecutedMigrations();
@@ -209,7 +209,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'   => true,
                 '--all'   => true,
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
@@ -239,7 +239,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 '--all'    => true,
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
@@ -263,7 +263,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'   => true,
                 'version' => '1234',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
@@ -292,7 +292,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 'version'  => '1234',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $executedMigrations = $this->metadataStorage->getExecutedMigrations();
@@ -322,7 +322,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--add'   => true,
                 'version' => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -342,7 +342,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 'version'  => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
     }
 
@@ -361,7 +361,7 @@ class MigrationVersionTest extends MigrationTestCase
                 '--delete' => true,
                 'version'  => '1233',
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay(true));

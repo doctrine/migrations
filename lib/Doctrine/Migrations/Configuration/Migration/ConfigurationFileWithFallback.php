@@ -56,9 +56,7 @@ final class ConfigurationFileWithFallback implements ConfigurationLoader
         return file_exists($config);
     }
 
-    /**
-     * @throws FileTypeNotSupported
-     */
+    /** @throws FileTypeNotSupported */
     private function loadConfiguration(string $file): Configuration
     {
         return (new FormattedFile($file))->getConfiguration();

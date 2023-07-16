@@ -80,9 +80,9 @@ $this->abortIf(
 PHP
                     ,
                     $currentPlatform,
-                    $currentPlatform
+                    $currentPlatform,
                 ),
-                ''
+                '',
             );
         }
 

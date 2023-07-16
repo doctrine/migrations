@@ -66,16 +66,14 @@ final class InlineParameterFormatter implements ParameterFormatter
         if (is_string($type) && Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(
                 $value,
-                $this->connection->getDatabasePlatform()
+                $this->connection->getDatabasePlatform(),
             );
         }
 
         return $this->parameterToString($value);
     }
 
-    /**
-     * @param int[]|bool[]|string[]|array|int|string|bool $value
-     */
+    /** @param int[]|bool[]|string[]|array|int|string|bool $value */
     private function parameterToString($value): string
     {
         if (is_array($value)) {

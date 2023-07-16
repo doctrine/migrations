@@ -25,9 +25,7 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     /** @var AbstractSchemaManager<AbstractPlatform> */
     private AbstractSchemaManager $schemaManager;
 
-    /**
-     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager-
-     */
+    /** @param AbstractSchemaManager<AbstractPlatform> $schemaManager- */
     public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
     {
         $this->schemaManager = $schemaManager;
@@ -48,7 +46,7 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array
     {
         return $this->platform->getAlterSchemaSQL(
-            $this->schemaManager->createComparator()->compareSchemas($fromSchema, $toSchema)
+            $this->schemaManager->createComparator()->compareSchemas($fromSchema, $toSchema),
         );
     }
 }

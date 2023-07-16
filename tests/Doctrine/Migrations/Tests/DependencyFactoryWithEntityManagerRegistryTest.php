@@ -56,7 +56,7 @@ final class DependencyFactoryWithEntityManagerRegistryTest extends MigrationTest
 
         $this->di = DependencyFactory::fromEntityManager(
             new ExistingConfiguration($this->configuration),
-            ManagerRegistryEntityManager::withSimpleDefault($this->registry)
+            ManagerRegistryEntityManager::withSimpleDefault($this->registry),
         );
     }
 

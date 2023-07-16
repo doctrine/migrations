@@ -44,7 +44,7 @@ class LatestCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($conn)
+            new ExistingConnection($conn),
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -65,7 +65,7 @@ class LatestCommandTest extends MigrationTestCase
 
         $this->commandTester->execute(
             [],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));

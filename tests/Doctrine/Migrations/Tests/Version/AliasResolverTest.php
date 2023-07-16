@@ -96,9 +96,7 @@ final class AliasResolverTest extends TestCase
         self::assertEquals(new Version($expectedVersion), $resolvedAlias);
     }
 
-    /**
-     * @return mixed[][]
-     */
+    /** @return mixed[][] */
     public function getAliasesWithNoExecuted(): array
     {
         return [
@@ -114,9 +112,7 @@ final class AliasResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @return mixed[][]
-     */
+    /** @return mixed[][] */
     public function getAliases(): array
     {
         return [
@@ -147,7 +143,7 @@ final class AliasResolverTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory
+            $versionFactory,
         );
 
         $this->metadataStorage = new TableMetadataStorage($conn, new AlphabeticalComparator());
@@ -156,14 +152,14 @@ final class AliasResolverTest extends TestCase
         $this->migrationPlanCalculator = new SortedMigrationPlanCalculator(
             $this->migrationRepository,
             $this->metadataStorage,
-            new AlphabeticalComparator()
+            new AlphabeticalComparator(),
         );
 
         $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
         $this->versionAliasResolver = new DefaultAliasResolver(
             $this->migrationPlanCalculator,
             $this->metadataStorage,
-            $this->statusCalculator
+            $this->statusCalculator,
         );
     }
 

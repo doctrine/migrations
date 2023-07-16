@@ -56,7 +56,7 @@ class DiffGeneratorTest extends TestCase
             ->willReturn(
                 static function ($name): bool {
                     return $name === 'table_name1';
-                }
+                },
             );
 
         $table1 = $this->createMock(Table::class);
@@ -126,7 +126,7 @@ class DiffGeneratorTest extends TestCase
             ->method('generate')
             ->with(self::logicalOr(
                 self::equalTo(['UPDATE table SET value = 2']),
-                self::equalTo(['UPDATE table SET value = 1'])
+                self::equalTo(['UPDATE table SET value = 1']),
             ), true, 80)
             ->will(self::onConsecutiveCalls('test1', 'test2'));
 
@@ -139,7 +139,7 @@ class DiffGeneratorTest extends TestCase
             '1234',
             '/table_name1/',
             true,
-            80
+            80,
         ));
     }
 
@@ -204,7 +204,7 @@ class DiffGeneratorTest extends TestCase
             ->method('generate')
             ->with(self::logicalOr(
                 self::equalTo(['CREATE TABLE table_name']),
-                self::equalTo(['DROP TABLE table_name'])
+                self::equalTo(['DROP TABLE table_name']),
             ), false, 120, true)
             ->will(self::onConsecutiveCalls('test up', 'test down'));
 
@@ -232,7 +232,7 @@ class DiffGeneratorTest extends TestCase
             $this->platform,
             $this->migrationGenerator,
             $this->migrationSqlGenerator,
-            $this->emptySchemaProvider
+            $this->emptySchemaProvider,
         );
     }
 }

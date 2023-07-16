@@ -16,7 +16,7 @@ final class NoMigrationsFoundWithCriteria extends RuntimeException implements Mi
             $criteria !== null
                 ? sprintf('Could not find any migrations matching your criteria (%s).', $criteria)
                 : 'Could not find any migrations matching your criteria.',
-            4
+            4,
         );
     }
 }

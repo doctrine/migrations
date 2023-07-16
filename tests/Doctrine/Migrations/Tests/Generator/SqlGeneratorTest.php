@@ -50,7 +50,7 @@ $this->abortIf(
 $this->addSql('SELECT 1');
 $this->addSql('SELECT 2');
 $this->addSql('%s');
-CODE
+CODE,
         );
 
         $code = $migrationSqlGenerator->generate($this->sql, true, 80);
@@ -67,7 +67,7 @@ CODE
 $this->addSql('SELECT 1');
 $this->addSql('SELECT 2');
 $this->addSql('%s');
-CODE
+CODE,
         );
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
@@ -84,7 +84,7 @@ CODE
 $this->addSql('SELECT 1');
 $this->addSql('SELECT 2');
 $this->addSql('%s');
-CODE
+CODE,
         );
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
@@ -101,7 +101,7 @@ CODE
         $this->configuration->setMetadataStorageConfiguration($this->metadataConfig);
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
-            $this->platform
+            $this->platform,
         );
     }
 
@@ -118,7 +118,7 @@ CODE
 
         return sprintf(
             $expectedCode,
-            (new SqlFormatter(new NullHighlighter()))->format($this->sql[2])
+            (new SqlFormatter(new NullHighlighter()))->format($this->sql[2]),
         );
     }
 }

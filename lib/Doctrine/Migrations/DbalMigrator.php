@@ -51,9 +51,7 @@ class DbalMigrator implements Migrator
         $this->dispatcher = $dispatcher;
     }
 
-    /**
-     * @return array<string, Query[]>
-     */
+    /** @return array<string, Query[]> */
     private function executeMigrations(
         MigrationPlanList $migrationsPlan,
         MigratorConfiguration $migratorConfiguration
@@ -95,9 +93,7 @@ class DbalMigrator implements Migrator
         }
     }
 
-    /**
-     * @return array<string, Query[]>
-     */
+    /** @return array<string, Query[]> */
     private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array
     {
         $sql  = [];
@@ -120,9 +116,7 @@ class DbalMigrator implements Migrator
         return $sql;
     }
 
-    /**
-     * @param array<string, Query[]> $sql
-     */
+    /** @param array<string, Query[]> $sql */
     private function endMigrations(
         StopwatchEvent $stopwatchEvent,
         MigrationPlanList $migrationsPlan,
@@ -137,7 +131,7 @@ class DbalMigrator implements Migrator
                 'memory' => BytesFormatter::formatBytes($stopwatchEvent->getMemory()),
                 'migrations_count' => count($migrationsPlan),
                 'queries_count' => count($sql, COUNT_RECURSIVE) - count($sql),
-            ]
+            ],
         );
     }
 

@@ -19,12 +19,11 @@ final class SyncMetadataCommand extends DoctrineCommand
         $this
             ->setAliases(['sync-metadata-storage'])
             ->setDescription('Ensures that the metadata storage is at the latest version.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command updates metadata storage the latest version.
 
     <info>%command.full_name%</info>
-EOT
-            );
+EOT);
     }
 
     public function execute(

@@ -26,9 +26,7 @@ abstract class Finder implements MigrationFinder
         require_once $path;
     }
 
-    /**
-     * @throws InvalidDirectory
-     */
+    /** @throws InvalidDirectory */
     protected function getRealPath(string $directory): string
     {
         $dir = realpath($directory);
@@ -97,9 +95,7 @@ abstract class Finder implements MigrationFinder
         return $classes;
     }
 
-    /**
-     * @param ReflectionClass<object> $reflectionClass
-     */
+    /** @param ReflectionClass<object> $reflectionClass */
     private function isReflectionClassInNamespace(ReflectionClass $reflectionClass, string $namespace): bool
     {
         return strncmp($reflectionClass->getName(), $namespace . '\\', strlen($namespace) + 1) === 0;

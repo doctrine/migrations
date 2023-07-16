@@ -132,9 +132,7 @@ METHOD
         return $this->template;
     }
 
-    /**
-     * @throws InvalidTemplateSpecified
-     */
+    /** @throws InvalidTemplateSpecified */
     private function loadCustomTemplate(): ?string
     {
         $customTemplate = $this->configuration->getCustomTemplate();
