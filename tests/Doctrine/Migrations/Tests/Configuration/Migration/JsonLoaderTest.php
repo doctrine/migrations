@@ -8,7 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\Exception\JsonNotValid;
 use Doctrine\Migrations\Configuration\Migration\JsonFile;
 
-class JsonLoaderTest extends LoaderTest
+class JsonLoaderTest extends LoaderTestCase
 {
     public function load(string $prefix = ''): Configuration
     {

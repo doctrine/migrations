@@ -8,7 +8,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\Exception\XmlNotValid;
 use Doctrine\Migrations\Configuration\Migration\XmlFile;
 
-class XmlLoaderTest extends LoaderTest
+class XmlLoaderTest extends LoaderTestCase
 {
     public function load(string $prefix = ''): Configuration
     {
