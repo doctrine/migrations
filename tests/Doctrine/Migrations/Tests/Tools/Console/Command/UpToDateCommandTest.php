@@ -134,7 +134,7 @@ class UpToDateCommandTest extends MigrationTestCase
     }
 
     /** @return mixed[][] */
-    public function dataIsUpToDate(): array
+    public static function dataIsUpToDate(): array
     {
         return [
             'up-to-date' => [

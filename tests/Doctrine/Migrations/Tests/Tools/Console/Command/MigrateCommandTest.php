@@ -76,7 +76,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /** @return array<array<int, bool|int>> */
-    public function getMigrateWithMigrationsOrWithout(): array
+    public static function getMigrateWithMigrationsOrWithout(): array
     {
         return [
             // migrations available, allow-no-migrations, expected exit code
@@ -120,7 +120,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /** @return array<array<bool|string|null>> */
-    public function getTargetAliases(): array
+    public static function getTargetAliases(): array
     {
         return [
             ['A', 'OK', 'A'], // already at A
@@ -250,7 +250,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /** @return mixed[] */
-    public function getWriteSqlValues(): array
+    public static function getWriteSqlValues(): array
     {
         return [
             // dry-run, write-path, path
@@ -381,7 +381,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /** @psalm-return Generator<array{bool, array<string, bool|int|string|null>, bool}> */
-    public function allOrNothing(): Generator
+    public static function allOrNothing(): Generator
     {
         yield [false, ['--all-or-nothing' => false], false];
         yield [false, ['--all-or-nothing' => 0], false];

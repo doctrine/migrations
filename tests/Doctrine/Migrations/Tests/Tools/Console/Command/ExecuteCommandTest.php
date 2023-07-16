@@ -80,7 +80,7 @@ class ExecuteCommandTest extends MigrationTestCase
     }
 
     /** @return mixed[] */
-    public function getWriteSqlValues(): array
+    public static function getWriteSqlValues(): array
     {
         return [
             // dry-run, write-path, path
