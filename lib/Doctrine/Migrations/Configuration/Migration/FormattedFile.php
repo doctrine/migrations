@@ -12,9 +12,7 @@ use function pathinfo;
 
 use const PATHINFO_EXTENSION;
 
-/**
- * @internal
- */
+/** @internal */
 final class FormattedFile extends ConfigurationFile
 {
     /** @var callable[] */

@@ -25,22 +25,21 @@ final class RollupCommand extends DoctrineCommand
         $this
             ->setAliases(['rollup'])
             ->setDescription('Rollup migrations by deleting all tracked versions and insert the one version that exists.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command rolls up migrations by deleting all tracked versions and
 inserts the one version that exists that was created with the <info>migrations:dump-schema</info> command.
 
     <info>%command.full_name%</info>
 
 To dump your schema to a migration version you can use the <info>migrations:dump-schema</info> command.
-EOT
-            );
+EOT);
     }
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         $question = sprintf(
             'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
-            $this->getDependencyFactory()->getConnection()->getDatabase() ?? '<unnamed>'
+            $this->getDependencyFactory()->getConnection()->getDatabase() ?? '<unnamed>',
         );
 
         if (! $this->canExecute($question, $input)) {
@@ -54,7 +53,7 @@ EOT
 
         $this->io->success(sprintf(
             'Rolled up migrations to version %s',
-            (string) $version
+            (string) $version,
         ));
 
         return 0;

@@ -70,9 +70,7 @@ final class DbalExecutor implements Executor
         $this->dispatcher         = $dispatcher;
     }
 
-    /**
-     * @return Query[]
-     */
+    /** @return Query[] */
     public function getSql(): array
     {
         return $this->sql;
@@ -95,7 +93,7 @@ final class DbalExecutor implements Executor
             $this->executeMigration(
                 $plan,
                 $result,
-                $configuration
+                $configuration,
             );
 
             $result->setSql($this->sql);
@@ -123,7 +121,7 @@ final class DbalExecutor implements Executor
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionExecuting,
             $plan,
-            $configuration
+            $configuration,
         );
 
         if (! $plan->getMigration()->isTransactional()) {
@@ -220,15 +218,13 @@ final class DbalExecutor implements Executor
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionExecuted,
             $plan,
-            $configuration
+            $configuration,
         );
 
         return $result;
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     private function getMigrationHeader(MigrationPlan $planItem, AbstractMigration $migration, string $direction): array
     {
         $versionInfo = (string) $planItem->getVersion();
@@ -261,7 +257,7 @@ final class DbalExecutor implements Executor
         $this->dispatcher->dispatchVersionEvent(
             Events::onMigrationsVersionSkipped,
             $plan,
-            $configuration
+            $configuration,
         );
     }
 
@@ -274,7 +270,7 @@ final class DbalExecutor implements Executor
                     'version' => (string) $plan->getVersion(),
                     'reason' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
-                ]
+                ],
             );
         } elseif ($result->hasError()) {
             $this->logger->error(
@@ -283,7 +279,7 @@ final class DbalExecutor implements Executor
                     'version' => (string) $plan->getVersion(),
                     'error' => $e->getMessage(),
                     'state' => $this->getExecutionStateAsString($result->getState()),
-                ]
+                ],
             );
         }
     }
@@ -312,7 +308,7 @@ final class DbalExecutor implements Executor
     {
         $params = $this->parameterFormatter->formatParameters(
             $query->getParameters(),
-            $query->getTypes()
+            $query->getTypes(),
         );
 
         $this->logger->log(
@@ -321,7 +317,7 @@ final class DbalExecutor implements Executor
             [
                 'query'  => $query->getStatement(),
                 'params' => $params,
-            ]
+            ],
         );
     }
 

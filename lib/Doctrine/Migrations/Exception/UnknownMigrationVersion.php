@@ -15,9 +15,9 @@ final class UnknownMigrationVersion extends RuntimeException implements Migratio
         return new self(
             sprintf(
                 'Could not find migration version %s',
-                $version
+                $version,
             ),
-            5
+            5,
         );
     }
 }

@@ -78,7 +78,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -111,7 +111,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -141,9 +141,7 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->migration->setDescription('testing');
@@ -174,7 +172,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -234,7 +232,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -267,9 +265,7 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSkipMigration(): void
     {
         $this->metadataStorage
@@ -308,7 +304,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         self::assertTrue($result->isSkipped());
@@ -324,9 +320,7 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testMigrationEvents(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -353,15 +347,13 @@ class ExecutorTest extends TestCase
 
         $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
         self::assertTrue($listener->onMigrationsVersionExecuted);
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testErrorMigration(): void
     {
         $this->metadataStorage
@@ -402,7 +394,7 @@ class ExecutorTest extends TestCase
         try {
             $this->versionExecutor->execute(
                 $plan,
-                $migratorConfiguration
+                $migratorConfiguration,
             );
             $migrationSucceed = true;
         } catch (Throwable $e) {
@@ -472,7 +464,7 @@ class ExecutorTest extends TestCase
         try {
             $this->versionExecutor->execute(
                 $plan,
-                $migratorConfiguration
+                $migratorConfiguration,
             );
             $migrationSucceed = true;
         } catch (Throwable $e) {
@@ -494,9 +486,7 @@ class ExecutorTest extends TestCase
         self::assertFalse($migrationSucceed);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -506,7 +496,7 @@ class ExecutorTest extends TestCase
 
         $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         self::assertSame('++ reverting test', $this->logger->logs[0]);
@@ -543,7 +533,7 @@ class ExecutorTest extends TestCase
             $this->schemaDiffProvider,
             $this->logger,
             $this->parameterFormatter,
-            $this->stopwatch
+            $this->stopwatch,
         );
 
         $this->version = new Version('test');

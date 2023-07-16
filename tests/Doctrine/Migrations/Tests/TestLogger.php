@@ -23,7 +23,7 @@ class TestLogger extends AbstractLogger
     public array $logs = [];
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param mixed[] $context
      */

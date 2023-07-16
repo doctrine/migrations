@@ -37,44 +37,41 @@ final class DumpSchemaCommand extends DoctrineCommand
         $this
             ->setAliases(['dump-schema'])
             ->setDescription('Dump the schema for your database to a migration.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command dumps the schema for your database to a migration:
 
     <info>%command.full_name%</info>
 
 After dumping your schema to a migration, you can rollup your migrations using the <info>migrations:rollup</info> command.
-EOT
-            )
+EOT)
             ->addOption(
                 'formatted',
                 null,
                 InputOption::VALUE_NONE,
-                'Format the generated SQL.'
+                'Format the generated SQL.',
             )
             ->addOption(
                 'namespace',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Namespace to use for the generated migrations (defaults to the first namespace definition).'
+                'Namespace to use for the generated migrations (defaults to the first namespace definition).',
             )
             ->addOption(
                 'filter-tables',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'Filter the tables to dump via Regex.'
+                'Filter the tables to dump via Regex.',
             )
             ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Max line length of unformatted lines.',
-                '120'
+                '120',
             );
     }
 
-    /**
-     * @throws SchemaDumpRequiresNoMigrations
-     */
+    /** @throws SchemaDumpRequiresNoMigrations */
     public function execute(
         InputInterface $input,
         OutputInterface $output
@@ -87,7 +84,7 @@ EOT
         if ($formatted) {
             if (! class_exists(SqlFormatter::class)) {
                 throw InvalidOptionUsage::new(
-                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".'
+                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".',
                 );
             }
         }
@@ -110,7 +107,7 @@ EOT
             $fqcn,
             $input->getOption('filter-tables'),
             $formatted,
-            $lineLength
+            $lineLength,
         );
 
         $this->io->text([
@@ -118,12 +115,12 @@ EOT
             '',
             sprintf(
                 'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
-                addslashes($fqcn)
+                addslashes($fqcn),
             ),
             '',
             sprintf(
                 'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
-                addslashes($fqcn)
+                addslashes($fqcn),
             ),
             '',
             'To use this as a rollup migration you can use the <info>migrations:rollup</info> command.',

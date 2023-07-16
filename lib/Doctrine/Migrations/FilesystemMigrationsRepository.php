@@ -57,7 +57,7 @@ class FilesystemMigrationsRepository implements MigrationsRepository
         if (isset($this->migrations[(string) $version])) {
             throw DuplicateMigrationVersion::new(
                 (string) $version,
-                (string) $version
+                (string) $version,
             );
         }
 
@@ -142,7 +142,7 @@ class FilesystemMigrationsRepository implements MigrationsRepository
         foreach ($migrationDirectories as $namespace => $path) {
                 $migrations = $this->migrationFinder->findMigrations(
                     $path,
-                    $namespace
+                    $namespace,
                 );
                 $this->registerMigrations($migrations);
         }

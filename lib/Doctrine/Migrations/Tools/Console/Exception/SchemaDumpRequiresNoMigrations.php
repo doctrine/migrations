@@ -14,7 +14,7 @@ final class SchemaDumpRequiresNoMigrations extends RuntimeException implements C
     {
         return new self(sprintf(
             'Delete any previous migrations in the namespace "%s" before dumping your schema.',
-            $namespace
+            $namespace,
         ));
     }
 }

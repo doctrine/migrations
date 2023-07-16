@@ -93,7 +93,7 @@ class SchemaDumper
             $upCode = $this->migrationSqlGenerator->generate(
                 $upSql,
                 $formatted,
-                $lineLength
+                $lineLength,
             );
 
             if ($upCode !== '') {
@@ -105,7 +105,7 @@ class SchemaDumper
             $downCode = $this->migrationSqlGenerator->generate(
                 $downSql,
                 $formatted,
-                $lineLength
+                $lineLength,
             );
 
             if ($downCode === '') {
@@ -125,13 +125,11 @@ class SchemaDumper
         return $this->migrationGenerator->generateMigration(
             $fqcn,
             $up,
-            $down
+            $down,
         );
     }
 
-    /**
-     * @param string[] $excludedTablesRegexes
-     */
+    /** @param string[] $excludedTablesRegexes */
     private function shouldSkipTable(Table $table, array $excludedTablesRegexes): bool
     {
         foreach (array_merge($excludedTablesRegexes, $this->excludedTablesRegexes) as $regex) {

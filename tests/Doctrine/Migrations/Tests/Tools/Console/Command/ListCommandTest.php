@@ -46,7 +46,7 @@ class ListCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($conn)
+            new ExistingConnection($conn),
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -92,7 +92,7 @@ class ListCommandTest extends MigrationTestCase
                 7 => '| 1231      | not migrated            |                     |                | foo         |',
                 8 => '+-----------+-------------------------+---------------------+----------------+-------------+',
             ],
-            $lines
+            $lines,
         );
     }
 }

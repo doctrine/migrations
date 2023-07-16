@@ -37,7 +37,7 @@ final class DependencyFactoryWithConnectionRegistryTest extends MigrationTestCas
 
         $this->di = DependencyFactory::fromConnection(
             new ExistingConfiguration($this->configuration),
-            ConnectionRegistryConnection::withSimpleDefault($this->registry)
+            ConnectionRegistryConnection::withSimpleDefault($this->registry),
         );
     }
 

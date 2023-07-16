@@ -14,8 +14,6 @@ use Doctrine\Migrations\Query\Query;
  */
 interface Migrator
 {
-    /**
-     * @return array<string, Query[]> A list of SQL statements executed, grouped by migration version
-     */
+    /** @return array<string, Query[]> A list of SQL statements executed, grouped by migration version */
     public function migrate(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array;
 }

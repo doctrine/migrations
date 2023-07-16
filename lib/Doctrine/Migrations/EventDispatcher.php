@@ -46,7 +46,7 @@ final class EventDispatcher
     ): void {
         $event = $this->createMigrationsVersionEventArgs(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $this->dispatchEvent($eventName, $event);
@@ -71,7 +71,7 @@ final class EventDispatcher
         return new MigrationsVersionEventArgs(
             $this->connection,
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
     }
 }

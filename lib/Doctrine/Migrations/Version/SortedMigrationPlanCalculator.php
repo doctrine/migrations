@@ -47,9 +47,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         $this->sorter              = $sorter;
     }
 
-    /**
-     * @param Version[] $versions
-     */
+    /** @param Version[] $versions */
     public function getPlanForVersions(array $versions, string $direction): MigrationPlanList
     {
         $migrationsToCheck   = $this->arrangeMigrationsForDirection($direction, $this->getMigrations());
@@ -127,9 +125,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         return Direction::UP;
     }
 
-    /**
-     * @return  AvailableMigration[]
-     */
+    /** @return  AvailableMigration[] */
     private function arrangeMigrationsForDirection(string $direction, Metadata\AvailableMigrationsList $availableMigrations): array
     {
         return $direction === Direction::UP ? $availableMigrations->getItems() : array_reverse($availableMigrations->getItems());

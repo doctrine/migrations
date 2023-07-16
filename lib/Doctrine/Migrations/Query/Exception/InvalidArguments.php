@@ -17,7 +17,7 @@ class InvalidArguments extends InvalidArgumentException implements MigrationExce
             'The number of types (%s) is higher than the number of passed parameters (%s) for the query "%s".',
             $types,
             $parameters,
-            $statement
+            $statement,
         ));
     }
 }

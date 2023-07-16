@@ -77,17 +77,13 @@ final class ExecutionResult
         return count($this->sql) !== 0;
     }
 
-    /**
-     * @return Query[]
-     */
+    /** @return Query[] */
     public function getSql(): array
     {
         return $this->sql;
     }
 
-    /**
-     * @param Query[] $sql
-     */
+    /** @param Query[] $sql */
     public function setSql(array $sql): void
     {
         $this->sql = $sql;

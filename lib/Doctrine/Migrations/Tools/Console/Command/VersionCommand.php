@@ -39,39 +39,39 @@ final class VersionCommand extends DoctrineCommand
                 'version',
                 InputArgument::OPTIONAL,
                 'The version to add or delete.',
-                null
+                null,
             )
             ->addOption(
                 'add',
                 null,
                 InputOption::VALUE_NONE,
-                'Add the specified version.'
+                'Add the specified version.',
             )
             ->addOption(
                 'delete',
                 null,
                 InputOption::VALUE_NONE,
-                'Delete the specified version.'
+                'Delete the specified version.',
             )
             ->addOption(
                 'all',
                 null,
                 InputOption::VALUE_NONE,
-                'Apply to all the versions.'
+                'Apply to all the versions.',
             )
             ->addOption(
                 'range-from',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Apply from specified version.'
+                'Apply from specified version.',
             )
             ->addOption(
                 'range-to',
                 null,
                 InputOption::VALUE_OPTIONAL,
-                'Apply to specified version.'
+                'Apply to specified version.',
             )
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command allows you to manually add, delete or synchronize migration versions from the version table:
 
     <info>%command.full_name% MIGRATION-FQCN --add</info>
@@ -93,15 +93,12 @@ If you want to synchronize by adding or deleting some range of migration version
 You can also execute this command without a warning message which you need to interact with:
 
     <info>%command.full_name% --no-interaction</info>
-EOT
-            );
+EOT);
 
         parent::configure();
     }
 
-    /**
-     * @throws InvalidOptionUsage
-     */
+    /** @throws InvalidOptionUsage */
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
         if ($input->getOption('add') === false && $input->getOption('delete') === false) {
@@ -127,9 +124,7 @@ EOT
         return 0;
     }
 
-    /**
-     * @throws InvalidOptionUsage
-     */
+    /** @throws InvalidOptionUsage */
     private function markVersions(InputInterface $input, OutputInterface $output): void
     {
         $affectedVersion = $input->getArgument('version');
@@ -139,13 +134,13 @@ EOT
 
         if ($allOption === true && ($rangeFromOption !== null || $rangeToOption !== null)) {
             throw InvalidOptionUsage::new(
-                'Options --all and --range-to/--range-from both used. You should use only one of them.'
+                'Options --all and --range-to/--range-from both used. You should use only one of them.',
             );
         }
 
         if ($rangeFromOption !== null xor $rangeToOption !== null) {
             throw InvalidOptionUsage::new(
-                'Options --range-to and --range-from should be used together.'
+                'Options --range-to and --range-from should be used together.',
             );
         }
 
@@ -213,7 +208,7 @@ EOT
                 $storage->complete($migrationResult);
                 $this->io->text(sprintf(
                     "<info>%s</info> deleted from the version table.\n",
-                    (string) $version
+                    (string) $version,
                 ));
 
                 return;
@@ -248,7 +243,7 @@ EOT
 
             $this->io->text(sprintf(
                 "<info>%s</info> added to the version table.\n",
-                (string) $version
+                (string) $version,
             ));
         } else {
             $migrationResult = new ExecutionResult($version, Direction::DOWN);
@@ -256,7 +251,7 @@ EOT
 
             $this->io->text(sprintf(
                 "<info>%s</info> deleted from the version table.\n",
-                (string) $version
+                (string) $version,
             ));
         }
     }

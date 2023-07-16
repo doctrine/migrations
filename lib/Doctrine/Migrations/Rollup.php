@@ -31,9 +31,7 @@ class Rollup
         $this->metadataStorage     = $metadataStorage;
     }
 
-    /**
-     * @throws RollupFailed
-     */
+    /** @throws RollupFailed */
     public function rollup(): Version
     {
         $versions = $this->migrationRepository->getMigrations();

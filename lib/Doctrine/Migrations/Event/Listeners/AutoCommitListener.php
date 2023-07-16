@@ -29,7 +29,7 @@ final class AutoCommitListener implements EventSubscriber
         TransactionHelper::commitIfInTransaction($conn);
     }
 
-    /** {@inheritdoc} */
+    /** {@inheritDoc} */
     public function getSubscribedEvents()
     {
         return [Events::onMigrationsMigrated];

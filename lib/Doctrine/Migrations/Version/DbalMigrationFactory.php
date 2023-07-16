@@ -29,7 +29,7 @@ final class DbalMigrationFactory implements MigrationFactory
     {
         return new $migrationClassName(
             $this->connection,
-            $this->logger
+            $this->logger,
         );
     }
 }

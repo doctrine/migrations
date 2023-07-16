@@ -46,7 +46,7 @@ final class YamlFile extends ConfigurationFile
         if (isset($config['migrations_paths'])) {
             $config['migrations_paths'] = $this->getDirectoriesRelativeToFile(
                 $config['migrations_paths'],
-                $this->file
+                $this->file,
             );
         }
 

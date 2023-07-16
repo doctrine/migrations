@@ -74,9 +74,7 @@ abstract class AbstractMigration
         $this->logger->warning($message, ['migration' => $this]);
     }
 
-    /**
-     * @throws AbortMigration
-     */
+    /** @throws AbortMigration */
     public function abortIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
@@ -84,9 +82,7 @@ abstract class AbstractMigration
         }
     }
 
-    /**
-     * @throws SkipMigration
-     */
+    /** @throws SkipMigration */
     public function skipIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
@@ -94,42 +90,30 @@ abstract class AbstractMigration
         }
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function preUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function postUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function preDown(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function postDown(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     abstract public function up(Schema $schema): void;
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function down(Schema $schema): void
     {
         $this->abortIf(true, sprintf('No down() migration implemented for "%s"', static::class));
@@ -147,9 +131,7 @@ abstract class AbstractMigration
         $this->plannedSql[] = new Query($sql, $params, $types);
     }
 
-    /**
-     * @return Query[]
-     */
+    /** @return Query[] */
     public function getSql(): array
     {
         return $this->plannedSql;
@@ -160,9 +142,7 @@ abstract class AbstractMigration
         $this->logger->notice($message, ['migration' => $this]);
     }
 
-    /**
-     * @throws IrreversibleMigration
-     */
+    /** @throws IrreversibleMigration */
     protected function throwIrreversibleMigrationException(?string $message = null): void
     {
         if ($message === null) {

@@ -30,12 +30,11 @@ final class ListCommand extends DoctrineCommand
         $this
             ->setAliases(['list-migrations'])
             ->setDescription('Display a list of all available migrations and their status.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command outputs a list of all available migrations and their status:
 
     <info>%command.full_name%</info>
-EOT
-            );
+EOT);
 
         parent::configure();
     }
@@ -44,7 +43,7 @@ EOT
     {
         $versions = $this->getSortedVersions(
             $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations(), // available migrations
-            $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations() // executed migrations
+            $this->getDependencyFactory()->getMetadataStorage()->getExecutedMigrations(), // executed migrations
         );
 
         $this->getDependencyFactory()->getMigrationStatusInfosHelper()->listVersions($versions, $output);
@@ -52,9 +51,7 @@ EOT
         return 0;
     }
 
-    /**
-     * @return Version[]
-     */
+    /** @return Version[] */
     private function getSortedVersions(AvailableMigrationsList $availableMigrations, ExecutedMigrationsList $executedMigrations): array
     {
         $availableVersions = array_map(static function (AvailableMigration $availableMigration): Version {

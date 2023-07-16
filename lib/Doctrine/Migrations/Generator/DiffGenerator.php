@@ -39,9 +39,7 @@ class DiffGenerator
 
     private SchemaProvider $emptySchemaProvider;
 
-    /**
-     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
-     */
+    /** @param AbstractSchemaManager<AbstractPlatform> $schemaManager */
     public function __construct(
         DBALConfiguration $dbalConfiguration,
         AbstractSchemaManager $schemaManager,
@@ -60,9 +58,7 @@ class DiffGenerator
         $this->emptySchemaProvider   = $emptySchemaProvider;
     }
 
-    /**
-     * @throws NoChangesDetected
-     */
+    /** @throws NoChangesDetected */
     public function generate(
         string $fqcn,
         ?string $filterExpression,
@@ -79,7 +75,7 @@ class DiffGenerator
                     }
 
                     return preg_match($filterExpression, $assetName);
-                }
+                },
             );
         }
 
@@ -97,7 +93,7 @@ class DiffGenerator
             $upSql,
             $formatted,
             $lineLength,
-            $checkDbPlatform
+            $checkDbPlatform,
         );
 
         $downSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($toSchema, $fromSchema));
@@ -106,7 +102,7 @@ class DiffGenerator
             $downSql,
             $formatted,
             $lineLength,
-            $checkDbPlatform
+            $checkDbPlatform,
         );
 
         if ($up === '' && $down === '') {
@@ -116,7 +112,7 @@ class DiffGenerator
         return $this->migrationGenerator->generateMigration(
             $fqcn,
             $up,
-            $down
+            $down,
         );
     }
 

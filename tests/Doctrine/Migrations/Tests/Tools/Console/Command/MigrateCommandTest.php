@@ -68,16 +68,14 @@ class MigrateCommandTest extends MigrationTestCase
     {
         $this->migrateCommandTester->execute(
             ['version' => 'B'],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         self::assertStringContainsString('[ERROR] Unknown version: B', $this->migrateCommandTester->getDisplay(true));
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
-    /**
-     * @return array<array<int, bool|int>>
-     */
+    /** @return array<array<int, bool|int>> */
     public function getMigrateWithMigrationsOrWithout(): array
     {
         return [
@@ -89,9 +87,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /**
-     * @dataProvider getMigrateWithMigrationsOrWithout
-     */
+    /** @dataProvider getMigrateWithMigrationsOrWithout */
     public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode): void
     {
         $finder                    = $this->createMock(Finder::class);
@@ -106,7 +102,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute(
             ['--allow-no-migration' => $allowNoMigration],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         if (! $hasMigrations) {
@@ -114,18 +110,16 @@ class MigrateCommandTest extends MigrationTestCase
             self::assertStringContainsString(
                 sprintf(
                     '[%s] The version "latest" couldn\'t be reached, there are no registered migrations.',
-                    $allowNoMigration ? 'WARNING' : 'ERROR'
+                    $allowNoMigration ? 'WARNING' : 'ERROR',
                 ),
-                $display
+                $display,
             );
         }
 
         self::assertSame($expectedExitCode, $this->migrateCommandTester->getStatusCode());
     }
 
-    /**
-     * @return array<array<bool|string|null>>
-     */
+    /** @return array<array<bool|string|null>> */
     public function getTargetAliases(): array
     {
         return [
@@ -139,9 +133,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /**
-     * @dataProvider getTargetAliases
-     */
+    /** @dataProvider getTargetAliases */
     public function testExecuteAtVersion(string $targetAlias, string $level, ?string $executedMigration): void
     {
         if ($executedMigration !== null) {
@@ -151,7 +143,7 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute(
             ['version' => $targetAlias],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         $display = trim($this->migrateCommandTester->getDisplay(true));
@@ -162,20 +154,20 @@ class MigrateCommandTest extends MigrationTestCase
                 '[%s] Already at the %s version ("%s")',
                 $level,
                 $targetAlias,
-                ($executedMigration ?? '0')
+                ($executedMigration ?? '0'),
             );
         } elseif ($targetAlias === 'A') {
             $message = sprintf(
                 '[%s] You are already at version "%s"',
                 $level,
-                $targetAlias
+                $targetAlias,
             );
         } else {
             $message = sprintf(
                 '[%s] The version "%s" couldn\'t be reached, you are at version "%s"',
                 $level,
                 $targetAlias,
-                ($executedMigration ?? '0')
+                ($executedMigration ?? '0'),
             );
         }
 
@@ -187,7 +179,7 @@ class MigrateCommandTest extends MigrationTestCase
     {
         $this->migrateCommandTester->execute(
             ['version' => 'unknown'],
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Unknown version: unknown') !== false);
@@ -252,14 +244,12 @@ class MigrateCommandTest extends MigrationTestCase
                 '--write-sql' => $arg,
                 '--dry-run' => $dryRun,
             ],
-            ['interactive' => false]
+            ['interactive' => false],
         );
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    /**
-     * @return mixed[]
-     */
+    /** @return mixed[] */
     public function getWriteSqlValues(): array
     {
         return [
@@ -305,7 +295,7 @@ class MigrateCommandTest extends MigrationTestCase
             $this->connection,
             new AlphabeticalComparator(),
             $this->metadataConfiguration,
-            $this->migrationRepository
+            $this->migrationRepository,
         );
         $this->dependencyFactory->setService(MetadataStorage::class, $this->storage);
 
@@ -384,15 +374,13 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute(
             $input,
-            ['interactive' => false]
+            ['interactive' => false],
         );
 
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    /**
-     * @psalm-return Generator<array{bool, array<string, bool|int|string|null>, bool}>
-     */
+    /** @psalm-return Generator<array{bool, array<string, bool|int|string|null>, bool}> */
     public function allOrNothing(): Generator
     {
         yield [false, ['--all-or-nothing' => false], false];
@@ -491,7 +479,7 @@ class MigrateCommandTest extends MigrationTestCase
             $this->connection,
             new AlphabeticalComparator(),
             $this->metadataConfiguration,
-            $this->migrationRepository
+            $this->migrationRepository,
         );
         $this->storage->ensureInitialized();
 

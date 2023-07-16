@@ -33,6 +33,7 @@ abstract class DoctrineCommand extends Command
     public function __construct(?DependencyFactory $dependencyFactory = null, ?string $name = null)
     {
         $this->dependencyFactory = $dependencyFactory;
+
         parent::__construct($name);
     }
 
@@ -42,21 +43,21 @@ abstract class DoctrineCommand extends Command
             'configuration',
             null,
             InputOption::VALUE_REQUIRED,
-            'The path to a migrations configuration file. <comment>[default: any of migrations.{php,xml,json,yml,yaml}]</comment>'
+            'The path to a migrations configuration file. <comment>[default: any of migrations.{php,xml,json,yml,yaml}]</comment>',
         );
 
         $this->addOption(
             'em',
             null,
             InputOption::VALUE_REQUIRED,
-            'The name of the entity manager to use.'
+            'The name of the entity manager to use.',
         );
 
         $this->addOption(
             'conn',
             null,
             InputOption::VALUE_REQUIRED,
-            'The name of the connection to use.'
+            'The name of the connection to use.',
         );
 
         if ($this->dependencyFactory !== null) {
@@ -68,7 +69,7 @@ abstract class DoctrineCommand extends Command
             null,
             InputOption::VALUE_REQUIRED,
             'The path to a database connection configuration file.',
-            'migrations-db.php'
+            'migrations-db.php',
         );
     }
 
@@ -81,7 +82,7 @@ abstract class DoctrineCommand extends Command
             $configurationLoader     = new ConfigurationFileWithFallback(
                 is_string($configurationParameter)
                     ? $configurationParameter
-                    : null
+                    : null,
             );
             $connectionLoader        = new ConfigurationFile($input->getOption('db-configuration'));
             $this->dependencyFactory = DependencyFactory::fromConnection($configurationLoader, $connectionLoader);

@@ -173,7 +173,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql  = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
         $rows = $this->connection->fetchAllAssociative($sql);
         self::assertEquals([
@@ -197,7 +197,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql  = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
         $rows = $this->connection->fetchAllAssociative($sql);
         self::assertEquals([
@@ -313,7 +313,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
@@ -334,7 +334,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
@@ -351,7 +351,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
         self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
@@ -369,7 +369,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertSame(sprintf(
             "INSERT INTO doctrine_migration_versions (version, executed_at, execution_time) VALUES ('%s', '%s', 0)",
             '2230',
-            '2010-01-05 10:30:21'
+            '2010-01-05 10:30:21',
         ), $queries[1]->getStatement());
 
         foreach ($queries as $query) {
@@ -378,7 +378,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s WHERE version = 2230',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName())
+            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
         );
 
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));
@@ -391,7 +391,7 @@ class TableMetadataStorageTest extends TestCase
         self::assertSame('-- Version 2230 update table metadata', $queries[0]->getStatement());
         self::assertSame(sprintf(
             "DELETE FROM doctrine_migration_versions WHERE version = '%s'",
-            '2230'
+            '2230',
         ), $queries[1]->getStatement());
 
         foreach ($queries as $query) {

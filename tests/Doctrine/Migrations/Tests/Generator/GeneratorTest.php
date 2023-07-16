@@ -87,7 +87,7 @@ final class GeneratorTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
             'The specified template "%s" is empty.',
-            $customTemplate
+            $customTemplate,
         ));
 
         $this->configuration->setCustomTemplate($customTemplate);
@@ -103,7 +103,7 @@ final class GeneratorTest extends TestCase
         $path = $this->migrationGenerator->generateMigration(
             'Test\\VersionNonTransactional1234',
             '// up',
-            '// down'
+            '// down',
         );
 
         self::assertFileExists($path);
@@ -113,7 +113,7 @@ final class GeneratorTest extends TestCase
         self::assertTrue(class_exists('Test\VersionNonTransactional1234'));
         self::assertFalse((new VersionNonTransactional1234(
             $this->createStub(Connection::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
         ))->isTransactional());
 
         unlink($path);
@@ -124,7 +124,7 @@ final class GeneratorTest extends TestCase
         $path = $this->migrationGenerator->generateMigration(
             'Test\\VersionNonTransactional1235',
             '// up',
-            '// down'
+            '// down',
         );
 
         self::assertFileExists($path);
@@ -134,7 +134,7 @@ final class GeneratorTest extends TestCase
         self::assertTrue(class_exists('Test\VersionNonTransactional1235'));
         self::assertTrue((new VersionNonTransactional1235(
             $this->createStub(Connection::class),
-            $this->createStub(LoggerInterface::class)
+            $this->createStub(LoggerInterface::class),
         ))->isTransactional());
 
         unlink($path);

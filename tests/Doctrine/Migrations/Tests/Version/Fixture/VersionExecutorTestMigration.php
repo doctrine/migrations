@@ -35,6 +35,7 @@ class VersionExecutorTestMigration extends AbstractMigration
     public function preUp(Schema $fromSchema): void
     {
         $this->preUpExecuted = true;
+
         parent::preUp($fromSchema);
     }
 
@@ -50,12 +51,14 @@ class VersionExecutorTestMigration extends AbstractMigration
     public function postUp(Schema $toSchema): void
     {
         $this->postUpExecuted = true;
+
         parent::postUp($toSchema);
     }
 
     public function preDown(Schema $fromSchema): void
     {
         $this->preDownExecuted = true;
+
         parent::preDown($fromSchema);
     }
 
@@ -68,6 +71,7 @@ class VersionExecutorTestMigration extends AbstractMigration
     public function postDown(Schema $toSchema): void
     {
         $this->postDownExecuted = true;
+
         parent::postDown($toSchema);
     }
 }

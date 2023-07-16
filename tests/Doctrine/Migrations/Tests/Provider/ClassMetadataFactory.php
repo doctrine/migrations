@@ -11,9 +11,7 @@ use function array_reverse;
 
 class ClassMetadataFactory extends BaseMetadataFactoryAlias
 {
-    /**
-     * @psalm-return list<ClassMetadata<object>>
-     */
+    /** @psalm-return list<ClassMetadata<object>> */
     public function getAllMetadata(): array
     {
         return array_reverse(parent::getAllMetadata());

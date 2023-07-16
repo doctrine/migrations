@@ -124,7 +124,7 @@ class ExecutionResultTest extends TestCase
     {
         $this->versionExecutionResult = new ExecutionResult(
             new Version('foo'),
-            Direction::UP
+            Direction::UP,
         );
         $this->versionExecutionResult->setSql([new Query('SELECT 1', [1], [2])]);
     }

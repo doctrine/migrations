@@ -14,9 +14,7 @@ class CustomClassNameMigrationFactory implements MigrationFactory
     /** @var class-string<AbstractMigration> */
     private string $migrationClassName;
 
-    /**
-     * @param class-string<AbstractMigration> $migrationClassName
-     */
+    /** @param class-string<AbstractMigration> $migrationClassName */
     public function __construct(MigrationFactory $parentMigrationFactory, string $migrationClassName)
     {
         $this->parentMigrationFactory = $parentMigrationFactory;
