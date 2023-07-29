@@ -8,3 +8,5 @@ build.xml               export-ignore
 /phpcs.xml.dist         export-ignore
 /phpstan.neon.dist      export-ignore
 composer.lock           export-ignore
+/download-box.sh        export-ignore
+/build-phar.sh          export-ignore
