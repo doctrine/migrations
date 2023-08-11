@@ -200,7 +200,7 @@ class DependencyFactory
         return $this->getDependency(EventDispatcher::class, function (): EventDispatcher {
             return new EventDispatcher(
                 $this->getConnection(),
-                $this->getConnection()->getEventManager(),
+                $this->getEntityManager()->getEventManager(),
             );
         });
     }
