@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\Deprecations\Deprecation;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
 use Doctrine\Migrations\Configuration\EntityManager\EntityManagerLoader;
@@ -79,17 +81,36 @@ class DependencyFactory
 
     private ?EntityManagerLoader $emLoader = null;
 
+    private ?EventManager $eventManager = null;
+
     /** @var callable[] */
     private array $factories = [];
 
     public static function fromConnection(
         ConfigurationLoader $configurationLoader,
         ConnectionLoader $connectionLoader,
+        EventManager|LoggerInterface|null $eventManager = null,
         ?LoggerInterface $logger = null
     ): self {
+        if (! $eventManager instanceof EventManager) {
+            Deprecation::trigger(
+                'doctrine/migrations',
+                'https://github.com/doctrine/migrations/issues/1348',
+                'Not passing a %s as third argument of the method %s is deprecated.',
+                EventManager::class,
+                __METHOD__,
+            );
+
+            $logger = $eventManager;
+        }
+
         $dependencyFactory                      = new self($logger);
         $dependencyFactory->configurationLoader = $configurationLoader;
         $dependencyFactory->connectionLoader    = $connectionLoader;
+
+        if ($eventManager instanceof EventManager) {
+            $dependencyFactory->eventManager = $eventManager;
+        }
 
         return $dependencyFactory;
     }
@@ -200,9 +221,22 @@ class DependencyFactory
         return $this->getDependency(EventDispatcher::class, function (): EventDispatcher {
             return new EventDispatcher(
                 $this->getConnection(),
-                $this->getEntityManager()->getEventManager(),
+                $this->getEventManager(),
             );
         });
+    }
+
+    private function getEventManager(): EventManager
+    {
+        if ($this->eventManager === null) {
+            if ($this->hasEntityManager()) {
+                $this->eventManager = $this->getEntityManager()->getEventManager();
+            } else {
+                $this->eventManager = $this->getConnection()->getEventManager();
+            }
+        }
+
+        return $this->eventManager;
     }
 
     public function getClassNameGenerator(): ClassNameGenerator
