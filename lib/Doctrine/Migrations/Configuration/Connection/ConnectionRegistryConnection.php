@@ -12,9 +12,9 @@ final class ConnectionRegistryConnection implements ConnectionLoader
 {
     private ConnectionRegistry $registry;
 
-    private ?string $defaultConnectionName = null;
+    private string|null $defaultConnectionName = null;
 
-    public static function withSimpleDefault(ConnectionRegistry $registry, ?string $connectionName = null): self
+    public static function withSimpleDefault(ConnectionRegistry $registry, string|null $connectionName = null): self
     {
         $that                        = new self();
         $that->registry              = $registry;
@@ -27,7 +27,7 @@ final class ConnectionRegistryConnection implements ConnectionLoader
     {
     }
 
-    public function getConnection(?string $name = null): Connection
+    public function getConnection(string|null $name = null): Connection
     {
         $connection = $this->registry->getConnection($name ?? $this->defaultConnectionName);
         if (! $connection instanceof Connection) {

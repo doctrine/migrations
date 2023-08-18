@@ -30,6 +30,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
 use function array_map;
+use function strval;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -79,7 +80,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
+            array_map(strval(...), $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 
@@ -140,7 +141,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
+            array_map(strval(...), $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 

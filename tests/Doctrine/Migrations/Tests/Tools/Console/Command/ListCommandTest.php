@@ -78,7 +78,7 @@ class ListCommandTest extends MigrationTestCase
 
         $this->commandTester->execute([]);
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
         self::assertSame(
             [

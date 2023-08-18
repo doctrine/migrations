@@ -227,7 +227,7 @@ class ConsoleRunnerStub extends ConsoleRunner
     public static Application $application;
 
     /** @param Command[] $commands */
-    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null): Application
+    public static function createApplication(array $commands = [], DependencyFactory|null $dependencyFactory = null): Application
     {
         return static::$application;
     }

@@ -11,8 +11,7 @@ use function var_export;
 
 final class UnknownConfigurationValue extends LogicException implements ConfigurationException
 {
-    /** @param mixed $value */
-    public static function new(string $key, $value): self
+    public static function new(string $key, mixed $value): self
     {
         return new self(
             sprintf(

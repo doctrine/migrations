@@ -24,7 +24,7 @@ class MigratorConfiguration
 
     private bool $allOrNothing = false;
 
-    private ?Schema $fromSchema = null;
+    private Schema|null $fromSchema = null;
 
     public function isDryRun(): bool
     {
@@ -74,7 +74,7 @@ class MigratorConfiguration
         return $this;
     }
 
-    public function getFromSchema(): ?Schema
+    public function getFromSchema(): Schema|null
     {
         return $this->fromSchema;
     }

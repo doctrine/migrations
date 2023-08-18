@@ -10,7 +10,7 @@ use function sprintf;
 
 final class NoMigrationsFoundWithCriteria extends RuntimeException implements MigrationException
 {
-    public static function new(?string $criteria = null): self
+    public static function new(string|null $criteria = null): self
     {
         return new self(
             $criteria !== null

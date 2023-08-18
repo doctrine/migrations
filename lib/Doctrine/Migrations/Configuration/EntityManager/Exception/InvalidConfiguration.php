@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Configuration\EntityManager\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 use InvalidArgumentException;
 
-use function get_class;
+use function get_debug_type;
 use function sprintf;
 
 final class InvalidConfiguration extends InvalidArgumentException implements LoaderException
@@ -19,6 +19,10 @@ final class InvalidConfiguration extends InvalidArgumentException implements Loa
 
     public static function invalidManagerType(object $em): self
     {
-        return new self(sprintf('The returned manager must implement %s, %s returned.', EntityManagerInterface::class, get_class($em)));
+        return new self(sprintf(
+            'The returned manager must implement %s, %s returned.',
+            EntityManagerInterface::class,
+            get_debug_type($em),
+        ));
     }
 }

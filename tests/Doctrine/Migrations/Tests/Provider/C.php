@@ -6,9 +6,9 @@ namespace Doctrine\Migrations\Tests\Provider;
 
 class C
 {
-    private ?int $id = null;
+    private int|null $id = null;
 
-    public function getId(): ?int
+    public function getId(): int|null
     {
         return $this->id;
     }

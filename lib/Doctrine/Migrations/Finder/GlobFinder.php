@@ -15,7 +15,7 @@ final class GlobFinder extends Finder
     /**
      * {@inheritDoc}
      */
-    public function findMigrations(string $directory, ?string $namespace = null): array
+    public function findMigrations(string $directory, string|null $namespace = null): array
     {
         $dir = $this->getRealPath($directory);
 

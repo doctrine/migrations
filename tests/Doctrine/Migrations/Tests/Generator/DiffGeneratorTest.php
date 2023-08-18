@@ -54,9 +54,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
             ->willReturn(
-                static function ($name): bool {
-                    return $name === 'table_name1';
-                },
+                static fn ($name): bool => $name === 'table_name1',
             );
 
         $table1 = $this->createMock(Table::class);
@@ -110,7 +108,7 @@ class DiffGeneratorTest extends TestCase
 
             public static function compareSchemas(
                 Schema $fromSchema,
-                Schema $toSchema
+                Schema $toSchema,
             ): SchemaDiff {
                 return self::$schemaDiff;
             }
@@ -188,7 +186,7 @@ class DiffGeneratorTest extends TestCase
 
             public static function compareSchemas(
                 Schema $fromSchema,
-                Schema $toSchema
+                Schema $toSchema,
             ): SchemaDiff {
                 return self::$schemaDiff;
             }

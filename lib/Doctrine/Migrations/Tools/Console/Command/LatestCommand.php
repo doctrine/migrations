@@ -37,7 +37,7 @@ final class LatestCommand extends DoctrineCommand
             $version            = $aliasResolver->resolveVersionAlias('latest');
             $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
             $description        = $availableMigration->getMigration()->getDescription();
-        } catch (NoMigrationsToExecute $e) {
+        } catch (NoMigrationsToExecute) {
             $version     = '0';
             $description = '';
         }

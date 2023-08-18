@@ -42,12 +42,8 @@ class ExecuteCommandTest extends MigrationTestCase
     /** @var MigrationPlanCalculator&MockObject */
     private MigrationPlanCalculator $planCalculator;
 
-    /**
-     * @param bool|string|null $arg
-     *
-     * @dataProvider getWriteSqlValues
-     */
-    public function testWriteSql(bool $dryRun, $arg, ?string $path): void
+    /** @dataProvider getWriteSqlValues */
+    public function testWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $this->migrator
             ->expects(self::once())

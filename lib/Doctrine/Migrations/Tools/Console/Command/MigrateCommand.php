@@ -23,7 +23,7 @@ use function is_dir;
 use function is_string;
 use function is_writable;
 use function sprintf;
-use function strpos;
+use function str_starts_with;
 
 /**
  * The MigrateCommand class is responsible for executing a migration from the current version to another
@@ -175,14 +175,14 @@ EOT);
 
         try {
             $version = $this->getDependencyFactory()->getVersionAliasResolver()->resolveVersionAlias($versionAlias);
-        } catch (UnknownMigrationVersion $e) {
+        } catch (UnknownMigrationVersion) {
             $this->io->error(sprintf(
                 'Unknown version: %s',
                 OutputFormatter::escape($versionAlias),
             ));
 
             return 1;
-        } catch (NoMigrationsToExecute | NoMigrationsFoundWithCriteria $e) {
+        } catch (NoMigrationsToExecute | NoMigrationsFoundWithCriteria) {
             return $this->exitForAlias($versionAlias);
         }
 
@@ -227,7 +227,7 @@ EOT);
 
     private function checkExecutedUnavailableMigrations(
         ExecutedMigrationsList $executedUnavailableMigrations,
-        InputInterface $input
+        InputInterface $input,
     ): bool {
         if (count($executedUnavailableMigrations) !== 0) {
             $this->io->warning(sprintf(
@@ -238,9 +238,7 @@ EOT);
             foreach ($executedUnavailableMigrations->getItems() as $executedUnavailableMigration) {
                 $this->io->text(sprintf(
                     '<comment>>></comment> %s (<comment>%s</comment>)',
-                    $executedUnavailableMigration->getExecutedAt() !== null
-                        ? $executedUnavailableMigration->getExecutedAt()->format('Y-m-d H:i:s')
-                        : null,
+                    $executedUnavailableMigration->getExecutedAt()?->format('Y-m-d H:i:s'),
                     $executedUnavailableMigration->getVersion(),
                 ));
             }
@@ -270,7 +268,7 @@ EOT);
             );
 
             $this->io->success($message);
-        } elseif (in_array($versionAlias, ['next', 'prev'], true) || strpos($versionAlias, 'current') === 0) {
+        } elseif (in_array($versionAlias, ['next', 'prev'], true) || str_starts_with($versionAlias, 'current')) {
             $message = sprintf(
                 'The version "%s" couldn\'t be reached, you are at version "%s"',
                 $versionAlias,

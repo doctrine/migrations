@@ -20,7 +20,7 @@ final class RecursiveRegexFinder extends Finder
 {
     private string $pattern;
 
-    public function __construct(?string $pattern = null)
+    public function __construct(string|null $pattern = null)
     {
         $this->pattern = $pattern ?? sprintf(
             '#^.+\\%s[^\\%s]+\\.php$#i',
@@ -30,7 +30,7 @@ final class RecursiveRegexFinder extends Finder
     }
 
     /** @return string[] */
-    public function findMigrations(string $directory, ?string $namespace = null): array
+    public function findMigrations(string $directory, string|null $namespace = null): array
     {
         $dir = $this->getRealPath($directory);
 

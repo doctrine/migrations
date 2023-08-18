@@ -20,16 +20,11 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class DBALSchemaDiffProvider implements SchemaDiffProvider
 {
-    private AbstractPlatform $platform;
-
-    /** @var AbstractSchemaManager<AbstractPlatform> */
-    private AbstractSchemaManager $schemaManager;
-
     /** @param AbstractSchemaManager<AbstractPlatform> $schemaManager- */
-    public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
-    {
-        $this->schemaManager = $schemaManager;
-        $this->platform      = $platform;
+    public function __construct(
+        private readonly AbstractSchemaManager $schemaManager,
+        private readonly AbstractPlatform $platform,
+    ) {
     }
 
     public function createFromSchema(): Schema

@@ -15,5 +15,5 @@ interface MigrationFinder
      *
      * @return string[]
      */
-    public function findMigrations(string $directory, ?string $namespace = null): array;
+    public function findMigrations(string $directory, string|null $namespace = null): array;
 }

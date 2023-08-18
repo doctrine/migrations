@@ -143,9 +143,7 @@ EOT);
         }
 
         $planCalculator = $this->getDependencyFactory()->getMigrationPlanCalculator();
-        $plan           = $planCalculator->getPlanForVersions(array_map(static function (string $version): Version {
-            return new Version($version);
-        }, $versions), $direction);
+        $plan           = $planCalculator->getPlanForVersions(array_map(static fn (string $version): Version => new Version($version), $versions), $direction);
 
         $this->getDependencyFactory()->getLogger()->notice(
             'Executing' . ($migratorConfiguration->isDryRun() ? ' (dry-run)' : '') . ' {versions} {direction}',

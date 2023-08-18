@@ -68,7 +68,7 @@ class CurrentCommandTest extends MigrationTestCase
             ['interactive' => false],
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
         self::assertSame('1231', $lines[0]);
     }
 
@@ -79,7 +79,7 @@ class CurrentCommandTest extends MigrationTestCase
             ['interactive' => false],
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
         self::assertSame('0 - (No migration executed yet)', $lines[0]);
     }
 
@@ -92,7 +92,7 @@ class CurrentCommandTest extends MigrationTestCase
             ['interactive' => false],
         );
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
         self::assertSame('missing - (Migration info not available)', $lines[0]);
     }
 }

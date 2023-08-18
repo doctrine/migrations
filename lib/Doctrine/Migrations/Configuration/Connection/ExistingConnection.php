@@ -9,14 +9,11 @@ use Doctrine\Migrations\Configuration\Exception\InvalidLoader;
 
 final class ExistingConnection implements ConnectionLoader
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private readonly Connection $connection)
     {
-        $this->connection = $connection;
     }
 
-    public function getConnection(?string $name = null): Connection
+    public function getConnection(string|null $name = null): Connection
     {
         if ($name !== null) {
             throw InvalidLoader::noMultipleConnections($this);

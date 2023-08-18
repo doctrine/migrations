@@ -70,7 +70,7 @@ DEPRECATION,
     {
         try {
             return $connection->getNativeConnection();
-        } catch (LogicException $e) {
+        } catch (LogicException) {
         }
 
         $innermostConnection = $connection;

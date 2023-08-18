@@ -15,5 +15,5 @@ use Doctrine\Migrations\Query\Query;
 interface FileBuilder
 {
     /** @param array<string,Query[]> $queriesByVersion */
-    public function buildMigrationFile(array $queriesByVersion, string $direction, ?DateTimeInterface $now = null): string;
+    public function buildMigrationFile(array $queriesByVersion, string $direction, DateTimeInterface|null $now = null): string;
 }

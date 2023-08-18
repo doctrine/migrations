@@ -17,6 +17,6 @@ interface QueryWriter
     public function write(
         string $path,
         string $direction,
-        array $queriesByVersion
+        array $queriesByVersion,
     ): bool;
 }

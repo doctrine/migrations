@@ -98,7 +98,7 @@ EOT)
     /** @throws InvalidOptionUsage */
     protected function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         $filterExpression = (string) $input->getOption('filter-expression');
         if ($filterExpression === '') {
@@ -189,7 +189,7 @@ EOT)
         AvailableMigrationsList $newMigrations,
         ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): bool {
         if (count($newMigrations) === 0 && count($executedUnavailableMigrations) === 0) {
             return true;
