@@ -24,7 +24,13 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: "Roave BC Check"
-        uses: "docker://nyholm/roave-bc-check-ga"
+      - name: Install PHP with extensions.
+        uses: shivammathur/setup-php@v2
         with:
-          args: "--from=${{ github.event.pull_request.base.sha }}"
+          php-version: "8.2"
+
+      - name: Install roave/backward-compatibility-check.
+        run: composer require --dev roave/backward-compatibility-check
+
+      - name: Run roave/backward-compatibility-check.
+        run: vendor/bin/roave-backward-compatibility-check
