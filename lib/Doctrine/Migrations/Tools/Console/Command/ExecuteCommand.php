@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -24,6 +25,7 @@ use function strtoupper;
 /**
  * The ExecuteCommand class is responsible for executing migration versions up or down manually.
  */
+#[AsCommand(name: 'migrations:execute', description: 'Execute one or more migration versions up or down manually.')]
 final class ExecuteCommand extends DoctrineCommand
 {
     /** @var string|null */

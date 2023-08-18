@@ -9,6 +9,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,6 +25,7 @@ use function uasort;
  * The UpToDateCommand class outputs if your database is up to date or if there are new migrations
  * that need to be executed.
  */
+#[AsCommand(name: 'migrations:up-to-date', description: 'Tells you if your schema is up-to-date.')]
 final class UpToDateCommand extends DoctrineCommand
 {
     /** @var string|null */

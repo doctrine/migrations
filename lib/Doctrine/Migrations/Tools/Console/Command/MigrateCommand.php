@@ -8,6 +8,7 @@ use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,6 +29,7 @@ use function strpos;
  * The MigrateCommand class is responsible for executing a migration from the current version to another
  * version up or down. It will calculate all the migration versions that need to be executed and execute them.
  */
+#[AsCommand(name: 'migrations:migrate', description: 'Execute a migration to a specified version or the latest available version.')]
 final class MigrateCommand extends DoctrineCommand
 {
     /** @var string|null */

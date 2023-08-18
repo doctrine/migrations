@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
@@ -13,6 +14,7 @@ use function sprintf;
  * The RollupCommand class is responsible for deleting all previously executed migrations from the versions table
  * and marking the freshly dumped schema migration (that was created with DumpSchemaCommand) as migrated.
  */
+#[AsCommand(name: 'migrations:rollup', description: 'Rollup migrations by deleting all tracked versions and insert the one version that exists.')]
 final class RollupCommand extends DoctrineCommand
 {
     /** @var string|null */

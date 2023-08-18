@@ -4,9 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
+#[AsCommand(name: 'migrations:sync-metadata-storage', description: 'Ensures that the metadata storage is at the latest version.')]
 final class SyncMetadataCommand extends DoctrineCommand
 {
     /** @var string|null */
