@@ -112,8 +112,8 @@ final class GeneratorTest extends TestCase
 
         self::assertTrue(class_exists('Test\VersionNonTransactional1234'));
         self::assertFalse((new VersionNonTransactional1234(
-            $this->createStub(Connection::class),
-            $this->createStub(LoggerInterface::class),
+            self::createStub(Connection::class),
+            self::createStub(LoggerInterface::class),
         ))->isTransactional());
 
         unlink($path);
@@ -133,8 +133,8 @@ final class GeneratorTest extends TestCase
 
         self::assertTrue(class_exists('Test\VersionNonTransactional1235'));
         self::assertTrue((new VersionNonTransactional1235(
-            $this->createStub(Connection::class),
-            $this->createStub(LoggerInterface::class),
+            self::createStub(Connection::class),
+            self::createStub(LoggerInterface::class),
         ))->isTransactional());
 
         unlink($path);

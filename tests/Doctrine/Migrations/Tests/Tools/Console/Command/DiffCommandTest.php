@@ -87,7 +87,7 @@ final class DiffCommandTest extends TestCase
 
     public function testAvailableMigrationsCancel(): void
     {
-        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
+        $m1 = new AvailableMigration(new Version('A'), self::createStub(AbstractMigration::class));
 
         $this->migrationStatusCalculator
             ->method('getNewMigrations')
@@ -114,7 +114,7 @@ final class DiffCommandTest extends TestCase
     public function testExecutedUnavailableMigrationsCancel(): void
     {
         $e1 = new ExecutedMigration(new Version('B'));
-        $m1 = new AvailableMigration(new Version('A'), $this->createStub(AbstractMigration::class));
+        $m1 = new AvailableMigration(new Version('A'), self::createStub(AbstractMigration::class));
 
         $this->migrationStatusCalculator
             ->method('getNewMigrations')

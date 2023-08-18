@@ -51,7 +51,7 @@ class MigratorTest extends MigrationTestCase
     protected function setUp(): void
     {
         $this->conn       = $this->createMock(Connection::class);
-        $driverConnection = $this->createStub(DriverConnection::class);
+        $driverConnection = self::createStub(DriverConnection::class);
         $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
 
         $this->config = new Configuration();

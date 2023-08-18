@@ -83,7 +83,7 @@ class SchemaDumperTest extends TestCase
                 self::equalTo(['CREATE TABLE test']),
                 self::equalTo(['DROP TABLE test']),
             ))
-            ->will(self::onConsecutiveCalls('up', 'down'));
+            ->willReturnOnConsecutiveCalls('up', 'down');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')

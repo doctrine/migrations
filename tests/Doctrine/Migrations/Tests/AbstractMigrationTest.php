@@ -31,7 +31,7 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->expectExceptionMessage('No down() migration implemented for "Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub"');
 
         $migration = new AbstractMigrationWithoutDownStub($this->getSqliteConnection(), $this->logger);
-        $schema    = $this->createStub(Schema::class);
+        $schema    = self::createStub(Schema::class);
         $migration->down($schema);
     }
 
