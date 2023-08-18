@@ -508,7 +508,7 @@ class ExecutorTest extends TestCase
         $this->metadataStorage = $this->createMock(FutureMetadataStorage::class);
 
         $this->connection = $this->createMock(Connection::class);
-        $driverConnection = $this->createStub(DriverConnection::class);
+        $driverConnection = self::createStub(DriverConnection::class);
         $this->connection->method('getWrappedConnection')->willReturn($driverConnection);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatter::class);

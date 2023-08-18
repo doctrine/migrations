@@ -16,8 +16,8 @@ final class TransactionHelperTest extends TestCase
 
     public function testItTriggersADeprecationWhenUseful(): void
     {
-        $connection        = $this->createStub(Connection::class);
-        $wrappedConnection = $this->createStub(PDO::class);
+        $connection        = self::createStub(Connection::class);
+        $wrappedConnection = self::createStub(PDO::class);
 
         $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 
@@ -36,8 +36,8 @@ final class TransactionHelperTest extends TestCase
 
     public function testItDoesNotTriggerADeprecationWhenUseless(): void
     {
-        $connection        = $this->createStub(Connection::class);
-        $wrappedConnection = $this->createStub(PDO::class);
+        $connection        = self::createStub(Connection::class);
+        $wrappedConnection = self::createStub(PDO::class);
 
         $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 

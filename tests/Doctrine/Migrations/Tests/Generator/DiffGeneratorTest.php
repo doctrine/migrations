@@ -91,9 +91,9 @@ class DiffGeneratorTest extends TestCase
 
         $toSchema->expects(self::exactly(2))
             ->method('dropTable')
-            ->will(self::onConsecutiveCalls('schema.table_name2', 'schema.table_name3'));
+            ->willReturnOnConsecutiveCalls('schema.table_name2', 'schema.table_name3');
 
-        $schemaDiff = $this->createStub(SchemaDiff::class);
+        $schemaDiff = self::createStub(SchemaDiff::class);
 
         $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
             static $i = 0;
@@ -128,7 +128,7 @@ class DiffGeneratorTest extends TestCase
                 self::equalTo(['UPDATE table SET value = 2']),
                 self::equalTo(['UPDATE table SET value = 1']),
             ), true, 80)
-            ->will(self::onConsecutiveCalls('test1', 'test2'));
+            ->willReturnOnConsecutiveCalls('test1', 'test2');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -172,7 +172,7 @@ class DiffGeneratorTest extends TestCase
         $toSchema->expects(self::never())
             ->method('dropTable');
 
-        $schemaDiff = $this->createStub(SchemaDiff::class);
+        $schemaDiff = self::createStub(SchemaDiff::class);
         $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
             static $i = 0;
             if ($i++ === 0) {
@@ -206,7 +206,7 @@ class DiffGeneratorTest extends TestCase
                 self::equalTo(['CREATE TABLE table_name']),
                 self::equalTo(['DROP TABLE table_name']),
             ), false, 120, true)
-            ->will(self::onConsecutiveCalls('test up', 'test down'));
+            ->willReturnOnConsecutiveCalls('test up', 'test down');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
