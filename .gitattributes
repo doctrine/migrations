@@ -1,4 +1,5 @@
 build/*                 export-ignore
+/docs                   export-ignore
 /tests                  export-ignore
 /.*                     export-ignore
 box.json.dist           export-ignore
