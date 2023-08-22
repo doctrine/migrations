@@ -397,7 +397,7 @@ class ExecutorTest extends TestCase
                 $migratorConfiguration,
             );
             $migrationSucceed = true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             self::assertFalse($listener->onMigrationsVersionExecuted);
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);
@@ -467,7 +467,7 @@ class ExecutorTest extends TestCase
                 $migratorConfiguration,
             );
             $migrationSucceed = true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             self::assertFalse($listener->onMigrationsVersionExecuted);
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);

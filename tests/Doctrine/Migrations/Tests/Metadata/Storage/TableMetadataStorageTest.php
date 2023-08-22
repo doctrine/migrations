@@ -44,7 +44,7 @@ class TableMetadataStorageTest extends TestCase
 
     private DebugLogger $debugLogger;
 
-    private function getSqliteConnection(?Configuration $configuration = null): Connection
+    private function getSqliteConnection(Configuration|null $configuration = null): Connection
     {
         $params = ['driver' => 'pdo_sqlite', 'memory' => true];
 

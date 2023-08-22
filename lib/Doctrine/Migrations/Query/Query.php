@@ -5,35 +5,27 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Query;
 
 use Doctrine\Migrations\Query\Exception\InvalidArguments;
+use Stringable;
 
 use function count;
 
 /**
  * The Query wraps the sql query, parameters and types.
  */
-final class Query
+final class Query implements Stringable
 {
-    private string $statement;
-
-    /** @var mixed[] */
-    private array $parameters;
-
-    /** @var mixed[] */
-    private array $types;
-
     /**
      * @param mixed[] $parameters
      * @param mixed[] $types
      */
-    public function __construct(string $statement, array $parameters = [], array $types = [])
-    {
+    public function __construct(
+        private readonly string $statement,
+        private readonly array $parameters = [],
+        private readonly array $types = [],
+    ) {
         if (count($types) > count($parameters)) {
             throw InvalidArguments::wrongTypesArgumentCount($statement, count($parameters), count($types));
         }
-
-        $this->statement  = $statement;
-        $this->parameters = $parameters;
-        $this->types      = $types;
     }
 
     public function __toString(): string

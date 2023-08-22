@@ -189,7 +189,7 @@ EOT);
     {
         try {
             $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
-        } catch (MigrationClassNotFound $e) {
+        } catch (MigrationClassNotFound) {
             $availableMigration = null;
         }
 

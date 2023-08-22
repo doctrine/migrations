@@ -41,36 +41,30 @@ final class TableMetadataStorage implements MetadataStorage
 
     private bool $schemaUpToDate = false;
 
-    private Connection $connection;
-
     /** @var AbstractSchemaManager<AbstractPlatform> */
-    private AbstractSchemaManager $schemaManager;
+    private readonly AbstractSchemaManager $schemaManager;
 
-    private AbstractPlatform $platform;
-
-    private TableMetadataStorageConfiguration $configuration;
-
-    private ?MigrationsRepository $migrationRepository = null;
-
-    private MigrationsComparator $comparator;
+    private readonly AbstractPlatform $platform;
+    private readonly TableMetadataStorageConfiguration $configuration;
 
     public function __construct(
-        Connection $connection,
-        MigrationsComparator $comparator,
-        ?MetadataStorageConfiguration $configuration = null,
-        ?MigrationsRepository $migrationRepository = null
+        private readonly Connection $connection,
+        private readonly MigrationsComparator $comparator,
+        MetadataStorageConfiguration|null $configuration = null,
+        private readonly MigrationsRepository|null $migrationRepository = null,
     ) {
-        $this->migrationRepository = $migrationRepository;
-        $this->connection          = $connection;
-        $this->schemaManager       = $connection->createSchemaManager();
-        $this->platform            = $connection->getDatabasePlatform();
+        $this->schemaManager = $connection->createSchemaManager();
+        $this->platform      = $connection->getDatabasePlatform();
 
         if ($configuration !== null && ! ($configuration instanceof TableMetadataStorageConfiguration)) {
-            throw new InvalidArgumentException(sprintf('%s accepts only %s as configuration', self::class, TableMetadataStorageConfiguration::class));
+            throw new InvalidArgumentException(sprintf(
+                '%s accepts only %s as configuration',
+                self::class,
+                TableMetadataStorageConfiguration::class,
+            ));
         }
 
         $this->configuration = $configuration ?? new TableMetadataStorageConfiguration();
-        $this->comparator    = $comparator;
     }
 
     public function getExecutedMigrations(): ExecutedMigrationsList
@@ -106,9 +100,7 @@ final class TableMetadataStorage implements MetadataStorage
             $migrations[(string) $version] = $migration;
         }
 
-        uasort($migrations, function (ExecutedMigration $a, ExecutedMigration $b): int {
-            return $this->comparator->compare($a->getVersion(), $b->getVersion());
-        });
+        uasort($migrations, fn (ExecutedMigration $a, ExecutedMigration $b): int => $this->comparator->compare($a->getVersion(), $b->getVersion()));
 
         return new ExecutedMigrationsList($migrations);
     }
@@ -198,7 +190,7 @@ final class TableMetadataStorage implements MetadataStorage
         $this->updateMigratedVersionsFromV1orV2toV3();
     }
 
-    private function needsUpdate(Table $expectedTable): ?TableDiff
+    private function needsUpdate(Table $expectedTable): TableDiff|null
     {
         if ($this->schemaUpToDate) {
             return null;

@@ -32,9 +32,7 @@ final class OrmSchemaProvider implements SchemaProvider
         /** @var array<int, ClassMetadata<object>> $metadata */
         $metadata = $this->entityManager->getMetadataFactory()->getAllMetadata();
 
-        usort($metadata, static function (ClassMetadata $a, ClassMetadata $b): int {
-            return $a->getTableName() <=> $b->getTableName();
-        });
+        usort($metadata, static fn (ClassMetadata $a, ClassMetadata $b): int => $a->getTableName() <=> $b->getTableName());
 
         $tool = new SchemaTool($this->entityManager);
 

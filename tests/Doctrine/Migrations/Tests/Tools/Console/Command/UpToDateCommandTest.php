@@ -112,7 +112,7 @@ class UpToDateCommandTest extends MigrationTestCase
 
         $this->commandTester->execute(['--list-migrations' => true]);
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
         self::assertSame(
             [

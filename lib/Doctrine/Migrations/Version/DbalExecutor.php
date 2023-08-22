@@ -35,39 +35,18 @@ use function ucfirst;
  */
 final class DbalExecutor implements Executor
 {
-    private Connection $connection;
-
-    private SchemaDiffProvider $schemaProvider;
-
-    private ParameterFormatter $parameterFormatter;
-
-    private Stopwatch $stopwatch;
-
     /** @var Query[] */
     private array $sql = [];
 
-    private MetadataStorage $metadataStorage;
-
-    private LoggerInterface $logger;
-
-    private EventDispatcher $dispatcher;
-
     public function __construct(
-        MetadataStorage $metadataStorage,
-        EventDispatcher $dispatcher,
-        Connection $connection,
-        SchemaDiffProvider $schemaProvider,
-        LoggerInterface $logger,
-        ParameterFormatter $parameterFormatter,
-        Stopwatch $stopwatch
+        private readonly MetadataStorage $metadataStorage,
+        private readonly EventDispatcher $dispatcher,
+        private readonly Connection $connection,
+        private readonly SchemaDiffProvider $schemaProvider,
+        private readonly LoggerInterface $logger,
+        private readonly ParameterFormatter $parameterFormatter,
+        private readonly Stopwatch $stopwatch,
     ) {
-        $this->connection         = $connection;
-        $this->schemaProvider     = $schemaProvider;
-        $this->parameterFormatter = $parameterFormatter;
-        $this->stopwatch          = $stopwatch;
-        $this->metadataStorage    = $metadataStorage;
-        $this->logger             = $logger;
-        $this->dispatcher         = $dispatcher;
     }
 
     /** @return Query[] */
@@ -83,7 +62,7 @@ final class DbalExecutor implements Executor
 
     public function execute(
         MigrationPlan $plan,
-        MigratorConfiguration $configuration
+        MigratorConfiguration $configuration,
     ): ExecutionResult {
         $result = new ExecutionResult($plan->getVersion(), $plan->getDirection(), new DateTimeImmutable());
 
@@ -114,7 +93,7 @@ final class DbalExecutor implements Executor
 
     private function startMigration(
         MigrationPlan $plan,
-        MigratorConfiguration $configuration
+        MigratorConfiguration $configuration,
     ): void {
         $this->sql = [];
 
@@ -135,7 +114,7 @@ final class DbalExecutor implements Executor
     private function executeMigration(
         MigrationPlan $plan,
         ExecutionResult $result,
-        MigratorConfiguration $configuration
+        MigratorConfiguration $configuration,
     ): ExecutionResult {
         $stopwatchEvent = $this->stopwatch->start('execute');
 
@@ -333,18 +312,11 @@ final class DbalExecutor implements Executor
 
     private function getExecutionStateAsString(int $state): string
     {
-        switch ($state) {
-            case State::PRE:
-                return 'Pre-Checks';
-
-            case State::POST:
-                return 'Post-Checks';
-
-            case State::EXEC:
-                return 'Execution';
-
-            default:
-                return 'No State';
-        }
+        return match ($state) {
+            State::PRE => 'Pre-Checks',
+            State::POST => 'Post-Checks',
+            State::EXEC => 'Execution',
+            default => 'No State',
+        };
     }
 }

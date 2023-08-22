@@ -16,16 +16,13 @@ use function array_merge;
 use function count;
 use function implode;
 use function preg_last_error;
+use function preg_last_error_msg;
 use function preg_match;
 use function restore_error_handler;
 use function set_error_handler;
 use function sprintf;
 
-use const PREG_BACKTRACK_LIMIT_ERROR;
-use const PREG_BAD_UTF8_ERROR;
-use const PREG_BAD_UTF8_OFFSET_ERROR;
 use const PREG_INTERNAL_ERROR;
-use const PREG_RECURSION_LIMIT_ERROR;
 
 /**
  * The SchemaDumper class is responsible for dumping the current state of your database schema to a migration. This
@@ -37,34 +34,17 @@ use const PREG_RECURSION_LIMIT_ERROR;
  */
 class SchemaDumper
 {
-    private AbstractPlatform $platform;
-
-    /** @var AbstractSchemaManager<AbstractPlatform> */
-    private AbstractSchemaManager $schemaManager;
-
-    private Generator $migrationGenerator;
-
-    private SqlGenerator $migrationSqlGenerator;
-
-    /** @var string[] */
-    private array $excludedTablesRegexes;
-
     /**
      * @param AbstractSchemaManager<AbstractPlatform> $schemaManager
      * @param string[]                                $excludedTablesRegexes
      */
     public function __construct(
-        AbstractPlatform $platform,
-        AbstractSchemaManager $schemaManager,
-        Generator $migrationGenerator,
-        SqlGenerator $migrationSqlGenerator,
-        array $excludedTablesRegexes = []
+        private readonly AbstractPlatform $platform,
+        private readonly AbstractSchemaManager $schemaManager,
+        private readonly Generator $migrationGenerator,
+        private readonly SqlGenerator $migrationSqlGenerator,
+        private readonly array $excludedTablesRegexes = [],
     ) {
-        $this->platform              = $platform;
-        $this->schemaManager         = $schemaManager;
-        $this->migrationGenerator    = $migrationGenerator;
-        $this->migrationSqlGenerator = $migrationSqlGenerator;
-        $this->excludedTablesRegexes = $excludedTablesRegexes;
     }
 
     /**
@@ -76,7 +56,7 @@ class SchemaDumper
         string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
-        int $lineLength = 120
+        int $lineLength = 120,
     ): string {
         $schema = $this->schemaManager->introspectSchema();
 
@@ -151,42 +131,26 @@ class SchemaDumper
      * @param mixed[]                                                 $matches
      * @param int-mask-of<PREG_OFFSET_CAPTURE|PREG_UNMATCHED_AS_NULL> $flags
      */
-    private static function pregMatch(string $pattern, string $subject, ?array &$matches = null, int $flags = 0, int $offset = 0): int
+    private static function pregMatch(string $pattern, string $subject, array|null &$matches = null, int $flags = 0, int $offset = 0): int
     {
-        try {
-            $errorMessages = [];
-            set_error_handler(static function (int $severity, string $message, string $file, int $line) use (&$errorMessages): bool {
-                $errorMessages[] = $message;
+        $errorMessages = [];
+        set_error_handler(static function (int $severity, string $message) use (&$errorMessages): bool {
+            $errorMessages[] = $message;
 
-                return true;
-            });
+            return true;
+        });
+
+        try {
             $ret = preg_match($pattern, $subject, $matches, $flags, $offset);
         } finally {
             restore_error_handler();
         }
 
         if ($ret === false) {
-            switch (preg_last_error()) {
-                case PREG_INTERNAL_ERROR:
-                    $error = sprintf('Internal PCRE error, please check your Regex. Reported errors: %s.', implode(', ', $errorMessages));
-                    break;
-                case PREG_BACKTRACK_LIMIT_ERROR:
-                    $error = 'pcre.backtrack_limit reached.';
-                    break;
-                case PREG_RECURSION_LIMIT_ERROR:
-                    $error = 'pcre.recursion_limit reached.';
-                    break;
-                case PREG_BAD_UTF8_ERROR:
-                    $error = 'Malformed UTF-8 data.';
-                    break;
-                case PREG_BAD_UTF8_OFFSET_ERROR:
-                    $error = 'Offset doesn\'t correspond to the begin of a valid UTF-8 code point.';
-                    break;
-                default:
-                    $error = 'Error.';
-            }
-
-            throw new InvalidArgumentException($error);
+            throw new InvalidArgumentException(match (preg_last_error()) {
+                PREG_INTERNAL_ERROR => sprintf('Internal PCRE error, please check your Regex. Reported errors: %s.', implode(', ', $errorMessages)),
+                default => preg_last_error_msg(),
+            });
         }
 
         return $ret;

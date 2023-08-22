@@ -33,17 +33,14 @@ abstract class AbstractMigration
     /** @var AbstractPlatform */
     protected $platform;
 
-    private LoggerInterface $logger;
-
     /** @var Query[] */
     private array $plannedSql = [];
 
-    public function __construct(Connection $connection, LoggerInterface $logger)
+    public function __construct(Connection $connection, private readonly LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->sm         = $this->connection->createSchemaManager();
         $this->platform   = $this->connection->getDatabasePlatform();
-        $this->logger     = $logger;
     }
 
     /**
@@ -126,7 +123,7 @@ abstract class AbstractMigration
     protected function addSql(
         string $sql,
         array $params = [],
-        array $types = []
+        array $types = [],
     ): void {
         $this->plannedSql[] = new Query($sql, $params, $types);
     }
@@ -143,7 +140,7 @@ abstract class AbstractMigration
     }
 
     /** @throws IrreversibleMigration */
-    protected function throwIrreversibleMigrationException(?string $message = null): void
+    protected function throwIrreversibleMigrationException(string|null $message = null): void
     {
         if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';

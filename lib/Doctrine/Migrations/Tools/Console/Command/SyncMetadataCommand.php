@@ -33,7 +33,7 @@ EOT);
 
     public function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         $this->getDependencyFactory()->getMetadataStorage()->ensureInitialized();
 

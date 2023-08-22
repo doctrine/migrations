@@ -56,20 +56,14 @@ EOT);
     /** @return Version[] */
     private function getSortedVersions(AvailableMigrationsList $availableMigrations, ExecutedMigrationsList $executedMigrations): array
     {
-        $availableVersions = array_map(static function (AvailableMigration $availableMigration): Version {
-            return $availableMigration->getVersion();
-        }, $availableMigrations->getItems());
+        $availableVersions = array_map(static fn (AvailableMigration $availableMigration): Version => $availableMigration->getVersion(), $availableMigrations->getItems());
 
-        $executedVersions = array_map(static function (ExecutedMigration $executedMigration): Version {
-            return $executedMigration->getVersion();
-        }, $executedMigrations->getItems());
+        $executedVersions = array_map(static fn (ExecutedMigration $executedMigration): Version => $executedMigration->getVersion(), $executedMigrations->getItems());
 
         $versions = array_unique(array_merge($availableVersions, $executedVersions));
 
         $comparator = $this->getDependencyFactory()->getVersionComparator();
-        uasort($versions, static function (Version $a, Version $b) use ($comparator): int {
-            return $comparator->compare($a, $b);
-        });
+        uasort($versions, $comparator->compare(...));
 
         return $versions;
     }

@@ -48,7 +48,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliases
      */
-    public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
+    public function testAliases(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);
@@ -77,7 +77,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliasesWithNoExecuted
      */
-    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
+    public function testAliasesWithNoExecuted(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);

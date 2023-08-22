@@ -27,34 +27,19 @@ use const COUNT_RECURSIVE;
  */
 class DbalMigrator implements Migrator
 {
-    private Stopwatch $stopwatch;
-
-    private LoggerInterface $logger;
-
-    private Executor $executor;
-
-    private Connection $connection;
-
-    private EventDispatcher $dispatcher;
-
     public function __construct(
-        Connection $connection,
-        EventDispatcher $dispatcher,
-        Executor $executor,
-        LoggerInterface $logger,
-        Stopwatch $stopwatch
+        private readonly Connection $connection,
+        private readonly EventDispatcher $dispatcher,
+        private readonly Executor $executor,
+        private readonly LoggerInterface $logger,
+        private readonly Stopwatch $stopwatch,
     ) {
-        $this->stopwatch  = $stopwatch;
-        $this->logger     = $logger;
-        $this->executor   = $executor;
-        $this->connection = $connection;
-        $this->dispatcher = $dispatcher;
     }
 
     /** @return array<string, Query[]> */
     private function executeMigrations(
         MigrationPlanList $migrationsPlan,
-        MigratorConfiguration $migratorConfiguration
+        MigratorConfiguration $migratorConfiguration,
     ): array {
         $allOrNothing = $migratorConfiguration->isAllOrNothing();
 
@@ -120,7 +105,7 @@ class DbalMigrator implements Migrator
     private function endMigrations(
         StopwatchEvent $stopwatchEvent,
         MigrationPlanList $migrationsPlan,
-        array $sql
+        array $sql,
     ): void {
         $stopwatchEvent->stop();
 

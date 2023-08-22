@@ -48,7 +48,7 @@ final class GenerateCommandTest extends TestCase
             'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\Version1234\'',
             '',
             'To revert the migration you can use migrations:execute --down \'FooNs\Version1234\'',
-        ], array_map('trim', explode("\n", trim($output))));
+        ], array_map(trim(...), explode("\n", trim($output))));
     }
 
     protected function setUp(): void

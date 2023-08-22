@@ -14,12 +14,9 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class LazySchemaDiffProvider implements SchemaDiffProvider
 {
-    private SchemaDiffProvider $originalSchemaManipulator;
-
     public function __construct(
-        SchemaDiffProvider $originalSchemaManipulator
+        private readonly SchemaDiffProvider $originalSchemaManipulator,
     ) {
-        $this->originalSchemaManipulator = $originalSchemaManipulator;
     }
 
     public function createFromSchema(): Schema

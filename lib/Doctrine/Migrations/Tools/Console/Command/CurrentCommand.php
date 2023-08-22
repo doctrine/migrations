@@ -40,7 +40,7 @@ final class CurrentCommand extends DoctrineCommand
             try {
                 $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
                 $description        = $availableMigration->getMigration()->getDescription();
-            } catch (MigrationClassNotFound $e) {
+            } catch (MigrationClassNotFound) {
                 $description = '(Migration info not available)';
             }
         }

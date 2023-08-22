@@ -25,15 +25,13 @@ use function is_string;
  */
 abstract class DoctrineCommand extends Command
 {
-    private ?DependencyFactory $dependencyFactory = null;
-
     /** @var StyleInterface */
     protected $io;
 
-    public function __construct(?DependencyFactory $dependencyFactory = null, ?string $name = null)
-    {
-        $this->dependencyFactory = $dependencyFactory;
-
+    public function __construct(
+        private DependencyFactory|null $dependencyFactory = null,
+        string|null $name = null,
+    ) {
         parent::__construct($name);
     }
 

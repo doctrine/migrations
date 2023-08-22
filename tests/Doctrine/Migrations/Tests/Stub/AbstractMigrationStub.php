@@ -22,7 +22,7 @@ class AbstractMigrationStub extends AbstractMigration
         $this->write($message);
     }
 
-    public function exposedThrowIrreversibleMigrationException(?string $message = null): void
+    public function exposedThrowIrreversibleMigrationException(string|null $message = null): void
     {
         $this->throwIrreversibleMigrationException($message);
     }

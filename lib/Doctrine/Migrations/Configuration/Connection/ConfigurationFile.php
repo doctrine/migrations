@@ -18,14 +18,11 @@ use function is_array;
  */
 final class ConfigurationFile implements ConnectionLoader
 {
-    private string $filename;
-
-    public function __construct(string $filename)
+    public function __construct(private readonly string $filename)
     {
-        $this->filename = $filename;
     }
 
-    public function getConnection(?string $name = null): Connection
+    public function getConnection(string|null $name = null): Connection
     {
         if ($name !== null) {
             throw new InvalidArgumentException('Only one connection is supported');

@@ -35,7 +35,7 @@ final class YamlFile extends ConfigurationFile
 
         try {
             $config = Yaml::parse($content);
-        } catch (ParseException $e) {
+        } catch (ParseException) {
             throw YamlNotValid::malformed();
         }
 

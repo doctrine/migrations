@@ -21,21 +21,11 @@ final class FormattedFile extends ConfigurationFile
     private function setDefaultLoaders(): void
     {
         $this->loaders = [
-            'json' => static function ($file): ConfigurationLoader {
-                return new JsonFile($file);
-            },
-            'php' => static function ($file): ConfigurationLoader {
-                return new PhpFile($file);
-            },
-            'xml' => static function ($file): ConfigurationLoader {
-                return new XmlFile($file);
-            },
-            'yaml' => static function ($file): ConfigurationLoader {
-                return new YamlFile($file);
-            },
-            'yml' => static function ($file): ConfigurationLoader {
-                return new YamlFile($file);
-            },
+            'json' => static fn ($file): ConfigurationLoader => new JsonFile($file),
+            'php' => static fn ($file): ConfigurationLoader => new PhpFile($file),
+            'xml' => static fn ($file): ConfigurationLoader => new XmlFile($file),
+            'yaml' => static fn ($file): ConfigurationLoader => new YamlFile($file),
+            'yml' => static fn ($file): ConfigurationLoader => new YamlFile($file),
         ];
     }
 

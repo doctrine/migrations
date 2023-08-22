@@ -38,30 +38,17 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function getcwd;
 use function in_array;
 use function sprintf;
-use function strpos;
 use function trim;
 
 class MigrateCommandTest extends MigrationTestCase
 {
     private DependencyFactory $dependencyFactory;
-
     private Configuration $configuration;
-
-    private MigrateCommand $migrateCommand;
-
     private CommandTester $migrateCommandTester;
-
     private MetadataStorage $storage;
-
-    private MockObject $queryWriter;
-
-    /** @var QuestionHelper&MockObject */
-    private QuestionHelper $questions;
-
+    private QueryWriter&MockObject $queryWriter;
     private MigrationsRepository $migrationRepository;
-
     private Connection $connection;
-
     private TableMetadataStorageConfiguration $metadataConfiguration;
 
     public function testTargetUnknownVersion(): void
@@ -134,7 +121,7 @@ class MigrateCommandTest extends MigrationTestCase
     }
 
     /** @dataProvider getTargetAliases */
-    public function testExecuteAtVersion(string $targetAlias, string $level, ?string $executedMigration): void
+    public function testExecuteAtVersion(string $targetAlias, string $level, string|null $executedMigration): void
     {
         if ($executedMigration !== null) {
             $result = new ExecutionResult(new Version($executedMigration));
@@ -182,7 +169,7 @@ class MigrateCommandTest extends MigrationTestCase
             ['interactive' => false],
         );
 
-        self::assertTrue(strpos($this->migrateCommandTester->getDisplay(true), 'Unknown version: unknown') !== false);
+        self::assertStringContainsString('Unknown version: unknown', $this->migrateCommandTester->getDisplay(true));
         self::assertSame(1, $this->migrateCommandTester->getStatusCode());
     }
 
@@ -209,12 +196,8 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
 
-    /**
-     * @param bool|string|null $arg
-     *
-     * @dataProvider getWriteSqlValues
-     */
-    public function testExecuteWriteSql(bool $dryRun, $arg, ?string $path): void
+    /** @dataProvider getWriteSqlValues */
+    public function testExecuteWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
 
@@ -468,12 +451,12 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
 
-        $this->migrateCommand = new MigrateCommand($this->dependencyFactory);
+        $migrateCommand = new MigrateCommand($this->dependencyFactory);
 
-        $this->questions = $this->createMock(QuestionHelper::class);
-        $this->migrateCommand->setHelperSet(new HelperSet(['question' => $this->questions]));
+        $questions = $this->createMock(QuestionHelper::class);
+        $migrateCommand->setHelperSet(new HelperSet(['question' => $questions]));
 
-        $this->migrateCommandTester = new CommandTester($this->migrateCommand);
+        $this->migrateCommandTester = new CommandTester($migrateCommand);
 
         $this->storage = new TableMetadataStorage(
             $this->connection,

@@ -18,21 +18,10 @@ class BooleanStringFormatter
 {
     public static function toBoolean(string $value, bool $default): bool
     {
-        switch (strtolower($value)) {
-            case 'true':
-                return true;
-
-            case '1':
-                return true;
-
-            case 'false':
-                return false;
-
-            case '0':
-                return false;
-
-            default:
-                return $default;
-        }
+        return match (strtolower($value)) {
+            'true', '1' => true,
+            'false', '0' => false,
+            default => $default,
+        };
     }
 }

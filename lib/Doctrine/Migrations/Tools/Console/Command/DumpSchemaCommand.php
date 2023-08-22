@@ -18,7 +18,7 @@ use function class_exists;
 use function is_string;
 use function key;
 use function sprintf;
-use function strpos;
+use function str_contains;
 
 /**
  * The DumpSchemaCommand class is responsible for dumping your current database schema to a migration class. This is
@@ -76,7 +76,7 @@ EOT)
     /** @throws SchemaDumpRequiresNoMigrations */
     public function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         $formatted  = $input->getOption('formatted');
         $lineLength = (int) $input->getOption('line-length');
@@ -136,7 +136,7 @@ EOT)
     {
         $migrations = $this->getDependencyFactory()->getMigrationRepository()->getMigrations();
         foreach ($migrations->getItems() as $migration) {
-            if (strpos((string) $migration->getVersion(), $namespace) !== false) {
+            if (str_contains((string) $migration->getVersion(), $namespace)) {
                 throw SchemaDumpRequiresNoMigrations::new($namespace);
             }
         }

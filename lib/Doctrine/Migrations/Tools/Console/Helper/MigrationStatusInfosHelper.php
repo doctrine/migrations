@@ -35,32 +35,14 @@ use function sprintf;
  */
 class MigrationStatusInfosHelper
 {
-    private Configuration $configuration;
-
-    private Connection $connection;
-
-    private AliasResolver $aliasResolver;
-
-    private MetadataStorage $metadataStorage;
-
-    private MigrationPlanCalculator $migrationPlanCalculator;
-
-    private MigrationStatusCalculator $statusCalculator;
-
     public function __construct(
-        Configuration $configuration,
-        Connection $connection,
-        AliasResolver $aliasResolver,
-        MigrationPlanCalculator $migrationPlanCalculator,
-        MigrationStatusCalculator $statusCalculator,
-        MetadataStorage $metadataStorage
+        private readonly Configuration $configuration,
+        private readonly Connection $connection,
+        private readonly AliasResolver $aliasResolver,
+        private readonly MigrationPlanCalculator $migrationPlanCalculator,
+        private readonly MigrationStatusCalculator $statusCalculator,
+        private readonly MetadataStorage $metadataStorage,
     ) {
-        $this->configuration           = $configuration;
-        $this->connection              = $connection;
-        $this->aliasResolver           = $aliasResolver;
-        $this->migrationPlanCalculator = $migrationPlanCalculator;
-        $this->metadataStorage         = $metadataStorage;
-        $this->statusCalculator        = $statusCalculator;
     }
 
     /** @param Version[] $versions */
@@ -132,7 +114,7 @@ class MigrationStatusInfosHelper
 
         $dataGroup = [
             'Storage' => [
-                'Type' => $storage !== null ? get_class($storage) : null,
+                'Type' => $storage !== null ? $storage::class : null,
             ],
             'Database' => [
                 'Driver' => get_class($this->connection->getDriver()),
@@ -194,7 +176,7 @@ class MigrationStatusInfosHelper
     {
         try {
             $version = $this->aliasResolver->resolveVersionAlias($alias);
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             $version = null;
         }
 
