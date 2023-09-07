@@ -27,14 +27,10 @@ use function var_export;
  */
 class SqlGenerator
 {
-    private Configuration $configuration;
-
-    private AbstractPlatform $platform;
-
-    public function __construct(Configuration $configuration, AbstractPlatform $platform)
-    {
-        $this->configuration = $configuration;
-        $this->platform      = $platform;
+    public function __construct(
+        private readonly Configuration $configuration,
+        private readonly AbstractPlatform $platform,
+    ) {
     }
 
     /** @param string[] $sql */
@@ -42,7 +38,7 @@ class SqlGenerator
         array $sql,
         bool $formatted = false,
         int $lineLength = 120,
-        bool $checkDbPlatform = true
+        bool $checkDbPlatform = true,
     ): string {
         $code = [];
 
@@ -80,9 +76,9 @@ $this->abortIf(
 PHP
                     ,
                     $currentPlatform,
-                    $currentPlatform
+                    $currentPlatform,
                 ),
-                ''
+                '',
             );
         }
 

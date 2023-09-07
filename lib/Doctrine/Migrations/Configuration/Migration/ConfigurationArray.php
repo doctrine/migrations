@@ -18,15 +18,9 @@ use function is_callable;
 
 final class ConfigurationArray implements ConfigurationLoader
 {
-    /** @var array<string,mixed> */
-    private array $configurations;
-
-    /**
-     * @param array<string,mixed> $configurations
-     */
-    public function __construct(array $configurations)
+    /** @param array<string,mixed> $configurations */
+    public function __construct(private readonly array $configurations)
     {
-        $this->configurations = $configurations;
     }
 
     public function getConfiguration(): Configuration
@@ -80,11 +74,10 @@ final class ConfigurationArray implements ConfigurationLoader
     }
 
     /**
-     * @param mixed[]                                         $configMap
-     * @param Configuration|TableMetadataStorageConfiguration $object
-     * @param array<string|int,mixed>                         $data
+     * @param mixed[]                 $configMap
+     * @param array<string|int,mixed> $data
      */
-    private static function applyConfigs(array $configMap, $object, array $data): void
+    private static function applyConfigs(array $configMap, Configuration|TableMetadataStorageConfiguration $object, array $data): void
     {
         foreach ($data as $configurationKey => $configurationValue) {
             if (! isset($configMap[$configurationKey])) {
@@ -109,7 +102,7 @@ final class ConfigurationArray implements ConfigurationLoader
                     $callable,
                     $configurationValue,
                     $object,
-                    $data
+                    $data,
                 );
             }
         }

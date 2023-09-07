@@ -10,11 +10,8 @@ use Symfony\Component\Console\Input\InputInterface;
 
 class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationFactory
 {
-    private Configuration $configuration;
-
-    public function __construct(Configuration $configuration)
+    public function __construct(private readonly Configuration $configuration)
     {
-        $this->configuration = $configuration;
     }
 
     public function getMigratorConfiguration(InputInterface $input): MigratorConfiguration
@@ -29,7 +26,7 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
             ->setAllOrNothing($allOrNothing);
     }
 
-    private function determineAllOrNothingValueFrom(InputInterface $input): ?bool
+    private function determineAllOrNothingValueFrom(InputInterface $input): bool|null
     {
         if (! $input->hasOption('all-or-nothing')) {
             return null;

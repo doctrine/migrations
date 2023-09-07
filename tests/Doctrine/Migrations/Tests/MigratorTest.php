@@ -30,6 +30,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
 use function array_map;
+use function strval;
 
 use const DIRECTORY_SEPARATOR;
 
@@ -51,7 +52,7 @@ class MigratorTest extends MigrationTestCase
     protected function setUp(): void
     {
         $this->conn       = $this->createMock(Connection::class);
-        $driverConnection = $this->createStub(DriverConnection::class);
+        $driverConnection = self::createStub(DriverConnection::class);
         $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
 
         $this->config = new Configuration();
@@ -59,7 +60,7 @@ class MigratorTest extends MigrationTestCase
         $this->migratorConfiguration = new MigratorConfiguration();
         $this->config->addMigrationsDirectory(
             'DoctrineMigrations\\',
-            __DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder'
+            __DIR__ . DIRECTORY_SEPARATOR . 'Stub/migration-empty-folder',
         );
     }
 
@@ -79,7 +80,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+            array_map(strval(...), $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 
@@ -140,7 +141,7 @@ class MigratorTest extends MigrationTestCase
         self::assertArrayHasKey('Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema', $sql);
         self::assertSame(
             ['SELECT 1'],
-            array_map('strval', $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema'])
+            array_map(strval(...), $sql['Doctrine\\Migrations\\Tests\\Stub\\Functional\\MigrateNotTouchingTheSchema']),
         );
     }
 

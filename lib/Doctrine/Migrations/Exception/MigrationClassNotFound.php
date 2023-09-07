@@ -15,8 +15,8 @@ final class MigrationClassNotFound extends RuntimeException implements Migration
         return new self(
             sprintf(
                 'Migration class "%s" was not found?',
-                $migrationClass
-            )
+                $migrationClass,
+            ),
         );
     }
 }

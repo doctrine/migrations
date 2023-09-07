@@ -13,9 +13,7 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 interface MigrationPlanCalculator
 {
-    /**
-     * @param Version[] $versions
-     */
+    /** @param Version[] $versions */
     public function getPlanForVersions(array $versions, string $direction): MigrationPlanList;
 
     public function getPlanUntilVersion(Version $to): MigrationPlanList;

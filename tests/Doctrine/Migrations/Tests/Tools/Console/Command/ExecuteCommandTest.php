@@ -42,12 +42,8 @@ class ExecuteCommandTest extends MigrationTestCase
     /** @var MigrationPlanCalculator&MockObject */
     private MigrationPlanCalculator $planCalculator;
 
-    /**
-     * @param bool|string|null $arg
-     *
-     * @dataProvider getWriteSqlValues
-     */
-    public function testWriteSql(bool $dryRun, $arg, ?string $path): void
+    /** @dataProvider getWriteSqlValues */
+    public function testWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $this->migrator
             ->expects(self::once())
@@ -79,10 +75,8 @@ class ExecuteCommandTest extends MigrationTestCase
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getWriteSqlValues(): array
+    /** @return mixed[] */
+    public static function getWriteSqlValues(): array
     {
         return [
             // dry-run, write-path, path
@@ -118,7 +112,7 @@ class ExecuteCommandTest extends MigrationTestCase
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
         self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
-        self::assertStringContainsString('[OK] Successfully migrated version(s) : 1 : [UP]', trim($this->executeCommandTester->getDisplay(true)));
+        self::assertStringContainsString('[OK] Successfully migrated version(s): 1: [UP]', trim($this->executeCommandTester->getDisplay(true)));
     }
 
     public function testExecuteMultiple(): void

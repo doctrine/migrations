@@ -20,18 +20,11 @@ use Doctrine\DBAL\Schema\Schema;
  */
 class DBALSchemaDiffProvider implements SchemaDiffProvider
 {
-    private AbstractPlatform $platform;
-
-    /** @var AbstractSchemaManager<AbstractPlatform> */
-    private AbstractSchemaManager $schemaManager;
-
-    /**
-     * @param AbstractSchemaManager<AbstractPlatform> $schemaManager-
-     */
-    public function __construct(AbstractSchemaManager $schemaManager, AbstractPlatform $platform)
-    {
-        $this->schemaManager = $schemaManager;
-        $this->platform      = $platform;
+    /** @param AbstractSchemaManager<AbstractPlatform> $schemaManager- */
+    public function __construct(
+        private readonly AbstractSchemaManager $schemaManager,
+        private readonly AbstractPlatform $platform,
+    ) {
     }
 
     public function createFromSchema(): Schema
@@ -48,7 +41,7 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array
     {
         return $this->platform->getAlterSchemaSQL(
-            $this->schemaManager->createComparator()->compareSchemas($fromSchema, $toSchema)
+            $this->schemaManager->createComparator()->compareSchemas($fromSchema, $toSchema),
         );
     }
 }

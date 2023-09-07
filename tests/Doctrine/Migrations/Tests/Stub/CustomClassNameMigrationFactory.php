@@ -9,18 +9,11 @@ use Doctrine\Migrations\Version\MigrationFactory;
 
 class CustomClassNameMigrationFactory implements MigrationFactory
 {
-    private MigrationFactory $parentMigrationFactory;
-
-    /** @var class-string<AbstractMigration> */
-    private string $migrationClassName;
-
-    /**
-     * @param class-string<AbstractMigration> $migrationClassName
-     */
-    public function __construct(MigrationFactory $parentMigrationFactory, string $migrationClassName)
-    {
-        $this->parentMigrationFactory = $parentMigrationFactory;
-        $this->migrationClassName     = $migrationClassName;
+    /** @param class-string<AbstractMigration> $migrationClassName */
+    public function __construct(
+        private readonly MigrationFactory $parentMigrationFactory,
+        private readonly string $migrationClassName,
+    ) {
     }
 
     public function createVersion(string $migrationClassName): AbstractMigration

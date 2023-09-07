@@ -25,7 +25,7 @@ final class DbalFactoryTest extends TestCase
     public function testCreateVersion(): void
     {
         $migration = $this->versionFactory->createVersion(
-            VersionFactoryTestMigration::class
+            VersionFactoryTestMigration::class,
         );
 
         self::assertInstanceOf(VersionFactoryTestMigration::class, $migration);
@@ -43,7 +43,7 @@ final class DbalFactoryTest extends TestCase
 
         $this->versionFactory = new DbalMigrationFactory(
             $this->connection,
-            $this->logger
+            $this->logger,
         );
     }
 }

@@ -25,31 +25,25 @@ final class ExecutionResult
     /**
      * Seconds
      */
-    private ?float $time = null;
+    private float|null $time = null;
 
-    private ?float $memory = null;
+    private float|null $memory = null;
 
     private bool $skipped = false;
 
     private bool $error = false;
 
-    private ?Throwable $exception = null;
-
-    private ?DateTimeImmutable $executedAt = null;
+    private Throwable|null $exception = null;
 
     private int $state;
 
-    private ?Schema $toSchema = null;
+    private Schema|null $toSchema = null;
 
-    private Version $version;
-
-    private string $direction;
-
-    public function __construct(Version $version, string $direction = Direction::UP, ?DateTimeImmutable $executedAt = null)
-    {
-        $this->executedAt = $executedAt;
-        $this->version    = $version;
-        $this->direction  = $direction;
+    public function __construct(
+        private readonly Version $version,
+        private readonly string $direction = Direction::UP,
+        private DateTimeImmutable|null $executedAt = null,
+    ) {
     }
 
     public function getDirection(): string
@@ -57,7 +51,7 @@ final class ExecutionResult
         return $this->direction;
     }
 
-    public function getExecutedAt(): ?DateTimeImmutable
+    public function getExecutedAt(): DateTimeImmutable|null
     {
         return $this->executedAt;
     }
@@ -77,23 +71,19 @@ final class ExecutionResult
         return count($this->sql) !== 0;
     }
 
-    /**
-     * @return Query[]
-     */
+    /** @return Query[] */
     public function getSql(): array
     {
         return $this->sql;
     }
 
-    /**
-     * @param Query[] $sql
-     */
+    /** @param Query[] $sql */
     public function setSql(array $sql): void
     {
         $this->sql = $sql;
     }
 
-    public function getTime(): ?float
+    public function getTime(): float|null
     {
         return $this->time;
     }
@@ -103,7 +93,7 @@ final class ExecutionResult
         $this->time = $time;
     }
 
-    public function getMemory(): ?float
+    public function getMemory(): float|null
     {
         return $this->memory;
     }
@@ -123,7 +113,7 @@ final class ExecutionResult
         return $this->skipped;
     }
 
-    public function setError(bool $error, ?Throwable $exception = null): void
+    public function setError(bool $error, Throwable|null $exception = null): void
     {
         $this->error     = $error;
         $this->exception = $exception;
@@ -134,7 +124,7 @@ final class ExecutionResult
         return $this->error;
     }
 
-    public function getException(): ?Throwable
+    public function getException(): Throwable|null
     {
         return $this->exception;
     }

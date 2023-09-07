@@ -56,7 +56,7 @@ final class FileQueryWriterTest extends MigrationTestCase
 
         $writer = new FileQueryWriter(
             $migrationFileBuilder,
-            $logger
+            $logger,
         );
 
         self::assertTrue($writer->write($path, Direction::UP, ['Foo' => [new Query('A')]]));

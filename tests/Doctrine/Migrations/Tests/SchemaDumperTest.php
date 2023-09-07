@@ -81,9 +81,9 @@ class SchemaDumperTest extends TestCase
             ->method('generate')
             ->with(self::logicalOr(
                 self::equalTo(['CREATE TABLE test']),
-                self::equalTo(['DROP TABLE test'])
+                self::equalTo(['DROP TABLE test']),
             ))
-            ->will(self::onConsecutiveCalls('up', 'down'));
+            ->willReturnOnConsecutiveCalls('up', 'down');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -202,7 +202,7 @@ class SchemaDumperTest extends TestCase
             $this->schemaManager,
             $this->migrationGenerator,
             $this->migrationSqlGenerator,
-            ['/skipped_table_name/']
+            ['/skipped_table_name/'],
         );
     }
 }

@@ -6,7 +6,7 @@
     <arg name="cache" value=".phpcs-cache"/>
     <arg name="colors"/>
 
-    <config name="php_version" value="70400"/>
+    <config name="php_version" value="80100"/>
 
     <!-- Ignore warnings, show progress of the run and show sniff names -->
     <arg value="nps"/>
@@ -44,7 +44,6 @@
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
         <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/Configuration/Loader/AbstractLoaderTest.php</exclude-pattern>
         <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 

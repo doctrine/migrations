@@ -10,6 +10,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\SqlFormatter\SqlFormatter;
 use OutOfBoundsException;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -29,6 +30,7 @@ use const FILTER_VALIDATE_BOOLEAN;
  * The DiffCommand class is responsible for generating a migration by comparing your current database schema to
  * your mapping information.
  */
+#[AsCommand(name: 'migrations:diff', description: 'Generate a migration by comparing your current database to your mapping information.')]
 final class DiffCommand extends DoctrineCommand
 {
     /** @var string|null */
@@ -41,65 +43,62 @@ final class DiffCommand extends DoctrineCommand
         $this
             ->setAliases(['diff'])
             ->setDescription('Generate a migration by comparing your current database to your mapping information.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
 
     <info>%command.full_name%</info>
 
-EOT
-            )
+EOT)
             ->addOption(
                 'namespace',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'The namespace to use for the migration (must be in the list of configured namespaces)'
+                'The namespace to use for the migration (must be in the list of configured namespaces)',
             )
             ->addOption(
                 'filter-expression',
                 null,
                 InputOption::VALUE_REQUIRED,
-                'Tables which are filtered by Regular Expression.'
+                'Tables which are filtered by Regular Expression.',
             )
             ->addOption(
                 'formatted',
                 null,
                 InputOption::VALUE_NONE,
-                'Format the generated SQL.'
+                'Format the generated SQL.',
             )
             ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_REQUIRED,
                 'Max line length of unformatted lines.',
-                '120'
+                '120',
             )
             ->addOption(
                 'check-database-platform',
                 null,
                 InputOption::VALUE_OPTIONAL,
                 'Check Database Platform to the generated code.',
-                false
+                false,
             )
             ->addOption(
                 'allow-empty-diff',
                 null,
                 InputOption::VALUE_NONE,
-                'Do not throw an exception when no changes are detected.'
+                'Do not throw an exception when no changes are detected.',
             )
             ->addOption(
                 'from-empty-schema',
                 null,
                 InputOption::VALUE_NONE,
-                'Generate a full migration as if the current database was empty.'
+                'Generate a full migration as if the current database was empty.',
             );
     }
 
-    /**
-     * @throws InvalidOptionUsage
-     */
+    /** @throws InvalidOptionUsage */
     protected function execute(
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): int {
         $filterExpression = (string) $input->getOption('filter-expression');
         if ($filterExpression === '') {
@@ -119,7 +118,7 @@ EOT
         if ($formatted) {
             if (! class_exists(SqlFormatter::class)) {
                 throw InvalidOptionUsage::new(
-                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".'
+                    'The "--formatted" option can only be used if the sql formatter is installed. Please run "composer require doctrine/sql-formatter".',
                 );
             }
         }
@@ -156,7 +155,7 @@ EOT
                 $formatted,
                 $lineLength,
                 $checkDbPlatform,
-                $fromEmptySchema
+                $fromEmptySchema,
             );
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {
@@ -173,12 +172,12 @@ EOT
             '',
             sprintf(
                 'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
-                addslashes($fqcn)
+                addslashes($fqcn),
             ),
             '',
             sprintf(
                 'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
-                addslashes($fqcn)
+                addslashes($fqcn),
             ),
             '',
         ]);
@@ -190,7 +189,7 @@ EOT
         AvailableMigrationsList $newMigrations,
         ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input,
-        OutputInterface $output
+        OutputInterface $output,
     ): bool {
         if (count($newMigrations) === 0 && count($executedUnavailableMigrations) === 0) {
             return true;
@@ -199,14 +198,14 @@ EOT
         if (count($newMigrations) !== 0) {
             $this->io->warning(sprintf(
                 'You have %d available migrations to execute.',
-                count($newMigrations)
+                count($newMigrations),
             ));
         }
 
         if (count($executedUnavailableMigrations) !== 0) {
             $this->io->warning(sprintf(
                 'You have %d previously executed migrations in the database that are not registered migrations.',
-                count($executedUnavailableMigrations)
+                count($executedUnavailableMigrations),
             ));
         }
 

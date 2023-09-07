@@ -7,7 +7,7 @@ namespace Doctrine\Migrations\Tests\Configuration\Migration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Migration\PhpFile;
 
-class PhpLoaderTest extends LoaderTest
+class PhpLoaderTest extends LoaderTestCase
 {
     public function load(string $prefix = ''): Configuration
     {

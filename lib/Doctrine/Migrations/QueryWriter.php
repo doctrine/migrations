@@ -13,12 +13,10 @@ use Doctrine\Migrations\Query\Query;
  */
 interface QueryWriter
 {
-    /**
-     * @param array<string,Query[]> $queriesByVersion
-     */
+    /** @param array<string,Query[]> $queriesByVersion */
     public function write(
         string $path,
         string $direction,
-        array $queriesByVersion
+        array $queriesByVersion,
     ): bool;
 }

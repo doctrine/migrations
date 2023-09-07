@@ -16,9 +16,9 @@ final class DuplicateMigrationVersion extends RuntimeException implements Migrat
             sprintf(
                 'Migration version %s already registered with class %s',
                 $version,
-                $class
+                $class,
             ),
-            7
+            7,
         );
     }
 }

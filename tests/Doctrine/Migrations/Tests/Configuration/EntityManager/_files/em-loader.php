@@ -10,7 +10,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 
 return new class () implements EntityManagerLoader {
-    public function getEntityManager(?string $name = null): EntityManagerInterface
+    public function getEntityManager(string|null $name = null): EntityManagerInterface
     {
         $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 

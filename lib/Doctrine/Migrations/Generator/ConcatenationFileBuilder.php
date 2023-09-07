@@ -21,7 +21,7 @@ final class ConcatenationFileBuilder implements FileBuilder
     public function buildMigrationFile(
         array $queriesByVersion,
         string $direction,
-        ?DateTimeInterface $now = null
+        DateTimeInterface|null $now = null,
     ): string {
         $now  ??= new DateTimeImmutable();
         $string = sprintf("-- Doctrine Migration File Generated on %s\n", $now->format('Y-m-d H:i:s'));

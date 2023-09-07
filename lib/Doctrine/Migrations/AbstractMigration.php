@@ -33,17 +33,14 @@ abstract class AbstractMigration
     /** @var AbstractPlatform */
     protected $platform;
 
-    private LoggerInterface $logger;
-
     /** @var Query[] */
     private array $plannedSql = [];
 
-    public function __construct(Connection $connection, LoggerInterface $logger)
+    public function __construct(Connection $connection, private readonly LoggerInterface $logger)
     {
         $this->connection = $connection;
         $this->sm         = $this->connection->createSchemaManager();
         $this->platform   = $this->connection->getDatabasePlatform();
-        $this->logger     = $logger;
     }
 
     /**
@@ -74,9 +71,7 @@ abstract class AbstractMigration
         $this->logger->warning($message, ['migration' => $this]);
     }
 
-    /**
-     * @throws AbortMigration
-     */
+    /** @throws AbortMigration */
     public function abortIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
@@ -84,9 +79,7 @@ abstract class AbstractMigration
         }
     }
 
-    /**
-     * @throws SkipMigration
-     */
+    /** @throws SkipMigration */
     public function skipIf(bool $condition, string $message = 'Unknown Reason'): void
     {
         if ($condition) {
@@ -94,42 +87,30 @@ abstract class AbstractMigration
         }
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function preUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function postUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function preDown(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function postDown(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     abstract public function up(Schema $schema): void;
 
-    /**
-     * @throws MigrationException|DBALException
-     */
+    /** @throws MigrationException|DBALException */
     public function down(Schema $schema): void
     {
         $this->abortIf(true, sprintf('No down() migration implemented for "%s"', static::class));
@@ -142,14 +123,12 @@ abstract class AbstractMigration
     protected function addSql(
         string $sql,
         array $params = [],
-        array $types = []
+        array $types = [],
     ): void {
         $this->plannedSql[] = new Query($sql, $params, $types);
     }
 
-    /**
-     * @return Query[]
-     */
+    /** @return Query[] */
     public function getSql(): array
     {
         return $this->plannedSql;
@@ -160,10 +139,8 @@ abstract class AbstractMigration
         $this->logger->notice($message, ['migration' => $this]);
     }
 
-    /**
-     * @throws IrreversibleMigration
-     */
-    protected function throwIrreversibleMigrationException(?string $message = null): void
+    /** @throws IrreversibleMigration */
+    protected function throwIrreversibleMigrationException(string|null $message = null): void
     {
         if ($message === null) {
             $message = 'This migration is irreversible and cannot be reverted.';

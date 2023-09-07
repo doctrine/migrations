@@ -19,5 +19,5 @@ interface ConnectionLoader
      *
      * @throws ConnectionNotSpecified
      */
-    public function getConnection(?string $name = null): Connection;
+    public function getConnection(string|null $name = null): Connection;
 }

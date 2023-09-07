@@ -15,18 +15,14 @@ use function array_keys;
 
 class DoctrineRegistry extends AbstractManagerRegistry
 {
-    /** @var EntityManager[] */
-    private array $realEntityManagers;
-
-    /** @var Connection[] */
-    private array $connections;
-
     /**
      * @param array<string,Connection>    $connections
      * @param array<string,EntityManager> $realEntityManagers
      */
-    public function __construct(array $connections = [], array $realEntityManagers = [])
-    {
+    public function __construct(
+        private readonly array $connections = [],
+        private readonly array $realEntityManagers = [],
+    ) {
         $connectionNames        = array_keys($connections);
         $realEntityManagerNames = array_keys($realEntityManagers);
 
@@ -36,10 +32,8 @@ class DoctrineRegistry extends AbstractManagerRegistry
             array_combine($realEntityManagerNames, $realEntityManagerNames),
             $connectionNames[0] ?? 'default',
             $realEntityManagerNames[0] ?? 'default',
-            Proxy::class
+            Proxy::class,
         );
-        $this->realEntityManagers = $realEntityManagers;
-        $this->connections        = $connections;
     }
 
     /**

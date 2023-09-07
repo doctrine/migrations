@@ -19,17 +19,13 @@ final class AvailableMigrationsSet implements Countable
     /** @var AvailableMigration[] */
     private array $items = [];
 
-    /**
-     * @param AvailableMigration[] $items
-     */
+    /** @param AvailableMigration[] $items */
     public function __construct(array $items)
     {
         $this->items = array_values($items);
     }
 
-    /**
-     * @return AvailableMigration[]
-     */
+    /** @return AvailableMigration[] */
     public function getItems(): array
     {
         return $this->items;

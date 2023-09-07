@@ -14,16 +14,10 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
  */
 final class CurrentMigrationStatusCalculator implements MigrationStatusCalculator
 {
-    private MigrationPlanCalculator $migrationPlanCalculator;
-
-    private MetadataStorage $metadataStorage;
-
     public function __construct(
-        MigrationPlanCalculator $migrationPlanCalculator,
-        MetadataStorage $metadataStorage
+        private readonly MigrationPlanCalculator $migrationPlanCalculator,
+        private readonly MetadataStorage $metadataStorage,
     ) {
-        $this->migrationPlanCalculator = $migrationPlanCalculator;
-        $this->metadataStorage         = $metadataStorage;
     }
 
     public function getExecutedUnavailableMigrations(): ExecutedMigrationsList

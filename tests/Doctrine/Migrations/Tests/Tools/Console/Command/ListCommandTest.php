@@ -46,7 +46,7 @@ class ListCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($conn)
+            new ExistingConnection($conn),
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -78,7 +78,7 @@ class ListCommandTest extends MigrationTestCase
 
         $this->commandTester->execute([]);
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
         self::assertSame(
             [
@@ -92,7 +92,7 @@ class ListCommandTest extends MigrationTestCase
                 7 => '| 1231      | not migrated            |                     |                | foo         |',
                 8 => '+-----------+-------------------------+---------------------+----------------+-------------+',
             ],
-            $lines
+            $lines,
         );
     }
 }

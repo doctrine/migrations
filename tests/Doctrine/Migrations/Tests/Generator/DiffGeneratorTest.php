@@ -54,9 +54,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
             ->willReturn(
-                static function ($name): bool {
-                    return $name === 'table_name1';
-                }
+                static fn ($name): bool => $name === 'table_name1',
             );
 
         $table1 = $this->createMock(Table::class);
@@ -91,9 +89,9 @@ class DiffGeneratorTest extends TestCase
 
         $toSchema->expects(self::exactly(2))
             ->method('dropTable')
-            ->will(self::onConsecutiveCalls('schema.table_name2', 'schema.table_name3'));
+            ->willReturnOnConsecutiveCalls('schema.table_name2', 'schema.table_name3');
 
-        $schemaDiff = $this->createStub(SchemaDiff::class);
+        $schemaDiff = self::createStub(SchemaDiff::class);
 
         $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
             static $i = 0;
@@ -110,7 +108,7 @@ class DiffGeneratorTest extends TestCase
 
             public static function compareSchemas(
                 Schema $fromSchema,
-                Schema $toSchema
+                Schema $toSchema,
             ): SchemaDiff {
                 return self::$schemaDiff;
             }
@@ -126,9 +124,9 @@ class DiffGeneratorTest extends TestCase
             ->method('generate')
             ->with(self::logicalOr(
                 self::equalTo(['UPDATE table SET value = 2']),
-                self::equalTo(['UPDATE table SET value = 1'])
+                self::equalTo(['UPDATE table SET value = 1']),
             ), true, 80)
-            ->will(self::onConsecutiveCalls('test1', 'test2'));
+            ->willReturnOnConsecutiveCalls('test1', 'test2');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -139,7 +137,7 @@ class DiffGeneratorTest extends TestCase
             '1234',
             '/table_name1/',
             true,
-            80
+            80,
         ));
     }
 
@@ -172,7 +170,7 @@ class DiffGeneratorTest extends TestCase
         $toSchema->expects(self::never())
             ->method('dropTable');
 
-        $schemaDiff = $this->createStub(SchemaDiff::class);
+        $schemaDiff = self::createStub(SchemaDiff::class);
         $this->platform->method('getAlterSchemaSQL')->willReturnCallback(static function (): array {
             static $i = 0;
             if ($i++ === 0) {
@@ -188,7 +186,7 @@ class DiffGeneratorTest extends TestCase
 
             public static function compareSchemas(
                 Schema $fromSchema,
-                Schema $toSchema
+                Schema $toSchema,
             ): SchemaDiff {
                 return self::$schemaDiff;
             }
@@ -204,9 +202,9 @@ class DiffGeneratorTest extends TestCase
             ->method('generate')
             ->with(self::logicalOr(
                 self::equalTo(['CREATE TABLE table_name']),
-                self::equalTo(['DROP TABLE table_name'])
+                self::equalTo(['DROP TABLE table_name']),
             ), false, 120, true)
-            ->will(self::onConsecutiveCalls('test up', 'test down'));
+            ->willReturnOnConsecutiveCalls('test up', 'test down');
 
         $this->migrationGenerator->expects(self::once())
             ->method('generateMigration')
@@ -232,7 +230,7 @@ class DiffGeneratorTest extends TestCase
             $this->platform,
             $this->migrationGenerator,
             $this->migrationSqlGenerator,
-            $this->emptySchemaProvider
+            $this->emptySchemaProvider,
         );
     }
 }

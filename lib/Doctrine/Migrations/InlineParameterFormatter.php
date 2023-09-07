@@ -23,11 +23,8 @@ use function sprintf;
  */
 final class InlineParameterFormatter implements ParameterFormatter
 {
-    private Connection $connection;
-
-    public function __construct(Connection $connection)
+    public function __construct(private readonly Connection $connection)
     {
-        $this->connection = $connection;
     }
 
     /**
@@ -55,33 +52,23 @@ final class InlineParameterFormatter implements ParameterFormatter
         return sprintf('with parameters (%s)', implode(', ', $formattedParameters));
     }
 
-    /**
-     * @param string|int $value
-     * @param string|int $type
-     *
-     * @return string|int
-     */
-    private function formatParameter($value, $type)
+    private function formatParameter(mixed $value, string|int $type): string|int|null
     {
         if (is_string($type) && Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(
                 $value,
-                $this->connection->getDatabasePlatform()
+                $this->connection->getDatabasePlatform(),
             );
         }
 
         return $this->parameterToString($value);
     }
 
-    /**
-     * @param int[]|bool[]|string[]|array|int|string|bool $value
-     */
-    private function parameterToString($value): string
+    /** @param int[]|bool[]|string[]|array|int|string|bool $value */
+    private function parameterToString(array|int|string|bool $value): string
     {
         if (is_array($value)) {
-            return implode(', ', array_map(function ($value): string {
-                return $this->parameterToString($value);
-            }, $value));
+            return implode(', ', array_map($this->parameterToString(...), $value));
         }
 
         if (is_int($value) || is_string($value)) {

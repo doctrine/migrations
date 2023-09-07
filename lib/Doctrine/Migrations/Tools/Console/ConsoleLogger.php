@@ -13,13 +13,11 @@ use Stringable;
 use Symfony\Component\Console\Output\ConsoleOutputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function get_class;
 use function gettype;
 use function is_object;
 use function is_scalar;
-use function method_exists;
 use function sprintf;
-use function strpos;
+use function str_contains;
 use function strtr;
 
 /**
@@ -33,8 +31,6 @@ final class ConsoleLogger extends AbstractLogger
 {
     public const INFO  = 'info';
     public const ERROR = 'error';
-
-    private OutputInterface $output;
 
     /** @var array<string, int> */
     private array $verbosityLevelMap = [
@@ -63,15 +59,17 @@ final class ConsoleLogger extends AbstractLogger
      * @param array<string, int>    $verbosityLevelMap
      * @param array<string, string> $formatLevelMap
      */
-    public function __construct(OutputInterface $output, array $verbosityLevelMap = [], array $formatLevelMap = [])
-    {
-        $this->output            = $output;
+    public function __construct(
+        private readonly OutputInterface $output,
+        array $verbosityLevelMap = [],
+        array $formatLevelMap = [],
+    ) {
         $this->verbosityLevelMap = $verbosityLevelMap + $this->verbosityLevelMap;
         $this->formatLevelMap    = $formatLevelMap + $this->formatLevelMap;
     }
 
     /**
-     * {@inheritdoc}
+     * {@inheritDoc}
      *
      * @param mixed[] $context
      */
@@ -102,24 +100,23 @@ final class ConsoleLogger extends AbstractLogger
     /**
      * Interpolates context values into the message placeholders.
      *
-     * @param string|Stringable $message
-     * @param mixed[]           $context
+     * @param mixed[] $context
      */
-    private function interpolate($message, array $context): string
+    private function interpolate(string|Stringable $message, array $context): string
     {
         $message = (string) $message;
-        if (strpos($message, '{') === false) {
+        if (! str_contains($message, '{')) {
             return $message;
         }
 
         $replacements = [];
         foreach ($context as $key => $val) {
-            if ($val === null || is_scalar($val) || (is_object($val) && method_exists($val, '__toString'))) {
+            if ($val === null || is_scalar($val) || $val instanceof Stringable) {
                 $replacements["{{$key}}"] = $val;
             } elseif ($val instanceof DateTimeInterface) {
                 $replacements["{{$key}}"] = $val->format(DateTime::RFC3339);
             } elseif (is_object($val)) {
-                $replacements["{{$key}}"] = '[object ' . get_class($val) . ']';
+                $replacements["{{$key}}"] = '[object ' . $val::class . ']';
             } else {
                 $replacements["{{$key}}"] = '[' . gettype($val) . ']';
             }

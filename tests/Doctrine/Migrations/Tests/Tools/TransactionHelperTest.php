@@ -16,40 +16,40 @@ final class TransactionHelperTest extends TestCase
 
     public function testItTriggersADeprecationWhenUseful(): void
     {
-        $connection        = $this->createStub(Connection::class);
-        $wrappedConnection = $this->createStub(PDO::class);
+        $connection        = self::createStub(Connection::class);
+        $wrappedConnection = self::createStub(PDO::class);
 
         $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 
         $wrappedConnection->method('inTransaction')->willReturn(false);
 
         $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::commitIfInTransaction($connection);
 
         $this->expectDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::rollbackIfInTransaction($connection);
     }
 
     public function testItDoesNotTriggerADeprecationWhenUseless(): void
     {
-        $connection        = $this->createStub(Connection::class);
-        $wrappedConnection = $this->createStub(PDO::class);
+        $connection        = self::createStub(Connection::class);
+        $wrappedConnection = self::createStub(PDO::class);
 
         $connection->method('getNativeConnection')->willReturn($wrappedConnection);
 
         $wrappedConnection->method('inTransaction')->willReturn(true);
 
         $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::commitIfInTransaction($connection);
 
         $this->expectNoDeprecationWithIdentifier(
-            'https://github.com/doctrine/migrations/issues/1169'
+            'https://github.com/doctrine/migrations/issues/1169',
         );
         TransactionHelper::rollbackIfInTransaction($connection);
     }

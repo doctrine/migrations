@@ -54,9 +54,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationRepository
             ->expects(self::any())
             ->method('hasMigration')
-            ->willReturnCallback(static function ($version) use ($m): bool {
-                return isset($m[$version]);
-            });
+            ->willReturnCallback(static fn ($version): bool => isset($m[$version]));
 
         $this->migrationRepository
             ->expects(self::any())
@@ -137,10 +135,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getPlanUpWhenNoMigrations(): array
+    /** @return mixed[] */
+    public static function getPlanUpWhenNoMigrations(): array
     {
         return [
             ['A', ['A'], Direction::UP],
@@ -183,10 +179,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         $this->migrationPlanCalculator->getPlanUntilVersion(new Version('D'));
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getPlanUpWhenMigrations(): array
+    /** @return mixed[] */
+    public static function getPlanUpWhenMigrations(): array
     {
         return [
             ['0', ['B', 'A'], Direction::DOWN],
@@ -223,10 +217,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         }
     }
 
-    /**
-     * @return mixed[]
-     */
-    public function getPlanUpWhenMigrationsOutOfOrder(): array
+    /** @return mixed[] */
+    public static function getPlanUpWhenMigrationsOutOfOrder(): array
     {
         return [
             ['C',['A'],Direction::UP],
@@ -244,7 +236,7 @@ final class MigrationPlanCalculatorTest extends TestCase
         $migrationPlanCalculator = new SortedMigrationPlanCalculator(
             $this->migrationRepository,
             $this->metadataStorage,
-            $reverseSorter
+            $reverseSorter,
         );
 
         $migrations = $migrationPlanCalculator->getMigrations();

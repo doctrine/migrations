@@ -13,14 +13,10 @@ use Doctrine\Migrations\Version\Version;
  */
 final class AvailableMigration
 {
-    private Version $version;
-
-    private AbstractMigration $migration;
-
-    public function __construct(Version $version, AbstractMigration $migration)
-    {
-        $this->version   = $version;
-        $this->migration = $migration;
+    public function __construct(
+        private readonly Version $version,
+        private readonly AbstractMigration $migration,
+    ) {
     }
 
     public function getVersion(): Version

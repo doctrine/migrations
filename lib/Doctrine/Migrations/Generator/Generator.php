@@ -63,19 +63,16 @@ final class <className> extends AbstractMigration
 
 TEMPLATE;
 
-    private Configuration $configuration;
+    private string|null $template = null;
 
-    private ?string $template = null;
-
-    public function __construct(Configuration $configuration)
+    public function __construct(private readonly Configuration $configuration)
     {
-        $this->configuration = $configuration;
     }
 
     public function generateMigration(
         string $fqcn,
-        ?string $up = null,
-        ?string $down = null
+        string|null $up = null,
+        string|null $down = null,
     ): string {
         $mch = [];
         if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
@@ -132,10 +129,8 @@ METHOD
         return $this->template;
     }
 
-    /**
-     * @throws InvalidTemplateSpecified
-     */
-    private function loadCustomTemplate(): ?string
+    /** @throws InvalidTemplateSpecified */
+    private function loadCustomTemplate(): string|null
     {
         $customTemplate = $this->configuration->getCustomTemplate();
 

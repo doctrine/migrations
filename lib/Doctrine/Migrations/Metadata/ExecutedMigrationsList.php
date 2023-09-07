@@ -22,17 +22,13 @@ final class ExecutedMigrationsList implements Countable
     /** @var ExecutedMigration[] */
     private array $items = [];
 
-    /**
-     * @param ExecutedMigration[] $items
-     */
+    /** @param ExecutedMigration[] $items */
     public function __construct(array $items)
     {
         $this->items = array_values($items);
     }
 
-    /**
-     * @return ExecutedMigration[]
-     */
+    /** @return ExecutedMigration[] */
     public function getItems(): array
     {
         return $this->items;
@@ -86,8 +82,6 @@ final class ExecutedMigrationsList implements Countable
 
     public function unavailableSubset(AvailableMigrationsList $availableMigrations): self
     {
-        return new self(array_filter($this->getItems(), static function (ExecutedMigration $migration) use ($availableMigrations): bool {
-            return ! $availableMigrations->hasMigration($migration->getVersion());
-        }));
+        return new self(array_filter($this->getItems(), static fn (ExecutedMigration $migration): bool => ! $availableMigrations->hasMigration($migration->getVersion())));
     }
 }

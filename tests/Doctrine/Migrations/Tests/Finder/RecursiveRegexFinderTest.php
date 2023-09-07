@@ -79,7 +79,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespaceNested',
-            'TestMigrations\\MultiNested'
+            'TestMigrations\\MultiNested',
         );
 
         $expectedVersions = [
@@ -97,7 +97,7 @@ class RecursiveRegexFinderTest extends FinderTestCase
     {
         $versions = $this->finder->findMigrations(
             __DIR__ . '/_features/MultiNamespaceNested',
-            'TestMigrations\\MultiNested\\Deep'
+            'TestMigrations\\MultiNested\\Deep',
         );
 
         self::assertSame(['TestMigrations\MultiNested\Deep\Version0002'], $versions);

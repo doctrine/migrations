@@ -78,7 +78,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -111,7 +111,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -141,9 +141,7 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->migration->setDescription('testing');
@@ -174,7 +172,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -234,7 +232,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $queries = $result->getSql();
@@ -267,9 +265,7 @@ class ExecutorTest extends TestCase
         ], $this->logger->logs);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testSkipMigration(): void
     {
         $this->metadataStorage
@@ -308,7 +304,7 @@ class ExecutorTest extends TestCase
 
         $result = $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         self::assertTrue($result->isSkipped());
@@ -324,9 +320,7 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testMigrationEvents(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -353,15 +347,13 @@ class ExecutorTest extends TestCase
 
         $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
         self::assertTrue($listener->onMigrationsVersionExecuted);
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function testErrorMigration(): void
     {
         $this->metadataStorage
@@ -402,10 +394,10 @@ class ExecutorTest extends TestCase
         try {
             $this->versionExecutor->execute(
                 $plan,
-                $migratorConfiguration
+                $migratorConfiguration,
             );
             $migrationSucceed = true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             self::assertFalse($listener->onMigrationsVersionExecuted);
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);
@@ -472,10 +464,10 @@ class ExecutorTest extends TestCase
         try {
             $this->versionExecutor->execute(
                 $plan,
-                $migratorConfiguration
+                $migratorConfiguration,
             );
             $migrationSucceed = true;
-        } catch (Throwable $e) {
+        } catch (Throwable) {
             self::assertFalse($listener->onMigrationsVersionExecuted);
             self::assertTrue($listener->onMigrationsVersionSkipped);
             self::assertTrue($listener->onMigrationsVersionExecuting);
@@ -494,9 +486,7 @@ class ExecutorTest extends TestCase
         self::assertFalse($migrationSucceed);
     }
 
-    /**
-     * @test
-     */
+    /** @test */
     public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -506,7 +496,7 @@ class ExecutorTest extends TestCase
 
         $this->versionExecutor->execute(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         self::assertSame('++ reverting test', $this->logger->logs[0]);
@@ -514,18 +504,11 @@ class ExecutorTest extends TestCase
 
     protected function setUp(): void
     {
-        // add getSql to mock until method will be added to MetadataStorage interface
-        $this->metadataStorage = $this->getMockBuilder(MetadataStorage::class)
-            ->disableOriginalConstructor()
-            ->disableOriginalClone()
-            ->disableArgumentCloning()
-            ->disallowMockingUnknownTypes()
-            ->onlyMethods(['ensureInitialized', 'getExecutedMigrations', 'complete', 'reset'])
-            ->addMethods(['getSql'])
-            ->getMock();
+        // use FutureMetadataStorage until getSql is added to MetadataStorage interface
+        $this->metadataStorage = $this->createMock(FutureMetadataStorage::class);
 
         $this->connection = $this->createMock(Connection::class);
-        $driverConnection = $this->createStub(DriverConnection::class);
+        $driverConnection = self::createStub(DriverConnection::class);
         $this->connection->method('getWrappedConnection')->willReturn($driverConnection);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
@@ -543,7 +526,7 @@ class ExecutorTest extends TestCase
             $this->schemaDiffProvider,
             $this->logger,
             $this->parameterFormatter,
-            $this->stopwatch
+            $this->stopwatch,
         );
 
         $this->version = new Version('test');
@@ -572,4 +555,10 @@ class ExecutorTest extends TestCase
         $stopwatchEvent->method('getPeriods')
             ->willReturn([$stopWatchPeriod]);
     }
+}
+
+interface FutureMetadataStorage extends MetadataStorage
+{
+    /** @return iterable<Query> */
+    public function getSql(ExecutionResult $result): iterable;
 }

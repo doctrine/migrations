@@ -16,18 +16,11 @@ use function reset;
  */
 final class MigrationPlanList implements Countable
 {
-    private string $direction;
-
-    /** @var MigrationPlan[] */
-    private array $items = [];
-
-    /**
-     * @param MigrationPlan[] $items
-     */
-    public function __construct(array $items, string $direction)
-    {
-        $this->items     = $items;
-        $this->direction = $direction;
+    /** @param MigrationPlan[] $items */
+    public function __construct(
+        private array $items,
+        private readonly string $direction,
+    ) {
     }
 
     public function count(): int
@@ -35,9 +28,7 @@ final class MigrationPlanList implements Countable
         return count($this->items);
     }
 
-    /**
-     * @return MigrationPlan[]
-     */
+    /** @return MigrationPlan[] */
     public function getItems(): array
     {
         return $this->items;

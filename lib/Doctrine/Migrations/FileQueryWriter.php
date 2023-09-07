@@ -21,26 +21,18 @@ use function realpath;
  */
 final class FileQueryWriter implements QueryWriter
 {
-    private FileBuilder $migrationFileBuilder;
-
-    private LoggerInterface $logger;
-
     public function __construct(
-        FileBuilder $migrationFileBuilder,
-        LoggerInterface $logger
+        private readonly FileBuilder $migrationFileBuilder,
+        private readonly LoggerInterface $logger,
     ) {
-        $this->migrationFileBuilder = $migrationFileBuilder;
-        $this->logger               = $logger;
     }
 
-    /**
-     * @param array<string,Query[]> $queriesByVersion
-     */
+    /** @param array<string,Query[]> $queriesByVersion */
     public function write(
         string $path,
         string $direction,
         array $queriesByVersion,
-        ?DateTimeInterface $now = null
+        DateTimeInterface|null $now = null,
     ): bool {
         $now ??= new DateTimeImmutable();
 

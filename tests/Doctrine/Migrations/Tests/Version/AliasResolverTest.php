@@ -48,7 +48,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliases
      */
-    public function testAliases(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
+    public function testAliases(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);
@@ -77,7 +77,7 @@ final class AliasResolverTest extends TestCase
      *
      * @dataProvider getAliasesWithNoExecuted
      */
-    public function testAliasesWithNoExecuted(string $alias, ?string $expectedVersion, ?string $expectedException = null): void
+    public function testAliasesWithNoExecuted(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {
             $this->expectException($expectedException);
@@ -96,10 +96,8 @@ final class AliasResolverTest extends TestCase
         self::assertEquals(new Version($expectedVersion), $resolvedAlias);
     }
 
-    /**
-     * @return mixed[][]
-     */
-    public function getAliasesWithNoExecuted(): array
+    /** @return mixed[][] */
+    public static function getAliasesWithNoExecuted(): array
     {
         return [
             ['first', '0'],
@@ -114,10 +112,8 @@ final class AliasResolverTest extends TestCase
         ];
     }
 
-    /**
-     * @return mixed[][]
-     */
-    public function getAliases(): array
+    /** @return mixed[][] */
+    public static function getAliases(): array
     {
         return [
             ['first', '0'],
@@ -147,7 +143,7 @@ final class AliasResolverTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory
+            $versionFactory,
         );
 
         $this->metadataStorage = new TableMetadataStorage($conn, new AlphabeticalComparator());
@@ -156,14 +152,14 @@ final class AliasResolverTest extends TestCase
         $this->migrationPlanCalculator = new SortedMigrationPlanCalculator(
             $this->migrationRepository,
             $this->metadataStorage,
-            new AlphabeticalComparator()
+            new AlphabeticalComparator(),
         );
 
         $this->statusCalculator     = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
         $this->versionAliasResolver = new DefaultAliasResolver(
             $this->migrationPlanCalculator,
             $this->metadataStorage,
-            $this->statusCalculator
+            $this->statusCalculator,
         );
     }
 

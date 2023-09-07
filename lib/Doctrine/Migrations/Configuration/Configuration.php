@@ -30,7 +30,7 @@ final class Configuration
 
     private bool $migrationsAreOrganizedByYearAndMonth = false;
 
-    private ?string $customTemplate = null;
+    private string|null $customTemplate = null;
 
     private bool $isDryRun = false;
 
@@ -38,13 +38,13 @@ final class Configuration
 
     private bool $transactional = true;
 
-    private ?string $connectionName = null;
+    private string|null $connectionName = null;
 
-    private ?string $entityManagerName = null;
+    private string|null $entityManagerName = null;
 
     private bool $checkDbPlatform = true;
 
-    private ?MetadataStorageConfiguration $metadataStorageConfiguration = null;
+    private MetadataStorageConfiguration|null $metadataStorageConfiguration = null;
 
     private bool $frozen = false;
 
@@ -66,9 +66,7 @@ final class Configuration
         $this->metadataStorageConfiguration = $metadataStorageConfiguration;
     }
 
-    /**
-     * @return string[]
-     */
+    /** @return string[] */
     public function getMigrationClasses(): array
     {
         return $this->migrationClasses;
@@ -80,7 +78,7 @@ final class Configuration
         $this->migrationClasses[] = $className;
     }
 
-    public function getMetadataStorageConfiguration(): ?MetadataStorageConfiguration
+    public function getMetadataStorageConfiguration(): MetadataStorageConfiguration|null
     {
         return $this->metadataStorageConfiguration;
     }
@@ -91,43 +89,41 @@ final class Configuration
         $this->migrationsDirectories[$namespace] = $path;
     }
 
-    /**
-     * @return array<string,string>
-     */
+    /** @return array<string,string> */
     public function getMigrationDirectories(): array
     {
         return $this->migrationsDirectories;
     }
 
-    public function getConnectionName(): ?string
+    public function getConnectionName(): string|null
     {
         return $this->connectionName;
     }
 
-    public function setConnectionName(?string $connectionName): void
+    public function setConnectionName(string|null $connectionName): void
     {
         $this->assertNotFrozen();
         $this->connectionName = $connectionName;
     }
 
-    public function getEntityManagerName(): ?string
+    public function getEntityManagerName(): string|null
     {
         return $this->entityManagerName;
     }
 
-    public function setEntityManagerName(?string $entityManagerName): void
+    public function setEntityManagerName(string|null $entityManagerName): void
     {
         $this->assertNotFrozen();
         $this->entityManagerName = $entityManagerName;
     }
 
-    public function setCustomTemplate(?string $customTemplate): void
+    public function setCustomTemplate(string|null $customTemplate): void
     {
         $this->assertNotFrozen();
         $this->customTemplate = $customTemplate;
     }
 
-    public function getCustomTemplate(): ?string
+    public function getCustomTemplate(): string|null
     {
         return $this->customTemplate;
     }
@@ -137,21 +133,17 @@ final class Configuration
         return $this->migrationsAreOrganizedByYear;
     }
 
-    /**
-     * @throws MigrationException
-     */
+    /** @throws MigrationException */
     public function setMigrationsAreOrganizedByYear(
-        bool $migrationsAreOrganizedByYear = true
+        bool $migrationsAreOrganizedByYear = true,
     ): void {
         $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear = $migrationsAreOrganizedByYear;
     }
 
-    /**
-     * @throws MigrationException
-     */
+    /** @throws MigrationException */
     public function setMigrationsAreOrganizedByYearAndMonth(
-        bool $migrationsAreOrganizedByYearAndMonth = true
+        bool $migrationsAreOrganizedByYearAndMonth = true,
     ): void {
         $this->assertNotFrozen();
         $this->migrationsAreOrganizedByYear         = $migrationsAreOrganizedByYearAndMonth;
@@ -210,18 +202,11 @@ final class Configuration
     {
         $this->assertNotFrozen();
 
-        switch (strtolower($migrationOrganization)) {
-            case self::VERSIONS_ORGANIZATION_NONE:
-                $this->setMigrationsAreOrganizedByYearAndMonth(false);
-                break;
-            case self::VERSIONS_ORGANIZATION_BY_YEAR:
-                $this->setMigrationsAreOrganizedByYear();
-                break;
-            case self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH:
-                $this->setMigrationsAreOrganizedByYearAndMonth();
-                break;
-            default:
-                throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization);
-        }
+        match (strtolower($migrationOrganization)) {
+            self::VERSIONS_ORGANIZATION_NONE => $this->setMigrationsAreOrganizedByYearAndMonth(false),
+            self::VERSIONS_ORGANIZATION_BY_YEAR => $this->setMigrationsAreOrganizedByYear(),
+            self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH => $this->setMigrationsAreOrganizedByYearAndMonth(),
+            default => throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization),
+        };
     }
 }

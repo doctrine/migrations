@@ -12,9 +12,7 @@ use function file_exists;
 use function realpath;
 use function sprintf;
 
-/**
- * @requires OS Linux|Darwin
- */
+/** @requires OS Linux|Darwin */
 class BoxPharCompileTest extends TestCase
 {
     public function testCompile(): void
@@ -41,7 +39,7 @@ class BoxPharCompileTest extends TestCase
 
         self::assertTrue(
             $process->isSuccessful(),
-            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput()),
         );
 
         assert($doctrinePharPath !== false);
@@ -63,7 +61,7 @@ class BoxPharCompileTest extends TestCase
 
         self::assertTrue(
             $successful,
-            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput())
+            sprintf("stdout: %s\nstderr: %s", $process->getOutput(), $process->getErrorOutput()),
         );
         self::assertTrue($process->isSuccessful());
     }

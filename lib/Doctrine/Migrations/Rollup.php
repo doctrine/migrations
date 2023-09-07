@@ -19,21 +19,13 @@ use function count;
  */
 class Rollup
 {
-    private MigrationsRepository $migrationRepository;
-
-    private MetadataStorage $metadataStorage;
-
     public function __construct(
-        MetadataStorage $metadataStorage,
-        MigrationsRepository $migrationRepository
+        private readonly MetadataStorage $metadataStorage,
+        private readonly MigrationsRepository $migrationRepository,
     ) {
-        $this->migrationRepository = $migrationRepository;
-        $this->metadataStorage     = $metadataStorage;
     }
 
-    /**
-     * @throws RollupFailed
-     */
+    /** @throws RollupFailed */
     public function rollup(): Version
     {
         $versions = $this->migrationRepository->getMigrations();

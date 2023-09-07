@@ -19,20 +19,16 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
  */
 final class EventDispatcher
 {
-    private EventManager $eventManager;
-
-    private Connection $connection;
-
-    public function __construct(Connection $connection, EventManager $eventManager)
-    {
-        $this->eventManager = $eventManager;
-        $this->connection   = $connection;
+    public function __construct(
+        private readonly Connection $connection,
+        private readonly EventManager $eventManager,
+    ) {
     }
 
     public function dispatchMigrationEvent(
         string $eventName,
         MigrationPlanList $migrationsPlan,
-        MigratorConfiguration $migratorConfiguration
+        MigratorConfiguration $migratorConfiguration,
     ): void {
         $event = $this->createMigrationEventArgs($migrationsPlan, $migratorConfiguration);
 
@@ -42,36 +38,36 @@ final class EventDispatcher
     public function dispatchVersionEvent(
         string $eventName,
         MigrationPlan $plan,
-        MigratorConfiguration $migratorConfiguration
+        MigratorConfiguration $migratorConfiguration,
     ): void {
         $event = $this->createMigrationsVersionEventArgs(
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
 
         $this->dispatchEvent($eventName, $event);
     }
 
-    private function dispatchEvent(string $eventName, ?EventArgs $args = null): void
+    private function dispatchEvent(string $eventName, EventArgs|null $args = null): void
     {
         $this->eventManager->dispatchEvent($eventName, $args);
     }
 
     private function createMigrationEventArgs(
         MigrationPlanList $migrationsPlan,
-        MigratorConfiguration $migratorConfiguration
+        MigratorConfiguration $migratorConfiguration,
     ): MigrationsEventArgs {
         return new MigrationsEventArgs($this->connection, $migrationsPlan, $migratorConfiguration);
     }
 
     private function createMigrationsVersionEventArgs(
         MigrationPlan $plan,
-        MigratorConfiguration $migratorConfiguration
+        MigratorConfiguration $migratorConfiguration,
     ): MigrationsVersionEventArgs {
         return new MigrationsVersionEventArgs(
             $this->connection,
             $plan,
-            $migratorConfiguration
+            $migratorConfiguration,
         );
     }
 }

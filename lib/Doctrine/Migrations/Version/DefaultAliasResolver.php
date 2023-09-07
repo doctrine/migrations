@@ -24,20 +24,11 @@ final class DefaultAliasResolver implements AliasResolver
     private const ALIAS_NEXT    = 'next';
     private const ALIAS_LATEST  = 'latest';
 
-    private MigrationPlanCalculator $migrationPlanCalculator;
-
-    private MetadataStorage $metadataStorage;
-
-    private MigrationStatusCalculator $migrationStatusCalculator;
-
     public function __construct(
-        MigrationPlanCalculator $migrationPlanCalculator,
-        MetadataStorage $metadataStorage,
-        MigrationStatusCalculator $migrationStatusCalculator
+        private readonly MigrationPlanCalculator $migrationPlanCalculator,
+        private readonly MetadataStorage $metadataStorage,
+        private readonly MigrationStatusCalculator $migrationStatusCalculator,
     ) {
-        $this->migrationPlanCalculator   = $migrationPlanCalculator;
-        $this->metadataStorage           = $metadataStorage;
-        $this->migrationStatusCalculator = $migrationStatusCalculator;
     }
 
     /**
@@ -70,7 +61,7 @@ final class DefaultAliasResolver implements AliasResolver
             case self::ALIAS_CURRENT:
                 try {
                     return $executedMigrations->getLast()->getVersion();
-                } catch (NoMigrationsFoundWithCriteria $e) {
+                } catch (NoMigrationsFoundWithCriteria) {
                     return new Version('0');
                 }
 
@@ -78,7 +69,7 @@ final class DefaultAliasResolver implements AliasResolver
             case self::ALIAS_PREV:
                 try {
                     return $executedMigrations->getLast(-1)->getVersion();
-                } catch (NoMigrationsFoundWithCriteria $e) {
+                } catch (NoMigrationsFoundWithCriteria) {
                     return new Version('0');
                 }
 
@@ -96,7 +87,7 @@ final class DefaultAliasResolver implements AliasResolver
             case self::ALIAS_LATEST:
                 try {
                     return $availableMigrations->getLast()->getVersion();
-                } catch (NoMigrationsFoundWithCriteria $e) {
+                } catch (NoMigrationsFoundWithCriteria) {
                     return $this->resolveVersionAlias(self::ALIAS_CURRENT);
                 }
 

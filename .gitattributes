@@ -1,4 +1,5 @@
 build/*                 export-ignore
+/docs                   export-ignore
 /tests                  export-ignore
 /.*                     export-ignore
 box.json.dist           export-ignore
@@ -6,4 +7,7 @@ build.properties.dev    export-ignore
 build.xml               export-ignore
 /phpunit.xml.dist       export-ignore
 /phpcs.xml.dist         export-ignore
+/phpstan.neon.dist      export-ignore
 composer.lock           export-ignore
+/download-box.sh        export-ignore
+/build-phar.sh          export-ignore

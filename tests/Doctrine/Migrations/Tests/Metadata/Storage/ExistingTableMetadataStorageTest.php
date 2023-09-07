@@ -55,7 +55,7 @@ class ExistingTableMetadataStorageTest extends TestCase
             [],
             [],
             new RecursiveRegexFinder('#.*\\.php$#i'),
-            $versionFactory
+            $versionFactory,
         );
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Foo\\5678'), $migration);
 
@@ -65,7 +65,7 @@ class ExistingTableMetadataStorageTest extends TestCase
             $this->connection,
             new AlphabeticalComparator(),
             $this->config,
-            $this->migrationRepository
+            $this->migrationRepository,
         );
 
         // create partial table
@@ -106,7 +106,7 @@ class ExistingTableMetadataStorageTest extends TestCase
         $rows = $this->connection->fetchAllAssociative(sprintf(
             'SELECT * FROM %s ORDER BY %s ASC',
             $this->config->getTableName(),
-            $this->config->getVersionColumnName()
+            $this->config->getVersionColumnName(),
         ));
 
         self::assertCount(2, $rows);

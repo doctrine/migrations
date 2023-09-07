@@ -54,7 +54,7 @@ class UpToDateCommandTest extends MigrationTestCase
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
-            new ExistingConnection($this->conn)
+            new ExistingConnection($this->conn),
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
@@ -112,7 +112,7 @@ class UpToDateCommandTest extends MigrationTestCase
 
         $this->commandTester->execute(['--list-migrations' => true]);
 
-        $lines = array_map('trim', explode("\n", trim($this->commandTester->getDisplay(true))));
+        $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
         self::assertSame(
             [
@@ -129,14 +129,12 @@ class UpToDateCommandTest extends MigrationTestCase
                 '| 1231      | not migrated            |                     |                | foo         |',
                 '+-----------+-------------------------+---------------------+----------------+-------------+',
             ],
-            $lines
+            $lines,
         );
     }
 
-    /**
-     * @return mixed[][]
-     */
-    public function dataIsUpToDate(): array
+    /** @return mixed[][] */
+    public static function dataIsUpToDate(): array
     {
         return [
             'up-to-date' => [

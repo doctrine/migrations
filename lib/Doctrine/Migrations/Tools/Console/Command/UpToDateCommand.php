@@ -9,6 +9,7 @@ use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Version\Version;
+use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -24,6 +25,7 @@ use function uasort;
  * The UpToDateCommand class outputs if your database is up to date or if there are new migrations
  * that need to be executed.
  */
+#[AsCommand(name: 'migrations:up-to-date', description: 'Tells you if your schema is up-to-date.')]
 final class UpToDateCommand extends DoctrineCommand
 {
     /** @var string|null */
@@ -36,12 +38,11 @@ final class UpToDateCommand extends DoctrineCommand
             ->setDescription('Tells you if your schema is up-to-date.')
             ->addOption('fail-on-unregistered', 'u', InputOption::VALUE_NONE, 'Whether to fail when there are unregistered extra migrations found')
             ->addOption('list-migrations', 'l', InputOption::VALUE_NONE, 'Show a list of missing or not migrated versions.')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command tells you if your schema is up-to-date:
 
     <info>%command.full_name%</info>
-EOT
-            );
+EOT);
 
         parent::configure();
     }
@@ -66,7 +67,7 @@ EOT
             $this->io->error(sprintf(
                 'Out-of-date! %u migration%s available to execute.',
                 $newMigrationsCount,
-                $newMigrationsCount > 1 ? 's are' : ' is'
+                $newMigrationsCount > 1 ? 's are' : ' is',
             ));
             $exitCode = 1;
         }
@@ -76,7 +77,7 @@ EOT
                 'You have %1$u previously executed migration%3$s in the database that %2$s registered migration%3$s.',
                 $executedUnavailableMigrationsCount,
                 $executedUnavailableMigrationsCount > 1 ? 'are not' : 'is not a',
-                $executedUnavailableMigrationsCount > 1 ? 's' : ''
+                $executedUnavailableMigrationsCount > 1 ? 's' : '',
             ));
             if ($input->getOption('fail-on-unregistered')) {
                 $exitCode = 2;
@@ -93,25 +94,17 @@ EOT
         return $exitCode;
     }
 
-    /**
-     * @return Version[]
-     */
+    /** @return Version[] */
     private function getSortedVersions(AvailableMigrationsList $newMigrations, ExecutedMigrationsList $executedUnavailableMigrations): array
     {
-        $executedUnavailableVersion = array_map(static function (ExecutedMigration $executedMigration): Version {
-            return $executedMigration->getVersion();
-        }, $executedUnavailableMigrations->getItems());
+        $executedUnavailableVersion = array_map(static fn (ExecutedMigration $executedMigration): Version => $executedMigration->getVersion(), $executedUnavailableMigrations->getItems());
 
-        $newVersions = array_map(static function (AvailableMigration $availableMigration): Version {
-            return $availableMigration->getVersion();
-        }, $newMigrations->getItems());
+        $newVersions = array_map(static fn (AvailableMigration $availableMigration): Version => $availableMigration->getVersion(), $newMigrations->getItems());
 
         $versions = array_unique(array_merge($executedUnavailableVersion, $newVersions));
 
         $comparator = $this->getDependencyFactory()->getVersionComparator();
-        uasort($versions, static function (Version $a, Version $b) use ($comparator): int {
-            return $comparator->compare($a, $b);
-        });
+        uasort($versions, $comparator->compare(...));
 
         return $versions;
     }

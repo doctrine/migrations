@@ -15,9 +15,9 @@ final class MigrationNotExecuted extends RuntimeException implements MigrationEx
         return new self(
             sprintf(
                 'The provided migration %s has not been executed',
-                $version
+                $version,
             ),
-            5
+            5,
         );
     }
 }

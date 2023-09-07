@@ -19,9 +19,7 @@ use function getcwd;
 use function realpath;
 use function sprintf;
 
-/**
- * @covers \Doctrine\Migrations\Tools\Console\ConsoleRunner
- */
+/** @covers \Doctrine\Migrations\Tools\Console\ConsoleRunner */
 class ConsoleRunnerTest extends TestCase
 {
     private Application $application;
@@ -45,9 +43,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    /**
-     * @dataProvider getDependencyFactoryTestDirectories
-     */
+    /** @dataProvider getDependencyFactoryTestDirectories */
     public function testDependencyFactory(string $directory): void
     {
         $dir = getcwd();
@@ -78,7 +74,7 @@ class ConsoleRunnerTest extends TestCase
             $this->expectExceptionMessage(sprintf(
                 'Configuration file "%s" must return an instance of "%s"',
                 realpath(__DIR__ . '/_wrong-config/cli-config.php'),
-                DependencyFactory::class
+                DependencyFactory::class,
             ));
 
             chdir(__DIR__ . '/_wrong-config');
@@ -106,10 +102,8 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    /**
-     * @return array<int,array<string>>
-     */
-    public function getDependencyFactoryTestDirectories(): array
+    /** @return array<int,array<string>> */
+    public static function getDependencyFactoryTestDirectories(): array
     {
         return [
             [__DIR__],
@@ -223,6 +217,7 @@ class ConsoleRunnerTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
+
         $this->application = new Application();
     }
 }
@@ -231,10 +226,8 @@ class ConsoleRunnerStub extends ConsoleRunner
 {
     public static Application $application;
 
-    /**
-     * @param Command[] $commands
-     */
-    public static function createApplication(array $commands = [], ?DependencyFactory $dependencyFactory = null): Application
+    /** @param Command[] $commands */
+    public static function createApplication(array $commands = [], DependencyFactory|null $dependencyFactory = null): Application
     {
         return static::$application;
     }

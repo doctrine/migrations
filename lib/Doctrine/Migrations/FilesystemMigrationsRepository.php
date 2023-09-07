@@ -25,13 +25,6 @@ class FilesystemMigrationsRepository implements MigrationsRepository
 {
     private bool $migrationsLoaded = false;
 
-    /** @var array<string, string> */
-    private array $migrationDirectories;
-
-    private MigrationFinder $migrationFinder;
-
-    private MigrationFactory $versionFactory;
-
     /** @var AvailableMigration[] */
     private array $migrations = [];
 
@@ -41,14 +34,10 @@ class FilesystemMigrationsRepository implements MigrationsRepository
      */
     public function __construct(
         array $classes,
-        array $migrationDirectories,
-        MigrationFinder $migrationFinder,
-        MigrationFactory $versionFactory
+        private readonly array $migrationDirectories,
+        private readonly MigrationFinder $migrationFinder,
+        private readonly MigrationFactory $versionFactory,
     ) {
-        $this->migrationDirectories = $migrationDirectories;
-        $this->migrationFinder      = $migrationFinder;
-        $this->versionFactory       = $versionFactory;
-
         $this->registerMigrations($classes);
     }
 
@@ -57,7 +46,7 @@ class FilesystemMigrationsRepository implements MigrationsRepository
         if (isset($this->migrations[(string) $version])) {
             throw DuplicateMigrationVersion::new(
                 (string) $version,
-                (string) $version
+                (string) $version,
             );
         }
 
@@ -142,7 +131,7 @@ class FilesystemMigrationsRepository implements MigrationsRepository
         foreach ($migrationDirectories as $namespace => $path) {
                 $migrations = $this->migrationFinder->findMigrations(
                     $path,
-                    $namespace
+                    $namespace,
                 );
                 $this->registerMigrations($migrations);
         }

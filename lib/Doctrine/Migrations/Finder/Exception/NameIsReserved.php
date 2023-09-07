@@ -18,7 +18,7 @@ final class NameIsReserved extends InvalidArgumentException implements FinderExc
             'Cannot load a migrations with the name "%s" because it is reserved by Doctrine Migrations.'
             . PHP_EOL
             . 'It is used to revert all migrations including the first one.',
-            $version
+            $version,
         ));
     }
 }

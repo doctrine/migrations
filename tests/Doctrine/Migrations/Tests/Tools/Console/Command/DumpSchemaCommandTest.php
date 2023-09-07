@@ -84,7 +84,7 @@ final class DumpSchemaCommandTest extends TestCase
                 '',
                 'To use this as a rollup migration you can use the migrations:rollup command.',
             ],
-            array_map('trim', explode("\n", trim($output)))
+            array_map(trim(...), explode("\n", trim($output))),
         );
     }
 

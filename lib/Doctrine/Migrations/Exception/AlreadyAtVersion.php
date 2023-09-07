@@ -15,9 +15,9 @@ final class AlreadyAtVersion extends RuntimeException implements MigrationExcept
         return new self(
             sprintf(
                 'Database is already at version %s',
-                $version
+                $version,
             ),
-            6
+            6,
         );
     }
 }
