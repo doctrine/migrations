@@ -43,8 +43,8 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
                 <<<'DEPRECATION'
                     Context: Passing values to option `--all-or-nothing`
                     Problem: Passing values is deprecated
-                    Solution: From version 4.0.x, `--all-or-nothing` option won't accept any value, 
-                    and the presence of the option will be treated as `true`.
+                    Solution: If you need to disable the behavior, omit the option,
+                    otherwise, pass the option without a value
                     DEPRECATION,
             );
         }
