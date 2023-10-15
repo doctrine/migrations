@@ -5,24 +5,23 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Generator;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\SqlFormatter\NullHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
-use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+use function class_exists;
 use function sprintf;
+
+// DBAL 3 compatibility
+class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
 
 final class SqlGeneratorTest extends TestCase
 {
     private Configuration $configuration;
-
-    /** @var AbstractPlatform&MockObject */
-    private AbstractPlatform $platform;
-
     private SqlGenerator $migrationSqlGenerator;
 
     /** @var string[] */
@@ -33,24 +32,26 @@ final class SqlGeneratorTest extends TestCase
     public function testGenerate(): void
     {
         $configuration = new Configuration();
-        $platform      = new SqlitePlatform();
+        $platform      = new SQLitePlatform();
 
-        $metadataConfig = new TableMetadataStorageConfiguration();
         $configuration->setMetadataStorageConfiguration($this->metadataConfig);
         $migrationSqlGenerator = new SqlGenerator($configuration, $platform);
         $configuration->setCheckDatabasePlatform(true);
 
-        $expectedCode = $this->prepareGeneratedCode(
-            <<<'CODE'
-$this->abortIf(
-    !$this->connection->getDatabasePlatform() instanceof \Doctrine\DBAL\Platforms\SqlitePlatform,
-    "Migration can only be executed safely on '\Doctrine\DBAL\Platforms\SqlitePlatform'."
-);
+        // SqlitePlatform on DBAL 3, SQLitePlatform on DBAL >= 4
+        $expectedPlatform = $platform::class;
 
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE,
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<CODE
+                \$this->abortIf(
+                    !\$this->connection->getDatabasePlatform() instanceof \\$expectedPlatform,
+                    "Migration can only be executed safely on '\\$expectedPlatform'."
+                );
+                
+                \$this->addSql('SELECT 1');
+                \$this->addSql('SELECT 2');
+                \$this->addSql('%s');
+                CODE,
         );
 
         $code = $migrationSqlGenerator->generate($this->sql, true, 80);
@@ -64,10 +65,10 @@ CODE,
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE,
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
+                $this->addSql('%s');
+                CODE,
         );
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
@@ -81,10 +82,10 @@ CODE,
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-$this->addSql('SELECT 1');
-$this->addSql('SELECT 2');
-$this->addSql('%s');
-CODE,
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
+                $this->addSql('%s');
+                CODE,
         );
 
         $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
@@ -95,13 +96,13 @@ CODE,
     protected function setUp(): void
     {
         $this->configuration = new Configuration();
-        $this->platform      = $this->createMock(AbstractPlatform::class);
+        $platform            = $this->createMock(AbstractPlatform::class);
 
         $this->metadataConfig = new TableMetadataStorageConfiguration();
         $this->configuration->setMetadataStorageConfiguration($this->metadataConfig);
         $this->migrationSqlGenerator = new SqlGenerator(
             $this->configuration,
-            $this->platform,
+            $platform,
         );
     }
 

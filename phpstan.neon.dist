@@ -42,6 +42,13 @@ parameters:
 			"""
             count: 1
             path: tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
+        -
+            message: """
+				#^Fetching class constant class of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
+				This class will be removed in ORM 3\\.0 without replacement\\.$#
+			"""
+            count: 1
+            path: tests/Doctrine/Migrations/Tests/Tools/Console/ConsoleRunnerTest.php
 
         # TODO: deprecate using the connection event manager and expose
         # our own event manager instead.
@@ -49,6 +56,12 @@ parameters:
             message: '~^Call to deprecated method getEventManager\(\) of class Doctrine\\DBAL\\Connection\.$~'
             path: lib/Doctrine/Migrations/DependencyFactory.php
 
+        # DBAL 4 forward compatibility
+        - '~^Call to function method_exists\(\) with ''Doctrine\\\\DBAL\\\\Connection'' and ''getEventManager'' will always evaluate to true\.$~'
+        - '~^Class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
+        - '~^Instantiated class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
+        - '~^Access to constant class on an unknown class Doctrine\\DBAL\\Platforms\\SQLitePlatform\.$~'
+        - '~expects Doctrine\\DBAL\\Platforms\\AbstractPlatform, Doctrine\\DBAL\\Platforms\\SQLitePlatform given\.$~'
     symfony:
             console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:

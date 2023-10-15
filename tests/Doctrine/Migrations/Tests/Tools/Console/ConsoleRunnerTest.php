@@ -4,10 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console;
 
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Application;
@@ -15,6 +16,7 @@ use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\HelperSet;
 
 use function chdir;
+use function class_exists;
 use function getcwd;
 use function realpath;
 use function sprintf;
@@ -26,6 +28,10 @@ class ConsoleRunnerTest extends TestCase
 
     public function testCreateDependencyFactoryFromLegacyOrmHelper(): void
     {
+        if (! class_exists(EntityManagerHelper::class)) {
+            self::markTestSkipped('This test requires ORM < 3.');
+        }
+
         $dir = getcwd();
         if ($dir === false) {
             $dir = '.';
@@ -36,7 +42,7 @@ class ConsoleRunnerTest extends TestCase
         try {
             $dependencyFactory = ConsoleRunnerStub::findDependencyFactory();
             self::assertInstanceOf(DependencyFactory::class, $dependencyFactory);
-            self::assertInstanceOf(SqlitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
+            self::assertInstanceOf(SQLitePlatform::class, $dependencyFactory->getConnection()->getDatabasePlatform());
             self::assertInstanceOf(EntityManager::class, $dependencyFactory->getEntityManager());
         } finally {
             chdir($dir);

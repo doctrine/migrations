@@ -132,7 +132,7 @@ final class TableMetadataStorage implements MetadataStorage
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
             ], [
                 Types::STRING,
-                Types::DATETIME_MUTABLE,
+                Types::DATETIME_IMMUTABLE,
                 Types::INTEGER,
             ]);
         }

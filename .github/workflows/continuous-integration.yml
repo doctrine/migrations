@@ -34,13 +34,19 @@ jobs:
           - "8.2"
         dependencies:
           - "highest"
+        stability:
+          - "default"
         include:
           - dependencies: "lowest"
+            stability: "default"
             php-version: "8.1"
+          - dependencies: "highest"
+            stability: "dev"
+            php-version: "8.2"
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
@@ -52,6 +58,10 @@ jobs:
 
       - name: "Download box"
         run: "./download-box.sh"
+
+      - name: "Allow dev dependencies"
+        if: "matrix.stability == 'dev'"
+        run: "composer config minimum-stability dev"
 
       - name: "Install dependencies with Composer"
         uses: "ramsey/composer-install@v2"

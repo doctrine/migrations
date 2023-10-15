@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DbalMigrator;
 use Doctrine\Migrations\EventDispatcher;
@@ -22,7 +21,6 @@ use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Tests\Stub\NonTransactional\MigrationNonTransactional;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
-use Doctrine\Migrations\Version\Executor;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -36,25 +34,15 @@ use const DIRECTORY_SEPARATOR;
 
 class MigratorTest extends MigrationTestCase
 {
-    /** @var Connection&MockObject */
-    private Connection $conn;
-
+    private Connection&MockObject $conn;
     private Configuration $config;
-
     protected StreamOutput $output;
-
     private MigratorConfiguration $migratorConfiguration;
-
-    private Executor $executor;
-
     private TestLogger $logger;
 
     protected function setUp(): void
     {
-        $this->conn       = $this->createMock(Connection::class);
-        $driverConnection = self::createStub(DriverConnection::class);
-        $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
-
+        $this->conn   = $this->createMock(Connection::class);
         $this->config = new Configuration();
 
         $this->migratorConfiguration = new MigratorConfiguration();
@@ -107,9 +95,13 @@ class MigratorTest extends MigrationTestCase
         $storage        = $this->createMock(MetadataStorage::class);
         $schemaDiff     = $this->createMock(SchemaDiffProvider::class);
 
-        $this->executor = new DbalExecutor($storage, $eventDispatcher, $this->conn, $schemaDiff, $this->logger, $paramFormatter, $stopwatch);
-
-        return new DbalMigrator($this->conn, $eventDispatcher, $this->executor, $this->logger, $stopwatch);
+        return new DbalMigrator(
+            $this->conn,
+            $eventDispatcher,
+            new DbalExecutor($storage, $eventDispatcher, $this->conn, $schemaDiff, $this->logger, $paramFormatter, $stopwatch),
+            $this->logger,
+            $stopwatch,
+        );
     }
 
     public function testMigrateAllOrNothing(): void

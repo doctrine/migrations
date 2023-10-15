@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Configuration\EntityManager;
 
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Migrations\Configuration\EntityManager\ConfigurationFile;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\EntityManager\Exception\InvalidConfiguration;
@@ -39,7 +39,7 @@ final class EntityManagerTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-loader.php');
         $em     = $loader->getEntityManager();
 
-        self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
+        self::assertInstanceOf(SQLitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 
     public function testArrayEntityManagerConfigurationLoaderWithEntityManagerInstance(): void
@@ -47,7 +47,7 @@ final class EntityManagerTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/migrations-em.php');
         $em     = $loader->getEntityManager();
 
-        self::assertInstanceOf(SqlitePlatform::class, $em->getConnection()->getDatabasePlatform());
+        self::assertInstanceOf(SQLitePlatform::class, $em->getConnection()->getDatabasePlatform());
     }
 
     public function testArrayEntityManagerConfigurationLoaderInvalid(): void

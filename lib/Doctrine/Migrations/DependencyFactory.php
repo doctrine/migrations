@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ConnectionLoader;
@@ -51,6 +52,7 @@ use Symfony\Component\Stopwatch\Stopwatch;
 
 use function array_key_exists;
 use function call_user_func;
+use function method_exists;
 use function preg_quote;
 use function sprintf;
 
@@ -67,16 +69,12 @@ class DependencyFactory
     /** @var object[]|callable[] */
     private array $dependencies = [];
 
-    private Connection|null $connection = null;
-
+    private Connection|null $connection     = null;
     private EntityManagerInterface|null $em = null;
-
-    private bool $frozen = false;
-
+    private EventManager|null $eventManager = null;
+    private bool $frozen                    = false;
     private ConfigurationLoader $configurationLoader;
-
     private ConnectionLoader $connectionLoader;
-
     private EntityManagerLoader|null $emLoader = null;
 
     /** @var callable[] */
@@ -193,7 +191,7 @@ class DependencyFactory
     {
         return $this->getDependency(EventDispatcher::class, fn (): EventDispatcher => new EventDispatcher(
             $this->getConnection(),
-            $this->getConnection()->getEventManager(),
+            $this->getEventManager(),
         ));
     }
 
@@ -445,5 +443,23 @@ class DependencyFactory
     {
         $this->assertNotFrozen();
         $this->factories[$id] = $service;
+    }
+
+    private function getEventManager(): EventManager
+    {
+        if ($this->eventManager !== null) {
+            return $this->eventManager;
+        }
+
+        if ($this->hasEntityManager()) {
+            return $this->eventManager = $this->getEntityManager()->getEventManager();
+        }
+
+        if (method_exists(Connection::class, 'getEventManager')) {
+            // DBAL < 4
+            return $this->eventManager = $this->getConnection()->getEventManager();
+        }
+
+        return $this->eventManager = new EventManager();
     }
 }
