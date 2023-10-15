@@ -7,6 +7,7 @@ on:
     paths:
       - .github/workflows/continuous-integration.yml
       - composer.*
+      - download-box.sh
       - lib/**
       - phpunit.xml.dist
       - tests/**
@@ -16,6 +17,7 @@ on:
     paths:
       - .github/workflows/continuous-integration.yml
       - composer.*
+      - download-box.sh
       - lib/**
       - phpunit.xml.dist
       - tests/**
