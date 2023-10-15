@@ -33,4 +33,4 @@ jobs:
         run: composer require --dev roave/backward-compatibility-check
 
       - name: Run roave/backward-compatibility-check.
-        run: vendor/bin/roave-backward-compatibility-check
+        run: vendor/bin/roave-backward-compatibility-check --format=github-actions
