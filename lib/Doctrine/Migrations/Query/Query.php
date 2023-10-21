@@ -21,19 +21,22 @@ final class Query
     /** @var mixed[] */
     private array $types;
 
+    private bool $executeAsStatement;
+
     /**
      * @param mixed[] $parameters
      * @param mixed[] $types
      */
-    public function __construct(string $statement, array $parameters = [], array $types = [])
+    public function __construct(string $statement, array $parameters = [], array $types = [], bool $executeAsStatement = false)
     {
         if (count($types) > count($parameters)) {
             throw InvalidArguments::wrongTypesArgumentCount($statement, count($parameters), count($types));
         }
 
-        $this->statement  = $statement;
-        $this->parameters = $parameters;
-        $this->types      = $types;
+        $this->statement          = $statement;
+        $this->parameters         = $parameters;
+        $this->types              = $types;
+        $this->executeAsStatement = $executeAsStatement;
     }
 
     public function __toString(): string
@@ -56,5 +59,10 @@ final class Query
     public function getTypes(): array
     {
         return $this->types;
+    }
+
+    public function getExecuteAsStatement(): bool
+    {
+        return $this->executeAsStatement;
     }
 }
