@@ -17,12 +17,10 @@ use function sprintf;
 #[AsCommand(name: 'migrations:latest', description: 'Outputs the latest version')]
 final class LatestCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:latest';
-
     protected function configure(): void
     {
         $this
+            ->setName('migrations:latest')
             ->setAliases(['latest'])
             ->setDescription('Outputs the latest version');
 

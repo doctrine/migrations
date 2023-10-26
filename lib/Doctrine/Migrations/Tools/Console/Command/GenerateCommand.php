@@ -21,12 +21,10 @@ use function sprintf;
 #[AsCommand(name: 'migrations:generate', description: 'Generate a blank migration class.')]
 final class GenerateCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:generate';
-
     protected function configure(): void
     {
         $this
+            ->setName('migrations:generate')
             ->setAliases(['generate'])
             ->setDescription('Generate a blank migration class.')
             ->addOption(

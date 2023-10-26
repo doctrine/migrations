@@ -28,12 +28,10 @@ use function strtoupper;
 #[AsCommand(name: 'migrations:execute', description: 'Execute one or more migration versions up or down manually.')]
 final class ExecuteCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:execute';
-
     protected function configure(): void
     {
         $this
+            ->setName('migrations:execute')
             ->setAliases(['execute'])
             ->setDescription(
                 'Execute one or more migration versions up or down manually.',

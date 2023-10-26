@@ -28,12 +28,10 @@ use function uasort;
 #[AsCommand(name: 'migrations:up-to-date', description: 'Tells you if your schema is up-to-date.')]
 final class UpToDateCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:up-to-date';
-
     protected function configure(): void
     {
         $this
+            ->setName('migrations:up-to-date')
             ->setAliases(['up-to-date'])
             ->setDescription('Tells you if your schema is up-to-date.')
             ->addOption('fail-on-unregistered', 'u', InputOption::VALUE_NONE, 'Whether to fail when there are unregistered extra migrations found')

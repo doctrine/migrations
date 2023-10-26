@@ -11,14 +11,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'migrations:sync-metadata-storage', description: 'Ensures that the metadata storage is at the latest version.')]
 final class SyncMetadataCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:sync-metadata-storage';
-
     protected function configure(): void
     {
         parent::configure();
 
         $this
+            ->setName('migrations:sync-metadata-storage')
             ->setAliases(['sync-metadata-storage'])
             ->setDescription('Ensures that the metadata storage is at the latest version.')
             ->setHelp(<<<'EOT'

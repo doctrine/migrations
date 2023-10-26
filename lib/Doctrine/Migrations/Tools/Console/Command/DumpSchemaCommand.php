@@ -29,14 +29,12 @@ use function strpos;
 #[AsCommand(name: 'migrations:dump-schema', description: 'Dump the schema for your database to a migration.')]
 final class DumpSchemaCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:dump-schema';
-
     protected function configure(): void
     {
         parent::configure();
 
         $this
+            ->setName('migrations:dump-schema')
             ->setAliases(['dump-schema'])
             ->setDescription('Dump the schema for your database to a migration.')
             ->setHelp(<<<'EOT'
