@@ -331,7 +331,7 @@ class DependencyFactory
         });
     }
 
-    public function setService(string $id, callable $service): void
+    public function setService(string $id, object|callable $service): void
     {
         $this->assertNotFrozen();
         $this->dependencies[$id] = $service;
