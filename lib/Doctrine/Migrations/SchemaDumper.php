@@ -80,7 +80,7 @@ class SchemaDumper
                 $up[] = $upCode;
             }
 
-            $downSql = [$this->platform->getDropTableSQL($table)];
+            $downSql = [$this->platform->getDropTableSQL($table->getQuotedName($this->platform))];
 
             $downCode = $this->migrationSqlGenerator->generate(
                 $downSql,

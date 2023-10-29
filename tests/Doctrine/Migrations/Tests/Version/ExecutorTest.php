@@ -6,7 +6,6 @@ namespace Doctrine\Migrations\Tests\Version;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -222,7 +221,7 @@ class ExecutorTest extends TestCase
 
         $this->connection
             ->expects(self::never())
-            ->method('executeUpdate');
+            ->method('executeStatement');
 
         $migratorConfiguration = (new MigratorConfiguration())
             ->setDryRun(true)
@@ -507,9 +506,7 @@ class ExecutorTest extends TestCase
         // use FutureMetadataStorage until getSql is added to MetadataStorage interface
         $this->metadataStorage = $this->createMock(FutureMetadataStorage::class);
 
-        $this->connection = $this->createMock(Connection::class);
-        $driverConnection = self::createStub(DriverConnection::class);
-        $this->connection->method('getWrappedConnection')->willReturn($driverConnection);
+        $this->connection         = $this->createMock(Connection::class);
         $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
         $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
 

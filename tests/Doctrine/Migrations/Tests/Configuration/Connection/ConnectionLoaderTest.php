@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Configuration\Connection;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Platforms\SqlitePlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\Migrations\Configuration\Connection\ConfigurationFile;
 use Doctrine\Migrations\Configuration\Connection\Exception\FileNotFound;
 use Doctrine\Migrations\Configuration\Connection\Exception\InvalidConfiguration;
@@ -39,7 +39,7 @@ final class ConnectionLoaderTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection.php');
         $conn   = $loader->getConnection();
 
-        self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
+        self::assertInstanceOf(SQLitePlatform::class, $conn->getDatabasePlatform());
     }
 
     public function testArrayConnectionConfigurationLoaderWithConnectionInstance(): void
@@ -47,7 +47,7 @@ final class ConnectionLoaderTest extends TestCase
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection-instance.php');
         $conn   = $loader->getConnection();
 
-        self::assertInstanceOf(SqlitePlatform::class, $conn->getDatabasePlatform());
+        self::assertInstanceOf(SQLitePlatform::class, $conn->getDatabasePlatform());
     }
 
     public function testArrayConnectionConfigurationLoaderInvalid(): void
