@@ -32,9 +32,6 @@ use function str_starts_with;
 #[AsCommand(name: 'migrations:migrate', description: 'Execute a migration to a specified version or the latest available version.')]
 final class MigrateCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:migrate';
-
     protected function configure(): void
     {
         $this

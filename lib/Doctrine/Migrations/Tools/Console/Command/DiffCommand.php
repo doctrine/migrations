@@ -33,9 +33,6 @@ use const FILTER_VALIDATE_BOOLEAN;
 #[AsCommand(name: 'migrations:diff', description: 'Generate a migration by comparing your current database to your mapping information.')]
 final class DiffCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:diff';
-
     protected function configure(): void
     {
         parent::configure();
