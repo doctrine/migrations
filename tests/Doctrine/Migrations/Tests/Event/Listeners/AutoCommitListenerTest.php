@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Event\Listeners;
 
 use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Connection as DriverConnection;
 use Doctrine\Migrations\Event\Listeners\AutoCommitListener;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -16,9 +15,7 @@ use PHPUnit\Framework\MockObject\MockObject;
 
 class AutoCommitListenerTest extends MigrationTestCase
 {
-    /** @var Connection&MockObject */
-    private Connection $conn;
-
+    private Connection&MockObject $conn;
     private AutoCommitListener $listener;
 
     public function testListenerDoesNothingDuringADryRun(): void
@@ -51,10 +48,7 @@ class AutoCommitListenerTest extends MigrationTestCase
 
     protected function setUp(): void
     {
-        $this->conn       = $this->createMock(Connection::class);
-        $driverConnection = self::createStub(DriverConnection::class);
-        $this->conn->method('getWrappedConnection')->willReturn($driverConnection);
-
+        $this->conn     = $this->createMock(Connection::class);
         $this->listener = new AutoCommitListener();
     }
 

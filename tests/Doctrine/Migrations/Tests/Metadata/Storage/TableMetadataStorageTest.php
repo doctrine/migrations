@@ -239,7 +239,7 @@ class TableMetadataStorageTest extends TestCase
                 ], $params);
                 self::assertSame([
                     Types::STRING,
-                    Types::DATETIME_MUTABLE,
+                    Types::DATETIME_IMMUTABLE,
                     Types::INTEGER,
                 ], $types);
 

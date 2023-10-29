@@ -20,28 +20,17 @@ use PHPUnit\Framework\TestCase;
 
 class DiffGeneratorTest extends TestCase
 {
-    /** @var DBALConfiguration&MockObject */
-    private DBALConfiguration $dbalConfiguration;
+    private DBALConfiguration&MockObject $dbalConfiguration;
 
     /** @var AbstractSchemaManager<AbstractPlatform>&MockObject */
-    private AbstractSchemaManager $schemaManager;
+    private AbstractSchemaManager&MockObject $schemaManager;
 
-    /** @var SchemaProvider&MockObject */
-    private SchemaProvider $schemaProvider;
-
-    /** @var AbstractPlatform&MockObject */
-    private AbstractPlatform $platform;
-
-    /** @var Generator&MockObject */
-    private Generator $migrationGenerator;
-
-    /** @var SqlGenerator&MockObject */
-    private SqlGenerator $migrationSqlGenerator;
-
+    private SchemaProvider&MockObject $schemaProvider;
+    private AbstractPlatform&MockObject $platform;
+    private Generator&MockObject $migrationGenerator;
+    private SqlGenerator&MockObject $migrationSqlGenerator;
     private DiffGenerator $migrationDiffGenerator;
-
-    /** @var SchemaProvider&MockObject */
-    private SchemaProvider $emptySchemaProvider;
+    private SchemaProvider&MockObject $emptySchemaProvider;
 
     public function testGenerate(): void
     {
@@ -89,7 +78,7 @@ class DiffGeneratorTest extends TestCase
 
         $toSchema->expects(self::exactly(2))
             ->method('dropTable')
-            ->willReturnOnConsecutiveCalls('schema.table_name2', 'schema.table_name3');
+            ->willReturnSelf();
 
         $schemaDiff = self::createStub(SchemaDiff::class);
 
@@ -102,19 +91,7 @@ class DiffGeneratorTest extends TestCase
             return ['UPDATE table SET value = 1'];
         });
 
-        // regular mocks cannot be used here, because the method is static
-        $comparator = new class extends Comparator {
-            public static SchemaDiff $schemaDiff;
-
-            public static function compareSchemas(
-                Schema $fromSchema,
-                Schema $toSchema,
-            ): SchemaDiff {
-                return self::$schemaDiff;
-            }
-        };
-
-        $comparator::$schemaDiff = $schemaDiff;
+        $comparator = $this->mockComparator($schemaDiff);
 
         $this->schemaManager->expects(self::once())
             ->method('createComparator')
@@ -151,10 +128,10 @@ class DiffGeneratorTest extends TestCase
 
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
-            ->willReturn(null);
+            ->willReturn(static fn () => true);
 
-        $toSchema->expects(self::never())
-            ->method('getTables');
+        $toSchema->method('getTables')
+            ->willReturn([new Table('table_name')]);
 
         $this->emptySchemaProvider->expects(self::once())
             ->method('createSchema')
@@ -181,18 +158,7 @@ class DiffGeneratorTest extends TestCase
         });
 
         // regular mocks cannot be used here, because the method is static
-        $comparator = new class extends Comparator {
-            public static SchemaDiff $schemaDiff;
-
-            public static function compareSchemas(
-                Schema $fromSchema,
-                Schema $toSchema,
-            ): SchemaDiff {
-                return self::$schemaDiff;
-            }
-        };
-
-        $comparator::$schemaDiff = $schemaDiff;
+        $comparator = $this->mockComparator($schemaDiff);
 
         $this->schemaManager->expects(self::once())
             ->method('createComparator')
@@ -232,5 +198,21 @@ class DiffGeneratorTest extends TestCase
             $this->migrationSqlGenerator,
             $this->emptySchemaProvider,
         );
+    }
+
+    private function mockComparator(SchemaDiff $schemaDiff): Comparator
+    {
+        $comparator = new class (self::createStub(AbstractPlatform::class)) extends Comparator {
+            public static SchemaDiff $schemaDiff;
+
+            public function compareSchemas(Schema $oldSchema, Schema $newSchema): SchemaDiff
+            {
+                return self::$schemaDiff;
+            }
+        };
+
+        $comparator::$schemaDiff = $schemaDiff;
+
+        return $comparator;
     }
 }
