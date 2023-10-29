@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console;
 
+use Doctrine\Deprecations\Deprecation;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\MigratorConfiguration;
 use Symfony\Component\Console\Input\InputInterface;
@@ -28,16 +29,30 @@ class ConsoleInputMigratorConfigurationFactory implements MigratorConfigurationF
 
     private function determineAllOrNothingValueFrom(InputInterface $input): bool|null
     {
-        if (! $input->hasOption('all-or-nothing')) {
-            return null;
+        $allOrNothingOption        = null;
+        $wasOptionExplicitlyPassed = $input->hasOption('all-or-nothing');
+
+        if ($wasOptionExplicitlyPassed) {
+            $allOrNothingOption = $input->getOption('all-or-nothing');
         }
 
-        $allOrNothingOption = $input->getOption('all-or-nothing');
+        if ($wasOptionExplicitlyPassed && $allOrNothingOption !== null) {
+            Deprecation::trigger(
+                'doctrine/migrations',
+                'https://github.com/doctrine/migrations/issues/1304',
+                <<<'DEPRECATION'
+                    Context: Passing values to option `--all-or-nothing`
+                    Problem: Passing values is deprecated
+                    Solution: If you need to disable the behavior, omit the option,
+                    otherwise, pass the option without a value
+                    DEPRECATION,
+            );
+        }
 
         if ($allOrNothingOption === 'notprovided') {
             return null;
         }
 
-        return (bool) ($allOrNothingOption ?? true);
+        return (bool) ($allOrNothingOption ?? false);
     }
 }

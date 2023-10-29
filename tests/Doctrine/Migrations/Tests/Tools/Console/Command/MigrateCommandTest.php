@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Types\Types;
+use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
@@ -42,6 +43,8 @@ use function trim;
 
 class MigrateCommandTest extends MigrationTestCase
 {
+    use VerifyDeprecations;
+
     private DependencyFactory $dependencyFactory;
     private Configuration $configuration;
     private CommandTester $migrateCommandTester;
@@ -340,7 +343,7 @@ class MigrateCommandTest extends MigrationTestCase
      *
      * @dataProvider allOrNothing
      */
-    public function testExecuteMigrateAllOrNothing(bool $default, array $input, bool $expected): void
+    public function testExecuteMigrateAllOrNothing(bool $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
         $this->dependencyFactory->setService(Migrator::class, $migrator);
@@ -355,6 +358,12 @@ class MigrateCommandTest extends MigrationTestCase
                 return ['A'];
             });
 
+        if ($expectDeprecation) {
+            $this->expectDeprecationWithIdentifier(
+                'https://github.com/doctrine/migrations/issues/1304',
+            );
+        }
+
         $this->migrateCommandTester->execute(
             $input,
             ['interactive' => false],
@@ -363,7 +372,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    /** @psalm-return Generator<array{bool, array<string, bool|int|string|null>, bool}> */
+    /** @psalm-return Generator<array{0: bool, 1: array<string, bool|int|string|null>, 2: bool, 3?: bool}> */
     public static function allOrNothing(): Generator
     {
         yield [false, ['--all-or-nothing' => false], false];
@@ -373,7 +382,7 @@ class MigrateCommandTest extends MigrationTestCase
         yield [false, ['--all-or-nothing' => true], true];
         yield [false, ['--all-or-nothing' => 1], true];
         yield [false, ['--all-or-nothing' => '1'], true];
-        yield [false, ['--all-or-nothing' => null], true];
+        yield [false, ['--all-or-nothing' => null], false, false];
 
         yield [true, ['--all-or-nothing' => false], false];
         yield [true, ['--all-or-nothing' => 0], false];
