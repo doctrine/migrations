@@ -17,9 +17,6 @@ use function sprintf;
 #[AsCommand(name: 'migrations:current', description: 'Outputs the current version')]
 final class CurrentCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:current';
-
     protected function configure(): void
     {
         $this

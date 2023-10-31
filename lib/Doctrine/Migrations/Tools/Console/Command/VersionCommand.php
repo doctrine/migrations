@@ -27,14 +27,12 @@ use function sprintf;
 #[AsCommand(name: 'migrations:version', description: 'Manually add and delete migration versions from the version table.')]
 final class VersionCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:version';
-
     private bool $markMigrated;
 
     protected function configure(): void
     {
         $this
+            ->setName('migrations:version')
             ->setAliases(['version'])
             ->setDescription('Manually add and delete migration versions from the version table.')
             ->addArgument(

@@ -15,12 +15,10 @@ use Symfony\Component\Console\Output\OutputInterface;
 #[AsCommand(name: 'migrations:status', description: 'View the status of a set of migrations.')]
 final class StatusCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:status';
-
     protected function configure(): void
     {
         $this
+            ->setName('migrations:status')
             ->setAliases(['status'])
             ->setDescription('View the status of a set of migrations.')
             ->setHelp(<<<'EOT'

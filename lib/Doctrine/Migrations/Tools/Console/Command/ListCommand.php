@@ -24,9 +24,6 @@ use function uasort;
 #[AsCommand(name: 'migrations:list', description: 'Display a list of all available migrations and their status.')]
 final class ListCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:list';
-
     protected function configure(): void
     {
         $this

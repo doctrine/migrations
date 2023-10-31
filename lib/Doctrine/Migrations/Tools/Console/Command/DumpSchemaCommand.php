@@ -29,9 +29,6 @@ use function str_contains;
 #[AsCommand(name: 'migrations:dump-schema', description: 'Dump the schema for your database to a migration.')]
 final class DumpSchemaCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:dump-schema';
-
     protected function configure(): void
     {
         parent::configure();

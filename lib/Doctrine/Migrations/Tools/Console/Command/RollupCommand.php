@@ -17,9 +17,6 @@ use function sprintf;
 #[AsCommand(name: 'migrations:rollup', description: 'Rollup migrations by deleting all tracked versions and insert the one version that exists.')]
 final class RollupCommand extends DoctrineCommand
 {
-    /** @var string|null */
-    protected static $defaultName = 'migrations:rollup';
-
     protected function configure(): void
     {
         parent::configure();
