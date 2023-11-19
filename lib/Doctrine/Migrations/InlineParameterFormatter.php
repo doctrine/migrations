@@ -11,6 +11,7 @@ use function array_map;
 use function implode;
 use function is_array;
 use function is_bool;
+use function is_float;
 use function is_int;
 use function is_string;
 use function sprintf;
@@ -52,7 +53,7 @@ final class InlineParameterFormatter implements ParameterFormatter
         return sprintf('with parameters (%s)', implode(', ', $formattedParameters));
     }
 
-    private function formatParameter(mixed $value, string|int $type): string|int|null
+    private function formatParameter(mixed $value, string|int $type): string|int|float|null
     {
         if (is_string($type) && Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(
@@ -64,14 +65,14 @@ final class InlineParameterFormatter implements ParameterFormatter
         return $this->parameterToString($value);
     }
 
-    /** @param int[]|bool[]|string[]|array|int|string|bool $value */
-    private function parameterToString(array|int|string|bool $value): string
+    /** @param int[]|bool[]|string[]|float[]|array|int|string|float|bool $value */
+    private function parameterToString(array|int|string|float|bool $value): string
     {
         if (is_array($value)) {
             return implode(', ', array_map($this->parameterToString(...), $value));
         }
 
-        if (is_int($value) || is_string($value)) {
+        if (is_int($value) || is_string($value) || is_float($value)) {
             return (string) $value;
         }
 

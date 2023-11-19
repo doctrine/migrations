@@ -23,23 +23,27 @@ class InlineParameterFormatterTest extends TestCase
         $params = [
             0       => 'string value',
             1       => 1,
-            2       => [1, true, false, 'string value'],
-            3       => true,
-            4       => false,
-            5       => 'string value',
-            6       => 1,
-            7       => true,
-            8       => false,
-            9       => [1, true, false, 'string value'],
+            2       => 1.5,
+            3       => [1, true, false, 'string value'],
+            4       => true,
+            5       => false,
+            6       => 'string value',
+            7       => 1,
+            8       => 1.5,
+            9       => true,
+            10       => false,
+            11      => [1, true, false, 'string value'],
             'named' => 'string value',
         ];
 
         $types = [
             Types::STRING,
             Types::INTEGER,
+            Types::FLOAT,
             Types::SIMPLE_ARRAY,
             Types::BOOLEAN,
             Types::BOOLEAN,
+            'unknown',
             'unknown',
             'unknown',
             'unknown',
@@ -50,7 +54,7 @@ class InlineParameterFormatterTest extends TestCase
 
         $result = $this->parameterFormatter->formatParameters($params, $types);
 
-        $expected = 'with parameters ([string value], [1], [1,1,,string value], [], [], [string value], [1], [true], [false], [1, true, false, string value], :named => [string value])';
+        $expected = 'with parameters ([string value], [1], [1.5], [1,1,,string value], [], [], [string value], [1], [1.5], [true], [false], [1, true, false, string value], :named => [string value])';
 
         self::assertSame($expected, $result);
     }
