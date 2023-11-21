@@ -348,17 +348,21 @@ Now update your ``cli-config.php`` in the root of your project to look like the 
     require 'vendor/autoload.php';
 
     use Doctrine\ORM\EntityManager;
-    use Doctrine\ORM\Tools\Setup;
+    use Doctrine\ORM\ORMSetup;
     use Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager;
     use Doctrine\Migrations\DependencyFactory;
+    use Doctrine\Migrations\Configuration\Migration\PhpFile;
+    use Doctrine\DBAL\DriverManager;
 
     $config = new PhpFile('migrations.php'); // Or use one of the Doctrine\Migrations\Configuration\Configuration\* loaders
 
     $paths = [__DIR__.'/lib/MyProject/Entities'];
     $isDevMode = true;
 
-    $ORMconfig = Setup::createAnnotationMetadataConfiguration($paths, $isDevMode);
-    $entityManager = EntityManager::create(['driver' => 'pdo_sqlite', 'memory' => true], $ORMconfig);
+    $ORMConfig = ORMSetup::createAttributeMetadataConfiguration($paths, $isDevMode);
+    $connection = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
+
+    $entityManager = new EntityManager($connection, $ORMConfig);
 
     return DependencyFactory::fromEntityManager($config, new ExistingEntityManager($entityManager));
 
