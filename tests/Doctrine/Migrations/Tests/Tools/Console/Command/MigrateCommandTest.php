@@ -388,8 +388,8 @@ class MigrateCommandTest extends MigrationTestCase
         yield [true, ['--all-or-nothing' => 0], false];
         yield [true, ['--all-or-nothing' => '0'], false];
 
-        yield [true, [], true];
-        yield [false, [], false];
+        yield [true, [], true, false];
+        yield [false, [], false, false];
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
