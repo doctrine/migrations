@@ -358,11 +358,10 @@ class MigrateCommandTest extends MigrationTestCase
                 return ['A'];
             });
 
-        if ($expectDeprecation) {
-            $this->expectDeprecationWithIdentifier(
-                'https://github.com/doctrine/migrations/issues/1304',
-            );
-        }
+        match ($expectDeprecation) {
+            true => $this->expectDeprecationWithIdentifier('https://github.com/doctrine/migrations/issues/1304'),
+            false => $this->expectNoDeprecationWithIdentifier('https://github.com/doctrine/migrations/issues/1304'),
+        };
 
         $this->migrateCommandTester->execute(
             $input,
@@ -388,8 +387,8 @@ class MigrateCommandTest extends MigrationTestCase
         yield [true, ['--all-or-nothing' => 0], false];
         yield [true, ['--all-or-nothing' => '0'], false];
 
-        yield [true, [], true];
-        yield [false, [], false];
+        yield [true, [], true, false];
+        yield [false, [], false, false];
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
