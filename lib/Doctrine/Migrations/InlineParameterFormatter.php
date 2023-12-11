@@ -53,7 +53,7 @@ final class InlineParameterFormatter implements ParameterFormatter
         return sprintf('with parameters (%s)', implode(', ', $formattedParameters));
     }
 
-    private function formatParameter(mixed $value, string|int $type): string|int|float|null
+    private function formatParameter(mixed $value, string|int $type): string|int|bool|float|null
     {
         if (is_string($type) && Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(
