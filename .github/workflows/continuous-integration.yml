@@ -75,7 +75,7 @@ jobs:
       - name: "Upload coverage file"
         uses: "actions/upload-artifact@v3"
         with:
-          name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
+          name: "phpunit-${{ matrix.dependencies }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
 
   upload_coverage:
