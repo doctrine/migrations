@@ -12,13 +12,13 @@
     <arg value="nps"/>
 
     <file>bin</file>
-    <file>lib</file>
+    <file>src</file>
     <file>tests</file>
 
     <rule ref="Doctrine"/>
 
     <rule ref="SlevomatCodingStandard.TypeHints.PropertyTypeHint.MissingNativeTypeHint">
-        <exclude-pattern>*/lib/*</exclude-pattern>
+        <exclude-pattern>*/src/*</exclude-pattern>
     </rule>
 
     <rule ref="PSR1.Classes.ClassDeclaration.MultipleClasses">
@@ -30,25 +30,25 @@
     </rule>
 
     <rule ref="Generic.NamingConventions.UpperCaseConstantName.ClassConstantNotUpperCase">
-        <exclude-pattern>lib/Doctrine/Migrations/Events.php</exclude-pattern>
+        <exclude-pattern>src/Events.php</exclude-pattern>
     </rule>
 
     <rule ref="Generic.Strings.UnnecessaryStringConcat.Found">
-        <exclude-pattern>lib/Doctrine/Migrations/MigrationsVersion.php</exclude-pattern>
+        <exclude-pattern>src/MigrationsVersion.php</exclude-pattern>
     </rule>
 
     <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/TestLogger.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php</exclude-pattern>
+        <exclude-pattern>tests/TestLogger.php</exclude-pattern>
+        <exclude-pattern>src/Tools/Console/ConsoleLogger.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">
-        <exclude-pattern>lib/Doctrine/Migrations/AbstractMigration.php</exclude-pattern>
-        <exclude-pattern>lib/Doctrine/Migrations/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
+        <exclude-pattern>src/AbstractMigration.php</exclude-pattern>
+        <exclude-pattern>src/Configuration/Loader/AbstractFileLoader.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.TypeHints.ParameterTypeHint.MissingNativeTypeHint">
-        <exclude-pattern>tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php</exclude-pattern>
+        <exclude-pattern>tests/Stub/DoctrineRegistry.php</exclude-pattern>
     </rule>
 
 </ruleset>
