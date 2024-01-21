@@ -26,16 +26,22 @@ the ORM. To test this functionality, create a new ``User`` entity located at ``l
 
     namespace MyProject\Entities;
 
-    /**
-     * @Entity
-     * @Table(name="users")
-     */
+    use Doctrine\ORM\Mapping\Column;
+    use Doctrine\ORM\Mapping\Entity;
+    use Doctrine\ORM\Mapping\GeneratedValue;
+    use Doctrine\ORM\Mapping\Id;
+    use Doctrine\ORM\Mapping\Table;
+
+    #[Entity]
+    #[Table(name: 'users')]
     class User
     {
-        /** @Id @Column(type="integer") @GeneratedValue */
+        #[Id]
+        #[Column(type: 'integer')]
+        #[GeneratedValue]
         private $id;
 
-        /** @Column(type="string", nullable=true) */
+        #[Column(type: 'string', nullable: true)]
         private $username;
 
         public function setId(int $id)
