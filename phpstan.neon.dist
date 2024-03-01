@@ -5,6 +5,7 @@ parameters:
         - tests
     excludePaths:
         - tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
+        - tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
     ignoreErrors:
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
@@ -34,34 +35,19 @@ parameters:
             paths:
                 - lib/Doctrine/Migrations/Version/DbalMigrationFactory.php
 
-        # We're testing legacy functionality here.
+        # ORM 2 + DBAL 3 backwards compatibility
         -
-            message: """
-				#^Instantiation of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
-				This class will be removed in ORM 3\\.0 without replacement\\.$#
-			"""
-            count: 1
-            path: tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
-        -
-            message: """
-				#^Fetching class constant class of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
-				This class will be removed in ORM 3\\.0 without replacement\\.$#
-			"""
-            count: 1
-            path: tests/Doctrine/Migrations/Tests/Tools/Console/ConsoleRunnerTest.php
-
-        # TODO: deprecate using the connection event manager and expose
-        # our own event manager instead.
-        -
-            message: '~^Call to deprecated method getEventManager\(\) of class Doctrine\\DBAL\\Connection\.$~'
+            message: '~^Call to an undefined method Doctrine\\DBAL\\Connection\:\:getEventManager\(\)\.$~'
             path: lib/Doctrine/Migrations/DependencyFactory.php
 
-        # DBAL 4 forward compatibility
-        - '~^Call to function method_exists\(\) with ''Doctrine\\\\DBAL\\\\Connection'' and ''getEventManager'' will always evaluate to true\.$~'
-        - '~^Class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
-        - '~^Instantiated class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
-        - '~^Access to constant class on an unknown class Doctrine\\DBAL\\Platforms\\SQLitePlatform\.$~'
-        - '~expects Doctrine\\DBAL\\Platforms\\AbstractPlatform, Doctrine\\DBAL\\Platforms\\SQLitePlatform given\.$~'
+        -
+            message: '~^Strict comparison using !== between callable\(\)\: mixed and null will always evaluate to true\.$~'
+            path: lib/Doctrine/Migrations/Generator/DiffGenerator.php
+
+        -
+            message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
+            path: lib/Doctrine/Migrations/Tools/Console/ConsoleRunner.php
+
     symfony:
             console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
 includes:
