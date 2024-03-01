@@ -8,7 +8,7 @@ on:
       - .github/workflows/continuous-integration.yml
       - composer.*
       - download-box.sh
-      - lib/**
+      - src/**
       - phpunit.xml.dist
       - tests/**
   push:
@@ -18,7 +18,7 @@ on:
       - .github/workflows/continuous-integration.yml
       - composer.*
       - download-box.sh
-      - lib/**
+      - src/**
       - phpunit.xml.dist
       - tests/**
 
@@ -75,7 +75,7 @@ jobs:
       - name: "Upload coverage file"
         uses: "actions/upload-artifact@v3"
         with:
-          name: "phpunit-${{ matrix.deps }}-${{ matrix.php-version }}.coverage"
+          name: "phpunit-${{ matrix.dependencies }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
 
   upload_coverage:

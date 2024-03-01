@@ -59,12 +59,12 @@
     },
     "autoload": {
         "psr-4": {
-            "Doctrine\\Migrations\\": "lib/Doctrine/Migrations"
+            "Doctrine\\Migrations\\": "src"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "Doctrine\\Migrations\\Tests\\": "tests/Doctrine/Migrations/Tests"
+            "Doctrine\\Migrations\\Tests\\": "tests"
         }
     },
     "bin": [

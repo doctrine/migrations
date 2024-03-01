@@ -1,69 +1,55 @@
 parameters:
     level: 7
     paths:
-        - lib
+        - src
         - tests
     excludePaths:
-        - tests/Doctrine/Migrations/Tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
+        - tests/Configuration/ConfigurationTestSource/Migrations/Version123.php
+        - tests/Tools/Console/legacy-config-orm/cli-config.php
     ignoreErrors:
         - '~Variable method call on Doctrine\\Migrations\\AbstractMigration~'
         -
             message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
-            path: lib/Doctrine/Migrations/Version/SortedMigrationPlanCalculator.php
+            path: src/Version/SortedMigrationPlanCalculator.php
         -
             message: '~^Variable property access on SimpleXMLElement\.$~'
-            path: lib/Doctrine/Migrations/Configuration/Migration/XmlFile.php
+            path: src/Configuration/Migration/XmlFile.php
         -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
-            path: lib/Doctrine/Migrations/InlineParameterFormatter.php
+            path: src/InlineParameterFormatter.php
         -
             message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
-            path: lib/Doctrine/Migrations/Tools/Console/ConsoleLogger.php
+            path: src/Tools/Console/ConsoleLogger.php
         -
             message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
-            path: tests/Doctrine/Migrations/Tests/Stub/DoctrineRegistry.php
+            path: tests/Stub/DoctrineRegistry.php
 
         # https://github.com/phpstan/phpstan/issues/5982
         -
             message: '~^Cannot call method getWrappedConnection\(\) on class-string\|object\.~'
-            path: lib/Doctrine/Migrations/Tools/TransactionHelper.php
+            path: src/Tools/TransactionHelper.php
 
         # TODO: Be more precise about class-strings
         -
             message: '~^Method Doctrine\\Migrations\\Version\\DbalMigrationFactory::createVersion\(\) should return Doctrine\\Migrations\\AbstractMigration but returns object\.$~'
             paths:
-                - lib/Doctrine/Migrations/Version/DbalMigrationFactory.php
+                - src/Version/DbalMigrationFactory.php
 
-        # We're testing legacy functionality here.
+        # ORM 2 + DBAL 3 backwards compatibility
         -
-            message: """
-				#^Instantiation of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
-				This class will be removed in ORM 3\\.0 without replacement\\.$#
-			"""
-            count: 1
-            path: tests/Doctrine/Migrations/Tests/Tools/Console/legacy-config-orm/cli-config.php
-        -
-            message: """
-				#^Fetching class constant class of deprecated class Doctrine\\\\ORM\\\\Tools\\\\Console\\\\Helper\\\\EntityManagerHelper\\:
-				This class will be removed in ORM 3\\.0 without replacement\\.$#
-			"""
-            count: 1
-            path: tests/Doctrine/Migrations/Tests/Tools/Console/ConsoleRunnerTest.php
+            message: '~^Call to an undefined method Doctrine\\DBAL\\Connection\:\:getEventManager\(\)\.$~'
+            path: src/DependencyFactory.php
 
-        # TODO: deprecate using the connection event manager and expose
-        # our own event manager instead.
         -
-            message: '~^Call to deprecated method getEventManager\(\) of class Doctrine\\DBAL\\Connection\.$~'
-            path: lib/Doctrine/Migrations/DependencyFactory.php
+            message: '~^Strict comparison using !== between callable\(\)\: mixed and null will always evaluate to true\.$~'
+            path: src/Generator/DiffGenerator.php
 
-        # DBAL 4 forward compatibility
-        - '~^Call to function method_exists\(\) with ''Doctrine\\\\DBAL\\\\Connection'' and ''getEventManager'' will always evaluate to true\.$~'
-        - '~^Class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
-        - '~^Instantiated class Doctrine\\DBAL\\Platforms\\SQLitePlatform not found\.$~'
-        - '~^Access to constant class on an unknown class Doctrine\\DBAL\\Platforms\\SQLitePlatform\.$~'
-        - '~expects Doctrine\\DBAL\\Platforms\\AbstractPlatform, Doctrine\\DBAL\\Platforms\\SQLitePlatform given\.$~'
+        -
+            message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
+            path: src/Tools/Console/ConsoleRunner.php
+
     symfony:
-            console_application_loader: tests/Doctrine/Migrations/Tests/doctrine-migrations-phpstan-app.php
+            console_application_loader: tests/doctrine-migrations-phpstan-app.php
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon
