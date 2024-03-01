@@ -32,6 +32,7 @@ jobs:
         php-version:
           - "8.1"
           - "8.2"
+          - "8.3"
         dependencies:
           - "highest"
         stability:
@@ -42,7 +43,7 @@ jobs:
             php-version: "8.1"
           - dependencies: "highest"
             stability: "dev"
-            php-version: "8.2"
+            php-version: "8.3"
 
     steps:
       - name: "Checkout"
@@ -73,9 +74,9 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
       - name: "Upload coverage file"
-        uses: "actions/upload-artifact@v3"
+        uses: "actions/upload-artifact@v4"
         with:
-          name: "phpunit-${{ matrix.dependencies }}-${{ matrix.php-version }}.coverage"
+          name: "phpunit-${{ matrix.dependencies }}-${{ matrix.stability }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
 
   upload_coverage:
@@ -86,12 +87,12 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v3"
+        uses: "actions/checkout@v4"
         with:
           fetch-depth: 2
 
       - name: "Download coverage files"
-        uses: "actions/download-artifact@v3"
+        uses: "actions/download-artifact@v4"
         with:
           path: "reports"
 
