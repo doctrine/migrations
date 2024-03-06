@@ -82,7 +82,6 @@ class DbalMigrator implements Migrator
     private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array
     {
         $sql  = [];
-        $time = 0;
 
         foreach ($migrationsPlan->getItems() as $plan) {
             $versionExecutionResult = $this->executor->execute($plan, $migratorConfiguration);
@@ -95,7 +94,6 @@ class DbalMigrator implements Migrator
             }
 
             $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
-            $time                             += $versionExecutionResult->getTime();
         }
 
         return $sql;
