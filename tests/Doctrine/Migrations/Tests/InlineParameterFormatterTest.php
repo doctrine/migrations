@@ -59,7 +59,7 @@ class InlineParameterFormatterTest extends TestCase
             'unknown',
             'unknown',
             ParameterType::STRING,
-            ArrayParameterType::INTEGER,
+            class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY,
         ];
 
         $result = $this->parameterFormatter->formatParameters($params, $types);
