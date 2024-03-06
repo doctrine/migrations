@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Types\Type;
 
 use function array_map;
@@ -53,7 +55,7 @@ final class InlineParameterFormatter implements ParameterFormatter
         return sprintf('with parameters (%s)', implode(', ', $formattedParameters));
     }
 
-    private function formatParameter(mixed $value, string|int $type): string|int|bool|float|null
+    private function formatParameter(mixed $value, string|int|ArrayParameterType|ParameterType $type): string|int|bool|float|null
     {
         if (is_string($type) && Type::hasType($type)) {
             return Type::getType($type)->convertToDatabaseValue(
