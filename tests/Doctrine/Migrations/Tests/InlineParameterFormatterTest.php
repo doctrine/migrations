@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
+use Doctrine\DBAL\ArrayParameterType;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\InlineParameterFormatter;
@@ -35,6 +37,8 @@ class InlineParameterFormatterTest extends TestCase
             11      => true,
             12      => false,
             13      => [1, true, false, 'string value'],
+            14      => 'string value',
+            15      => [1, 2, 3],
             'named' => 'string value',
         ];
 
@@ -54,11 +58,13 @@ class InlineParameterFormatterTest extends TestCase
             'unknown',
             'unknown',
             'unknown',
+            ParameterType::STRING,
+            ArrayParameterType::INTEGER,
         ];
 
         $result = $this->parameterFormatter->formatParameters($params, $types);
 
-        $expected = 'with parameters ([string value], [1], [], [1], [1.5], [1,1,,string value], [], [], [string value], [1], [1.5], [true], [false], [1, true, false, string value], :named => [string value])';
+        $expected = 'with parameters ([string value], [1], [], [1], [1.5], [1,1,,string value], [], [], [string value], [1], [1.5], [true], [false], [1, true, false, string value], [string value], [1, 2, 3], :named => [string value])';
 
         self::assertSame($expected, $result);
     }
