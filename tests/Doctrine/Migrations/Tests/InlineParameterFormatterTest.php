@@ -12,6 +12,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\InlineParameterFormatter;
 use PHPUnit\Framework\TestCase;
 
+use function class_exists;
+
 class InlineParameterFormatterTest extends TestCase
 {
     private Connection $connection;
