@@ -115,19 +115,19 @@ EOT);
             $confirmation = $this->io->confirm($question);
 
             if ($confirmation) {
-                $this->markVersions($input, $output);
+                $this->markVersions($input);
             } else {
                 $this->io->error('Migration cancelled!');
             }
         } else {
-            $this->markVersions($input, $output);
+            $this->markVersions($input);
         }
 
         return 0;
     }
 
     /** @throws InvalidOptionUsage */
-    private function markVersions(InputInterface $input, OutputInterface $output): void
+    private function markVersions(InputInterface $input): void
     {
         $affectedVersion = $input->getArgument('version');
         $allOption       = $input->getOption('all');
@@ -151,15 +151,15 @@ EOT);
         if ($allOption === true) {
             if ($input->getOption('delete') === true) {
                 foreach ($executedMigrations->getItems() as $availableMigration) {
-                    $this->mark($input, $output, $availableMigration->getVersion(), false, $executedMigrations);
+                    $this->mark($input, $availableMigration->getVersion(), false, $executedMigrations);
                 }
             }
 
             foreach ($availableVersions->getItems() as $availableMigration) {
-                $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
+                $this->mark($input, $availableMigration->getVersion(), true, $executedMigrations);
             }
         } elseif ($affectedVersion !== null) {
-            $this->mark($input, $output, new Version($affectedVersion), false, $executedMigrations);
+            $this->mark($input, new Version($affectedVersion), false, $executedMigrations);
         } elseif ($rangeFromOption !== null && $rangeToOption !== null) {
             $migrate = false;
             foreach ($availableVersions->getItems() as $availableMigration) {
@@ -168,7 +168,7 @@ EOT);
                 }
 
                 if ($migrate) {
-                    $this->mark($input, $output, $availableMigration->getVersion(), true, $executedMigrations);
+                    $this->mark($input, $availableMigration->getVersion(), true, $executedMigrations);
                 }
 
                 if ((string) $availableMigration->getVersion() === $rangeToOption) {
@@ -185,7 +185,7 @@ EOT);
      * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
-    private function mark(InputInterface $input, OutputInterface $output, Version $version, bool $all, ExecutedMigrationsList $executedMigrations): void
+    private function mark(InputInterface $input, Version $version, bool $all, ExecutedMigrationsList $executedMigrations): void
     {
         try {
             $availableMigration = $this->getDependencyFactory()->getMigrationRepository()->getMigration($version);
