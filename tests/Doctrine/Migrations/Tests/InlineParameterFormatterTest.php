@@ -61,6 +61,7 @@ class InlineParameterFormatterTest extends TestCase
             'unknown',
             'unknown',
             ParameterType::STRING,
+            // @phpstan-ignore-next-line
             class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY,
         ];
 
