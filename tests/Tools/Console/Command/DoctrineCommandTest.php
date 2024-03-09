@@ -16,7 +16,10 @@ use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\ORM\EntityManager;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -206,5 +209,177 @@ class DoctrineCommandTest extends MigrationTestCase
             ],
             ['interactive' => false],
         );
+    }
+
+    public function testNamespaceFromOption(): void
+    {
+        $configuration = new Configuration();
+        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
+
+        $conn       = $this->createMock(Connection::class);
+        $connLoader = new ExistingConnection($conn);
+
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration($configuration),
+            $connLoader,
+        );
+
+        $command = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function configure(): void
+            {
+                parent::configure();
+
+                $this
+                    ->addOption(
+                        'namespace',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'The namespace to use for the migration (must be in the list of configured namespaces)',
+                    );
+            }
+
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrations');
+
+                return DoctrineCommand::SUCCESS;
+            }
+        };
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute(
+            ['--namespace' => 'DoctrineMigrations'],
+            ['interactive' => false],
+        );
+    }
+
+    public function testNamespaceUnknown(): void
+    {
+        $configuration = new Configuration();
+        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
+
+        $conn       = $this->createMock(Connection::class);
+        $connLoader = new ExistingConnection($conn);
+
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration($configuration),
+            $connLoader,
+        );
+
+        $command = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function configure(): void
+            {
+                parent::configure();
+
+                $this
+                    ->addOption(
+                        'namespace',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'The namespace to use for the migration (must be in the list of configured namespaces)',
+                    );
+            }
+
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                $this->getNamespace($input, $output);
+
+                return DoctrineCommand::SUCCESS;
+            }
+        };
+
+        $commandTester = new CommandTester($command);
+
+        $this->expectExceptionMessage('Path not defined for the namespace "Unknown"');
+        $commandTester->execute(
+            ['--namespace' => 'Unknown'],
+            ['interactive' => false],
+        );
+    }
+
+    public function testNamespaceFirstFromDirectories(): void
+    {
+        $configuration = new Configuration();
+        $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
+
+        $conn       = $this->createMock(Connection::class);
+        $connLoader = new ExistingConnection($conn);
+
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration($configuration),
+            $connLoader,
+        );
+
+        $command = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function configure(): void
+            {
+                parent::configure();
+
+                $this
+                    ->addOption(
+                        'namespace',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'The namespace to use for the migration (must be in the list of configured namespaces)',
+                    );
+            }
+
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrations');
+
+                return DoctrineCommand::SUCCESS;
+            }
+        };
+
+        $commandTester = new CommandTester($command);
+        $commandTester->execute([]);
+    }
+
+    public function testNamespaceChoiceTwoDirectories(): void
+    {
+        $configuration = new Configuration();
+        $configuration->addMigrationsDirectory('DoctrineMigrationsFirst', sys_get_temp_dir());
+        $configuration->addMigrationsDirectory('DoctrineMigrationsTwo', sys_get_temp_dir());
+
+        $conn       = $this->createMock(Connection::class);
+        $connLoader = new ExistingConnection($conn);
+
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration($configuration),
+            $connLoader,
+        );
+
+        $command = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function configure(): void
+            {
+                parent::configure();
+
+                $this
+                    ->addOption(
+                        'namespace',
+                        null,
+                        InputOption::VALUE_REQUIRED,
+                        'The namespace to use for the migration (must be in the list of configured namespaces)',
+                    );
+            }
+
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrationsTwo');
+
+                return DoctrineCommand::SUCCESS;
+            }
+        };
+
+        $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
+
+        $commandTester = new CommandTester($command);
+        $commandTester->setInputs([1]);
+        $commandTester->execute([]);
     }
 }

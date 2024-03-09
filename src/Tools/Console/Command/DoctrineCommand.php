@@ -10,16 +10,22 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
+use Exception;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function array_keys;
 use function assert;
+use function count;
 use function is_string;
+use function key;
+use function sprintf;
 
 /**
  * The DoctrineCommand class provides base functionality for the other migrations commands to extend from.
@@ -137,5 +143,37 @@ abstract class DoctrineCommand extends Command
 
             return;
         }
+    }
+
+    final protected function getNamespace(InputInterface $input, OutputInterface $output): string
+    {
+        $configuration = $this->getDependencyFactory()->getConfiguration();
+
+        $namespace = $input->getOption('namespace');
+        if ($namespace === '') {
+            $namespace = null;
+        }
+
+        $dirs = $configuration->getMigrationDirectories();
+        if ($namespace === null && count($dirs) === 1) {
+            $namespace = key($dirs);
+        } elseif ($namespace === null && count($dirs) > 1) {
+            $helper    = $this->getHelper('question');
+            $question  = new ChoiceQuestion(
+                'Please choose a namespace (defaults to the first one)',
+                array_keys($dirs),
+                0,
+            );
+            $namespace = $helper->ask($input, $output, $question);
+            $this->io->text(sprintf('You have selected the "%s" namespace', $namespace));
+        }
+
+        if (! isset($dirs[$namespace])) {
+            throw new Exception(sprintf('Path not defined for the namespace "%s"', $namespace));
+        }
+
+        assert(is_string($namespace));
+
+        return $namespace;
     }
 }
