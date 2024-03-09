@@ -9,8 +9,11 @@ use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Question\ChoiceQuestion;
 
+use function array_keys;
 use function assert;
+use function count;
 use function is_string;
 use function key;
 use function sprintf;
@@ -57,9 +60,19 @@ EOT);
         }
 
         $dirs = $configuration->getMigrationDirectories();
-        if ($namespace === null) {
+        if ($namespace === null && count($dirs) === 1) {
             $namespace = key($dirs);
-        } elseif (! isset($dirs[$namespace])) {
+        } elseif ($namespace === null && count($dirs) > 1) {
+            $helper    = $this->getHelper('question');
+            $question  = new ChoiceQuestion(
+                'Please choose a namespace (defaults to the first one)',
+                array_keys($dirs),
+                0,
+            );
+            $namespace = $helper->ask($input, $output, $question);
+        }
+
+        if (! isset($dirs[$namespace])) {
             throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
         }
 
