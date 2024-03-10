@@ -150,7 +150,7 @@ EOT)
         $executedUnavailableMigrations = $statusCalculator->getExecutedUnavailableMigrations();
         $newMigrations                 = $statusCalculator->getNewMigrations();
 
-        if (! $this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input, $output)) {
+        if (! $this->checkNewMigrationsOrExecutedUnavailable($newMigrations, $executedUnavailableMigrations, $input)) {
             $this->io->error('Migration cancelled!');
 
             return 3;
@@ -201,7 +201,6 @@ EOT)
         AvailableMigrationsList $newMigrations,
         ExecutedMigrationsList $executedUnavailableMigrations,
         InputInterface $input,
-        OutputInterface $output,
     ): bool {
         if (count($newMigrations) === 0 && count($executedUnavailableMigrations) === 0) {
             return true;

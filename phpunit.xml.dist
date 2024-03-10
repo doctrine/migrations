@@ -11,13 +11,13 @@
 
     <testsuites>
         <testsuite name="Doctrine2 Database Migrations Test Suite">
-            <directory>./tests/Doctrine/</directory>
+            <directory>tests</directory>
         </testsuite>
     </testsuites>
 
     <source>
         <include>
-            <directory>./lib/</directory>
+            <directory>src</directory>
         </include>
     </source>
 </phpunit>

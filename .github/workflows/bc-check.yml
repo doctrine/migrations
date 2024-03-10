@@ -7,13 +7,13 @@ on:
       - "*.x"
     paths:
       - .github/workflows/bc-check.yml
-      - lib/**
+      - src/**
   push:
     branches:
       - "*.x"
     paths:
       - .github/workflows/bc-check.yml
-      - lib/**
+      - src/**
 
 jobs:
   roave_bc_check:

@@ -12,14 +12,8 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\InlineParameterFormatter;
 use PHPUnit\Framework\TestCase;
 
-use function class_exists;
-
 class InlineParameterFormatterTest extends TestCase
 {
-    private Connection $connection;
-
-    private AbstractPlatform $platform;
-
     private InlineParameterFormatter $parameterFormatter;
 
     public function testFormatParameters(): void
@@ -61,8 +55,7 @@ class InlineParameterFormatterTest extends TestCase
             'unknown',
             'unknown',
             ParameterType::STRING,
-            // @phpstan-ignore-next-line
-            class_exists(ArrayParameterType::class) ? ArrayParameterType::INTEGER : Connection::PARAM_INT_ARRAY,
+            ArrayParameterType::INTEGER,
         ];
 
         $result = $this->parameterFormatter->formatParameters($params, $types);
@@ -74,14 +67,12 @@ class InlineParameterFormatterTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
+        $connection = $this->createMock(Connection::class);
 
-        $this->platform = $this->createMock(AbstractPlatform::class);
-
-        $this->connection->expects(self::any())
+        $connection->expects(self::any())
             ->method('getDatabasePlatform')
-            ->willReturn($this->platform);
+            ->willReturn(self::createStub(AbstractPlatform::class));
 
-        $this->parameterFormatter = new InlineParameterFormatter($this->connection);
+        $this->parameterFormatter = new InlineParameterFormatter($connection);
     }
 }
