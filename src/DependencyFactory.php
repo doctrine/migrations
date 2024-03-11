@@ -145,7 +145,7 @@ class DependencyFactory
     {
         if ($this->configuration === null) {
             $this->configuration = $this->configurationLoader->getConfiguration();
-            $this->frozen = true;
+            $this->frozen        = true;
         }
 
         return $this->configuration;
@@ -157,7 +157,7 @@ class DependencyFactory
             $this->connection = $this->hasEntityManager()
                 ? $this->getEntityManager()->getConnection()
                 : $this->connectionLoader->getConnection($this->getConfiguration()->getConnectionName());
-            $this->frozen = true;
+            $this->frozen     = true;
         }
 
         return $this->connection;
@@ -170,7 +170,7 @@ class DependencyFactory
                 throw MissingDependency::noEntityManager();
             }
 
-            $this->em = $this->emLoader->getEntityManager($this->getConfiguration()->getEntityManagerName());
+            $this->em     = $this->emLoader->getEntityManager($this->getConfiguration()->getEntityManagerName());
             $this->frozen = true;
         }
 

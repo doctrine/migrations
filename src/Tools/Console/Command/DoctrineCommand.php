@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function assert;
 use function is_string;
 
 /**
@@ -88,6 +89,7 @@ abstract class DoctrineCommand extends Command
             $configurationLoader = new ConfigurationFileWithFallback($configurationParameter);
             $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
+
         $dependencyFactory = $this->dependencyFactory;
 
         $this->setNamedEmOrConnection($input);
