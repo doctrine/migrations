@@ -88,16 +88,17 @@ abstract class DoctrineCommand extends Command
             $configurationLoader = new ConfigurationFileWithFallback($configurationParameter);
             $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
+        $dependencyFactory = $this->dependencyFactory;
 
         $this->setNamedEmOrConnection($input);
 
-        if ($this->dependencyFactory->isFrozen()) {
+        if ($dependencyFactory->isFrozen()) {
             return;
         }
 
         $logger = new ConsoleLogger($output);
-        $this->dependencyFactory->setService(LoggerInterface::class, $logger);
-        $this->dependencyFactory->freeze();
+        $dependencyFactory->setService(LoggerInterface::class, $logger);
+        $dependencyFactory->freeze();
     }
 
     protected function getDependencyFactory(): DependencyFactory
@@ -116,6 +117,7 @@ abstract class DoctrineCommand extends Command
 
     private function setNamedEmOrConnection(InputInterface $input): void
     {
+        assert($this->dependencyFactory !== null);
         $emName   = $input->getOption('em');
         $connName = $input->getOption('conn');
         if ($emName !== null && $connName !== null) {
