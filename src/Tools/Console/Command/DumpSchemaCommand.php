@@ -109,6 +109,7 @@ EOT)
                 0,
             );
             $namespace = $helper->ask($input, $output, $question);
+            $this->io->text(sprintf('You have selected the "%s" namespace', $namespace));
         }
 
         assert(is_string($namespace));
