@@ -142,7 +142,7 @@ final class DiffCommandTest extends TestCase
         self::assertSame(3, $statusCode);
     }
 
-    /** @return array<string, int|null, array<string[]>> */
+    /** @return array<string, array<int, int|string|null>> */
     public static function getNamespaceSelected(): array
     {
         return [

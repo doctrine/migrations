@@ -64,7 +64,7 @@ final class GenerateCommandTest extends TestCase
         ], array_map(trim(...), explode("\n", trim($output))));
     }
 
-    /** @return array<string, int|null, array<string[]>> */
+    /** @return array<string, array<int, int|string|null>> */
     public static function getNamespaceSelected(): array
     {
         return [
