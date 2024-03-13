@@ -18,6 +18,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\StyleInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
 
+use function assert;
 use function is_string;
 
 /**
@@ -89,15 +90,17 @@ abstract class DoctrineCommand extends Command
             $this->dependencyFactory->setConfigurationLoader($configurationLoader);
         }
 
+        $dependencyFactory = $this->dependencyFactory;
+
         $this->setNamedEmOrConnection($input);
 
-        if ($this->dependencyFactory->isFrozen()) {
+        if ($dependencyFactory->isFrozen()) {
             return;
         }
 
         $logger = new ConsoleLogger($output);
-        $this->dependencyFactory->setService(LoggerInterface::class, $logger);
-        $this->dependencyFactory->freeze();
+        $dependencyFactory->setService(LoggerInterface::class, $logger);
+        $dependencyFactory->freeze();
     }
 
     protected function getDependencyFactory(): DependencyFactory
@@ -116,6 +119,7 @@ abstract class DoctrineCommand extends Command
 
     private function setNamedEmOrConnection(InputInterface $input): void
     {
+        assert($this->dependencyFactory !== null);
         $emName   = $input->getOption('em');
         $connName = $input->getOption('conn');
         if ($emName !== null && $connName !== null) {

@@ -145,7 +145,7 @@ class DependencyFactory
     {
         if ($this->configuration === null) {
             $this->configuration = $this->configurationLoader->getConfiguration();
-            $this->freeze();
+            $this->frozen        = true;
         }
 
         return $this->configuration;
@@ -157,7 +157,7 @@ class DependencyFactory
             $this->connection = $this->hasEntityManager()
                 ? $this->getEntityManager()->getConnection()
                 : $this->connectionLoader->getConnection($this->getConfiguration()->getConnectionName());
-            $this->freeze();
+            $this->frozen     = true;
         }
 
         return $this->connection;
@@ -170,8 +170,8 @@ class DependencyFactory
                 throw MissingDependency::noEntityManager();
             }
 
-            $this->em = $this->emLoader->getEntityManager($this->getConfiguration()->getEntityManagerName());
-            $this->freeze();
+            $this->em     = $this->emLoader->getEntityManager($this->getConfiguration()->getEntityManagerName());
+            $this->frozen = true;
         }
 
         return $this->em;
@@ -222,7 +222,7 @@ class DependencyFactory
 
     private function getEmptySchemaProvider(): SchemaProvider
     {
-        return $this->getDependency(EmptySchemaProvider::class, fn (): SchemaProvider => new EmptySchemaProvider($this->connection->createSchemaManager()));
+        return $this->getDependency(EmptySchemaProvider::class, fn (): SchemaProvider => new EmptySchemaProvider($this->getConnection()->createSchemaManager()));
     }
 
     public function hasSchemaProvider(): bool
