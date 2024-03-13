@@ -11,10 +11,13 @@ use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function array_map;
 use function explode;
+use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -39,6 +42,16 @@ final class GenerateCommandTest extends TestCase
             ->with('FooNs\\Version1234')
             ->willReturn('/path/to/migration.php');
 
+        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->dependencyFactory->expects(self::once())
+            ->method('getClassNameGenerator')
+            ->willReturn($classNameGenerator);
+
         $this->generateCommandTest->execute([]);
         $output = $this->generateCommandTest->getDisplay(true);
 
@@ -51,6 +64,34 @@ final class GenerateCommandTest extends TestCase
         ], array_map(trim(...), explode("\n", trim($output))));
     }
 
+    /** @return array<string, array<int, int|string|null>> */
+    public static function getNamespaceSelected(): array
+    {
+        return [
+            'no' => [null, 'FooNs'],
+            'first' => [0, 'FooNs'],
+            'two' => [1, 'FooNs2'],
+        ];
+    }
+
+    /** @dataProvider getNamespaceSelected */
+    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    {
+        $this->configuration->addMigrationsDirectory('FooNs2', sys_get_temp_dir());
+
+        $this->generateCommand->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
+
+        $this->generateCommandTest->setInputs([$input]);
+        $this->generateCommandTest->execute([]);
+
+        $output = $this->generateCommandTest->getDisplay(true);
+
+        self::assertStringContainsString('Please choose a namespace (defaults to the first one)', $output);
+        self::assertStringContainsString('[0] FooNs', $output);
+        self::assertStringContainsString('[1] FooNs2', $output);
+        self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
+    }
+
     protected function setUp(): void
     {
         $this->configuration = new Configuration();
@@ -58,16 +99,6 @@ final class GenerateCommandTest extends TestCase
 
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
-
-        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
-        $classNameGenerator->expects(self::once())
-            ->method('generateClassName')
-            ->with('FooNs')
-            ->willReturn('FooNs\\Version1234');
-
-        $this->dependencyFactory->expects(self::once())
-            ->method('getClassNameGenerator')
-            ->willReturn($classNameGenerator);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getConfiguration')
