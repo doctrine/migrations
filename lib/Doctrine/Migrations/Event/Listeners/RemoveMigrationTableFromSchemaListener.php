@@ -18,9 +18,11 @@ class RemoveMigrationTableFromSchemaListener
     ) {
         $configuration = $this->dependencyFactory->getConfiguration()->getMetadataStorageConfiguration();
 
-        if ($configuration instanceof TableMetadataStorageConfiguration) {
-            $this->configuration = $configuration;
+        if (! ($configuration instanceof TableMetadataStorageConfiguration)) {
+            return;
         }
+
+        $this->configuration = $configuration;
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void
@@ -33,16 +35,18 @@ class RemoveMigrationTableFromSchemaListener
         $this->removeMigrationsTableFromSchema($args->getSchema());
     }
 
-    private function removeMigrationsTableFromSchema(Schema $schema)
+    private function removeMigrationsTableFromSchema(Schema $schema): void
     {
-        if (!($this->configuration instanceof TableMetadataStorageConfiguration)) {
+        if (! ($this->configuration instanceof TableMetadataStorageConfiguration)) {
             return;
         }
 
         $tableName = $this->configuration->getTableName();
 
-        if ($schema->hasTable($tableName)) {
-            $schema->dropTable($tableName);
+        if (! $schema->hasTable($tableName)) {
+            return;
         }
+
+        $schema->dropTable($tableName);
     }
 }
