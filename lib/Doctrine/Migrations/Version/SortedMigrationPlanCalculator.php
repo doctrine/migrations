@@ -45,7 +45,7 @@ final class SortedMigrationPlanCalculator implements MigrationPlanCalculator
         $availableMigrations = array_filter(
             $migrationsToCheck,
             // in_array third parameter is intentionally false to force object to string casting
-            static fn (AvailableMigration $availableMigration): bool => in_array($availableMigration->getVersion(), $versions, false)
+            static fn (AvailableMigration $availableMigration): bool => in_array($availableMigration->getVersion(), $versions, false),
         );
 
         $planItems = array_map(static fn (AvailableMigration $availableMigration): MigrationPlan => new MigrationPlan($availableMigration->getVersion(), $availableMigration->getMigration(), $direction), $availableMigrations);
