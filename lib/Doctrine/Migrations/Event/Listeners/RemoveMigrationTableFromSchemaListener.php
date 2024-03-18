@@ -4,13 +4,15 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Event\Listeners;
 
+use Doctrine\Common\EventSubscriber;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\ORM\Tools\Event\GenerateSchemaEventArgs;
+use Doctrine\ORM\Tools\ToolEvents;
 
-class RemoveMigrationTableFromSchemaListener
+class RemoveMigrationTableFromSchemaListener implements EventSubscriber
 {
     private Configuration $configuration;
 
@@ -18,6 +20,15 @@ class RemoveMigrationTableFromSchemaListener
         DependencyFactory $dependencyFactory,
     ) {
         $this->configuration = $dependencyFactory->getConfiguration();
+    }
+
+    /** {@inheritDoc} */
+    public function getSubscribedEvents()
+    {
+        return [
+            ToolEvents::postGenerateSchema,
+            ToolEvents::postGenerateComparisonSchema,
+        ];
     }
 
     public function postGenerateSchema(GenerateSchemaEventArgs $args): void

@@ -55,9 +55,9 @@ class RemoveMigrationTableFromSchemaListenerTest extends MigrationTestCase
 
     public function testListenerIgnoresMissingConfiguration(): void
     {
-        $this->listener->postGenerateSchema(new GenerateSchemaEventArgs($this->entityManager, new Schema()));
+        static::expectNotToPerformAssertions();
 
-        static::assertTrue(true);
+        $this->listener->postGenerateSchema(new GenerateSchemaEventArgs($this->entityManager, new Schema()));
     }
 
     protected function setUp(): void
