@@ -10,6 +10,12 @@ final class AlphabeticalComparator implements Comparator
 {
     public function compare(Version $a, Version $b): int
     {
-        return strcmp((string) $a, (string) $b);
+        return strcmp($this->stripNamespace($a), $this->stripNamespace($b));
+    }
+
+    private function stripNamespace(Version $version): string
+    {
+        $path = explode('\\', (string) $version);
+        return end($path);
     }
 }
