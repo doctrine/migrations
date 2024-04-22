@@ -81,7 +81,7 @@ class DbalMigrator implements Migrator
     /** @return array<string, Query[]> */
     private function executePlan(MigrationPlanList $migrationsPlan, MigratorConfiguration $migratorConfiguration): array
     {
-        $sql  = [];
+        $sql = [];
 
         foreach ($migrationsPlan->getItems() as $plan) {
             $versionExecutionResult = $this->executor->execute($plan, $migratorConfiguration);
