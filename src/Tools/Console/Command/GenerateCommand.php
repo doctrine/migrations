@@ -4,15 +4,11 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
-use Exception;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use function assert;
-use function is_string;
-use function key;
 use function sprintf;
 
 /**
@@ -47,23 +43,9 @@ EOT);
 
     protected function execute(InputInterface $input, OutputInterface $output): int
     {
-        $configuration = $this->getDependencyFactory()->getConfiguration();
-
         $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 
-        $namespace = $input->getOption('namespace');
-        if ($namespace === '') {
-            $namespace = null;
-        }
-
-        $dirs = $configuration->getMigrationDirectories();
-        if ($namespace === null) {
-            $namespace = key($dirs);
-        } elseif (! isset($dirs[$namespace])) {
-            throw new Exception(sprintf('Path not defined for the namespace %s', $namespace));
-        }
-
-        assert(is_string($namespace));
+        $namespace = $this->getNamespace($input, $output);
 
         $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 

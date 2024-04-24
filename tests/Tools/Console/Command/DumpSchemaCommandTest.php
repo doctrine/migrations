@@ -18,10 +18,13 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function array_map;
 use function explode;
+use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -62,6 +65,16 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([]));
 
+        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->dependencyFactory->expects(self::any())
+            ->method('getClassNameGenerator')
+            ->willReturn($classNameGenerator);
+
         $this->schemaDumper->expects(self::once())
             ->method('dump')
             ->with('FooNs\\Version1234', ['/foo/'], true, 80);
@@ -88,6 +101,40 @@ final class DumpSchemaCommandTest extends TestCase
         );
     }
 
+    /** @return array<string, array<int, int|string|null>> */
+    public static function getNamespaceSelected(): array
+    {
+        return [
+            'no' => [null, 'FooNs'],
+            'first' => [0, 'FooNs'],
+            'two' => [1, 'FooNs2'],
+        ];
+    }
+
+    /** @dataProvider getNamespaceSelected */
+    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    {
+        $this->migrationRepository->expects(self::once())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsSet([]));
+
+        $this->configuration->addMigrationsDirectory('FooNs2', sys_get_temp_dir());
+
+        $this->dumpSchemaCommand->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
+
+        $this->schemaDumper->expects(self::once())->method('dump');
+
+        $this->dumpSchemaCommandTester->setInputs([$input]);
+        $this->dumpSchemaCommandTester->execute([]);
+
+        $output = $this->dumpSchemaCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('Please choose a namespace (defaults to the first one)', $output);
+        self::assertStringContainsString('[0] FooNs', $output);
+        self::assertStringContainsString('[1] FooNs2', $output);
+        self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
+    }
+
     protected function setUp(): void
     {
         $this->configuration = new Configuration();
@@ -96,16 +143,6 @@ final class DumpSchemaCommandTest extends TestCase
         $this->dependencyFactory   = $this->createMock(DependencyFactory::class);
         $this->migrationRepository = $this->createMock(FilesystemMigrationsRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
-
-        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
-        $classNameGenerator->expects(self::any())
-            ->method('generateClassName')
-            ->with('FooNs')
-            ->willReturn('FooNs\\Version1234');
-
-        $this->dependencyFactory->expects(self::any())
-            ->method('getClassNameGenerator')
-            ->willReturn($classNameGenerator);
 
         $this->dependencyFactory->expects(self::any())
             ->method('getSchemaDumper')
