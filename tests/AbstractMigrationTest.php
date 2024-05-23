@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\Migrations\Exception\FrozenMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Query\Query;
@@ -45,6 +46,15 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->exposedAddSql('SELECT 1', [1], [2]);
 
         self::assertEquals([new Query('SELECT 1', [1], [2])], $this->migration->getSql());
+    }
+
+    public function testThrowFrozenMigrationException(): void
+    {
+        $this->expectException(FrozenMigration::class);
+        $this->expectExceptionMessage('The migration is frozen and cannot be edited anymore.');
+
+        $this->migration->freeze();
+        $this->migration->exposedAddSql('SELECT 1', [1], [2]);
     }
 
     public function testWarnIfOutputMessage(): void
