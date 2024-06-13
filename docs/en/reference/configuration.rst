@@ -116,21 +116,21 @@ Please note that if you want to use the YAML configuration option, you will need
 
 Here are details about what each configuration option does:
 
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| Name                       | Required   | Default                      | Description                                                                      |
-+============================+============+==============================+==================================================================================+
-| migrations_paths<string, string>       | yes        | null             | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage              | no         |                              | Used by doctrine migrations to track the currently executed migrations           |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| all_or_nothing             | no         | false                        | Whether or not to wrap multiple migrations in a single transaction.              |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.  |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories. |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| Name                       | Required   | Default                      | Description                                                                                                                 |
++============================+============+==============================+=============================================================================================================================+
+| migrations_paths<string, string>       | yes        | null             | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes. |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| table_storage              | no         |                              | Used by doctrine migrations to track the currently executed migrations                                                      |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| all_or_nothing             | no         | false                        | Whether or not to wrap multiple migrations in a single transaction.                                                         |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.                                             |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code.                                            |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
+| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories.          |
++----------------------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------------------------------+
 
 
 Here the possible options for ``table_storage``:
