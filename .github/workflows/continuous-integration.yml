@@ -65,7 +65,7 @@ jobs:
         run: "composer config minimum-stability dev"
 
       - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v2"
+        uses: "ramsey/composer-install@v3"
         with:
           dependency-versions: "${{ matrix.dependencies }}"
           composer-options: "--ignore-platform-req=php+"
@@ -97,6 +97,8 @@ jobs:
           path: "reports"
 
       - name: "Upload to Codecov"
-        uses: "codecov/codecov-action@v3"
+        uses: "codecov/codecov-action@v4"
         with:
           directory: reports
+        env:
+          CODECOV_TOKEN: "${{ secrets.CODECOV_TOKEN }}"

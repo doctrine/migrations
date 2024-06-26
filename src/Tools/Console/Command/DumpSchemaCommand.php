@@ -13,10 +13,7 @@ use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 use function addslashes;
-use function assert;
 use function class_exists;
-use function is_string;
-use function key;
 use function sprintf;
 use function str_contains;
 
@@ -88,15 +85,7 @@ EOT)
             }
         }
 
-        $configuration = $this->getDependencyFactory()->getConfiguration();
-
-        $namespace = $input->getOption('namespace');
-        if ($namespace === null) {
-            $dirs      = $configuration->getMigrationDirectories();
-            $namespace = key($dirs);
-        }
-
-        assert(is_string($namespace));
+        $namespace = $this->getNamespace($input, $output);
 
         $this->checkNoPreviousDumpExistsForNamespace($namespace);
 

@@ -145,6 +145,8 @@ final class DbalExecutor implements Executor
             $this->addSql(new Query($sql));
         }
 
+        $migration->freeze();
+
         if (count($this->sql) !== 0) {
             if (! $configuration->isDryRun()) {
                 $this->executeResult($configuration);

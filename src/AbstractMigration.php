@@ -10,6 +10,7 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Exception\AbortMigration;
+use Doctrine\Migrations\Exception\FrozenMigration;
 use Doctrine\Migrations\Exception\IrreversibleMigration;
 use Doctrine\Migrations\Exception\MigrationException;
 use Doctrine\Migrations\Exception\SkipMigration;
@@ -35,6 +36,8 @@ abstract class AbstractMigration
 
     /** @var Query[] */
     private array $plannedSql = [];
+
+    private bool $frozen = false;
 
     public function __construct(Connection $connection, private readonly LoggerInterface $logger)
     {
@@ -125,6 +128,10 @@ abstract class AbstractMigration
         array $params = [],
         array $types = [],
     ): void {
+        if ($this->frozen) {
+            throw FrozenMigration::new();
+        }
+
         $this->plannedSql[] = new Query($sql, $params, $types);
     }
 
@@ -132,6 +139,11 @@ abstract class AbstractMigration
     public function getSql(): array
     {
         return $this->plannedSql;
+    }
+
+    public function freeze(): void
+    {
+        $this->frozen = true;
     }
 
     protected function write(string $message): void

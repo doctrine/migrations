@@ -20,9 +20,6 @@ parameters:
         -
             message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
             path: src/Tools/Console/ConsoleLogger.php
-        -
-            message: '~^Method Doctrine\\Migrations\\Tests\\Stub\\DoctrineRegistry::getService\(\) should return Doctrine\\Persistence\\ObjectManager but returns Doctrine\\DBAL\\Connection\|Doctrine\\ORM\\EntityManager~'
-            path: tests/Stub/DoctrineRegistry.php
 
         # https://github.com/phpstan/phpstan/issues/5982
         -

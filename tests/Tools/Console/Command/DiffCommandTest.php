@@ -18,10 +18,13 @@ use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Symfony\Component\Console\Helper\HelperSet;
+use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function array_map;
 use function explode;
+use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
@@ -137,6 +140,44 @@ final class DiffCommandTest extends TestCase
         self::assertStringContainsString('[ERROR] Migration cancelled!', $output);
 
         self::assertSame(3, $statusCode);
+    }
+
+    /** @return array<string, array{int|null, string}> */
+    public static function getSelectedNamespace(): array
+    {
+        return [
+            'no' => [null, 'FooNs'],
+            'first' => [0, 'FooNs'],
+            'two' => [1, 'FooNs2'],
+        ];
+    }
+
+    /** @dataProvider getSelectedNamespace */
+    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->configuration->addMigrationsDirectory('FooNs2', sys_get_temp_dir());
+
+        $this->diffCommand->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
+
+        $this->migrationDiffGenerator->expects(self::once())->method('generate');
+
+        $this->diffCommandTester->setInputs([$input]);
+        $this->diffCommandTester->execute([]);
+
+        $output = $this->diffCommandTester->getDisplay(true);
+
+        self::assertStringContainsString('Please choose a namespace (defaults to the first one)', $output);
+        self::assertStringContainsString('[0] FooNs', $output);
+        self::assertStringContainsString('[1] FooNs2', $output);
+        self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
     }
 
     protected function setUp(): void
