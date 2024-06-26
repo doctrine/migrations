@@ -27,6 +27,8 @@ use function var_export;
  */
 class SqlGenerator
 {
+    private SqlFormatter|null $formatter = null;
+
     public function __construct(
         private readonly Configuration $configuration,
         private readonly AbstractPlatform $platform,
@@ -55,7 +57,7 @@ class SqlGenerator
                 $maxLength = $lineLength - 18 - 8; // max - php code length - indentation
 
                 if (strlen($query) > $maxLength) {
-                    $query = (new SqlFormatter(new NullHighlighter()))->format($query);
+                    $query = $this->formatQuery($query);
                 }
             }
 
@@ -83,5 +85,12 @@ PHP
         }
 
         return implode("\n", $code);
+    }
+
+    private function formatQuery(string $query): string
+    {
+        $this->formatter ??= new SqlFormatter(new NullHighlighter());
+
+        return $this->formatter->format($query);
     }
 }
