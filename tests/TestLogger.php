@@ -25,7 +25,7 @@ class TestLogger extends AbstractLogger
      *
      * @param mixed[] $context
      */
-    public function log($level, $message, array $context = []): void
+    public function log(mixed $level, string|Stringable $message, array $context = []): void
     {
         $this->logs[] = $this->interpolate($message, $context);
     }
