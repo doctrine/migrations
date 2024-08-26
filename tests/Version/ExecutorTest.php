@@ -14,7 +14,7 @@ use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Query\Query;
-use Doctrine\Migrations\Tests\TestLogger;
+use Doctrine\Migrations\Tests\LogUtil;
 use Doctrine\Migrations\Tests\Version\Fixture\EmptyTestMigration;
 use Doctrine\Migrations\Tests\Version\Fixture\VersionExecutorTestMigration;
 use Doctrine\Migrations\Version\DbalExecutor;
@@ -25,6 +25,7 @@ use Doctrine\Migrations\Version\Version;
 use Exception;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Component\Stopwatch\StopwatchPeriod;
@@ -32,6 +33,8 @@ use Throwable;
 
 class ExecutorTest extends TestCase
 {
+    use LogUtil;
+
     /** @var Connection&MockObject */
     private Connection $connection;
 
@@ -90,7 +93,7 @@ class ExecutorTest extends TestCase
             '++ migrating xx',
             'Migration xx was executed but did not result in any SQL statements.',
             'Migration xx migrated (took 100ms, used 100 memory)',
-        ], $this->logger->logs);
+        ], $this->getInterpolatedLogRecords($this->logger));
     }
 
     public function testExecuteUp(): void
@@ -137,7 +140,7 @@ class ExecutorTest extends TestCase
             3 => 'SELECT 2 ',
             4 => 'Query took 100ms',
             5 => 'Migration test migrated (took 100ms, used 100 memory)',
-        ], $this->logger->logs);
+        ], $this->getInterpolatedLogRecords($this->logger));
     }
 
     /** @test */
@@ -151,7 +154,7 @@ class ExecutorTest extends TestCase
 
         $this->versionExecutor->execute($plan, $migratorConfiguration);
 
-        self::assertSame('++ migrating test (testing)', $this->logger->logs[0]);
+        self::assertSame('++ migrating test (testing)', $this->getInterpolatedLogRecords($this->logger)[0]);
     }
 
     public function testExecuteDown(): void
@@ -198,7 +201,7 @@ class ExecutorTest extends TestCase
             3 => 'SELECT 4 ',
             4 => 'Query took 100ms',
             5 => 'Migration test reverted (took 100ms, used 100 memory)',
-        ], $this->logger->logs);
+        ], $this->getInterpolatedLogRecords($this->logger));
     }
 
     public function testExecuteDryRun(): void
@@ -261,7 +264,7 @@ class ExecutorTest extends TestCase
             'SELECT 1 ',
             'SELECT 2 ',
             'Migration test migrated (took 100ms, used 100 memory)',
-        ], $this->logger->logs);
+        ], $this->getInterpolatedLogRecords($this->logger));
     }
 
     /** @test */
@@ -498,7 +501,7 @@ class ExecutorTest extends TestCase
             $migratorConfiguration,
         );
 
-        self::assertSame('++ reverting test', $this->logger->logs[0]);
+        self::assertSame('++ reverting test', $this->getInterpolatedLogRecords($this->logger)[0]);
     }
 
     protected function setUp(): void

@@ -13,12 +13,12 @@ use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
-use Doctrine\Migrations\Tests\TestLogger;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
+use Psr\Log\NullLogger;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
@@ -40,13 +40,12 @@ class MigrationVersionTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn   = $this->getSqliteConnection();
-        $logger = new TestLogger();
+        $conn = $this->getSqliteConnection();
 
         $dependencyFactory = DependencyFactory::fromConnection(
             new ExistingConfiguration($configuration),
             new ExistingConnection($conn),
-            $logger,
+            new NullLogger(),
         );
 
         $this->migrationRepository = $dependencyFactory->getMigrationRepository();
