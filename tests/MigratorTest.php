@@ -23,6 +23,7 @@ use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
+use Psr\Log\Test\TestLogger;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
@@ -79,8 +80,8 @@ class MigratorTest extends MigrationTestCase
         $planList = new MigrationPlanList([], Direction::UP);
         $migrator->migrate($planList, $this->migratorConfiguration);
 
-        self::assertCount(1, $this->logger->logs, 'should output the no migrations message');
-        self::assertStringContainsString('No migrations', $this->logger->logs[0]);
+        self::assertCount(1, $this->logger->records, 'should output the no migrations message');
+        self::assertStringContainsString('No migrations', $this->logger->records[0]['message']);
     }
 
     protected function createTestMigrator(): DbalMigrator

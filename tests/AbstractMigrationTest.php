@@ -12,9 +12,12 @@ use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationStub;
 use Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub;
+use Psr\Log\Test\TestLogger;
 
 class AbstractMigrationTest extends MigrationTestCase
 {
+    use LogUtil;
+
     private AbstractMigrationStub $migration;
 
     private TestLogger $logger;
@@ -73,7 +76,7 @@ class AbstractMigrationTest extends MigrationTestCase
     public function testWarnIfDontOutputMessageIfFalse(): void
     {
         $this->migration->warnIf(false, 'trallala');
-        self::assertSame('', $this->getLogOutput($this->logger));
+        self::assertSame([], $this->logger->records);
     }
 
     public function testWriteInvokesOutputWriter(): void

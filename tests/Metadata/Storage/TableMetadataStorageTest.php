@@ -26,6 +26,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
 
 use function sprintf;
 
@@ -42,7 +43,7 @@ class TableMetadataStorageTest extends TestCase
     /** @var AbstractSchemaManager<AbstractPlatform> */
     private AbstractSchemaManager $schemaManager;
 
-    private DebugLogger $debugLogger;
+    private TestLogger $testLogger;
 
     private function getSqliteConnection(Configuration|null $configuration = null): Connection
     {
@@ -54,8 +55,8 @@ class TableMetadataStorageTest extends TestCase
     public function setUp(): void
     {
         $this->connectionConfig = new Configuration();
-        $this->debugLogger      = new DebugLogger();
-        $this->connectionConfig->setMiddlewares([new Middleware($this->debugLogger)]);
+        $this->testLogger       = new TestLogger();
+        $this->connectionConfig->setMiddlewares([new Middleware($this->testLogger)]);
         $this->connection    = $this->getSqliteConnection($this->connectionConfig);
         $this->schemaManager = $this->connection->createSchemaManager();
 
@@ -67,13 +68,12 @@ class TableMetadataStorageTest extends TestCase
     {
         $this->storage->ensureInitialized();
 
-        $oldQueryCount = $this->debugLogger->count;
+        $this->testLogger->reset();
         $this->storage->ensureInitialized();
-        self::assertSame(0, $this->debugLogger->count - $oldQueryCount);
+        self::assertCount(0, $this->testLogger->records);
 
-        $oldQueryCount = $this->debugLogger->count;
         $this->storage->getExecutedMigrations();
-        self::assertSame(1, $this->debugLogger->count - $oldQueryCount);
+        self::assertCount(1, $this->testLogger->records);
     }
 
     public function testDifferentTableNotUpdatedOnRead(): void
