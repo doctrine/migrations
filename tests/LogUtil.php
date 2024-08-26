@@ -4,51 +4,49 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests;
 
-use DateTime;
 use DateTimeInterface;
-use Psr\Log\AbstractLogger;
+use Psr\Log\Test\TestLogger;
 use Stringable;
 
+use function array_map;
 use function gettype;
+use function implode;
 use function is_object;
 use function is_scalar;
 use function str_contains;
 use function strtr;
 
-class TestLogger extends AbstractLogger
+trait LogUtil
 {
-    /** @var string[] */
-    public array $logs = [];
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param string|Stringable $message
-     * @param mixed[]           $context
-     */
-    public function log($level, $message, array $context = []): void
+    private function getLogOutput(TestLogger $logger): string
     {
-        $this->logs[] = $this->interpolate($message, $context);
+        return implode("\n", $this->getInterpolatedLogRecords($logger));
+    }
+
+    /** @return list<string> */
+    private function getInterpolatedLogRecords(TestLogger $logger): array
+    {
+        return array_map($this->interpolate(...), $logger->records);
     }
 
     /**
      * Interpolates context values into the message placeholders.
      *
-     * @param mixed[] $context
+     * @param array{level: mixed, message: string|Stringable, context: mixed[]} $record
      */
-    private function interpolate(string|Stringable $message, array $context): string
+    private function interpolate(array $record): string
     {
-        $message = (string) $message;
+        $message = (string) $record['message'];
         if (! str_contains($message, '{')) {
             return $message;
         }
 
         $replacements = [];
-        foreach ($context as $key => $val) {
+        foreach ($record['context'] as $key => $val) {
             if ($val === null || is_scalar($val) || $val instanceof Stringable) {
                 $replacements["{{$key}}"] = $val;
             } elseif ($val instanceof DateTimeInterface) {
-                $replacements["{{$key}}"] = $val->format(DateTime::RFC3339);
+                $replacements["{{$key}}"] = $val->format(DateTimeInterface::RFC3339);
             } elseif (is_object($val)) {
                 $replacements["{{$key}}"] = '[object ' . $val::class . ']';
             } else {
