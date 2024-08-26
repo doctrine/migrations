@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Metadata\Storage;
 
 use Psr\Log\AbstractLogger;
+use Stringable;
 
 final class DebugLogger extends AbstractLogger
 {
@@ -13,7 +14,8 @@ final class DebugLogger extends AbstractLogger
     /**
      * {@inheritDoc}
      *
-     * @param mixed[] $context
+     * @param string|Stringable $message
+     * @param mixed[]           $context
      */
     public function log($level, $message, array $context = []): void
     {
