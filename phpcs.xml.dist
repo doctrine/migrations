@@ -38,8 +38,7 @@
     </rule>
 
     <rule ref="Squiz.Strings.DoubleQuoteUsage.ContainsVar">
-        <exclude-pattern>tests/TestLogger.php</exclude-pattern>
-        <exclude-pattern>src/Tools/Console/ConsoleLogger.php</exclude-pattern>
+        <exclude-pattern>tests/LogUtil.php</exclude-pattern>
     </rule>
 
     <rule ref="SlevomatCodingStandard.Classes.SuperfluousAbstractClassNaming">

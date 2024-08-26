@@ -7,14 +7,15 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Configuration\Connection\ConfigurationFile;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationFileWithFallback;
 use Doctrine\Migrations\DependencyFactory;
-use Doctrine\Migrations\Tools\Console\ConsoleLogger;
 use Doctrine\Migrations\Tools\Console\Exception\DependenciesNotSatisfied;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Exception;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Style\StyleInterface;
@@ -104,7 +105,16 @@ abstract class DoctrineCommand extends Command
             return;
         }
 
-        $logger = new ConsoleLogger($output);
+        $logger = new ConsoleLogger($output, [
+            LogLevel::EMERGENCY => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ALERT => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::CRITICAL => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::ERROR => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::WARNING => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::NOTICE => OutputInterface::VERBOSITY_NORMAL,
+            LogLevel::INFO => OutputInterface::VERBOSITY_VERBOSE,
+            LogLevel::DEBUG => OutputInterface::VERBOSITY_VERY_VERBOSE,
+        ]);
         $dependencyFactory->setService(LoggerInterface::class, $logger);
         $dependencyFactory->freeze();
     }
