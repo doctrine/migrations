@@ -17,9 +17,6 @@ parameters:
         -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
             path: src/InlineParameterFormatter.php
-        -
-            message: '~^Call to an undefined method Symfony\\Component\\Console\\Output\\OutputInterface\:\:getErrorOutput\(\)\.$~'
-            path: src/Tools/Console/ConsoleLogger.php
 
         # https://github.com/phpstan/phpstan/issues/5982
         -
