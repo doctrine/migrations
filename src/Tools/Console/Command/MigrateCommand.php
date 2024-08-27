@@ -8,7 +8,6 @@ use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
-use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
@@ -74,15 +73,8 @@ final class MigrateCommand extends DoctrineCommand
             ->addOption(
                 'all-or-nothing',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_NEGATABLE,
                 'Wrap the entire migration in a transaction.',
-                ConsoleInputMigratorConfigurationFactory::ABSENT_CONFIG_VALUE,
-            )
-            ->addOption(
-                'no-all-or-nothing',
-                null,
-                InputOption::VALUE_NONE,
-                'Disable wrapping the entire migration in a transaction.',
             )
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
