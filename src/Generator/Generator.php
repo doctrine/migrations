@@ -9,6 +9,7 @@ use Doctrine\Migrations\Generator\Exception\InvalidTemplateSpecified;
 use Doctrine\Migrations\Tools\Console\Helper\MigrationDirectoryHelper;
 use InvalidArgumentException;
 
+use function assert;
 use function explode;
 use function file_get_contents;
 use function file_put_contents;
@@ -74,10 +75,13 @@ TEMPLATE;
         string|null $up = null,
         string|null $down = null,
     ): string {
-        $mch = [];
-        if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
+        $mch         = [];
+        $matchResult = preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch);
+        if ($matchResult === 0) {
             throw new InvalidArgumentException(sprintf('Invalid FQCN'));
         }
+
+        assert($matchResult !== false);
 
         [$fqcn, $namespace, $className] = $mch;
 
