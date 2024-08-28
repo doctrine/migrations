@@ -243,18 +243,23 @@ Setting ``transactional`` to ``false`` will disable that.
 From the Command Line
 ~~~~~~~~~~~~~~~~~~~~~
 
-You can also set this option from the command line with the ``migrate`` command and the ``--all-or-nothing`` option:
+To override the configuration and explicitly enable All or Nothing Transaction from the command line,
+use the ``--all-or-nothing`` option:
 
 .. code-block:: sh
 
     $ ./vendor/bin/doctrine-migrations migrate --all-or-nothing
 
-If you have it enabled at the configuration level and want to change it for an individual migration you can
-pass a value of ``0`` or ``1`` to ``--all-or-nothing``.
+.. note::
+
+    Passing options to --all-or-nothing is deprecated from 3.7.x, and will not be allowed in 4.x
+
+To override the configuration and explicitly disable All or Nothing Transaction from the command line,
+use the ``--no-all-or-nothing`` option:
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations migrate --all-or-nothing=0
+    $ ./vendor/bin/doctrine-migrations migrate --no-all-or-nothing
 
 Connection Configuration
 ------------------------

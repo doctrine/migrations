@@ -26,6 +26,7 @@ use Doctrine\Migrations\QueryWriter;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\MigrateCommand;
+use Doctrine\Migrations\Tools\Console\InvalidAllOrNothingConfiguration;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
@@ -343,11 +344,13 @@ class MigrateCommandTest extends MigrationTestCase
      *
      * @dataProvider allOrNothing
      */
-    public function testExecuteMigrateAllOrNothing(bool $default, array $input, bool $expected, bool $expectDeprecation = true): void
+    public function testExecuteMigrateAllOrNothing(bool|null $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
         $this->dependencyFactory->setService(Migrator::class, $migrator);
-        $this->configuration->setAllOrNothing($default);
+        if ($default !== null) {
+            $this->configuration->setAllOrNothing($default);
+        }
 
         $migrator->expects(self::once())
             ->method('migrate')
@@ -371,7 +374,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(0, $this->migrateCommandTester->getStatusCode());
     }
 
-    /** @psalm-return Generator<array{0: bool, 1: array<string, bool|int|string|null>, 2: bool, 3?: bool}> */
+    /** @psalm-return Generator<array{0: bool|null, 1: array<string, bool|int|string|null>, 2: bool, 3?: bool}> */
     public static function allOrNothing(): Generator
     {
         yield [false, ['--all-or-nothing' => false], false];
@@ -381,7 +384,8 @@ class MigrateCommandTest extends MigrationTestCase
         yield [false, ['--all-or-nothing' => true], true];
         yield [false, ['--all-or-nothing' => 1], true];
         yield [false, ['--all-or-nothing' => '1'], true];
-        yield [false, ['--all-or-nothing' => null], false, false];
+        yield [false, ['--all-or-nothing' => null], true, false];
+        yield [true, ['--no-all-or-nothing' => null], false, false];
 
         yield [true, ['--all-or-nothing' => false], false];
         yield [true, ['--all-or-nothing' => 0], false];
@@ -389,6 +393,20 @@ class MigrateCommandTest extends MigrationTestCase
 
         yield [true, [], true, false];
         yield [false, [], false, false];
+        yield [null, [], false, false];
+    }
+
+    public function testThrowsOnContradictoryAllOrNothingOptions(): void
+    {
+        $this->expectException(InvalidAllOrNothingConfiguration::class);
+
+        $this->migrateCommandTester->execute(
+            [
+                '--all-or-nothing' => null,
+                '--no-all-or-nothing' => null,
+            ],
+            ['interactive' => false],
+        );
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void

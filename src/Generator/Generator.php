@@ -75,7 +75,7 @@ TEMPLATE;
         string|null $down = null,
     ): string {
         $mch = [];
-        if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) === 0) {
+        if (preg_match('~(.*)\\\\([^\\\\]+)~', $fqcn, $mch) !== 1) {
             throw new InvalidArgumentException(sprintf('Invalid FQCN'));
         }
 
