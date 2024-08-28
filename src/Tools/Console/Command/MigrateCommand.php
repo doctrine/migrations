@@ -81,6 +81,12 @@ final class MigrateCommand extends DoctrineCommand
                 'Wrap the entire migration in a transaction.',
                 ConsoleInputMigratorConfigurationFactory::ABSENT_CONFIG_VALUE,
             )
+            ->addOption(
+                'no-all-or-nothing',
+                null,
+                InputOption::VALUE_NONE,
+                'Disable wrapping the entire migration in a transaction.',
+            )
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command executes a migration to a specified version or the latest available version:
 

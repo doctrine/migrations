@@ -93,4 +93,18 @@ class ConfigurationTest extends TestCase
         self::assertFalse($config->areMigrationsOrganizedByYearAndMonth());
         self::assertFalse($config->areMigrationsOrganizedByYear());
     }
+
+    public function testTransactionalConfigDefaultOption(): void
+    {
+        $config = new Configuration();
+
+        self::assertTrue($config->isTransactional());
+    }
+
+    public function testAllOrNothingConfigDefaultOption(): void
+    {
+        $config = new Configuration();
+
+        self::assertFalse($config->isAllOrNothing());
+    }
 }
