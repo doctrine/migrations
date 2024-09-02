@@ -250,10 +250,6 @@ use the ``--all-or-nothing`` option:
 
     $ ./vendor/bin/doctrine-migrations migrate --all-or-nothing
 
-.. note::
-
-    Passing options to --all-or-nothing is deprecated from 3.7.x, and will not be allowed in 4.x
-
 To override the configuration and explicitly disable All or Nothing Transaction from the command line,
 use the ``--no-all-or-nothing`` option:
 

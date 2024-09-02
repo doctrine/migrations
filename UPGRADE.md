@@ -1,3 +1,12 @@
+# Upgrade to 4.0
+
+## Console
+- The `--all-or-nothing` option for `migrations:migrate` does not accept a value anymore, and is now exclusively used 
+  to enable wrapping all migrations in a single transaction. To disable it, you can use the `--no-all-or-nothing` 
+  option instead. Both options override the configuration value.
+
+
+
 # Upgrade to 3.6
 
 ## Console
