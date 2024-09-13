@@ -131,28 +131,27 @@ Please note that if you want to use the YAML configuration option, you will need
 
 Here are details about what each configuration option does:
 
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| Name                       | Required   | Default                      | Description                                                                      |
-+============================+============+==============================+==================================================================================+
-| migrations_paths<string, string>       | yes        | null             | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes.                     |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| table_storage              | no         |                              | Used by doctrine migrations to track the currently executed migrations           |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| all_or_nothing             | no         | false                        | Whether or not to wrap multiple migrations in a single transaction.              |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| transactional              | no         | true                         | Whether or not to wrap migrations in a single transaction.                       |
-|                            |            |                              |                                                                                  |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| migrations                 | no         | []                           | Manually specify the array of migration versions instead of finding migrations.  |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| check_database_platform    | no         | true                         | Whether to add a database platform check at the beginning of the generated code. |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| organize_migrations        | no         | ``none``                     | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories. |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| connection                 | no         | null                         | The named connection to use (available only when ConnectionRegistryConnection is used). |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| em                         | no         | null                         | The named entity manager to use (available only when ManagerRegistryEntityManager is used). |
-+----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| Name                             | Required | Default  | Description                                                                                                                 |
++==================================+==========+==========+=============================================================================================================================+
+| migrations_paths<string, string> | yes      | null     | The PHP namespace your migration classes are located under and the path to a directory where to look for migration classes. |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| table_storage                    | no       |          | Used by doctrine migrations to track the currently executed migrations                                                      |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| all_or_nothing                   | no       | false    | Whether or not to wrap multiple migrations in a single transaction.                                                         |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| transactional                    | no       | true     | Whether or not to wrap migrations in a single transaction.                                                                  |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| migrations                       | no       | []       | Manually specify the array of migration versions instead of finding migrations.                                             |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| check_database_platform          | no       | true     | Whether to add a database platform check at the beginning of the generated code.                                            |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| organize_migrations              | no       | ``none`` | Whether to organize migration classes under year (``year``) or year and month (``year_and_month``) subdirectories.          |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| connection                       | no       | null     | The named connection to use (available only when ConnectionRegistryConnection is used).                                     |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| em                               | no       | null     | The named entity manager to use (available only when ManagerRegistryEntityManager is used).                                 |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
 
 
 Here the possible options for ``table_storage``:
@@ -164,7 +163,7 @@ Here the possible options for ``table_storage``:
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | version_column_name        | no         | version                      | The name of the column which stores the version name.                            |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
-| version_column_length      | no         | 191                         | The length of the column which stores the version name.                          |
+| version_column_length      | no         | 191                          | The length of the column which stores the version name.                          |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
 | executed_at_column_name    | no         | executed_at                  | The name of the column which stores the date that a migration was executed.      |
 +----------------------------+------------+------------------------------+----------------------------------------------------------------------------------+
@@ -378,3 +377,4 @@ Make sure to create the directory where your ORM entities will be located:
     $ mkdir lib/MyProject/Entities
 
 :ref:`Next Chapter: Migration Classes <migration-classes>`
+
