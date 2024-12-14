@@ -35,4 +35,13 @@ class AbstractMigrationStub extends AbstractMigration
     {
         $this->addSql($sql, $params, $types);
     }
+
+    /**
+     * @param int[] $params
+     * @param int[] $types
+     */
+    public function exposedAddDeferredSql(string $sql, array $params = [], array $types = []): void
+    {
+        $this->addDeferredSql($sql, $params, $types);
+    }
 }

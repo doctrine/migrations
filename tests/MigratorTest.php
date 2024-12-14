@@ -15,8 +15,10 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\ParameterFormatter;
+use Doctrine\Migrations\Provider\DBALSchemaDiffProvider;
 use Doctrine\Migrations\Provider\SchemaDiffProvider;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrateNotTouchingTheSchema;
+use Doctrine\Migrations\Tests\Stub\Functional\MigrateWithDeferredSql;
 use Doctrine\Migrations\Tests\Stub\Functional\MigrationThrowsError;
 use Doctrine\Migrations\Tests\Stub\NonTransactional\MigrationNonTransactional;
 use Doctrine\Migrations\Version\DbalExecutor;
@@ -73,6 +75,32 @@ class MigratorTest extends MigrationTestCase
         );
     }
 
+    public function testQueriesOrder(): void
+    {
+        $this->config->addMigrationsDirectory('DoctrineMigrations\\', __DIR__ . '/Stub/migrations-empty-folder');
+
+        $conn     = $this->getSqliteConnection();
+        $migrator = $this->createTestMigrator(
+            schemaDiff: new DBALSchemaDiffProvider($conn->createSchemaManager(), $conn->getDatabasePlatform()),
+        );
+
+        $migration = new MigrateWithDeferredSql($conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrateWithDeferredSql::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        $sql = $migrator->migrate($planList, $this->migratorConfiguration);
+
+        self::assertArrayHasKey(MigrateWithDeferredSql::class, $sql);
+        self::assertSame(
+            [
+                'SELECT 1',
+                'CREATE TABLE test (id INTEGER NOT NULL)',
+                'INSERT INTO test(id) VALUES(123)',
+            ],
+            array_map(strval(...), $sql[MigrateWithDeferredSql::class]),
+        );
+    }
+
     public function testEmptyPlanShowsMessage(): void
     {
         $migrator = $this->createTestMigrator();
@@ -84,7 +112,7 @@ class MigratorTest extends MigrationTestCase
         self::assertStringContainsString('No migrations', $this->logger->records[0]['message']);
     }
 
-    protected function createTestMigrator(): DbalMigrator
+    protected function createTestMigrator(SchemaDiffProvider|null $schemaDiff = null): DbalMigrator
     {
         $eventManager    = new EventManager();
         $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
@@ -94,7 +122,7 @@ class MigratorTest extends MigrationTestCase
         $stopwatch      = new Stopwatch();
         $paramFormatter = $this->createMock(ParameterFormatter::class);
         $storage        = $this->createMock(MetadataStorage::class);
-        $schemaDiff     = $this->createMock(SchemaDiffProvider::class);
+        $schemaDiff   ??= $this->createMock(SchemaDiffProvider::class);
 
         return new DbalMigrator(
             $this->conn,

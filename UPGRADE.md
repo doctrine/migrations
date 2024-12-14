@@ -5,6 +5,9 @@
   to enable wrapping all migrations in a single transaction. To disable it, you can use the `--no-all-or-nothing` 
   option instead. Both options override the configuration value.
 
+## Migration classes
+- It is now possible to add SQL statements, that needs to be executed after changes made to schema object. Use
+  `addDeferredSql` method in your migrations for this purpose.
 
 
 # Upgrade to 3.6

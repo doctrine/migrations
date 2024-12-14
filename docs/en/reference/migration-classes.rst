@@ -188,7 +188,7 @@ addSql
 You can use the ``addSql`` method within the ``up`` and ``down`` methods. Internally the ``addSql`` calls are passed
 to the executeQuery method in the DBAL. This means that you can use the power of prepared statements easily and that
 you don't need to copy paste the same query with different parameters. You can just pass those different parameters
-to the addSql method as parameters.
+to the addSql method as parameters. These queries are executed before changes applied to ``$schema``.
 
 .. code-block:: php
 
@@ -202,6 +202,30 @@ to the addSql method as parameters.
 
         foreach ($users as $user) {
             $this->addSql('UPDATE user SET happy = true WHERE name = :name AND id = :id', $user);
+        }
+    }
+
+addDeferredSql
+~~~~~~~~~~~~~~
+
+Works just like the ``addSql`` method, but queries are deferred to be executed after changes to ``$schema`` were
+planned.
+
+.. code-block:: php
+
+    public function up(Schema $schema): void
+    {
+        $schema->getTable('user')->addColumn('happy', 'boolean')->setDefault(false);
+
+        $users = [
+            ['name' => 'mike', 'id' => 1],
+            ['name' => 'jwage', 'id' => 2],
+            ['name' => 'ocramius', 'id' => 3],
+        ];
+
+        foreach ($users as $user) {
+            // Use addDeferredSql since "happy" is new column, that will not yet be present in schema if called by using addSql
+            $this->addDeferredSql('UPDATE user SET happy = true WHERE name = :name AND id = :id', $user);
         }
     }
 

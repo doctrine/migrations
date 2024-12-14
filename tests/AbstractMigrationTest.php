@@ -51,6 +51,13 @@ class AbstractMigrationTest extends MigrationTestCase
         self::assertEquals([new Query('SELECT 1', [1], [2])], $this->migration->getSql());
     }
 
+    public function testAddDeferredSql(): void
+    {
+        $this->migration->exposedAddDeferredSql('SELECT 2', [1], [2]);
+
+        self::assertEquals([new Query('SELECT 2', [1], [2])], $this->migration->getDeferredSql());
+    }
+
     public function testThrowFrozenMigrationException(): void
     {
         $this->expectException(FrozenMigration::class);
@@ -58,6 +65,15 @@ class AbstractMigrationTest extends MigrationTestCase
 
         $this->migration->freeze();
         $this->migration->exposedAddSql('SELECT 1', [1], [2]);
+    }
+
+    public function testThrowFrozenMigrationExceptionOnDeferredAdd(): void
+    {
+        $this->expectException(FrozenMigration::class);
+        $this->expectExceptionMessage('The migration is frozen and cannot be edited anymore.');
+
+        $this->migration->freeze();
+        $this->migration->exposedAddDeferredSql('SELECT 2', [1], [2]);
     }
 
     public function testWarnIfOutputMessage(): void
