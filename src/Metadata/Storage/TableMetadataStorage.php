@@ -212,7 +212,7 @@ final class TableMetadataStorage implements MetadataStorage
             $this->connection->ensureConnectedToPrimary();
         }
 
-        return $this->schemaManager->tablesExist([$this->configuration->getTableName()]);
+        return $this->schemaManager->tablesExist([$this->configuration->getTableName()], false);
     }
 
     private function checkInitialization(): void
