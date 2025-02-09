@@ -37,7 +37,8 @@ class DiffGeneratorTest extends TestCase
         $fromSchema = $this->createMock(Schema::class);
         $toSchema   = $this->createMock(Schema::class);
 
-        $this->dbalConfiguration->expects(self::once())
+        // once to set provided $filterExpression then 2 times during decoration to whitelist tables in from schema
+        $this->dbalConfiguration->expects(self::exactly(3))
             ->method('setSchemaAssetsFilter');
 
         $this->dbalConfiguration->expects(self::once())
@@ -45,25 +46,6 @@ class DiffGeneratorTest extends TestCase
             ->willReturn(
                 static fn ($name): bool => $name === 'table_name1',
             );
-
-        $table1 = $this->createMock(Table::class);
-        $table1->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name1');
-
-        $table2 = $this->createMock(Table::class);
-        $table2->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name2');
-
-        $table3 = $this->createMock(Table::class);
-        $table3->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name3');
-
-        $toSchema->expects(self::once())
-            ->method('getTables')
-            ->willReturn([$table1, $table2, $table3]);
 
         $this->emptySchemaProvider->expects(self::never())
             ->method('createSchema');
@@ -75,10 +57,6 @@ class DiffGeneratorTest extends TestCase
         $this->schemaProvider->expects(self::once())
             ->method('createSchema')
             ->willReturn($toSchema);
-
-        $toSchema->expects(self::exactly(2))
-            ->method('dropTable')
-            ->willReturnSelf();
 
         $schemaDiff = self::createStub(SchemaDiff::class);
 
@@ -125,10 +103,6 @@ class DiffGeneratorTest extends TestCase
 
         $this->dbalConfiguration->expects(self::never())
             ->method('setSchemaAssetsFilter');
-
-        $this->dbalConfiguration->expects(self::once())
-            ->method('getSchemaAssetsFilter')
-            ->willReturn(static fn () => true);
 
         $toSchema->method('getTables')
             ->willReturn([new Table('table_name')]);
