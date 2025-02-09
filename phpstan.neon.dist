@@ -35,10 +35,6 @@ parameters:
             path: src/DependencyFactory.php
 
         -
-            message: '~^Strict comparison using !== between callable\(\)\: mixed and null will always evaluate to true\.$~'
-            path: src/Generator/DiffGenerator.php
-
-        -
             message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
             path: src/Tools/Console/ConsoleRunner.php
 
