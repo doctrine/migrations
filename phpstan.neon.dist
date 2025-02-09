@@ -35,7 +35,7 @@ parameters:
             path: src/DependencyFactory.php
 
         -
-            message: '~^Strict comparison using !== between callable\(\)\: mixed and null will always evaluate to true\.$~'
+            message: '~^Strict comparison using === between callable\(\)\: mixed and null will always evaluate to false\.$~'
             path: src/Generator/DiffGenerator.php
 
         -
