@@ -16,8 +16,6 @@ use Doctrine\Migrations\Provider\SchemaProvider;
 use function class_exists;
 use function method_exists;
 use function preg_match;
-use function strpos;
-use function substr;
 
 /**
  * The DiffGenerator class is responsible for comparing two Doctrine\DBAL\Schema\Schema instances and generating a
@@ -136,7 +134,7 @@ class DiffGenerator
             foreach ($toSchema->getTables() as $table) {
                 $tableName = $table->getName();
 
-                if ($schemaAssetsFilter($this->resolveTableName($tableName))) {
+                if ($schemaAssetsFilter($tableName)) {
                     continue;
                 }
 
@@ -145,18 +143,5 @@ class DiffGenerator
         }
 
         return $toSchema;
-    }
-
-    /**
-     * Resolve a table name from its fully qualified name. The `$name` argument
-     * comes from Doctrine\DBAL\Schema\Table#getName which can sometimes return
-     * a namespaced name with the form `{namespace}.{tableName}`. This extracts
-     * the table name from that.
-     */
-    private function resolveTableName(string $name): string
-    {
-        $pos = strpos($name, '.');
-
-        return $pos === false ? $name : substr($name, $pos + 1);
     }
 }
