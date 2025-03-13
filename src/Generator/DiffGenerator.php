@@ -14,8 +14,6 @@ use Doctrine\Migrations\Provider\SchemaProvider;
 
 use function method_exists;
 use function preg_match;
-use function strpos;
-use function substr;
 
 /**
  * The DiffGenerator class is responsible for comparing two Doctrine\DBAL\Schema\Schema instances and generating a
@@ -46,14 +44,22 @@ class DiffGenerator
         bool $checkDbPlatform = true,
         bool $fromEmptySchema = false,
     ): string {
+        $toSchema = $this->createToSchema();
+
         if ($filterExpression !== null) {
+            // whitelist assets we already know about in $toSchema, use the existing $filterExpression otherwise
+            // @see https://github.com/doctrine/orm/pull/7875
             $this->dbalConfiguration->setSchemaAssetsFilter(
-                static function ($assetName) use ($filterExpression) {
+                static function ($assetName) use ($filterExpression, $toSchema): bool {
                     if ($assetName instanceof AbstractAsset) {
                         $assetName = $assetName->getName();
                     }
 
-                    return preg_match($filterExpression, $assetName);
+                    if ($toSchema->hasTable($assetName) || $toSchema->hasSequence($assetName)) {
+                        return true;
+                    }
+
+                    return (bool) preg_match($filterExpression, $assetName);
                 },
             );
         }
@@ -61,8 +67,6 @@ class DiffGenerator
         $fromSchema = $fromEmptySchema
             ? $this->createEmptySchema()
             : $this->createFromSchema();
-
-        $toSchema = $this->createToSchema();
 
         // prior to DBAL 4.0, the schema name was set to the first element in the search path,
         // which is not necessarily the default schema name
@@ -119,35 +123,6 @@ class DiffGenerator
 
     private function createToSchema(): Schema
     {
-        $toSchema = $this->schemaProvider->createSchema();
-
-        $schemaAssetsFilter = $this->dbalConfiguration->getSchemaAssetsFilter();
-
-        if ($schemaAssetsFilter !== null) {
-            foreach ($toSchema->getTables() as $table) {
-                $tableName = $table->getName();
-
-                if ($schemaAssetsFilter($this->resolveTableName($tableName))) {
-                    continue;
-                }
-
-                $toSchema->dropTable($tableName);
-            }
-        }
-
-        return $toSchema;
-    }
-
-    /**
-     * Resolve a table name from its fully qualified name. The `$name` argument
-     * comes from Doctrine\DBAL\Schema\Table#getName which can sometimes return
-     * a namespaced name with the form `{namespace}.{tableName}`. This extracts
-     * the table name from that.
-     */
-    private function resolveTableName(string $name): string
-    {
-        $pos = strpos($name, '.');
-
-        return $pos === false ? $name : substr($name, $pos + 1);
+        return $this->schemaProvider->createSchema();
     }
 }
