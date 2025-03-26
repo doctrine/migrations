@@ -38,7 +38,7 @@
         "ext-pdo_sqlite": "*",
         "doctrine/coding-standard": "^12",
         "doctrine/orm": "^2.13 || ^3",
-        "doctrine/persistence": "^2 || ^3",
+        "doctrine/persistence": "^2 || ^3 || ^4",
         "doctrine/sql-formatter": "^1.0",
         "fig/log-test": "^1",
         "phpstan/phpstan": "^1.10",
