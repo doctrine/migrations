@@ -9,9 +9,8 @@ use InvalidArgumentException;
 
 use function count;
 use function in_array;
+use function is_link;
 use function sort;
-
-use const PHP_OS_FAMILY;
 
 class RecursiveRegexFinderTest extends FinderTestCase
 {
@@ -43,11 +42,12 @@ class RecursiveRegexFinderTest extends FinderTestCase
             'TestMigrations\\DifferentNamingSchema',
         ];
 
-        if (PHP_OS_FAMILY !== 'Windows') {
+        // Some Windows installations may not support symlinks
+        if (is_link(__DIR__ . '/_files/_symlinked_files')) {
             $tests[] = 'TestMigrations\\Version1SymlinkedFile';
         }
 
-        self::assertCount(count($tests), $migrations); // Windows does not support symlinks
+        self::assertCount(count($tests), $migrations);
         foreach ($tests as $fqcn) {
             self::assertTrue(in_array($fqcn, $migrations, true));
         }

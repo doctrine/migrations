@@ -12,9 +12,6 @@ parameters:
             message: '~^Call to function in_array\(\) requires parameter #3 to be true\.$~'
             path: src/Version/SortedMigrationPlanCalculator.php
         -
-            message: '~^Variable property access on SimpleXMLElement\.$~'
-            path: src/Configuration/Migration/XmlFile.php
-        -
             message: '~^Call to function is_bool\(\) with bool will always evaluate to true\.$~'
             path: src/InlineParameterFormatter.php
 

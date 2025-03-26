@@ -12,6 +12,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
 
+use function method_exists;
 use function preg_match;
 use function strpos;
 use function substr;
@@ -62,6 +63,18 @@ class DiffGenerator
             : $this->createFromSchema();
 
         $toSchema = $this->createToSchema();
+
+        // prior to DBAL 4.0, the schema name was set to the first element in the search path,
+        // which is not necessarily the default schema name
+        if (
+            ! method_exists($this->schemaManager, 'getSchemaSearchPaths')
+            && $this->platform->supportsSchemas()
+        ) {
+            $defaultNamespace = $toSchema->getName();
+            if ($defaultNamespace !== '') {
+                $toSchema->createNamespace($defaultNamespace);
+            }
+        }
 
         $comparator = $this->schemaManager->createComparator();
 

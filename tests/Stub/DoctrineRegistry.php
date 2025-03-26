@@ -39,7 +39,7 @@ class DoctrineRegistry extends AbstractManagerRegistry
     /**
      * {@inheritDoc}
      */
-    protected function getService($name)
+    protected function getService($name): object
     {
         return $this->realEntityManagers[$name] ?? $this->connections[$name];
     }

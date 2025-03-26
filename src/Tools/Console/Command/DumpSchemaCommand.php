@@ -102,12 +102,12 @@ EOT)
             sprintf('Dumped your schema to a new migration class at "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up "%s"</info>',
                 addslashes($fqcn),
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                'To revert the migration you can use <info>migrations:execute --down "%s"</info>',
                 addslashes($fqcn),
             ),
             '',

@@ -91,9 +91,9 @@ final class DumpSchemaCommandTest extends TestCase
             [
                 'Dumped your schema to a new migration class at ""',
                 '',
-                'To run just this migration for testing purposes, you can use migrations:execute --up \'FooNs\\\\Version1234\'',
+                'To run just this migration for testing purposes, you can use migrations:execute --up "FooNs\\\\Version1234"',
                 '',
-                'To revert the migration you can use migrations:execute --down \'FooNs\\\\Version1234\'',
+                'To revert the migration you can use migrations:execute --down "FooNs\\\\Version1234"',
                 '',
                 'To use this as a rollup migration you can use the migrations:rollup command.',
             ],

@@ -14,10 +14,11 @@ use function array_unshift;
 use function count;
 use function get_class;
 use function implode;
+use function preg_replace;
 use function sprintf;
+use function str_repeat;
 use function stripos;
 use function strlen;
-use function var_export;
 
 /**
  * The SqlGenerator class is responsible for generating the body of the up() and down() methods for a migration
@@ -61,7 +62,10 @@ class SqlGenerator
                 }
             }
 
-            $code[] = sprintf('$this->addSql(%s);', var_export($query, true));
+            $code[] = sprintf(
+                "\$this->addSql(<<<'SQL'\n%s\nSQL);",
+                preg_replace('/^/m', str_repeat(' ', 4), $query),
+            );
         }
 
         if (count($code) !== 0 && $checkDbPlatform && $this->configuration->isDatabasePlatformChecked()) {

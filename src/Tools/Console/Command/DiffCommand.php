@@ -124,8 +124,7 @@ EOT)
             return 3;
         }
 
-        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
-
+        $fqcn          = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
         $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
 
         try {
@@ -151,12 +150,12 @@ EOT)
             sprintf('Generated new migration class to "<info>%s</info>"', $path),
             '',
             sprintf(
-                'To run just this migration for testing purposes, you can use <info>migrations:execute --up \'%s\'</info>',
+                'To run just this migration for testing purposes, you can use <info>migrations:execute --up "%s"</info>',
                 addslashes($fqcn),
             ),
             '',
             sprintf(
-                'To revert the migration you can use <info>migrations:execute --down \'%s\'</info>',
+                'To revert the migration you can use <info>migrations:execute --down "%s"</info>',
                 addslashes($fqcn),
             ),
             '',

@@ -14,7 +14,10 @@ use Doctrine\SqlFormatter\SqlFormatter;
 use PHPUnit\Framework\TestCase;
 
 use function class_exists;
+use function explode;
+use function implode;
 use function sprintf;
+use function str_repeat;
 
 // DBAL 3 compatibility
 class_exists('Doctrine\DBAL\Platforms\SqlitePlatform');
@@ -47,10 +50,16 @@ final class SqlGeneratorTest extends TestCase
                     !\$this->connection->getDatabasePlatform() instanceof \\$expectedPlatform,
                     "Migration can only be executed safely on '\\$expectedPlatform'."
                 );
-                
-                \$this->addSql('SELECT 1');
-                \$this->addSql('SELECT 2');
-                \$this->addSql('%s');
+
+                \$this->addSql(<<<'SQL'
+                    SELECT 1
+                SQL);
+                \$this->addSql(<<<'SQL'
+                    SELECT 2
+                SQL);
+                \$this->addSql(<<<'SQL'
+                    %s
+                SQL);
                 CODE,
         );
 
@@ -65,9 +74,15 @@ final class SqlGeneratorTest extends TestCase
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-                $this->addSql('SELECT 1');
-                $this->addSql('SELECT 2');
-                $this->addSql('%s');
+                $this->addSql(<<<'SQL'
+                    SELECT 1
+                SQL);
+                $this->addSql(<<<'SQL'
+                    SELECT 2
+                SQL);
+                $this->addSql(<<<'SQL'
+                    %s
+                SQL);
                 CODE,
         );
 
@@ -82,9 +97,15 @@ final class SqlGeneratorTest extends TestCase
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-                $this->addSql('SELECT 1');
-                $this->addSql('SELECT 2');
-                $this->addSql('%s');
+                $this->addSql(<<<'SQL'
+                    SELECT 1
+                SQL);
+                $this->addSql(<<<'SQL'
+                    SELECT 2
+                SQL);
+                $this->addSql(<<<'SQL'
+                    %s
+                SQL);
                 CODE,
         );
 
@@ -119,7 +140,13 @@ final class SqlGeneratorTest extends TestCase
 
         return sprintf(
             $expectedCode,
-            (new SqlFormatter(new NullHighlighter()))->format($this->sql[2]),
+            implode(
+                "\n" . str_repeat(' ', 4),
+                explode(
+                    "\n",
+                    (new SqlFormatter(new NullHighlighter()))->format($this->sql[2]),
+                ),
+            ),
         );
     }
 }
