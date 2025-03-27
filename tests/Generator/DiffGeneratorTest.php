@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
+use Doctrine\DBAL\Schema\Sequence;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
@@ -17,6 +18,8 @@ use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+
+use function in_array;
 
 class DiffGeneratorTest extends TestCase
 {
@@ -43,7 +46,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
             ->willReturn(
-                static fn ($name): bool => $name === 'table_name1',
+                static fn ($name): bool => in_array($name, ['table_name1', 'table_name2_id_seq'], true),
             );
 
         $table1 = $this->createMock(Table::class);
@@ -61,9 +64,23 @@ class DiffGeneratorTest extends TestCase
             ->method('getName')
             ->willReturn('schema.table_name3');
 
+        $sequence1 = $this->createMock(Sequence::class);
+        $sequence1->expects(self::once())
+            ->method('getName')
+            ->willReturn('table_name1_id_seq');
+
+        $sequence2 = $this->createMock(Sequence::class);
+        $sequence2->expects(self::once())
+            ->method('getName')
+            ->willReturn('table_name2_id_seq');
+
         $toSchema->expects(self::once())
             ->method('getTables')
             ->willReturn([$table1, $table2, $table3]);
+
+        $toSchema->expects(self::once())
+            ->method('getSequences')
+            ->willReturn([$sequence1, $sequence2]);
 
         $this->emptySchemaProvider->expects(self::never())
             ->method('createSchema');
@@ -79,6 +96,10 @@ class DiffGeneratorTest extends TestCase
         $toSchema->expects(self::exactly(2))
             ->method('dropTable')
             ->willReturnSelf();
+
+        $toSchema->expects(self::once())
+            ->method('dropSequence')
+            ->with('table_name1_id_seq');
 
         $schemaDiff = self::createStub(SchemaDiff::class);
 
