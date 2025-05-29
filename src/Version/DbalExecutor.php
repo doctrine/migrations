@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
+use Doctrine\Migrations\Exception\CatastrophicMigrationException;
 use Doctrine\Migrations\Exception\TransactionRollbackException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
@@ -237,7 +238,7 @@ final class DbalExecutor implements Executor
                     (new TransactionRollbackException(
                         'The migration transaction could not be rolled back after an encountered exception during its execution.',
                         previous: $transactionRollbackException
-                    ))->setRollbackCausationalException($e),
+                    ))->setAdditionalException($e),
                     $result,
                     $plan
                 );
@@ -266,14 +267,14 @@ final class DbalExecutor implements Executor
                 ],
             );
         } elseif ($result->hasError()) {
-            if ($e instanceof TransactionRollbackException) {
+            if ($e instanceof CatastrophicMigrationException) {
                 $this->logger->error(
                     'Migration {version} failed catastrophically at {state} during the error handling routine.'
-                        . ' Error: "{error}". Original error: {originalError}',
+                        . ' Error: "{error}". Additional error: {additionalError}',
                     [
                         'version' => (string)$plan->getVersion(),
                         'error' => $e->getMessage(),
-                        'originalError' => $e->getRollbackCausationalException()->getMessage(),
+                        'additionalError' => $e->getAdditionalException()->getMessage(),
                         'state' => $this->getExecutionStateAsString($result->getState()),
                     ],
                 );

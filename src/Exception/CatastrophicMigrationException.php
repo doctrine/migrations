@@ -6,6 +6,9 @@ namespace Doctrine\Migrations\Exception;
 
 use Throwable;
 
-interface CatastrophicMigrationException extends Throwable
+interface CatastrophicMigrationException
 {
+
+    public function getAdditionalException(): Throwable;
+    public function setAdditionalException(Throwable $additionalException): static;
 }
