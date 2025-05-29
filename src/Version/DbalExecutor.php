@@ -10,6 +10,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\EventDispatcher;
 use Doctrine\Migrations\Events;
+use Doctrine\Migrations\Exception\TransactionRollbackException;
 use Doctrine\Migrations\Exception\SkipMigration;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
@@ -228,8 +229,19 @@ final class DbalExecutor implements Executor
     {
         $migration = $plan->getMigration();
         if ($migration->isTransactional()) {
-            //only rollback transaction if in transactional mode
-            TransactionHelper::rollbackIfInTransaction($this->connection);
+            try {
+                //only rollback transaction if in transactional mode
+                TransactionHelper::rollbackIfInTransaction($this->connection);
+            } catch (\Exception $transactionRollbackException) {
+                $this->logResult(
+                    (new TransactionRollbackException(
+                        'The migration transaction could not be rolled back after an encountered exception during its execution.',
+                        previous: $transactionRollbackException
+                    ))->setRollbackCausationalException($e),
+                    $result,
+                    $plan
+                );
+            }
         }
 
         $plan->markAsExecuted($result);
@@ -254,14 +266,27 @@ final class DbalExecutor implements Executor
                 ],
             );
         } elseif ($result->hasError()) {
-            $this->logger->error(
-                'Migration {version} failed during {state}. Error: "{error}"',
-                [
-                    'version' => (string) $plan->getVersion(),
-                    'error' => $e->getMessage(),
-                    'state' => $this->getExecutionStateAsString($result->getState()),
-                ],
-            );
+            if ($e instanceof TransactionRollbackException) {
+                $this->logger->error(
+                    'Migration {version} failed catastrophically at {state} during the error handling routine.'
+                        . ' Error: "{error}". Original error: {originalError}',
+                    [
+                        'version' => (string)$plan->getVersion(),
+                        'error' => $e->getMessage(),
+                        'originalError' => $e->getRollbackCausationalException()->getMessage(),
+                        'state' => $this->getExecutionStateAsString($result->getState()),
+                    ],
+                );
+            } else {
+                $this->logger->error(
+                    'Migration {version} failed during {state}. Error: "{error}"',
+                    [
+                        'version' => (string)$plan->getVersion(),
+                        'error' => $e->getMessage(),
+                        'state' => $this->getExecutionStateAsString($result->getState()),
+                    ],
+                );
+            }
         }
     }
 
