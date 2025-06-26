@@ -56,6 +56,7 @@ class SchemaDumper
         string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
+        bool $nowdocOutput = false,
         int $lineLength = 120,
     ): string {
         $schema = $this->schemaManager->introspectSchema();
@@ -73,6 +74,7 @@ class SchemaDumper
             $upCode = $this->migrationSqlGenerator->generate(
                 $upSql,
                 $formatted,
+                $nowdocOutput,
                 $lineLength,
             );
 
@@ -85,6 +87,7 @@ class SchemaDumper
             $downCode = $this->migrationSqlGenerator->generate(
                 $downSql,
                 $formatted,
+                $nowdocOutput,
                 $lineLength,
             );
 

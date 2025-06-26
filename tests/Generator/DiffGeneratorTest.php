@@ -102,7 +102,7 @@ class DiffGeneratorTest extends TestCase
             ->with(self::logicalOr(
                 self::equalTo(['UPDATE table SET value = 2']),
                 self::equalTo(['UPDATE table SET value = 1']),
-            ), true, 80)
+            ), true, false, 80)
             ->willReturnOnConsecutiveCalls('test1', 'test2');
 
         $this->migrationGenerator->expects(self::once())
@@ -114,6 +114,7 @@ class DiffGeneratorTest extends TestCase
             '1234',
             '/table_name1/',
             true,
+            false,
             80,
         ));
     }
@@ -169,7 +170,7 @@ class DiffGeneratorTest extends TestCase
             ->with(self::logicalOr(
                 self::equalTo(['CREATE TABLE table_name']),
                 self::equalTo(['DROP TABLE table_name']),
-            ), false, 120, true)
+            ), false, false, 120, true)
             ->willReturnOnConsecutiveCalls('test up', 'test down');
 
         $this->migrationGenerator->expects(self::once())
@@ -177,7 +178,7 @@ class DiffGeneratorTest extends TestCase
             ->with('2345', 'test up', 'test down')
             ->willReturn('path2');
 
-        self::assertSame('path2', $this->migrationDiffGenerator->generate('2345', null, false, 120, true, true));
+        self::assertSame('path2', $this->migrationDiffGenerator->generate('2345', null, false, false, 120, true, true));
     }
 
     protected function setUp(): void
