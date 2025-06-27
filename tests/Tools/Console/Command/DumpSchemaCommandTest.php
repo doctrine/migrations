@@ -77,12 +77,13 @@ final class DumpSchemaCommandTest extends TestCase
 
         $this->schemaDumper->expects(self::once())
             ->method('dump')
-            ->with('FooNs\\Version1234', ['/foo/'], true, 80);
+            ->with('FooNs\\Version1234', ['/foo/'], true, false, 80);
 
         $this->dumpSchemaCommandTester->execute([
             '--filter-tables' => ['/foo/'],
             '--line-length' => 80,
             '--formatted' => true,
+            '--nowdoc' => false,
         ]);
 
         $output = $this->dumpSchemaCommandTester->getDisplay(true);

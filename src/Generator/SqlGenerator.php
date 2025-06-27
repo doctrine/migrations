@@ -19,6 +19,7 @@ use function sprintf;
 use function str_repeat;
 use function stripos;
 use function strlen;
+use function var_export;
 
 /**
  * The SqlGenerator class is responsible for generating the body of the up() and down() methods for a migration
@@ -40,12 +41,14 @@ class SqlGenerator
     public function generate(
         array $sql,
         bool $formatted = false,
+        bool|null $nowdocOutput = null,
         int $lineLength = 120,
         bool $checkDbPlatform = true,
     ): string {
         $code = [];
 
         $storageConfiguration = $this->configuration->getMetadataStorageConfiguration();
+        $maxLength            = $lineLength - 18 - 8; // max - php code length - indentation
         foreach ($sql as $query) {
             if (
                 $storageConfiguration instanceof TableMetadataStorageConfiguration
@@ -54,18 +57,18 @@ class SqlGenerator
                 continue;
             }
 
-            if ($formatted) {
-                $maxLength = $lineLength - 18 - 8; // max - php code length - indentation
-
-                if (strlen($query) > $maxLength) {
-                    $query = $this->formatQuery($query);
-                }
+            if ($formatted && strlen($query) > $maxLength) {
+                $query = $this->formatQuery($query);
             }
 
-            $code[] = sprintf(
-                "\$this->addSql(<<<'SQL'\n%s\nSQL);",
-                preg_replace('/^/m', str_repeat(' ', 4), $query),
-            );
+            if ($nowdocOutput === true || ($nowdocOutput !== false && $formatted && strlen($query) > $maxLength )) {
+                $code[] = sprintf(
+                    "\$this->addSql(<<<'SQL'\n%s\nSQL);",
+                    preg_replace('/^/m', str_repeat(' ', 4), $query),
+                );
+            } else {
+                $code[] = sprintf('$this->addSql(%s);', var_export($query, true));
+            }
         }
 
         if (count($code) !== 0 && $checkDbPlatform && $this->configuration->isDatabasePlatformChecked()) {

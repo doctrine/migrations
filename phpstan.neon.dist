@@ -38,6 +38,9 @@ parameters:
         -
             message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
             path: src/Tools/Console/ConsoleRunner.php
+        -
+            message: '#^Usage of deprecated trait Symfony\\Component\\VarExporter\\LazyProxyTrait in class Doctrine\\Migrations\\Provider\\LazySchema\:\nsince Symfony 7\.3, use native lazy objects instead$#'
+            path: src/Provider/LazySchema.php
 
     symfony:
             console_application_loader: tests/doctrine-migrations-phpstan-app.php
