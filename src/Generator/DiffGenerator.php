@@ -42,6 +42,7 @@ class DiffGenerator
         string $fqcn,
         string|null $filterExpression,
         bool $formatted = false,
+        bool|null $nowdocOutput = null,
         int $lineLength = 120,
         bool $checkDbPlatform = true,
         bool $fromEmptySchema = false,
@@ -83,6 +84,7 @@ class DiffGenerator
         $up = $this->migrationSqlGenerator->generate(
             $upSql,
             $formatted,
+            $nowdocOutput,
             $lineLength,
             $checkDbPlatform,
         );
@@ -92,6 +94,7 @@ class DiffGenerator
         $down = $this->migrationSqlGenerator->generate(
             $downSql,
             $formatted,
+            $nowdocOutput,
             $lineLength,
             $checkDbPlatform,
         );

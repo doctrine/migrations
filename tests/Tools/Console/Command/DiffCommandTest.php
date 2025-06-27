@@ -65,12 +65,13 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
-            ->with('FooNs\\Version1234', 'filter expression', true, 80)
+            ->with('FooNs\\Version1234', 'filter expression', true, false, 80)
             ->willReturn('/path/to/migration.php');
 
         $this->diffCommandTester->execute([
             '--filter-expression' => 'filter expression',
             '--formatted' => true,
+            '--nowdoc' => false,
             '--line-length' => 80,
             '--allow-empty-diff' => true,
             '--check-database-platform' => true,
