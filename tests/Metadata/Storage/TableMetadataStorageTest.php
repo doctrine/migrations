@@ -325,6 +325,7 @@ class TableMetadataStorageTest extends TestCase
         $result->setTime(31.0);
         $this->storage->complete($result);
 
+        /** @phpstan-ignore staticMethod.impossibleType (https://github.com/phpstan/phpstan-phpunit/issues/232) */
         self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
@@ -344,6 +345,7 @@ class TableMetadataStorageTest extends TestCase
 
         $this->storage->reset();
 
+        /** @phpstan-ignore staticMethod.impossibleType (https://github.com/phpstan/phpstan-phpunit/issues/232) */
         self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
 
