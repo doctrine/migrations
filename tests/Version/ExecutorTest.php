@@ -268,7 +268,6 @@ class ExecutorTest extends TestCase
         ], $this->getInterpolatedLogRecords($this->logger));
     }
 
-    /** @test */
     public function testSkipMigration(): void
     {
         $this->metadataStorage
@@ -323,7 +322,6 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /** @test */
     public function testMigrationEvents(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -356,7 +354,6 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /** @test */
     public function testErrorMigration(): void
     {
         $this->metadataStorage
