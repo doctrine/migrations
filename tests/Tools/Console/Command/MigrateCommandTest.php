@@ -32,6 +32,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -78,7 +79,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /** @dataProvider getMigrateWithMigrationsOrWithout */
+    #[DataProvider('getMigrateWithMigrationsOrWithout')]
     public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode): void
     {
         $finder                    = $this->createMock(Finder::class);
@@ -124,7 +125,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /** @dataProvider getTargetAliases */
+    #[DataProvider('getTargetAliases')]
     public function testExecuteAtVersion(string $targetAlias, string $level, string|null $executedMigration): void
     {
         if ($executedMigration !== null) {
@@ -200,7 +201,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
 
-    /** @dataProvider getWriteSqlValues */
+    #[DataProvider('getWriteSqlValues')]
     public function testExecuteWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
@@ -339,11 +340,8 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
-    /**
-     * @psalm-param array<string, bool|int|string|null> $input
-     *
-     * @dataProvider allOrNothing
-     */
+    /** @psalm-param array<string, bool|int|string|null> $input */
+    #[DataProvider('allOrNothing')]
     public function testExecuteMigrateAllOrNothing(bool|null $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);

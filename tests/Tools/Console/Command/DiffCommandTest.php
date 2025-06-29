@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -153,7 +154,7 @@ final class DiffCommandTest extends TestCase
         ];
     }
 
-    /** @dataProvider getSelectedNamespace */
+    #[DataProvider('getSelectedNamespace')]
     public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
     {
         $this->migrationStatusCalculator

@@ -15,6 +15,7 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
@@ -112,7 +113,7 @@ final class DumpSchemaCommandTest extends TestCase
         ];
     }
 
-    /** @dataProvider getNamespaceSelected */
+    #[DataProvider('getNamespaceSelected')]
     public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
     {
         $this->migrationRepository->expects(self::once())
