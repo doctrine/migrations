@@ -23,7 +23,7 @@ use function getcwd;
 use function realpath;
 use function sprintf;
 
-#[CoversClass('Doctrine\Migrations\Tools\Console\ConsoleRunner')]
+#[CoversClass(ConsoleRunner::class)]
 class ConsoleRunnerTest extends TestCase
 {
     private Application $application;
