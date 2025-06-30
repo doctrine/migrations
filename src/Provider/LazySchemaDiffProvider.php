@@ -5,6 +5,9 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Provider;
 
 use Doctrine\DBAL\Schema\Schema;
+use ReflectionClass;
+
+use const PHP_VERSION_ID;
 
 /**
  * The LazySchemaDiffProvider is responsible for lazily generating the from schema when diffing two schemas
@@ -23,7 +26,15 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
     {
         $originalSchemaManipulator = $this->originalSchemaManipulator;
 
-        return LazySchema::createLazyProxy(static fn () => $originalSchemaManipulator->createFromSchema());
+        if (PHP_VERSION_ID < 80400) {
+            return LazySchema::createLazyProxy(static fn () => $originalSchemaManipulator->createFromSchema());
+        }
+
+        $reflector = new ReflectionClass(Schema::class);
+
+        return $reflector->newLazyProxy(
+            static fn () => $originalSchemaManipulator->createFromSchema(),
+        );
     }
 
     public function createToSchema(Schema $fromSchema): Schema
@@ -32,6 +43,23 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
 
         if ($fromSchema instanceof LazySchema && ! $fromSchema->isLazyObjectInitialized()) {
             return LazySchema::createLazyProxy(static fn () => $originalSchemaManipulator->createToSchema($fromSchema));
+        }
+
+        if (PHP_VERSION_ID >= 80400) {
+            $reflector = new ReflectionClass(Schema::class);
+
+            if ($reflector->isUninitializedLazyObject($fromSchema)) {
+                return $reflector->newLazyProxy(
+                    static function () use ($originalSchemaManipulator, $fromSchema, $reflector) {
+                        /* $this->originalSchemaManipulator may return a lazy
+                         * object, for instance DBALSchemaDiffProvider just clones $fromSchema,
+                         * which we know is lazy at this point of execution */
+                        return $reflector->initializeLazyObject(
+                            $originalSchemaManipulator->createToSchema($fromSchema),
+                        );
+                    },
+                );
+            }
         }
 
         return $this->originalSchemaManipulator->createToSchema($fromSchema);
@@ -45,6 +73,14 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
             && ! $toSchema->isLazyObjectInitialized()
         ) {
             return [];
+        }
+
+        if (PHP_VERSION_ID >= 80400) {
+            $reflector = new ReflectionClass(Schema::class);
+
+            if ($reflector->isUninitializedLazyObject($toSchema)) {
+                return [];
+            }
         }
 
         return $this->originalSchemaManipulator->getSqlDiffToMigrate($fromSchema, $toSchema);
