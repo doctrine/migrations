@@ -64,13 +64,13 @@ final class VersionCommand extends DoctrineCommand
             ->addOption(
                 'range-from',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Apply from specified version.',
             )
             ->addOption(
                 'range-to',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Apply to specified version.',
             )
             ->setHelp(<<<'EOT'

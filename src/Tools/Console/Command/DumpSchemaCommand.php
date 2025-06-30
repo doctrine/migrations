@@ -73,7 +73,7 @@ EOT)
             ->addOption(
                 'line-length',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Max line length of unformatted lines.',
                 '120',
             );
