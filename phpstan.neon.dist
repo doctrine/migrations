@@ -43,7 +43,7 @@ parameters:
             path: src/Provider/LazySchema.php
 
     symfony:
-            console_application_loader: tests/doctrine-migrations-phpstan-app.php
+            consoleApplicationLoader: tests/doctrine-migrations-phpstan-app.php
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon

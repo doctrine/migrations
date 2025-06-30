@@ -8,6 +8,7 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
+use Traversable;
 
 use function sprintf;
 
@@ -40,6 +41,7 @@ final class RecursiveRegexFinder extends Finder
         );
     }
 
+    /** @return RegexIterator<mixed, mixed, Traversable<mixed, mixed>> */
     private function createIterator(string $dir): RegexIterator
     {
         return new RegexIterator(
@@ -57,7 +59,11 @@ final class RecursiveRegexFinder extends Finder
         return $this->pattern;
     }
 
-    /** @return string[] */
+    /**
+     * @param RegexIterator<mixed, mixed, Traversable<mixed, mixed>> $iteratorFilesMatch
+     *
+     * @return string[]
+     */
     private function getMatches(RegexIterator $iteratorFilesMatch): array
     {
         $files = [];

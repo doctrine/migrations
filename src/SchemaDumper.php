@@ -133,6 +133,8 @@ class SchemaDumper
      *
      * @param mixed[]                                                 $matches
      * @param int-mask-of<PREG_OFFSET_CAPTURE|PREG_UNMATCHED_AS_NULL> $flags
+     *
+     * @phpstan-ignore parameterByRef.unusedType
      */
     private static function pregMatch(string $pattern, string $subject, array|null &$matches = null, int $flags = 0, int $offset = 0): int
     {
