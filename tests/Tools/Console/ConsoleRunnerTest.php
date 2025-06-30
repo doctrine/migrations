@@ -9,6 +9,8 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tools\Console\ConsoleRunner;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Tools\Console\Helper\EntityManagerHelper;
+use PHPUnit\Framework\Attributes\CoversClass;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
 use Symfony\Component\Console\Application;
@@ -21,7 +23,7 @@ use function getcwd;
 use function realpath;
 use function sprintf;
 
-/** @covers \Doctrine\Migrations\Tools\Console\ConsoleRunner */
+#[CoversClass(ConsoleRunner::class)]
 class ConsoleRunnerTest extends TestCase
 {
     private Application $application;
@@ -49,7 +51,7 @@ class ConsoleRunnerTest extends TestCase
         }
     }
 
-    /** @dataProvider getDependencyFactoryTestDirectories */
+    #[DataProvider('getDependencyFactoryTestDirectories')]
     public function testDependencyFactory(string $directory): void
     {
         $dir = getcwd();

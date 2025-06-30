@@ -14,6 +14,7 @@ use function file_get_contents;
 use function glob;
 use function is_dir;
 use function is_file;
+use function method_exists;
 use function realpath;
 use function sys_get_temp_dir;
 use function unlink;
@@ -52,7 +53,8 @@ final class FileQueryWriterTest extends MigrationTestCase
         $logger = $this->createMock(LoggerInterface::class);
         $logger->expects(self::atLeastOnce())
             ->method('info')
-            ->with(self::isType('string'));
+            /* @phpstan-ignore staticMethod.deprecated,function.alreadyNarrowedType */
+            ->with(method_exists($this, 'isString') ? $this::isString() : self::isType('string'));
 
         $writer = new FileQueryWriter(
             $migrationFileBuilder,

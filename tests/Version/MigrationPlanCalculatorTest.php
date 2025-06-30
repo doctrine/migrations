@@ -18,6 +18,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
@@ -112,11 +113,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         self::assertSame(Direction::UP, $plan->getDirection());
     }
 
-    /**
-     * @param string[] $expectedPlan
-     *
-     * @dataProvider getPlanUpWhenNoMigrations
-     */
+    /** @param string[] $expectedPlan */
+    #[DataProvider('getPlanUpWhenNoMigrations')]
     public function testPlanWhenNoMigrations(string $to, array $expectedPlan, string $direction): void
     {
         $this->metadataStorage
@@ -145,11 +143,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
     }
 
-    /**
-     * @param string[] $expectedPlan
-     *
-     * @dataProvider getPlanUpWhenMigrations
-     */
+    /** @param string[] $expectedPlan */
+    #[DataProvider('getPlanUpWhenMigrations')]
     public function testPlanWhenMigrations(string $to, array $expectedPlan, string $direction): void
     {
         $e1 = new ExecutedMigration(new Version('A'));
@@ -190,11 +185,8 @@ final class MigrationPlanCalculatorTest extends TestCase
         ];
     }
 
-    /**
-     * @param string[] $expectedPlan
-     *
-     * @dataProvider getPlanUpWhenMigrationsOutOfOrder
-     */
+    /** @param string[] $expectedPlan */
+    #[DataProvider('getPlanUpWhenMigrationsOutOfOrder')]
     public function testPlanWhenMigrationsOutOfOrder(string $to, array $expectedPlan, string $direction): void
     {
         $e1 = new ExecutedMigration(new Version('B'));

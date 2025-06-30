@@ -21,6 +21,7 @@ use Doctrine\Migrations\Tools\Console\Command\UpToDateCommand;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Symfony\Component\Console\Tester\CommandTester;
 
 use function array_map;
@@ -70,9 +71,8 @@ class UpToDateCommandTest extends MigrationTestCase
      * @param string[] $migratedVersions
      *
      * @throws MigrationException
-     *
-     * @dataProvider dataIsUpToDate
      */
+    #[DataProvider('dataIsUpToDate')]
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false): void
     {
         $migrationClass = $this->createMock(AbstractMigration::class);
