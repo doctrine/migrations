@@ -4,9 +4,11 @@
          xsi:noNamespaceSchemaLocation="vendor/phpunit/phpunit/phpunit.xsd"
          colors="true"
          beStrictAboutOutputDuringTests="true"
+         displayDetailsOnTestsThatTriggerDeprecations="true"
 >
     <php>
         <env name="COLUMNS" value="120" />
+        <env name="DOCTRINE_DEPRECATIONS" value="trigger" />
     </php>
 
     <testsuites>
@@ -15,7 +17,7 @@
         </testsuite>
     </testsuites>
 
-    <source>
+    <source ignoreSuppressionOfDeprecations="true">
         <include>
             <directory>src</directory>
         </include>
