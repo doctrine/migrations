@@ -43,6 +43,7 @@ class DiffGenerator
         string|null $filterExpression,
         bool $formatted = false,
         bool|null $nowdocOutput = null,
+        bool $singleBlock = false,
         int $lineLength = 120,
         bool $checkDbPlatform = true,
         bool $fromEmptySchema = false,
@@ -85,6 +86,7 @@ class DiffGenerator
             $upSql,
             $formatted,
             $nowdocOutput,
+            $singleBlock,
             $lineLength,
             $checkDbPlatform,
         );
@@ -95,6 +97,7 @@ class DiffGenerator
             $downSql,
             $formatted,
             $nowdocOutput,
+            $singleBlock,
             $lineLength,
             $checkDbPlatform,
         );

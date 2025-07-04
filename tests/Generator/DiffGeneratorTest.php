@@ -99,10 +99,16 @@ class DiffGeneratorTest extends TestCase
 
         $this->migrationSqlGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::logicalOr(
-                self::equalTo(['UPDATE table SET value = 2']),
-                self::equalTo(['UPDATE table SET value = 1']),
-            ), true, false, 80)
+            ->with(
+                fqcn: self::logicalOr(
+                    self::equalTo(['UPDATE table SET value = 2']),
+                    self::equalTo(['UPDATE table SET value = 1']),
+                ),
+                formatted: true,
+                nowdocOutput: false,
+                singleBlock: false,
+                lineLength: 80,
+            )
             ->willReturnOnConsecutiveCalls('test1', 'test2');
 
         $this->migrationGenerator->expects(self::once())
@@ -111,11 +117,12 @@ class DiffGeneratorTest extends TestCase
             ->willReturn('path');
 
         self::assertSame('path', $this->migrationDiffGenerator->generate(
-            '1234',
-            '/table_name1/',
-            true,
-            false,
-            80,
+            fqcn: '1234',
+            filterExpression: '/table_name1/',
+            formatted: true,
+            nowdocOutput: false,
+            singleBlock: false,
+            lineLength: 80,
         ));
     }
 
@@ -167,10 +174,17 @@ class DiffGeneratorTest extends TestCase
 
         $this->migrationSqlGenerator->expects(self::exactly(2))
             ->method('generate')
-            ->with(self::logicalOr(
-                self::equalTo(['CREATE TABLE table_name']),
-                self::equalTo(['DROP TABLE table_name']),
-            ), false, false, 120, true)
+            ->with(
+                fqcn: self::logicalOr(
+                    self::equalTo(['CREATE TABLE table_name']),
+                    self::equalTo(['DROP TABLE table_name']),
+                ),
+                formatted: false,
+                nowdocOutput: false,
+                singleBlock: false,
+                lineLength: 120,
+                fromEmptySchema: true,
+            )
             ->willReturnOnConsecutiveCalls('test up', 'test down');
 
         $this->migrationGenerator->expects(self::once())
@@ -178,7 +192,19 @@ class DiffGeneratorTest extends TestCase
             ->with('2345', 'test up', 'test down')
             ->willReturn('path2');
 
-        self::assertSame('path2', $this->migrationDiffGenerator->generate('2345', null, false, false, 120, true, true));
+        self::assertSame(
+            'path2',
+            $this->migrationDiffGenerator->generate(
+                fqcn: '2345',
+                filterExpression: null,
+                formatted: false,
+                nowdocOutput: false,
+                singleBlock: false,
+                lineLength: 120,
+                checkDbPlatform: true,
+                fromEmptySchema: true,
+            ),
+        );
     }
 
     protected function setUp(): void

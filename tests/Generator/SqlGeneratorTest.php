@@ -59,7 +59,13 @@ final class SqlGeneratorTest extends TestCase
                 CODE,
         );
 
-        $code = $migrationSqlGenerator->generate($this->sql, true, null, 80);
+        $code = $migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: true,
+            nowdocOutput: null,
+            singleBlock: false,
+            lineLength: 80,
+        );
 
         self::assertSame($expectedCode, $code);
     }
@@ -77,7 +83,14 @@ final class SqlGeneratorTest extends TestCase
             formatted: false,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, false, null, 80, false);
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: false,
+            nowdocOutput: null,
+            singleBlock: false,
+            lineLength: 80,
+            checkDbPlatform: false,
+        );
         self::assertSame($expectedCode, $code);
     }
 
@@ -100,7 +113,14 @@ final class SqlGeneratorTest extends TestCase
             formatted: false,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, false, true, 80, false);
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: false,
+            nowdocOutput: true,
+            singleBlock: false,
+            lineLength: 80,
+            checkDbPlatform: false,
+        );
         self::assertSame($expectedCode, $code);
     }
 
@@ -118,7 +138,41 @@ final class SqlGeneratorTest extends TestCase
             nowdoc: false,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, false, 80, false);
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: true,
+            nowdocOutput: false,
+            singleBlock: false,
+            lineLength: 80,
+            checkDbPlatform: false,
+        );
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithSingleBlockOutput(): void
+    {
+        $this->configuration->setCheckDatabasePlatform(true);
+
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+                $this->addSql(<<<'SQL'
+                    SELECT 1;
+                    SELECT 2;
+                    %s;
+                SQL);
+                CODE,
+            formatted: true,
+            nowdoc: true,
+        );
+
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: true,
+            nowdocOutput: false,
+            singleBlock: true,
+            lineLength: 80,
+            checkDbPlatform: false,
+        );
 
         self::assertSame($expectedCode, $code);
     }
@@ -137,7 +191,14 @@ final class SqlGeneratorTest extends TestCase
                 CODE,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, null, 80, false);
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: true,
+            nowdocOutput: null,
+            singleBlock: false,
+            lineLength: 80,
+            checkDbPlatform: false,
+        );
 
         self::assertSame($expectedCode, $code);
     }
@@ -156,7 +217,13 @@ final class SqlGeneratorTest extends TestCase
                 CODE,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, null, 80);
+        $code = $this->migrationSqlGenerator->generate(
+            sql: $this->sql,
+            formatted: true,
+            nowdocOutput: null,
+            singleBlock: false,
+            lineLength: 80,
+        );
 
         self::assertSame($expectedCode, $code);
     }

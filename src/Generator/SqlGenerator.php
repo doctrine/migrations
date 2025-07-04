@@ -42,6 +42,7 @@ class SqlGenerator
         array $sql,
         bool $formatted = false,
         bool|null $nowdocOutput = null,
+        bool $singleBlock = false,
         int $lineLength = 120,
         bool $checkDbPlatform = true,
     ): string {
@@ -61,7 +62,9 @@ class SqlGenerator
                 $query = $this->formatQuery($query);
             }
 
-            if ($nowdocOutput === true || ($nowdocOutput !== false && $formatted && strlen($query) > $maxLength )) {
+            if ($singleBlock === true) {
+                $code[] = $query;
+            } elseif ($nowdocOutput === true || ($nowdocOutput !== false && $formatted && strlen($query) > $maxLength )) {
                 $code[] = sprintf(
                     "\$this->addSql(<<<'SQL'\n%s\nSQL);",
                     preg_replace('/^/m', str_repeat(' ', 4), $query),
@@ -88,6 +91,13 @@ PHP
                     $currentPlatform,
                 ),
                 '',
+            );
+        }
+
+        if ($singleBlock === true) {
+            return sprintf(
+                "\$this->addSql(<<<'SQL'\n%s;\nSQL);",
+                preg_replace('/^/m', str_repeat(' ', 4), implode(";\n", $code)),
             );
         }
 

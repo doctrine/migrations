@@ -59,6 +59,12 @@ EOT)
                 'Output the generated SQL as a nowdoc string (always active for formatted queries).',
             )
             ->addOption(
+                'single-block',
+                null,
+                InputOption::VALUE_NONE,
+                'Output the generated SQL as a single block nowdoc string.',
+            )
+            ->addOption(
                 'namespace',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -86,6 +92,7 @@ EOT)
     ): int {
         $formatted    = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
         $nowdocOutput = filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
+        $singleBlock  = filter_var($input->getOption('single-block'), FILTER_VALIDATE_BOOLEAN);
         $lineLength   = (int) $input->getOption('line-length');
 
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
@@ -109,6 +116,7 @@ EOT)
             $input->getOption('filter-tables'),
             $formatted,
             $nowdocOutput,
+            $singleBlock,
             $lineLength,
         );
 

@@ -57,6 +57,7 @@ class SchemaDumper
         array $excludedTablesRegexes = [],
         bool $formatted = false,
         bool $nowdocOutput = false,
+        bool $singleBlock = false,
         int $lineLength = 120,
     ): string {
         $schema = $this->schemaManager->introspectSchema();
@@ -75,6 +76,7 @@ class SchemaDumper
                 $upSql,
                 $formatted,
                 $nowdocOutput,
+                $singleBlock,
                 $lineLength,
             );
 
@@ -88,6 +90,7 @@ class SchemaDumper
                 $downSql,
                 $formatted,
                 $nowdocOutput,
+                $singleBlock,
                 $lineLength,
             );
 

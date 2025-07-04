@@ -70,6 +70,12 @@ EOT)
                 'Output the generated SQL as a nowdoc string (always active for formatted queries).',
             )
             ->addOption(
+                'single-block',
+                null,
+                InputOption::VALUE_NONE,
+                'Output the generated SQL as a single block nowdoc string.',
+            )
+            ->addOption(
                 'line-length',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -109,6 +115,7 @@ EOT)
 
         $formatted       = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
         $nowdocOutput    = filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
+        $singleBlock     = filter_var($input->getOption('single-block'), FILTER_VALIDATE_BOOLEAN);
         $lineLength      = (int) $input->getOption('line-length');
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
@@ -143,6 +150,7 @@ EOT)
                 $filterExpression,
                 $formatted,
                 $nowdocOutput,
+                $singleBlock,
                 $lineLength,
                 $checkDbPlatform,
                 $fromEmptySchema,
