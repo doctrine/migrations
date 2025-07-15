@@ -9,6 +9,8 @@ use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\FilesystemMigrationsRepository;
@@ -22,6 +24,7 @@ use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\TestCase;
 
+use function class_exists;
 use function sprintf;
 
 class ExistingTableMetadataStorageTest extends TestCase
@@ -71,7 +74,17 @@ class ExistingTableMetadataStorageTest extends TestCase
         // create partial table
         $table = new Table($this->config->getTableName());
         $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
-        $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+        }
+
         $this->schemaManager->createTable($table);
     }
 

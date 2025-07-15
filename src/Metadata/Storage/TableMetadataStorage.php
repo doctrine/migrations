@@ -9,6 +9,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\ComparatorConfig;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Schema\TableDiff;
 use Doctrine\DBAL\Types\Types;
@@ -25,6 +28,7 @@ use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
 
 use function array_change_key_case;
+use function class_exists;
 use function floatval;
 use function round;
 use function sprintf;
@@ -112,7 +116,7 @@ final class TableMetadataStorage implements MetadataStorage
         $this->connection->executeStatement(
             sprintf(
                 'DELETE FROM %s WHERE 1 = 1',
-                $this->platform->quoteIdentifier($this->configuration->getTableName()),
+                $this->configuration->getTableName(),
             ),
         );
     }
@@ -196,8 +200,14 @@ final class TableMetadataStorage implements MetadataStorage
             return null;
         }
 
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $this->schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $this->schemaManager->createComparator();
+        }
+
         $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());
-        $diff         = $this->schemaManager->createComparator()->compareTables($currentTable, $expectedTable);
+        $diff         = $comparator->compareTables($currentTable, $expectedTable);
 
         return $diff->isEmpty() ? null : $diff;
     }
@@ -240,7 +250,15 @@ final class TableMetadataStorage implements MetadataStorage
         $schemaChangelog->addColumn($this->configuration->getExecutedAtColumnName(), 'datetime', ['notnull' => false]);
         $schemaChangelog->addColumn($this->configuration->getExecutionTimeColumnName(), 'integer', ['notnull' => false]);
 
-        $schemaChangelog->setPrimaryKey([$this->configuration->getVersionColumnName()]);
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($this->configuration->getVersionColumnName()))
+                ->create();
+
+            $schemaChangelog->addPrimaryKeyConstraint($constraint);
+        } else {
+            $schemaChangelog->setPrimaryKey([$this->configuration->getVersionColumnName()]);
+        }
 
         return $schemaChangelog;
     }

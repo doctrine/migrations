@@ -8,10 +8,12 @@ use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
 
+use function class_exists;
 use function method_exists;
 use function preg_match;
 use function strpos;
@@ -77,7 +79,11 @@ class DiffGenerator
             }
         }
 
-        $comparator = $this->schemaManager->createComparator();
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $this->schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $this->schemaManager->createComparator();
+        }
 
         $upSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($fromSchema, $toSchema));
 
