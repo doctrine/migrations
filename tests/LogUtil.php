@@ -26,6 +26,7 @@ trait LogUtil
     /** @return list<string> */
     private function getInterpolatedLogRecords(TestLogger $logger): array
     {
+        /* @phpstan-ignore return.type (https://github.com/php-fig/log-test/issues/11) */
         return array_map($this->interpolate(...), $logger->records);
     }
 

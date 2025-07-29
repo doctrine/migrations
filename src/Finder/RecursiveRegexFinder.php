@@ -8,6 +8,7 @@ use FilesystemIterator;
 use RecursiveDirectoryIterator;
 use RecursiveIteratorIterator;
 use RegexIterator;
+use Traversable;
 
 use function sprintf;
 
@@ -40,8 +41,10 @@ final class RecursiveRegexFinder extends Finder
         );
     }
 
+    /** @return RegexIterator<mixed, mixed, Traversable<mixed, mixed>> */
     private function createIterator(string $dir): RegexIterator
     {
+        /** @phpstan-ignore return.type (https://github.com/phpstan/phpstan/issues/13325) */
         return new RegexIterator(
             new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
@@ -57,7 +60,11 @@ final class RecursiveRegexFinder extends Finder
         return $this->pattern;
     }
 
-    /** @return string[] */
+    /**
+     * @param RegexIterator<mixed, mixed, Traversable<mixed, mixed>> $iteratorFilesMatch
+     *
+     * @return string[]
+     */
     private function getMatches(RegexIterator $iteratorFilesMatch): array
     {
         $files = [];

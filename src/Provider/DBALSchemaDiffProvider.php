@@ -6,7 +6,10 @@ namespace Doctrine\Migrations\Provider;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Schema\Schema;
+
+use function class_exists;
 
 /**
  * The SchemaDiffProvider class is responsible for providing a Doctrine\DBAL\Schema\Schema instance that
@@ -40,8 +43,14 @@ class DBALSchemaDiffProvider implements SchemaDiffProvider
     /** @return string[] */
     public function getSqlDiffToMigrate(Schema $fromSchema, Schema $toSchema): array
     {
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $this->schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $this->schemaManager->createComparator();
+        }
+
         return $this->platform->getAlterSchemaSQL(
-            $this->schemaManager->createComparator()->compareSchemas($fromSchema, $toSchema),
+            $comparator->compareSchemas($fromSchema, $toSchema),
         );
     }
 }

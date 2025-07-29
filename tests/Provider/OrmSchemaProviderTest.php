@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
+use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
@@ -39,9 +40,8 @@ class OrmSchemaProviderTest extends MigrationTestCase
     /**
      * It should be OK to use migrations to manage tables not managed by
      * the ORM.
-     *
-     * @doesNotPerformAssertions
      */
+    #[DoesNotPerformAssertions]
     public function testEntityManagerWithoutMetadata(): void
     {
         $this->config->setMetadataDriverImpl(new XmlDriver([]));

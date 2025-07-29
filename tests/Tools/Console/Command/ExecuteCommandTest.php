@@ -20,6 +20,7 @@ use Doctrine\Migrations\Tools\Console\Command\ExecuteCommand;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Tester\CommandTester;
 
@@ -42,7 +43,7 @@ class ExecuteCommandTest extends MigrationTestCase
     /** @var MigrationPlanCalculator&MockObject */
     private MigrationPlanCalculator $planCalculator;
 
-    /** @dataProvider getWriteSqlValues */
+    #[DataProvider('getWriteSqlValues')]
     public function testWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $this->migrator
