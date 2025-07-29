@@ -13,6 +13,8 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
@@ -32,6 +34,7 @@ use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 
+use function class_exists;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -87,7 +90,17 @@ class TableMetadataStorageTest extends TestCase
 
         $table = new Table($this->config->getTableName());
         $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-        $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+        }
+
         $this->schemaManager->createTable($table);
 
         $this->storage->getExecutedMigrations();
@@ -112,7 +125,17 @@ class TableMetadataStorageTest extends TestCase
 
         $table = new Table($config->getTableName());
         $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-        $table->setPrimaryKey([$config->getVersionColumnName()]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$config->getVersionColumnName()]);
+        }
+
         $this->schemaManager->createTable($table);
 
         $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
@@ -140,7 +163,17 @@ class TableMetadataStorageTest extends TestCase
 
         $table = new Table($config->getTableName());
         $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-        $table->setPrimaryKey([$config->getVersionColumnName()]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$config->getVersionColumnName()]);
+        }
+
         $this->schemaManager->createTable($table);
 
         $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
@@ -177,7 +210,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql  = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
         $rows = $this->connection->fetchAllAssociative($sql);
         self::assertEquals([
@@ -201,7 +234,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql  = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
         $rows = $this->connection->fetchAllAssociative($sql);
         self::assertEquals([
@@ -317,7 +350,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
@@ -339,7 +372,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));
 
@@ -357,7 +390,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
         self::assertCount(0, $this->connection->fetchAllAssociative($sql));
     }
@@ -384,7 +417,7 @@ class TableMetadataStorageTest extends TestCase
 
         $sql = sprintf(
             'SELECT * FROM %s WHERE version = 2230',
-            $this->connection->getDatabasePlatform()->quoteIdentifier($this->config->getTableName()),
+            $this->config->getTableName(),
         );
 
         self::assertCount(1, $this->connection->fetchAllAssociative($sql));

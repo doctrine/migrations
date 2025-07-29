@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\AbstractMigration;
@@ -39,6 +40,7 @@ use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function class_exists;
 use function getcwd;
 use function in_array;
 use function sprintf;
@@ -504,7 +506,13 @@ class MigrateCommandTest extends MigrationTestCase
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
 
-        $diff = $schemaManager->createComparator()->compareTables($originalTable, $modifiedTable);
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $schemaManager->createComparator();
+        }
+
+        $diff = $comparator->compareTables($originalTable, $modifiedTable);
         if ($diff->isEmpty()) {
             return;
         }

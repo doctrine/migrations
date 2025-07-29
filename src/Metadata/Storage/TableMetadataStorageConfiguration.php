@@ -8,6 +8,7 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
 {
     private string $tableName = 'doctrine_migration_versions';
 
+    /** @var non-empty-string */
     private string $versionColumnName = 'version';
 
     private int $versionColumnLength = 191;
@@ -26,11 +27,13 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
         $this->tableName = $tableName;
     }
 
+    /** @return non-empty-string */
     public function getVersionColumnName(): string
     {
         return $this->versionColumnName;
     }
 
+    /** @param non-empty-string $versionColumnName */
     public function setVersionColumnName(string $versionColumnName): void
     {
         $this->versionColumnName = $versionColumnName;
