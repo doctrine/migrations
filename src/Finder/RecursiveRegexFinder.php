@@ -44,6 +44,7 @@ final class RecursiveRegexFinder extends Finder
     /** @return RegexIterator<mixed, mixed, Traversable<mixed, mixed>> */
     private function createIterator(string $dir): RegexIterator
     {
+        /** @phpstan-ignore return.type (https://github.com/phpstan/phpstan/issues/13325) */
         return new RegexIterator(
             new RecursiveIteratorIterator(
                 new RecursiveDirectoryIterator($dir, FilesystemIterator::SKIP_DOTS | FilesystemIterator::FOLLOW_SYMLINKS),
