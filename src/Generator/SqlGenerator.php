@@ -98,6 +98,6 @@ PHP
     {
         $this->formatter ??= new SqlFormatter(new NullHighlighter());
 
-        return $this->formatter->format($query);
+        return $this->formatter->format($query, '    ');
     }
 }
