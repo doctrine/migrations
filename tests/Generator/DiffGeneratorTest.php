@@ -18,6 +18,10 @@ use Doctrine\Migrations\Provider\SchemaProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+use function array_map;
+use function array_values;
+use function preg_match;
+
 class DiffGeneratorTest extends TestCase
 {
     private DBALConfiguration&MockObject $dbalConfiguration;
@@ -43,7 +47,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration->expects(self::once())
             ->method('getSchemaAssetsFilter')
             ->willReturn(
-                static fn ($name): bool => $name === 'table_name1',
+                static fn ($name): bool => $name === 'schema.table_name1',
             );
 
         $table1 = $this->createMock(Table::class);
@@ -179,6 +183,49 @@ class DiffGeneratorTest extends TestCase
             ->willReturn('path2');
 
         self::assertSame('path2', $this->migrationDiffGenerator->generate('2345', null, false, false, 120, true, true));
+    }
+
+    public function testGenerateAppliesFilterOnMappedSchema(): void
+    {
+        // a standard Regex SchemaAssetsFilter already registered on the DBAL
+        $dbalSchemaAssetsFilter = static function ($assetName): bool {
+            return (bool) preg_match('~^some_schema~', $assetName);
+        };
+
+        $fromSchema = new Schema();
+
+        $toTable1 = new Table('some_schema.table1');
+        $toTable2 = new Table('some_schema.table2');
+        $toSchema = new Schema([$toTable1, $toTable2]);
+
+        $this->schemaManager->expects(self::once())
+            ->method('introspectSchema')
+            ->willReturn($fromSchema);
+
+        $this->schemaProvider->expects(self::once())
+            ->method('createSchema')
+            ->willReturn($toSchema);
+
+        $this->dbalConfiguration->expects(self::once())
+            ->method('getSchemaAssetsFilter')
+            ->willReturn($dbalSchemaAssetsFilter);
+
+        $schemaDiff = self::createStub(SchemaDiff::class);
+        $comparator = $this->mockComparator($schemaDiff);
+
+        $this->schemaManager->expects(self::once())
+            ->method('createComparator')
+            ->willReturn($comparator);
+
+        $this->migrationSqlGenerator->expects(self::exactly(2))
+            ->method('generate')
+            ->willReturnOnConsecutiveCalls('up', 'down');
+
+        $this->migrationDiffGenerator->generate('Version1234', null);
+
+        $filteredTableNames = array_map(static fn (Table $table) => $table->getName(), $toSchema->getTables());
+
+        self::assertSame(['some_schema.table1', 'some_schema.table2'], array_values($filteredTableNames));
     }
 
     protected function setUp(): void
