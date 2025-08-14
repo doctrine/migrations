@@ -186,7 +186,7 @@ final class SqlGeneratorTest extends TestCase
         $this->metadataConfig->setTableName('migrations_table_name');
 
         if ($formatted) {
-            $formattedSql = (new SqlFormatter(new NullHighlighter()))->format($this->sql[2]);
+            $formattedSql = (new SqlFormatter(new NullHighlighter()))->format($this->sql[2], '    ');
             if ($nowdoc) {
                 $formattedSql = implode(
                     "\n" . str_repeat(' ', 4),
