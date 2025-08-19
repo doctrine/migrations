@@ -67,7 +67,7 @@ EOT)
                 'nowdoc',
                 null,
                 InputOption::VALUE_NEGATABLE,
-                'Output the generated SQL as a nowdoc string (always active for formatted queries).',
+                'Output the generated SQL as a nowdoc string (enabled by default for formatted queries).',
             )
             ->addOption(
                 'line-length',
@@ -108,7 +108,8 @@ EOT)
         }
 
         $formatted       = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
-        $nowdocOutput    = filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
+        $nowdocOutput    = $input->getOption('nowdoc');
+        $nowdocOutput    = $nowdocOutput === null ? null : filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
         $lineLength      = (int) $input->getOption('line-length');
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);

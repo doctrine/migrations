@@ -57,7 +57,7 @@ class SchemaDumper
         string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
-        bool $nowdocOutput = false,
+        bool|null $nowdocOutput = null,
         int $lineLength = 120,
     ): string {
         $schema = $this->schemaManager->introspectSchema();
