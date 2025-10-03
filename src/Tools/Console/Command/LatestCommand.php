@@ -29,7 +29,7 @@ final class LatestCommand extends DoctrineCommand
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $aliasResolver = $this->getDependencyFactory()->getVersionAliasResolver();
 

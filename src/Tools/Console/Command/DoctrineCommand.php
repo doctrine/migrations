@@ -119,6 +119,17 @@ abstract class DoctrineCommand extends Command
         $dependencyFactory->freeze();
     }
 
+    protected function execute(InputInterface $input, OutputInterface $output): int
+    {
+        try {
+            return $this->doExecute($input, $output);
+        } finally {
+            $this->dependencyFactory?->unfreeze();
+        }
+    }
+
+    abstract protected function doExecute(InputInterface $input, OutputInterface $output): int;
+
     protected function getDependencyFactory(): DependencyFactory
     {
         if ($this->dependencyFactory === null) {

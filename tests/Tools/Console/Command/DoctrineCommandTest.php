@@ -40,7 +40,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
             }
@@ -67,7 +67,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 $migrationDirectories = $this->getDependencyFactory()->getConfiguration()->getMigrationDirectories();
                 DoctrineCommandTest::assertSame(['DoctrineMigrationsTest' => 'bar'], $migrationDirectories);
@@ -88,6 +88,11 @@ class DoctrineCommandTest extends MigrationTestCase
         $dependencyFactory = $this->createMock(DependencyFactory::class);
         $command           = new class ($dependencyFactory) extends DoctrineCommand
         {
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
+            {
+                return 0;
+            }
+
             protected function configure(): void
             {
                 $this->getDependencyFactory();
@@ -122,7 +127,7 @@ class DoctrineCommandTest extends MigrationTestCase
                 $this->expectedEm = $entityManager;
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 $em = $this->getDependencyFactory()->getEntityManager();
                 DoctrineCommandTest::assertSame($this->expectedEm, $em);
@@ -163,7 +168,7 @@ class DoctrineCommandTest extends MigrationTestCase
                 $this->expectedConnection = $connection;
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 $connection = $this->getDependencyFactory()->getConnection();
                 DoctrineCommandTest::assertSame($this->expectedConnection, $connection);
@@ -196,7 +201,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
         $command       = new class ($dependencyFactory) extends DoctrineCommand
         {
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 return 0;
             }
@@ -239,7 +244,7 @@ class DoctrineCommandTest extends MigrationTestCase
                     );
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrations');
 
@@ -282,7 +287,7 @@ class DoctrineCommandTest extends MigrationTestCase
                     );
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 $this->getNamespace($input, $output);
 
@@ -327,7 +332,7 @@ class DoctrineCommandTest extends MigrationTestCase
                     );
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrations');
 
@@ -368,7 +373,7 @@ class DoctrineCommandTest extends MigrationTestCase
                     );
             }
 
-            protected function execute(InputInterface $input, OutputInterface $output): int
+            protected function doExecute(InputInterface $input, OutputInterface $output): int
             {
                 DoctrineCommandTest::assertSame($this->getNamespace($input, $output), 'DoctrineMigrationsTwo');
 
