@@ -86,7 +86,7 @@ EOT)
     }
 
     /** @throws SchemaDumpRequiresNoMigrations */
-    public function doExecute(
+    protected function doExecute(
         InputInterface $input,
         OutputInterface $output,
     ): int {

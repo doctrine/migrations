@@ -90,38 +90,22 @@ abstract class AbstractMigration
         }
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     *
-     * @phpstan-ignore throws.unusedType,throws.unusedType
-     */
+    /** @throws MigrationException|DBALException */
     public function preUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     *
-     * @phpstan-ignore throws.unusedType,throws.unusedType
-     */
+    /** @throws MigrationException|DBALException */
     public function postUp(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     *
-     * @phpstan-ignore throws.unusedType,throws.unusedType
-     */
+    /** @throws MigrationException|DBALException */
     public function preDown(Schema $schema): void
     {
     }
 
-    /**
-     * @throws MigrationException|DBALException
-     *
-     * @phpstan-ignore throws.unusedType,throws.unusedType
-     */
+    /** @throws MigrationException|DBALException */
     public function postDown(Schema $schema): void
     {
     }

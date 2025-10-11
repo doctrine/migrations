@@ -37,7 +37,7 @@ EOT);
         return parent::execute($input, $output);
     }
 
-    public function doExecute(
+    protected function doExecute(
         InputInterface $input,
         OutputInterface $output,
     ): int {

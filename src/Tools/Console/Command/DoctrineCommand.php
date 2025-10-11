@@ -128,7 +128,10 @@ abstract class DoctrineCommand extends Command
         }
     }
 
-    abstract protected function doExecute(InputInterface $input, OutputInterface $output): int;
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
+    {
+        throw new Exception('You must implement the doExecute() method in the concrete command class.');
+    }
 
     protected function getDependencyFactory(): DependencyFactory
     {
