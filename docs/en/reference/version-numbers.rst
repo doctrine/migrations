@@ -75,7 +75,7 @@ Should some custom migration numbers be necessary, keeping the version number th
     */
 
 Please note that migrating to this new, zero-padded format may require
-:ref:`manual version table intervention <managing-migrations#managing-the-version-table>` if the
+:doc:`manual version table intervention <managing-migrations#managing-the-version-table>` if the
 versions have previously been applied.
 
 :ref:`Next Chapter: Integrations <integrations>`
