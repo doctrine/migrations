@@ -4,7 +4,7 @@ Migrations Events
 The Doctrine Migrations library emits a series of events during the migration process.
 
 - ``onMigrationsMigrating``: dispatched immediately before starting to execute versions. This does not fire if
-there are no versions to be executed.
+  there are no versions to be executed.
 - ``onMigrationsVersionExecuting``: dispatched before a single version executes.
 - ``onMigrationsVersionExecuted``: dispatched after a single version executes.
 - ``onMigrationsVersionSkipped``: dispatched when a single version is skipped.
