@@ -42,9 +42,9 @@ final class DiffCommand extends DoctrineCommand
             ->setHelp(<<<'EOT'
 The <info>%command.name%</info> command generates a migration by comparing your current database to your mapping information:
 
-    <info>%command.full_name%</info>
+	<info>%command.full_name%</info>
 
-EOT)
+EOT,)
             ->addOption(
                 'namespace',
                 null,
@@ -94,6 +94,12 @@ EOT)
                 null,
                 InputOption::VALUE_NONE,
                 'Generate a full migration as if the current database was empty.',
+            )
+            ->addOption(
+                'check',
+                null,
+                InputOption::VALUE_NONE,
+                'Check if a migration is needed and exit with a non-zero status code if it is.',
             );
     }
 
@@ -107,13 +113,34 @@ EOT)
             $filterExpression = null;
         }
 
+        $fromEmptySchema = $input->getOption('from-empty-schema');
+        $check           = $input->getOption('check');
+
+        $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
+
+        if ($check) {
+            if ($diffGenerator->hasChanges($filterExpression, $fromEmptySchema)) {
+                $this->io->error([
+                    'The database schema is not in sync with the mapping.',
+                    'Run the following command to generate a migration:',
+                    '',
+                    'bin/console doctrine:migrations:diff',
+                ]);
+
+                return 1;
+            }
+
+            $this->io->success('The database schema is in sync with the mapping. No migration required.');
+
+            return 0;
+        }
+
         $formatted       = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
         $nowdocOutput    = $input->getOption('nowdoc');
         $nowdocOutput    = $nowdocOutput === null ? null : filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
         $lineLength      = (int) $input->getOption('line-length');
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
-        $fromEmptySchema = $input->getOption('from-empty-schema');
 
         if ($formatted) {
             if (! class_exists(SqlFormatter::class)) {
@@ -135,8 +162,7 @@ EOT)
             return 3;
         }
 
-        $fqcn          = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
-        $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
+        $fqcn = $this->getDependencyFactory()->getClassNameGenerator()->generateClassName($namespace);
 
         try {
             $path = $diffGenerator->generate(

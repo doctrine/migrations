@@ -182,6 +182,54 @@ final class DiffCommandTest extends TestCase
         self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
     }
 
+    public function testCheckReturnsZeroWhenNoChanges(): void
+    {
+        $this->migrationDiffGenerator
+            ->expects(self::once())
+            ->method('hasChanges')
+            ->with(null, false)
+            ->willReturn(false);
+
+        $this->migrationDiffGenerator
+            ->expects(self::never())
+            ->method('generate');
+
+        $this->diffCommandTester->execute(['--check' => true]);
+
+        $output     = $this->diffCommandTester->getDisplay(true);
+        $statusCode = $this->diffCommandTester->getStatusCode();
+
+        self::assertStringContainsString('[OK] The database schema is in sync with the mapping. No migration required.', $output);
+        self::assertSame(0, $statusCode);
+    }
+
+    public function testCheckReturnsOneWhenChanges(): void
+    {
+        $this->migrationDiffGenerator
+            ->expects(self::once())
+            ->method('hasChanges')
+            ->with('filter', true)
+            ->willReturn(true);
+
+        $this->migrationDiffGenerator
+            ->expects(self::never())
+            ->method('generate');
+
+        $this->diffCommandTester->execute([
+            '--check' => true,
+            '--filter-expression' => 'filter',
+            '--from-empty-schema' => true,
+        ]);
+
+        $output     = $this->diffCommandTester->getDisplay(true);
+        $statusCode = $this->diffCommandTester->getStatusCode();
+
+        self::assertStringContainsString('[ERROR] The database schema is not in sync with the mapping.', $output);
+        self::assertStringContainsString('Run the following command to generate a migration:', $output);
+        self::assertStringContainsString('bin/console doctrine:migrations:diff', $output);
+        self::assertSame(1, $statusCode);
+    }
+
     protected function setUp(): void
     {
         $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);

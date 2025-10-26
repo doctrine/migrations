@@ -37,6 +37,38 @@ class DiffGenerator
     ) {
     }
 
+    public function hasChanges(string|null $filterExpression, bool $fromEmptySchema = false): bool
+    {
+        if ($filterExpression !== null) {
+            $this->dbalConfiguration->setSchemaAssetsFilter(
+                static function ($assetName) use ($filterExpression) {
+                    if ($assetName instanceof AbstractAsset) {
+                        $assetName = $assetName->getName();
+                    }
+
+                    return preg_match($filterExpression, $assetName);
+                },
+            );
+        }
+
+        $fromSchema = $fromEmptySchema
+            ? $this->createEmptySchema()
+            : $this->createFromSchema();
+
+        $toSchema = $this->createToSchema();
+
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $this->schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $this->schemaManager->createComparator();
+        }
+
+        $upSql   = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($fromSchema, $toSchema));
+        $downSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($toSchema, $fromSchema));
+
+        return $upSql !== [] || $downSql !== [];
+    }
+
     /** @throws NoChangesDetected */
     public function generate(
         string $fqcn,
