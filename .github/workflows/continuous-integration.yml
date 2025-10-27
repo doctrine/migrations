@@ -75,7 +75,7 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
       - name: "Upload coverage file"
-        uses: "actions/upload-artifact@v4"
+        uses: "actions/upload-artifact@v5"
         with:
           name: "phpunit-${{ matrix.dependencies }}-${{ matrix.stability }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
