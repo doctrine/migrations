@@ -31,6 +31,7 @@ use function assert;
 use function file_exists;
 use function getcwd;
 use function is_readable;
+use function method_exists;
 use function sprintf;
 
 use const DIRECTORY_SEPARATOR;
@@ -129,7 +130,11 @@ class ConsoleRunner
             return;
         }
 
-        $cli->add(new DiffCommand($dependencyFactory));
+        if (method_exists(Application::class, 'addCommand')) {
+            $cli->addCommand(new DiffCommand($dependencyFactory));
+        } else {
+            $cli->add(new DiffCommand($dependencyFactory));
+        }
     }
 
     private static function checkLegacyConfiguration(mixed $dependencyFactory, string $configurationFile): mixed

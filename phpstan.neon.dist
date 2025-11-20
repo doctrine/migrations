@@ -60,6 +60,11 @@ parameters:
             message: '~^Parameter #1 \$array \(list<string>\) of array_values is already a list, call has no effect\.$~'
             path: tests/Generator/DiffGeneratorTest.php
 
+        # Symfony 8 forward compatibility
+        -
+            message: '~^Call to an undefined method Symfony\\Component\\Console\\Application\:\:addCommand\(\)\.$~'
+            path: src/Tools/Console/ConsoleRunner.php
+
     symfony:
             consoleApplicationLoader: tests/doctrine-migrations-phpstan-app.php
 includes:
