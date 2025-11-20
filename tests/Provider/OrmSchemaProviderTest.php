@@ -14,6 +14,8 @@ use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
 
+use const PHP_VERSION_ID;
+
 /**
  * Tests the OrmSchemaProvider using a real entity manager.
  */
@@ -53,6 +55,10 @@ class OrmSchemaProviderTest extends MigrationTestCase
     {
         $this->config = ORMSetup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);
+
+        if (PHP_VERSION_ID >= 80400) {
+            $this->config->enableNativeLazyObjects(true);
+        }
 
         $this->conn          = $this->getSqliteConnection();
         $this->entityManager = new EntityManager($this->conn, $this->config);
