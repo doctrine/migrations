@@ -145,6 +145,10 @@ final class DbalExecutor implements Executor
             $this->addSql(new Query($sql));
         }
 
+        foreach ($migration->getDeferredSql() as $deferredSqlQuery) {
+            $this->addSql($deferredSqlQuery);
+        }
+
         $migration->freeze();
 
         if (count($this->sql) !== 0) {

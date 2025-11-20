@@ -37,6 +37,9 @@ abstract class AbstractMigration
     /** @var Query[] */
     private array $plannedSql = [];
 
+    /** @var Query[] */
+    private array $deferredSql = [];
+
     private bool $frozen = false;
 
     public function __construct(Connection $connection, private readonly LoggerInterface $logger)
@@ -135,10 +138,34 @@ abstract class AbstractMigration
         $this->plannedSql[] = new Query($sql, $params, $types);
     }
 
+    /**
+     * Adds SQL queries which should be executed after schema changes
+     *
+     * @param mixed[] $params
+     * @param mixed[] $types
+     */
+    protected function addDeferredSql(
+        string $sql,
+        array $params = [],
+        array $types = [],
+    ): void {
+        if ($this->frozen) {
+            throw FrozenMigration::new();
+        }
+
+        $this->deferredSql[] = new Query($sql, $params, $types);
+    }
+
     /** @return Query[] */
     public function getSql(): array
     {
         return $this->plannedSql;
+    }
+
+    /** @return Query[] */
+    public function getDeferredSql(): array
+    {
+        return $this->deferredSql;
     }
 
     public function freeze(): void
