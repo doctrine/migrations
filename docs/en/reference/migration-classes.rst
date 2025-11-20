@@ -76,7 +76,7 @@ Override this method if you want to disable transactions in a migration. It defa
     your database platform to know what is actually happening.
     ``isTransactional()`` does not guarantee that statements are wrapped
     in a single transaction. To learn more about this, read the
-    :ref:`dedicated explanation <../explanation/implicit-commits>`.
+    :doc:`dedicated explanation <../explanation/implicit-commits>`.
 
 getDescription
 ~~~~~~~~~~~~~~

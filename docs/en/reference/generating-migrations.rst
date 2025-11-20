@@ -274,7 +274,7 @@ with a schema filter.
         return (bool) preg_match("~^(?!t_)~", $assetName);
     });
 
-With this expression all tables prefixed with t_ will ignored by the schema tool.
+With this expression all tables prefixed with ``t_`` will ignored by the schema tool.
 
 If you use the DoctrineBundle with Symfony you can set the ``schema_filter`` option
 in your configuration. You can find more information in the documentation of the
