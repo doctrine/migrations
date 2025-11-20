@@ -26,6 +26,7 @@ use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Throwable;
 
@@ -43,11 +44,8 @@ final class AliasResolverTest extends TestCase
 
     private MigrationStatusCalculator $statusCalculator;
 
-    /**
-     * @param class-string<Throwable>|null $expectedException
-     *
-     * @dataProvider getAliases
-     */
+    /** @param class-string<Throwable>|null $expectedException */
+    #[DataProvider('getAliases')]
     public function testAliases(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {
@@ -72,11 +70,8 @@ final class AliasResolverTest extends TestCase
         self::assertEquals(new Version($expectedVersion), $resolvedAlias);
     }
 
-    /**
-     * @param class-string<Throwable>|null $expectedException
-     *
-     * @dataProvider getAliasesWithNoExecuted
-     */
+    /** @param class-string<Throwable>|null $expectedException */
+    #[DataProvider('getAliasesWithNoExecuted')]
     public function testAliasesWithNoExecuted(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
         if ($expectedException !== null) {

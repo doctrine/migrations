@@ -14,8 +14,11 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use function addslashes;
 use function class_exists;
+use function filter_var;
 use function sprintf;
 use function str_contains;
+
+use const FILTER_VALIDATE_BOOLEAN;
 
 /**
  * The DumpSchemaCommand class is responsible for dumping your current database schema to a migration class. This is
@@ -47,6 +50,12 @@ EOT)
                 'Format the generated SQL.',
             )
             ->addOption(
+                'nowdoc',
+                null,
+                InputOption::VALUE_NEGATABLE,
+                'Output the generated SQL as a nowdoc string (enabled by default for formatted queries).',
+            )
+            ->addOption(
                 'namespace',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -61,7 +70,7 @@ EOT)
             ->addOption(
                 'line-length',
                 null,
-                InputOption::VALUE_OPTIONAL,
+                InputOption::VALUE_REQUIRED,
                 'Max line length of unformatted lines.',
                 '120',
             );
@@ -72,8 +81,10 @@ EOT)
         InputInterface $input,
         OutputInterface $output,
     ): int {
-        $formatted  = $input->getOption('formatted');
-        $lineLength = (int) $input->getOption('line-length');
+        $formatted    = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
+        $nowdocOutput = $input->getOption('nowdoc');
+        $nowdocOutput = $nowdocOutput === null ? null : filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
+        $lineLength   = (int) $input->getOption('line-length');
 
         $schemaDumper = $this->getDependencyFactory()->getSchemaDumper();
 
@@ -95,6 +106,7 @@ EOT)
             $fqcn,
             $input->getOption('filter-tables'),
             $formatted,
+            $nowdocOutput,
             $lineLength,
         );
 

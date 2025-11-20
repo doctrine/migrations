@@ -15,6 +15,7 @@ use InvalidArgumentException;
 use function array_merge;
 use function count;
 use function implode;
+use function method_exists;
 use function preg_last_error;
 use function preg_last_error_msg;
 use function preg_match;
@@ -56,6 +57,7 @@ class SchemaDumper
         string $fqcn,
         array $excludedTablesRegexes = [],
         bool $formatted = false,
+        bool|null $nowdocOutput = null,
         int $lineLength = 120,
     ): string {
         $schema = $this->schemaManager->introspectSchema();
@@ -73,6 +75,7 @@ class SchemaDumper
             $upCode = $this->migrationSqlGenerator->generate(
                 $upSql,
                 $formatted,
+                $nowdocOutput,
                 $lineLength,
             );
 
@@ -80,11 +83,17 @@ class SchemaDumper
                 $up[] = $upCode;
             }
 
-            $downSql = [$this->platform->getDropTableSQL($table->getQuotedName($this->platform))];
+            if (method_exists($table, 'getObjectName')) {
+                $tableName = $table->getObjectName()->toSQL($this->platform);
+            } else {
+                $tableName = $table->getQuotedName($this->platform);
+            }
 
+            $downSql  = [$this->platform->getDropTableSQL($tableName)];
             $downCode = $this->migrationSqlGenerator->generate(
                 $downSql,
                 $formatted,
+                $nowdocOutput,
                 $lineLength,
             );
 
@@ -130,6 +139,8 @@ class SchemaDumper
      *
      * @param mixed[]                                                 $matches
      * @param int-mask-of<PREG_OFFSET_CAPTURE|PREG_UNMATCHED_AS_NULL> $flags
+     *
+     * @phpstan-ignore parameterByRef.unusedType
      */
     private static function pregMatch(string $pattern, string $subject, array|null &$matches = null, int $flags = 0, int $offset = 0): int
     {

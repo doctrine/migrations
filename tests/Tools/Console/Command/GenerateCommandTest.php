@@ -9,6 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -64,18 +65,18 @@ final class GenerateCommandTest extends TestCase
         ], array_map(trim(...), explode("\n", trim($output))));
     }
 
-    /** @return array<string, array<int, int|string|null>> */
+    /** @return array<string, array{string, string}> */
     public static function getNamespaceSelected(): array
     {
         return [
-            'no' => [null, 'FooNs'],
-            'first' => [0, 'FooNs'],
-            'two' => [1, 'FooNs2'],
+            'no' => ['', 'FooNs'],
+            'first' => ['0', 'FooNs'],
+            'two' => ['1', 'FooNs2'],
         ];
     }
 
-    /** @dataProvider getNamespaceSelected */
-    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    #[DataProvider('getNamespaceSelected')]
+    public function testExecuteWithMultipleDirectories(string $input, string $namespace): void
     {
         $this->configuration->addMigrationsDirectory('FooNs2', sys_get_temp_dir());
 

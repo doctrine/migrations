@@ -38,9 +38,35 @@ parameters:
         -
             message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
             path: src/Tools/Console/ConsoleRunner.php
+        -
+            message: '#^Usage of deprecated trait Symfony\\Component\\VarExporter\\LazyProxyTrait in class Doctrine\\Migrations\\Provider\\LazySchema\:\nsince Symfony 7\.3, use native lazy objects instead$#'
+            path: src/Provider/LazySchema.php
+        -
+            message: '#^Call to deprecated method setPrimaryKey\(\) of class Doctrine\\DBAL\\Schema\\Table\:\nUse \{\@see addPrimaryKeyConstraint\(\)\} instead\.$#'
+            paths:
+                - src/Metadata/Storage/TableMetadataStorage.php
+                - tests/Metadata/Storage/ExistingTableMetadataStorageTest.php
+                - tests/Metadata/Storage/TableMetadataStorageTest.php
+        -
+            message: '#^Call to deprecated method getName\(\) of class Doctrine\\DBAL\\Schema\\Schema\.$#'
+            path: src/Generator/DiffGenerator.php
+        -
+            message: '#^Call to deprecated method getQuotedName\(\) of class Doctrine\\DBAL\\Schema\\AbstractAsset\:\nUse \{@see NamedObject\:\:getObjectName\(\)\} or \{@see OptionallyQualifiedName\:\:getObjectName\(\)\} followed\nby \{@see Name\:\:toSQL\(\)\} instead\.$#'
+            path: src/SchemaDumper.php
+        -
+            message: '#^Call to function method_exists\(\) with Doctrine\\DBAL\\Schema\\Table and ''getObjectName'' will always evaluate to true\.$#'
+            path: src/SchemaDumper.php
+        -
+            message: '~^Parameter #1 \$array \(list<string>\) of array_values is already a list, call has no effect\.$~'
+            path: tests/Generator/DiffGeneratorTest.php
+
+        # Symfony 8 forward compatibility
+        -
+            message: '~^Call to an undefined method Symfony\\Component\\Console\\Application\:\:addCommand\(\)\.$~'
+            path: src/Tools/Console/ConsoleRunner.php
 
     symfony:
-            console_application_loader: tests/doctrine-migrations-phpstan-app.php
+            consoleApplicationLoader: tests/doctrine-migrations-phpstan-app.php
 includes:
     - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - vendor/phpstan/phpstan-phpunit/extension.neon

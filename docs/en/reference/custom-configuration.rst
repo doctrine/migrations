@@ -69,7 +69,7 @@ Once you have your custom integration setup, you can modify it to look like the 
 
     $cli->run();
 
-:ref:`Next Chapter: Migrations Events <events>`
+:doc:`Next Chapter: Migrations Events <events>`
 
 
 It is possible to use multiple entity managers or connections, this is a way to configure your application:

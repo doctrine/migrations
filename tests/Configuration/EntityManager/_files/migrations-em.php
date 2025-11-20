@@ -10,8 +10,13 @@ use Doctrine\Persistence\Mapping\Driver\PHPDriver;
 $conn = DriverManager::getConnection(['driver' => 'pdo_sqlite', 'memory' => true]);
 
 $conf = new Configuration();
-$conf->setProxyDir(__DIR__);
-$conf->setProxyNamespace('Foo');
 $conf->setMetadataDriverImpl(new PHPDriver(''));
+
+if (PHP_VERSION_ID > 80400) {
+    $conf->enableNativeLazyObjects(true);
+} else {
+    $conf->setProxyDir(__DIR__);
+    $conf->setProxyNamespace('Foo');
+}
 
 return new EntityManager($conn, $conf);

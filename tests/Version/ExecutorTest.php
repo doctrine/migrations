@@ -23,6 +23,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
 use Exception;
+use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
@@ -143,7 +144,7 @@ class ExecutorTest extends TestCase
         ], $this->getInterpolatedLogRecords($this->logger));
     }
 
-    /** @test */
+    #[Test]
     public function executeUpShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $this->migration->setDescription('testing');
@@ -267,7 +268,6 @@ class ExecutorTest extends TestCase
         ], $this->getInterpolatedLogRecords($this->logger));
     }
 
-    /** @test */
     public function testSkipMigration(): void
     {
         $this->metadataStorage
@@ -322,7 +322,6 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /** @test */
     public function testMigrationEvents(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())
@@ -355,7 +354,6 @@ class ExecutorTest extends TestCase
         self::assertTrue($listener->onMigrationsVersionExecuting);
     }
 
-    /** @test */
     public function testErrorMigration(): void
     {
         $this->metadataStorage
@@ -488,7 +486,7 @@ class ExecutorTest extends TestCase
         self::assertFalse($migrationSucceed);
     }
 
-    /** @test */
+    #[Test]
     public function executeDownShouldAppendDescriptionWhenItIsNotEmpty(): void
     {
         $migratorConfiguration = (new MigratorConfiguration())

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests\Provider;
 
 class C
 {
+    /** @phpstan-ignore property.unusedType */
     private int|null $id = null;
 
     public function getId(): int|null

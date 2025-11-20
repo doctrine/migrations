@@ -51,24 +51,37 @@ final class SqlGeneratorTest extends TestCase
                     "Migration can only be executed safely on '\\$expectedPlatform'."
                 );
 
-                \$this->addSql(<<<'SQL'
-                    SELECT 1
-                SQL);
-                \$this->addSql(<<<'SQL'
-                    SELECT 2
-                SQL);
+                \$this->addSql('SELECT 1');
+                \$this->addSql('SELECT 2');
                 \$this->addSql(<<<'SQL'
                     %s
                 SQL);
                 CODE,
         );
 
-        $code = $migrationSqlGenerator->generate($this->sql, true, 80);
+        $code = $migrationSqlGenerator->generate($this->sql, true, null, 80);
 
         self::assertSame($expectedCode, $code);
     }
 
-    public function testGenerationWithoutCheckingDatabasePlatform(): void
+    public function testGenerationWithoutFormatting(): void
+    {
+        $this->configuration->setCheckDatabasePlatform(true);
+
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
+                $this->addSql('%s');
+                CODE,
+            formatted: false,
+        );
+
+        $code = $this->migrationSqlGenerator->generate($this->sql, false, null, 80, false);
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithNowDocOutput(): void
     {
         $this->configuration->setCheckDatabasePlatform(true);
 
@@ -84,9 +97,47 @@ final class SqlGeneratorTest extends TestCase
                     %s
                 SQL);
                 CODE,
+            formatted: false,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80, false);
+        $code = $this->migrationSqlGenerator->generate($this->sql, false, true, 80, false);
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithNoNowDocFormatting(): void
+    {
+        $this->configuration->setCheckDatabasePlatform(true);
+
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
+                $this->addSql('%s');
+                CODE,
+            formatted: true,
+            nowdoc: false,
+        );
+
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, false, 80, false);
+
+        self::assertSame($expectedCode, $code);
+    }
+
+    public function testGenerationWithoutCheckingDatabasePlatform(): void
+    {
+        $this->configuration->setCheckDatabasePlatform(true);
+
+        $expectedCode = $this->prepareGeneratedCode(
+            <<<'CODE'
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
+                $this->addSql(<<<'SQL'
+                    %s
+                SQL);
+                CODE,
+        );
+
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, null, 80, false);
 
         self::assertSame($expectedCode, $code);
     }
@@ -97,19 +148,15 @@ final class SqlGeneratorTest extends TestCase
 
         $expectedCode = $this->prepareGeneratedCode(
             <<<'CODE'
-                $this->addSql(<<<'SQL'
-                    SELECT 1
-                SQL);
-                $this->addSql(<<<'SQL'
-                    SELECT 2
-                SQL);
+                $this->addSql('SELECT 1');
+                $this->addSql('SELECT 2');
                 $this->addSql(<<<'SQL'
                     %s
                 SQL);
                 CODE,
         );
 
-        $code = $this->migrationSqlGenerator->generate($this->sql, true, 80);
+        $code = $this->migrationSqlGenerator->generate($this->sql, true, null, 80);
 
         self::assertSame($expectedCode, $code);
     }
@@ -127,7 +174,7 @@ final class SqlGeneratorTest extends TestCase
         );
     }
 
-    private function prepareGeneratedCode(string $expectedCode): string
+    private function prepareGeneratedCode(string $expectedCode, bool $formatted = true, bool $nowdoc = true): string
     {
         $this->sql = [
             'SELECT 1',
@@ -138,15 +185,21 @@ final class SqlGeneratorTest extends TestCase
 
         $this->metadataConfig->setTableName('migrations_table_name');
 
+        if ($formatted) {
+            $formattedSql = (new SqlFormatter(new NullHighlighter()))->format($this->sql[2], '    ');
+            if ($nowdoc) {
+                $formattedSql = implode(
+                    "\n" . str_repeat(' ', 4),
+                    explode("\n", $formattedSql),
+                );
+            }
+
+            return sprintf($expectedCode, $formattedSql);
+        }
+
         return sprintf(
             $expectedCode,
-            implode(
-                "\n" . str_repeat(' ', 4),
-                explode(
-                    "\n",
-                    (new SqlFormatter(new NullHighlighter()))->format($this->sql[2]),
-                ),
-            ),
+            $this->sql[2],
         );
     }
 }

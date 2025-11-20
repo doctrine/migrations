@@ -18,5 +18,5 @@ Doctrine Migrations don't panic. You can get help from different sources:
 Getting Started
 ---------------
 
-The best way to get started is with the :doc:`Introduction <introduction>` section.
+The best way to get started is with the :doc:`Introduction <reference/introduction>` section.
 Use the sidebar to browse other documentation for the Doctrine PHP Migrations project.

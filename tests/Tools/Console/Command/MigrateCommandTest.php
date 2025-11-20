@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\ComparatorConfig;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\AbstractMigration;
@@ -31,11 +32,14 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use Generator;
+use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function class_exists;
 use function getcwd;
 use function in_array;
 use function sprintf;
@@ -77,7 +81,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /** @dataProvider getMigrateWithMigrationsOrWithout */
+    #[DataProvider('getMigrateWithMigrationsOrWithout')]
     public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode): void
     {
         $finder                    = $this->createMock(Finder::class);
@@ -123,7 +127,7 @@ class MigrateCommandTest extends MigrationTestCase
         ];
     }
 
-    /** @dataProvider getTargetAliases */
+    #[DataProvider('getTargetAliases')]
     public function testExecuteAtVersion(string $targetAlias, string $level, string|null $executedMigration): void
     {
         if ($executedMigration !== null) {
@@ -199,7 +203,7 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertSame(3, $this->migrateCommandTester->getStatusCode());
     }
 
-    /** @dataProvider getWriteSqlValues */
+    #[DataProvider('getWriteSqlValues')]
     public function testExecuteWriteSql(bool $dryRun, bool|string|null $arg, string|null $path): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
@@ -338,11 +342,9 @@ class MigrateCommandTest extends MigrationTestCase
         self::assertStringContainsString('[notice] Migrating down to A', trim($this->migrateCommandTester->getDisplay(true)));
     }
 
-    /**
-     * @psalm-param array<string, bool|int|string|null> $input
-     *
-     * @dataProvider allOrNothing
-     */
+    /** @psalm-param array<string, bool|int|string|null> $input */
+    #[DataProvider('allOrNothing')]
+    #[WithoutErrorHandler]
     public function testExecuteMigrateAllOrNothing(bool|null $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
@@ -479,7 +481,13 @@ class MigrateCommandTest extends MigrationTestCase
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
 
-        $diff = $schemaManager->createComparator()->compareTables($originalTable, $modifiedTable);
+        if (class_exists(ComparatorConfig::class)) {
+            $comparator = $schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));
+        } else {
+            $comparator = $schemaManager->createComparator();
+        }
+
+        $diff = $comparator->compareTables($originalTable, $modifiedTable);
         if ($diff->isEmpty()) {
             return;
         }

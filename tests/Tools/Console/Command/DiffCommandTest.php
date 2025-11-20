@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use Symfony\Component\Console\Helper\HelperSet;
@@ -65,12 +66,13 @@ final class DiffCommandTest extends TestCase
 
         $this->migrationDiffGenerator->expects(self::once())
             ->method('generate')
-            ->with('FooNs\\Version1234', 'filter expression', true, 80)
+            ->with('FooNs\\Version1234', 'filter expression', true, false, 80)
             ->willReturn('/path/to/migration.php');
 
         $this->diffCommandTester->execute([
             '--filter-expression' => 'filter expression',
             '--formatted' => true,
+            '--nowdoc' => false,
             '--line-length' => 80,
             '--allow-empty-diff' => true,
             '--check-database-platform' => true,
@@ -142,18 +144,18 @@ final class DiffCommandTest extends TestCase
         self::assertSame(3, $statusCode);
     }
 
-    /** @return array<string, array{int|null, string}> */
+    /** @return array<string, array{string, string}> */
     public static function getSelectedNamespace(): array
     {
         return [
-            'no' => [null, 'FooNs'],
-            'first' => [0, 'FooNs'],
-            'two' => [1, 'FooNs2'],
+            'no' => ['', 'FooNs'],
+            'first' => ['0', 'FooNs'],
+            'two' => ['1', 'FooNs2'],
         ];
     }
 
-    /** @dataProvider getSelectedNamespace */
-    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    #[DataProvider('getSelectedNamespace')]
+    public function testExecuteWithMultipleDirectories(string $input, string $namespace): void
     {
         $this->migrationStatusCalculator
             ->method('getNewMigrations')

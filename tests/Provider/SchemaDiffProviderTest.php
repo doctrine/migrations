@@ -14,7 +14,7 @@ use Doctrine\Migrations\Tests\MigrationTestCase;
  */
 class SchemaDiffProviderTest extends MigrationTestCase
 {
-    private SchemaDiffProvider $provider;
+    protected SchemaDiffProvider $provider;
 
     public function testCreateFromSchema(): void
     {

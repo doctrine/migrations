@@ -81,6 +81,7 @@ class MigratorTest extends MigrationTestCase
         $migrator->migrate($planList, $this->migratorConfiguration);
 
         self::assertCount(1, $this->logger->records, 'should output the no migrations message');
+        self::assertIsString($this->logger->records[0]['message'], 'should be a string');
         self::assertStringContainsString('No migrations', $this->logger->records[0]['message']);
     }
 
