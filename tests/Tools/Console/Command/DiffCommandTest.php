@@ -144,18 +144,18 @@ final class DiffCommandTest extends TestCase
         self::assertSame(3, $statusCode);
     }
 
-    /** @return array<string, array{int|null, string}> */
+    /** @return array<string, array{string, string}> */
     public static function getSelectedNamespace(): array
     {
         return [
-            'no' => [null, 'FooNs'],
-            'first' => [0, 'FooNs'],
-            'two' => [1, 'FooNs2'],
+            'no' => ['', 'FooNs'],
+            'first' => ['0', 'FooNs'],
+            'two' => ['1', 'FooNs2'],
         ];
     }
 
     #[DataProvider('getSelectedNamespace')]
-    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    public function testExecuteWithMultipleDirectories(string $input, string $namespace): void
     {
         $this->migrationStatusCalculator
             ->method('getNewMigrations')

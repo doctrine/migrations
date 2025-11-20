@@ -65,18 +65,18 @@ final class GenerateCommandTest extends TestCase
         ], array_map(trim(...), explode("\n", trim($output))));
     }
 
-    /** @return array<string, array<int, int|string|null>> */
+    /** @return array<string, array{string, string}> */
     public static function getNamespaceSelected(): array
     {
         return [
-            'no' => [null, 'FooNs'],
-            'first' => [0, 'FooNs'],
-            'two' => [1, 'FooNs2'],
+            'no' => ['', 'FooNs'],
+            'first' => ['0', 'FooNs'],
+            'two' => ['1', 'FooNs2'],
         ];
     }
 
     #[DataProvider('getNamespaceSelected')]
-    public function testExecuteWithMultipleDirectories(int|null $input, string $namespace): void
+    public function testExecuteWithMultipleDirectories(string $input, string $namespace): void
     {
         $this->configuration->addMigrationsDirectory('FooNs2', sys_get_temp_dir());
 
