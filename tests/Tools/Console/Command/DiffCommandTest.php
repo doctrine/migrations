@@ -182,6 +182,59 @@ final class DiffCommandTest extends TestCase
         self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
     }
 
+    public function testFormattedInputHasPrecedenceOverConfig(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->configuration->setFormatted(false);
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), true);
+
+        $this->diffCommandTester->execute(['--formatted' => true]);
+    }
+
+    public function testFormattedConfigIsFallback(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->configuration->setFormatted(true);
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), true);
+
+        $this->diffCommandTester->execute([]);
+    }
+
+    public function testFormattedConfigIsFalseByDefault(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), false);
+
+        $this->diffCommandTester->execute([]);
+    }
+
     protected function setUp(): void
     {
         $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);
