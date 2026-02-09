@@ -30,6 +30,7 @@ use InvalidArgumentException;
 use function array_change_key_case;
 use function class_exists;
 use function floatval;
+use function method_exists;
 use function round;
 use function sprintf;
 use function strlen;
@@ -206,8 +207,15 @@ final class TableMetadataStorage implements MetadataStorage
             $comparator = $this->schemaManager->createComparator();
         }
 
-        $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());
-        $diff         = $comparator->compareTables($currentTable, $expectedTable);
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            $currentTable = $this->schemaManager->introspectTableByUnquotedName($this->configuration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());
+        }
+
+        $diff = $comparator->compareTables($currentTable, $expectedTable);
 
         return $diff->isEmpty() ? null : $diff;
     }

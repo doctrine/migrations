@@ -16,7 +16,6 @@ use InvalidArgumentException;
 use function array_merge;
 use function count;
 use function implode;
-use function method_exists;
 use function preg_last_error;
 use function preg_last_error_msg;
 use function preg_match;
@@ -88,7 +87,7 @@ class SchemaDumper
             if ($table instanceof NamedObject) {
                 $tableName = $table->getObjectName()->toSQL($this->platform);
             } else {
-                $tableName = $table->getQuotedName($this->platform);
+                $tableName = $table->getName();
             }
 
             $downSql  = [$this->platform->getDropTableSQL($tableName)];
@@ -124,7 +123,15 @@ class SchemaDumper
     private function shouldSkipTable(Table $table, array $excludedTablesRegexes): bool
     {
         foreach (array_merge($excludedTablesRegexes, $this->excludedTablesRegexes) as $regex) {
-            if (self::pregMatch($regex, $table->getName()) !== 0) {
+            if (
+                self::pregMatch(
+                    $regex,
+                    /** @phpstan-ignore instanceof.alwaysTrue */
+                    $table instanceof NamedObject ?
+                    $table->getObjectName()->toString() :
+                    $table->getName(),
+                ) !== 0
+            ) {
                 return true;
             }
         }

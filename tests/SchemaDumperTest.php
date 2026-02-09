@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Name\UnquotedIdentifierFolding;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Generator\Generator;
@@ -15,6 +16,8 @@ use InvalidArgumentException;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 use RuntimeException;
+
+use function method_exists;
 
 class SchemaDumperTest extends TestCase
 {
@@ -52,10 +55,7 @@ class SchemaDumperTest extends TestCase
 
     public function testDump(): void
     {
-        $table = $this->createMock(Table::class);
-        $table->expects(self::once())
-            ->method('getName')
-            ->willReturn('test');
+        $table = new Table('test');
 
         $schema = $this->createMock(Schema::class);
 
@@ -70,6 +70,12 @@ class SchemaDumperTest extends TestCase
         $this->platform->expects(self::once())
             ->method('getCreateTableSQL')
             ->willReturn(['CREATE TABLE test']);
+
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(AbstractPlatform::class, 'getUnquotedIdentifierFolding')) {
+            $this->platform->method('getUnquotedIdentifierFolding')
+                ->willReturn(UnquotedIdentifierFolding::NONE);
+        }
 
         $this->platform->expects(self::once())
             ->method('getDropTableSQL')
@@ -96,10 +102,7 @@ class SchemaDumperTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
 
-        $table = $this->createMock(Table::class);
-        $table->expects(self::atLeastOnce())
-            ->method('getName')
-            ->willReturn('skipped_table_name');
+        $table = new Table('skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
 
@@ -131,10 +134,7 @@ class SchemaDumperTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessageMatches('/Internal PCRE error/');
 
-        $table = $this->createMock(Table::class);
-        $table->expects(self::atLeastOnce())
-            ->method('getName')
-            ->willReturn('other_skipped_table_name');
+        $table = new Table('other_skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
 
@@ -154,10 +154,7 @@ class SchemaDumperTest extends TestCase
         $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Your database schema does not contain any tables.');
 
-        $table = $this->createMock(Table::class);
-        $table->expects(self::atLeastOnce())
-            ->method('getName')
-            ->willReturn('other_skipped_table_name');
+        $table = new Table('other_skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
 

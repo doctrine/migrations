@@ -27,6 +27,7 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
         $originalSchemaManipulator = $this->originalSchemaManipulator;
 
         if (PHP_VERSION_ID < 80400) {
+            /** @phpstan-ignore staticMethod.notFound */
             return LazySchema::createLazyProxy(static fn () => $originalSchemaManipulator->createFromSchema());
         }
 
@@ -41,7 +42,9 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
     {
         $originalSchemaManipulator = $this->originalSchemaManipulator;
 
+        /** @phpstan-ignore method.notFound */
         if ($fromSchema instanceof LazySchema && ! $fromSchema->isLazyObjectInitialized()) {
+            /** @phpstan-ignore staticMethod.notFound */
             return LazySchema::createLazyProxy(static fn () => $originalSchemaManipulator->createToSchema($fromSchema));
         }
 
@@ -70,6 +73,7 @@ class LazySchemaDiffProvider implements SchemaDiffProvider
     {
         if (
             $toSchema instanceof LazySchema
+            /** @phpstan-ignore method.notFound */
             && ! $toSchema->isLazyObjectInitialized()
         ) {
             return [];
