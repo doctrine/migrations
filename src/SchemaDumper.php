@@ -6,6 +6,7 @@ namespace Doctrine\Migrations;
 
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\Migrations\Exception\NoTablesFound;
 use Doctrine\Migrations\Generator\Generator;
@@ -83,7 +84,8 @@ class SchemaDumper
                 $up[] = $upCode;
             }
 
-            if (method_exists($table, 'getObjectName')) {
+            /** @phpstan-ignore instanceof.alwaysTrue */
+            if ($table instanceof NamedObject) {
                 $tableName = $table->getObjectName()->toSQL($this->platform);
             } else {
                 $tableName = $table->getQuotedName($this->platform);
