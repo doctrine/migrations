@@ -53,12 +53,10 @@ final class MigrationPlanCalculatorTest extends TestCase
 
         $migrationList = new AvailableMigrationsSet($m);
         $this->migrationRepository
-            ->expects(self::any())
             ->method('hasMigration')
             ->willReturnCallback(static fn ($version): bool => isset($m[$version]));
 
         $this->migrationRepository
-            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn($migrationList);
     }

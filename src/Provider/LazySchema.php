@@ -7,7 +7,11 @@ namespace Doctrine\Migrations\Provider;
 use Doctrine\DBAL\Schema\Schema;
 use Symfony\Component\VarExporter\LazyProxyTrait;
 
-/** @internal */
+/**
+ * @internal
+ *
+ * @phpstan-ignore class.extendsFinalByPhpDoc
+ */
 class LazySchema extends Schema
 {
     use LazyProxyTrait;

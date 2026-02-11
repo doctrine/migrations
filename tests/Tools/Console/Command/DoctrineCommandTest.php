@@ -379,7 +379,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
 
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs([1]);
+        $commandTester->setInputs(['1']);
         $commandTester->execute([]);
     }
 }

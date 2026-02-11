@@ -201,7 +201,7 @@ final class DiffCommandTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 

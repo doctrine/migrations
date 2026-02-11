@@ -9,6 +9,8 @@ use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ComparatorConfig;
+use Doctrine\DBAL\Schema\NamedObject;
+use Doctrine\DBAL\Schema\OptionallyNamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
@@ -50,7 +52,14 @@ class DiffGenerator
         if ($filterExpression !== null) {
             $this->dbalConfiguration->setSchemaAssetsFilter(
                 static function ($assetName) use ($filterExpression) {
-                    if ($assetName instanceof AbstractAsset) {
+                    if ($assetName instanceof NamedObject || $assetName instanceof OptionallyNamedObject) {
+                        if ($assetName->getObjectName() === null) {
+                            return false;
+                        }
+
+                        $assetName = $assetName->getObjectName()->toString();
+                    } elseif ($assetName instanceof AbstractAsset) {
+                        /** @phpstan-ignore method.deprecated */
                         $assetName = $assetName->getName();
                     }
 
@@ -71,8 +80,10 @@ class DiffGenerator
             ! method_exists($this->schemaManager, 'getSchemaSearchPaths')
             && $this->platform->supportsSchemas()
         ) {
+            /** @phpstan-ignore method.deprecated */
             $defaultNamespace = $toSchema->getName();
             if ($defaultNamespace !== '') {
+                /* @phpstan-ignore method.deprecated */
                 $toSchema->createNamespace($defaultNamespace);
             }
         }
@@ -132,7 +143,12 @@ class DiffGenerator
 
         if ($schemaAssetsFilter !== null) {
             foreach ($toSchema->getTables() as $table) {
-                $tableName = $table->getName();
+                /** @phpstan-ignore instanceof.alwaysTrue */
+                if ($table instanceof NamedObject) {
+                    $tableName = $table->getObjectName()->toString();
+                } else {
+                    $tableName = $table->getName();
+                }
 
                 if ($schemaAssetsFilter($tableName)) {
                     continue;

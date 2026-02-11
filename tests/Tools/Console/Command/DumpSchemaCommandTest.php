@@ -72,7 +72,7 @@ final class DumpSchemaCommandTest extends TestCase
             ->with('FooNs')
             ->willReturn('FooNs\\Version1234');
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getClassNameGenerator')
             ->willReturn($classNameGenerator);
 
@@ -146,15 +146,15 @@ final class DumpSchemaCommandTest extends TestCase
         $this->migrationRepository = $this->createMock(FilesystemMigrationsRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getSchemaDumper')
             ->willReturn($this->schemaDumper);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getMigrationRepository')
             ->willReturn($this->migrationRepository);
 

@@ -41,7 +41,7 @@ class ConcatenationFileBuilderTest extends TestCase
 
         $now = new DateTime('2018-09-01');
 
-        $this->platform->expects(self::any())
+        $this->platform
             ->method('getCurrentTimestampSQL')
             ->willReturn('CURRENT_TIMESTAMP');
 
