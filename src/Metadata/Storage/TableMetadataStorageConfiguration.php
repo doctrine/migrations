@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Metadata\Storage;
 
 final class TableMetadataStorageConfiguration implements MetadataStorageConfiguration
 {
+    /** @var non-empty-string */
     private string $tableName = 'doctrine_migration_versions';
 
     /** @var non-empty-string */
@@ -17,11 +18,13 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
 
     private string $executionTimeColumnName = 'execution_time';
 
+    /** @return non-empty-string */
     public function getTableName(): string
     {
         return $this->tableName;
     }
 
+    /** @param non-empty-string $tableName */
     public function setTableName(string $tableName): void
     {
         $this->tableName = $tableName;

@@ -101,7 +101,7 @@ final class GenerateCommandTest extends TestCase
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 

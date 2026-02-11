@@ -43,6 +43,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use function class_exists;
 use function getcwd;
 use function in_array;
+use function method_exists;
 use function sprintf;
 use function trim;
 
@@ -292,8 +293,16 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([], ['interactive' => false]);
 
-        $refreshedTable = $this->connection->createSchemaManager()
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        $schemaManager = $this->connection->createSchemaManager();
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $refreshedTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $refreshedTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
         self::assertFalse($refreshedTable->hasColumn('extra'));
     }
@@ -306,8 +315,16 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([]);
 
-        $refreshedTable = $this->connection->createSchemaManager()
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        $schemaManager = $this->connection->createSchemaManager();
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $refreshedTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $refreshedTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
         self::assertTrue($refreshedTable->hasColumn('extra'));
     }
@@ -500,8 +517,15 @@ class MigrateCommandTest extends MigrationTestCase
     private function alterMetadataTable(): void
     {
         $schemaManager = $this->connection->createSchemaManager();
-        $originalTable = $schemaManager
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $originalTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $originalTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
         $modifiedTable = clone $originalTable;
         $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);

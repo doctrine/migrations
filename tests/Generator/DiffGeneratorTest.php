@@ -8,6 +8,7 @@ use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Table;
@@ -50,20 +51,9 @@ class DiffGeneratorTest extends TestCase
                 static fn ($name): bool => $name === 'schema.table_name1',
             );
 
-        $table1 = $this->createMock(Table::class);
-        $table1->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name1');
-
-        $table2 = $this->createMock(Table::class);
-        $table2->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name2');
-
-        $table3 = $this->createMock(Table::class);
-        $table3->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name3');
+        $table1 = new Table('schema.table_name1');
+        $table2 = new Table('schema.table_name2');
+        $table3 = new Table('schema.table_name3');
 
         $toSchema->expects(self::once())
             ->method('getTables')
@@ -223,7 +213,13 @@ class DiffGeneratorTest extends TestCase
 
         $this->migrationDiffGenerator->generate('Version1234', null);
 
-        $filteredTableNames = array_map(static fn (Table $table) => $table->getName(), $toSchema->getTables());
+        $filteredTableNames = array_map(
+            /** @phpstan-ignore instanceof.alwaysTrue */
+            static fn (Table $table) => $table instanceof NamedObject ?
+            $table->getObjectName()->toString() :
+            $table->getName(),
+            $toSchema->getTables(),
+        );
 
         self::assertSame(['some_schema.table1', 'some_schema.table2'], array_values($filteredTableNames));
     }

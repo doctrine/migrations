@@ -86,7 +86,6 @@ class RollupTest extends TestCase
     public function testRollupNoMigrations(): void
     {
         $this->repository
-            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([]));
 

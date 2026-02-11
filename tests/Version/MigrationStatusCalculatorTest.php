@@ -48,7 +48,6 @@ final class MigrationStatusCalculatorTest extends TestCase
         $e1 = new ExecutedMigration(new Version('A'));
 
         $this->migrationPlanCalculator
-            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$m1, $m2, $m3]));
 
@@ -71,7 +70,6 @@ final class MigrationStatusCalculatorTest extends TestCase
         $e3 = new ExecutedMigration(new Version('C'));
 
         $this->migrationPlanCalculator
-            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsList([$a1]));
 

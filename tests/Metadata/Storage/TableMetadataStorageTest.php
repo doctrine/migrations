@@ -35,6 +35,7 @@ use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 
 use function class_exists;
+use function method_exists;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -142,7 +143,13 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->introspectTable($config->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            $table = $this->schemaManager->introspectTableByUnquotedName($config->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $table = $this->schemaManager->introspectTable($config->getTableName());
+        }
 
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
@@ -193,7 +200,13 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->introspectTable($config->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            $table = $this->schemaManager->introspectTableByUnquotedName($config->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $table = $this->schemaManager->introspectTable($config->getTableName());
+        }
 
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());

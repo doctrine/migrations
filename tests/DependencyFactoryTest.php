@@ -41,7 +41,6 @@ final class DependencyFactoryTest extends MigrationTestCase
         $this->connection    = $this->createMock(Connection::class);
         $this->entityManager = $this->createMock(EntityManager::class);
         $this->entityManager
-            ->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection);
 

@@ -69,7 +69,7 @@ class InlineParameterFormatterTest extends TestCase
     {
         $connection = $this->createMock(Connection::class);
 
-        $connection->expects(self::any())
+        $connection
             ->method('getDatabasePlatform')
             ->willReturn(self::createStub(AbstractPlatform::class));
 
