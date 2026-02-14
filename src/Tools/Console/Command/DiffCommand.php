@@ -60,7 +60,7 @@ EOT)
             ->addOption(
                 'formatted',
                 null,
-                InputOption::VALUE_NONE,
+                InputOption::VALUE_NEGATABLE,
                 'Format the generated SQL.',
             )
             ->addOption(
@@ -107,7 +107,7 @@ EOT)
             $filterExpression = null;
         }
 
-        $formatted       = filter_var($input->getOption('formatted'), FILTER_VALIDATE_BOOLEAN);
+        $formatted       = filter_var($input->getOption('formatted') ?? $this->getDependencyFactory()->getConfiguration()->isFormatted(), FILTER_VALIDATE_BOOLEAN);
         $nowdocOutput    = $input->getOption('nowdoc');
         $nowdocOutput    = $nowdocOutput === null ? null : filter_var($input->getOption('nowdoc'), FILTER_VALIDATE_BOOLEAN);
         $lineLength      = (int) $input->getOption('line-length');

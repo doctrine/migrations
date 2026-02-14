@@ -107,4 +107,11 @@ class ConfigurationTest extends TestCase
 
         self::assertFalse($config->isAllOrNothing());
     }
+
+    public function testFormattedConfigDefaultOption(): void
+    {
+        $config = new Configuration();
+
+        self::assertFalse($config->isFormatted());
+    }
 }
