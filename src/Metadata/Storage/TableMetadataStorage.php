@@ -209,7 +209,14 @@ final class TableMetadataStorage implements MetadataStorage
 
         /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
-            $currentTable = $this->schemaManager->introspectTableByUnquotedName($this->configuration->getTableName());
+            $fullName = $this->configuration->getTableName();
+
+            if (str_contains($fullName, '.')) {
+                [$schemaName, $tableName] = explode('.', $fullName, 2);
+                $currentTable = $this->schemaManager->introspectTableByUnquotedName($tableName, $schemaName);
+            } else {
+                $currentTable = $this->schemaManager->introspectTableByUnquotedName($fullName);
+            }
         } else {
             /** @phpstan-ignore method.deprecated */
             $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());

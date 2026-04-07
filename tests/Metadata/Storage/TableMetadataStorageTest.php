@@ -156,6 +156,46 @@ class TableMetadataStorageTest extends TestCase
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
     }
 
+    public function testTableStructureWithSchemaQualifiedName(): void
+    {
+        if (! method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            self::markTestSkipped('DBAL does not support introspectTableByUnquotedName.');
+        }
+
+        $config = new TableMetadataStorageConfiguration();
+        $config->setTableName('main.a');
+        $config->setVersionColumnName('b');
+        $config->setVersionColumnLength(199);
+        $config->setExecutedAtColumnName('c');
+        $config->setExecutionTimeColumnName('d');
+
+        $table = new Table($config->getTableName());
+        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$config->getVersionColumnName()]);
+        }
+
+        $this->schemaManager->createTable($table);
+
+        $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
+
+        $storage->ensureInitialized();
+
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        $table = $this->schemaManager->introspectTableByUnquotedName('a', 'main');
+
+        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+    }
+
     public function testTableNotUpToDateTriggersExcepton(): void
     {
         $this->expectException(MetadataStorageError::class);
