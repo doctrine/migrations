@@ -18,6 +18,9 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
 
     private string $executionTimeColumnName = 'execution_time';
 
+    /** @var non-empty-string|null */
+    private string|null $schemaName = null;
+
     /** @return non-empty-string */
     public function getTableName(): string
     {
@@ -28,6 +31,18 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
     public function setTableName(string $tableName): void
     {
         $this->tableName = $tableName;
+    }
+
+    /** @return non-empty-string|null */
+    public function getSchemaName(): string|null
+    {
+        return $this->schemaName;
+    }
+
+    /** @param non-empty-string|null $schemaName */
+    public function setSchemaName(string|null $schemaName): void
+    {
+        $this->schemaName = $schemaName;
     }
 
     /** @return non-empty-string */
