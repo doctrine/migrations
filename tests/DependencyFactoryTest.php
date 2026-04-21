@@ -22,24 +22,24 @@ use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\Stub\CustomClassNameMigrationFactory;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManager;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
 final class DependencyFactoryTest extends MigrationTestCase
 {
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection;
 
     private Configuration $configuration;
 
-    /** @var EntityManager&MockObject */
+    /** @var EntityManager&Stub */
     private EntityManager $entityManager;
 
     public function setUp(): void
     {
-        $this->connection    = $this->createMock(Connection::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->connection    = self::createStub(Connection::class);
+        $this->entityManager = self::createStub(EntityManager::class);
         $this->entityManager
             ->method('getConnection')
             ->willReturn($this->connection);

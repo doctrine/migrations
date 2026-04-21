@@ -8,16 +8,16 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Version\DbalMigrationFactory;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LoggerInterface;
 use ReflectionProperty;
 
 final class DbalFactoryTest extends TestCase
 {
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection;
-    /** @var LoggerInterface&MockObject */
+    /** @var LoggerInterface&Stub */
     private LoggerInterface $logger;
 
     private DbalMigrationFactory $versionFactory;
@@ -37,8 +37,8 @@ final class DbalFactoryTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
-        $this->logger     = $this->createMock(LoggerInterface::class);
+        $this->connection = self::createStub(Connection::class);
+        $this->logger     = self::createStub(LoggerInterface::class);
 
         $this->versionFactory = new DbalMigrationFactory(
             $this->connection,

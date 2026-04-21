@@ -85,7 +85,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
     public function testDependencyFactoryIsSetFirst(): void
     {
-        $dependencyFactory = $this->createMock(DependencyFactory::class);
+        $dependencyFactory = self::createStub(DependencyFactory::class);
         $command           = new class ($dependencyFactory) extends DoctrineCommand
         {
             protected function configure(): void
@@ -102,8 +102,8 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $em1      = $this->createMock(EntityManager::class);
-        $em2      = $this->createMock(EntityManager::class);
+        $em1      = self::createStub(EntityManager::class);
+        $em2      = self::createStub(EntityManager::class);
         $registry = new DoctrineRegistry([], ['foo' => $em1, 'bar' => $em2]);
 
         $dependencyFactory = DependencyFactory::fromEntityManager(
@@ -143,8 +143,8 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn1    = $this->createMock(Connection::class);
-        $conn2    = $this->createMock(Connection::class);
+        $conn1    = self::createStub(Connection::class);
+        $conn2    = self::createStub(Connection::class);
         $registry = new DoctrineRegistry(['foo' => $conn1, 'bar' => $conn2]);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -186,7 +186,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -216,7 +216,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -259,7 +259,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -304,7 +304,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(

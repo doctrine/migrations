@@ -457,7 +457,7 @@ class TableMetadataStorageTest extends TestCase
     {
         $availableMigration     = new AvailableMigration(
             new Version('Foo\\Version1234'),
-            $this->createMock(AbstractMigration::class),
+            self::createStub(AbstractMigration::class),
         );
         $executedMigrationV3    = new ExecutedMigration(new Version('Foo\\Version1234'));
         $executedMigrationOlder = new ExecutedMigration(new Version('Version1234'));

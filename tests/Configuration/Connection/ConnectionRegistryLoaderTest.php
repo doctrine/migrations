@@ -9,23 +9,23 @@ use Doctrine\Migrations\Configuration\Connection\ConnectionRegistryConnection;
 use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\Persistence\AbstractManagerRegistry;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class ConnectionRegistryLoaderTest extends TestCase
 {
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection1;
 
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection2;
 
     private AbstractManagerRegistry $registry;
 
     public function setUp(): void
     {
-        $this->connection1 = $this->createMock(Connection::class);
-        $this->connection2 = $this->createMock(Connection::class);
+        $this->connection1 = self::createStub(Connection::class);
+        $this->connection2 = self::createStub(Connection::class);
         $this->registry    = new DoctrineRegistry(['foo' => $this->connection1, 'bar' => $this->connection2], []);
     }
 

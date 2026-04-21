@@ -10,12 +10,12 @@ use Doctrine\Migrations\Generator\ConcatenationFileBuilder;
 use Doctrine\Migrations\Generator\FileBuilder;
 use Doctrine\Migrations\Query\Query;
 use Doctrine\Migrations\Version\Direction;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class ConcatenationFileBuilderTest extends TestCase
 {
-    /** @var AbstractPlatform&MockObject */
+    /** @var AbstractPlatform&Stub */
     private AbstractPlatform $platform;
 
     private FileBuilder $migrationFileBuilder;
@@ -69,7 +69,7 @@ FILE;
 
     protected function setUp(): void
     {
-        $this->platform = $this->createMock(AbstractPlatform::class);
+        $this->platform = self::createStub(AbstractPlatform::class);
 
         $this->migrationFileBuilder = new ConcatenationFileBuilder();
     }

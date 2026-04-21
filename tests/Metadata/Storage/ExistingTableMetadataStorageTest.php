@@ -52,8 +52,8 @@ class ExistingTableMetadataStorageTest extends TestCase
         $this->connection    = $this->getSqliteConnection();
         $this->schemaManager = $this->connection->createSchemaManager();
 
-        $migration                 = $this->createMock(AbstractMigration::class);
-        $versionFactory            = $this->createMock(MigrationFactory::class);
+        $migration                 = self::createStub(AbstractMigration::class);
+        $versionFactory            = self::createStub(MigrationFactory::class);
         $this->migrationRepository = new FilesystemMigrationsRepository(
             [],
             [],

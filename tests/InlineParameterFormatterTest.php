@@ -67,7 +67,7 @@ class InlineParameterFormatterTest extends TestCase
 
     protected function setUp(): void
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createStub(Connection::class);
 
         $connection
             ->method('getDatabasePlatform')

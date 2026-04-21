@@ -20,6 +20,7 @@ use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 use function count;
@@ -29,19 +30,19 @@ final class MigrationPlanCalculatorTest extends TestCase
 {
     private MigrationPlanCalculator $migrationPlanCalculator;
 
-    /** @var MigrationsRepository&MockObject */
+    /** @var MigrationsRepository&Stub */
     private MigrationsRepository $migrationRepository;
 
     /** @var MetadataStorage&MockObject */
     private MetadataStorage $metadataStorage;
 
-    /** @var AbstractMigration&MockObject */
+    /** @var AbstractMigration&Stub */
     private AbstractMigration $abstractMigration;
 
     protected function setUp(): void
     {
-        $this->abstractMigration       = $this->createMock(AbstractMigration::class);
-        $this->migrationRepository     = $this->createMock(MigrationsRepository::class);
+        $this->abstractMigration       = self::createStub(AbstractMigration::class);
+        $this->migrationRepository     = self::createStub(MigrationsRepository::class);
         $this->metadataStorage         = $this->createMock(MetadataStorage::class);
         $this->migrationPlanCalculator = new SortedMigrationPlanCalculator($this->migrationRepository, $this->metadataStorage, new AlphabeticalComparator());
 

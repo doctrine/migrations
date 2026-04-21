@@ -80,7 +80,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
 
     public function testLoadMigrationInstance(): void
     {
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
 
         $migrations = $this->migrationRepository->getMigrations();
 
@@ -94,8 +94,8 @@ class FilesystemMigrationsRepositoryTest extends TestCase
     public function testDuplicateLoadMigrationInstance(): void
     {
         $this->expectException(DuplicateMigrationVersion::class);
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
     }
 
     public function testFindMigrations(): void

@@ -25,6 +25,7 @@ use Doctrine\Migrations\Version\Version;
 use Exception;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\Test\TestLogger;
 use Symfony\Component\Stopwatch\Stopwatch;
@@ -39,13 +40,13 @@ class ExecutorTest extends TestCase
     /** @var Connection&MockObject */
     private Connection $connection;
 
-    /** @var SchemaDiffProvider&MockObject */
+    /** @var SchemaDiffProvider&Stub */
     private SchemaDiffProvider $schemaDiffProvider;
 
-    /** @var ParameterFormatter&MockObject */
+    /** @var ParameterFormatter&Stub */
     private ParameterFormatter $parameterFormatter;
 
-    /** @var Stopwatch&MockObject */
+    /** @var Stopwatch&Stub */
     private Stopwatch $stopwatch;
 
     private DbalExecutor $versionExecutor;
@@ -508,13 +509,13 @@ class ExecutorTest extends TestCase
         $this->metadataStorage = $this->createMock(FutureMetadataStorage::class);
 
         $this->connection         = $this->createMock(Connection::class);
-        $this->schemaDiffProvider = $this->createMock(SchemaDiffProvider::class);
-        $this->parameterFormatter = $this->createMock(ParameterFormatter::class);
+        $this->schemaDiffProvider = self::createStub(SchemaDiffProvider::class);
+        $this->parameterFormatter = self::createStub(ParameterFormatter::class);
 
         $this->eventManager    = new EventManager();
         $this->eventDispatcher = new EventDispatcher($this->connection, $this->eventManager);
 
-        $this->stopwatch = $this->createMock(Stopwatch::class);
+        $this->stopwatch = self::createStub(Stopwatch::class);
         $this->logger    = new TestLogger();
 
         $this->versionExecutor = new DbalExecutor(

@@ -17,7 +17,7 @@ final class EntityManagerTest extends TestCase
 {
     public function testExistingEntityManagerLoader(): void
     {
-        $em     = $this->createMock(EntityManager::class);
+        $em     = self::createStub(EntityManager::class);
         $loader = new ExistingEntityManager($em);
 
         self::assertSame($em, $loader->getEntityManager());
@@ -28,7 +28,7 @@ final class EntityManagerTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only one entity manager is supported by Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager');
 
-        $em     = $this->createMock(EntityManager::class);
+        $em     = self::createStub(EntityManager::class);
         $loader = new ExistingEntityManager($em);
 
         self::assertSame($em, $loader->getEntityManager('foo'));

@@ -52,7 +52,7 @@ final class AliasResolverTest extends TestCase
             $this->expectException($expectedException);
         }
 
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
@@ -78,7 +78,7 @@ final class AliasResolverTest extends TestCase
             $this->expectException($expectedException);
         }
 
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
@@ -132,7 +132,7 @@ final class AliasResolverTest extends TestCase
 
         $conn = $this->getSqliteConnection();
 
-        $versionFactory = $this->createMock(MigrationFactory::class);
+        $versionFactory = self::createStub(MigrationFactory::class);
 
         $this->migrationRepository = new FilesystemMigrationsRepository(
             [],
