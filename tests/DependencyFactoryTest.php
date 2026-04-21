@@ -22,10 +22,12 @@ use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\Stub\CustomClassNameMigrationFactory;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DependencyFactoryTest extends MigrationTestCase
 {
     /** @var Connection&Stub */

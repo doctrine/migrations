@@ -18,6 +18,7 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\SortedMigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -26,6 +27,7 @@ use PHPUnit\Framework\TestCase;
 use function count;
 use function strcmp;
 
+#[AllowMockObjectsWithoutExpectations]
 final class MigrationPlanCalculatorTest extends TestCase
 {
     private MigrationPlanCalculator $migrationPlanCalculator;

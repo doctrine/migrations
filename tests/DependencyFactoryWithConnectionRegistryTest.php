@@ -11,8 +11,10 @@ use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\Persistence\AbstractManagerRegistry;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DependencyFactoryWithConnectionRegistryTest extends MigrationTestCase
 {
     /** @var Connection&MockObject */

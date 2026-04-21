@@ -17,9 +17,11 @@ use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\B\C;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class FilesystemMigrationsRepositoryTest extends TestCase
 {
     /** @var MigrationFactory&MockObject */

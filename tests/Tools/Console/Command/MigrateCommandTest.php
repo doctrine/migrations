@@ -33,6 +33,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use Generator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ use function method_exists;
 use function sprintf;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 class MigrateCommandTest extends MigrationTestCase
 {
     use VerifyDeprecations;

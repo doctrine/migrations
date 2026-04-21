@@ -16,6 +16,7 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
@@ -24,6 +25,7 @@ use function array_map;
 use function array_values;
 use function preg_match;
 
+#[AllowMockObjectsWithoutExpectations]
 class DiffGeneratorTest extends TestCase
 {
     private DBALConfiguration&MockObject $dbalConfiguration;

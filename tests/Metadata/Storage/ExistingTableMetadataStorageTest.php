@@ -22,11 +22,13 @@ use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Version\AlphabeticalComparator;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 use function class_exists;
 use function sprintf;
 
+#[AllowMockObjectsWithoutExpectations]
 class ExistingTableMetadataStorageTest extends TestCase
 {
     private Connection $connection;

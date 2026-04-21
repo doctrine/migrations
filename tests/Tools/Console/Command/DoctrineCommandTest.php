@@ -16,6 +16,7 @@ use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use function sys_get_temp_dir;
 
+#[AllowMockObjectsWithoutExpectations]
 class DoctrineCommandTest extends MigrationTestCase
 {
     public function testCommandFreezes(): void

@@ -15,6 +15,7 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DumpSchemaCommandTest extends TestCase
 {
     private Configuration $configuration;

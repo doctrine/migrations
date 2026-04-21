@@ -23,6 +23,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\State;
 use Doctrine\Migrations\Version\Version;
 use Exception;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\Test;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -33,6 +34,7 @@ use Symfony\Component\Stopwatch\StopwatchEvent;
 use Symfony\Component\Stopwatch\StopwatchPeriod;
 use Throwable;
 
+#[AllowMockObjectsWithoutExpectations]
 class ExecutorTest extends TestCase
 {
     use LogUtil;
