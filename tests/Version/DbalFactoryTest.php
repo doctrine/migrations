@@ -32,7 +32,6 @@ final class DbalFactoryTest extends TestCase
         self::assertSame($this->connection, $migration->getConnection());
 
         $ref = new ReflectionProperty(AbstractMigration::class, 'logger');
-        $ref->setAccessible(true);
         self::assertSame($this->logger, $ref->getValue($migration));
     }
 

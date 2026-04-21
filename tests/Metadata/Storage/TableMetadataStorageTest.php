@@ -464,7 +464,6 @@ class TableMetadataStorageTest extends TestCase
 
         $reflection = new ReflectionClass(TableMetadataStorage::class);
         $method     = $reflection->getMethod('isAlreadyV3Format');
-        $method->setAccessible(true);
 
         self::assertTrue($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationV3]));
         self::assertFalse($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationOlder]));
