@@ -25,7 +25,7 @@ class MigrationPlanListTest extends TestCase
 
     public function setUp(): void
     {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->abstractMigration = self::createStub(AbstractMigration::class);
         $this->m1                = new MigrationPlan(new Version('A'), $this->abstractMigration, Direction::UP);
         $this->m2                = new MigrationPlan(new Version('B'), $this->abstractMigration, Direction::UP);
         $this->m3                = new MigrationPlan(new Version('C'), $this->abstractMigration, Direction::UP);

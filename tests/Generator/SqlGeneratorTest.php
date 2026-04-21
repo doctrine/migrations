@@ -164,7 +164,7 @@ final class SqlGeneratorTest extends TestCase
     protected function setUp(): void
     {
         $this->configuration = new Configuration();
-        $platform            = $this->createMock(AbstractPlatform::class);
+        $platform            = self::createStub(AbstractPlatform::class);
 
         $this->metadataConfig = new TableMetadataStorageConfiguration();
         $this->configuration->setMetadataStorageConfiguration($this->metadataConfig);

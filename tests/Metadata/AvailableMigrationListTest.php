@@ -20,7 +20,7 @@ class AvailableMigrationListTest extends TestCase
 
     public function setUp(): void
     {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->abstractMigration = self::createStub(AbstractMigration::class);
     }
 
     public function testFirstWhenEmpty(): void

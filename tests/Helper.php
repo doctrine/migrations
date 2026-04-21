@@ -21,7 +21,6 @@ class Helper
     public static function registerMigrationInstance(MigrationsRepository $repository, Version $version, AbstractMigration $migration): void
     {
         $reflection = new ReflectionMethod(FilesystemMigrationsRepository::class, 'registerMigrationInstance');
-        $reflection->setAccessible(true);
         $reflection->invoke($repository, $version, $migration);
     }
 
