@@ -71,7 +71,6 @@ final class DumpSchemaCommandTest extends TestCase
         $classNameGenerator = self::createStub(ClassNameGenerator::class);
         $classNameGenerator
             ->method('generateClassName')
-            ->with('FooNs')
             ->willReturn('FooNs\\Version1234');
 
         $this->dependencyFactory
