@@ -79,7 +79,7 @@ final class TableMetadataStorage implements MetadataStorage
         }
 
         $this->checkInitialization();
-        $rows = $this->connection->fetchAllAssociative(sprintf('SELECT * FROM %s', $this->configuration->getTableName()));
+        $rows = $this->connection->fetchAllAssociative(sprintf('SELECT * FROM %s', $this->getQualifiedTableName()));
 
         $migrations = [];
         foreach ($rows as $row) {
@@ -117,7 +117,7 @@ final class TableMetadataStorage implements MetadataStorage
         $this->connection->executeStatement(
             sprintf(
                 'DELETE FROM %s WHERE 1 = 1',
-                $this->configuration->getTableName(),
+                $this->getQualifiedTableName(),
             ),
         );
     }
@@ -127,11 +127,11 @@ final class TableMetadataStorage implements MetadataStorage
         $this->checkInitialization();
 
         if ($result->getDirection() === Direction::DOWN) {
-            $this->connection->delete($this->configuration->getTableName(), [
+            $this->connection->delete($this->getQualifiedTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
             ]);
         } else {
-            $this->connection->insert($this->configuration->getTableName(), [
+            $this->connection->insert($this->getQualifiedTableName(), [
                 $this->configuration->getVersionColumnName() => (string) $result->getVersion(),
                 $this->configuration->getExecutedAtColumnName() => $result->getExecutedAt(),
                 $this->configuration->getExecutionTimeColumnName() => $result->getTime() === null ? null : (int) round($result->getTime() * 1000),
@@ -151,7 +151,7 @@ final class TableMetadataStorage implements MetadataStorage
         if ($result->getDirection() === Direction::DOWN) {
             yield new Query(sprintf(
                 'DELETE FROM %s WHERE %s = %s',
-                $this->configuration->getTableName(),
+                $this->getQualifiedTableName(),
                 $this->configuration->getVersionColumnName(),
                 $this->connection->quote((string) $result->getVersion()),
             ));
@@ -161,7 +161,7 @@ final class TableMetadataStorage implements MetadataStorage
 
         yield new Query(sprintf(
             'INSERT INTO %s (%s, %s, %s) VALUES (%s, %s, 0)',
-            $this->configuration->getTableName(),
+            $this->getQualifiedTableName(),
             $this->configuration->getVersionColumnName(),
             $this->configuration->getExecutedAtColumnName(),
             $this->configuration->getExecutionTimeColumnName(),
@@ -209,10 +209,13 @@ final class TableMetadataStorage implements MetadataStorage
 
         /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
-            $currentTable = $this->schemaManager->introspectTableByUnquotedName($this->configuration->getTableName());
+            $currentTable = $this->schemaManager->introspectTableByUnquotedName(
+                $this->configuration->getTableName(),
+                $this->configuration->getSchemaName(),
+            );
         } else {
             /** @phpstan-ignore method.deprecated */
-            $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());
+            $currentTable = $this->schemaManager->introspectTable($this->getQualifiedTableName());
         }
 
         $diff = $comparator->compareTables($currentTable, $expectedTable);
@@ -244,6 +247,15 @@ final class TableMetadataStorage implements MetadataStorage
         if ($this->needsUpdate($expectedTable) !== null) {
             throw MetadataStorageError::notUpToDate();
         }
+    }
+
+    private function getQualifiedTableName(): string
+    {
+        $schema = $this->configuration->getSchemaName();
+
+        return $schema !== null
+            ? $schema . '.' . $this->configuration->getTableName()
+            : $this->configuration->getTableName();
     }
 
     private function getExpectedTable(): Table
@@ -287,7 +299,7 @@ final class TableMetadataStorage implements MetadataStorage
                 }
 
                 $this->connection->update(
-                    $this->configuration->getTableName(),
+                    $this->getQualifiedTableName(),
                     [
                         $this->configuration->getVersionColumnName() => (string) $availableMigration->getVersion(),
                     ],

@@ -12,6 +12,7 @@ use Doctrine\DBAL\Driver\PDO\SQLite\Driver as SQLiteDriver;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
@@ -154,6 +155,52 @@ class TableMetadataStorageTest extends TestCase
         self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
         self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
         self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+    }
+
+    public function testTableStructureWithSchemaQualifiedName(): void
+    {
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (! method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            self::markTestSkipped('DBAL does not support introspectTableByUnquotedName.');
+        }
+
+        $platform = $this->connection->getDatabasePlatform();
+        if ($platform instanceof SQLitePlatform) {
+            self::markTestSkipped('SQLite does not support schema-qualified table introspection.');
+        }
+
+        $config = new TableMetadataStorageConfiguration();
+        $config->setTableName('a');
+        $config->setSchemaName('main');
+        $config->setVersionColumnName('b');
+        $config->setVersionColumnLength(199);
+        $config->setExecutedAtColumnName('c');
+        $config->setExecutionTimeColumnName('d');
+
+        $table = new Table($config->getTableName());
+        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+        if (class_exists(PrimaryKeyConstraint::class)) {
+            $constraint = PrimaryKeyConstraint::editor()
+                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                ->create();
+
+            $table->addPrimaryKeyConstraint($constraint);
+        } else {
+            $table->setPrimaryKey([$config->getVersionColumnName()]);
+        }
+
+        $this->schemaManager->createTable($table);
+
+        $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
+
+        $storage->ensureInitialized();
+
+        $result = new ExecutionResult(new Version('1.0'), Direction::UP, new DateTimeImmutable());
+        $storage->complete($result);
+
+        $migrations = $storage->getExecutedMigrations();
+        self::assertTrue($migrations->hasMigration(new Version('1.0')));
     }
 
     public function testTableNotUpToDateTriggersExcepton(): void
