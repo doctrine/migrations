@@ -28,11 +28,14 @@ use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
 
 use function array_change_key_case;
+use function assert;
 use function class_exists;
+use function explode;
 use function floatval;
 use function method_exists;
 use function round;
 use function sprintf;
+use function str_contains;
 use function strlen;
 use function strpos;
 use function strtolower;
@@ -209,7 +212,16 @@ final class TableMetadataStorage implements MetadataStorage
 
         /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
-            $currentTable = $this->schemaManager->introspectTableByUnquotedName($this->configuration->getTableName());
+            if (str_contains($this->configuration->getTableName(), '.')) {
+                [$namespace, $tableName] = explode('.', $this->configuration->getTableName(), 2);
+                assert($namespace !== '' && $tableName !== '');
+                $currentTable = $this->schemaManager->introspectTableByUnquotedName(
+                    $tableName,
+                    $namespace,
+                );
+            } else {
+                $currentTable = $this->schemaManager->introspectTableByUnquotedName($this->configuration->getTableName());
+            }
         } else {
             /** @phpstan-ignore method.deprecated */
             $currentTable = $this->schemaManager->introspectTable($this->configuration->getTableName());
