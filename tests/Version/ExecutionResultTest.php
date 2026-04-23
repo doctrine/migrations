@@ -105,7 +105,7 @@ class ExecutionResultTest extends TestCase
 
     public function testToSchema(): void
     {
-        $toSchema = $this->createMock(Schema::class);
+        $toSchema = self::createStub(Schema::class);
 
         $this->versionExecutionResult->setToSchema($toSchema);
 

@@ -61,7 +61,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeOption(): void
     {
-        $mock = $this->createMock(AbstractMigration::class);
+        $mock = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
@@ -160,7 +160,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteRangeOption(): void
     {
-        $mock = $this->createMock(AbstractMigration::class);
+        $mock = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
@@ -194,7 +194,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddAllOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
@@ -223,7 +223,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteAllOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
@@ -252,7 +252,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
@@ -276,7 +276,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
@@ -308,7 +308,7 @@ class MigrationVersionTest extends MigrationTestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The version "1233" already exists in the version table.');
 
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
@@ -330,7 +330,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOptionIfVersionNotMigrated(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
         $this->expectException(InvalidArgumentException::class);

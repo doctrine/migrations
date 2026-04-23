@@ -17,7 +17,7 @@ final class ConnectionLoaderTest extends TestCase
 {
     public function testExistingConnectionLoader(): void
     {
-        $conn   = $this->createMock(Connection::class);
+        $conn   = self::createStub(Connection::class);
         $loader = new ExistingConnection($conn);
 
         self::assertSame($conn, $loader->getConnection());
@@ -28,7 +28,7 @@ final class ConnectionLoaderTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
 
-        $conn   = $this->createMock(Connection::class);
+        $conn   = self::createStub(Connection::class);
         $loader = new ExistingConnection($conn);
 
         self::assertSame($conn, $loader->getConnection('foo'));

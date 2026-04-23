@@ -15,7 +15,7 @@ class StubSchemaProviderTest extends MigrationTestCase
 {
     public function testCreateFromSchema(): void
     {
-        $schema   = $this->createMock(Schema::class);
+        $schema   = self::createStub(Schema::class);
         $provider = new StubSchemaProvider($schema);
 
         self::assertSame($schema, $provider->createSchema());

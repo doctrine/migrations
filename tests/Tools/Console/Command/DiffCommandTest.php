@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DiffCommandTest extends TestCase
 {
     /** @var DiffGenerator&MockObject */

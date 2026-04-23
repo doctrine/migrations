@@ -33,6 +33,7 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use Generator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\Attributes\WithoutErrorHandler;
 use PHPUnit\Framework\MockObject\MockObject;
@@ -47,6 +48,7 @@ use function method_exists;
 use function sprintf;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 class MigrateCommandTest extends MigrationTestCase
 {
     use VerifyDeprecations;
@@ -86,8 +88,8 @@ class MigrateCommandTest extends MigrationTestCase
     #[DataProvider('getMigrateWithMigrationsOrWithout')]
     public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode): void
     {
-        $finder                    = $this->createMock(Finder::class);
-        $factory                   = $this->createMock(MigrationFactory::class);
+        $finder                    = self::createStub(Finder::class);
+        $factory                   = self::createStub(MigrationFactory::class);
         $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
         $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
 
@@ -487,8 +489,8 @@ class MigrateCommandTest extends MigrationTestCase
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
-        $finder                    = $this->createMock(Finder::class);
-        $factory                   = $this->createMock(MigrationFactory::class);
+        $finder                    = self::createStub(Finder::class);
+        $factory                   = self::createStub(MigrationFactory::class);
         $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
 
         $migration = $this->createMock(AbstractMigration::class);

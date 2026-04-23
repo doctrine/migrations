@@ -15,26 +15,27 @@ use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 final class MigrationStatusCalculatorTest extends TestCase
 {
     private MigrationStatusCalculator $migrationStatusCalculator;
 
-    /** @var MigrationPlanCalculator&MockObject */
+    /** @var MigrationPlanCalculator&Stub */
     private MigrationPlanCalculator $migrationPlanCalculator;
 
     /** @var MetadataStorage&MockObject */
     private MetadataStorage $metadataStorage;
 
-    /** @var AbstractMigration&MockObject */
+    /** @var AbstractMigration&Stub */
     private AbstractMigration $abstractMigration;
 
     protected function setUp(): void
     {
-        $this->abstractMigration       = $this->createMock(AbstractMigration::class);
+        $this->abstractMigration       = self::createStub(AbstractMigration::class);
         $this->metadataStorage         = $this->createMock(MetadataStorage::class);
-        $this->migrationPlanCalculator = $this->createMock(MigrationPlanCalculator::class);
+        $this->migrationPlanCalculator = self::createStub(MigrationPlanCalculator::class);
 
         $this->migrationStatusCalculator = new CurrentMigrationStatusCalculator($this->migrationPlanCalculator, $this->metadataStorage);
     }

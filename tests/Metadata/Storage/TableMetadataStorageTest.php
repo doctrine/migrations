@@ -457,14 +457,13 @@ class TableMetadataStorageTest extends TestCase
     {
         $availableMigration     = new AvailableMigration(
             new Version('Foo\\Version1234'),
-            $this->createMock(AbstractMigration::class),
+            self::createStub(AbstractMigration::class),
         );
         $executedMigrationV3    = new ExecutedMigration(new Version('Foo\\Version1234'));
         $executedMigrationOlder = new ExecutedMigration(new Version('Version1234'));
 
         $reflection = new ReflectionClass(TableMetadataStorage::class);
         $method     = $reflection->getMethod('isAlreadyV3Format');
-        $method->setAccessible(true);
 
         self::assertTrue($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationV3]));
         self::assertFalse($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationOlder]));

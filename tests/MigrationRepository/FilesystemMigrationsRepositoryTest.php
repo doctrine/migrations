@@ -17,9 +17,11 @@ use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\B;
 use Doctrine\Migrations\Tests\MigrationRepository\Migrations\B\C;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class FilesystemMigrationsRepositoryTest extends TestCase
 {
     /** @var MigrationFactory&MockObject */
@@ -80,7 +82,7 @@ class FilesystemMigrationsRepositoryTest extends TestCase
 
     public function testLoadMigrationInstance(): void
     {
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
 
         $migrations = $this->migrationRepository->getMigrations();
 
@@ -94,8 +96,8 @@ class FilesystemMigrationsRepositoryTest extends TestCase
     public function testDuplicateLoadMigrationInstance(): void
     {
         $this->expectException(DuplicateMigrationVersion::class);
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
-        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), $this->createMock(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
     }
 
     public function testFindMigrations(): void

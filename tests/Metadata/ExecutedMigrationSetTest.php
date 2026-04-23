@@ -132,7 +132,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m3          = new ExecutedMigration(new Version('C'));
         $executedSet = new ExecutedMigrationsList([$m1, $m2, $m3]);
 
-        $abstractMigration = $this->createMock(AbstractMigration::class);
+        $abstractMigration = self::createStub(AbstractMigration::class);
         $availableSet      = new AvailableMigrationsList([
             new AvailableMigration(new Version('A'), $abstractMigration),
             new AvailableMigration(new Version('C'), $abstractMigration),

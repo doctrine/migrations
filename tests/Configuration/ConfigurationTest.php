@@ -14,7 +14,7 @@ class ConfigurationTest extends TestCase
 {
     public function testBase(): void
     {
-        $storage = $this->createMock(MetadataStorageConfiguration::class);
+        $storage = self::createStub(MetadataStorageConfiguration::class);
 
         $config = new Configuration();
         $config->addMigrationsDirectory('foo', 'bar');

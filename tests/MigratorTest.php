@@ -22,6 +22,7 @@ use Doctrine\Migrations\Tests\Stub\NonTransactional\MigrationNonTransactional;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\Test\TestLogger;
 use Symfony\Component\Console\Output\StreamOutput;
@@ -33,6 +34,7 @@ use function strval;
 
 use const DIRECTORY_SEPARATOR;
 
+#[AllowMockObjectsWithoutExpectations]
 class MigratorTest extends MigrationTestCase
 {
     private Connection&MockObject $conn;

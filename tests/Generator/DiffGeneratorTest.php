@@ -16,13 +16,16 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 use function array_map;
 use function array_values;
 use function preg_match;
 
+#[AllowMockObjectsWithoutExpectations]
 class DiffGeneratorTest extends TestCase
 {
     private DBALConfiguration&MockObject $dbalConfiguration;
@@ -31,7 +34,7 @@ class DiffGeneratorTest extends TestCase
     private AbstractSchemaManager&MockObject $schemaManager;
 
     private SchemaProvider&MockObject $schemaProvider;
-    private AbstractPlatform&MockObject $platform;
+    private AbstractPlatform&Stub $platform;
     private Generator&MockObject $migrationGenerator;
     private SqlGenerator&MockObject $migrationSqlGenerator;
     private DiffGenerator $migrationDiffGenerator;
@@ -229,7 +232,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration      = $this->createMock(DBALConfiguration::class);
         $this->schemaManager          = $this->createMock(AbstractSchemaManager::class);
         $this->schemaProvider         = $this->createMock(SchemaProvider::class);
-        $this->platform               = $this->createMock(AbstractPlatform::class);
+        $this->platform               = self::createStub(AbstractPlatform::class);
         $this->migrationGenerator     = $this->createMock(Generator::class);
         $this->migrationSqlGenerator  = $this->createMock(SqlGenerator::class);
         $this->emptySchemaProvider    = $this->createMock(SchemaProvider::class);
