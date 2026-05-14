@@ -9,6 +9,8 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\AvailableMigration;
+use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
@@ -22,9 +24,14 @@ use Doctrine\Migrations\Version\MigrationPlanCalculator;
 use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function array_map;
 use function getcwd;
 use function sys_get_temp_dir;
 use function trim;
@@ -195,6 +202,39 @@ class ExecuteCommandTest extends MigrationTestCase
 
         self::assertSame(0, $this->executeCommandTester->getStatusCode());
         self::assertStringContainsString('[notice] Executing 1 up', trim($this->executeCommandTester->getDisplay(true)));
+    }
+
+    /**
+     * @param list<string> $args
+     * @param list<string> $expectedSuggestions
+     */
+    #[TestWith([['console'], ['A', 'B']])]
+    #[TestWith([['console', 'A'], ['A', 'B']])]
+    public function testComplete(array $args, array $expectedSuggestions): void
+    {
+        $migration = $this->createMock(AbstractMigration::class);
+
+        $this->planCalculator
+            ->expects(self::once())
+            ->method('getMigrations')
+            ->willReturn(new AvailableMigrationsList([
+                new AvailableMigration(new Version('A'), $migration),
+                new AvailableMigration(new Version('B'), $migration),
+            ]));
+
+        $input = CompletionInput::fromTokens($args, 1);
+        $input->bind($this->executeCommand->getDefinition());
+        $suggestions = new CompletionSuggestions();
+
+        $this->executeCommand->complete($input, $suggestions);
+
+        self::assertSame(
+            $expectedSuggestions,
+            array_map(
+                static fn (Suggestion $suggestion): string => $suggestion->getValue(),
+                $suggestions->getValueSuggestions(),
+            ),
+        );
     }
 
     protected function setUp(): void

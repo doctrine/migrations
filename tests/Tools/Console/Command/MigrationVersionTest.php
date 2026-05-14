@@ -18,11 +18,16 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function array_map;
 use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -364,5 +369,32 @@ class MigrationVersionTest extends MigrationTestCase
         );
 
         self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay(true));
+    }
+
+    /**
+     * @param list<string> $args
+     * @param list<string> $expectedSuggestions
+     */
+    #[TestWith([['console'], ['1233', '1234']])]
+    #[TestWith([['console', '1233'], ['1233', '1234']])]
+    public function testComplete(array $args, array $expectedSuggestions): void
+    {
+        $migration = self::createStub(AbstractMigration::class);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migration);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migration);
+
+        $input = CompletionInput::fromTokens($args, 1);
+        $input->bind($this->command->getDefinition());
+        $suggestions = new CompletionSuggestions();
+
+        $this->command->complete($input, $suggestions);
+
+        self::assertSame(
+            $expectedSuggestions,
+            array_map(
+                static fn (Suggestion $suggestion): string => $suggestion->getValue(),
+                $suggestions->getValueSuggestions(),
+            ),
+        );
     }
 }

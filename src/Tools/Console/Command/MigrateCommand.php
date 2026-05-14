@@ -7,15 +7,20 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 use Doctrine\Migrations\Exception\NoMigrationsFoundWithCriteria;
 use Doctrine\Migrations\Exception\NoMigrationsToExecute;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\ConsoleInputMigratorConfigurationFactory;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Formatter\OutputFormatter;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function array_map;
+use function array_merge;
 use function count;
 use function dirname;
 use function getcwd;
@@ -304,5 +309,21 @@ EOT);
     private function isPathWritable(string $path): bool
     {
         return is_writable($path) || is_dir($path) || is_writable(dirname($path));
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('version')) {
+            $availableMigrations = $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations();
+
+            /** @var list<string> $availableVersions */
+            $availableVersions = array_map(static function (AvailableMigration $availableMigration): string {
+                return (string) $availableMigration->getVersion();
+            }, $availableMigrations->getItems());
+
+            $suggestions->suggestValues(array_merge(['current', 'latest', 'first', 'next', 'prev'], $availableVersions));
+
+            return;
+        }
     }
 }
