@@ -4,9 +4,12 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -174,5 +177,21 @@ EOT);
     private function isPathWritable(string $path): bool
     {
         return is_writable($path) || is_dir($path) || is_writable(dirname($path));
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('versions')) {
+            $availableMigrations = $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations();
+
+            /** @var list<string> $availableVersions */
+            $availableVersions = array_map(static function (AvailableMigration $availableMigration): string {
+                return (string) $availableMigration->getVersion();
+            }, $availableMigrations->getItems());
+
+            $suggestions->suggestValues($availableVersions);
+
+            return;
+        }
     }
 }
