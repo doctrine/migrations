@@ -1,0 +1,12 @@
+<?php
+
+declare(strict_types=1);
+
+namespace Doctrine\Migrations\Exception;
+
+use RuntimeException;
+
+class TransactionRollbackException extends RuntimeException implements CatastrophicMigrationException
+{
+    use CatastrophicMigrationExceptionTrait;
+}
