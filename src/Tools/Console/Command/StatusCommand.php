@@ -32,7 +32,7 @@ EOT);
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $infosHelper = $this->getDependencyFactory()->getMigrationStatusInfosHelper();
         $infosHelper->showMigrationsInfo($output);
