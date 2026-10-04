@@ -79,8 +79,14 @@ EOT)
             );
     }
 
+    /** keep BC */
+    public function execute(InputInterface $input, OutputInterface $output): int
+    {
+        return parent::execute($input, $output);
+    }
+
     /** @throws SchemaDumpRequiresNoMigrations */
-    public function execute(
+    protected function doExecute(
         InputInterface $input,
         OutputInterface $output,
     ): int {

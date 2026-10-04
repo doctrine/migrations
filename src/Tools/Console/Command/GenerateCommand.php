@@ -41,7 +41,7 @@ EOT);
         parent::configure();
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $migrationGenerator = $this->getDependencyFactory()->getMigrationGenerator();
 

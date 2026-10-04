@@ -37,7 +37,7 @@ To dump your schema to a migration version you can use the <info>migrations:dump
 EOT);
     }
 
-    protected function execute(InputInterface $input, OutputInterface $output): int
+    protected function doExecute(InputInterface $input, OutputInterface $output): int
     {
         $question = sprintf(
             'WARNING! You are about to execute a migration in database "%s" that could result in schema changes and data loss. Are you sure you wish to continue?',
