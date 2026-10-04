@@ -114,13 +114,17 @@ class UpToDateCommandTest extends MigrationTestCase
 
         $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
+        // Because of https://github.com/symfony/symfony/pull/64843 the header is different in lowest
+        // and highest symfony version. Overwrite it since it's not the important part of the assertion.
+        $lines[4] = '+----------------------------------------------------------------------------+-------------+';
+
         self::assertSame(
             [
                 '[ERROR] Out-of-date! 1 migration is available to execute.',
                 '',
                 '[ERROR] You have 1 previously executed migration in the database that is not a registered migration.',
                 '',
-                '+-----------+-------------------------+---------------------+----------------+-------------+',
+                '+----------------------------------------------------------------------------+-------------+',
                 '| Migration Versions                                                         |             |',
                 '+-----------+-------------------------+---------------------+----------------+-------------+',
                 '| Migration | Status                  | Migrated At         | Execution Time | Description |',

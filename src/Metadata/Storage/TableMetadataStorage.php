@@ -9,7 +9,9 @@ use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ComparatorConfig;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
@@ -260,23 +262,63 @@ final class TableMetadataStorage implements MetadataStorage
 
     private function getExpectedTable(): Table
     {
+        // @phpstan-ignore-next-line function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) { // doctrine/dbal >= 4.5
+            $editor = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($this->configuration->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->configuration->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength($this->configuration->getVersionColumnLength())
+                        ->create(),
+                )
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->configuration->getExecutedAtColumnName()))
+                        ->setTypeName('datetime')
+                        ->setNotNull(false)
+                        ->create(),
+                )
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->configuration->getExecutionTimeColumnName()))
+                        ->setTypeName('integer')
+                        ->setNotNull(false)
+                        ->create(),
+                )
+                ->addPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($this->configuration->getVersionColumnName()))
+                        ->create(),
+                );
+
+            return $editor->create();
+        }
+
         $schemaChangelog = new Table($this->configuration->getTableName());
 
+        // @phpstan-ignore-next-line method.deprecated
         $schemaChangelog->addColumn(
             $this->configuration->getVersionColumnName(),
             'string',
             ['notnull' => true, 'length' => $this->configuration->getVersionColumnLength()],
         );
+        // @phpstan-ignore-next-line method.deprecated
         $schemaChangelog->addColumn($this->configuration->getExecutedAtColumnName(), 'datetime', ['notnull' => false]);
+        // @phpstan-ignore-next-line method.deprecated
         $schemaChangelog->addColumn($this->configuration->getExecutionTimeColumnName(), 'integer', ['notnull' => false]);
 
-        if (class_exists(PrimaryKeyConstraint::class)) {
+        if (class_exists(PrimaryKeyConstraint::class)) { // doctrine/dbal >= 4.3
             $constraint = PrimaryKeyConstraint::editor()
                 ->setColumnNames(UnqualifiedName::unquoted($this->configuration->getVersionColumnName()))
                 ->create();
 
+            // @phpstan-ignore-next-line method.deprecated
             $schemaChangelog->addPrimaryKeyConstraint($constraint);
         } else {
+            // @phpstan-ignore-next-line method.deprecated
             $schemaChangelog->setPrimaryKey([$this->configuration->getVersionColumnName()]);
         }
 

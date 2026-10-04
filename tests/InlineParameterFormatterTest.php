@@ -44,7 +44,7 @@ class InlineParameterFormatterTest extends TestCase
             Types::STRING,
             Types::INTEGER,
             Types::FLOAT,
-            Types::SIMPLE_ARRAY,
+            Types::SIMPLE_ARRAY, // @phpstan-ignore classConstant.deprecated
             Types::BOOLEAN,
             Types::BOOLEAN,
             'unknown',

@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ComparatorConfig;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\AbstractMigration;
@@ -561,8 +564,20 @@ class MigrateCommandTest extends MigrationTestCase
                 ->introspectTable($this->metadataConfiguration->getTableName());
         }
 
-        $modifiedTable = clone $originalTable;
-        $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Table::class, 'editor')) {
+            $modifiedTable = $originalTable->edit()->addColumn(
+                Column::editor()
+                    ->setName(UnqualifiedName::unquoted('extra'))
+                    ->setTypeName(Types::STRING)
+                    ->setNotNull(false)
+                    ->create(),
+            )->create();
+        } else {
+            $modifiedTable = clone $originalTable;
+            /** @phpstan-ignore method.deprecated */
+            $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
+        }
 
         if (class_exists(ComparatorConfig::class)) {
             $comparator = $schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));

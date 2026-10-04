@@ -9,6 +9,8 @@ use Doctrine\DBAL\Connections\PrimaryReadReplicaConnection;
 use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
@@ -26,6 +28,7 @@ use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\TestCase;
 
 use function class_exists;
+use function method_exists;
 use function sprintf;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -74,17 +77,40 @@ class ExistingTableMetadataStorageTest extends TestCase
         );
 
         // create partial table
-        $table = new Table($this->config->getTableName());
-        $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($this->config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(24)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            $table = new Table($this->config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 24]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);

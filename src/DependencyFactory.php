@@ -452,6 +452,7 @@ class DependencyFactory
         }
 
         if ($this->hasEntityManager()) {
+            /** @phpstan-ignore return.type (the property is an EventManager), assign.propertyType (TODO: widen the property type to EventManagerInterface) */
             return $this->eventManager = $this->getEntityManager()->getEventManager();
         }
 

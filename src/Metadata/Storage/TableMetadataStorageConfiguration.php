@@ -14,8 +14,10 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
 
     private int $versionColumnLength = 191;
 
+    /** @var non-empty-string */
     private string $executedAtColumnName = 'executed_at';
 
+    /** @var non-empty-string */
     private string $executionTimeColumnName = 'execution_time';
 
     /** @return non-empty-string */
@@ -52,21 +54,25 @@ final class TableMetadataStorageConfiguration implements MetadataStorageConfigur
         $this->versionColumnLength = $versionColumnLength;
     }
 
+    /** @return non-empty-string */
     public function getExecutedAtColumnName(): string
     {
         return $this->executedAtColumnName;
     }
 
+    /** @param non-empty-string $executedAtColumnName */
     public function setExecutedAtColumnName(string $executedAtColumnName): void
     {
         $this->executedAtColumnName = $executedAtColumnName;
     }
 
+    /** @return non-empty-string */
     public function getExecutionTimeColumnName(): string
     {
         return $this->executionTimeColumnName;
     }
 
+    /** @param non-empty-string $executionTimeColumnName */
     public function setExecutionTimeColumnName(string $executionTimeColumnName): void
     {
         $this->executionTimeColumnName = $executionTimeColumnName;

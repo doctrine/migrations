@@ -40,12 +40,7 @@ parameters:
         -
             message: '~Doctrine\\ORM\\Tools\\Console\\Helper\\EntityManagerHelper~'
             path: src/Tools/Console/ConsoleRunner.php
-        -
-            message: '#^Call to deprecated method setPrimaryKey\(\) of class Doctrine\\DBAL\\Schema\\Table\:\nUse \{\@see addPrimaryKeyConstraint\(\)\} instead\.$#'
-            paths:
-                - src/Metadata/Storage/TableMetadataStorage.php
-                - tests/Metadata/Storage/ExistingTableMetadataStorageTest.php
-                - tests/Metadata/Storage/TableMetadataStorageTest.php
+
         -
             message: '~^Parameter #1 \$array \(list<string>\) of array_values is already a list, call has no effect\.$~'
             path: tests/Generator/DiffGeneratorTest.php
