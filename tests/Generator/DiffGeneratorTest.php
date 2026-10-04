@@ -23,6 +23,7 @@ use PHPUnit\Framework\TestCase;
 
 use function array_map;
 use function array_values;
+use function method_exists;
 use function preg_match;
 
 #[AllowMockObjectsWithoutExpectations]
@@ -42,8 +43,28 @@ class DiffGeneratorTest extends TestCase
 
     public function testGenerate(): void
     {
-        $fromSchema = $this->createMock(Schema::class);
-        $toSchema   = $this->createMock(Schema::class);
+        $table1 = new Table('schema.table_name1');
+        $table2 = new Table('schema.table_name2');
+        $table3 = new Table('schema.table_name3');
+
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Schema::class, 'editor')) {
+            $fromSchema = Schema::editor()->create();
+            $toSchema   = Schema::editor()
+                ->setTables($table1, $table2, $table3)
+                ->create();
+        } else {
+            $fromSchema = $this->createMock(Schema::class);
+            $toSchema   = $this->createMock(Schema::class);
+
+            $toSchema->expects(self::once())
+                ->method('getTables')
+                ->willReturn([$table1, $table2, $table3]);
+
+            $toSchema->expects(self::exactly(2))
+                ->method('dropTable')
+                ->willReturnSelf();
+        }
 
         $this->dbalConfiguration->expects(self::once())
             ->method('setSchemaAssetsFilter');
@@ -53,14 +74,6 @@ class DiffGeneratorTest extends TestCase
             ->willReturn(
                 static fn ($name): bool => $name === 'schema.table_name1',
             );
-
-        $table1 = new Table('schema.table_name1');
-        $table2 = new Table('schema.table_name2');
-        $table3 = new Table('schema.table_name3');
-
-        $toSchema->expects(self::once())
-            ->method('getTables')
-            ->willReturn([$table1, $table2, $table3]);
 
         $this->emptySchemaProvider->expects(self::never())
             ->method('createSchema');
@@ -72,10 +85,6 @@ class DiffGeneratorTest extends TestCase
         $this->schemaProvider->expects(self::once())
             ->method('createSchema')
             ->willReturn($toSchema);
-
-        $toSchema->expects(self::exactly(2))
-            ->method('dropTable')
-            ->willReturnSelf();
 
         $schemaDiff = self::createStub(SchemaDiff::class);
 

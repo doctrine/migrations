@@ -13,12 +13,15 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
+use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MetadataStorageError;
@@ -89,17 +92,40 @@ class TableMetadataStorageTest extends TestCase
         $this->expectException(MetadataStorageError::class);
         $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
 
-        $table = new Table($this->config->getTableName());
-        $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($this->config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            $table = new Table($this->config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
@@ -124,17 +150,40 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutedAtColumnName('c');
         $config->setExecutionTimeColumnName('d');
 
-        $table = new Table($config->getTableName());
-        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$config->getVersionColumnName()]);
+            $table = new Table($config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
@@ -151,9 +200,19 @@ class TableMetadataStorageTest extends TestCase
             $table = $this->schemaManager->introspectTable($config->getTableName());
         }
 
-        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
-        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Column::class, 'getTypeName')) {
+            self::assertInstanceOf(StringType::class, Type::getType($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeType::class, Type::getType($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, Type::getType($table->getColumn('d')->getTypeName()));
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        }
     }
 
     public function testTableNotUpToDateTriggersExcepton(): void
@@ -168,17 +227,40 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutedAtColumnName('c');
         $config->setExecutionTimeColumnName('d');
 
-        $table = new Table($config->getTableName());
-        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$config->getVersionColumnName()]);
+            $table = new Table($config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
@@ -208,9 +290,19 @@ class TableMetadataStorageTest extends TestCase
             $table = $this->schemaManager->introspectTable($config->getTableName());
         }
 
-        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
-        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Column::class, 'getTypeName')) {
+            self::assertInstanceOf(StringType::class, Type::getType($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeType::class, Type::getType($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, Type::getType($table->getColumn('d')->getTypeName()));
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        }
     }
 
     public function testComplete(): void

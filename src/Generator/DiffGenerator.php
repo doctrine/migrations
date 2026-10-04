@@ -154,7 +154,13 @@ class DiffGenerator
                     continue;
                 }
 
-                $toSchema->dropTable($tableName);
+                // @phpstan-ignore-next-line function.alreadyNarrowedType
+                if (method_exists(Schema::class, 'editor')) { // doctrine/dbal >= 4.5
+                    $toSchema = $toSchema->edit()->dropTable($table->getObjectName())->create();
+                } else {
+                    // @phpstan-ignore-next-line method.deprecated
+                    $toSchema->dropTable($tableName);
+                }
             }
         }
 

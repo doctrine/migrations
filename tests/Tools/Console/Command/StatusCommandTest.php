@@ -70,9 +70,13 @@ class StatusCommandTest extends MigrationTestCase
 
         $lines = array_map(trim(...), explode("\n", trim($this->commandTester->getDisplay(true))));
 
+        // Because of https://github.com/symfony/symfony/pull/64843 the header is different in lowest
+        // and highest symfony version. Overwrite it since it's not the important part of the assertion.
+        $lines[0] = '+----------------------------------------------------------------------------------------------------------------------+';
+
         self::assertSame(
             [
-                '+----------------------+----------------------+------------------------------------------------------------------------+',
+                '+----------------------------------------------------------------------------------------------------------------------+',
                 '| Configuration                                                                                                        |',
                 '+----------------------+----------------------+------------------------------------------------------------------------+',
                 '| Storage              | Type                 | Doctrine\\Migrations\\Metadata\\Storage\\TableMetadataStorageConfiguration |',
