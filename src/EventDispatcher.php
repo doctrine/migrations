@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations;
 
 use Doctrine\Common\EventArgs;
-use Doctrine\Common\EventManager;
+use Doctrine\Common\EventDispatcher as BaseEventDispatcher;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Event\MigrationsEventArgs;
 use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
@@ -21,7 +21,7 @@ final class EventDispatcher
 {
     public function __construct(
         private readonly Connection $connection,
-        private readonly EventManager $eventManager,
+        private readonly BaseEventDispatcher $eventManager,
     ) {
     }
 
