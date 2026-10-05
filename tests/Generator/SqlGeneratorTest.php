@@ -64,6 +64,26 @@ final class SqlGeneratorTest extends TestCase
         self::assertSame($expectedCode, $code);
     }
 
+    public function testGenerateReferencesBasePlatformInsteadOfSubclass(): void
+    {
+        $configuration = new Configuration();
+        $configuration->setMetadataStorageConfiguration($this->metadataConfig);
+        $configuration->setCheckDatabasePlatform(true);
+
+        // stands in for version-specific platforms like MariaDB120300Platform
+        $platform  = new class extends SQLitePlatform {
+        };
+        $generator = new SqlGenerator($configuration, $platform);
+
+        // SqlitePlatform on DBAL 3, SQLitePlatform on DBAL >= 4
+        $expectedPlatform = (new SQLitePlatform())::class;
+
+        $code = $generator->generate(['SELECT 1'], false);
+
+        self::assertStringContainsString(sprintf('instanceof \\%s,', $expectedPlatform), $code);
+        self::assertStringNotContainsString('@anonymous', $code);
+    }
+
     public function testGenerationWithoutFormatting(): void
     {
         $this->configuration->setCheckDatabasePlatform(true);
