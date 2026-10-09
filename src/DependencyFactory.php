@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Common\EventDispatcher as BaseEventDispatcher;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -69,10 +70,10 @@ class DependencyFactory
     /** @var object[]|callable[] */
     private array $dependencies = [];
 
-    private Connection|null $connection     = null;
-    private EntityManagerInterface|null $em = null;
-    private EventManager|null $eventManager = null;
-    private bool $frozen                    = false;
+    private Connection|null $connection               = null;
+    private EntityManagerInterface|null $em           = null;
+    private BaseEventDispatcher|null $eventDispatcher = null;
+    private bool $frozen                              = false;
     private ConfigurationLoader $configurationLoader;
     private ConnectionLoader $connectionLoader;
     private EntityManagerLoader|null $emLoader = null;
@@ -191,7 +192,7 @@ class DependencyFactory
     {
         return $this->getDependency(EventDispatcher::class, fn (): EventDispatcher => new EventDispatcher(
             $this->getConnection(),
-            $this->getEventManager(),
+            $this->getBaseEventDispatcher(),
         ));
     }
 
@@ -445,22 +446,21 @@ class DependencyFactory
         $this->factories[$id] = $service;
     }
 
-    private function getEventManager(): EventManager
+    private function getBaseEventDispatcher(): BaseEventDispatcher
     {
-        if ($this->eventManager !== null) {
-            return $this->eventManager;
+        if ($this->eventDispatcher !== null) {
+            return $this->eventDispatcher;
         }
 
         if ($this->hasEntityManager()) {
-            /** @phpstan-ignore return.type (the property is an EventManager), assign.propertyType (TODO: widen the property type to EventManagerInterface) */
-            return $this->eventManager = $this->getEntityManager()->getEventManager();
+            return $this->eventDispatcher = $this->getEntityManager()->getEventManager();
         }
 
         if (method_exists(Connection::class, 'getEventManager')) {
             // DBAL < 4
-            return $this->eventManager = $this->getConnection()->getEventManager();
+            return $this->eventDispatcher = $this->getConnection()->getEventManager();
         }
 
-        return $this->eventManager = new EventManager();
+        return $this->eventDispatcher = new EventManager();
     }
 }
