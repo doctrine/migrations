@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tools\Console\Command;
 
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Metadata\AvailableMigrationsList;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
@@ -18,7 +19,9 @@ use function addslashes;
 use function class_exists;
 use function count;
 use function filter_var;
+use function in_array;
 use function sprintf;
+use function strtoupper;
 
 use const FILTER_VALIDATE_BOOLEAN;
 
@@ -94,6 +97,12 @@ EOT)
                 null,
                 InputOption::VALUE_NONE,
                 'Generate a full migration as if the current database was empty.',
+            )
+            ->addOption(
+                'mysql-algorithm',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'Add INSTANT or INPLACE to generated MySQL ALTER TABLE statements.',
             );
     }
 
@@ -114,6 +123,17 @@ EOT)
         $allowEmptyDiff  = $input->getOption('allow-empty-diff');
         $checkDbPlatform = filter_var($input->getOption('check-database-platform'), FILTER_VALIDATE_BOOLEAN);
         $fromEmptySchema = $input->getOption('from-empty-schema');
+        $mysqlAlgorithm  = $input->getOption('mysql-algorithm');
+        if ($mysqlAlgorithm !== null) {
+            $mysqlAlgorithm = strtoupper((string) $mysqlAlgorithm);
+            if (! in_array($mysqlAlgorithm, ['INSTANT', 'INPLACE'], true)) {
+                throw InvalidOptionUsage::new('The "--mysql-algorithm" option must be INSTANT or INPLACE.');
+            }
+
+            if (! $this->getDependencyFactory()->getConnection()->getDatabasePlatform() instanceof MySQLPlatform) {
+                throw InvalidOptionUsage::new('The "--mysql-algorithm" option can only be used with MySQL.');
+            }
+        }
 
         if ($formatted) {
             if (! class_exists(SqlFormatter::class)) {
@@ -139,15 +159,28 @@ EOT)
         $diffGenerator = $this->getDependencyFactory()->getDiffGenerator();
 
         try {
-            $path = $diffGenerator->generate(
-                $fqcn,
-                $filterExpression,
-                $formatted,
-                $nowdocOutput,
-                $lineLength,
-                $checkDbPlatform,
-                $fromEmptySchema,
-            );
+            if ($mysqlAlgorithm === null) {
+                $path = $diffGenerator->generate(
+                    $fqcn,
+                    $filterExpression,
+                    $formatted,
+                    $nowdocOutput,
+                    $lineLength,
+                    $checkDbPlatform,
+                    $fromEmptySchema,
+                );
+            } else {
+                $path = $diffGenerator->generate(
+                    $fqcn,
+                    $filterExpression,
+                    $formatted,
+                    $nowdocOutput,
+                    $lineLength,
+                    $checkDbPlatform,
+                    $fromEmptySchema,
+                    $mysqlAlgorithm,
+                );
+            }
         } catch (NoChangesDetected $exception) {
             if ($allowEmptyDiff) {
                 $this->io->error($exception->getMessage());
