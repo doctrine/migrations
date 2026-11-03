@@ -38,7 +38,7 @@ use Doctrine\Migrations\Version\Version;
 use Generator;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
@@ -367,7 +367,7 @@ class MigrateCommandTest extends MigrationTestCase
 
     /** @psalm-param array<string, bool|int|string|null> $input */
     #[DataProvider('allOrNothing')]
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testExecuteMigrateAllOrNothing(bool|null $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
