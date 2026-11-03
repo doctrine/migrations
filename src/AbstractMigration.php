@@ -146,6 +146,12 @@ abstract class AbstractMigration
         $this->frozen = true;
     }
 
+    public function reset(): void
+    {
+        $this->plannedSql = [];
+        $this->frozen     = false;
+    }
+
     protected function write(string $message): void
     {
         $this->logger->notice($message, ['migration' => $this]);
