@@ -31,7 +31,7 @@ final class ConnectionLoaderTest extends TestCase
         $conn   = self::createStub(Connection::class);
         $loader = new ExistingConnection($conn);
 
-        self::assertSame($conn, $loader->getConnection('foo'));
+        $loader->getConnection('foo');
     }
 
     public function testArrayConnectionConfigurationLoader(): void

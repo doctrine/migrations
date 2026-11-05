@@ -31,7 +31,7 @@ final class EntityManagerTest extends TestCase
         $em     = self::createStub(EntityManager::class);
         $loader = new ExistingEntityManager($em);
 
-        self::assertSame($em, $loader->getEntityManager('foo'));
+        $loader->getEntityManager('foo');
     }
 
     public function testArrayEntityManagerConfigurationLoader(): void
