@@ -199,6 +199,10 @@ EOT);
                 throw UnknownMigrationVersion::new((string) $version);
             }
 
+            if (! $executedMigrations->hasMigration($version)) {
+                throw VersionDoesNotExist::new($version);
+            }
+
             $question =
                 'WARNING! You are about to delete a migration version from the version table that has no corresponding migration file.' .
                 'Do you want to delete this migration from the migrations table?';

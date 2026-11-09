@@ -365,4 +365,23 @@ class MigrationVersionTest extends MigrationTestCase
 
         self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay(true));
     }
+
+    /**
+     * Test "--delete" option on not migrated version without existing version file.
+     */
+    public function testDeleteOptionIfVersionNotMigratedAndFileDoesNotExist(): void
+    {
+        $this->command->setHelperSet(new HelperSet([new QuestionHelper()]));
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
+
+        $this->commandTester->execute(
+            [
+                '--delete' => true,
+                'version'  => '1233',
+            ],
+            ['interactive' => false],
+        );
+    }
 }
