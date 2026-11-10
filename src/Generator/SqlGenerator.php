@@ -9,10 +9,10 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration;
 use Doctrine\SqlFormatter\NullHighlighter;
 use Doctrine\SqlFormatter\SqlFormatter;
+use ReflectionClass;
 
 use function array_unshift;
 use function count;
-use function get_class;
 use function implode;
 use function preg_replace;
 use function sprintf;
@@ -35,6 +35,21 @@ class SqlGenerator
         private readonly Configuration $configuration,
         private readonly AbstractPlatform $platform,
     ) {
+    }
+
+    /**
+     * Returns the topmost concrete platform class, so that generated code does not
+     * reference version-specific subclasses (e.g. MariaDB120300Platform) that DBAL deprecates.
+     */
+    private function getPlatformClass(): string
+    {
+        $class = new ReflectionClass($this->platform);
+
+        while (($parent = $class->getParentClass()) !== false && ! $parent->isAbstract()) {
+            $class = $parent;
+        }
+
+        return '\\' . $class->getName();
     }
 
     /** @param string[] $sql */
@@ -72,7 +87,7 @@ class SqlGenerator
         }
 
         if (count($code) !== 0 && $checkDbPlatform && $this->configuration->isDatabasePlatformChecked()) {
-            $currentPlatform = '\\' . get_class($this->platform);
+            $currentPlatform = $this->getPlatformClass();
 
             array_unshift(
                 $code,
