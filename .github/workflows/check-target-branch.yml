@@ -18,7 +18,7 @@ concurrency:
 jobs:
   check:
     name: "Labels match target branch"
-    uses: "doctrine/.github/.github/workflows/check-target-branch.yml@16.1.0"
+    uses: "doctrine/.github/.github/workflows/check-target-branch.yml@16.2.0"
     permissions:
       contents: "read"
       issues: "write"
