@@ -128,7 +128,7 @@ class SchemaDumperTest extends TestCase
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234'));
+        $this->schemaDumper->dump('Foo\\1234');
     }
 
     public function testRegexErrorsAreConvertedToExceptions(): void
@@ -148,7 +148,7 @@ class SchemaDumperTest extends TestCase
             ->method('getTables')
             ->willReturn([$table]);
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['invalid regex']));
+        $this->schemaDumper->dump('Foo\\1234', ['invalid regex']);
     }
 
     public function testExcludedTableViaParamIsNotInTheDump(): void
@@ -180,7 +180,7 @@ class SchemaDumperTest extends TestCase
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
 
-        self::assertSame('/path/to/migration.php', $this->schemaDumper->dump('Foo\\1234', ['/other_skipped_table_name/']));
+        $this->schemaDumper->dump('Foo\\1234', ['/other_skipped_table_name/']);
     }
 
     protected function setUp(): void
