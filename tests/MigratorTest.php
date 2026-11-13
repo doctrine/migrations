@@ -6,9 +6,12 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DbalMigrator;
+use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\EventDispatcher;
+use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Exception\MigrationConfigurationConflict;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -25,10 +28,12 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\Test\TestLogger;
+use RuntimeException;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
+use function array_keys;
 use function array_map;
 use function strval;
 
@@ -87,9 +92,11 @@ class MigratorTest extends MigrationTestCase
         self::assertStringContainsString('No migrations', $this->logger->records[0]['message']);
     }
 
-    protected function createTestMigrator(): DbalMigrator
-    {
-        $eventManager    = new EventManager();
+    protected function createTestMigrator(
+        EventManager|null $eventManager = null,
+        SchemaDiffProvider|null $schemaDiff = null,
+    ): DbalMigrator {
+        $eventManager  ??= new EventManager();
         $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
 
         $this->logger = new TestLogger();
@@ -97,7 +104,7 @@ class MigratorTest extends MigrationTestCase
         $stopwatch      = new Stopwatch();
         $paramFormatter = $this->createMock(ParameterFormatter::class);
         $storage        = $this->createMock(MetadataStorage::class);
-        $schemaDiff     = $this->createMock(SchemaDiffProvider::class);
+        $schemaDiff   ??= $this->createMock(SchemaDiffProvider::class);
 
         return new DbalMigrator(
             $this->conn,
@@ -185,5 +192,84 @@ class MigratorTest extends MigrationTestCase
         self::expectExceptionMessage(MigrationNonTransactional::class);
 
         $migrator->migrate($planList, $this->migratorConfiguration);
+    }
+
+    public function testToSchemaIsReleasedAfterEachMigrationWhenNotInDryRun(): void
+    {
+        $listener     = new class {
+            /** @var array<string, Schema|null> */
+            public array $toSchemas = [];
+
+            public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args): void
+            {
+                $plan = $args->getPlan();
+
+                $this->toSchemas[(string) $plan->getVersion()] = $plan->getResult()?->getToSchema();
+            }
+        };
+        $eventManager = new EventManager();
+        $eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+
+        $migrator = $this->createTestMigrator($eventManager);
+
+        $plans = [
+            new MigrationPlan(new Version('A'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+            new MigrationPlan(new Version('B'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+        ];
+
+        $migrator->migrate(new MigrationPlanList($plans, Direction::UP), $this->migratorConfiguration);
+
+        self::assertSame(['A', 'B'], array_keys($listener->toSchemas));
+        self::assertContainsOnlyInstancesOf(Schema::class, $listener->toSchemas, 'toSchema should be available to listeners');
+        self::assertNull($this->migratorConfiguration->getFromSchema());
+
+        foreach ($plans as $plan) {
+            $result = $plan->getResult();
+            self::assertNotNull($result);
+            self::assertFalse($this->hasToSchema($result->getToSchema(...)), 'toSchema should be released after execution');
+        }
+    }
+
+    public function testToSchemaIsChainedToTheNextMigrationInDryRun(): void
+    {
+        $schemaDiff = $this->createMock(SchemaDiffProvider::class);
+        $schemaDiff->expects(self::once())
+            ->method('createFromSchema')
+            ->willReturn(new Schema());
+        $schemaDiff->method('createToSchema')
+            ->willReturnCallback(static fn (Schema $fromSchema): Schema => clone $fromSchema);
+        $schemaDiff->method('getSqlDiffToMigrate')
+            ->willReturn([]);
+
+        $migrator = $this->createTestMigrator(schemaDiff: $schemaDiff);
+
+        $this->migratorConfiguration->setDryRun(true);
+
+        $plans = [
+            new MigrationPlan(new Version('A'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+            new MigrationPlan(new Version('B'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+        ];
+
+        $migrator->migrate(new MigrationPlanList($plans, Direction::UP), $this->migratorConfiguration);
+
+        self::assertInstanceOf(Schema::class, $this->migratorConfiguration->getFromSchema());
+
+        foreach ($plans as $plan) {
+            $result = $plan->getResult();
+            self::assertNotNull($result);
+            self::assertFalse($this->hasToSchema($result->getToSchema(...)), 'toSchema should be released after execution');
+        }
+    }
+
+    /** @param callable(): Schema $getToSchema */
+    private function hasToSchema(callable $getToSchema): bool
+    {
+        try {
+            $getToSchema();
+
+            return true;
+        } catch (RuntimeException) {
+            return false;
+        }
     }
 }

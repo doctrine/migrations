@@ -129,7 +129,7 @@ final class ExecutionResult
         return $this->exception;
     }
 
-    public function setToSchema(Schema $toSchema): void
+    public function setToSchema(Schema|null $toSchema): void
     {
         $this->toSchema = $toSchema;
     }
