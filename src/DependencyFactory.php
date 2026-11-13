@@ -123,6 +123,11 @@ class DependencyFactory
         $this->frozen = true;
     }
 
+    public function unfreeze(): void
+    {
+        $this->frozen = false;
+    }
+
     private function assertNotFrozen(): void
     {
         if ($this->frozen) {

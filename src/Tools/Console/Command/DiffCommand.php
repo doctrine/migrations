@@ -98,7 +98,7 @@ EOT)
     }
 
     /** @throws InvalidOptionUsage */
-    protected function execute(
+    protected function doExecute(
         InputInterface $input,
         OutputInterface $output,
     ): int {
