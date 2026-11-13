@@ -155,6 +155,30 @@ The SQL generated here is the exact same SQL that would be executed if you were 
 This just allows you to capture that SQL and maybe tweak it or add to it and trigger the deployment later across
 multiple database servers.
 
+MySQL ALTER TABLE algorithms
+----------------------------
+
+The ``diff`` command leaves algorithm selection to MySQL by default. To add an algorithm to generated MySQL
+``ALTER TABLE`` statements, use the ``--mysql-algorithm`` option:
+
+.. code-block:: sh
+
+    $ ./vendor/bin/doctrine-migrations diff --mysql-algorithm=INSTANT
+
+The selected algorithm is added to each generated ``ALTER TABLE`` statement in both the ``up()`` and ``down()``
+methods. For example:
+
+.. code-block:: php
+
+    $this->addSql('ALTER TABLE users ADD COLUMN email VARCHAR(255) DEFAULT NULL, ALGORITHM=INSTANT');
+
+Use ``INSTANT`` for metadata-only changes when the operation supports it. ``INPLACE`` can rebuild a table.
+MySQL fails the statement if it cannot use the selected algorithm. Support depends on the MySQL version, operation,
+and table definition, so check both generated directions against your supported MySQL versions. See the
+`MySQL online DDL operation matrix`_ for operation-specific restrictions.
+
+.. _MySQL online DDL operation matrix: https://dev.mysql.com/doc/refman/8.4/en/innodb-online-ddl-operations.html
+
 Diffing Without the ORM
 -----------------------
 
