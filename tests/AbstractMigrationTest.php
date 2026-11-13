@@ -60,6 +60,17 @@ class AbstractMigrationTest extends MigrationTestCase
         $this->migration->exposedAddSql('SELECT 1', [1], [2]);
     }
 
+    public function testResetClearsSqlAndUnfreezes(): void
+    {
+        $this->migration->exposedAddSql('SELECT 1');
+        $this->migration->freeze();
+
+        $this->migration->reset();
+        $this->migration->exposedAddSql('SELECT 2');
+
+        self::assertEquals([new Query('SELECT 2')], $this->migration->getSql());
+    }
+
     public function testWarnIfOutputMessage(): void
     {
         $this->migration->warnIf(true, 'Warning was thrown');
