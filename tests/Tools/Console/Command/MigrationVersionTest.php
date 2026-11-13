@@ -14,6 +14,7 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
+use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -364,5 +365,22 @@ class MigrationVersionTest extends MigrationTestCase
         );
 
         self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay(true));
+    }
+
+    /**
+     * Test "--delete" option on not migrated version without existing version file.
+     */
+    public function testDeleteOptionIfVersionNotMigratedAndFileDoesNotExist(): void
+    {
+        $this->expectException(VersionDoesNotExist::class);
+        $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
+
+        $this->commandTester->execute(
+            [
+                '--delete' => true,
+                'version'  => '1233',
+            ],
+            ['interactive' => false],
+        );
     }
 }
