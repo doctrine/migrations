@@ -9,7 +9,7 @@ statements (``CREATE TABLE``, ``ALTER TABLE``, etc.) in transactions.
 
 The issue existed before PHP 8 but is now made visible by e.g. PDO,
 which now produces the above error message when this library attempts to
-commit a transaction that has already been commited before.
+commit a transaction that has already been committed before.
 
 Consider the following migration.
 
@@ -31,7 +31,7 @@ Consider the following migration.
     }
 
 When you run that migration, what actually happens with some platforms
-is you get the updates inside an implicitly commited transaction, then
+is you get the updates inside an implicitly committed transaction, then
 the ``CREATE TABLE`` happens outside that transaction, and then there is
 an attempt to commit a non-existent transaction.
 
@@ -74,7 +74,7 @@ Please refer to the manual of your database platform to know if you need
 to do this or not.
 
 At the moment, this library checks if there is an active transaction
-before commiting it, which means you should not encouter the error
+before committing it, which means you should not encounter the error
 described above. It will not be the case in the next major version
 though, and you should prepare for that.
 
