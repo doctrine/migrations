@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -68,6 +69,10 @@ class InlineParameterFormatterTest extends TestCase
     protected function setUp(): void
     {
         $connection = self::createStub(Connection::class);
+
+        $connection
+            ->method('getConfiguration')
+            ->willReturn(new Configuration());
 
         $connection
             ->method('getDatabasePlatform')

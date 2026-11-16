@@ -14,6 +14,7 @@ use function is_bool;
 use function is_float;
 use function is_int;
 use function is_string;
+use function method_exists;
 use function sprintf;
 
 /**
@@ -55,16 +56,36 @@ final class InlineParameterFormatter implements ParameterFormatter
 
     private function formatParameter(mixed $value, mixed $type): string|int|bool|float|null
     {
-        /** @phpstan-ignore staticMethod.deprecated (todo: use connection type provider) */
-        if (is_string($type) && Type::hasType($type)) {
-            /** @phpstan-ignore staticMethod.deprecated (todo: use connection type provider) */
+        if (! is_string($type)) {
+            return $this->parameterToString($value);
+        }
+
+        $configuration = $this->connection->getConfiguration();
+
+        /** @phpstan-ignore function.alreadyNarrowedType (DBAL < 4.6 has no type provider) */
+        if (! method_exists($configuration, 'getTypeProvider')) {
+            /** @phpstan-ignore staticMethod.deprecated (DBAL < 4.6) */
+            if (! Type::hasType($type)) {
+                return $this->parameterToString($value);
+            }
+
+            /** @phpstan-ignore staticMethod.deprecated (DBAL < 4.6) */
             return Type::getType($type)->convertToDatabaseValue(
                 $value,
                 $this->connection->getDatabasePlatform(),
             );
         }
 
-        return $this->parameterToString($value);
+        $typeProvider = $configuration->getTypeProvider();
+
+        if (! $typeProvider->has($type)) {
+            return $this->parameterToString($value);
+        }
+
+        return $typeProvider->get($type)->convertToDatabaseValue(
+            $value,
+            $this->connection->getDatabasePlatform(),
+        );
     }
 
     /** @param int[]|bool[]|string[]|float[]|array|int|string|float|bool $value */
