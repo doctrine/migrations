@@ -55,6 +55,32 @@ class DoctrineCommandTest extends MigrationTestCase
         );
     }
 
+    public function testCommandUnfreezes(): void
+    {
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration(new Configuration()),
+            new ExistingConnection($this->getSqliteConnection()),
+        );
+
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                return 0;
+            }
+        };
+        $commandTester = new CommandTester($command);
+
+        $input = ['--configuration' => __DIR__ . '/_files/config.yml'];
+
+        $commandTester->execute($input, ['interactive' => false]);
+        self::assertFalse($dependencyFactory->isFrozen());
+
+        // A frozen dependency factory would reject the new configuration loader
+        $commandTester->execute($input, ['interactive' => false]);
+        self::assertFalse($dependencyFactory->isFrozen());
+    }
+
     public function testCustomConfiguration(): void
     {
         $configuration = new Configuration();
