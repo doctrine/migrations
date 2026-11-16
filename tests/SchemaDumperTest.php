@@ -39,9 +39,6 @@ class SchemaDumperTest extends TestCase
 
     public function testDumpNoTablesException(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Your database schema does not contain any tables.');
-
         $schema = $this->createMock(Schema::class);
 
         $this->schemaManager->expects(self::once())
@@ -51,6 +48,9 @@ class SchemaDumperTest extends TestCase
         $schema->expects(self::once())
             ->method('getTables')
             ->willReturn([]);
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Your database schema does not contain any tables.');
 
         $this->schemaDumper->dump('Foo\\1234');
     }

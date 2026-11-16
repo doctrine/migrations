@@ -52,15 +52,19 @@ final class EntityManagerTest extends TestCase
 
     public function testArrayEntityManagerConfigurationLoaderInvalid(): void
     {
-        $this->expectException(InvalidConfiguration::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-invalid.php');
+
+        $this->expectException(InvalidConfiguration::class);
+
         $loader->getEntityManager();
     }
 
     public function testArrayEntityManagerConfigurationLoaderNotFound(): void
     {
-        $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');
+
+        $this->expectException(FileNotFound::class);
+
         $loader->getEntityManager();
     }
 }

@@ -114,9 +114,10 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testNoEntityManagerRaiseException(): void
     {
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+
         $this->expectException(MissingDependency::class);
 
-        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $di->getEntityManager();
     }
 

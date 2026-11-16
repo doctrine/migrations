@@ -95,8 +95,10 @@ class FilesystemMigrationsRepositoryTest extends TestCase
 
     public function testDuplicateLoadMigrationInstance(): void
     {
-        $this->expectException(DuplicateMigrationVersion::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
+
+        $this->expectException(DuplicateMigrationVersion::class);
+
         Helper::registerMigrationInstance($this->migrationRepository, new Version('Z'), self::createStub(AbstractMigration::class));
     }
 
