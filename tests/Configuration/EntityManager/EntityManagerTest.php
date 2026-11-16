@@ -25,13 +25,13 @@ final class EntityManagerTest extends TestCase
 
     public function testNamedConnectionIsNotSupported(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only one entity manager is supported by Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager');
-
         $em     = self::createStub(EntityManager::class);
         $loader = new ExistingEntityManager($em);
 
-        self::assertSame($em, $loader->getEntityManager('foo'));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one entity manager is supported by Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager');
+
+        $loader->getEntityManager('foo');
     }
 
     public function testArrayEntityManagerConfigurationLoader(): void
