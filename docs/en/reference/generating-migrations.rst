@@ -261,7 +261,7 @@ Ignoring Custom Tables
 ----------------------
 
 If you have custom tables which are not managed by Doctrine you will need to tell Doctrine to ignore these tables.
-Otherwise, everytime you run the ``diff`` command, Doctrine will try to drop those tables. You can configure Doctrine
+Otherwise, every time you run the ``diff`` command, Doctrine will try to drop those tables. You can configure Doctrine
 with a schema filter.
 
 .. code-block:: php

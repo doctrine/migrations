@@ -18,10 +18,10 @@ use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\DateTimeImmutableType;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
-use Doctrine\DBAL\Types\Type;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Exception\MetadataStorageError;
@@ -201,14 +201,15 @@ class TableMetadataStorageTest extends TestCase
         }
 
         /** @phpstan-ignore function.alreadyNarrowedType */
-        if (method_exists(Column::class, 'getTypeName')) {
-            self::assertInstanceOf(StringType::class, Type::getType($table->getColumn('b')->getTypeName()));
-            self::assertInstanceOf(DateTimeType::class, Type::getType($table->getColumn('c')->getTypeName()));
-            self::assertInstanceOf(IntegerType::class, Type::getType($table->getColumn('d')->getTypeName()));
+        if (method_exists(Configuration::class, 'getTypeProvider')) {
+            $typeProvider = $this->connection->getConfiguration()->getTypeProvider();
+            self::assertInstanceOf(StringType::class, $typeProvider->get($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeImmutableType::class, $typeProvider->get($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, $typeProvider->get($table->getColumn('d')->getTypeName()));
         } else {
             /** @phpstan-ignore method.deprecated */
             self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-            /** @phpstan-ignore method.deprecated */
+            /** @phpstan-ignore method.deprecated, classConstant.deprecatedClass */
             self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
             /** @phpstan-ignore method.deprecated */
             self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
@@ -291,14 +292,15 @@ class TableMetadataStorageTest extends TestCase
         }
 
         /** @phpstan-ignore function.alreadyNarrowedType */
-        if (method_exists(Column::class, 'getTypeName')) {
-            self::assertInstanceOf(StringType::class, Type::getType($table->getColumn('b')->getTypeName()));
-            self::assertInstanceOf(DateTimeType::class, Type::getType($table->getColumn('c')->getTypeName()));
-            self::assertInstanceOf(IntegerType::class, Type::getType($table->getColumn('d')->getTypeName()));
+        if (method_exists(Configuration::class, 'getTypeProvider')) {
+            $typeProvider = $this->connection->getConfiguration()->getTypeProvider();
+            self::assertInstanceOf(StringType::class, $typeProvider->get($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeImmutableType::class, $typeProvider->get($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, $typeProvider->get($table->getColumn('d')->getTypeName()));
         } else {
             /** @phpstan-ignore method.deprecated */
             self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-            /** @phpstan-ignore method.deprecated */
+            /** @phpstan-ignore method.deprecated, classConstant.deprecatedClass */
             self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
             /** @phpstan-ignore method.deprecated */
             self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());

@@ -42,7 +42,7 @@ parameters:
             path: src/Tools/Console/ConsoleRunner.php
 
         -
-            message: '~^Parameter #1 \$array \(list<string>\) of array_values is already a list, call has no effect\.$~'
+            message: '~^Parameter #1 \$array \(list<non-empty-string>\) of array_values is already a list, call has no effect\.$~'
             path: tests/Generator/DiffGeneratorTest.php
     symfony:
             consoleApplicationLoader: tests/doctrine-migrations-phpstan-app.php

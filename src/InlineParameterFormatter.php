@@ -55,7 +55,9 @@ final class InlineParameterFormatter implements ParameterFormatter
 
     private function formatParameter(mixed $value, mixed $type): string|int|bool|float|null
     {
+        /** @phpstan-ignore staticMethod.deprecated (todo: use connection type provider) */
         if (is_string($type) && Type::hasType($type)) {
+            /** @phpstan-ignore staticMethod.deprecated (todo: use connection type provider) */
             return Type::getType($type)->convertToDatabaseValue(
                 $value,
                 $this->connection->getDatabasePlatform(),
