@@ -25,11 +25,11 @@ final class ConnectionLoaderTest extends TestCase
 
     public function testNamedConnectionIsNotSupported(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
-
         $conn   = self::createStub(Connection::class);
         $loader = new ExistingConnection($conn);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
 
         $loader->getConnection('foo');
     }

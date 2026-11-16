@@ -101,9 +101,6 @@ class SchemaDumperTest extends TestCase
 
     public function testExcludedTableIsNotInTheDump(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Your database schema does not contain any tables.');
-
         $table = new Table('skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
@@ -128,14 +125,14 @@ class SchemaDumperTest extends TestCase
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
 
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Your database schema does not contain any tables.');
+
         $this->schemaDumper->dump('Foo\\1234');
     }
 
     public function testRegexErrorsAreConvertedToExceptions(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessageMatches('/Internal PCRE error/');
-
         $table = new Table('other_skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
@@ -148,14 +145,14 @@ class SchemaDumperTest extends TestCase
             ->method('getTables')
             ->willReturn([$table]);
 
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessageMatches('/Internal PCRE error/');
+
         $this->schemaDumper->dump('Foo\\1234', ['invalid regex']);
     }
 
     public function testExcludedTableViaParamIsNotInTheDump(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Your database schema does not contain any tables.');
-
         $table = new Table('other_skipped_table_name');
 
         $schema = $this->createMock(Schema::class);
@@ -179,6 +176,9 @@ class SchemaDumperTest extends TestCase
 
         $this->migrationGenerator->expects(self::never())
             ->method('generateMigration');
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Your database schema does not contain any tables.');
 
         $this->schemaDumper->dump('Foo\\1234', ['/other_skipped_table_name/']);
     }
