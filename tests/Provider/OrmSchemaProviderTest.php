@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Provider;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Provider\OrmSchemaProvider;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\ORM\Configuration;
@@ -13,6 +14,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Mapping\Driver\XmlDriver;
 use Doctrine\ORM\ORMSetup;
 use PHPUnit\Framework\Attributes\DoesNotPerformAssertions;
+
+use function method_exists;
 
 use const PHP_VERSION_ID;
 
@@ -58,6 +61,11 @@ class OrmSchemaProviderTest extends MigrationTestCase
             $this->config->enableNativeLazyObjects(true);
         } else {
             $this->config = ORMSetup::createXMLMetadataConfiguration([__DIR__ . '/_files'], true);
+        }
+
+        /** @phpstan-ignore function.alreadyNarrowedType, function.alreadyNarrowedType (these method exists since ORM 3.8 and DBAL 4.5) */
+        if (method_exists(Configuration::class, 'setUseSchemaEditorApi') && method_exists(Schema::class, 'edit')) {
+            $this->config->setUseSchemaEditorApi(true);
         }
 
         $this->config->setClassMetadataFactoryName(ClassMetadataFactory::class);
