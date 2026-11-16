@@ -204,7 +204,12 @@ EOT);
             }
 
             if (! $executedMigrations->hasMigration($version)) {
-                throw VersionDoesNotExist::new($version);
+                $this->io->text(sprintf(
+                    "<info>%s</info> is not in the version table, nothing to delete.\n",
+                    (string) $version,
+                ));
+
+                return;
             }
 
             $question =

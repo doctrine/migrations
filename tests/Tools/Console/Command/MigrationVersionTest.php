@@ -14,7 +14,6 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
 use Doctrine\Migrations\Tests\MigrationTestCase;
 use Doctrine\Migrations\Tools\Console\Command\VersionCommand;
-use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -404,15 +403,34 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOptionIfVersionNotMigratedAndFileDoesNotExist(): void
     {
-        $this->expectException(VersionDoesNotExist::class);
-        $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
-
-        $this->commandTester->execute(
+        $exitCode = $this->commandTester->execute(
             [
                 '--delete' => true,
                 'version'  => '1233',
             ],
             ['interactive' => false],
         );
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        self::assertStringNotContainsString('deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration(new Version('1233')));
+    }
+
+    public function testDeleteOptionWithoutVersionFileIsIdempotent(): void
+    {
+        $version = new Version('1233');
+        $this->metadataStorage->complete(new ExecutionResult($version, Direction::UP));
+
+        $arguments = ['--delete' => true, 'version' => '1233'];
+        $options   = ['interactive' => false];
+
+        self::assertSame(0, $this->commandTester->execute($arguments, $options));
+        self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration($version));
+
+        self::assertSame(0, $this->commandTester->execute($arguments, $options));
+        self::assertStringContainsString('1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        self::assertStringNotContainsString('deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration($version));
     }
 }
