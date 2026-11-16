@@ -124,6 +124,18 @@ class DependencyFactory
         $this->frozen = true;
     }
 
+    /**
+     * Allows dependencies to be replaced again.
+     *
+     * Console commands freeze the dependency factory while they run, then
+     * unfreeze it so it can be reused, for example to run several commands in
+     * the same process.
+     */
+    public function unfreeze(): void
+    {
+        $this->frozen = false;
+    }
+
     private function assertNotFrozen(): void
     {
         if ($this->frozen) {
