@@ -31,11 +31,12 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testDownMigrationIsOptional(): void
     {
+        $migration = new AbstractMigrationWithoutDownStub($this->getSqliteConnection(), $this->logger);
+        $schema    = self::createStub(Schema::class);
+
         $this->expectException(AbortMigration::class);
         $this->expectExceptionMessage('No down() migration implemented for "Doctrine\Migrations\Tests\Stub\AbstractMigrationWithoutDownStub"');
 
-        $migration = new AbstractMigrationWithoutDownStub($this->getSqliteConnection(), $this->logger);
-        $schema    = self::createStub(Schema::class);
         $migration->down($schema);
     }
 
@@ -53,10 +54,11 @@ class AbstractMigrationTest extends MigrationTestCase
 
     public function testThrowFrozenMigrationException(): void
     {
+        $this->migration->freeze();
+
         $this->expectException(FrozenMigration::class);
         $this->expectExceptionMessage('The migration is frozen and cannot be edited anymore.');
 
-        $this->migration->freeze();
         $this->migration->exposedAddSql('SELECT 1', [1], [2]);
     }
 

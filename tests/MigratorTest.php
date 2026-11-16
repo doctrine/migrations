@@ -143,9 +143,6 @@ class MigratorTest extends MigrationTestCase
 
     public function testMigrateAllOrNothingRollback(): void
     {
-        $this->expectException(Throwable::class);
-        $this->expectExceptionMessage('Migration up throws exception.');
-
         $this->conn
             ->expects(self::exactly(2))
             ->method('beginTransaction');
@@ -165,6 +162,9 @@ class MigratorTest extends MigrationTestCase
         $migration = new MigrationThrowsError($this->conn, $this->logger);
         $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
         $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        $this->expectException(Throwable::class);
+        $this->expectExceptionMessage('Migration up throws exception.');
 
         $migrator->migrate($planList, $this->migratorConfiguration);
     }

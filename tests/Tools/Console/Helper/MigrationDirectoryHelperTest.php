@@ -76,9 +76,9 @@ class MigrationDirectoryHelperTest extends MigrationTestCase
 
     public function testMigrationsDirectoryHelperWithFolderThatDoesNotExists(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-
         $this->configuration->addMigrationsDirectory('DoctrineMigrations', '/non_exiting_folder');
+
+        $this->expectException(InvalidArgumentException::class);
 
         foreach ($this->configuration->getMigrationDirectories() as $dir) {
             $this->mirationDirectoryHelper->getMigrationDirectory($this->configuration, $dir);

@@ -89,9 +89,6 @@ class TableMetadataStorageTest extends TestCase
 
     public function testDifferentTableNotUpdatedOnRead(): void
     {
-        $this->expectException(MetadataStorageError::class);
-        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
-
         // @phpstan-ignore function.alreadyNarrowedType
         if (method_exists(Table::class, 'editor')) {
             $table = Table::editor()
@@ -129,6 +126,9 @@ class TableMetadataStorageTest extends TestCase
         }
 
         $this->schemaManager->createTable($table);
+
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
 
         $this->storage->getExecutedMigrations();
     }
@@ -218,9 +218,6 @@ class TableMetadataStorageTest extends TestCase
 
     public function testTableNotUpToDateTriggersExcepton(): void
     {
-        $this->expectException(MetadataStorageError::class);
-        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
-
         $config = new TableMetadataStorageConfiguration();
         $config->setTableName('a');
         $config->setVersionColumnName('b');
@@ -267,6 +264,10 @@ class TableMetadataStorageTest extends TestCase
         $this->schemaManager->createTable($table);
 
         $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
+
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
+
         $storage->getExecutedMigrations();
     }
 

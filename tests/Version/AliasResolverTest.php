@@ -48,10 +48,6 @@ final class AliasResolverTest extends TestCase
     #[DataProvider('getAliases')]
     public function testAliases(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
-        if ($expectedException !== null) {
-            $this->expectException($expectedException);
-        }
-
         $migrationClass = self::createStub(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
@@ -60,6 +56,10 @@ final class AliasResolverTest extends TestCase
         foreach (['A', 'B'] as $version) {
             $result = new ExecutionResult(new Version($version), Direction::UP);
             $this->metadataStorage->complete($result);
+        }
+
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
         }
 
         $resolvedAlias = $this->versionAliasResolver->resolveVersionAlias($alias);
@@ -74,13 +74,13 @@ final class AliasResolverTest extends TestCase
     #[DataProvider('getAliasesWithNoExecuted')]
     public function testAliasesWithNoExecuted(string $alias, string|null $expectedVersion, string|null $expectedException = null): void
     {
-        if ($expectedException !== null) {
-            $this->expectException($expectedException);
-        }
-
         $migrationClass = self::createStub(AbstractMigration::class);
         foreach (['A', 'B', 'C'] as $version) {
             Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
+        }
+
+        if ($expectedException !== null) {
+            $this->expectException($expectedException);
         }
 
         $resolvedAlias = $this->versionAliasResolver->resolveVersionAlias($alias);

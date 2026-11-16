@@ -35,17 +35,21 @@ class MigrationPlanListTest extends TestCase
 
     public function testFirstWhenEmpty(): void
     {
+        $set = new MigrationPlanList([], Direction::UP);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
-        $set = new MigrationPlanList([], Direction::UP);
+
         $set->getFirst();
     }
 
     public function testLastWhenEmpty(): void
     {
+        $set = new MigrationPlanList([], Direction::UP);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
-        $set = new MigrationPlanList([], Direction::UP);
+
         $set->getLast();
     }
 
@@ -85,11 +89,12 @@ class MigrationPlanListTest extends TestCase
 
     public function testPlanResultCanBeSetOnlyOnce(): void
     {
+        $result = new ExecutionResult(new Version('A'), Direction::UP);
+        $this->m1->markAsExecuted($result);
+
         $this->expectException(PlanAlreadyExecuted::class);
         $this->expectExceptionMessage('This plan was already marked as executed.');
 
-        $result = new ExecutionResult(new Version('A'), Direction::UP);
-        $this->m1->markAsExecuted($result);
         $this->m1->markAsExecuted($result);
     }
 
