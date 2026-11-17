@@ -208,6 +208,26 @@ class ExecutorTest extends TestCase
         ], $this->getInterpolatedLogRecords($this->logger));
     }
 
+    public function testExecuteSameMigrationUpThenDown(): void
+    {
+        $migratorConfiguration = new MigratorConfiguration();
+
+        $this->versionExecutor->execute(
+            new MigrationPlan($this->version, $this->migration, Direction::UP),
+            $migratorConfiguration,
+        );
+
+        $result = $this->versionExecutor->execute(
+            new MigrationPlan($this->version, $this->migration, Direction::DOWN),
+            $migratorConfiguration,
+        );
+
+        $queries = $result->getSql();
+        self::assertCount(2, $queries);
+        self::assertSame('SELECT 3', $queries[0]->getStatement());
+        self::assertSame('SELECT 4', $queries[1]->getStatement());
+    }
+
     public function testExecuteDryRun(): void
     {
         $this->metadataStorage
