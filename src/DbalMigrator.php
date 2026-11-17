@@ -89,9 +89,13 @@ class DbalMigrator implements Migrator
             // capture the to Schema for the migration so we have the ability to use
             // it as the from Schema for the next migration when we are running a dry run
             // $toSchema may be null in the case of skipped migrations
-            if (! $versionExecutionResult->isSkipped()) {
+            if ($migratorConfiguration->isDryRun() && ! $versionExecutionResult->isSkipped()) {
                 $migratorConfiguration->setFromSchema($versionExecutionResult->getToSchema());
             }
+
+            // the result stays referenced by the plan until the end of the run, so release
+            // the to Schema to keep memory from growing with every executed migration
+            $versionExecutionResult->setToSchema(null);
 
             $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
         }
