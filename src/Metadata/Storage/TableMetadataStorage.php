@@ -277,7 +277,7 @@ final class TableMetadataStorage implements MetadataStorage
                 ->addColumn(
                     Column::editor()
                         ->setName(UnqualifiedName::unquoted($this->configuration->getExecutedAtColumnName()))
-                        ->setTypeName('datetime')
+                        ->setTypeName('datetime_immutable')
                         ->setNotNull(false)
                         ->create(),
                 )
