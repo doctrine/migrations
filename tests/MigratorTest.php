@@ -25,6 +25,7 @@ use Doctrine\Migrations\Version\Version;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\Test\TestLogger;
+use RuntimeException;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
@@ -167,6 +168,51 @@ class MigratorTest extends MigrationTestCase
         $this->expectExceptionMessage('Migration up throws exception.');
 
         $migrator->migrate($planList, $this->migratorConfiguration);
+    }
+
+    public function testMigrateAllOrNothingKeepsTheOriginalErrorWhenTheRollbackFails(): void
+    {
+        // ONLY THE SECOND ROLLBACK FAILS. Two sites roll back under all-or-nothing: the executor's
+        // per-migration one and this class's outer one. Making every call throw would exercise the
+        // executor instead, so the failure is aimed at the outer rollback specifically.
+        $rollbacks = 0;
+        $this->conn
+            ->method('rollback')
+            ->willReturnCallback(static function () use (&$rollbacks): bool {
+                $rollbacks++;
+
+                if ($rollbacks === 2) {
+                    // What MySQL answers once a DDL statement's implicit commit has destroyed the
+                    // savepoint. The code under test cannot tell why the rollback failed, only that
+                    // it did while another exception was already in flight.
+                    throw new RuntimeException('SAVEPOINT DOCTRINE_2 does not exist');
+                }
+
+                return true;
+            });
+
+        $migrator = $this->createTestMigrator();
+
+        $this->migratorConfiguration->setAllOrNothing(true);
+
+        $migration = new MigrationThrowsError($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        try {
+            $migrator->migrate($planList, $this->migratorConfiguration);
+
+            self::fail('the failing rollback should have propagated');
+        } catch (Throwable $e) {
+            // The migration's own error must survive: the rollback failure is what propagates, and
+            // the error that stopped the migration is reachable from it as the previous exception.
+            self::assertSame('SAVEPOINT DOCTRINE_2 does not exist', $e->getMessage());
+
+            $previous = $e->getPrevious();
+
+            self::assertNotNull($previous, 'the migration error must be chained onto the rollback failure');
+            self::assertSame('Migration up throws exception.', $previous->getMessage());
+        }
     }
 
     public function testMigrateAllOrNothingNonTransactionalMigration(): void
