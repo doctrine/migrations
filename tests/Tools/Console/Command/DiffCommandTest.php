@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
+use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\Migrations\AbstractMigration;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DependencyFactory;
@@ -90,6 +92,35 @@ final class DiffCommandTest extends TestCase
             '',
             'To revert the migration you can use migrations:execute --down "FooNs\\\\Version1234"',
         ], array_map(trim(...), explode("\n", trim($output))));
+    }
+
+    public function testExecutePassesMySQLAlgorithmToDiffGenerator(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $platform = self::createStub(MySQLPlatform::class);
+
+        $connection = $this->createMock(Connection::class);
+        $connection->method('getDatabasePlatform')->willReturn($platform);
+        $this->dependencyFactory->method('getConnection')->willReturn($connection);
+
+        $this->classNameGenerator->expects(self::once())
+            ->method('generateClassName')
+            ->with('FooNs')
+            ->willReturn('FooNs\\Version1234');
+
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with('FooNs\\Version1234', null, false, null, 120, false, false, 'INSTANT')
+            ->willReturn('/path/to/migration.php');
+
+        $this->diffCommandTester->execute(['--mysql-algorithm' => 'instant']);
     }
 
     public function testAvailableMigrationsCancel(): void
