@@ -76,8 +76,10 @@ class ConfigurationTest extends TestCase
 
     public function testMigrationOrganizationWithWrongValue(): void
     {
-        $this->expectException(UnknownConfigurationValue::class);
         $config = new Configuration();
+
+        $this->expectException(UnknownConfigurationValue::class);
+
         $config->setMigrationOrganization('foo');
     }
 

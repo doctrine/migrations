@@ -50,14 +50,14 @@ final class DumpSchemaCommandTest extends TestCase
 
     public function testExecuteThrowsRuntimeException(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
-
         $migration = new AvailableMigration(new Version('FooNs\Abc'), self::createStub(AbstractMigration::class));
 
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([$migration]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
 
         $this->dumpSchemaCommandTester->execute([]);
     }

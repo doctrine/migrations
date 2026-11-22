@@ -310,9 +310,6 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOptionIfVersionAlreadyMigrated(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The version "1233" already exists in the version table.');
-
         $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
@@ -320,6 +317,9 @@ class MigrationVersionTest extends MigrationTestCase
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The version "1233" already exists in the version table.');
 
         $this->commandTester->execute(
             [

@@ -25,13 +25,13 @@ final class ConnectionLoaderTest extends TestCase
 
     public function testNamedConnectionIsNotSupported(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
-
         $conn   = self::createStub(Connection::class);
         $loader = new ExistingConnection($conn);
 
-        self::assertSame($conn, $loader->getConnection('foo'));
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Only one connection is supported by Doctrine\Migrations\Configuration\Connection\ExistingConnection');
+
+        $loader->getConnection('foo');
     }
 
     public function testArrayConnectionConfigurationLoader(): void
@@ -52,15 +52,19 @@ final class ConnectionLoaderTest extends TestCase
 
     public function testArrayConnectionConfigurationLoaderInvalid(): void
     {
-        $this->expectException(InvalidConfiguration::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/sqlite-connection-invalid.php');
+
+        $this->expectException(InvalidConfiguration::class);
+
         $loader->getConnection();
     }
 
     public function testArrayConnectionConfigurationLoaderNotFound(): void
     {
-        $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');
+
+        $this->expectException(FileNotFound::class);
+
         $loader->getConnection();
     }
 }

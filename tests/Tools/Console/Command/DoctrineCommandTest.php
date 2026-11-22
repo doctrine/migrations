@@ -209,8 +209,6 @@ class DoctrineCommandTest extends MigrationTestCase
 
     public function testCanNotSpecifyBothEmAndConnection(): void
     {
-        $this->expectException(InvalidOptionUsage::class);
-        $this->expectExceptionMessage('You can specify only one of the --em and --conn options.');
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
@@ -230,6 +228,10 @@ class DoctrineCommandTest extends MigrationTestCase
             }
         };
         $commandTester = new CommandTester($command);
+
+        $this->expectException(InvalidOptionUsage::class);
+        $this->expectExceptionMessage('You can specify only one of the --em and --conn options.');
+
         $commandTester->execute(
             [
                 '--conn' => 'bar',

@@ -14,7 +14,6 @@ use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
-use Throwable;
 
 use function count;
 
@@ -48,18 +47,21 @@ class DbalMigrator implements Migrator
             $this->connection->beginTransaction();
         }
 
+        $successful = false;
+
         try {
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $migratorConfiguration);
 
             $sql = $this->executePlan($migrationsPlan, $migratorConfiguration);
 
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $migratorConfiguration);
-        } catch (Throwable $e) {
-            if ($allOrNothing) {
+
+            $successful = true;
+        } finally {
+            // Rolling back in finally keeps the migration's exception as the previous one.
+            if (! $successful && $allOrNothing) {
                 TransactionHelper::rollbackIfInTransaction($this->connection);
             }
-
-            throw $e;
         }
 
         if ($allOrNothing) {

@@ -53,8 +53,10 @@ class ConfigurationFileWithFallbackTest extends TestCase
 
     public function testMissingConfig(): void
     {
+        $loader = new ConfigurationFileWithFallback();
+
         $this->expectException(MissingConfigurationFile::class);
-        $loader        = new ConfigurationFileWithFallback();
+
         $configuration = $loader->getConfiguration();
     }
 }
