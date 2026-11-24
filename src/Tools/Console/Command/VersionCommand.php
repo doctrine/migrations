@@ -10,7 +10,6 @@ use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
-use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
@@ -186,7 +185,6 @@ EOT);
 
     /**
      * @throws VersionAlreadyExists
-     * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
     private function mark(InputInterface $input, Version $version, bool $all, ExecutedMigrationsList $executedMigrations): void
@@ -201,6 +199,15 @@ EOT);
         if ($availableMigration === null) {
             if ($input->getOption('delete') === false) {
                 throw UnknownMigrationVersion::new((string) $version);
+            }
+
+            if (! $executedMigrations->hasMigration($version)) {
+                $this->io->warning(sprintf(
+                    '%s is not in the version table, nothing to delete.',
+                    (string) $version,
+                ));
+
+                return;
             }
 
             $question =
@@ -233,7 +240,12 @@ EOT);
 
         if (! $this->markMigrated && ! $executedMigrations->hasMigration($version)) {
             if (! $all) {
-                throw VersionDoesNotExist::new($version);
+                $this->io->warning(sprintf(
+                    '%s is not in the version table, nothing to delete.',
+                    (string) $version,
+                ));
+
+                return;
             }
 
             $marked = true;
