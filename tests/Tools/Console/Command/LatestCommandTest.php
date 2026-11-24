@@ -57,7 +57,7 @@ class LatestCommandTest extends MigrationTestCase
 
     public function testExecute(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1230'), $migrationClass);
 

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests;
 
 use Doctrine\DBAL\ArrayParameterType;
+use Doctrine\DBAL\Configuration;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\ParameterType;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
@@ -44,7 +45,7 @@ class InlineParameterFormatterTest extends TestCase
             Types::STRING,
             Types::INTEGER,
             Types::FLOAT,
-            Types::SIMPLE_ARRAY,
+            Types::SIMPLE_ARRAY, // @phpstan-ignore classConstant.deprecated
             Types::BOOLEAN,
             Types::BOOLEAN,
             'unknown',
@@ -67,9 +68,13 @@ class InlineParameterFormatterTest extends TestCase
 
     protected function setUp(): void
     {
-        $connection = $this->createMock(Connection::class);
+        $connection = self::createStub(Connection::class);
 
-        $connection->expects(self::any())
+        $connection
+            ->method('getConfiguration')
+            ->willReturn(new Configuration());
+
+        $connection
             ->method('getDatabasePlatform')
             ->willReturn(self::createStub(AbstractPlatform::class));
 

@@ -12,9 +12,11 @@ class ArrayLoaderTest extends TestCase
 {
     public function testInvalidKey(): void
     {
+        $loader = new ConfigurationArray(['foo' => 'aaa']);
+
         $this->expectException(InvalidConfigurationKey::class);
         $this->expectExceptionMessage('Migrations configuration key "foo" does not exist');
-        $loader = new ConfigurationArray(['foo' => 'aaa']);
+
         $loader->getConfiguration();
     }
 }

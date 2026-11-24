@@ -48,6 +48,8 @@ final class Configuration
 
     private bool $frozen = false;
 
+    private bool $formatted = false;
+
     public function freeze(): void
     {
         $this->frozen = true;
@@ -208,5 +210,16 @@ final class Configuration
             self::VERSIONS_ORGANIZATION_BY_YEAR_AND_MONTH => $this->setMigrationsAreOrganizedByYearAndMonth(),
             default => throw UnknownConfigurationValue::new('organize_migrations', $migrationOrganization),
         };
+    }
+
+    public function setFormatted(bool $formatted): void
+    {
+        $this->assertNotFrozen();
+        $this->formatted = $formatted;
+    }
+
+    public function isFormatted(): bool
+    {
+        return $this->formatted;
     }
 }

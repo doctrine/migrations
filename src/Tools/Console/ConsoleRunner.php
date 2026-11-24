@@ -130,9 +130,11 @@ class ConsoleRunner
             return;
         }
 
+        /** @phpstan-ignore function.alreadyNarrowedType */
         if (method_exists(Application::class, 'addCommand')) {
             $cli->addCommand(new DiffCommand($dependencyFactory));
         } else {
+            /** @phpstan-ignore method.notFound */
             $cli->add(new DiffCommand($dependencyFactory));
         }
     }

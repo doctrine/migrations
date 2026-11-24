@@ -13,9 +13,12 @@ use Doctrine\DBAL\DriverManager;
 use Doctrine\DBAL\Logging\Middleware;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
+use Doctrine\DBAL\Schema\Column;
+use Doctrine\DBAL\Schema\Name\OptionallyQualifiedName;
 use Doctrine\DBAL\Schema\Name\UnqualifiedName;
 use Doctrine\DBAL\Schema\PrimaryKeyConstraint;
 use Doctrine\DBAL\Schema\Table;
+use Doctrine\DBAL\Types\DateTimeImmutableType;
 use Doctrine\DBAL\Types\DateTimeType;
 use Doctrine\DBAL\Types\IntegerType;
 use Doctrine\DBAL\Types\StringType;
@@ -35,6 +38,7 @@ use Psr\Log\Test\TestLogger;
 use ReflectionClass;
 
 use function class_exists;
+use function method_exists;
 use function sprintf;
 
 class TableMetadataStorageTest extends TestCase
@@ -85,23 +89,46 @@ class TableMetadataStorageTest extends TestCase
 
     public function testDifferentTableNotUpdatedOnRead(): void
     {
-        $this->expectException(MetadataStorageError::class);
-        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
-
-        $table = new Table($this->config->getTableName());
-        $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($this->config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            $table = new Table($this->config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($this->config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($this->config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$this->config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
+
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
 
         $this->storage->getExecutedMigrations();
     }
@@ -123,17 +150,40 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutedAtColumnName('c');
         $config->setExecutionTimeColumnName('d');
 
-        $table = new Table($config->getTableName());
-        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$config->getVersionColumnName()]);
+            $table = new Table($config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
@@ -142,18 +192,32 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->introspectTable($config->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            $table = $this->schemaManager->introspectTableByUnquotedName($config->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $table = $this->schemaManager->introspectTable($config->getTableName());
+        }
 
-        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
-        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Configuration::class, 'getTypeProvider')) {
+            $typeProvider = $this->connection->getConfiguration()->getTypeProvider();
+            self::assertInstanceOf(StringType::class, $typeProvider->get($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeImmutableType::class, $typeProvider->get($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, $typeProvider->get($table->getColumn('d')->getTypeName()));
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+            /** @phpstan-ignore method.deprecated, classConstant.deprecatedClass */
+            self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        }
     }
 
     public function testTableNotUpToDateTriggersExcepton(): void
     {
-        $this->expectException(MetadataStorageError::class);
-        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
-
         $config = new TableMetadataStorageConfiguration();
         $config->setTableName('a');
         $config->setVersionColumnName('b');
@@ -161,22 +225,49 @@ class TableMetadataStorageTest extends TestCase
         $config->setExecutedAtColumnName('c');
         $config->setExecutionTimeColumnName('d');
 
-        $table = new Table($config->getTableName());
-        $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
-
-        if (class_exists(PrimaryKeyConstraint::class)) {
-            $constraint = PrimaryKeyConstraint::editor()
-                ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Table::class, 'editor')) {
+            $table = Table::editor()
+                ->setName(OptionallyQualifiedName::unquoted($config->getTableName()))
+                ->addColumn(
+                    Column::editor()
+                        ->setName(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->setTypeName('string')
+                        ->setNotNull(true)
+                        ->setLength(10)
+                        ->create(),
+                )
+                ->setPrimaryKeyConstraint(
+                    PrimaryKeyConstraint::editor()
+                        ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                        ->create(),
+                )
                 ->create();
-
-            $table->addPrimaryKeyConstraint($constraint);
         } else {
-            $table->setPrimaryKey([$config->getVersionColumnName()]);
+            $table = new Table($config->getTableName());
+            // @phpstan-ignore method.deprecated
+            $table->addColumn($config->getVersionColumnName(), 'string', ['notnull' => true, 'length' => 10]);
+
+            if (class_exists(PrimaryKeyConstraint::class)) {
+                $constraint = PrimaryKeyConstraint::editor()
+                    ->setColumnNames(UnqualifiedName::unquoted($config->getVersionColumnName()))
+                    ->create();
+
+                // @phpstan-ignore method.deprecated
+                $table->addPrimaryKeyConstraint($constraint);
+            } else {
+                // @phpstan-ignore method.deprecated
+                $table->setPrimaryKey([$config->getVersionColumnName()]);
+            }
         }
 
         $this->schemaManager->createTable($table);
 
         $storage = new TableMetadataStorage($this->connection, new AlphabeticalComparator(), $config);
+
+        $this->expectException(MetadataStorageError::class);
+        $this->expectExceptionMessage('The metadata storage is not up to date, please run the sync-metadata-storage command to fix this issue.');
+
         $storage->getExecutedMigrations();
     }
 
@@ -193,11 +284,28 @@ class TableMetadataStorageTest extends TestCase
 
         $storage->ensureInitialized();
 
-        $table = $this->schemaManager->introspectTable($config->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($this->schemaManager, 'introspectTableByUnquotedName')) {
+            $table = $this->schemaManager->introspectTableByUnquotedName($config->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $table = $this->schemaManager->introspectTable($config->getTableName());
+        }
 
-        self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
-        self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
-        self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Configuration::class, 'getTypeProvider')) {
+            $typeProvider = $this->connection->getConfiguration()->getTypeProvider();
+            self::assertInstanceOf(StringType::class, $typeProvider->get($table->getColumn('b')->getTypeName()));
+            self::assertInstanceOf(DateTimeImmutableType::class, $typeProvider->get($table->getColumn('c')->getTypeName()));
+            self::assertInstanceOf(IntegerType::class, $typeProvider->get($table->getColumn('d')->getTypeName()));
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(StringType::class, $table->getColumn('b')->getType());
+            /** @phpstan-ignore method.deprecated, classConstant.deprecatedClass */
+            self::assertInstanceOf(DateTimeType::class, $table->getColumn('c')->getType());
+            /** @phpstan-ignore method.deprecated */
+            self::assertInstanceOf(IntegerType::class, $table->getColumn('d')->getType());
+        }
     }
 
     public function testComplete(): void
@@ -444,14 +552,13 @@ class TableMetadataStorageTest extends TestCase
     {
         $availableMigration     = new AvailableMigration(
             new Version('Foo\\Version1234'),
-            $this->createMock(AbstractMigration::class),
+            self::createStub(AbstractMigration::class),
         );
         $executedMigrationV3    = new ExecutedMigration(new Version('Foo\\Version1234'));
         $executedMigrationOlder = new ExecutedMigration(new Version('Version1234'));
 
         $reflection = new ReflectionClass(TableMetadataStorage::class);
         $method     = $reflection->getMethod('isAlreadyV3Format');
-        $method->setAccessible(true);
 
         self::assertTrue($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationV3]));
         self::assertFalse($method->invokeArgs($this->storage, [$availableMigration, $executedMigrationOlder]));

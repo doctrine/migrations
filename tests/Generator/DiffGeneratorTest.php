@@ -8,6 +8,7 @@ use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
+use Doctrine\DBAL\Schema\NamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\SchemaDiff;
 use Doctrine\DBAL\Schema\Table;
@@ -15,13 +16,17 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 use function array_map;
 use function array_values;
+use function method_exists;
 use function preg_match;
 
+#[AllowMockObjectsWithoutExpectations]
 class DiffGeneratorTest extends TestCase
 {
     private DBALConfiguration&MockObject $dbalConfiguration;
@@ -30,7 +35,7 @@ class DiffGeneratorTest extends TestCase
     private AbstractSchemaManager&MockObject $schemaManager;
 
     private SchemaProvider&MockObject $schemaProvider;
-    private AbstractPlatform&MockObject $platform;
+    private AbstractPlatform&Stub $platform;
     private Generator&MockObject $migrationGenerator;
     private SqlGenerator&MockObject $migrationSqlGenerator;
     private DiffGenerator $migrationDiffGenerator;
@@ -38,8 +43,28 @@ class DiffGeneratorTest extends TestCase
 
     public function testGenerate(): void
     {
-        $fromSchema = $this->createMock(Schema::class);
-        $toSchema   = $this->createMock(Schema::class);
+        $table1 = new Table('schema.table_name1');
+        $table2 = new Table('schema.table_name2');
+        $table3 = new Table('schema.table_name3');
+
+        // @phpstan-ignore function.alreadyNarrowedType
+        if (method_exists(Schema::class, 'editor')) {
+            $fromSchema = Schema::editor()->create();
+            $toSchema   = Schema::editor()
+                ->setTables($table1, $table2, $table3)
+                ->create();
+        } else {
+            $fromSchema = $this->createMock(Schema::class);
+            $toSchema   = $this->createMock(Schema::class);
+
+            $toSchema->expects(self::once())
+                ->method('getTables')
+                ->willReturn([$table1, $table2, $table3]);
+
+            $toSchema->expects(self::exactly(2))
+                ->method('dropTable')
+                ->willReturnSelf();
+        }
 
         $this->dbalConfiguration->expects(self::once())
             ->method('setSchemaAssetsFilter');
@@ -49,25 +74,6 @@ class DiffGeneratorTest extends TestCase
             ->willReturn(
                 static fn ($name): bool => $name === 'schema.table_name1',
             );
-
-        $table1 = $this->createMock(Table::class);
-        $table1->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name1');
-
-        $table2 = $this->createMock(Table::class);
-        $table2->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name2');
-
-        $table3 = $this->createMock(Table::class);
-        $table3->expects(self::once())
-            ->method('getName')
-            ->willReturn('schema.table_name3');
-
-        $toSchema->expects(self::once())
-            ->method('getTables')
-            ->willReturn([$table1, $table2, $table3]);
 
         $this->emptySchemaProvider->expects(self::never())
             ->method('createSchema');
@@ -79,10 +85,6 @@ class DiffGeneratorTest extends TestCase
         $this->schemaProvider->expects(self::once())
             ->method('createSchema')
             ->willReturn($toSchema);
-
-        $toSchema->expects(self::exactly(2))
-            ->method('dropTable')
-            ->willReturnSelf();
 
         $schemaDiff = self::createStub(SchemaDiff::class);
 
@@ -223,7 +225,13 @@ class DiffGeneratorTest extends TestCase
 
         $this->migrationDiffGenerator->generate('Version1234', null);
 
-        $filteredTableNames = array_map(static fn (Table $table) => $table->getName(), $toSchema->getTables());
+        $filteredTableNames = array_map(
+            /** @phpstan-ignore instanceof.alwaysTrue */
+            static fn (Table $table) => $table instanceof NamedObject ?
+            $table->getObjectName()->toString() :
+            $table->getName(),
+            $toSchema->getTables(),
+        );
 
         self::assertSame(['some_schema.table1', 'some_schema.table2'], array_values($filteredTableNames));
     }
@@ -233,7 +241,7 @@ class DiffGeneratorTest extends TestCase
         $this->dbalConfiguration      = $this->createMock(DBALConfiguration::class);
         $this->schemaManager          = $this->createMock(AbstractSchemaManager::class);
         $this->schemaProvider         = $this->createMock(SchemaProvider::class);
-        $this->platform               = $this->createMock(AbstractPlatform::class);
+        $this->platform               = self::createStub(AbstractPlatform::class);
         $this->migrationGenerator     = $this->createMock(Generator::class);
         $this->migrationSqlGenerator  = $this->createMock(SqlGenerator::class);
         $this->emptySchemaProvider    = $this->createMock(SchemaProvider::class);

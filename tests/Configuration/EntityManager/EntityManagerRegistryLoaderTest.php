@@ -9,23 +9,23 @@ use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\AbstractManagerRegistry;
 use InvalidArgumentException;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub as MockObjectStub;
 use PHPUnit\Framework\TestCase;
 
 final class EntityManagerRegistryLoaderTest extends TestCase
 {
-    /** @var EntityManager&MockObject */
+    /** @var EntityManager&MockObjectStub */
     private EntityManager $em1;
 
-    /** @var EntityManager&MockObject */
+    /** @var EntityManager&MockObjectStub */
     private EntityManager $em2;
 
     private AbstractManagerRegistry $registry;
 
     public function setUp(): void
     {
-        $this->em1      = $this->createMock(EntityManager::class);
-        $this->em2      = $this->createMock(EntityManager::class);
+        $this->em1      = self::createStub(EntityManager::class);
+        $this->em2      = self::createStub(EntityManager::class);
         $this->registry = new DoctrineRegistry([], ['foo' => $this->em1, 'bar' => $this->em2]);
     }
 

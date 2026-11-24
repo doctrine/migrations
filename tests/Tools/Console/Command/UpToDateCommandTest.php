@@ -75,7 +75,7 @@ class UpToDateCommandTest extends MigrationTestCase
     #[DataProvider('dataIsUpToDate')]
     public function testIsUpToDate(array $migrations, array $migratedVersions, int $exitCode, bool $failOnUnregistered = false): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         foreach ($migrations as $version) {
             Helper::registerMigrationInstance($this->migrationRepository, new Version($version), $migrationClass);
         }
@@ -120,7 +120,7 @@ class UpToDateCommandTest extends MigrationTestCase
                 '',
                 '[ERROR] You have 1 previously executed migration in the database that is not a registered migration.',
                 '',
-                '+-----------+-------------------------+---------------------+----------------+-------------+',
+                '+----------------------------------------------------------------------------+-------------+',
                 '| Migration Versions                                                         |             |',
                 '+-----------+-------------------------+---------------------+----------------+-------------+',
                 '| Migration | Status                  | Migrated At         | Execution Time | Description |',

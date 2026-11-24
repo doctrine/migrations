@@ -14,7 +14,6 @@ use Doctrine\Migrations\Version\Executor;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Symfony\Component\Stopwatch\StopwatchEvent;
-use Throwable;
 
 use function count;
 
@@ -48,18 +47,21 @@ class DbalMigrator implements Migrator
             $this->connection->beginTransaction();
         }
 
+        $successful = false;
+
         try {
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrating, $migrationsPlan, $migratorConfiguration);
 
             $sql = $this->executePlan($migrationsPlan, $migratorConfiguration);
 
             $this->dispatcher->dispatchMigrationEvent(Events::onMigrationsMigrated, $migrationsPlan, $migratorConfiguration);
-        } catch (Throwable $e) {
-            if ($allOrNothing) {
+
+            $successful = true;
+        } finally {
+            // Rolling back in finally keeps the migration's exception as the previous one.
+            if (! $successful && $allOrNothing) {
                 TransactionHelper::rollbackIfInTransaction($this->connection);
             }
-
-            throw $e;
         }
 
         if ($allOrNothing) {
@@ -89,9 +91,13 @@ class DbalMigrator implements Migrator
             // capture the to Schema for the migration so we have the ability to use
             // it as the from Schema for the next migration when we are running a dry run
             // $toSchema may be null in the case of skipped migrations
-            if (! $versionExecutionResult->isSkipped()) {
+            if ($migratorConfiguration->isDryRun() && ! $versionExecutionResult->isSkipped()) {
                 $migratorConfiguration->setFromSchema($versionExecutionResult->getToSchema());
             }
+
+            // the result stays referenced by the plan until the end of the run, so release
+            // the to Schema to keep memory from growing with every executed migration
+            $versionExecutionResult->setToSchema(null);
 
             $sql[(string) $plan->getVersion()] = $versionExecutionResult->getSql();
         }

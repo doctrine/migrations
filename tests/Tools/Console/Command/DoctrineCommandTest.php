@@ -16,6 +16,7 @@ use Doctrine\Migrations\Tests\Stub\DoctrineRegistry;
 use Doctrine\Migrations\Tools\Console\Command\DoctrineCommand;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\ORM\EntityManager;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Input\InputInterface;
@@ -25,6 +26,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 use function sys_get_temp_dir;
 
+#[AllowMockObjectsWithoutExpectations]
 class DoctrineCommandTest extends MigrationTestCase
 {
     public function testCommandFreezes(): void
@@ -51,6 +53,32 @@ class DoctrineCommandTest extends MigrationTestCase
             [],
             ['interactive' => false],
         );
+    }
+
+    public function testCommandUnfreezes(): void
+    {
+        $dependencyFactory = DependencyFactory::fromConnection(
+            new ExistingConfiguration(new Configuration()),
+            new ExistingConnection($this->getSqliteConnection()),
+        );
+
+        $command       = new class ($dependencyFactory) extends DoctrineCommand
+        {
+            protected function execute(InputInterface $input, OutputInterface $output): int
+            {
+                return 0;
+            }
+        };
+        $commandTester = new CommandTester($command);
+
+        $input = ['--configuration' => __DIR__ . '/_files/config.yml'];
+
+        $commandTester->execute($input, ['interactive' => false]);
+        self::assertFalse($dependencyFactory->isFrozen());
+
+        // A frozen dependency factory would reject the new configuration loader
+        $commandTester->execute($input, ['interactive' => false]);
+        self::assertFalse($dependencyFactory->isFrozen());
     }
 
     public function testCustomConfiguration(): void
@@ -85,7 +113,7 @@ class DoctrineCommandTest extends MigrationTestCase
 
     public function testDependencyFactoryIsSetFirst(): void
     {
-        $dependencyFactory = $this->createMock(DependencyFactory::class);
+        $dependencyFactory = self::createStub(DependencyFactory::class);
         $command           = new class ($dependencyFactory) extends DoctrineCommand
         {
             protected function configure(): void
@@ -102,8 +130,8 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $em1      = $this->createMock(EntityManager::class);
-        $em2      = $this->createMock(EntityManager::class);
+        $em1      = self::createStub(EntityManager::class);
+        $em2      = self::createStub(EntityManager::class);
         $registry = new DoctrineRegistry([], ['foo' => $em1, 'bar' => $em2]);
 
         $dependencyFactory = DependencyFactory::fromEntityManager(
@@ -143,8 +171,8 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn1    = $this->createMock(Connection::class);
-        $conn2    = $this->createMock(Connection::class);
+        $conn1    = self::createStub(Connection::class);
+        $conn2    = self::createStub(Connection::class);
         $registry = new DoctrineRegistry(['foo' => $conn1, 'bar' => $conn2]);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -181,12 +209,10 @@ class DoctrineCommandTest extends MigrationTestCase
 
     public function testCanNotSpecifyBothEmAndConnection(): void
     {
-        $this->expectException(InvalidOptionUsage::class);
-        $this->expectExceptionMessage('You can specify only one of the --em and --conn options.');
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -202,6 +228,10 @@ class DoctrineCommandTest extends MigrationTestCase
             }
         };
         $commandTester = new CommandTester($command);
+
+        $this->expectException(InvalidOptionUsage::class);
+        $this->expectExceptionMessage('You can specify only one of the --em and --conn options.');
+
         $commandTester->execute(
             [
                 '--conn' => 'bar',
@@ -216,7 +246,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -259,7 +289,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -304,7 +334,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $configuration = new Configuration();
         $configuration->addMigrationsDirectory('DoctrineMigrations', sys_get_temp_dir());
 
-        $conn       = $this->createMock(Connection::class);
+        $conn       = self::createStub(Connection::class);
         $connLoader = new ExistingConnection($conn);
 
         $dependencyFactory = DependencyFactory::fromConnection(
@@ -379,7 +409,7 @@ class DoctrineCommandTest extends MigrationTestCase
         $command->setHelperSet(new HelperSet(['question' => new QuestionHelper()]));
 
         $commandTester = new CommandTester($command);
-        $commandTester->setInputs([1]);
+        $commandTester->setInputs(['1']);
         $commandTester->execute([]);
     }
 }
