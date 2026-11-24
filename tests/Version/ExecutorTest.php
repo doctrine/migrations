@@ -102,6 +102,26 @@ class ExecutorTest extends TestCase
 
     public function testExecuteUp(): void
     {
+        $call = 0;
+        $this->connection
+            ->expects(self::exactly(2))
+            ->method('executeStatement')
+            ->willReturnCallback(function (string $statement, array $parameters = [], array $types = []) use (&$call): int {
+                $call++;
+                if ($call === 1) {
+                    self::assertSame('SELECT 1', $statement);
+                    self::assertSame([1], $parameters);
+                    self::assertSame([3], $types);
+                }
+
+                if ($call === 2) {
+                    self::assertSame('SELECT 2', $statement);
+                    self::assertSame([], $parameters);
+                    self::assertSame([], $types);
+                }
+                return 1;
+            });
+
         $this->metadataStorage
             ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
@@ -163,6 +183,26 @@ class ExecutorTest extends TestCase
 
     public function testExecuteDown(): void
     {
+        $call = 0;
+        $this->connection
+            ->expects(self::exactly(2))
+            ->method('executeStatement')
+            ->willReturnCallback(function (string $statement, array $parameters = [], array $types = []) use (&$call): int {
+                $call++;
+                if ($call === 1) {
+                    self::assertSame('SELECT 3', $statement);
+                    self::assertSame([5], $parameters);
+                    self::assertSame([7], $types);
+                }
+
+                if ($call === 2) {
+                    self::assertSame('SELECT 4', $statement);
+                    self::assertSame([6], $parameters);
+                    self::assertSame([8], $types);
+                }
+                return 1;
+            });
+
         $this->metadataStorage
             ->expects(self::once())
             ->method('complete')->willReturnCallback(static function (ExecutionResult $result): void {
