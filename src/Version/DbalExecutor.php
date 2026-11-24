@@ -121,6 +121,9 @@ final class DbalExecutor implements Executor
         $migration = $plan->getMigration();
         $direction = $plan->getDirection();
 
+        // the same instance is reused when a process runs several migration commands
+        $migration->reset();
+
         $result->setState(State::PRE);
 
         $fromSchema = $this->getFromSchema($configuration);
