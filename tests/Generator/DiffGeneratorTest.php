@@ -6,6 +6,8 @@ namespace Doctrine\Migrations\Tests\Generator;
 
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
+use Doctrine\DBAL\Platforms\SQLitePlatform;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\NamedObject;
@@ -16,6 +18,7 @@ use Doctrine\Migrations\Generator\DiffGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Generator\SqlGenerator;
 use Doctrine\Migrations\Provider\SchemaProvider;
+use InvalidArgumentException;
 use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\MockObject\Stub;
@@ -123,6 +126,67 @@ class DiffGeneratorTest extends TestCase
             false,
             80,
         ));
+    }
+
+    public function testGenerateAddsMySQLAlgorithmToAlterStatementsInBothDirections(): void
+    {
+        $this->platform               = self::createStub(MySQLPlatform::class);
+        $this->migrationDiffGenerator = $this->createDiffGenerator($this->platform);
+
+        $this->schemaManager->method('introspectSchema')->willReturn(new Schema());
+        $this->schemaProvider->method('createSchema')->willReturn(new Schema());
+
+        $schemaDiff = self::createStub(SchemaDiff::class);
+        $comparator = $this->mockComparator($schemaDiff);
+        $this->schemaManager->method('createComparator')->willReturn($comparator);
+
+        $this->platform->method('getAlterSchemaSQL')->willReturnOnConsecutiveCalls(
+            ['ALTER TABLE users ADD name VARCHAR(255)', 'UPDATE users SET active = 1'],
+            ['ALTER TABLE users DROP name;'],
+        );
+
+        $this->migrationSqlGenerator->expects(self::exactly(2))
+            ->method('generate')
+            ->willReturnCallback(static function (array $sql): string {
+                static $call = 0;
+                self::assertSame(
+                    $call++ === 0
+                        ? ['ALTER TABLE users ADD name VARCHAR(255), ALGORITHM=INSTANT', 'UPDATE users SET active = 1']
+                        : ['ALTER TABLE users DROP name, ALGORITHM=INSTANT;'],
+                    $sql,
+                );
+
+                return 'generated SQL';
+            });
+
+        $this->migrationGenerator->expects(self::once())
+            ->method('generateMigration')
+            ->with('Version1234', 'generated SQL', 'generated SQL')
+            ->willReturn('path');
+
+        self::assertSame(
+            'path',
+            $this->migrationDiffGenerator->generate('Version1234', null, mysqlAlgorithm: 'instant'),
+        );
+    }
+
+    public function testGenerateRejectsUnsupportedMySQLAlgorithm(): void
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The MySQL ALTER TABLE algorithm must be INSTANT or INPLACE.');
+
+        $this->migrationDiffGenerator->generate('Version1234', null, mysqlAlgorithm: 'COPY');
+    }
+
+    public function testGenerateRejectsMySQLAlgorithmOnOtherPlatforms(): void
+    {
+        $this->platform               = self::createStub(SQLitePlatform::class);
+        $this->migrationDiffGenerator = $this->createDiffGenerator($this->platform);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The MySQL ALTER TABLE algorithm can only be used with MySQL.');
+
+        $this->migrationDiffGenerator->generate('Version1234', null, mysqlAlgorithm: 'INSTANT');
     }
 
     public function testGenerateFromEmptySchema(): void
@@ -245,11 +309,16 @@ class DiffGeneratorTest extends TestCase
         $this->migrationGenerator     = $this->createMock(Generator::class);
         $this->migrationSqlGenerator  = $this->createMock(SqlGenerator::class);
         $this->emptySchemaProvider    = $this->createMock(SchemaProvider::class);
-        $this->migrationDiffGenerator = new DiffGenerator(
+        $this->migrationDiffGenerator = $this->createDiffGenerator($this->platform);
+    }
+
+    private function createDiffGenerator(AbstractPlatform $platform): DiffGenerator
+    {
+        return new DiffGenerator(
             $this->dbalConfiguration,
             $this->schemaManager,
             $this->schemaProvider,
-            $this->platform,
+            $platform,
             $this->migrationGenerator,
             $this->migrationSqlGenerator,
             $this->emptySchemaProvider,

@@ -6,6 +6,7 @@ namespace Doctrine\Migrations\Generator;
 
 use Doctrine\DBAL\Configuration as DBALConfiguration;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
+use Doctrine\DBAL\Platforms\MySQLPlatform;
 use Doctrine\DBAL\Schema\AbstractAsset;
 use Doctrine\DBAL\Schema\AbstractSchemaManager;
 use Doctrine\DBAL\Schema\ComparatorConfig;
@@ -14,10 +15,17 @@ use Doctrine\DBAL\Schema\OptionallyNamedObject;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Generator\Exception\NoChangesDetected;
 use Doctrine\Migrations\Provider\SchemaProvider;
+use InvalidArgumentException;
 
+use function array_map;
 use function class_exists;
+use function in_array;
 use function method_exists;
 use function preg_match;
+use function rtrim;
+use function str_ends_with;
+use function strtoupper;
+use function substr;
 
 /**
  * The DiffGenerator class is responsible for comparing two Doctrine\DBAL\Schema\Schema instances and generating a
@@ -39,7 +47,7 @@ class DiffGenerator
     ) {
     }
 
-    /** @throws NoChangesDetected */
+    /** @throws NoChangesDetected|InvalidArgumentException */
     public function generate(
         string $fqcn,
         string|null $filterExpression,
@@ -48,7 +56,20 @@ class DiffGenerator
         int $lineLength = 120,
         bool $checkDbPlatform = true,
         bool $fromEmptySchema = false,
+        string|null $mysqlAlgorithm = null,
     ): string {
+        if ($mysqlAlgorithm !== null) {
+            $mysqlAlgorithm = strtoupper($mysqlAlgorithm);
+
+            if (! in_array($mysqlAlgorithm, ['INSTANT', 'INPLACE'], true)) {
+                throw new InvalidArgumentException('The MySQL ALTER TABLE algorithm must be INSTANT or INPLACE.');
+            }
+
+            if (! $this->platform instanceof MySQLPlatform) {
+                throw new InvalidArgumentException('The MySQL ALTER TABLE algorithm can only be used with MySQL.');
+            }
+        }
+
         if ($filterExpression !== null) {
             $this->dbalConfiguration->setSchemaAssetsFilter(
                 static function ($assetName) use ($filterExpression) {
@@ -95,6 +116,9 @@ class DiffGenerator
         }
 
         $upSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($fromSchema, $toSchema));
+        if ($mysqlAlgorithm !== null) {
+            $upSql = $this->addMySQLAlgorithm($upSql, $mysqlAlgorithm);
+        }
 
         $up = $this->migrationSqlGenerator->generate(
             $upSql,
@@ -105,6 +129,9 @@ class DiffGenerator
         );
 
         $downSql = $this->platform->getAlterSchemaSQL($comparator->compareSchemas($toSchema, $fromSchema));
+        if ($mysqlAlgorithm !== null) {
+            $downSql = $this->addMySQLAlgorithm($downSql, $mysqlAlgorithm);
+        }
 
         $down = $this->migrationSqlGenerator->generate(
             $downSql,
@@ -165,5 +192,34 @@ class DiffGenerator
         }
 
         return $toSchema;
+    }
+
+    /**
+     * @param string[] $sql
+     *
+     * @return string[]
+     */
+    private function addMySQLAlgorithm(array $sql, string $algorithm): array
+    {
+        return array_map(static function (string $query) use ($algorithm): string {
+            if (preg_match('/^\s*ALTER\s+TABLE\b/i', $query) !== 1) {
+                return $query;
+            }
+
+            if (preg_match('/\bALGORITHM\s*=/i', $query) === 1) {
+                throw new InvalidArgumentException(
+                    'The generated ALTER TABLE statement already specifies an algorithm.',
+                );
+            }
+
+            $query      = rtrim($query);
+            $terminator = '';
+            if (str_ends_with($query, ';')) {
+                $query      = substr($query, 0, -1);
+                $terminator = ';';
+            }
+
+            return $query . ', ALGORITHM=' . $algorithm . $terminator;
+        }, $sql);
     }
 }
