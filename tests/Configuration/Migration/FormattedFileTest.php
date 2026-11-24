@@ -12,9 +12,10 @@ class FormattedFileTest extends TestCase
 {
     public function testUnknownLoader(): void
     {
+        $loader = new FormattedFile('migrations.abc');
+
         $this->expectException(InvalidConfigurationFormat::class);
 
-        $loader = new FormattedFile('migrations.abc');
         $loader->getConfiguration();
     }
 }

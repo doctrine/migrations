@@ -16,6 +16,7 @@ use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Command\DiffCommand;
 use Doctrine\Migrations\Version\MigrationStatusCalculator;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DiffCommandTest extends TestCase
 {
     /** @var DiffGenerator&MockObject */
@@ -182,6 +184,59 @@ final class DiffCommandTest extends TestCase
         self::assertStringContainsString(sprintf('You have selected the "%s" namespace', $namespace), $output);
     }
 
+    public function testFormattedInputHasPrecedenceOverConfig(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->configuration->setFormatted(false);
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), true);
+
+        $this->diffCommandTester->execute(['--formatted' => true]);
+    }
+
+    public function testFormattedConfigIsFallback(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->configuration->setFormatted(true);
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), true);
+
+        $this->diffCommandTester->execute([]);
+    }
+
+    public function testFormattedConfigIsFalseByDefault(): void
+    {
+        $this->migrationStatusCalculator
+            ->method('getNewMigrations')
+            ->willReturn(new AvailableMigrationsList([]));
+
+        $this->migrationStatusCalculator
+            ->method('getExecutedUnavailableMigrations')
+            ->willReturn(new ExecutedMigrationsList([]));
+
+        $this->migrationDiffGenerator->expects(self::once())
+            ->method('generate')
+            ->with(self::anything(), self::anything(), false);
+
+        $this->diffCommandTester->execute([]);
+    }
+
     protected function setUp(): void
     {
         $this->migrationDiffGenerator    = $this->createMock(DiffGenerator::class);
@@ -201,7 +256,7 @@ final class DiffCommandTest extends TestCase
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getDiffGenerator')
             ->willReturn($this->migrationDiffGenerator);
 

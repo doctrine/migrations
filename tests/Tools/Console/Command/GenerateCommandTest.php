@@ -9,6 +9,7 @@ use Doctrine\Migrations\DependencyFactory;
 use Doctrine\Migrations\Generator\ClassNameGenerator;
 use Doctrine\Migrations\Generator\Generator;
 use Doctrine\Migrations\Tools\Console\Command\GenerateCommand;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -22,6 +23,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 final class GenerateCommandTest extends TestCase
 {
     private Configuration $configuration;
@@ -101,7 +103,7 @@ final class GenerateCommandTest extends TestCase
         $this->dependencyFactory  = $this->createMock(DependencyFactory::class);
         $this->migrationGenerator = $this->createMock(Generator::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 

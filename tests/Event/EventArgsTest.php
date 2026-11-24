@@ -13,24 +13,24 @@ use Doctrine\Migrations\Metadata\MigrationPlanList;
 use Doctrine\Migrations\MigratorConfiguration;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\MockObject\Stub;
 use PHPUnit\Framework\TestCase;
 
 class EventArgsTest extends TestCase
 {
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection;
 
-    /** @var MigratorConfiguration&MockObject */
+    /** @var MigratorConfiguration&Stub */
     private MigratorConfiguration $config;
 
     private MigrationPlan $plan;
 
     public function setUp(): void
     {
-        $this->connection = $this->createMock(Connection::class);
-        $this->config     = $this->createMock(MigratorConfiguration::class);
-        $migration        = $this->createMock(AbstractMigration::class);
+        $this->connection = self::createStub(Connection::class);
+        $this->config     = self::createStub(MigratorConfiguration::class);
+        $migration        = self::createStub(AbstractMigration::class);
         $this->plan       = new MigrationPlan(new Version('1'), $migration, Direction::UP);
     }
 

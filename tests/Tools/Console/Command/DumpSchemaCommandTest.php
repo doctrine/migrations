@@ -15,6 +15,7 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\SchemaDumper;
 use Doctrine\Migrations\Tools\Console\Command\DumpSchemaCommand;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
@@ -29,6 +30,7 @@ use function sprintf;
 use function sys_get_temp_dir;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DumpSchemaCommandTest extends TestCase
 {
     private Configuration $configuration;
@@ -48,14 +50,14 @@ final class DumpSchemaCommandTest extends TestCase
 
     public function testExecuteThrowsRuntimeException(): void
     {
-        $this->expectException(RuntimeException::class);
-        $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
-
-        $migration = new AvailableMigration(new Version('FooNs\Abc'), $this->createMock(AbstractMigration::class));
+        $migration = new AvailableMigration(new Version('FooNs\Abc'), self::createStub(AbstractMigration::class));
 
         $this->migrationRepository->expects(self::once())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([$migration]));
+
+        $this->expectException(RuntimeException::class);
+        $this->expectExceptionMessage('Delete any previous migrations in the namespace "FooNs" before dumping your schema.');
 
         $this->dumpSchemaCommandTester->execute([]);
     }
@@ -66,13 +68,12 @@ final class DumpSchemaCommandTest extends TestCase
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([]));
 
-        $classNameGenerator = $this->createMock(ClassNameGenerator::class);
+        $classNameGenerator = self::createStub(ClassNameGenerator::class);
         $classNameGenerator
             ->method('generateClassName')
-            ->with('FooNs')
             ->willReturn('FooNs\\Version1234');
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getClassNameGenerator')
             ->willReturn($classNameGenerator);
 
@@ -146,15 +147,15 @@ final class DumpSchemaCommandTest extends TestCase
         $this->migrationRepository = $this->createMock(FilesystemMigrationsRepository::class);
         $this->schemaDumper        = $this->createMock(SchemaDumper::class);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getSchemaDumper')
             ->willReturn($this->schemaDumper);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getConfiguration')
             ->willReturn($this->configuration);
 
-        $this->dependencyFactory->expects(self::any())
+        $this->dependencyFactory
             ->method('getMigrationRepository')
             ->willReturn($this->migrationRepository);
 

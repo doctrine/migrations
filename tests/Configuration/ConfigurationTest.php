@@ -14,7 +14,7 @@ class ConfigurationTest extends TestCase
 {
     public function testBase(): void
     {
-        $storage = $this->createMock(MetadataStorageConfiguration::class);
+        $storage = self::createStub(MetadataStorageConfiguration::class);
 
         $config = new Configuration();
         $config->addMigrationsDirectory('foo', 'bar');
@@ -76,8 +76,10 @@ class ConfigurationTest extends TestCase
 
     public function testMigrationOrganizationWithWrongValue(): void
     {
-        $this->expectException(UnknownConfigurationValue::class);
         $config = new Configuration();
+
+        $this->expectException(UnknownConfigurationValue::class);
+
         $config->setMigrationOrganization('foo');
     }
 
@@ -106,5 +108,12 @@ class ConfigurationTest extends TestCase
         $config = new Configuration();
 
         self::assertFalse($config->isAllOrNothing());
+    }
+
+    public function testFormattedConfigDefaultOption(): void
+    {
+        $config = new Configuration();
+
+        self::assertFalse($config->isFormatted());
     }
 }

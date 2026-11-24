@@ -9,6 +9,7 @@ use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\Configuration\Connection\ExistingConnection;
 use Doctrine\Migrations\Configuration\Migration\ExistingConfiguration;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Metadata\Storage\MetadataStorage;
 use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Tests\Helper;
@@ -18,11 +19,17 @@ use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use InvalidArgumentException;
+use PHPUnit\Framework\Attributes\TestWith;
 use Psr\Log\NullLogger;
+use Symfony\Component\Console\Application;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function array_map;
 use function sys_get_temp_dir;
 
 class MigrationVersionTest extends MigrationTestCase
@@ -61,7 +68,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddRangeOption(): void
     {
-        $mock = $this->createMock(AbstractMigration::class);
+        $mock = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
@@ -160,7 +167,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteRangeOption(): void
     {
-        $mock = $this->createMock(AbstractMigration::class);
+        $mock = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $mock);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1235'), $mock);
@@ -194,7 +201,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddAllOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1231'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
@@ -223,7 +230,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteAllOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
@@ -252,7 +259,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1232'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
@@ -276,7 +283,7 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOption(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
@@ -305,16 +312,16 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testAddOptionIfVersionAlreadyMigrated(): void
     {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The version "1233" already exists in the version table.');
-
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
 
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migrationClass);
 
         $result = new ExecutionResult(new Version('1233'), Direction::UP);
         $this->metadataStorage->complete($result);
+
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('The version "1233" already exists in the version table.');
 
         $this->commandTester->execute(
             [
@@ -330,19 +337,21 @@ class MigrationVersionTest extends MigrationTestCase
      */
     public function testDeleteOptionIfVersionNotMigrated(): void
     {
-        $migrationClass = $this->createMock(AbstractMigration::class);
+        $migrationClass = self::createStub(AbstractMigration::class);
         Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migrationClass);
 
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('The version "1233" does not exist in the version table.');
-
-        $this->commandTester->execute(
+        $exitCode = $this->commandTester->execute(
             [
                 '--delete' => true,
                 'version'  => '1233',
             ],
             ['interactive' => false],
         );
+
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        self::assertStringNotContainsString('deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration(new Version('1233')));
     }
 
     /**
@@ -364,5 +373,154 @@ class MigrationVersionTest extends MigrationTestCase
         );
 
         self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay(true));
+    }
+
+    /**
+     * @param list<string> $args
+     * @param list<string> $expectedSuggestions
+     */
+    #[TestWith([['console'], ['1233', '1234']])]
+    #[TestWith([['console', '1233'], ['1233', '1234']])]
+    public function testComplete(array $args, array $expectedSuggestions): void
+    {
+        $migration = self::createStub(AbstractMigration::class);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migration);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migration);
+
+        $input = CompletionInput::fromTokens($args, 1);
+        $input->bind($this->command->getDefinition());
+        $suggestions = new CompletionSuggestions();
+
+        $this->command->complete($input, $suggestions);
+
+        self::assertSame(
+            $expectedSuggestions,
+            array_map(
+                static fn (Suggestion $suggestion): string => $suggestion->getValue(),
+                $suggestions->getValueSuggestions(),
+            ),
+        );
+    }
+
+    /**
+     * Test "--delete" option on not migrated version without existing version file.
+     */
+    public function testDeleteOptionIfVersionNotMigratedAndFileDoesNotExist(): void
+    {
+        $exitCode = $this->commandTester->execute(
+            [
+                '--delete' => true,
+                'version'  => '1233',
+            ],
+            ['interactive' => false],
+        );
+        self::assertSame(0, $exitCode);
+        self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        self::assertStringNotContainsString('deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration(new Version('1233')));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDeleteOptionIsIdempotent(bool $classExists): void
+    {
+        $version = new Version('1233');
+        if ($classExists) {
+            Helper::registerMigrationInstance($this->migrationRepository, $version, self::createStub(AbstractMigration::class));
+        }
+
+        $this->metadataStorage->complete(new ExecutionResult($version, Direction::UP));
+
+        $arguments = ['--delete' => true, 'version' => '1233'];
+        $options   = ['interactive' => false];
+
+        self::assertSame(0, $this->commandTester->execute($arguments, $options));
+        self::assertStringContainsString('1233 deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration($version));
+
+        self::assertSame(0, $this->commandTester->execute($arguments, $options));
+        self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        self::assertStringNotContainsString('deleted from the version table.', $this->commandTester->getDisplay());
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration($version));
+    }
+
+    #[TestWith([false])]
+    #[TestWith([true])]
+    public function testDeleteMissingVersionDoesNotWriteToCustomStorage(bool $classExists): void
+    {
+        $storage = self::createMock(MetadataStorage::class);
+        $storage->method('getExecutedMigrations')->willReturn(new ExecutedMigrationsList([]));
+        $storage->expects(self::never())->method('complete');
+        $storage->expects(self::never())->method('reset');
+
+        $factory = DependencyFactory::fromConnection(
+            new ExistingConfiguration(new Configuration()),
+            new ExistingConnection($this->getSqliteConnection()),
+        );
+        $factory->setService(MetadataStorage::class, $storage);
+        if ($classExists) {
+            Helper::registerMigrationInstance($factory->getMigrationRepository(), new Version('1233'), self::createStub(AbstractMigration::class));
+        }
+
+        $tester = new CommandTester(new VersionCommand($factory));
+        self::assertSame(0, $tester->execute(['--delete' => true, 'version' => '1233'], ['interactive' => false]));
+        self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $tester->getDisplay());
+    }
+
+    /** @param array<string, bool|string> $selection */
+    #[TestWith([['--all' => true]])]
+    #[TestWith([['--range-from' => '1233', '--range-to' => '1234']])]
+    public function testDeleteUnexecutedVersionsInBatchRemainsSilent(array $selection): void
+    {
+        $migration = self::createStub(AbstractMigration::class);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), $migration);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1234'), $migration);
+
+        self::assertSame(0, $this->commandTester->execute(['--delete' => true] + $selection, ['interactive' => false]));
+        self::assertSame('', $this->commandTester->getDisplay());
+        self::assertCount(0, $this->metadataStorage->getExecutedMigrations());
+    }
+
+    #[TestWith([false, 'yes'])]
+    #[TestWith([true, 'yes'])]
+    #[TestWith([false, 'no'])]
+    #[TestWith([true, 'no'])]
+    public function testDeleteMissingVersionInteractively(bool $classExists, string $answer): void
+    {
+        if ($classExists) {
+            Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), self::createStub(AbstractMigration::class));
+        }
+
+        $this->commandTester->setInputs([$answer]);
+        self::assertSame(0, $this->commandTester->execute(['--delete' => true, 'version' => '1233']));
+        if ($answer === 'yes') {
+            self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $this->commandTester->getDisplay());
+        } else {
+            self::assertStringContainsString('Migration cancelled!', $this->commandTester->getDisplay());
+            self::assertStringNotContainsString('nothing to delete', $this->commandTester->getDisplay());
+        }
+
+        self::assertFalse($this->metadataStorage->getExecutedMigrations()->hasMigration(new Version('1233')));
+    }
+
+    public function testDeleteMissingVersionThroughCommandAlias(): void
+    {
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('1233'), self::createStub(AbstractMigration::class));
+        $application = new Application();
+        $application->addCommands([$this->command]);
+        $tester = new CommandTester($application->find('version'));
+
+        self::assertSame(0, $tester->execute(['--delete' => true, 'version' => '1233'], ['interactive' => false]));
+        self::assertStringContainsString('[WARNING] 1233 is not in the version table, nothing to delete.', $tester->getDisplay());
+    }
+
+    public function testAddStillTakesPrecedenceOverDeleteWithAvailableClass(): void
+    {
+        $version = new Version('1233');
+        Helper::registerMigrationInstance($this->migrationRepository, $version, self::createStub(AbstractMigration::class));
+
+        self::assertSame(0, $this->commandTester->execute(['--add' => true, '--delete' => true, 'version' => '1233'], ['interactive' => false]));
+        self::assertTrue($this->metadataStorage->getExecutedMigrations()->hasMigration($version));
+        self::assertStringContainsString('1233 added to the version table.', $this->commandTester->getDisplay());
     }
 }

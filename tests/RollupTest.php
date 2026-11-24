@@ -14,9 +14,11 @@ use Doctrine\Migrations\MigrationsRepository;
 use Doctrine\Migrations\Rollup;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
 
+#[AllowMockObjectsWithoutExpectations]
 class RollupTest extends TestCase
 {
     /** @var AbstractMigration&MockObject */
@@ -86,7 +88,6 @@ class RollupTest extends TestCase
     public function testRollupNoMigrations(): void
     {
         $this->repository
-            ->expects(self::any())
             ->method('getMigrations')
             ->willReturn(new AvailableMigrationsSet([]));
 

@@ -39,6 +39,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             'all_or_nothing' => true,
             'transactional' => true,
+            'formatted' => true,
             'check_database_platform' => true,
             'organize_migrations' => 'none',
             'connection' => null,
@@ -60,6 +61,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
         all_or_nothing: true
         transactional: true
+        formatted: true
         check_database_platform: true
         organize_migrations: none
 
@@ -93,6 +95,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             <all-or-nothing>true</all-or-nothing>
             <transactional>true</transactional>
+            <formatted>true</formatted>
 
             <check-database-platform>true</check-database-platform>
             <organize_migrations>none</organize_migrations>
@@ -116,6 +119,7 @@ Now, in the root of your project place a file named ``migrations.php``, ``migrat
 
             "all_or_nothing": true,
             "transactional": true,
+            "formatted": true,
             "check_database_platform": true,
             "organize_migrations": "none",
 
@@ -141,6 +145,8 @@ Here are details about what each configuration option does:
 | all_or_nothing                   | no       | false    | Whether or not to wrap multiple migrations in a single transaction.                                                         |
 +----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
 | transactional                    | no       | true     | Whether or not to wrap migrations in a single transaction.                                                                  |
++----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
+| formatted                        | no       | false    | Whether or not to format generated SQL.                                                                                     |
 +----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+
 | migrations                       | no       | []       | Manually specify the array of migration versions instead of finding migrations.                                             |
 +----------------------------------+----------+----------+-----------------------------------------------------------------------------------------------------------------------------+

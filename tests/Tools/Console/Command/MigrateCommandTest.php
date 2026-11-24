@@ -5,7 +5,10 @@ declare(strict_types=1);
 namespace Doctrine\Migrations\Tests\Tools\Console\Command;
 
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Column;
 use Doctrine\DBAL\Schema\ComparatorConfig;
+use Doctrine\DBAL\Schema\Name\UnqualifiedName;
+use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\AbstractMigration;
@@ -32,25 +35,34 @@ use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\Migrations\Version\Version;
 use Generator;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\Attributes\DataProvider;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
+use PHPUnit\Framework\Attributes\TestWith;
 use PHPUnit\Framework\MockObject\MockObject;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
+use Symfony\Component\Console\Completion\Suggestion;
 use Symfony\Component\Console\Helper\HelperSet;
 use Symfony\Component\Console\Helper\QuestionHelper;
 use Symfony\Component\Console\Tester\CommandTester;
 
+use function array_map;
 use function class_exists;
 use function getcwd;
 use function in_array;
+use function method_exists;
 use function sprintf;
 use function trim;
 
+#[AllowMockObjectsWithoutExpectations]
 class MigrateCommandTest extends MigrationTestCase
 {
     use VerifyDeprecations;
 
     private DependencyFactory $dependencyFactory;
     private Configuration $configuration;
+    private MigrateCommand $migrateCommand;
     private CommandTester $migrateCommandTester;
     private MetadataStorage $storage;
     private QueryWriter&MockObject $queryWriter;
@@ -84,8 +96,8 @@ class MigrateCommandTest extends MigrationTestCase
     #[DataProvider('getMigrateWithMigrationsOrWithout')]
     public function testMigrateWhenNoMigrationsAvailable(bool $hasMigrations, bool $allowNoMigration, int $expectedExitCode): void
     {
-        $finder                    = $this->createMock(Finder::class);
-        $factory                   = $this->createMock(MigrationFactory::class);
+        $finder                    = self::createStub(Finder::class);
+        $factory                   = self::createStub(MigrationFactory::class);
         $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
         $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
 
@@ -291,8 +303,16 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([], ['interactive' => false]);
 
-        $refreshedTable = $this->connection->createSchemaManager()
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        $schemaManager = $this->connection->createSchemaManager();
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $refreshedTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $refreshedTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
         self::assertFalse($refreshedTable->hasColumn('extra'));
     }
@@ -305,8 +325,16 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->migrateCommandTester->execute([]);
 
-        $refreshedTable = $this->connection->createSchemaManager()
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        $schemaManager = $this->connection->createSchemaManager();
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $refreshedTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $refreshedTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
         self::assertTrue($refreshedTable->hasColumn('extra'));
     }
@@ -344,7 +372,7 @@ class MigrateCommandTest extends MigrationTestCase
 
     /** @psalm-param array<string, bool|int|string|null> $input */
     #[DataProvider('allOrNothing')]
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testExecuteMigrateAllOrNothing(bool|null $default, array $input, bool $expected, bool $expectDeprecation = true): void
     {
         $migrator = $this->createMock(DbalMigrator::class);
@@ -384,6 +412,32 @@ class MigrateCommandTest extends MigrationTestCase
         yield [true, [], true, false];
         yield [false, [], false, false];
         yield [null, [], false, false];
+    }
+
+    /**
+     * @param list<string> $args
+     * @param list<string> $expectedSuggestions
+     */
+    #[TestWith([['console'], ['current', 'latest', 'first', 'next', 'prev', 'A', 'B']])]
+    #[TestWith([['console', 'A'], ['current', 'latest', 'first', 'next', 'prev', 'A', 'B']])]
+    public function testComplete(array $args, array $expectedSuggestions): void
+    {
+        $migration = $this->createMock(AbstractMigration::class);
+        Helper::registerMigrationInstance($this->migrationRepository, new Version('B'), $migration);
+
+        $input = CompletionInput::fromTokens($args, 1);
+        $input->bind($this->migrateCommand->getDefinition());
+        $suggestions = new CompletionSuggestions();
+
+        $this->migrateCommand->complete($input, $suggestions);
+
+        self::assertSame(
+            $expectedSuggestions,
+            array_map(
+                static fn (Suggestion $suggestion): string => $suggestion->getValue(),
+                $suggestions->getValueSuggestions(),
+            ),
+        );
     }
 
     public function testExecuteMigrateCancelExecutedUnavailableMigrations(): void
@@ -445,8 +499,8 @@ class MigrateCommandTest extends MigrationTestCase
         $this->queryWriter = $this->createMock(QueryWriter::class);
         $this->dependencyFactory->setService(QueryWriter::class, $this->queryWriter);
 
-        $finder                    = $this->createMock(Finder::class);
-        $factory                   = $this->createMock(MigrationFactory::class);
+        $finder                    = self::createStub(Finder::class);
+        $factory                   = self::createStub(MigrationFactory::class);
         $this->migrationRepository = new FilesystemMigrationsRepository([], [], $finder, $factory);
 
         $migration = $this->createMock(AbstractMigration::class);
@@ -454,12 +508,12 @@ class MigrateCommandTest extends MigrationTestCase
 
         $this->dependencyFactory->setService(MigrationsRepository::class, $this->migrationRepository);
 
-        $migrateCommand = new MigrateCommand($this->dependencyFactory);
+        $this->migrateCommand = new MigrateCommand($this->dependencyFactory);
 
         $questions = $this->createMock(QuestionHelper::class);
-        $migrateCommand->setHelperSet(new HelperSet(['question' => $questions]));
+        $this->migrateCommand->setHelperSet(new HelperSet(['question' => $questions]));
 
-        $this->migrateCommandTester = new CommandTester($migrateCommand);
+        $this->migrateCommandTester = new CommandTester($this->migrateCommand);
 
         $this->storage = new TableMetadataStorage(
             $this->connection,
@@ -475,11 +529,30 @@ class MigrateCommandTest extends MigrationTestCase
     private function alterMetadataTable(): void
     {
         $schemaManager = $this->connection->createSchemaManager();
-        $originalTable = $schemaManager
-            ->introspectTable($this->metadataConfiguration->getTableName());
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists($schemaManager, 'introspectTableByUnquotedName')) {
+            $originalTable = $this->connection->createSchemaManager()
+                ->introspectTableByUnquotedName($this->metadataConfiguration->getTableName());
+        } else {
+            /** @phpstan-ignore method.deprecated */
+            $originalTable = $schemaManager
+                ->introspectTable($this->metadataConfiguration->getTableName());
+        }
 
-        $modifiedTable = clone $originalTable;
-        $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
+        /** @phpstan-ignore function.alreadyNarrowedType */
+        if (method_exists(Table::class, 'editor')) {
+            $modifiedTable = $originalTable->edit()->addColumn(
+                Column::editor()
+                    ->setName(UnqualifiedName::unquoted('extra'))
+                    ->setTypeName(Types::STRING)
+                    ->setNotNull(false)
+                    ->create(),
+            )->create();
+        } else {
+            $modifiedTable = clone $originalTable;
+            /** @phpstan-ignore method.deprecated */
+            $modifiedTable->addColumn('extra', Types::STRING, ['notnull' => false]);
+        }
 
         if (class_exists(ComparatorConfig::class)) {
             $comparator = $schemaManager->createComparator((new ComparatorConfig())->withReportModifiedIndexes(false));

@@ -17,7 +17,7 @@ final class EntityManagerTest extends TestCase
 {
     public function testExistingEntityManagerLoader(): void
     {
-        $em     = $this->createMock(EntityManager::class);
+        $em     = self::createStub(EntityManager::class);
         $loader = new ExistingEntityManager($em);
 
         self::assertSame($em, $loader->getEntityManager());
@@ -25,13 +25,13 @@ final class EntityManagerTest extends TestCase
 
     public function testNamedConnectionIsNotSupported(): void
     {
+        $em     = self::createStub(EntityManager::class);
+        $loader = new ExistingEntityManager($em);
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Only one entity manager is supported by Doctrine\Migrations\Configuration\EntityManager\ExistingEntityManager');
 
-        $em     = $this->createMock(EntityManager::class);
-        $loader = new ExistingEntityManager($em);
-
-        self::assertSame($em, $loader->getEntityManager('foo'));
+        $loader->getEntityManager('foo');
     }
 
     public function testArrayEntityManagerConfigurationLoader(): void
@@ -52,15 +52,19 @@ final class EntityManagerTest extends TestCase
 
     public function testArrayEntityManagerConfigurationLoaderInvalid(): void
     {
-        $this->expectException(InvalidConfiguration::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/em-invalid.php');
+
+        $this->expectException(InvalidConfiguration::class);
+
         $loader->getEntityManager();
     }
 
     public function testArrayEntityManagerConfigurationLoaderNotFound(): void
     {
-        $this->expectException(FileNotFound::class);
         $loader = new ConfigurationFile(__DIR__ . '/_files/not-found.php');
+
+        $this->expectException(FileNotFound::class);
+
         $loader->getEntityManager();
     }
 }

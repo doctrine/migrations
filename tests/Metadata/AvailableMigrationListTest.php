@@ -20,22 +20,26 @@ class AvailableMigrationListTest extends TestCase
 
     public function setUp(): void
     {
-        $this->abstractMigration = $this->createMock(AbstractMigration::class);
+        $this->abstractMigration = self::createStub(AbstractMigration::class);
     }
 
     public function testFirstWhenEmpty(): void
     {
+        $set = new AvailableMigrationsList([]);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
-        $set = new AvailableMigrationsList([]);
+
         $set->getFirst();
     }
 
     public function testLastWhenEmpty(): void
     {
+        $set = new AvailableMigrationsList([]);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
-        $set = new AvailableMigrationsList([]);
+
         $set->getLast();
     }
 
@@ -93,12 +97,14 @@ class AvailableMigrationListTest extends TestCase
 
     public function testGetMigrationThrowsExceptionIfNotExisting(): void
     {
-        $this->expectException(MigrationNotAvailable::class);
         $m1 = new AvailableMigration(new Version('A'), $this->abstractMigration);
         $m2 = new AvailableMigration(new Version('B'), $this->abstractMigration);
         $m3 = new AvailableMigration(new Version('C'), $this->abstractMigration);
 
         $set = new AvailableMigrationsList([$m1, $m2, $m3]);
+
+        $this->expectException(MigrationNotAvailable::class);
+
         $set->getMigration(new Version('D'));
     }
 

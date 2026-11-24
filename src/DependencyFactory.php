@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Doctrine\Migrations;
 
+use Doctrine\Common\EventDispatcher as BaseEventDispatcher;
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\Migrations\Configuration\Configuration;
@@ -69,10 +70,10 @@ class DependencyFactory
     /** @var object[]|callable[] */
     private array $dependencies = [];
 
-    private Connection|null $connection     = null;
-    private EntityManagerInterface|null $em = null;
-    private EventManager|null $eventManager = null;
-    private bool $frozen                    = false;
+    private Connection|null $connection               = null;
+    private EntityManagerInterface|null $em           = null;
+    private BaseEventDispatcher|null $eventDispatcher = null;
+    private bool $frozen                              = false;
     private ConfigurationLoader $configurationLoader;
     private ConnectionLoader $connectionLoader;
     private EntityManagerLoader|null $emLoader = null;
@@ -121,6 +122,18 @@ class DependencyFactory
     public function freeze(): void
     {
         $this->frozen = true;
+    }
+
+    /**
+     * Allows dependencies to be replaced again.
+     *
+     * Console commands freeze the dependency factory while they run, then
+     * unfreeze it so it can be reused, for example to run several commands in
+     * the same process.
+     */
+    public function unfreeze(): void
+    {
+        $this->frozen = false;
     }
 
     private function assertNotFrozen(): void
@@ -191,7 +204,7 @@ class DependencyFactory
     {
         return $this->getDependency(EventDispatcher::class, fn (): EventDispatcher => new EventDispatcher(
             $this->getConnection(),
-            $this->getEventManager(),
+            $this->getBaseEventDispatcher(),
         ));
     }
 
@@ -445,21 +458,21 @@ class DependencyFactory
         $this->factories[$id] = $service;
     }
 
-    private function getEventManager(): EventManager
+    private function getBaseEventDispatcher(): BaseEventDispatcher
     {
-        if ($this->eventManager !== null) {
-            return $this->eventManager;
+        if ($this->eventDispatcher !== null) {
+            return $this->eventDispatcher;
         }
 
         if ($this->hasEntityManager()) {
-            return $this->eventManager = $this->getEntityManager()->getEventManager();
+            return $this->eventDispatcher = $this->getEntityManager()->getEventManager();
         }
 
         if (method_exists(Connection::class, 'getEventManager')) {
             // DBAL < 4
-            return $this->eventManager = $this->getConnection()->getEventManager();
+            return $this->eventDispatcher = $this->getConnection()->getEventManager();
         }
 
-        return $this->eventManager = new EventManager();
+        return $this->eventDispatcher = new EventManager();
     }
 }

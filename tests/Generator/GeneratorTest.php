@@ -70,10 +70,10 @@ final class GeneratorTest extends TestCase
 
     public function testCustomTemplateThrowsInvalidArgumentExceptionWhenTemplateMissing(): void
     {
+        $this->configuration->setCustomTemplate('invalid');
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('The specified template "invalid" cannot be found or is not readable.');
-
-        $this->configuration->setCustomTemplate('invalid');
 
         $this->migrationGenerator->generateMigration('Test\\Version1234');
     }
@@ -84,13 +84,13 @@ final class GeneratorTest extends TestCase
 
         file_put_contents($customTemplate, '');
 
+        $this->configuration->setCustomTemplate($customTemplate);
+
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage(sprintf(
             'The specified template "%s" is empty.',
             $customTemplate,
         ));
-
-        $this->configuration->setCustomTemplate($customTemplate);
 
         $this->migrationGenerator->generateMigration('Test\\Version1234');
 

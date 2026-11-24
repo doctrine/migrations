@@ -6,19 +6,22 @@ namespace Doctrine\Migrations\Tools\Console\Command;
 
 use Doctrine\Migrations\Exception\MigrationClassNotFound;
 use Doctrine\Migrations\Exception\UnknownMigrationVersion;
+use Doctrine\Migrations\Metadata\AvailableMigration;
 use Doctrine\Migrations\Metadata\ExecutedMigrationsList;
 use Doctrine\Migrations\Tools\Console\Exception\InvalidOptionUsage;
 use Doctrine\Migrations\Tools\Console\Exception\VersionAlreadyExists;
-use Doctrine\Migrations\Tools\Console\Exception\VersionDoesNotExist;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\ExecutionResult;
 use Doctrine\Migrations\Version\Version;
 use Symfony\Component\Console\Attribute\AsCommand;
+use Symfony\Component\Console\Completion\CompletionInput;
+use Symfony\Component\Console\Completion\CompletionSuggestions;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use function array_map;
 use function sprintf;
 
 /**
@@ -180,7 +183,6 @@ EOT);
 
     /**
      * @throws VersionAlreadyExists
-     * @throws VersionDoesNotExist
      * @throws UnknownMigrationVersion
      */
     private function mark(InputInterface $input, Version $version, bool $all, ExecutedMigrationsList $executedMigrations): void
@@ -195,6 +197,15 @@ EOT);
         if ($availableMigration === null) {
             if ($input->getOption('delete') === false) {
                 throw UnknownMigrationVersion::new((string) $version);
+            }
+
+            if (! $executedMigrations->hasMigration($version)) {
+                $this->io->warning(sprintf(
+                    '%s is not in the version table, nothing to delete.',
+                    (string) $version,
+                ));
+
+                return;
             }
 
             $question =
@@ -227,7 +238,12 @@ EOT);
 
         if (! $this->markMigrated && ! $executedMigrations->hasMigration($version)) {
             if (! $all) {
-                throw VersionDoesNotExist::new($version);
+                $this->io->warning(sprintf(
+                    '%s is not in the version table, nothing to delete.',
+                    (string) $version,
+                ));
+
+                return;
             }
 
             $marked = true;
@@ -253,6 +269,22 @@ EOT);
                 "<info>%s</info> deleted from the version table.\n",
                 (string) $version,
             ));
+        }
+    }
+
+    public function complete(CompletionInput $input, CompletionSuggestions $suggestions): void
+    {
+        if ($input->mustSuggestArgumentValuesFor('version')) {
+            $availableMigrations = $this->getDependencyFactory()->getMigrationPlanCalculator()->getMigrations();
+
+            /** @var list<string> $availableVersions */
+            $availableVersions = array_map(static function (AvailableMigration $availableMigration): string {
+                return (string) $availableMigration->getVersion();
+            }, $availableMigrations->getItems());
+
+            $suggestions->suggestValues($availableVersions);
+
+            return;
         }
     }
 }

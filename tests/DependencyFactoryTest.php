@@ -22,26 +22,27 @@ use Doctrine\Migrations\Tests\MigrationRepository\Migrations\A\A;
 use Doctrine\Migrations\Tests\Stub\CustomClassNameMigrationFactory;
 use Doctrine\Migrations\Version\MigrationFactory;
 use Doctrine\ORM\EntityManager;
-use PHPUnit\Framework\MockObject\MockObject;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
+use PHPUnit\Framework\MockObject\Stub;
 use Psr\Log\LoggerInterface;
 use stdClass;
 
+#[AllowMockObjectsWithoutExpectations]
 final class DependencyFactoryTest extends MigrationTestCase
 {
-    /** @var Connection&MockObject */
+    /** @var Connection&Stub */
     private Connection $connection;
 
     private Configuration $configuration;
 
-    /** @var EntityManager&MockObject */
+    /** @var EntityManager&Stub */
     private EntityManager $entityManager;
 
     public function setUp(): void
     {
-        $this->connection    = $this->createMock(Connection::class);
-        $this->entityManager = $this->createMock(EntityManager::class);
+        $this->connection    = self::createStub(Connection::class);
+        $this->entityManager = self::createStub(EntityManager::class);
         $this->entityManager
-            ->expects(self::any())
             ->method('getConnection')
             ->willReturn($this->connection);
 
@@ -113,9 +114,10 @@ final class DependencyFactoryTest extends MigrationTestCase
 
     public function testNoEntityManagerRaiseException(): void
     {
+        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
+
         $this->expectException(MissingDependency::class);
 
-        $di = DependencyFactory::fromConnection(new ExistingConfiguration($this->configuration), new ExistingConnection($this->connection));
         $di->getEntityManager();
     }
 

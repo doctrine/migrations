@@ -6,9 +6,12 @@ namespace Doctrine\Migrations\Tests;
 
 use Doctrine\Common\EventManager;
 use Doctrine\DBAL\Connection;
+use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\Configuration\Configuration;
 use Doctrine\Migrations\DbalMigrator;
+use Doctrine\Migrations\Event\MigrationsVersionEventArgs;
 use Doctrine\Migrations\EventDispatcher;
+use Doctrine\Migrations\Events;
 use Doctrine\Migrations\Exception\MigrationConfigurationConflict;
 use Doctrine\Migrations\Metadata\MigrationPlan;
 use Doctrine\Migrations\Metadata\MigrationPlanList;
@@ -22,17 +25,21 @@ use Doctrine\Migrations\Tests\Stub\NonTransactional\MigrationNonTransactional;
 use Doctrine\Migrations\Version\DbalExecutor;
 use Doctrine\Migrations\Version\Direction;
 use Doctrine\Migrations\Version\Version;
+use PHPUnit\Framework\Attributes\AllowMockObjectsWithoutExpectations;
 use PHPUnit\Framework\MockObject\MockObject;
 use Psr\Log\Test\TestLogger;
+use RuntimeException;
 use Symfony\Component\Console\Output\StreamOutput;
 use Symfony\Component\Stopwatch\Stopwatch;
 use Throwable;
 
+use function array_keys;
 use function array_map;
 use function strval;
 
 use const DIRECTORY_SEPARATOR;
 
+#[AllowMockObjectsWithoutExpectations]
 class MigratorTest extends MigrationTestCase
 {
     private Connection&MockObject $conn;
@@ -85,9 +92,11 @@ class MigratorTest extends MigrationTestCase
         self::assertStringContainsString('No migrations', $this->logger->records[0]['message']);
     }
 
-    protected function createTestMigrator(): DbalMigrator
-    {
-        $eventManager    = new EventManager();
+    protected function createTestMigrator(
+        EventManager|null $eventManager = null,
+        SchemaDiffProvider|null $schemaDiff = null,
+    ): DbalMigrator {
+        $eventManager  ??= new EventManager();
         $eventDispatcher = new EventDispatcher($this->conn, $eventManager);
 
         $this->logger = new TestLogger();
@@ -95,7 +104,7 @@ class MigratorTest extends MigrationTestCase
         $stopwatch      = new Stopwatch();
         $paramFormatter = $this->createMock(ParameterFormatter::class);
         $storage        = $this->createMock(MetadataStorage::class);
-        $schemaDiff     = $this->createMock(SchemaDiffProvider::class);
+        $schemaDiff   ??= $this->createMock(SchemaDiffProvider::class);
 
         return new DbalMigrator(
             $this->conn,
@@ -141,9 +150,6 @@ class MigratorTest extends MigrationTestCase
 
     public function testMigrateAllOrNothingRollback(): void
     {
-        $this->expectException(Throwable::class);
-        $this->expectExceptionMessage('Migration up throws exception.');
-
         $this->conn
             ->expects(self::exactly(2))
             ->method('beginTransaction');
@@ -164,7 +170,55 @@ class MigratorTest extends MigrationTestCase
         $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
         $planList  = new MigrationPlanList([$plan], Direction::UP);
 
+        $this->expectException(Throwable::class);
+        $this->expectExceptionMessage('Migration up throws exception.');
+
         $migrator->migrate($planList, $this->migratorConfiguration);
+    }
+
+    public function testMigrateAllOrNothingKeepsTheOriginalErrorWhenTheRollbackFails(): void
+    {
+        // ONLY THE SECOND ROLLBACK FAILS. Two sites roll back under all-or-nothing: the executor's
+        // per-migration one and this class's outer one. Making every call throw would exercise the
+        // executor instead, so the failure is aimed at the outer rollback specifically.
+        $rollbacks = 0;
+        $this->conn
+            ->method('rollback')
+            ->willReturnCallback(static function () use (&$rollbacks): bool {
+                $rollbacks++;
+
+                if ($rollbacks === 2) {
+                    // What MySQL answers once a DDL statement's implicit commit has destroyed the
+                    // savepoint. The code under test cannot tell why the rollback failed, only that
+                    // it did while another exception was already in flight.
+                    throw new RuntimeException('SAVEPOINT DOCTRINE_2 does not exist');
+                }
+
+                return true;
+            });
+
+        $migrator = $this->createTestMigrator();
+
+        $this->migratorConfiguration->setAllOrNothing(true);
+
+        $migration = new MigrationThrowsError($this->conn, $this->logger);
+        $plan      = new MigrationPlan(new Version(MigrationThrowsError::class), $migration, Direction::UP);
+        $planList  = new MigrationPlanList([$plan], Direction::UP);
+
+        try {
+            $migrator->migrate($planList, $this->migratorConfiguration);
+
+            self::fail('the failing rollback should have propagated');
+        } catch (Throwable $e) {
+            // The migration's own error must survive: the rollback failure is what propagates, and
+            // the error that stopped the migration is reachable from it as the previous exception.
+            self::assertSame('SAVEPOINT DOCTRINE_2 does not exist', $e->getMessage());
+
+            $previous = $e->getPrevious();
+
+            self::assertNotNull($previous, 'the migration error must be chained onto the rollback failure');
+            self::assertSame('Migration up throws exception.', $previous->getMessage());
+        }
     }
 
     public function testMigrateAllOrNothingNonTransactionalMigration(): void
@@ -183,5 +237,84 @@ class MigratorTest extends MigrationTestCase
         self::expectExceptionMessage(MigrationNonTransactional::class);
 
         $migrator->migrate($planList, $this->migratorConfiguration);
+    }
+
+    public function testToSchemaIsReleasedAfterEachMigrationWhenNotInDryRun(): void
+    {
+        $listener     = new class {
+            /** @var array<string, Schema|null> */
+            public array $toSchemas = [];
+
+            public function onMigrationsVersionExecuted(MigrationsVersionEventArgs $args): void
+            {
+                $plan = $args->getPlan();
+
+                $this->toSchemas[(string) $plan->getVersion()] = $plan->getResult()?->getToSchema();
+            }
+        };
+        $eventManager = new EventManager();
+        $eventManager->addEventListener(Events::onMigrationsVersionExecuted, $listener);
+
+        $migrator = $this->createTestMigrator($eventManager);
+
+        $plans = [
+            new MigrationPlan(new Version('A'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+            new MigrationPlan(new Version('B'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+        ];
+
+        $migrator->migrate(new MigrationPlanList($plans, Direction::UP), $this->migratorConfiguration);
+
+        self::assertSame(['A', 'B'], array_keys($listener->toSchemas));
+        self::assertContainsOnlyInstancesOf(Schema::class, $listener->toSchemas, 'toSchema should be available to listeners');
+        self::assertNull($this->migratorConfiguration->getFromSchema());
+
+        foreach ($plans as $plan) {
+            $result = $plan->getResult();
+            self::assertNotNull($result);
+            self::assertFalse($this->hasToSchema($result->getToSchema(...)), 'toSchema should be released after execution');
+        }
+    }
+
+    public function testToSchemaIsChainedToTheNextMigrationInDryRun(): void
+    {
+        $schemaDiff = $this->createMock(SchemaDiffProvider::class);
+        $schemaDiff->expects(self::once())
+            ->method('createFromSchema')
+            ->willReturn(new Schema());
+        $schemaDiff->method('createToSchema')
+            ->willReturnCallback(static fn (Schema $fromSchema): Schema => clone $fromSchema);
+        $schemaDiff->method('getSqlDiffToMigrate')
+            ->willReturn([]);
+
+        $migrator = $this->createTestMigrator(schemaDiff: $schemaDiff);
+
+        $this->migratorConfiguration->setDryRun(true);
+
+        $plans = [
+            new MigrationPlan(new Version('A'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+            new MigrationPlan(new Version('B'), new MigrateNotTouchingTheSchema($this->conn, $this->logger), Direction::UP),
+        ];
+
+        $migrator->migrate(new MigrationPlanList($plans, Direction::UP), $this->migratorConfiguration);
+
+        self::assertInstanceOf(Schema::class, $this->migratorConfiguration->getFromSchema());
+
+        foreach ($plans as $plan) {
+            $result = $plan->getResult();
+            self::assertNotNull($result);
+            self::assertFalse($this->hasToSchema($result->getToSchema(...)), 'toSchema should be released after execution');
+        }
+    }
+
+    /** @param callable(): Schema $getToSchema */
+    private function hasToSchema(callable $getToSchema): bool
+    {
+        try {
+            $getToSchema();
+
+            return true;
+        } catch (RuntimeException) {
+            return false;
+        }
     }
 }

@@ -19,17 +19,21 @@ class ExecutedMigrationSetTest extends TestCase
 {
     public function testFirstWhenEmpty(): void
     {
+        $set = new ExecutedMigrationsList([]);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (first).');
-        $set = new ExecutedMigrationsList([]);
+
         $set->getFirst();
     }
 
     public function testLastWhenEmpty(): void
     {
+        $set = new ExecutedMigrationsList([]);
+
         $this->expectException(NoMigrationsFoundWithCriteria::class);
         $this->expectExceptionMessage('Could not find any migrations matching your criteria (last).');
-        $set = new ExecutedMigrationsList([]);
+
         $set->getLast();
     }
 
@@ -87,12 +91,14 @@ class ExecutedMigrationSetTest extends TestCase
 
     public function testGetMigrationThrowsExceptionIfNotExisting(): void
     {
-        $this->expectException(MigrationNotExecuted::class);
         $m1 = new ExecutedMigration(new Version('A'));
         $m2 = new ExecutedMigration(new Version('B'));
         $m3 = new ExecutedMigration(new Version('C'));
 
         $set = new ExecutedMigrationsList([$m1, $m2, $m3]);
+
+        $this->expectException(MigrationNotExecuted::class);
+
         $set->getMigration(new Version('D'));
     }
 
@@ -132,7 +138,7 @@ class ExecutedMigrationSetTest extends TestCase
         $m3          = new ExecutedMigration(new Version('C'));
         $executedSet = new ExecutedMigrationsList([$m1, $m2, $m3]);
 
-        $abstractMigration = $this->createMock(AbstractMigration::class);
+        $abstractMigration = self::createStub(AbstractMigration::class);
         $availableSet      = new AvailableMigrationsList([
             new AvailableMigration(new Version('A'), $abstractMigration),
             new AvailableMigration(new Version('C'), $abstractMigration),

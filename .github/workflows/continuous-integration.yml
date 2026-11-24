@@ -48,7 +48,7 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v7"
 
       - name: "Install PHP"
         uses: "shivammathur/setup-php@v2"
@@ -66,7 +66,7 @@ jobs:
         run: "composer config minimum-stability dev"
 
       - name: "Install dependencies with Composer"
-        uses: "ramsey/composer-install@v3"
+        uses: "ramsey/composer-install@v4"
         with:
           dependency-versions: "${{ matrix.dependencies }}"
           composer-options: "--ignore-platform-req=php+"
@@ -75,7 +75,7 @@ jobs:
         run: "vendor/bin/phpunit --coverage-clover=coverage.xml"
 
       - name: "Upload coverage file"
-        uses: "actions/upload-artifact@v5"
+        uses: "actions/upload-artifact@v7"
         with:
           name: "phpunit-${{ matrix.dependencies }}-${{ matrix.stability }}-${{ matrix.php-version }}.coverage"
           path: "coverage.xml"
@@ -88,17 +88,17 @@ jobs:
 
     steps:
       - name: "Checkout"
-        uses: "actions/checkout@v5"
+        uses: "actions/checkout@v7"
         with:
           fetch-depth: 2
 
       - name: "Download coverage files"
-        uses: "actions/download-artifact@v6"
+        uses: "actions/download-artifact@v8"
         with:
           path: "reports"
 
       - name: "Upload to Codecov"
-        uses: "codecov/codecov-action@v5"
+        uses: "codecov/codecov-action@v7"
         with:
           directory: reports
         env:

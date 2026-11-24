@@ -8,14 +8,14 @@ use Doctrine\DBAL\Connection;
 use Doctrine\Deprecations\PHPUnit\VerifyDeprecations;
 use Doctrine\Migrations\Tools\TransactionHelper;
 use PDO;
-use PHPUnit\Framework\Attributes\WithoutErrorHandler;
+use PHPUnit\Framework\Attributes\IgnoreDeprecations;
 use PHPUnit\Framework\TestCase;
 
 final class TransactionHelperTest extends TestCase
 {
     use VerifyDeprecations;
 
-    #[WithoutErrorHandler]
+    #[IgnoreDeprecations]
     public function testItTriggersADeprecationWhenUseful(): void
     {
         $connection        = self::createStub(Connection::class);
