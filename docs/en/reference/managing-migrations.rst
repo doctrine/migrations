@@ -7,36 +7,40 @@ have the option to write the SQL for a migration to a file instead of executing 
 Status
 ------
 
-Now that we have a new migration created, run the ``status`` command with the ``--show-versions`` option to see
+Now that we have a new migration created, run the ``status`` command to see
 that the new migration is registered and ready to be executed:
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations status --show-versions
+    $ ./vendor/bin/doctrine-migrations status
 
-     == Configuration
+    +----------------------------------------------------------------------------------------------------------------------+
+    | Configuration                                                                                                        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
+    | Storage              | Type                 | Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration |
+    |                      | Table Name           | doctrine_migration_versions                                            |
+    |                      | Column Name          | version                                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Database             | Driver               | Doctrine\DBAL\Driver\PDO\MySQL\Driver                                  |
+    |                      | Name                 | migrations_docs_example                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Versions             | Previous             | Already at first version                                               |
+    |                      | Current              | 0                                                                      |
+    |                      | Next                 | MyProject\Migrations\Version20180601193057                             |
+    |                      | Latest               | MyProject\Migrations\Version20180601193057                             |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migrations           | Executed             | 0                                                                      |
+    |                      | Executed Unavailable | 0                                                                      |
+    |                      | Available            | 1                                                                      |
+    |                      | New                  | 1                                                                      |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migration Namespaces | MyProject\Migrations | /data/doctrine/migrations-docs-example/lib/MyProject/Migrations        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
 
-        >> Name:                                               My Project Migrations
-        >> Database Driver:                                    pdo_mysql
-        >> Database Host:                                      localhost
-        >> Database Name:                                      migrations_docs_example
-        >> Configuration Source:                               /data/doctrine/migrations-docs-example/migrations.php
-        >> Version Table Name:                                 doctrine_migration_versions
-        >> Version Column Name:                                version
-        >> Migrations Namespace:                               MyProject\Migrations
-        >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
-        >> Previous Version:                                   Already at first version
-        >> Current Version:                                    0
-        >> Next Version:                                       2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Executed Migrations:                                0
-        >> Executed Unavailable Migrations:                    0
-        >> Available Migrations:                               1
-        >> New Migrations:                                     1
+.. note::
 
-     == Available Migration Versions
-
-        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                not migrated     This is my example migration.
+    To display a list of all available migration versions along with their status and description, run the
+    ``migrations:list`` (or ``list-migrations``) command.
 
 As you can see we have a new migration version available and it is ready to be executed. The problem
 is, it does not have anything in it so nothing would be executed! Let's add some code to it and add a new table:
@@ -181,31 +185,30 @@ By checking the status again after using either method you will see everything i
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations status --show-versions
+    $ ./vendor/bin/doctrine-migrations status
 
-     == Configuration
-
-        >> Name:                                               My Project Migrations
-        >> Database Driver:                                    pdo_mysql
-        >> Database Host:                                      localhost
-        >> Database Name:                                      migrations_docs_example
-        >> Configuration Source:                               /data/doctrine/migrations-docs-example/migrations.php
-        >> Version Table Name:                                 doctrine_migration_versions
-        >> Version Column Name:                                version
-        >> Migrations Namespace:                               MyProject\Migrations
-        >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
-        >> Previous Version:                                   0
-        >> Current Version:                                    2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Next Version:                                       Already at latest version
-        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Executed Migrations:                                1
-        >> Executed Unavailable Migrations:                    0
-        >> Available Migrations:                               1
-        >> New Migrations:                                     0
-
-     == Available Migration Versions
-
-        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                migrated (executed at 2018-06-01 17:08:44)     This is my example migration.
+    +----------------------------------------------------------------------------------------------------------------------+
+    | Configuration                                                                                                        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
+    | Storage              | Type                 | Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration |
+    |                      | Table Name           | doctrine_migration_versions                                            |
+    |                      | Column Name          | version                                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Database             | Driver               | Doctrine\DBAL\Driver\PDO\MySQL\Driver                                  |
+    |                      | Name                 | migrations_docs_example                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Versions             | Previous             | 0                                                                      |
+    |                      | Current              | MyProject\Migrations\Version20180601193057                             |
+    |                      | Next                 | Already at latest version                                              |
+    |                      | Latest               | MyProject\Migrations\Version20180601193057                             |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migrations           | Executed             | 1                                                                      |
+    |                      | Executed Unavailable | 0                                                                      |
+    |                      | Available            | 1                                                                      |
+    |                      | New                  | 0                                                                      |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migration Namespaces | MyProject\Migrations | /data/doctrine/migrations-docs-example/lib/MyProject/Migrations        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
 
 Reverting Migrations
 --------------------
@@ -241,31 +244,30 @@ Now if you run the ``status`` command again, you will see that the database is b
 
 .. code-block:: sh
 
-    $ ./vendor/bin/doctrine-migrations status --show-versions
+    $ ./vendor/bin/doctrine-migrations status
 
-     == Configuration
-
-        >> Name:                                               My Project Migrations
-        >> Database Driver:                                    pdo_mysql
-        >> Database Host:                                      localhost
-        >> Database Name:                                      migrations_docs_example
-        >> Configuration Source:                               /data/doctrine/migrations-docs-example/migrations.php
-        >> Version Table Name:                                 doctrine_migration_versions
-        >> Version Column Name:                                version
-        >> Migrations Namespace:                               MyProject\Migrations
-        >> Migrations Directory:                               /data/doctrine/migrations-docs-example/lib/MyProject/Migrations
-        >> Previous Version:                                   Already at first version
-        >> Current Version:                                    0
-        >> Next Version:                                       2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Latest Version:                                     2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)
-        >> Executed Migrations:                                0
-        >> Executed Unavailable Migrations:                    0
-        >> Available Migrations:                               1
-        >> New Migrations:                                     1
-
-     == Available Migration Versions
-
-        >> 2018-06-01 19:30:57 (MyProject\Migrations\Version20180601193057)                not migrated     This is my example migration.
+    +----------------------------------------------------------------------------------------------------------------------+
+    | Configuration                                                                                                        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
+    | Storage              | Type                 | Doctrine\Migrations\Metadata\Storage\TableMetadataStorageConfiguration |
+    |                      | Table Name           | doctrine_migration_versions                                            |
+    |                      | Column Name          | version                                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Database             | Driver               | Doctrine\DBAL\Driver\PDO\MySQL\Driver                                  |
+    |                      | Name                 | migrations_docs_example                                                |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Versions             | Previous             | Already at first version                                               |
+    |                      | Current              | 0                                                                      |
+    |                      | Next                 | MyProject\Migrations\Version20180601193057                             |
+    |                      | Latest               | MyProject\Migrations\Version20180601193057                             |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migrations           | Executed             | 0                                                                      |
+    |                      | Executed Unavailable | 0                                                                      |
+    |                      | Available            | 1                                                                      |
+    |                      | New                  | 1                                                                      |
+    |----------------------------------------------------------------------------------------------------------------------|
+    | Migration Namespaces | MyProject\Migrations | /data/doctrine/migrations-docs-example/lib/MyProject/Migrations        |
+    +----------------------+----------------------+------------------------------------------------------------------------+
 
 Version Aliases
 ---------------

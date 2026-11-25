@@ -82,7 +82,7 @@ getDescription
 ~~~~~~~~~~~~~~
 
 Override this method if you want to provide a description for your migration. The value returned here
-will get outputted when you run the ``./vendor/bin/doctrine-migrations status --show-versions`` command.
+will get outputted when you run the ``./vendor/bin/doctrine-migrations migrations:list`` command.
 
 .. code-block:: php
 
